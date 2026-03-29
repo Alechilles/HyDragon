@@ -1570,10 +1570,19 @@
                         "Type": "CombatActionEvaluator",
                         "TargetInRange": false
                       },
-                      "Actions": [
+                      "Instructions": [
                         {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE default out of range"
+                          "Continue": true,
+                          "Sensor": {
+                            "Type": "Any",
+                            "Once": true
+                          },
+                          "Actions": [
+                            {
+                              "Type": "TameworkDebugMessage",
+                              "Message": "Hydra CAE default out of range"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -1630,13 +1639,26 @@
                         "HitProbability": 1.0
                       },
                       "ActionsBlocking": true,
-                      "Actions": [
+                      "Instructions": [
                         {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE ranged out of range"
+                          "Continue": true,
+                          "Sensor": {
+                            "Type": "Any",
+                            "Once": true
+                          },
+                          "Actions": [
+                            {
+                              "Type": "TameworkDebugMessage",
+                              "Message": "Hydra CAE ranged out of range"
+                            }
+                          ]
                         },
                         {
-                          "Type": "CombatAbility"
+                          "Actions": [
+                            {
+                              "Type": "CombatAbility"
+                            }
+                          ]
                         }
                       ]
                     }
