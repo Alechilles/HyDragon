@@ -13,7 +13,7 @@
     "HearingRange": 20,
     "DropList": "Empty",
     "MaxSpeed": 9,
-    "CombatConfig": "CAE_Hydra",
+    "_CombatConfig": "CAE_Hydra",
     "UseCombatActionEvaluator": true,
     "Attack": "Root_NPC_Hydra_Attack",
     "AttackDistance": 3,
