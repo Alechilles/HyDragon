@@ -2012,6 +2012,10 @@
               },
               "Actions": [
                 {
+                  "Type": "TameworkDebugMessage",
+                  "Message": "Hydra combat message state"
+                },
+                {
                   "Type": "FlockBeacon",
                   "Message": "Flock_Attack",
                   "SendTargetSlot": "LockedTarget"
@@ -2065,6 +2069,18 @@
                     {
                       "Sensor": {
                         "Type": "CombatActionEvaluator",
+                        "TargetInRange": false
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugMessage",
+                          "Message": "Hydra CAE default out of range"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "CombatActionEvaluator",
                         "TargetInRange": true
                       },
                       "HeadMotion": {
@@ -2083,7 +2099,7 @@
                       "Actions": [
                         {
                           "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE default branch"
+                          "Message": "Hydra CAE default in range"
                         },
                         {
                           "Type": "CombatAbility"
