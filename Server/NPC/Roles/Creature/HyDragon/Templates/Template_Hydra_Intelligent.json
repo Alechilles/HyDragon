@@ -1566,6 +1566,7 @@
                       ]
                     },
                     {
+                      "Continue": true,
                       "Sensor": {
                         "Type": "CombatActionEvaluator",
                         "TargetInRange": false
@@ -1621,6 +1622,7 @@
                       ]
                     },
                     {
+                      "Continue": true,
                       "Sensor": {
                         "Type": "CombatActionEvaluator",
                         "TargetInRange": false
