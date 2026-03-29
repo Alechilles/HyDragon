@@ -1,0 +1,30 @@
+{
+  "Group": "Alechilles",
+  "Name": "HyDragon",
+  "Version": "0.0.1",
+  "Description": "HyDragon",
+  "Authors": [
+    {
+      "Name": "Alec (Alechilles)",
+      "Email": "",
+      "Url": "https://www.curseforge.com/members/alechilles/projects",
+      "Discord": "alechilles"
+    }
+  ],
+  "Website": "",
+  "ServerVersion": "2026.03.26-89796e57b",
+  "Dependencies": {
+    "Alechilles:Alec's Tamework!": "2.5.x"
+  },
+  "OptionalDependencies": {},
+  "LoadBefore": {},
+  "DisabledByDefault": false,
+  "IncludesAssetPack": true,
+  "SubPlugins": [],
+  "UpdateChecker": {
+    "CurseForge": ""
+  }
+}
+
+
+

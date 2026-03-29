@@ -1,0 +1,11 @@
+{
+  "Interactions": [
+    "Hydra_Ice_Ball"
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  },
+  "RequireNewClick": false
+}

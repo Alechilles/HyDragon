@@ -1,0 +1,41 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Hydra_Default",
+    "ItemAnimationId": "SwipeRight"
+  },
+  "RunTime": 0.379,
+  "Next": {
+    "Type": "Selector",
+    "RunTime": 0.152,
+    "Selector": {
+      "Id": "Horizontal",
+      "Direction": "ToRight",
+      "TestLineOfSight": true,
+      "ExtendTop": 0.5,
+      "ExtendBottom": 0.5,
+      "StartDistance": 1,
+      "EndDistance": 4,
+      "Length": 120,
+      "RollOffset": -15,
+      "YawStartOffset": -90
+    },
+    "HitEntity": {
+      "Interactions": [
+        {
+          "Type": "Replace",
+          "Var": "Swipe_Right_Damage",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Swipe_Right_Damage"
+            ]
+          }
+        }
+      ]
+    },
+    "Next": {
+      "Type": "Simple",
+      "RunTime": 0.53
+    }
+  }
+}

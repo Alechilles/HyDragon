@@ -1,0 +1,19 @@
+{
+  "Interactions": [
+    {
+      "Type": "Chaining",
+      "ChainId": "HydraAttacks",
+      "ChainingAllowance": 15,
+      "Next": [
+        "Hydra_Swipe_Left",
+        "Hydra_Swipe_Right",
+        "Hydra_Stomp"
+      ]
+    }
+  ],
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  }
+}

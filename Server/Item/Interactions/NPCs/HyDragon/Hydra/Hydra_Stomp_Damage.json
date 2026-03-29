@@ -1,0 +1,24 @@
+{
+  "Parent": "DamageEntityParent",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Physical": 5
+    }
+  },
+  "DamageEffects": {
+    "Knockback": {
+      "Force": 0.2,
+      "RelativeX": 0,
+      "RelativeZ": -2,
+      "VelocityY": 15,
+      "VelocityType": "Set"
+    },
+    "WorldSoundEventId": "SFX_Bone_Hit",
+    "LocalSoundEventId": "SFX_Bone_Hit",
+    "WorldParticles": [
+      {
+        "SystemId": "Impact_Sword_Basic"
+      }
+    ]
+  }
+}

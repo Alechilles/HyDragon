@@ -1,0 +1,127 @@
+{
+  "Type": "CombatActionEvaluator",
+  "TargetMemoryDuration": 5,
+  "CombatActionEvaluator": {
+    "RunConditions": [
+      {
+        "Type": "TimeSinceLastUsed",
+        "Curve": {
+          "ResponseCurve": "Linear",
+          "XRange": [
+            0,
+            5
+          ]
+        }
+      },
+      {
+        "Type": "Randomiser",
+        "MinValue": 0.9,
+        "MaxValue": 1
+      }
+    ],
+    "MinRunUtility": 0.5,
+    "MinActionUtility": 0.01,
+    "AvailableActions": {
+      "Melee": {
+        "Type": "Ability",
+        "Description": "Switch to melee attacks",
+        "SubState": "Default",
+        "Ability": "Root_NPC_Hydra_Attack",
+        "Target": "Hostile",
+        "AttackDistanceRange": [
+          3,
+          3
+        ],
+        "PostExecuteDistanceRange": [
+          3,
+          3
+        ],
+        "Conditions": [
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "ResponseCurve": "Linear",
+              "XRange": [
+                0,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      "Ranged": {
+        "Type": "Ability",
+        "Description": "Switch to ranged attack",
+        "SubState": "Ranged",
+        "Ability": "Root_NPC_Hydra_Ice_Ball",
+        "Target": "Hostile",
+        "AttackDistanceRange": [
+          15,
+          15
+        ],
+        "PostExecuteDistanceRange": [
+          3,
+          3
+        ],
+        "Conditions": [
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "ResponseCurve": "Linear",
+              "XRange": [
+                0,
+                2
+              ]
+            }
+          },
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleLogistic",
+              "XRange": [
+                0,
+                20
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ActionSets": {
+      "Default": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_Hydra_Attack"
+          ],
+          "Randomise": false,
+          "MaxRange": 3,
+          "Timeout": 0.5,
+          "CooldownRange": [
+            0.001,
+            0.001
+          ]
+        },
+        "Actions": [
+          "Ranged"
+        ]
+      },
+      "Ranged": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_Hydra_Ice_Ball"
+          ],
+          "Randomise": false,
+          "MaxRange": 20,
+          "Timeout": 0.5,
+          "CooldownRange": [
+            0.8,
+            2
+          ]
+        },
+        "Actions": [
+          "Melee"
+        ]
+      }
+    }
+  }
+}

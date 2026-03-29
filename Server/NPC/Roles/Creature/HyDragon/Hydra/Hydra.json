@@ -1,0 +1,109 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_HyDragon",
+  "Modify": {
+    "Appearance": "Hydra",
+    "FlockArray": [
+      "Hydra"
+    ],
+    "AttitudeGroup": "PredatorsBig",
+    "WanderRadius": 8,
+    "ViewRange": 24,
+    "FleeRange": 15,
+    "HearingRange": 20,
+    "DropList": "Empty",
+    "MaxSpeed": 9,
+    "CombatConfig": "CAE_Hydra",
+    "UseCombatActionEvaluator": true,
+    "Attack": "Root_NPC_Hydra_Attack",
+    "AttackDistance": 3,
+    "RangedAttack": "Root_NPC_Hydra_Ice_Ball",
+    "RangedAttackDistance": 20,
+    "RangedAttackMinimumDistance": 10,
+    "TargetRange": 3,
+    "CombatBehaviorDistance": 6,
+    "CombatAlwaysMovingWeight": 1000,
+    "CombatBackwardsRelativeSpeed": 0.4,
+    "RunThreshold": 0.1,
+    "KnockbackScale": 0.1,
+    "ClimbHeight": 2,
+    "MinJumpHeight": 1.5,
+    "AscentAnimationType": "Walk",
+    "ClimbSpeedMult": 1,
+    "ClimbSpeedPow": 1,
+    "ClimbSpeedConst": 5,
+    "DescendSpeedCompensation": 1,
+    "DescendFlatness": 0.9,
+    "DescentSteepness": 0.9,
+    "DescentBlending": 1.5,
+    "LeashDistance": 60,
+    "HardLeashDistance": 100,
+    "LeashMinPlayerDistance": 15,
+    "LeashTimer": [
+      12,
+      16
+    ],
+    "AlwaysSleepAtNight": false,
+    "MaxHealth": 400,
+    "IsMemory": true,
+    "MemoriesCategory": "Reptile",
+    "MemoriesNameOverride": "Hydra",
+    "BreathesInWater": false,
+    "_InteractionVars": {
+      "Swipe_Left_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Swipe_Left_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Swipe_Right_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Swipe_Right_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Stomp_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Stomp_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      }
+    },
+    "IsTameable": false,
+    "TameRoleChange": "",
+    "InteractionConfigId": "",
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Hydra.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}
