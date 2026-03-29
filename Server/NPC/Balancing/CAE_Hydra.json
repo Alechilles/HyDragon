@@ -20,88 +20,60 @@
       }
     ],
     "MinRunUtility": 0.5,
-    "MinActionUtility": 0.0,
+    "MinActionUtility": 0.01,
     "AvailableActions": {
-      "SelectTargetMelee": {
-        "Type": "SelectBasicAttackTarget",
-        "Description": "Seed close-range basic attack targeting",
-        "Conditions": [
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [
-                0,
-                12
-              ]
-            }
-          }
-        ]
-      },
-      "SelectTargetRanged": {
-        "Type": "SelectBasicAttackTarget",
-        "Description": "Seed ranged basic attack targeting",
-        "Conditions": [
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [
-                0,
-                28
-              ]
-            }
-          }
-        ]
-      },
       "Melee": {
-        "Type": "State",
-        "Description": "Switch to melee attacks",
-        "State": "Combat",
+        "Type": "Ability",
+        "Description": "Quick change to melee state using an ability",
+        "WeaponSlot": 0,
         "SubState": "Default",
+        "Ability": "Root_NPC_Hydra_Attack",
         "Target": "Hostile",
-        "PostExecuteDistanceRange": [
-          7,
+        "AttackDistanceRange": [
+          8,
           8
         ],
-        "WeightCoefficient": 1.25,
+        "PostExecuteDistanceRange": [
+          8,
+          8
+        ],
         "Conditions": [
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [
-                0,
-                24
-              ]
-            }
-          },
           {
             "Type": "TimeSinceLastUsed",
             "Curve": {
-              "Type": "Switch",
-              "SwitchPoint": 1
+              "ResponseCurve": "Linear",
+              "XRange": [
+                0,
+                1
+              ]
             }
           }
         ]
       },
       "Ranged": {
-        "Type": "State",
-        "Description": "Switch to ranged attack",
-        "State": "Combat",
+        "Type": "Ability",
+        "Description": "Switch to ranged state using an ability",
+        "WeaponSlot": 0,
         "SubState": "Ranged",
+        "Ability": "Root_NPC_Hydra_Ice_Ball",
         "Target": "Hostile",
-        "PostExecuteDistanceRange": [
-          14,
-          20
+        "AttackDistanceRange": [
+          15,
+          15
         ],
-        "WeightCoefficient": 1.75,
+        "PostExecuteDistanceRange": [
+          2.5,
+          2.5
+        ],
         "Conditions": [
           {
             "Type": "TimeSinceLastUsed",
             "Curve": {
-              "Type": "Switch",
-              "SwitchPoint": 1
+              "ResponseCurve": "Linear",
+              "XRange": [
+                0,
+                2
+              ]
             }
           },
           {
@@ -109,8 +81,8 @@
             "Curve": {
               "ResponseCurve": "SimpleLogistic",
               "XRange": [
-                6,
-                30
+                0,
+                15
               ]
             }
           }
@@ -133,7 +105,6 @@
           ]
         },
         "Actions": [
-          "SelectTargetMelee",
           "Ranged"
         ]
       },
@@ -152,7 +123,6 @@
           ]
         },
         "Actions": [
-          "SelectTargetRanged",
           "Melee"
         ]
       }
