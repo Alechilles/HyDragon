@@ -2067,8 +2067,13 @@
                   "Name": ".Default",
                   "Instructions": [
                     {
-                      "Type": "TameworkDebugMessage",
-                      "Message": "Hydra combat default state active"
+                      "Continue": true,
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugMessage",
+                          "Message": "Hydra combat default state active"
+                        }
+                      ]
                     },
                     {
                       "Sensor": {
@@ -2139,8 +2144,13 @@
                   },
                   "Instructions": [
                     {
-                      "Type": "TameworkDebugMessage",
-                      "Message": "Hydra combat ranged state active"
+                      "Continue": true,
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugMessage",
+                          "Message": "Hydra combat ranged state active"
+                        }
+                      ]
                     },
                     {
                       "Sensor": {
