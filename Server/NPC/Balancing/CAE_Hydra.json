@@ -20,7 +20,7 @@
       }
     ],
     "MinRunUtility": 0.5,
-    "MinActionUtility": 0.01,
+    "MinActionUtility": 0.0,
     "AvailableActions": {
       "Melee": {
         "Type": "State",
@@ -29,8 +29,8 @@
         "SubState": "Default",
         "Target": "Hostile",
         "PostExecuteDistanceRange": [
-          3,
-          3
+          7,
+          8
         ],
         "WeightCoefficient": 1.25,
         "Conditions": [
@@ -40,7 +40,7 @@
               "ResponseCurve": "SimpleDescendingLogistic",
               "XRange": [
                 0,
-                20
+                24
               ]
             }
           },
@@ -60,16 +60,16 @@
         "SubState": "Ranged",
         "Target": "Hostile",
         "PostExecuteDistanceRange": [
-          10,
+          14,
           20
         ],
-        "WeightCoefficient": 1.25,
+        "WeightCoefficient": 1.75,
         "Conditions": [
           {
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "Type": "Switch",
-              "SwitchPoint": 2
+              "SwitchPoint": 1
             }
           },
           {
@@ -77,8 +77,8 @@
             "Curve": {
               "ResponseCurve": "SimpleLogistic",
               "XRange": [
-                0,
-                20
+                6,
+                30
               ]
             }
           }
@@ -93,7 +93,7 @@
           ],
           "Randomise": false,
           "UseProjectedDistance": true,
-          "MaxRange": 3,
+          "MaxRange": 8,
           "Timeout": 0.5,
           "CooldownRange": [
             0.001,
@@ -111,7 +111,7 @@
           ],
           "Randomise": false,
           "UseProjectedDistance": true,
-          "MaxRange": 20,
+          "MaxRange": 28,
           "Timeout": 0.5,
           "CooldownRange": [
             0.8,
