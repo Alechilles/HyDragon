@@ -22,9 +22,9 @@
     "MinRunUtility": 0.5,
     "MinActionUtility": 0.01,
     "AvailableActions": {
-      "SelectTargetMelee": {
+      "SelectTarget": {
         "Type": "SelectBasicAttackTarget",
-        "Description": "Seed melee target selection",
+        "Description": "Select a target for basic attacks",
         "Conditions": [
           {
             "Type": "TargetDistance",
@@ -33,94 +33,6 @@
               "XRange": [
                 0,
                 30
-              ]
-            }
-          }
-        ]
-      },
-      "SelectTargetRanged": {
-        "Type": "SelectBasicAttackTarget",
-        "Description": "Seed ranged target selection",
-        "Conditions": [
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [
-                0,
-                45
-              ]
-            }
-          }
-        ]
-      },
-      "Default": {
-        "Type": "State",
-        "Description": "Change to the Default state",
-        "State": "Combat",
-        "SubState": "Default",
-        "Target": "Hostile",
-        "PostExecuteDistanceRange": [
-          9,
-          11
-        ],
-        "WeightCoefficient": 1.25,
-        "Conditions": [
-          {
-            "Type": "Randomiser",
-            "MinValue": 0.9,
-            "MaxValue": 1
-          },
-          {
-            "Type": "TimeSinceLastUsed",
-            "Curve": {
-              "Type": "Switch",
-              "SwitchPoint": 10
-            }
-          },
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [
-                0,
-                25
-              ]
-            }
-          }
-        ]
-      },
-      "Ranged": {
-        "Type": "State",
-        "Description": "Change to the Ranged state",
-        "State": "Combat",
-        "SubState": "Ranged",
-        "Target": "Hostile",
-        "PostExecuteDistanceRange": [
-          12,
-          16
-        ],
-        "WeightCoefficient": 1.25,
-        "Conditions": [
-          {
-            "Type": "Randomiser",
-            "MinValue": 0.8,
-            "MaxValue": 1
-          },
-          {
-            "Type": "TimeSinceLastUsed",
-            "Curve": {
-              "Type": "Switch",
-              "SwitchPoint": 2
-            }
-          },
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleLogistic",
-              "XRange": [
-                6,
-                40
               ]
             }
           }
@@ -134,36 +46,16 @@
             "Root_NPC_Hydra_Attack"
           ],
           "Randomise": false,
-          "UseProjectedDistance": false,
+          "UseProjectedDistance": true,
           "MaxRange": 20,
           "Timeout": 0.5,
           "CooldownRange": [
             0.001,
-            0.001
+            0.2
           ]
         },
         "Actions": [
-          "SelectTargetRanged",
-          "Ranged"
-        ]
-      },
-      "Ranged": {
-        "BasicAttacks": {
-          "Attacks": [
-            "Root_NPC_Hydra_Ice_Ball"
-          ],
-          "Randomise": false,
-          "UseProjectedDistance": false,
-          "MaxRange": 35,
-          "Timeout": 0.5,
-          "CooldownRange": [
-            0.8,
-            2
-          ]
-        },
-        "Actions": [
-          "SelectTargetMelee",
-          "Default"
+          "SelectTarget"
         ]
       }
     }
