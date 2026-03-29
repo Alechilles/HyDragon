@@ -1438,6 +1438,18 @@
                           "Type": "CombatAbility"
                         }
                       ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "CombatActionEvaluator",
+                        "TargetInRange": false
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugMessage",
+                          "Message": "Hydra CAE default out of range"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -1480,6 +1492,10 @@
                       },
                       "ActionsBlocking": true,
                       "Actions": [
+                        {
+                          "Type": "TameworkDebugMessage",
+                          "Message": "Hydra CAE ranged out of range"
+                        },
                         {
                           "Type": "CombatAbility"
                         }

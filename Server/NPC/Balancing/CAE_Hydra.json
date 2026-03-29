@@ -38,6 +38,16 @@
         ],
         "Conditions": [
           {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                20
+              ]
+            }
+          },
+          {
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "ResponseCurve": "Linear",
@@ -94,6 +104,7 @@
             "Root_NPC_Hydra_Attack"
           ],
           "Randomise": false,
+          "UseProjectedDistance": true,
           "MaxRange": 3,
           "Timeout": 0.5,
           "CooldownRange": [
@@ -111,6 +122,7 @@
             "Root_NPC_Hydra_Ice_Ball"
           ],
           "Randomise": false,
+          "UseProjectedDistance": true,
           "MaxRange": 20,
           "Timeout": 0.5,
           "CooldownRange": [
