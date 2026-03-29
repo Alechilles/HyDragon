@@ -1539,30 +1539,6 @@
                           "Message": "Hydra CAE default out of range"
                         }
                       ]
-                    },
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Target",
-                        "TargetSlot": "LockedTarget",
-                        "Range": { "Compute": "AttackDistance" }
-                      },
-                      "HeadMotion": {
-                        "Type": "Aim",
-                        "HitProbability": 1.0
-                      },
-                      "ActionsBlocking": true,
-                      "Actions": [
-                        {
-                          "Type": "Attack",
-                          "Attack": { "Compute": "Attack" },
-                          "AttackPauseRange": { "Compute": "AttackPauseRange" }
-                        },
-                        {
-                          "Type": "Timeout",
-                          "Delay": [ 0.35, 0.55 ]
-                        }
-                      ]
                     }
                   ]
                 },

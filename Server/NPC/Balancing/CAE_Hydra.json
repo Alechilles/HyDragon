@@ -22,28 +22,17 @@
     "MinRunUtility": 0.5,
     "MinActionUtility": 0.01,
     "AvailableActions": {
-      "MeleeTest": {
-        "Type": "Ability",
-        "Description": "Force a permissive melee ability for CAE validation",
-        "Target": "Hostile",
-        "SubState": "Default",
-        "Ability": "Root_NPC_Hydra_Attack",
-        "AttackDistanceRange": [
-          0,
-          60
-        ],
-        "PostExecuteDistanceRange": [
-          8,
-          12
-        ],
+      "SelectTarget": {
+        "Type": "SelectBasicAttackTarget",
+        "Description": "Select a target for Hydra CAE basic attacks",
         "Conditions": [
           {
-            "Type": "TimeSinceLastUsed",
+            "Type": "TargetDistance",
             "Curve": {
-              "ResponseCurve": "Linear",
+              "ResponseCurve": "SimpleDescendingLogistic",
               "XRange": [
                 0,
-                1
+                30
               ]
             }
           }
@@ -54,19 +43,19 @@
       "Default": {
         "BasicAttacks": {
           "Attacks": [
-            "Root_NPC_Hydra_Attack"
+            "Root_NPC_Hydra_Melee_CAE"
           ],
           "Randomise": false,
-          "UseProjectedDistance": false,
-          "MaxRange": 20,
+          "UseProjectedDistance": true,
+          "MaxRange": 12,
           "Timeout": 0.5,
           "CooldownRange": [
             0.001,
-            0.2
+            0.001
           ]
         },
         "Actions": [
-          "MeleeTest"
+          "SelectTarget"
         ]
       }
     }
