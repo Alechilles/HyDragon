@@ -1,6 +1,6 @@
 {
   "Type": "CombatActionEvaluator",
-  "TargetMemoryDuration": 5,
+  "TargetMemoryDuration": 10,
   "CombatActionEvaluator": {
     "RunConditions": [
       {
@@ -15,65 +15,71 @@
       },
       {
         "Type": "Randomiser",
-        "MinValue": 0.9,
+        "MinValue": 0.75,
         "MaxValue": 1
       }
     ],
     "MinRunUtility": 0.5,
     "MinActionUtility": 0.01,
     "AvailableActions": {
-      "Melee": {
-        "Type": "Ability",
-        "Description": "Quick change to melee state using an ability",
-        "WeaponSlot": 0,
+      "Default": {
+        "Type": "State",
+        "Description": "Change to the Default state",
+        "State": "Combat",
         "SubState": "Default",
-        "Ability": "Root_NPC_Hydra_Attack",
         "Target": "Hostile",
-        "AttackDistanceRange": [
-          8,
-          8
-        ],
         "PostExecuteDistanceRange": [
-          8,
-          8
+          9,
+          11
         ],
+        "WeightCoefficient": 1.25,
         "Conditions": [
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.9,
+            "MaxValue": 1
+          },
           {
             "Type": "TimeSinceLastUsed",
             "Curve": {
-              "ResponseCurve": "Linear",
+              "Type": "Switch",
+              "SwitchPoint": 10
+            }
+          },
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
               "XRange": [
                 0,
-                1
+                18
               ]
             }
           }
         ]
       },
       "Ranged": {
-        "Type": "Ability",
-        "Description": "Switch to ranged state using an ability",
-        "WeaponSlot": 0,
+        "Type": "State",
+        "Description": "Change to the Ranged state",
+        "State": "Combat",
         "SubState": "Ranged",
-        "Ability": "Root_NPC_Hydra_Ice_Ball",
         "Target": "Hostile",
-        "AttackDistanceRange": [
-          15,
-          15
-        ],
         "PostExecuteDistanceRange": [
-          2.5,
-          2.5
+          12,
+          16
         ],
+        "WeightCoefficient": 1.25,
         "Conditions": [
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.8,
+            "MaxValue": 1
+          },
           {
             "Type": "TimeSinceLastUsed",
             "Curve": {
-              "ResponseCurve": "Linear",
-              "XRange": [
-                0,
-                2
-              ]
+              "Type": "Switch",
+              "SwitchPoint": 2
             }
           },
           {
@@ -81,8 +87,8 @@
             "Curve": {
               "ResponseCurve": "SimpleLogistic",
               "XRange": [
-                0,
-                15
+                8,
+                24
               ]
             }
           }
@@ -97,7 +103,7 @@
           ],
           "Randomise": false,
           "UseProjectedDistance": true,
-          "MaxRange": 8,
+          "MaxRange": 12,
           "Timeout": 0.5,
           "CooldownRange": [
             0.001,
@@ -123,7 +129,7 @@
           ]
         },
         "Actions": [
-          "Melee"
+          "Default"
         ]
       }
     }
