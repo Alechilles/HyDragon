@@ -22,6 +22,19 @@
     "MinRunUtility": 0.5,
     "MinActionUtility": 0.01,
     "AvailableActions": {
+      "SelectTarget": {
+        "Type": "SelectBasicAttackTarget",
+        "Description": "Select a basic attack target",
+        "Conditions": [
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 10
+            }
+          }
+        ]
+      },
       "Melee": {
         "Type": "Ability",
         "Description": "Switch to melee attacks",
@@ -113,6 +126,7 @@
           ]
         },
         "Actions": [
+          "SelectTarget",
           "Ranged"
         ]
       },
@@ -131,6 +145,7 @@
           ]
         },
         "Actions": [
+          "SelectTarget",
           "Melee"
         ]
       }

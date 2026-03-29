@@ -1363,6 +1363,19 @@
               },
               "Instructions": [
                 {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Any",
+                    "Once": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "TameworkDebugMessage",
+                      "Message": "Hydra CAE hostile context active"
+                    }
+                  ]
+                },
+                {
                   "$Comment": "Store the CAE target in the regular marked target slot so it works with the leash and chase components.",
                   "Continue": true,
                   "Sensor": {
@@ -1414,6 +1427,19 @@
                   },
                   "Instructions": [
                     {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugMessage",
+                          "Message": "Hydra CAE default state active"
+                        }
+                      ]
+                    },
+                    {
                       "Sensor": {
                         "Type": "CombatActionEvaluator",
                         "TargetInRange": true
@@ -1461,6 +1487,19 @@
                     "IgnoreMissingSetState": true
                   },
                   "Instructions": [
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugMessage",
+                          "Message": "Hydra CAE ranged state active"
+                        }
+                      ]
+                    },
                     {
                       "Sensor": {
                         "Type": "CombatActionEvaluator",
