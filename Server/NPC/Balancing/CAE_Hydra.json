@@ -22,6 +22,38 @@
     "MinRunUtility": 0.5,
     "MinActionUtility": 0.0,
     "AvailableActions": {
+      "SelectTargetMelee": {
+        "Type": "SelectBasicAttackTarget",
+        "Description": "Seed close-range basic attack targeting",
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                12
+              ]
+            }
+          }
+        ]
+      },
+      "SelectTargetRanged": {
+        "Type": "SelectBasicAttackTarget",
+        "Description": "Seed ranged basic attack targeting",
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                28
+              ]
+            }
+          }
+        ]
+      },
       "Melee": {
         "Type": "State",
         "Description": "Switch to melee attacks",
@@ -101,6 +133,7 @@
           ]
         },
         "Actions": [
+          "SelectTargetMelee",
           "Ranged"
         ]
       },
@@ -119,6 +152,7 @@
           ]
         },
         "Actions": [
+          "SelectTargetRanged",
           "Melee"
         ]
       }
