@@ -1438,44 +1438,6 @@
                   ]
                 },
                 {
-                  "$Comment": "Bootstrap the CAE target slot from the normal combat target so the evaluator sensors have a live target before CAE picks its own attack.",
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Target",
-                    "TargetSlot": "LockedTarget",
-                    "Range": { "Compute": "AlertedRange" }
-                  },
-                  "Actions": [
-                    {
-                      "Type": "SetMarkedTarget",
-                      "TargetSlot": "CAETargetSlot"
-                    }
-                  ]
-                },
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Target",
-                    "TargetSlot": "CAETargetSlot",
-                    "Range": { "Compute": "AlertedRange" }
-                  },
-                  "Instructions": [
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Any",
-                        "Once": true
-                      },
-                      "Actions": [
-                        {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE target slot present"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
                   "$Comment": "Store the CAE target in the regular marked target slot so it works with the leash and chase components.",
                   "Continue": true,
                   "Sensor": {
