@@ -52,7 +52,7 @@
               "ResponseCurve": "SimpleDescendingLogistic",
               "XRange": [
                 0,
-                18
+                25
               ]
             }
           }
@@ -87,8 +87,8 @@
             "Curve": {
               "ResponseCurve": "SimpleLogistic",
               "XRange": [
-                8,
-                24
+                6,
+                40
               ]
             }
           }
@@ -102,8 +102,8 @@
             "Root_NPC_Hydra_Attack"
           ],
           "Randomise": false,
-          "UseProjectedDistance": true,
-          "MaxRange": 12,
+          "UseProjectedDistance": false,
+          "MaxRange": 20,
           "Timeout": 0.5,
           "CooldownRange": [
             0.001,
@@ -120,8 +120,8 @@
             "Root_NPC_Hydra_Ice_Ball"
           ],
           "Randomise": false,
-          "UseProjectedDistance": true,
-          "MaxRange": 28,
+          "UseProjectedDistance": false,
+          "MaxRange": 35,
           "Timeout": 0.5,
           "CooldownRange": [
             0.8,
