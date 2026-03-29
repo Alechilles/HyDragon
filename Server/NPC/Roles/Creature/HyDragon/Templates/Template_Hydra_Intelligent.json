@@ -1438,6 +1438,21 @@
                   ]
                 },
                 {
+                  "$Comment": "Bootstrap the CAE target slot from the normal combat target so the evaluator sensors have a live target before CAE picks its own attack.",
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Target",
+                    "TargetSlot": "LockedTarget",
+                    "Range": { "Compute": "AlertedRange" }
+                  },
+                  "Actions": [
+                    {
+                      "Type": "SetMarkedTarget",
+                      "TargetSlot": "CAETargetSlot"
+                    }
+                  ]
+                },
+                {
                   "Continue": true,
                   "Sensor": {
                     "Type": "Target",
