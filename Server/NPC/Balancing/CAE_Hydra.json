@@ -56,12 +56,12 @@
         "Ability": "Root_NPC_Hydra_Ice_Ball",
         "Target": "Hostile",
         "AttackDistanceRange": [
-          15,
-          15
+          10,
+          20
         ],
         "PostExecuteDistanceRange": [
-          3,
-          3
+          10,
+          20
         ],
         "Conditions": [
           {

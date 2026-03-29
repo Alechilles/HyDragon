@@ -1,25 +1,29 @@
 {
   "Type": "Variant",
-  "Reference": "Template_HyDragon",
+  "Reference": "Template_Hydra_Intelligent",
   "Modify": {
     "Appearance": "Hydra",
+    "Weapons": [],
+    "DefaultHotbarSlot": -1,
+    "OffHand": [],
+    "NighttimeOffhandSlot": -1,
     "FlockArray": [
       "Hydra"
     ],
     "AttitudeGroup": "PredatorsBig",
     "WanderRadius": 8,
     "ViewRange": 24,
-    "FleeRange": 15,
     "HearingRange": 20,
     "DropList": "Empty",
     "MaxSpeed": 9,
     "_CombatConfig": "CAE_Hydra",
-    "UseCombatActionEvaluator": false,
+    "UseCombatActionEvaluator": true,
     "Attack": "Root_NPC_Hydra_Attack",
     "AttackDistance": 3,
-    "RangedAttack": "Root_NPC_Hydra_Ice_Ball",
-    "RangedAttackDistance": 20,
-    "RangedAttackMinimumDistance": 10,
+    "DesiredAttackDistanceRange": [
+      2.5,
+      2.5
+    ],
     "TargetRange": 3,
     "CombatBehaviorDistance": 6,
     "CombatAlwaysMovingWeight": 10,
@@ -43,7 +47,10 @@
       12,
       16
     ],
-    "AlwaysSleepAtNight": false,
+    "WakingPeriod": [
+      0,
+      24
+    ],
     "MaxHealth": 400,
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
@@ -93,9 +100,6 @@
         ]
       }
     },
-    "IsTameable": false,
-    "TameRoleChange": "",
-    "InteractionConfigId": "",
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"
     }

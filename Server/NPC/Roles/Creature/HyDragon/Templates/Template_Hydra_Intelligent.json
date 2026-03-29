@@ -1458,18 +1458,28 @@
                         "Type": "Aim",
                         "HitProbability": 1.0
                       },
-                      "BodyMotion": {
-                        "Type": "MaintainDistance",
-                        "DesiredDistanceRange": { "Compute": "DesiredAttackDistanceRange" },
-                        "MoveThreshold": 0.2,
-                        "RelativeForwardsSpeed": { "Compute": "CombatMovingRelativeSpeed" },
-                        "RelativeBackwardsSpeed": { "Compute": "CombatBackwardsRelativeSpeed" }
-                      },
+                      "ActionsBlocking": true,
                       "Actions": [
                         {
                           "Type": "TameworkDebugMessage",
                           "Message": "Hydra CAE ranged in range"
                         },
+                        {
+                          "Type": "CombatAbility"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "CombatActionEvaluator",
+                        "TargetInRange": false
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "HitProbability": 1.0
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
                         {
                           "Type": "CombatAbility"
                         }
