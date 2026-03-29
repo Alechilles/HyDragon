@@ -1323,8 +1323,19 @@
               },
               "Actions": [
                 {
-                  "Type": "TameworkDebugMessage",
-                  "Message": "Hydra combat entry"
+                  "Type": "TameworkDebugCombatSnapshot",
+                  "Message": "Hydra combat entry",
+                  "TargetSlots": [
+                    "LockedTarget",
+                    "CAETargetSlot",
+                    "MasterTarget"
+                  ],
+                  "NumberParams": [
+                    "AttackDistance",
+                    "CombatBehaviorDistance",
+                    "DesiredAttackDistanceRange",
+                    "CombatBackwardsRelativeSpeed"
+                  ]
                 },
                 {
                   "Type": "FlockBeacon",
@@ -1496,8 +1507,19 @@
                       },
                       "Actions": [
                         {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE default state active"
+                          "Type": "TameworkDebugCombatSnapshot",
+                          "Message": "Hydra CAE default state active",
+                          "TargetSlots": [
+                            "LockedTarget",
+                            "CAETargetSlot",
+                            "MasterTarget"
+                          ],
+                          "NumberParams": [
+                            "AttackDistance",
+                            "CombatBehaviorDistance",
+                            "DesiredAttackDistanceRange",
+                            "CombatBackwardsRelativeSpeed"
+                          ]
                         }
                       ]
                     },
