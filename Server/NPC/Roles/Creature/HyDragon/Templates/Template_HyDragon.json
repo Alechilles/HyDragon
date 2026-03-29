@@ -2058,7 +2058,81 @@
               "Enabled": {
                 "Compute": "UseCombatActionEvaluator"
               },
+              "Sensor": {
+                "Type": "Or",
+                "Sensors": [
+                  {
+                    "Reference": "Component_Sensor_Standard_Detection",
+                    "Modify": {
+                      "ViewRange": {
+                        "Compute": "ViewRange"
+                      },
+                      "ViewSector": {
+                        "Compute": "ViewSector"
+                      },
+                      "HearingRange": {
+                        "Compute": "HearingRange"
+                      },
+                      "AbsoluteDetectionRange": {
+                        "Compute": "AbsoluteDetectionRange"
+                      },
+                      "Attitudes": [
+                        "Hostile"
+                      ]
+                    }
+                  },
+                  {
+                    "Type": "HasHostileTargetMemory"
+                  }
+                ]
+              },
               "Instructions": [
+                {
+                  "Continue": true,
+                  "Actions": [
+                    {
+                      "Type": "TameworkDebugMessage",
+                      "Message": "Hydra CAE hostile target context active"
+                    }
+                  ]
+                },
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Or",
+                    "Sensors": [
+                      {
+                        "Type": "CombatActionEvaluator",
+                        "TargetInRange": true
+                      },
+                      {
+                        "Type": "CombatActionEvaluator",
+                        "TargetInRange": false
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "TameworkDebugMessage",
+                      "Message": "Hydra CAE target selected"
+                    },
+                    {
+                      "Type": "SetMarkedTarget"
+                    }
+                  ]
+                },
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Damage",
+                    "Combat": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "AddToHostileTargetMemory"
+                    }
+                  ]
+                },
                 {
                   "Sensor": {
                     "Type": "State",
