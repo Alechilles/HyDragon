@@ -1539,6 +1539,29 @@
                           "Message": "Hydra CAE default out of range"
                         }
                       ]
+                    },
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Target",
+                        "TargetSlot": "LockedTarget",
+                        "Range": { "Compute": "AttackDistance" }
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "HitProbability": 1.0
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugMessage",
+                          "Message": "Hydra fallback melee attack"
+                        },
+                        {
+                          "Type": "Attack",
+                          "Attack": { "Compute": "Attack" },
+                          "AttackPauseRange": { "Compute": "AttackPauseRange" }
+                        }
+                      ]
                     }
                   ]
                 },
