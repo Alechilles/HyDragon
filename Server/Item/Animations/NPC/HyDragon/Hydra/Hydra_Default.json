@@ -19,6 +19,11 @@
       "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Rainshoot.blockyanim",
       "Speed": 1,
       "Looping": false
+    },
+    "Bite": {
+      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Bite.blockyanim",
+      "Speed": 1,
+      "Looping": false
     }
   },
   "Camera": {
