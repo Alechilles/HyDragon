@@ -29,7 +29,7 @@
         "Conditions": [
           {
             "Type": "Randomiser",
-            "MinValue": 1,
+            "MinValue": 0.999,
             "MaxValue": 1
           }
         ]
