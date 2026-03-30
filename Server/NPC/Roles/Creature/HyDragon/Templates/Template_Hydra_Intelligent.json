@@ -1321,38 +1321,59 @@
                 "Type": "State",
                 "State": ".Message"
               },
-              "Actions": [
+              "Instructions": [
                 {
-                  "Type": "TameworkDebugCombatSnapshot",
-                  "Message": "Hydra combat entry",
-                  "TargetSlots": [
-                    "LockedTarget",
-                    "CAETargetSlot",
-                    "MasterTarget"
-                  ],
-                  "NumberParams": [
-                    "AttackDistance",
-                    "CombatBehaviorDistance",
-                    "DesiredAttackDistanceRange",
-                    "CombatBackwardsRelativeSpeed",
-                    "CAEMinRange",
-                    "CAEMaxRange",
-                    "CAEPositioningAngle"
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Target",
+                    "TargetSlot": "LockedTarget",
+                    "Range": { "Compute": "max(ViewRange, HearingRange)" }
+                  },
+                  "Actions": [
+                    {
+                      "Type": "AddToHostileTargetMemory"
+                    },
+                    {
+                      "Type": "TameworkDebugActionMessage",
+                      "Message": "Hydra message seeded hostile memory"
+                    }
                   ]
                 },
                 {
-                  "Type": "FlockBeacon",
-                  "Message": "Flock_Attack",
-                  "SendTargetSlot": "LockedTarget"
-                },
-                {
-                  "Type": "Beacon",
-                  "Message": "Under_Attack",
-                  "TargetGroups": { "Compute": "CombatMessageTargetGroups" }
-                },
-                {
-                  "Type": "State",
-                  "State": ".Default"
+                  "Actions": [
+                    {
+                      "Type": "TameworkDebugCombatSnapshot",
+                      "Message": "Hydra combat entry",
+                      "TargetSlots": [
+                        "LockedTarget",
+                        "CAETargetSlot",
+                        "MasterTarget"
+                      ],
+                      "NumberParams": [
+                        "AttackDistance",
+                        "CombatBehaviorDistance",
+                        "DesiredAttackDistanceRange",
+                        "CombatBackwardsRelativeSpeed",
+                        "CAEMinRange",
+                        "CAEMaxRange",
+                        "CAEPositioningAngle"
+                      ]
+                    },
+                    {
+                      "Type": "FlockBeacon",
+                      "Message": "Flock_Attack",
+                      "SendTargetSlot": "LockedTarget"
+                    },
+                    {
+                      "Type": "Beacon",
+                      "Message": "Under_Attack",
+                      "TargetGroups": { "Compute": "CombatMessageTargetGroups" }
+                    },
+                    {
+                      "Type": "State",
+                      "State": ".Default"
+                    }
+                  ]
                 }
               ]
             },
