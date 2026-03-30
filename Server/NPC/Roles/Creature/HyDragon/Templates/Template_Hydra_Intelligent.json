@@ -1445,6 +1445,18 @@
                           "Message": "Hydra locked target present"
                         }
                       ]
+                    },
+                    {
+                      "Continue": true,
+                      "Actions": [
+                        {
+                          "Type": "AddToHostileTargetMemory"
+                        },
+                        {
+                          "Type": "SetMarkedTarget",
+                          "TargetSlot": "CAETargetSlot"
+                        }
+                      ]
                     }
                   ]
                 },

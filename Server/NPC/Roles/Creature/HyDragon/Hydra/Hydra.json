@@ -18,10 +18,10 @@
     "_CombatConfig": "CAE_Hydra",
     "UseCombatActionEvaluator": true,
     "Attack": "Root_NPC_Hydra_Attack",
-    "AttackDistance": 12,
+    "AttackDistance": 3.5,
     "DesiredAttackDistanceRange": [
-      10,
-      12
+      2.5,
+      3.5
     ],
     "TargetRange": 12,
     "CombatBehaviorDistance": 18,

@@ -47,7 +47,7 @@
           ],
           "Randomise": false,
           "UseProjectedDistance": true,
-          "MaxRange": 12,
+          "MaxRange": 3.5,
           "Timeout": 0.5,
           "CooldownRange": [
             0.001,
