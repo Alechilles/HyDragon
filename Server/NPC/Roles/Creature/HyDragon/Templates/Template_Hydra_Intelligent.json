@@ -1334,7 +1334,7 @@
                       "Type": "AddToHostileTargetMemory"
                     },
                     {
-                      "Type": "TameworkDebugActionMessage",
+                      "Type": "TameworkDebugMessage",
                       "Message": "Hydra message seeded hostile memory"
                     }
                   ]
@@ -1394,7 +1394,7 @@
               },
               "Actions": [
                 {
-                  "Type": "TameworkDebugActionMessage",
+                  "Type": "TameworkDebugMessage",
                   "Message": "Hydra entered combat default"
                 }
               ]
