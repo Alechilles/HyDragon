@@ -12,10 +12,10 @@
       "Id": "Horizontal",
       "Direction": "ToLeft",
       "TestLineOfSight": true,
-      "ExtendTop": 0.5,
-      "ExtendBottom": 0.5,
+      "ExtendTop": 0.75,
+      "ExtendBottom": 0.75,
       "StartDistance": 1,
-      "EndDistance": 4,
+      "EndDistance": 4.75,
       "Length": 105,
       "RollOffset": 45,
       "YawStartOffset": -60
