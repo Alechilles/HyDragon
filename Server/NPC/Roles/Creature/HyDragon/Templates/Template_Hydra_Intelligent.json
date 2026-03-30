@@ -1377,6 +1377,20 @@
               },
               "Instructions": [
                 {
+                  "$Comment": "Seed hostile memory from the currently locked combat target so CAE has a target to evaluate immediately.",
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Target",
+                    "TargetSlot": "LockedTarget",
+                    "Range": { "Compute": "max(ViewRange, HearingRange)" }
+                  },
+                  "Actions": [
+                    {
+                      "Type": "AddToHostileTargetMemory"
+                    }
+                  ]
+                },
+                {
                   "$Comment": "Store the CAE target in the regular marked target slot so it works with the leash and chase components.",
                   "Continue": true,
                   "Sensor": {

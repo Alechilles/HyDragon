@@ -24,18 +24,8 @@
       "SelectTarget": {
         "Type": "SelectBasicAttackTarget",
         "Description": "Select melee target",
-        "Conditions": [
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [
-                0,
-                15
-              ]
-            }
-          }
-        ]
+        "WeaponSlot": 0,
+        "OffhandSlot": -1
       }
     },
     "MinActionUtility": 0.01,
