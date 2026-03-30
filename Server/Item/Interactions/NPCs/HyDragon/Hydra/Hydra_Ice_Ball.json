@@ -11,8 +11,8 @@
       }
     ]
   },
-  "$Comment": "Play the BasicShoot windup and charge particles together before releasing the projectile.",
-  "RunTime": 1,
+  "$Comment": "Play the full BasicShoot windup and charge particles together before releasing the projectile.",
+  "RunTime": 1.8,
   "Next": {
     "Type": "LaunchProjectile",
     "$Comment": "Release the projectile after the shared BasicShoot windup completes.",
