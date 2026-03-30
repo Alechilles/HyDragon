@@ -25,7 +25,14 @@
         "Type": "SelectBasicAttackTarget",
         "Description": "Select melee target",
         "WeaponSlot": 0,
-        "OffhandSlot": -1
+        "OffhandSlot": -1,
+        "Conditions": [
+          {
+            "Type": "Randomiser",
+            "MinValue": 1,
+            "MaxValue": 1
+          }
+        ]
       }
     },
     "MinActionUtility": 0.01,
