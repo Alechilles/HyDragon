@@ -1385,6 +1385,11 @@
                     }
                   },
                   {
+                    "Type": "Target",
+                    "TargetSlot": "LockedTarget",
+                    "Range": { "Compute": "max(ViewRange, HearingRange)" }
+                  },
+                  {
                     "Type": "HasHostileTargetMemory"
                   }
                 ]
