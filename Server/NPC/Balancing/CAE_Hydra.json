@@ -9,7 +9,7 @@
           "ResponseCurve": "Linear",
           "XRange": [
             0,
-            5
+            10
           ]
         }
       },
@@ -26,10 +26,13 @@
         "Description": "Select melee target",
         "Conditions": [
           {
-            "Type": "TimeSinceLastUsed",
+            "Type": "TargetDistance",
             "Curve": {
-              "Type": "Switch",
-              "SwitchPoint": 0.25
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                15
+              ]
             }
           }
         ]
@@ -43,11 +46,30 @@
             "Root_NPC_Hydra_Attack"
           ],
           "Randomise": false,
+          "UseProjectedDistance": true,
           "MaxRange": 3.5,
           "Timeout": 0.5,
           "CooldownRange": [
-            0.2,
-            0.6
+            0.001,
+            0.001
+          ]
+        },
+        "Actions": [
+          "SelectTarget"
+        ]
+      },
+      "Attack": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_Hydra_Attack"
+          ],
+          "Randomise": false,
+          "UseProjectedDistance": true,
+          "MaxRange": 3.5,
+          "Timeout": 0.5,
+          "CooldownRange": [
+            0.001,
+            0.3
           ]
         },
         "Actions": [

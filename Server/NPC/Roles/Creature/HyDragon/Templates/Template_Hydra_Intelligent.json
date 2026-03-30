@@ -1377,131 +1377,6 @@
               },
               "Instructions": [
                 {
-                  "Continue": true,
-                  "Sensor": {
-                    "Reference": "Component_Sensor_Standard_Detection",
-                    "Modify": {
-                      "ViewRange": { "Compute": "ViewRange" },
-                      "ViewSector": { "Compute": "ViewSector" },
-                      "HearingRange": { "Compute": "HearingRange" },
-                      "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
-                      "Attitudes": [ "Hostile" ]
-                    }
-                  },
-                  "Actions": [
-                    {
-                      "Type": "AddToHostileTargetMemory"
-                    }
-                  ]
-                },
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Any",
-                    "Once": true
-                  },
-                  "Actions": [
-                    {
-                      "Type": "TameworkDebugMessage",
-                      "Message": "Hydra CAE hostile context active"
-                    }
-                  ]
-                },
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "HasHostileTargetMemory"
-                  },
-                  "Instructions": [
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Any",
-                        "Once": true
-                      },
-                      "Actions": [
-                        {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra hostile memory present"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Target",
-                    "TargetSlot": "LockedTarget",
-                    "Range": { "Compute": "AlertedRange" }
-                  },
-                  "Instructions": [
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Any",
-                        "Once": true
-                      },
-                      "Actions": [
-                        {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra locked target present"
-                        }
-                      ]
-                    },
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Target",
-                        "TargetSlot": "LockedTarget",
-                        "Range": { "Compute": "AlertedRange" }
-                      },
-                      "Actions": [
-                        {
-                          "Type": "AddToHostileTargetMemory"
-                        }
-                      ]
-                    },
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Target",
-                        "TargetSlot": "LockedTarget",
-                        "Range": { "Compute": "AlertedRange" }
-                      },
-                      "Actions": [
-                        {
-                          "Type": "SetMarkedTarget",
-                          "TargetSlot": "CAETargetSlot"
-                        }
-                      ]
-                    },
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Target",
-                        "TargetSlot": "CAETargetSlot",
-                        "Range": { "Compute": "AlertedRange" }
-                      },
-                      "Instructions": [
-                        {
-                          "Continue": true,
-                          "Sensor": {
-                            "Type": "Any",
-                            "Once": true
-                          },
-                          "Actions": [
-                            {
-                              "Type": "TameworkDebugMessage",
-                              "Message": "Hydra CAE target slot present"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
                   "$Comment": "Store the CAE target in the regular marked target slot so it works with the leash and chase components.",
                   "Continue": true,
                   "Sensor": {
@@ -1547,38 +1422,16 @@
                       },
                       {
                         "Type": "State",
+                        "State": ".Ranged",
+                        "IgnoreMissingSetState": true
+                      },
+                      {
+                        "Type": "State",
                         "State": ".Default"
                       }
                     ]
                   },
                   "Instructions": [
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Any",
-                        "Once": true
-                      },
-                      "Actions": [
-                        {
-                          "Type": "TameworkDebugCombatSnapshot",
-                          "Message": "Hydra CAE default state active",
-                          "TargetSlots": [
-                            "LockedTarget",
-                            "CAETargetSlot",
-                            "MasterTarget"
-                          ],
-                          "NumberParams": [
-                            "AttackDistance",
-                            "CombatBehaviorDistance",
-                            "DesiredAttackDistanceRange",
-                            "CombatBackwardsRelativeSpeed",
-                            "CAEMinRange",
-                            "CAEMaxRange",
-                            "CAEPositioningAngle"
-                          ]
-                        }
-                      ]
-                    },
                     {
                       "Sensor": {
                         "Type": "CombatActionEvaluator",
@@ -1596,87 +1449,6 @@
                         "RelativeBackwardsSpeed": { "Compute": "CombatBackwardsRelativeSpeed" }
                       },
                       "Actions": [
-                        {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE default in range"
-                        },
-                        {
-                          "Type": "CombatAbility"
-                        }
-                      ]
-                    },
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "CombatActionEvaluator",
-                        "TargetInRange": false
-                      },
-                      "Actions": [
-                        {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE default out of range"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "TreeMode": true,
-                  "Sensor": {
-                    "Type": "State",
-                    "State": ".Ranged",
-                    "IgnoreMissingSetState": true
-                  },
-                  "Instructions": [
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Any",
-                        "Once": true
-                      },
-                      "Actions": [
-                        {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE ranged state active"
-                        }
-                      ]
-                    },
-                    {
-                      "Sensor": {
-                        "Type": "CombatActionEvaluator",
-                        "TargetInRange": true
-                      },
-                      "HeadMotion": {
-                        "Type": "Aim",
-                        "HitProbability": 1.0
-                      },
-                      "ActionsBlocking": true,
-                      "Actions": [
-                        {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE ranged in range"
-                        },
-                        {
-                          "Type": "CombatAbility"
-                        }
-                      ]
-                    },
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "CombatActionEvaluator",
-                        "TargetInRange": false
-                      },
-                      "HeadMotion": {
-                        "Type": "Aim",
-                        "HitProbability": 1.0
-                      },
-                      "ActionsBlocking": true,
-                      "Actions": [
-                        {
-                          "Type": "TameworkDebugMessage",
-                          "Message": "Hydra CAE ranged out of range"
-                        },
                         {
                           "Type": "CombatAbility"
                         }
