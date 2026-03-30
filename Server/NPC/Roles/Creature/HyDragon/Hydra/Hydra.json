@@ -20,7 +20,7 @@
     "Attack": "Root_NPC_Hydra_Attack",
     "AttackDistance": 3.5,
     "DesiredAttackDistanceRange": [
-      2.5,
+      0.5,
       3.5
     ],
     "TargetRange": 12,
