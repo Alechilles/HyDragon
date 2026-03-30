@@ -6,7 +6,8 @@
     "WorldSoundEventId": "SFX_Bow_T2_Shoot",
     "LocalSoundEventId": "SFX_Bow_T2_Shoot_Local"
   },
-  "RunTime": 1,
+  "$Comment": "Shorten the windup so the projectile releases closer to Rainshoot's visible cast frame.",
+  "RunTime": 0.55,
   "Next": {
     "Type": "LaunchProjectile",
     "RunTime": 0.2,
