@@ -12,17 +12,32 @@
     "MinRunUtility": 0.5,
     "MinActionUtility": 0.01,
     "AvailableActions": {
-      "SelectTarget": {
-        "Type": "SelectBasicAttackTarget",
-        "Description": "Select a target for Hydra CAE basic attacks",
+      "HydraMelee": {
+        "Type": "Ability",
+        "Description": "Hydra melee attack",
+        "Target": "Hostile",
+        "Ability": "Root_NPC_Hydra_Attack",
+        "AttackDistanceRange": [
+          0,
+          3.5
+        ],
+        "FailureTimeout": 0.5,
+        "RequireAiming": false,
+        "PositionFirst": false,
+        "WeightCoefficient": 1.25,
         "Conditions": [
+          {
+            "Type": "Randomiser",
+            "MinValue": 0.9,
+            "MaxValue": 1
+          },
           {
             "Type": "TargetDistance",
             "Curve": {
               "ResponseCurve": "SimpleDescendingLogistic",
               "XRange": [
                 0,
-                30
+                10
               ]
             }
           }
@@ -45,7 +60,7 @@
           ]
         },
         "Actions": [
-          "SelectTarget"
+          "HydraMelee"
         ]
       }
     }
