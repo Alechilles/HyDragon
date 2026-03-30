@@ -1324,23 +1324,6 @@
               },
               "Instructions": [
                 {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Target",
-                    "TargetSlot": "LockedTarget",
-                    "Range": { "Compute": "max(ViewRange, HearingRange)" }
-                  },
-                  "Actions": [
-                    {
-                      "Type": "AddToHostileTargetMemory"
-                    },
-                    {
-                      "Type": "TameworkDebugMessage",
-                      "Message": "Hydra message seeded hostile memory"
-                    }
-                  ]
-                },
-                {
                   "Actions": [
                     {
                       "Type": "TameworkDebugCombatSnapshot",
@@ -1379,20 +1362,6 @@
               ]
             },
             {
-              "$Comment": "Always seed hostile memory from the currently locked combat target so CAE can immediately evaluate and select an action.",
-              "Continue": true,
-              "Sensor": {
-                "Type": "Target",
-                "TargetSlot": "LockedTarget",
-                "Range": { "Compute": "max(ViewRange, HearingRange)" }
-              },
-              "Actions": [
-                {
-                  "Type": "AddToHostileTargetMemory"
-                }
-              ]
-            },
-            {
               "Sensor": {
                 "Type": "Or",
                 "Sensors": [
@@ -1405,11 +1374,6 @@
                       "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
                       "Attitudes": [ "Hostile" ]
                     }
-                  },
-                  {
-                    "Type": "Target",
-                    "TargetSlot": "LockedTarget",
-                    "Range": { "Compute": "max(ViewRange, HearingRange)" }
                   },
                   {
                     "Type": "HasHostileTargetMemory"
