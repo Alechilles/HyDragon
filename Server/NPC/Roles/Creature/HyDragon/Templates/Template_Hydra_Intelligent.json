@@ -1416,7 +1416,6 @@
                   ]
                 },
                 {
-                  "Continue": true,
                   "Sensor": {
                     "Type": "And",
                     "Sensors": [
@@ -1427,6 +1426,7 @@
                       },
                       {
                         "Type": "Target",
+                        "Range": 20,
                         "Filters": [
                           {
                             "Type": "LineOfSight"
@@ -1435,10 +1435,26 @@
                       }
                     ]
                   },
+                  "HeadMotion": {
+                    "Type": "Aim",
+                    "HitProbability": 1.0
+                  },
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  },
+                  "ActionsBlocking": true,
                   "Actions": [
                     {
                       "Type": "State",
                       "State": ".Ranged"
+                    },
+                    {
+                      "Type": "Attack",
+                      "Attack": "Root_NPC_Hydra_Ice_Ball",
+                      "AttackPauseRange": [
+                        1.5,
+                        2.5
+                      ]
                     }
                   ]
                 },
