@@ -1,22 +1,36 @@
 {
-  "Type": "Simple",
-  "Effects": {
-    "ItemPlayerAnimationsId": "Hydra_Default",
-    "ItemAnimationId": "Rainshoot",
-    "WorldSoundEventId": "SFX_Bow_T2_Shoot",
-    "LocalSoundEventId": "SFX_Bow_T2_Shoot_Local"
-  },
-  "$Comment": "Shorten the windup so the projectile releases closer to Rainshoot's visible cast frame.",
-  "RunTime": 0.55,
-  "Next": {
-    "Type": "LaunchProjectile",
-    "RunTime": 0.2,
-    "Effects": {
-      "WorldSoundEventId": "SFX_Unarmed_Swing"
+  "Type": "Parallel",
+  "Interactions": [
+    {
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "Effects": {
+            "ItemPlayerAnimationsId": "Hydra_Default",
+            "ItemAnimationId": "Rainshoot",
+            "WorldSoundEventId": "SFX_Bow_T2_Shoot",
+            "LocalSoundEventId": "SFX_Bow_T2_Shoot_Local"
+          },
+          "$Comment": "Play the full cast animation while the projectile branch waits for the release frame.",
+          "RunTime": 1
+        }
+      ]
     },
-    "ProjectileId": "Ice_Ball",
-    "Tags": {
-      "AimingReference": []
+    {
+      "Interactions": [
+        {
+          "Type": "LaunchProjectile",
+          "$Comment": "Fire the projectile near the visible Rainshoot release frame instead of after the animation ends.",
+          "RunTime": 0.55,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Unarmed_Swing"
+          },
+          "ProjectileId": "Ice_Ball",
+          "Tags": {
+            "AimingReference": []
+          }
+        }
+      ]
     }
-  }
+  ]
 }
