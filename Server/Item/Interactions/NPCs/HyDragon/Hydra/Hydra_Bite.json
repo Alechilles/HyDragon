@@ -2,10 +2,9 @@
   "Type": "Simple",
   "Effects": {
     "ItemPlayerAnimationsId": "Hydra_Default",
-    "ItemAnimationId": "Stomp",
-    "WorldSoundEventId": "SFX_Golem_Frost_Stomp"
+    "ItemAnimationId": "Bite"
   },
-  "RunTime": 0.5,
+  "RunTime": 0.25,
   "Next": {
     "Type": "Parallel",
     "Interactions": [
@@ -13,20 +12,28 @@
         "Interactions": [
           {
             "Type": "Selector",
-            "RunTime": 0.333,
+            "RunTime": 0.167,
             "Selector": {
-              "Id": "AOECircle",
-              "Range": 4.75
+              "Id": "Horizontal",
+              "Direction": "ToLeft",
+              "TestLineOfSight": true,
+              "ExtendTop": 0.75,
+              "ExtendBottom": 0.75,
+              "StartDistance": 1.5,
+              "EndDistance": 5.75,
+              "Length": 45,
+              "RollOffset": -90,
+              "YawStartOffset": -20
             },
             "HitEntity": {
               "Interactions": [
                 {
                   "Type": "Replace",
                   "DefaultOk": true,
-                  "Var": "Stomp_Damage",
+                  "Var": "Bite_Damage",
                   "DefaultValue": {
                     "Interactions": [
-                      "Hydra_Stomp_Damage"
+                      "Hydra_Bite_Damage"
                     ]
                   }
                 }
@@ -34,7 +41,7 @@
             },
             "Next": {
               "Type": "Simple",
-              "RunTime": 0.334
+              "RunTime": 0.25
             }
           }
         ]
@@ -45,7 +52,7 @@
             "Type": "Simple",
             "RunTime": 0.167,
             "Effects": {
-              "WorldSoundEventId": "SFX_Bear_Grizzly_Attack"
+              "WorldSoundEventId": "SFX_Rex_Bite"
             }
           }
         ]

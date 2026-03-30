@@ -41,8 +41,8 @@
         "SubState": "Default",
         "Ability": "Root_NPC_Hydra_Attack",
         "AttackDistanceRange": [
-          3.5,
-          3.5
+          1,
+          4.5
         ],
         "PostExecuteDistanceRange": [
           3.5,
@@ -64,6 +64,40 @@
             "Curve": {
               "Type": "Switch",
               "SwitchPoint": 1
+            }
+          }
+        ]
+      },
+      "BiteAttack": {
+        "Type": "Ability",
+        "Description": "Lunge bite at extended melee range",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "Ability": "Root_NPC_Hydra_Bite",
+        "AttackDistanceRange": [
+          3.5,
+          5.75
+        ],
+        "PostExecuteDistanceRange": [
+          3.5,
+          3.5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleLogistic",
+              "XRange": [
+                0,
+                8
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 2
             }
           }
         ]
@@ -120,7 +154,8 @@
         },
         "Actions": [
           "SelectTarget",
-          "RangedAttack"
+          "RangedAttack",
+          "BiteAttack"
         ]
       },
       "Ranged": {
@@ -138,7 +173,8 @@
         },
         "Actions": [
           "SelectTarget",
-          "MeleeAttack"
+          "MeleeAttack",
+          "BiteAttack"
         ]
       }
     }
