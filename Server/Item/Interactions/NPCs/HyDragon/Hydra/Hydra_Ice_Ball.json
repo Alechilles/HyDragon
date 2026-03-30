@@ -10,7 +10,7 @@
     ]
   },
   "$Comment": "Play a short charge-up burst before the synced cast begins.",
-  "RunTime": 0.25,
+  "RunTime": 1,
   "Next": {
     "Type": "Parallel",
     "Interactions": [

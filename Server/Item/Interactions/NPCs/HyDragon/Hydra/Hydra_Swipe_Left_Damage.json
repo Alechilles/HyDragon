@@ -13,8 +13,8 @@
       "RelativeZ": 0,
       "VelocityY": 3
     },
-    "WorldSoundEventId": "SFX_Bone_Hit",
-    "LocalSoundEventId": "SFX_Bone_Hit",
+    "WorldSoundEventId": "SFX_Unarmed_Impact",
+    "LocalSoundEventId": "SFX_Unarmed_Impact",
     "WorldParticles": [
       {
         "SystemId": "Impact_Sword_Basic"

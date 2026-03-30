@@ -57,7 +57,7 @@
           "Animation": "NPC/HyDragon/Hydra/Animations/Idle2.blockyanim",
           "Looping": false,
           "Weight": 1,
-          "Speed": 0.1
+          "Speed": 0.15
         }
       ],
       "NextAnimationDelay": {
@@ -77,28 +77,37 @@
     "Walk": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Hydra/Animations/Walk.blockyanim"
+          "Animation": "NPC/HyDragon/Hydra/Animations/Walk.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk"
         }
       ]
     },
     "WalkPassive": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Hydra/Animations/Walk.blockyanim"
+          "Animation": "NPC/HyDragon/Hydra/Animations/Walk.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk"
         }
       ]
     },
     "WalkBackward": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Hydra/Animations/Walk_Backward.blockyanim"
+          "Animation": "NPC/HyDragon/Hydra/Animations/Walk_Backward.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk"
         }
       ]
     },
     "Run": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Hydra/Animations/Run.blockyanim"
+          "Animation": "NPC/HyDragon/Hydra/Animations/Run.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk",
+          "FootstepIntervals": [
+            3
+          ],
+          "Looping": true,
+          "Speed": 0.7
         }
       ]
     },
@@ -372,7 +381,20 @@
         {
           "Animation": "NPC/HyDragon/Hydra/Animations/Rainshoot.blockyanim",
           "Looping": false,
-          "SoundEventId": "SFX_Staff_Ice_Shoot"
+          "SoundEventId": "SFX_Staff_Ice_Shoot",
+          "Speed": 0.5
+        }
+      ],
+      "NextAnimationDelay": {
+        "Min": 1,
+        "Max": 1
+      }
+    },
+    "Bite": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra/Animations/Bite.blockyanim",
+          "SoundEventId": "SFX_Rex_Bite"
         }
       ]
     }
