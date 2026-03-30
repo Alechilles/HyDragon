@@ -1,57 +1,56 @@
 {
-  "Type": "Simple",
-  "Effects": {
-    "Particles": [
-      {
-        "TargetEntityPart": "Entity",
-        "TargetNodeName": "Head",
-        "SystemId": "Hydra_Ice_Ball_Charging"
-      }
-    ]
-  },
-  "$Comment": "Play a short charge-up burst before the synced cast begins.",
-  "RunTime": 1,
+  "Type": "Parallel",
+  "Interactions": [
+    {
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Head",
+                "SystemId": "Hydra_Ice_Ball_Charging"
+              }
+            ]
+          },
+          "$Comment": "Run the charge particles for the full BasicShoot windup.",
+          "RunTime": 1
+        }
+      ]
+    },
+    {
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "Effects": {
+            "ItemPlayerAnimationsId": "Hydra_Default",
+            "ItemAnimationId": "BasicShoot"
+          },
+          "$Comment": "Play the BasicShoot charge-up animation in parallel with the charge particles.",
+          "RunTime": 1
+        }
+      ]
+    }
+  ],
   "Next": {
-    "Type": "Parallel",
-    "Interactions": [
-      {
-        "Interactions": [
-          {
-            "Type": "Simple",
-            "Effects": {
-              "ItemPlayerAnimationsId": "Hydra_Default",
-              "ItemAnimationId": "BasicShoot",
-              "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-              "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-              "Particles": [
-                {
-                  "TargetEntityPart": "Entity",
-                  "TargetNodeName": "Head",
-                  "SystemId": "Ice_Staff"
-                }
-              ]
-            },
-            "$Comment": "Play the full cast animation while the projectile branch waits for the release frame.",
-            "RunTime": 1
-          }
-        ]
-      },
-      {
-        "Interactions": [
-          {
-            "Type": "LaunchProjectile",
-            "$Comment": "Fire the projectile near the visible BasicShoot release frame instead of after the animation ends.",
-            "RunTime": 0.55,
-            "Effects": {
-              "WorldSoundEventId": "SFX_Unarmed_Swing"
-            },
-            "ProjectileId": "Ice_Ball",
-            "Tags": {
-              "AimingReference": []
-            }
-          }
-        ]
-      }
-    ]
+    "Type": "LaunchProjectile",
+    "$Comment": "Release the projectile after the shared BasicShoot windup completes.",
+    "RunTime": 0,
+    "Effects": {
+      "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+      "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+      "Particles": [
+        {
+          "TargetEntityPart": "Entity",
+          "TargetNodeName": "Head",
+          "SystemId": "Ice_Staff"
+        }
+      ]
+    },
+    "ProjectileId": "Ice_Ball",
+    "Tags": {
+      "AimingReference": []
+    }
   }
 }
