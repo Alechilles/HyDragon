@@ -33,6 +33,74 @@
             }
           }
         ]
+      },
+      "MeleeAttack": {
+        "Type": "Ability",
+        "Description": "Return to melee combat",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "Ability": "Root_NPC_Hydra_Attack",
+        "AttackDistanceRange": [
+          3.5,
+          3.5
+        ],
+        "PostExecuteDistanceRange": [
+          3.5,
+          3.5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                10
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 1
+            }
+          }
+        ]
+      },
+      "RangedAttack": {
+        "Type": "Ability",
+        "Description": "Fire an ice ball at range",
+        "Target": "Hostile",
+        "SubState": "Ranged",
+        "Ability": "Root_NPC_Hydra_Ice_Ball",
+        "AttackDistanceRange": [
+          10,
+          20
+        ],
+        "PostExecuteDistanceRange": [
+          3.5,
+          3.5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleLogistic",
+              "XRange": [
+                0,
+                20
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 2
+            }
+          }
+        ]
       }
     },
     "MinActionUtility": 0.01,
@@ -51,7 +119,26 @@
           ]
         },
         "Actions": [
-          "SelectTarget"
+          "SelectTarget",
+          "RangedAttack"
+        ]
+      },
+      "Ranged": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_Hydra_Ice_Ball"
+          ],
+          "Randomise": false,
+          "MaxRange": 20,
+          "Timeout": 1,
+          "CooldownRange": [
+            1.5,
+            3
+          ]
+        },
+        "Actions": [
+          "SelectTarget",
+          "MeleeAttack"
         ]
       }
     }

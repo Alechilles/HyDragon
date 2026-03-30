@@ -1416,6 +1416,33 @@
                   ]
                 },
                 {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "Nav",
+                        "NavStates": [ "Defer" ],
+                        "ThrottleDuration": 3
+                      },
+                      {
+                        "Type": "Target",
+                        "Filters": [
+                          {
+                            "Type": "LineOfSight"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "State",
+                      "State": ".Ranged"
+                    }
+                  ]
+                },
+                {
                   "TreeMode": true,
                   "Sensor": {
                     "Type": "Or",
@@ -1423,11 +1450,6 @@
                       {
                         "Type": "State",
                         "State": ".Melee",
-                        "IgnoreMissingSetState": true
-                      },
-                      {
-                        "Type": "State",
-                        "State": ".Ranged",
                         "IgnoreMissingSetState": true
                       },
                       {
@@ -1453,6 +1475,48 @@
                         "RelativeForwardsSpeed": { "Compute": "CombatMovingRelativeSpeed" },
                         "RelativeBackwardsSpeed": { "Compute": "CombatBackwardsRelativeSpeed" }
                       },
+                      "Actions": [
+                        {
+                          "Type": "CombatAbility"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "TreeMode": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".Ranged",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Sensor": {
+                        "Type": "CombatActionEvaluator",
+                        "TargetInRange": true
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "HitProbability": 1.0
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "CombatAbility"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "CombatActionEvaluator",
+                        "TargetInRange": false
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "HitProbability": 1.0
+                      },
+                      "ActionsBlocking": true,
                       "Actions": [
                         {
                           "Type": "CombatAbility"
