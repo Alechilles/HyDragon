@@ -1,38 +1,18 @@
 {
-  "Type": "Parallel",
-  "Interactions": [
-    {
-      "Interactions": [
-        {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Head",
-                "SystemId": "Hydra_Ice_Ball_Charging"
-              }
-            ]
-          },
-          "$Comment": "Run the charge particles for the full BasicShoot windup.",
-          "RunTime": 1
-        }
-      ]
-    },
-    {
-      "Interactions": [
-        {
-          "Type": "Simple",
-          "Effects": {
-            "ItemPlayerAnimationsId": "Hydra_Default",
-            "ItemAnimationId": "BasicShoot"
-          },
-          "$Comment": "Play the BasicShoot charge-up animation in parallel with the charge particles.",
-          "RunTime": 1
-        }
-      ]
-    }
-  ],
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Hydra_Default",
+    "ItemAnimationId": "BasicShoot",
+    "Particles": [
+      {
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Head",
+        "SystemId": "Hydra_Ice_Ball_Charging"
+      }
+    ]
+  },
+  "$Comment": "Play the BasicShoot windup and charge particles together before releasing the projectile.",
+  "RunTime": 1,
   "Next": {
     "Type": "LaunchProjectile",
     "$Comment": "Release the projectile after the shared BasicShoot windup completes.",
