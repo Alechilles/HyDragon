@@ -1448,6 +1448,11 @@
                     },
                     {
                       "Continue": true,
+                      "Sensor": {
+                        "Type": "Target",
+                        "TargetSlot": "LockedTarget",
+                        "Range": { "Compute": "AlertedRange" }
+                      },
                       "Actions": [
                         {
                           "Type": "SetMarkedTarget",
