@@ -186,7 +186,7 @@
     "Alerted": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Hydra/Animations/Stomp.blockyanim",
+          "Animation": "NPC/HyDragon/Hydra/Animations/Roar.blockyanim",
           "Looping": false,
           "BlendingDuration": 0.1,
           "SoundEventId": "SFX_Rex_Alerted"
@@ -395,6 +395,28 @@
         {
           "Animation": "NPC/HyDragon/Hydra/Animations/Bite.blockyanim",
           "SoundEventId": "SFX_Rex_Bite"
+        }
+      ]
+    },
+    "BasicShoot": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra/Animations/BasicShoot.blockyanim"
+        }
+      ]
+    },
+    "Eat": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra/Animations/Eat.blockyanim"
+        }
+      ]
+    },
+    "Roar": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra/Animations/Roar.blockyanim",
+          "SoundEventId": "SFX_Rex_Alerted"
         }
       ]
     }

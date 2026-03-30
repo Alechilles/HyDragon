@@ -20,6 +20,11 @@
       "Speed": 1,
       "Looping": false
     },
+    "BasicShoot": {
+      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/BasicShoot.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    },
     "Bite": {
       "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Bite.blockyanim",
       "Speed": 1,

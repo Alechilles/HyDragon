@@ -20,7 +20,7 @@
             "Type": "Simple",
             "Effects": {
               "ItemPlayerAnimationsId": "Hydra_Default",
-              "ItemAnimationId": "Rainshoot",
+              "ItemAnimationId": "BasicShoot",
               "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
               "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
               "Particles": [
@@ -40,7 +40,7 @@
         "Interactions": [
           {
             "Type": "LaunchProjectile",
-            "$Comment": "Fire the projectile near the visible Rainshoot release frame instead of after the animation ends.",
+            "$Comment": "Fire the projectile near the visible BasicShoot release frame instead of after the animation ends.",
             "RunTime": 0.55,
             "Effects": {
               "WorldSoundEventId": "SFX_Unarmed_Swing"
