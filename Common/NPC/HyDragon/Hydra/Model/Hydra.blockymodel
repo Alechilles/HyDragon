@@ -634,6 +634,25 @@
                               },
                               "children": [
                                 {
+                                  "id": "999",
+                                  "name": "Origin_Projectile",
+                                  "position": {"x": 0, "y": 2, "z": 16},
+                                  "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
+                                  "shape": {
+                                    "type": "none",
+                                    "offset": {"x": 0, "y": 0, "z": 0},
+                                    "stretch": {"x": 1, "y": 1, "z": 1},
+                                    "settings": {
+                                      "isPiece": true
+                                    },
+                                    "textureLayout": {},
+                                    "unwrapMode": "custom",
+                                    "visible": true,
+                                    "doubleSided": false,
+                                    "shadingMode": "flat"
+                                  }
+                                },
+                                {
                                   "id": "19",
                                   "name": "cube--C1",
                                   "position": {"x": 7.25, "y": -11.96934, "z": 51.60872},
@@ -1455,7 +1474,7 @@
                                 },
                                 {
                                   "id": "38",
-                                  "name": "Mouth",
+                                  "name": "Jaw",
                                   "position": {"x": 0, "y": 0, "z": -9},
                                   "orientation": {"x": 0.17365, "y": 0, "z": 0, "w": 0.98481},
                                   "shape": {
@@ -2723,7 +2742,7 @@
                                 },
                                 {
                                   "id": "68",
-                                  "name": "Mouth2",
+                                  "name": "Jaw2",
                                   "position": {"x": 0, "y": 0, "z": -9},
                                   "orientation": {"x": 0.17365, "y": 0, "z": 0, "w": 0.98481},
                                   "shape": {
@@ -3991,7 +4010,7 @@
                                 },
                                 {
                                   "id": "98",
-                                  "name": "Mouth3",
+                                  "name": "Jaw3",
                                   "position": {"x": 0, "y": 0, "z": -9},
                                   "orientation": {"x": 0.17365, "y": 0, "z": 0, "w": 0.98481},
                                   "shape": {

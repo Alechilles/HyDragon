@@ -15,30 +15,21 @@
   "RunTime": 1,
   "Next": {
     "Type": "LaunchProjectile",
-    "$Comment": "Release the projectile after the shared BasicShoot windup completes, from a point slightly farther forward.",
+    "$Comment": "Release the projectile after the shared BasicShoot windup completes from the model's projectile origin.",
     "RunTime": 0,
-    "PositionOffset": {
-      "Z": 1
-    },
     "Effects": {
       "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
       "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
       "Particles": [
         {
           "TargetEntityPart": "Entity",
-          "TargetNodeName": "Head",
+          "TargetNodeName": "Origin_Projectile",
           "SystemId": "Ice_Staff",
-          "DetachedFromModel": false,
-          "PositionOffset": {
-            "Z": 1,
-            "Y": 0
-          }
+          "DetachedFromModel": false
         }
       ]
     },
     "ProjectileId": "Ice_Ball",
-    "Tags": {
-      "AimingReference": []
-    }
+    "Tags": {}
   }
 }
