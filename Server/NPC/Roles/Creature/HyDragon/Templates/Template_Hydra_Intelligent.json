@@ -1,6 +1,7 @@
 {
   "Type": "Abstract",
   "StartState": "Idle",
+  "CombatConfig": "CAE_Hydra",
   "Parameters": {
     "Appearance": {
       "Value": "Trork_Hunter",
@@ -1374,28 +1375,6 @@
                       "State": ".Default"
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "Continue": true,
-              "Sensor": {
-                "Type": "And",
-                "Sensors": [
-                  {
-                    "Type": "State",
-                    "State": ".Default"
-                  },
-                  {
-                    "Type": "Any",
-                    "Once": true
-                  }
-                ]
-              },
-              "Actions": [
-                {
-                  "Type": "TameworkDebugMessage",
-                  "Message": "Hydra entered combat default"
                 }
               ]
             },
