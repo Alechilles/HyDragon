@@ -6,8 +6,11 @@
     "Particles": [
       {
         "TargetEntityPart": "Entity",
-        "TargetNodeName": "Head",
-        "SystemId": "Hydra_Ice_Ball_Charging"
+        "TargetNodeName": "Origin_Projectile",
+        "SystemId": "Hydra_Ice_Ball_Charging",
+        "PositionOffset": {
+          "Z": 0
+        }
       }
     ]
   },
@@ -25,11 +28,13 @@
           "TargetEntityPart": "Entity",
           "TargetNodeName": "Origin_Projectile",
           "SystemId": "Ice_Staff",
-          "DetachedFromModel": false
+          "DetachedFromModel": false,
+          "PositionOffset": {},
+          "Scale": 1.5
         }
       ]
     },
-    "ProjectileId": "Ice_Ball",
+    "ProjectileId": "Hydra_Ice_Ball",
     "Tags": {}
   }
 }
