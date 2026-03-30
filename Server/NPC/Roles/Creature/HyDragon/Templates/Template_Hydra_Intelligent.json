@@ -1334,7 +1334,10 @@
                     "AttackDistance",
                     "CombatBehaviorDistance",
                     "DesiredAttackDistanceRange",
-                    "CombatBackwardsRelativeSpeed"
+                    "CombatBackwardsRelativeSpeed",
+                    "CAEMinRange",
+                    "CAEMaxRange",
+                    "CAEPositioningAngle"
                   ]
                 },
                 {
@@ -1555,7 +1558,10 @@
                             "AttackDistance",
                             "CombatBehaviorDistance",
                             "DesiredAttackDistanceRange",
-                            "CombatBackwardsRelativeSpeed"
+                            "CombatBackwardsRelativeSpeed",
+                            "CAEMinRange",
+                            "CAEMaxRange",
+                            "CAEPositioningAngle"
                           ]
                         }
                       ]

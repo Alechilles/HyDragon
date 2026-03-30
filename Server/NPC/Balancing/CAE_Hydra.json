@@ -4,18 +4,8 @@
   "CombatActionEvaluator": {
     "RunConditions": [
       {
-        "Type": "TimeSinceLastUsed",
-        "Curve": {
-          "ResponseCurve": "Linear",
-          "XRange": [
-            0,
-            5
-          ]
-        }
-      },
-      {
         "Type": "Randomiser",
-        "MinValue": 0.75,
+        "MinValue": 1,
         "MaxValue": 1
       }
     ],
