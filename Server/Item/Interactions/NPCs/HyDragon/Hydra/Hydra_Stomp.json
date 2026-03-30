@@ -6,29 +6,49 @@
   },
   "RunTime": 0.5,
   "Next": {
-    "Type": "Selector",
-    "RunTime": 0.333,
-    "Selector": {
-      "Id": "AOECircle",
-      "Range": 4.75
-    },
-    "HitEntity": {
-      "Interactions": [
-        {
-          "Type": "Replace",
-          "DefaultOk": true,
-          "Var": "Stomp_Damage",
-          "DefaultValue": {
-            "Interactions": [
-              "Hydra_Stomp_Damage"
-            ]
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.333,
+            "Selector": {
+              "Id": "AOECircle",
+              "Range": 4.75
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultOk": true,
+                  "Var": "Stomp_Damage",
+                  "DefaultValue": {
+                    "Interactions": [
+                      "Hydra_Stomp_Damage"
+                    ]
+                  }
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.334
+            }
           }
-        }
-      ]
-    },
-    "Next": {
-      "Type": "Simple",
-      "RunTime": 0.334
-    }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.167,
+            "Effects": {
+              "WorldSoundEventId": "SFX_Bear_Grizzly_Attack"
+            }
+          }
+        ]
+      }
+    ]
   }
 }
