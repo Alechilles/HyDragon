@@ -1378,6 +1378,28 @@
               ]
             },
             {
+              "Continue": true,
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "State",
+                    "State": ".Default"
+                  },
+                  {
+                    "Type": "Any",
+                    "Once": true
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "TameworkDebugActionMessage",
+                  "Message": "Hydra entered combat default"
+                }
+              ]
+            },
+            {
               "$Comment": "Always seed hostile memory from the currently locked combat target so CAE can immediately evaluate and select an action.",
               "Continue": true,
               "Sensor": {
