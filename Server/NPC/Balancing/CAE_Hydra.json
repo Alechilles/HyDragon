@@ -135,6 +135,41 @@
             }
           }
         ]
+      },
+      "RainShootAttack": {
+        "Type": "Ability",
+        "Description": "Periodically launch an ice-barrage overhead",
+        "Target": "Hostile",
+        "SubState": "Ranged",
+        "Ability": "Root_NPC_Hydra_RainShoot",
+        "AttackDistanceRange": [
+          8,
+          20
+        ],
+        "PostExecuteDistanceRange": [
+          10,
+          14
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleLogistic",
+              "XRange": [
+                0,
+                20
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 10
+            }
+          }
+        ],
+        "RequireAiming": true
       }
     },
     "MinActionUtility": 0.01,
@@ -154,6 +189,7 @@
         },
         "Actions": [
           "SelectTarget",
+          "RainShootAttack",
           "RangedAttack",
           "BiteAttack"
         ]
@@ -173,6 +209,7 @@
         },
         "Actions": [
           "SelectTarget",
+          "RainShootAttack",
           "MeleeAttack",
           "BiteAttack"
         ]
