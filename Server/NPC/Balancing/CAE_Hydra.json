@@ -142,13 +142,14 @@
         "Target": "Hostile",
         "SubState": "Ranged",
         "Ability": "Root_NPC_Hydra_RainShoot",
+        "WeightCoefficient": 2.0,
         "AttackDistanceRange": [
-          8,
+          6,
           20
         ],
         "PostExecuteDistanceRange": [
-          10,
-          14
+          8,
+          12
         ],
         "Conditions": [
           {
@@ -165,7 +166,7 @@
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "Type": "Switch",
-              "SwitchPoint": 10
+              "SwitchPoint": 6
             }
           }
         ],
