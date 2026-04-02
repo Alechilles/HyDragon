@@ -18,7 +18,7 @@
     "Rainshoot": {
       "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Rainshoot.blockyanim",
       "Speed": 1,
-      "Looping": false
+      "Looping": true
     },
     "BasicShoot": {
       "ThirdPerson": "NPC/HyDragon/Hydra/Animations/BasicShoot.blockyanim",

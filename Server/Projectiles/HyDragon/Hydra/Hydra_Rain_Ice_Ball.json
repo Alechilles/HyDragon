@@ -1,0 +1,43 @@
+{
+  "Appearance": "Ice_Ball",
+  "Radius": 1.6,
+  "Height": -1,
+  "HorizontalCenterShot": 0,
+  "DepthShot": 3,
+  "PitchAdjustShot": true,
+  "SticksVertically": true,
+  "MuzzleVelocity": 18,
+  "TerminalVelocity": 50,
+  "Gravity": 12,
+  "Damage": 18,
+  "DeathEffectsOnHit": true,
+  "TimeToLive": 8,
+  "DeadTimeMiss": 0,
+  "DeathParticles": {
+    "SystemId": "IceBall_Explosion"
+  },
+  "MissParticles": {
+    "SystemId": "IceBall_Explosion"
+  },
+  "ImpactSlowdown": 0,
+  "VerticalCenterShot": 0,
+  "HitParticles": {
+    "SystemId": "Impact_Ice"
+  },
+  "DeathSoundEventId": "SFX_Ice_Ball_Death",
+  "ExplosionConfig": {
+    "DamageEntities": true,
+    "EntityDamageRadius": 2.5,
+    "EntityDamage": 10,
+    "Knockback": {
+      "Type": "Force",
+      "Force": 6,
+      "Direction": {
+        "Z": 0.35,
+        "Y": 1.25,
+        "X": 0.35
+      }
+    },
+    "DamageBlocks": true
+  }
+}

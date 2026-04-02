@@ -1,0 +1,17 @@
+{
+  "Interactions": [
+    {
+      "Type": "Parallel",
+      "Interactions": [
+        "Root_NPC_Hydra_RainShoot_Animation",
+        "Root_NPC_Hydra_RainShoot_Barrage"
+      ]
+    }
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  },
+  "RequireNewClick": false
+}

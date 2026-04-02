@@ -1,0 +1,370 @@
+{
+  "Interactions": [
+    {
+      "Type": "Serial",
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        },
+        {
+          "Type": "Simple",
+          "Effects": {
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Hydra_Ice_Ball_Charging",
+                "PositionOffset": {
+                  "Z": 0
+                }
+              }
+            ]
+          },
+          "RunTime": 0.3
+        },
+        {
+          "Type": "LaunchProjectile",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+            "Particles": [
+              {
+                "TargetEntityPart": "Entity",
+                "TargetNodeName": "Origin_Projectile",
+                "SystemId": "Ice_Staff",
+                "DetachedFromModel": false,
+                "PositionOffset": {},
+                "Scale": 1.5
+              }
+            ]
+          },
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "Tags": {}
+        }
+      ]
+    }
+  ],
+  "RequireNewClick": false
+}

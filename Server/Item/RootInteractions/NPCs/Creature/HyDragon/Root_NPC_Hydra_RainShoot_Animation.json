@@ -1,0 +1,13 @@
+{
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "Hydra_Default",
+        "ItemAnimationId": "Rainshoot"
+      },
+      "RunTime": 3.2
+    }
+  ],
+  "RequireNewClick": false
+}
