@@ -14,17 +14,17 @@
   "TimeToLive": 10,
   "DeadTimeMiss": 0,
   "DeathParticles": {
-    "SystemId": "IceBall_Explosion",
+    "SystemId": "Hydra_Rain_IceBall_Explosion",
     "Scale": 2.0
   },
   "MissParticles": {
-    "SystemId": "IceBall_Explosion",
+    "SystemId": "Hydra_Rain_IceBall_Explosion",
     "Scale": 2.0
   },
   "ImpactSlowdown": 0,
   "VerticalCenterShot": 0,
   "HitParticles": {
-    "SystemId": "Impact_Ice",
+    "SystemId": "Hydra_Rain_Impact_Ice",
     "Scale": 2.0
   },
   "DeathSoundEventId": "SFX_Ice_Ball_Death",
