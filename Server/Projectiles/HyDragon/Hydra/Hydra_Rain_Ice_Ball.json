@@ -6,12 +6,12 @@
   "DepthShot": 3,
   "PitchAdjustShot": true,
   "SticksVertically": true,
-  "MuzzleVelocity": 18,
-  "TerminalVelocity": 50,
-  "Gravity": 12,
+  "MuzzleVelocity": 28,
+  "TerminalVelocity": 60,
+  "Gravity": 14,
   "Damage": 18,
   "DeathEffectsOnHit": true,
-  "TimeToLive": 8,
+  "TimeToLive": 10,
   "DeadTimeMiss": 0,
   "DeathParticles": {
     "SystemId": "IceBall_Explosion"
