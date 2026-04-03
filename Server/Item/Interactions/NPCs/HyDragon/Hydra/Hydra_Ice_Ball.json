@@ -29,7 +29,7 @@
       "RunTime": 1
     },
     {
-      "Type": "LaunchProjectile",
+      "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
       "Effects": {
         "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -46,6 +46,13 @@
         ]
       },
       "ProjectileId": "Hydra_Ice_Ball",
+      "TrajectoryMode": "DIRECT",
+      "TargetSlot": "CAETargetSlot",
+      "ImpactEffect": {
+        "EffectId": "Chilled",
+        "Radius": 3.0,
+        "ExcludeSource": true
+      },
       "Tags": {}
     },
     {
@@ -67,7 +74,7 @@
       "RunTime": 0.5
     },
     {
-      "Type": "LaunchProjectile",
+      "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
       "Effects": {
         "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -84,6 +91,13 @@
         ]
       },
       "ProjectileId": "Hydra_Ice_Ball",
+      "TrajectoryMode": "DIRECT",
+      "TargetSlot": "CAETargetSlot",
+      "ImpactEffect": {
+        "EffectId": "Chilled",
+        "Radius": 3.0,
+        "ExcludeSource": true
+      },
       "Tags": {}
     },
     {
@@ -105,7 +119,7 @@
       "RunTime": 0.5
     },
     {
-      "Type": "LaunchProjectile",
+      "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
       "Effects": {
         "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -122,6 +136,13 @@
         ]
       },
       "ProjectileId": "Hydra_Ice_Ball",
+      "TrajectoryMode": "DIRECT",
+      "TargetSlot": "CAETargetSlot",
+      "ImpactEffect": {
+        "EffectId": "Chilled",
+        "Radius": 3.0,
+        "ExcludeSource": true
+      },
       "Tags": {}
     }
   ]
