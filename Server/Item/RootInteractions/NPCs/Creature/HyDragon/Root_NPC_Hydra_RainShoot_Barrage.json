@@ -20,8 +20,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -36,7 +40,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -56,8 +59,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -72,7 +79,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -92,8 +98,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -108,7 +118,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -128,8 +137,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -144,7 +157,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -164,8 +176,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -180,7 +196,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -200,8 +215,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -216,7 +235,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -236,8 +254,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -252,7 +274,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -272,8 +293,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -288,7 +313,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -308,8 +332,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -324,7 +352,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         },
         {
@@ -344,8 +371,12 @@
           "RunTime": 0.3
         },
         {
-          "Type": "LaunchProjectile",
+          "Type": "TameworkLaunchProjectile",
           "RunTime": 0,
+          "ProjectileId": "Hydra_Rain_Ice_Ball",
+          "TargetSlot": "CAETargetSlot",
+          "YawSpreadDegrees": 5.0,
+          "PitchSpreadDegrees": 2.0,
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -360,7 +391,6 @@
               }
             ]
           },
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
           "Tags": {}
         }
       ]
