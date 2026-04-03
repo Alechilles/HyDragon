@@ -26,6 +26,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -65,6 +73,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -104,6 +120,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -143,6 +167,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -182,6 +214,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -221,6 +261,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -260,6 +308,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -299,6 +355,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -338,6 +402,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -377,6 +449,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -416,6 +496,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -455,6 +543,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -494,6 +590,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -533,6 +637,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -572,6 +684,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -611,6 +731,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -650,6 +778,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -689,6 +825,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -728,6 +872,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -767,6 +919,14 @@
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
           "RandomAroundSourceVerticalOffset": 0.0,
+          "LingeringHazard": {
+            "Radius": 4.0,
+            "DurationSeconds": 6.0,
+            "TickIntervalSeconds": 1.0,
+            "DamagePerTick": 5.0,
+            "ExcludeSource": true,
+            "SourceTypeId": "hydragon.rain_ice_hazard"
+          },
           "Effects": {
             "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
             "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
@@ -788,3 +948,4 @@
   ],
   "RequireNewClick": false
 }
+
