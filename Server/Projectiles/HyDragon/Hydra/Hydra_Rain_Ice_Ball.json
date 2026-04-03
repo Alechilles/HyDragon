@@ -14,20 +14,23 @@
   "TimeToLive": 10,
   "DeadTimeMiss": 0,
   "DeathParticles": {
-    "SystemId": "IceBall_Explosion"
+    "SystemId": "IceBall_Explosion",
+    "Scale": 2.0
   },
   "MissParticles": {
-    "SystemId": "IceBall_Explosion"
+    "SystemId": "IceBall_Explosion",
+    "Scale": 2.0
   },
   "ImpactSlowdown": 0,
   "VerticalCenterShot": 0,
   "HitParticles": {
-    "SystemId": "Impact_Ice"
+    "SystemId": "Impact_Ice",
+    "Scale": 2.0
   },
   "DeathSoundEventId": "SFX_Ice_Ball_Death",
   "ExplosionConfig": {
     "DamageEntities": true,
-    "EntityDamageRadius": 2.5,
+    "EntityDamageRadius": 5.0,
     "EntityDamage": 10,
     "Knockback": {
       "Type": "Force",
