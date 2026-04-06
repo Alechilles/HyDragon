@@ -1,0 +1,800 @@
+{
+  "Type": "Abstract",
+  "Debug": "DisplayState",
+  "Appearance": {
+    "Compute": "Appearance"
+  },
+  "StartState": "IdleGround",
+  "Parameters": {
+    "Appearance": {
+      "Value": "Wyvern_Mini",
+      "Description": "Model to be used"
+    },
+    "WanderRadius": {
+      "Value": 10,
+      "Description": "General idle movement radius"
+    },
+    "ViewRange": {
+      "Value": 28,
+      "Description": "View range"
+    },
+    "ViewSector": {
+      "Value": 180,
+      "Description": "View sector"
+    },
+    "HearingRange": {
+      "Value": 18,
+      "Description": "Hearing range"
+    },
+    "AlertedRange": {
+      "Value": 36,
+      "Description": "A range within which the player can still be sensed while alerted"
+    },
+    "DropList": {
+      "Value": "Empty",
+      "Description": "Drop items"
+    },
+    "GroundSpeed": {
+      "Value": 3.5,
+      "Description": "Ground movement speed"
+    },
+    "FlightSpeed": {
+      "Value": 12,
+      "Description": "Maximum flight speed"
+    },
+    "RangedAttack": {
+      "Value": "Root_NPC_Wyvern_Mini_Shot",
+      "Description": "The ranged attack to use"
+    },
+    "RangedAttackDistance": {
+      "Value": 18,
+      "Description": "The distance to attack at range from"
+    },
+    "RangedAttackMinimumDistance": {
+      "Value": 3.25,
+      "Description": "Minimum distance before preferring the ranged shot"
+    },
+    "Attack": {
+      "Value": "Root_NPC_Wyvern_Mini_Bite",
+      "Description": "The close attack"
+    },
+    "AttackDistance": {
+      "Value": 2.75,
+      "Description": "The close distance attack range"
+    },
+    "CombatBehaviorDistance": {
+      "Value": 8,
+      "Description": "Distance at which to start slowing in combat movement"
+    },
+    "AttitudeGroup": {
+      "Value": "Predators",
+      "Description": "This NPCs attitude group"
+    },
+    "CombatRelativeTurnSpeed": {
+      "Value": 1.5,
+      "Description": "Modifier that decides turn speed difference in combat"
+    },
+    "MaxHealth": {
+      "Value": 80,
+      "Description": "Max health for the NPC"
+    },
+    "IsMemory": {
+      "Value": false,
+      "Description": "Defines if the NPC is a memory"
+    },
+    "MemoriesCategory": {
+      "Value": "Reptile",
+      "Description": "Defines the category of the memory"
+    },
+    "MemoriesNameOverride": {
+      "Value": "",
+      "Description": "Overrides the memory name if set"
+    },
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Template.name",
+      "Description": "Translation key for NPC name display"
+    }
+  },
+  "IsMemory": {
+    "Compute": "IsMemory"
+  },
+  "MemoriesCategory": {
+    "Compute": "MemoriesCategory"
+  },
+  "MemoriesNameOverride": {
+    "Compute": "MemoriesNameOverride"
+  },
+  "DisableDamageGroups": [
+    "Self"
+  ],
+  "KnockbackScale": 0.2,
+  "DefaultNPCAttitude": "Ignore",
+  "DefaultPlayerAttitude": "Neutral",
+  "AttitudeGroup": {
+    "Compute": "AttitudeGroup"
+  },
+  "DropList": {
+    "Compute": "DropList"
+  },
+  "MaxHealth": {
+    "Compute": "MaxHealth"
+  },
+  "MotionControllerList": [
+    {
+      "Type": "Fly",
+      "MaxHorizontalSpeed": {
+        "Compute": "FlightSpeed"
+      },
+      "MaxSinkSpeed": 8,
+      "MaxClimbSpeed": 10,
+      "MinAirSpeed": 3,
+      "Acceleration": 6,
+      "MinHeightOverGround": 4,
+      "MaxHeightOverGround": 10,
+      "MaxRollAngle": 70,
+      "MaxTurnSpeed": 180,
+      "DesiredAltitudeWeight": 1
+    },
+    {
+      "Type": "Walk",
+      "MaxWalkSpeed": {
+        "Compute": "GroundSpeed"
+      },
+      "Gravity": 10,
+      "MaxFallSpeed": 10,
+      "Acceleration": 10
+    }
+  ],
+  "Instructions": [
+    {
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "IdleGround"
+          },
+          "Instructions": [
+            {
+              "Reference": "Component_Instruction_Clear_Status_Animation"
+            },
+            {
+              "Sensor": {
+                "Type": "Damage",
+                "Combat": true
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Alerted"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "Or",
+                "Sensors": [
+                  {
+                    "Reference": "Component_Sensor_Sight_By_Attitude",
+                    "Modify": {
+                      "ViewRange": {
+                        "Compute": "ViewRange"
+                      },
+                      "ViewSector": {
+                        "Compute": "ViewSector"
+                      },
+                      "Attitudes": [
+                        "Hostile",
+                        "Neutral"
+                      ]
+                    }
+                  },
+                  {
+                    "Reference": "Component_Sensor_Sound_By_Attitude",
+                    "Modify": {
+                      "HearingRange": {
+                        "Compute": "HearingRange"
+                      },
+                      "Attitudes": [
+                        "Hostile",
+                        "Neutral"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Alerted"
+                }
+              ]
+            },
+            {
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    6,
+                    10
+                  ]
+                },
+                {
+                  "Type": "State",
+                  "State": "TakeOff"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "WanderInCircle",
+                "Radius": {
+                  "Compute": "WanderRadius"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "TakeOff"
+          },
+          "Instructions": [
+            {
+              "Sensor": {
+                "Type": "Damage",
+                "Combat": true
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Alerted"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "Or",
+                "Sensors": [
+                  {
+                    "Reference": "Component_Sensor_Sight_By_Attitude",
+                    "Modify": {
+                      "ViewRange": {
+                        "Compute": "AlertedRange"
+                      },
+                      "ViewSector": {
+                        "Compute": "ViewSector"
+                      },
+                      "Attitudes": [
+                        "Hostile",
+                        "Neutral"
+                      ]
+                    }
+                  },
+                  {
+                    "Reference": "Component_Sensor_Sound_By_Attitude",
+                    "Modify": {
+                      "HearingRange": {
+                        "Compute": "HearingRange"
+                      },
+                      "Attitudes": [
+                        "Hostile",
+                        "Neutral"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Alerted"
+                }
+              ]
+            },
+            {
+              "BodyMotion": {
+                "Type": "TakeOff",
+                "JumpSpeed": 4
+              }
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "IdleAir"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "IdleAir"
+          },
+          "Instructions": [
+            {
+              "Reference": "Component_Instruction_Clear_Status_Animation"
+            },
+            {
+              "Sensor": {
+                "Type": "Damage",
+                "Combat": true
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Alerted"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "Or",
+                "Sensors": [
+                  {
+                    "Reference": "Component_Sensor_Sight_By_Attitude",
+                    "Modify": {
+                      "ViewRange": {
+                        "Compute": "ViewRange"
+                      },
+                      "ViewSector": {
+                        "Compute": "ViewSector"
+                      },
+                      "Attitudes": [
+                        "Hostile",
+                        "Neutral"
+                      ]
+                    }
+                  },
+                  {
+                    "Reference": "Component_Sensor_Sound_By_Attitude",
+                    "Modify": {
+                      "HearingRange": {
+                        "Compute": "HearingRange"
+                      },
+                      "Attitudes": [
+                        "Hostile",
+                        "Neutral"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Alerted"
+                }
+              ]
+            },
+            {
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    8,
+                    12
+                  ]
+                },
+                {
+                  "Type": "State",
+                  "State": "Land"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "WanderInCircle",
+                "Radius": {
+                  "Compute": "WanderRadius + 2"
+                },
+                "RelativeSpeed": 0.35
+              }
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "Alerted"
+          },
+          "Instructions": [
+            {
+              "Continue": true,
+              "Sensor": {
+                "Type": "Any",
+                "Once": true
+              },
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Slot": "Status",
+                  "Animation": "Alerted"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [
+                    0,
+                    1.2,
+                    0
+                  ],
+                  "ParticleSystem": "Alerted"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Walk"
+              },
+              "BodyMotion": {
+                "Type": "TakeOff",
+                "JumpSpeed": 4
+              }
+            },
+            {
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Fly"
+                  },
+                  {
+                    "Type": "Target",
+                    "Range": {
+                      "Compute": "ViewRange"
+                    }
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    1,
+                    1.5
+                  ],
+                  "Action": {
+                    "Type": "State",
+                    "State": "Attack"
+                  }
+                }
+              ],
+              "HeadMotion": {
+                "Type": "Watch"
+              }
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              },
+              "ActionsAtomic": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "Type": "ReleaseTarget"
+                },
+                {
+                  "Type": "State",
+                  "State": "IdleAir"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Walk"
+              },
+              "ActionsAtomic": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "Type": "ReleaseTarget"
+                },
+                {
+                  "Type": "State",
+                  "State": "IdleGround"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "Attack"
+          },
+          "Instructions": [
+            {
+              "Reference": "Component_Instruction_Clear_Status_Animation"
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Walk"
+              },
+              "BodyMotion": {
+                "Type": "TakeOff",
+                "JumpSpeed": 4
+              }
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              },
+              "Instructions": [
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Any"
+                  },
+                  "Actions": [
+                    {
+                      "Type": "OverrideAltitude",
+                      "DesiredAltitudeRange": [
+                        4,
+                        8
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Target",
+                    "Range": {
+                      "Compute": "AttackDistance"
+                    },
+                    "Filters": [
+                      {
+                        "Type": "LineOfSight"
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "Attack",
+                      "Attack": {
+                        "Compute": "Attack"
+                      },
+                      "AimingTimeRange": [
+                        0.25,
+                        0.5
+                      ],
+                      "AttackPauseRange": [
+                        1.25,
+                        2
+                      ]
+                    }
+                  ],
+                  "HeadMotion": {
+                    "Type": "Aim",
+                    "Spread": 0,
+                    "HitProbability": 1,
+                    "Deflection": true,
+                    "RelativeTurnSpeed": {
+                      "Compute": "CombatRelativeTurnSpeed"
+                    }
+                  }
+                },
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Target",
+                    "Range": {
+                      "Compute": "RangedAttackDistance"
+                    },
+                    "MinRange": {
+                      "Compute": "RangedAttackMinimumDistance"
+                    },
+                    "Filters": [
+                      {
+                        "Type": "LineOfSight"
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "Attack",
+                      "Attack": {
+                        "Compute": "RangedAttack"
+                      },
+                      "BallisticMode": "Short",
+                      "AimingTimeRange": [
+                        0.75,
+                        1.25
+                      ],
+                      "AttackPauseRange": [
+                        2,
+                        3
+                      ]
+                    }
+                  ],
+                  "HeadMotion": {
+                    "Type": "Aim",
+                    "Spread": 0,
+                    "HitProbability": 1,
+                    "Deflection": true,
+                    "RelativeTurnSpeed": {
+                      "Compute": "CombatRelativeTurnSpeed"
+                    }
+                  }
+                },
+                {
+                  "Sensor": {
+                    "Type": "Target",
+                    "Range": {
+                      "Compute": "ViewRange"
+                    }
+                  },
+                  "BodyMotion": {
+                    "Type": "Seek",
+                    "SlowDownDistance": {
+                      "Compute": "CombatBehaviorDistance"
+                    },
+                    "StopDistance": {
+                      "Compute": "AttackDistance"
+                    },
+                    "RelativeSpeed": 0.7
+                  }
+                }
+              ]
+            },
+            {
+              "ActionsAtomic": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    4,
+                    6
+                  ]
+                },
+                {
+                  "Type": "ReleaseTarget"
+                },
+                {
+                  "Type": "State",
+                  "State": "IdleAir"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "Land"
+          },
+          "Instructions": [
+            {
+              "Sensor": {
+                "Type": "Damage",
+                "Combat": true
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Alerted"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "Nav",
+                "NavStates": [
+                  "Defer",
+                  "Blocked",
+                  "Aborted"
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "IdleAir"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              },
+              "Instructions": [
+                {
+                  "Sensor": {
+                    "Type": "AdjustPosition",
+                    "Offset": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "Sensor": {
+                      "Type": "SearchRay",
+                      "Name": "LandingRay",
+                      "Range": 20,
+                      "Angle": 45,
+                      "Blocks": "Gaia"
+                    }
+                  },
+                  "BodyMotion": {
+                    "Type": "Land",
+                    "SlowDownDistance": 5,
+                    "StopDistance": 0.5,
+                    "GoalLenience": 3
+                  }
+                },
+                {
+                  "BodyMotion": {
+                    "Type": "Wander",
+                    "RelativeSpeed": 0.2
+                  }
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Walk"
+              },
+              "Actions": [
+                {
+                  "Type": "ResetSearchRays"
+                },
+                {
+                  "Type": "State",
+                  "State": "IdleGround"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    4,
+                    6
+                  ]
+                },
+                {
+                  "Type": "ResetSearchRays"
+                },
+                {
+                  "Type": "State",
+                  "State": "IdleAir"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "NameTranslationKey": {
+    "Compute": "NameTranslationKey"
+  }
+}

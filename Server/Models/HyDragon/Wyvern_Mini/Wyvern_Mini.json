@@ -1,0 +1,137 @@
+{
+  "Model": "NPC/HyDragon/Wyvern_Mini/Model/Wyvern_Mini.blockymodel",
+  "Texture": "NPC/HyDragon/Wyvern_Mini/Model/WyverNature.png",
+  "EyeHeight": 1.6,
+  "HitBox": {
+    "Max": {
+      "X": 1.8,
+      "Y": 2.0,
+      "Z": 2.4
+    },
+    "Min": {
+      "X": -1.8,
+      "Y": 0,
+      "Z": -2.4
+    }
+  },
+  "Camera": {
+    "Pitch": {
+      "AngleRange": {
+        "Max": 45,
+        "Min": -25
+      },
+      "TargetNodes": [
+        "Head"
+      ]
+    },
+    "PositionOffset": {
+      "X": 0.5,
+      "Y": 0,
+      "Z": 4.5
+    },
+    "Yaw": {
+      "AngleRange": {
+        "Max": 35,
+        "Min": -35
+      },
+      "TargetNodes": [
+        "Head"
+      ]
+    }
+  },
+  "MinScale": 0.95,
+  "MaxScale": 1.05,
+  "AnimationSets": {
+    "Idle": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/IdleLanded.blockyanim",
+          "Speed": 0.8
+        }
+      ]
+    },
+    "Walk": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Landed.blockyanim",
+          "Speed": 0.9
+        }
+      ]
+    },
+    "Run": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Landed.blockyanim",
+          "Speed": 1.1
+        }
+      ]
+    },
+    "Alerted": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
+          "Looping": false,
+          "Speed": 1.1
+        }
+      ]
+    },
+    "FlyIdle": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
+          "Speed": 0.8
+        }
+      ]
+    },
+    "Fly": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
+          "Speed": 1
+        }
+      ]
+    },
+    "FlyFast": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
+          "Speed": 1.2
+        }
+      ]
+    },
+    "Hurt": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/IdleLanded.blockyanim",
+          "Looping": false,
+          "Speed": 1.2
+        }
+      ]
+    },
+    "Sleep": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Sleep.blockyanim",
+          "Speed": 0.8
+        }
+      ]
+    },
+    "Wake": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/IdleLanded.blockyanim",
+          "Looping": false,
+          "Speed": 1.1
+        }
+      ]
+    },
+    "Death": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Dead.blockyanim",
+          "Looping": false
+        }
+      ]
+    }
+  }
+}

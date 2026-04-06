@@ -1,0 +1,9 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Wyvern_Mini_Default",
+    "ItemAnimationId": "Shoot"
+  },
+  "RunTime": 0.333,
+  "Next": "Scarak_Seeker_Spit_Projectile"
+}

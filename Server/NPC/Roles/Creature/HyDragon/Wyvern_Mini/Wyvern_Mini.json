@@ -1,0 +1,32 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Wyvern_Mini_Flying_Hostile",
+  "Modify": {
+    "Appearance": "Wyvern_Mini",
+    "WanderRadius": 10,
+    "ViewRange": 28,
+    "HearingRange": 18,
+    "AlertedRange": 36,
+    "GroundSpeed": 3.5,
+    "FlightSpeed": 12,
+    "DropList": "Empty",
+    "Attack": "Root_NPC_Wyvern_Mini_Bite",
+    "AttackDistance": 2.75,
+    "RangedAttack": "Root_NPC_Wyvern_Mini_Shot",
+    "RangedAttackDistance": 18,
+    "RangedAttackMinimumDistance": 3.25,
+    "CombatBehaviorDistance": 8,
+    "AttitudeGroup": "Predators",
+    "CombatRelativeTurnSpeed": 1.5,
+    "MaxHealth": 80,
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Wyvern_Mini.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}
