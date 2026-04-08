@@ -134,7 +134,8 @@
               "SwitchPoint": 2
             }
           }
-        ]
+        ],
+        "RequireAiming": true
       },
       "RainShootAttack": {
         "Type": "Ability",
@@ -201,7 +202,7 @@
             "Root_NPC_Hydra_Ice_Ball"
           ],
           "Randomise": false,
-          "MaxRange": 20,
+          "MaxRange": 30,
           "Timeout": 1,
           "CooldownRange": [
             1.5,

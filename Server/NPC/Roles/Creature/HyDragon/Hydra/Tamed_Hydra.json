@@ -1,11 +1,11 @@
 {
   "Type": "Variant",
-  "Reference": "Template_HyDragon",
+  "Reference": "Template_HyDragon_Tamed",
   "Modify": {
     "Appearance": "Hydra",
     "Weapons": [],
     "FlockArray": [
-      "Hydra"
+      "Tamed_Hydra"
     ],
     "AttitudeGroup": "PredatorsBig",
     "WanderRadius": 8,
@@ -13,14 +13,11 @@
     "HearingRange": 24,
     "DropList": "Empty",
     "MaxSpeed": 7,
-    "CombatConfig": "CAE_Hydra",
-    "UseCombatActionEvaluator": true,
     "Attack": "Root_NPC_Hydra_Attack",
     "AttackDistance": 3.5,
     "TargetRange": 12,
     "CombatBehaviorDistance": 18,
     "CombatAlwaysMovingWeight": 10,
-    "CombatBackwardsRelativeSpeed": 0.4,
     "RunThreshold": 0.3,
     "KnockbackScale": 0.1,
     "ClimbHeight": 2,
@@ -41,14 +38,20 @@
       16
     ],
     "MaxHealth": 400,
-    "IsTameable": true,
-    "TameRoleChange": "Tamed_Hydra",
     "AttractiveItemSet": [
       "Food_Wildmeat_Raw"
     ],
-    "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
-    "TranquilizerSleepThresholdSeconds": 170,
-    "InteractionConfigId": "HyDragonIntBeast",
+    "NeedsSeekConsumeAnimation": "",
+    "CanFollow": true,
+    "CanHold": true,
+    "CanDefend": true,
+    "CanAggressive": true,
+    "CanAttackTarget": true,
+    "CanMoveToLocation": true,
+    "CanReturnHome": true,
+    "CanRecall": true,
+    "CanSetHome": true,
+    "CanBreedPair": true,
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
     "MemoriesNameOverride": "Hydra",

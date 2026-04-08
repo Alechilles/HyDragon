@@ -87,15 +87,17 @@
       "Animations": [
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
-          "Speed": 1
+          "Speed": 1,
+          "Looping": true
         }
       ]
     },
     "FlyFast": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
-          "Speed": 1.2
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/FlyFast.blockyanim",
+          "Speed": 1,
+          "Looping": true
         }
       ]
     },
