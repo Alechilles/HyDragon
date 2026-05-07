@@ -1,0 +1,583 @@
+{
+  "Type": "Abstract",
+  "Debug": "DisplayState",
+  "Appearance": {
+    "Compute": "Appearance"
+  },
+  "StartState": "Idle",
+  "Parameters": {
+    "Appearance": {
+      "Value": "Wyvern_Mini",
+      "Description": "Model to be used"
+    },
+    "WanderRadius": {
+      "Value": 10,
+      "Description": "General idle movement radius"
+    },
+    "ViewRange": {
+      "Value": 28,
+      "Description": "View range"
+    },
+    "ViewSector": {
+      "Value": 180,
+      "Description": "View sector"
+    },
+    "HearingRange": {
+      "Value": 18,
+      "Description": "Hearing range"
+    },
+    "GroundSpeed": {
+      "Value": 3.5,
+      "Description": "Ground movement speed"
+    },
+    "FlightSpeed": {
+      "Value": 12,
+      "Description": "Maximum flight speed"
+    },
+    "DropList": {
+      "Value": "Empty",
+      "Description": "Drop items"
+    },
+    "MaxHealth": {
+      "Value": 80,
+      "Description": "Max health for the NPC"
+    },
+    "AttractiveItemSet": {
+      "Value": [
+        "Food_Wildmeat_Raw",
+        "Food_Chicken_Raw",
+        "Food_Fish_Raw"
+      ],
+      "TypeHint": "String",
+      "Description": "Food item IDs accepted for feeding."
+    },
+    "InteractionConfigId": {
+      "Value": "",
+      "Description": "Optional TwInteractionConfig asset id override."
+    },
+    "CanFollow": {
+      "Value": true,
+      "Description": "Whether command-driven Follow behavior is enabled for this role."
+    },
+    "CanHold": {
+      "Value": true,
+      "Description": "Whether command-driven Hold behavior is enabled for this role."
+    },
+    "IsMemory": {
+      "Value": true,
+      "Description": "Defines if the NPC is a memory"
+    },
+    "MemoriesCategory": {
+      "Value": "Reptile",
+      "Description": "Defines the category of the memory"
+    },
+    "MemoriesNameOverride": {
+      "Value": "Mini Wyvern",
+      "Description": "Overrides the memory name if set"
+    },
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Template.name",
+      "Description": "Translation key for NPC name display"
+    }
+  },
+  "IsMemory": {
+    "Compute": "IsMemory"
+  },
+  "MemoriesCategory": {
+    "Compute": "MemoriesCategory"
+  },
+  "MemoriesNameOverride": {
+    "Compute": "MemoriesNameOverride"
+  },
+  "DisableDamageGroups": [
+    "Self"
+  ],
+  "KnockbackScale": 0.2,
+  "DefaultNPCAttitude": "Ignore",
+  "DefaultPlayerAttitude": "Neutral",
+  "AttitudeGroup": "Predators",
+  "DropList": {
+    "Compute": "DropList"
+  },
+  "MaxHealth": {
+    "Compute": "MaxHealth"
+  },
+  "MotionControllerList": [
+    {
+      "Type": "Fly",
+      "MaxHorizontalSpeed": {
+        "Compute": "FlightSpeed"
+      },
+      "MaxSinkSpeed": 8,
+      "MaxClimbSpeed": 10,
+      "MinAirSpeed": 3,
+      "Acceleration": 6,
+      "MinHeightOverGround": 4,
+      "MaxHeightOverGround": 10,
+      "MaxRollAngle": 70,
+      "MaxTurnSpeed": 180,
+      "DesiredAltitudeWeight": 1
+    },
+    {
+      "Type": "Walk",
+      "MaxWalkSpeed": {
+        "Compute": "GroundSpeed"
+      },
+      "Gravity": 10,
+      "MaxFallSpeed": 10,
+      "Acceleration": 10
+    }
+  ],
+  "Instructions": [
+    {
+      "$Comment": "Validation-only state setters (disabled).",
+      "Enabled": false,
+      "Actions": [
+        {
+          "Type": "State",
+          "State": "Idle"
+        },
+        {
+          "Type": "State",
+          "State": "TakeOff"
+        },
+        {
+          "Type": "State",
+          "State": "Follow"
+        },
+        {
+          "Type": "State",
+          "State": "Hold"
+        },
+        {
+          "Type": "State",
+          "State": "HoldGrounded"
+        },
+        {
+          "Type": "State",
+          "State": "Land"
+        }
+      ]
+    },
+    {
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "Idle"
+          },
+          "Instructions": [
+            {
+              "Reference": "Component_Instruction_Clear_Status_Animation"
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Walk"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    6,
+                    10
+                  ]
+                },
+                {
+                  "Type": "State",
+                  "State": "TakeOff"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "WanderInCircle",
+                "Radius": {
+                  "Compute": "WanderRadius"
+                }
+              }
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    8,
+                    12
+                  ]
+                },
+                {
+                  "Type": "State",
+                  "State": "Land"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "WanderInCircle",
+                "Radius": {
+                  "Compute": "WanderRadius + 2"
+                },
+                "RelativeSpeed": 0.3
+              }
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "TakeOff"
+          },
+          "Instructions": [
+            {
+              "BodyMotion": {
+                "Type": "TakeOff",
+                "JumpSpeed": 4
+              }
+            },
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Idle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "Follow"
+          },
+          "Instructions": [
+            {
+              "Reference": "Component_Instruction_Clear_Status_Animation"
+            },
+            {
+              "Continue": true,
+              "Sensor": {
+                "Type": "Any",
+                "Once": true
+              },
+              "Actions": [
+                {
+                  "Type": "TameworkSetFlyingCompanionMode",
+                  "Mode": "Follow"
+                }
+              ]
+            },
+            {
+              "Reference": "Component_Tamework_Instruction_Follow_Flying",
+              "Modify": {
+                "MasterTargetSlot": "MasterTarget",
+                "FollowDesiredAltitudeRange": [
+                  4,
+                  8
+                ],
+                "FollowTeleportThresholdRange": 32,
+                "FollowSeekSlowDownDistance": 10,
+                "FollowSeekStopDistance": 6,
+                "FollowSeekRelativeSpeed": 0.9,
+                "FollowHoverRadius": 1.75,
+                "FollowHoverRelativeSpeed": 0.12
+              }
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "Hold"
+          },
+          "Instructions": [
+            {
+              "Reference": "Component_Instruction_Clear_Status_Animation"
+            },
+            {
+              "Continue": true,
+              "Sensor": {
+                "Type": "Any",
+                "Once": true
+              },
+              "Actions": [
+                {
+                  "Type": "TameworkSetFlyingCompanionMode",
+                  "Mode": "Hold",
+                  "LandingState": "Hold",
+                  "GroundedState": "HoldGrounded",
+                  "DescendStep": 0.12,
+                  "ReissueDelayMs": 50,
+                  "GroundedStableTicks": 3,
+                  "VerticalMovementEpsilon": 0.15
+                }
+              ]
+            },
+            {
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "HoldGrounded"
+          },
+          "Instructions": [
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Walk"
+              },
+              "Instructions": [
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Any",
+                    "Once": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "SetFlag",
+                      "Name": "HoldLandingPending",
+                      "SetTo": false
+                    },
+                    {
+                      "Type": "ResetSearchRays"
+                    },
+                    {
+                      "Type": "SetFlag",
+                      "Name": "HoldLandAnimationPending",
+                      "SetTo": true
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Slot": "Status",
+                      "Animation": "Land"
+                    }
+                  ]
+                },
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Flag",
+                    "Name": "HoldLandAnimationPending"
+                  },
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "Timeout",
+                      "Delay": [
+                        0.6,
+                        0.6
+                      ]
+                    },
+                    {
+                      "Type": "SetFlag",
+                      "Name": "HoldLandAnimationPending",
+                      "SetTo": false
+                    }
+                  ]
+                },
+                {
+                  "Sensor": {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "Flag",
+                      "Name": "HoldLandAnimationPending"
+                    }
+                  },
+                  "Instructions": [
+                    {
+                      "Reference": "Component_Instruction_Clear_Status_Animation"
+                    }
+                  ]
+                },
+                {
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "Land"
+          },
+          "Instructions": [
+            {
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              },
+              "Instructions": [
+                {
+                  "Sensor": {
+                    "Type": "AdjustPosition",
+                    "Offset": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "Sensor": {
+                      "Type": "SearchRay",
+                      "Name": "LandingRay",
+                      "Range": 20,
+                      "Angle": 45,
+                      "Blocks": "Gaia"
+                    }
+                  },
+                  "BodyMotion": {
+                    "Type": "Land",
+                    "SlowDownDistance": 5,
+                    "StopDistance": 0.5,
+                    "GoalLenience": 3
+                  }
+                },
+                {
+                  "BodyMotion": {
+                    "Type": "Wander",
+                    "RelativeSpeed": 0.2
+                  }
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "Flag",
+                "Name": "HoldLandingPending"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    4,
+                    6
+                  ]
+                },
+                {
+                  "Type": "ResetSearchRays"
+                },
+                {
+                  "Type": "State",
+                  "State": "HoldGrounded"
+                }
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "Flag",
+                "Name": "HoldLandingPending",
+                "Set": false
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [
+                    4,
+                    6
+                  ]
+                },
+                {
+                  "Type": "ResetSearchRays"
+                },
+                {
+                  "Type": "State",
+                  "State": "Idle"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "InteractionInstruction": {
+    "Instructions": [
+      {
+        "Continue": true,
+        "Actions": [
+          {
+            "Type": "LockOnInteractionTarget",
+            "TargetSlot": "InteractionTarget"
+          }
+        ]
+      },
+      {
+        "Enabled": {
+          "Compute": "!isEmpty(InteractionConfigId)"
+        },
+        "Continue": true,
+        "Sensor": {
+          "Type": "Any"
+        },
+        "Actions": [
+          {
+            "Type": "TameworkInteractPrompt",
+            "ConfigId": {
+              "Compute": "InteractionConfigId"
+            },
+            "LovedItems": {
+              "Compute": "AttractiveItemSet"
+            }
+          }
+        ]
+      },
+      {
+        "Enabled": {
+          "Compute": "!isEmpty(InteractionConfigId)"
+        },
+        "Sensor": {
+          "Type": "HasInteracted"
+        },
+        "Actions": [
+          {
+            "Type": "LockOnInteractionTarget",
+            "TargetSlot": "InteractionTarget"
+          },
+          {
+            "Type": "LockOnInteractionTarget",
+            "TargetSlot": "MasterTarget"
+          },
+          {
+            "Type": "TameworkInteract",
+            "ConfigId": {
+              "Compute": "InteractionConfigId"
+            },
+            "LovedItems": {
+              "Compute": "AttractiveItemSet"
+            }
+          }
+        ]
+      },
+      {
+        "$Comment": "Only now that we've failed to match all possible interactions do we set interactability to false.",
+        "Enabled": {
+          "Compute": "isEmpty(InteractionConfigId)"
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": false
+          }
+        ]
+      }
+    ]
+  },
+  "NameTranslationKey": {
+    "Compute": "NameTranslationKey"
+  }
+}

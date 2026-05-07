@@ -786,8 +786,8 @@
             "Idle",
             "Follow",
             "Defend",
-            "CommandMove",
-            "Aggressive"
+            "Aggressive",
+            "CommandMove"
           ]
         }
       ],
@@ -815,7 +815,7 @@
       ]
     },
     {
-      "$Comment": "Clear looping status animation when leaving hold/sleep/needs states so locomotion can play.",
+      "$Comment": "Clear status-slot animation when entering locomotion/command states so movement animations can play.",
       "States": [
         {
           "From": [
@@ -823,14 +823,14 @@
             "Sleep",
             "SleepWakeResolve",
             "NeedsSeekWater",
-            "NeedsSeekFood"
+            "NeedsSeekFood",
+            "Defend",
+            "Aggressive"
           ],
           "To": [
             "Idle",
             "Follow",
-            "Defend",
-            "CommandMove",
-            "Aggressive"
+            "CommandMove"
           ]
         }
       ],
@@ -1182,7 +1182,16 @@
             {
               "Reference": "Component_Tamework_Instruction_Follow_Advanced",
               "Modify": {
-                "MasterTargetSlot": "MasterTarget"
+                "MasterTargetSlot": "MasterTarget",
+                "FollowDefaultSpotRange": 10,
+                "FollowLockOnRange": 20,
+                "FollowSeekSlowDownDistance": 8,
+                "FollowSeekStopDistance": 6,
+                "FollowScanRange": 16,
+                "FollowMaintainDistanceRange": [
+                  5,
+                  9
+                ]
               }
             }
           ]

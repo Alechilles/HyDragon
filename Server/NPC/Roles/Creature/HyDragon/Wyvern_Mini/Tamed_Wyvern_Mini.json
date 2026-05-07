@@ -1,0 +1,29 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Wyvern_Mini_Flying_Tamed",
+  "Modify": {
+    "Appearance": "Wyvern_Mini",
+    "DropList": "Empty",
+    "WanderRadius": 10,
+    "ViewRange": 28,
+    "HearingRange": 18,
+    "GroundSpeed": 3.5,
+    "FlightSpeed": 12,
+    "MaxHealth": 80,
+    "AttractiveItemSet": [
+      "Food_Wildmeat_Raw",
+      "Food_Chicken_Raw",
+      "Food_Fish_Raw"
+    ],
+    "InteractionConfigId": "HyDragonIntWyvernMini",
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Wyvern_Mini.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}

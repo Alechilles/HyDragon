@@ -42,7 +42,7 @@
         "Ability": "Root_NPC_Hydra_Attack",
         "AttackDistanceRange": [
           1,
-          4.5
+          6
         ],
         "PostExecuteDistanceRange": [
           3.5,
@@ -63,7 +63,7 @@
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "Type": "Switch",
-              "SwitchPoint": 1
+              "SwitchPoint": 3
             }
           }
         ]
@@ -76,7 +76,7 @@
         "Ability": "Root_NPC_Hydra_Bite",
         "AttackDistanceRange": [
           3.5,
-          5.75
+          6.25
         ],
         "PostExecuteDistanceRange": [
           3.5,
@@ -97,10 +97,46 @@
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "Type": "Switch",
-              "SwitchPoint": 2
+              "SwitchPoint": 4
             }
           }
         ]
+      },
+      "TailSpinAttack": {
+        "Type": "Ability",
+        "Description": "Periodically spin counter-clockwise and sweep a damaging circle around the Hydra",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "Ability": "Root_NPC_Hydra_Tail_Spin",
+        "WeightCoefficient": 3.0,
+        "AttackDistanceRange": [
+          1,
+          8
+        ],
+        "PostExecuteDistanceRange": [
+          4,
+          4
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                8
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 20
+            }
+          }
+        ],
+        "RequireAiming": false
       },
       "RangedAttack": {
         "Type": "Ability",
@@ -108,8 +144,9 @@
         "Target": "Hostile",
         "SubState": "Ranged",
         "Ability": "Root_NPC_Hydra_Ice_Ball",
+        "WeightCoefficient": 2.0,
         "AttackDistanceRange": [
-          10,
+          6,
           20
         ],
         "PostExecuteDistanceRange": [
@@ -131,7 +168,7 @@
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "Type": "Switch",
-              "SwitchPoint": 2
+              "SwitchPoint": 10
             }
           }
         ],
@@ -139,27 +176,27 @@
       },
       "RainShootAttack": {
         "Type": "Ability",
-        "Description": "Periodically launch an ice-barrage overhead",
+        "Description": "Occasionally launch an ice-barrage at melee or mid-range as area denial",
         "Target": "Hostile",
         "SubState": "Ranged",
         "Ability": "Root_NPC_Hydra_RainShoot",
-        "WeightCoefficient": 2.0,
+        "WeightCoefficient": 3.0,
         "AttackDistanceRange": [
-          6,
-          20
+          1,
+          10
         ],
         "PostExecuteDistanceRange": [
-          8,
-          12
+          3.5,
+          3.5
         ],
         "Conditions": [
           {
             "Type": "TargetDistance",
             "Curve": {
-              "ResponseCurve": "SimpleLogistic",
+              "ResponseCurve": "SimpleDescendingLogistic",
               "XRange": [
                 0,
-                20
+                12
               ]
             }
           },
@@ -167,11 +204,11 @@
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "Type": "Switch",
-              "SwitchPoint": 6
+              "SwitchPoint": 45
             }
           }
         ],
-        "RequireAiming": true
+        "RequireAiming": false
       }
     },
     "MinActionUtility": 0.01,
@@ -182,16 +219,17 @@
             "Root_NPC_Hydra_Attack"
           ],
           "Randomise": false,
-          "MaxRange": 3.5,
+          "MaxRange": 5.25,
           "Timeout": 2,
           "CooldownRange": [
-            0.5,
-            1.5
+            2,
+            3
           ]
         },
         "Actions": [
           "SelectTarget",
           "RainShootAttack",
+          "TailSpinAttack",
           "RangedAttack",
           "BiteAttack"
         ]
@@ -205,13 +243,14 @@
           "MaxRange": 30,
           "Timeout": 1,
           "CooldownRange": [
-            1.5,
-            3
+            10,
+            10
           ]
         },
         "Actions": [
           "SelectTarget",
           "RainShootAttack",
+          "TailSpinAttack",
           "MeleeAttack",
           "BiteAttack"
         ]

@@ -17,8 +17,8 @@
     },
     "Rainshoot": {
       "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Rainshoot.blockyanim",
-      "Speed": 1,
-      "Looping": true
+      "Speed": 0.5,
+      "Looping": false
     },
     "BasicShoot": {
       "ThirdPerson": "NPC/HyDragon/Hydra/Animations/BasicShoot.blockyanim",
@@ -37,6 +37,11 @@
     },
     "Bite": {
       "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Bite.blockyanim",
+      "Speed": 1,
+      "Looping": false
+    },
+    "TailSpin": {
+      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Tail_Spin.blockyanim",
       "Speed": 1,
       "Looping": false
     }

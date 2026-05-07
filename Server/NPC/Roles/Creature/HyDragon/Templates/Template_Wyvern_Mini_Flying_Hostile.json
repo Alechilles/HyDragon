@@ -78,6 +78,38 @@
       "Value": 80,
       "Description": "Max health for the NPC"
     },
+    "AttractiveItemSet": {
+      "Value": [
+        "Food_Wildmeat_Raw",
+        "Food_Chicken_Raw",
+        "Food_Fish_Raw"
+      ],
+      "TypeHint": "String",
+      "Description": "The list of items that are deemed attractive for tame interactions."
+    },
+    "IsTameable": {
+      "Value": false,
+      "Description": "Whether this NPC can be tamed."
+    },
+    "TameRoleChange": {
+      "Value": "Tamed_Wyvern_Mini",
+      "Description": "The role the NPC will change into when it's tamed."
+    },
+    "TranquilizerSleepThresholdSeconds": {
+      "Value": 50,
+      "Description": "Minimum remaining tranquilizer duration required to force Sleep.Tranquilized."
+    },
+    "TranquilizerSleepHealthRange": {
+      "Value": [
+        0,
+        0.2
+      ],
+      "Description": "Health ratio range required for tranquilizer-forced sleep."
+    },
+    "InteractionConfigId": {
+      "Value": "",
+      "Description": "Optional TwInteractionConfig asset id override. If set, Tamework interaction flow is used for this role."
+    },
     "IsMemory": {
       "Value": false,
       "Description": "Defines if the NPC is a memory"
@@ -146,6 +178,110 @@
     }
   ],
   "Instructions": [
+    {
+      "$Comment": "Validation-only state setters (disabled).",
+      "Enabled": false,
+      "Actions": [
+        {
+          "Type": "State",
+          "State": "Sleep.TranquilizedLanding"
+        },
+        {
+          "Type": "State",
+          "State": "Sleep.TranquilizedGrounded"
+        }
+      ]
+    },
+    {
+      "$Comment": "Latch tranquilizer sleep eligibility once remaining duration reaches threshold.",
+      "Continue": true,
+      "Sensor": {
+        "Type": "TameworkEffectActive",
+        "EffectId": "Tw_Status_Tranquilized",
+        "MinRemainingSeconds": {
+          "Compute": "TranquilizerSleepThresholdSeconds"
+        }
+      },
+      "Actions": [
+        {
+          "Type": "SetFlag",
+          "Name": "TranquilizerSleepEligible",
+          "SetTo": true
+        }
+      ]
+    },
+    {
+      "$Comment": "Clear tranquilizer sleep eligibility when tranquilizer effect ends.",
+      "Continue": true,
+      "Sensor": {
+        "Type": "Not",
+        "Sensor": {
+          "Type": "TameworkEffectActive",
+          "EffectId": "Tw_Status_Tranquilized"
+        }
+      },
+      "Actions": [
+        {
+          "Type": "SetFlag",
+          "Name": "TranquilizerSleepEligible",
+          "SetTo": false
+        }
+      ]
+    },
+    {
+      "$Comment": "Force tranquilized sleep when effect is active, eligibility is latched, and current health is in the configured range.",
+      "Continue": true,
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          {
+            "Type": "TameworkEffectActive",
+            "EffectId": "Tw_Status_Tranquilized"
+          },
+          {
+            "Type": "Flag",
+            "Name": "TranquilizerSleepEligible"
+          },
+          {
+            "Type": "Not",
+            "Sensor": {
+              "Type": "Or",
+              "Sensors": [
+                {
+                  "Type": "State",
+                  "State": "Sleep.TranquilizedLanding"
+                },
+                {
+                  "Type": "State",
+                  "State": "Sleep.TranquilizedGrounded"
+                }
+              ]
+            }
+          },
+          {
+            "Type": "Self",
+            "Filters": [
+              {
+                "Type": "Stat",
+                "StatTarget": "Value",
+                "RelativeTo": "Health",
+                "Stat": "Health",
+                "RelativeToTarget": "Max",
+                "ValueRange": {
+                  "Compute": "TranquilizerSleepHealthRange"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "State",
+          "State": "Sleep.TranquilizedLanding"
+        }
+      ]
+    },
     {
       "Instructions": [
         {
@@ -790,10 +926,249 @@
               ]
             }
           ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": "Sleep"
+          },
+          "Instructions": [
+            {
+              "$Comment": "Tranquilized sleep landing: stay in a landing-only substate until Tamework confirms touchdown.",
+              "Sensor": {
+                "Type": "State",
+                "State": ".TranquilizedLanding"
+              },
+              "Instructions": [
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Any",
+                    "Once": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "TameworkSetFlyingCompanionMode",
+                      "Mode": "Hold",
+                      "LandingState": "Sleep.TranquilizedLanding",
+                      "GroundedState": "Sleep.TranquilizedGrounded",
+                      "DescendStep": 0.12,
+                      "ReissueDelayMs": 50,
+                      "GroundedStableTicks": 3,
+                      "VerticalMovementEpsilon": 0.15
+                    }
+                  ]
+                },
+                {
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "Sensor": {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "TameworkEffectActive",
+                      "EffectId": "Tw_Status_Tranquilized"
+                    }
+                  },
+                  "Actions": [
+                    {
+                      "Type": "ResetSearchRays"
+                    },
+                    {
+                      "Type": "ReleaseTarget"
+                    },
+                    {
+                      "Type": "TameworkSetFlyingCompanionMode",
+                      "Mode": "Follow"
+                    },
+                    {
+                      "Type": "State",
+                      "State": "IdleGround"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$Comment": "Tranquilized grounded sleep: play the touchdown animation once, then sleep while effect is active.",
+              "Sensor": {
+                "Type": "State",
+                "State": ".TranquilizedGrounded"
+              },
+              "Instructions": [
+                {
+                  "Sensor": {
+                    "Type": "MotionController",
+                    "MotionController": "Walk"
+                  },
+                  "Instructions": [
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "SetFlag",
+                          "Name": "TranquilizedLandAnimationPending",
+                          "SetTo": true
+                        },
+                        {
+                          "Type": "PlayAnimation",
+                          "Slot": "Status",
+                          "Animation": "Land"
+                        }
+                      ]
+                    },
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Flag",
+                        "Name": "TranquilizedLandAnimationPending"
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": [
+                            0.6,
+                            0.6
+                          ]
+                        },
+                        {
+                          "Type": "SetFlag",
+                          "Name": "TranquilizedLandAnimationPending",
+                          "SetTo": false
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Not",
+                        "Sensor": {
+                          "Type": "Flag",
+                          "Name": "TranquilizedLandAnimationPending"
+                        }
+                      },
+                      "Instructions": [
+                        {
+                          "Reference": "Component_Instruction_Play_Animation",
+                          "Modify": {
+                            "Animation": "Sleep"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "BodyMotion": {
+                        "Type": "Nothing"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Sensor": {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "TameworkEffectActive",
+                      "EffectId": "Tw_Status_Tranquilized"
+                    }
+                  },
+                  "Actions": [
+                    {
+                      "Type": "ResetSearchRays"
+                    },
+                    {
+                      "Type": "ReleaseTarget"
+                    },
+                    {
+                      "Type": "TameworkSetFlyingCompanionMode",
+                      "Mode": "Follow"
+                    },
+                    {
+                      "Type": "State",
+                      "State": "IdleGround"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
   ],
+  "InteractionInstruction": {
+    "Instructions": [
+      {
+        "Continue": true,
+        "Actions": [
+          {
+            "Type": "LockOnInteractionTarget",
+            "TargetSlot": "InteractionTarget"
+          }
+        ]
+      },
+      {
+        "Enabled": {
+          "Compute": "!isEmpty(InteractionConfigId) && IsTameable"
+        },
+        "Continue": true,
+        "Sensor": {
+          "Type": "Any"
+        },
+        "Actions": [
+          {
+            "Type": "TameworkInteractPrompt",
+            "ConfigId": {
+              "Compute": "InteractionConfigId"
+            },
+            "LovedItems": {
+              "Compute": "AttractiveItemSet"
+            }
+          }
+        ]
+      },
+      {
+        "Enabled": {
+          "Compute": "!isEmpty(InteractionConfigId) && IsTameable"
+        },
+        "Sensor": {
+          "Type": "HasInteracted"
+        },
+        "Actions": [
+          {
+            "Type": "LockOnInteractionTarget",
+            "TargetSlot": "InteractionTarget"
+          },
+          {
+            "Type": "TameworkInteract",
+            "ConfigId": {
+              "Compute": "InteractionConfigId"
+            },
+            "LovedItems": {
+              "Compute": "AttractiveItemSet"
+            }
+          }
+        ]
+      },
+      {
+        "$Comment": "Only now that we've failed to match all possible interactions do we set interactability to false.",
+        "Enabled": {
+          "Compute": "isEmpty(InteractionConfigId)"
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": false
+          }
+        ]
+      }
+    ]
+  },
   "NameTranslationKey": {
     "Compute": "NameTranslationKey"
   }

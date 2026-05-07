@@ -1,0 +1,16 @@
+{
+  "Environments": [
+    "Env_Zone3_Glacial"
+  ],
+  "NPCs": [
+    {
+      "Weight": 1,
+      "SpawnBlockSet": "IceAndSnow",
+      "Id": "Hydra"
+    }
+  ],
+  "DayTimeRange": [
+    6,
+    18
+  ]
+}

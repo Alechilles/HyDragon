@@ -4,14 +4,14 @@
   "EyeHeight": 1.6,
   "HitBox": {
     "Max": {
-      "X": 1.8,
-      "Y": 2.0,
-      "Z": 2.4
+      "X": 0.5,
+      "Y": 1.3,
+      "Z": 0.5
     },
     "Min": {
-      "X": -1.8,
+      "X": -0.5,
       "Y": 0,
-      "Z": -2.4
+      "Z": -0.5
     }
   },
   "Camera": {
@@ -46,7 +46,8 @@
       "Animations": [
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/IdleLanded.blockyanim",
-          "Speed": 0.8
+          "Speed": 0.8,
+          "Looping": true
         }
       ]
     },
@@ -114,7 +115,9 @@
       "Animations": [
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Sleep.blockyanim",
-          "Speed": 0.8
+          "Looping": true,
+          "Speed": 0.8,
+          "BlendingDuration": 0.2
         }
       ]
     },
@@ -132,6 +135,15 @@
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Dead.blockyanim",
           "Looping": false
+        }
+      ]
+    },
+    "Land": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Landed.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1
         }
       ]
     }

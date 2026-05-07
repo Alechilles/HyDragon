@@ -46,7 +46,7 @@
         ]
       },
       "ProjectileId": "Hydra_Ice_Ball",
-      "TrajectoryMode": "DIRECT",
+      "TrajectoryMode": "Direct",
       "TargetSlot": "CAETargetSlot",
       "ImpactEffect": {
         "EffectId": "Chilled",
@@ -91,7 +91,7 @@
         ]
       },
       "ProjectileId": "Hydra_Ice_Ball",
-      "TrajectoryMode": "DIRECT",
+      "TrajectoryMode": "Direct",
       "TargetSlot": "CAETargetSlot",
       "ImpactEffect": {
         "EffectId": "Chilled",
@@ -136,7 +136,7 @@
         ]
       },
       "ProjectileId": "Hydra_Ice_Ball",
-      "TrajectoryMode": "DIRECT",
+      "TrajectoryMode": "Direct",
       "TargetSlot": "CAETargetSlot",
       "ImpactEffect": {
         "EffectId": "Chilled",

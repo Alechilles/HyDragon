@@ -14,9 +14,11 @@
     "DropList": "Empty",
     "MaxSpeed": 7,
     "Attack": "Root_NPC_Hydra_Attack",
-    "AttackDistance": 3.5,
+    "AttackDistance": 5,
+    "AttackPauseRange": [3, 4],
+    "CombatAttackPostDelay": [0.7, 0.7],
     "TargetRange": 12,
-    "CombatBehaviorDistance": 18,
+    "CombatBehaviorDistance": 19,
     "CombatAlwaysMovingWeight": 10,
     "RunThreshold": 0.3,
     "KnockbackScale": 0.1,
@@ -39,7 +41,7 @@
     ],
     "MaxHealth": 400,
     "AttractiveItemSet": [
-      "Food_Wildmeat_Raw"
+      "Draconic_Stone"
     ],
     "NeedsSeekConsumeAnimation": "",
     "CanFollow": true,

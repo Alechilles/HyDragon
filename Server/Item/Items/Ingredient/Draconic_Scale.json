@@ -1,0 +1,38 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Scale.name",
+    "Description": "server.items.Draconic_Scale.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Scale.png",
+  "Quality": "Uncommon",
+  "Categories": [
+    "Items.Ingredients"
+  ],
+  "Model": "Items/HyDragon/Draconic_Scale.blockymodel",
+  "Texture": "Items/HyDragon/Draconic_Scale.png",
+  "PlayerAnimationsId": "Item",
+  "IconProperties": {
+    "Scale": 1.6,
+    "Rotation": [
+      0,
+      19,
+      3
+    ],
+    "Translation": [
+      1,
+      -5
+    ]
+  },
+  "Tags": {
+    "Type": [
+      "Ingredient"
+    ]
+  },
+  "ItemEntity": {
+    "ParticleSystemId": null
+  },
+  "Scale": 2,
+  "MaxStack": 100,
+  "ItemSoundSetId": "ISS_Items_Bones",
+  "DropOnDeath": true
+}

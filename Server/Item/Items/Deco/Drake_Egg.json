@@ -1,0 +1,66 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Drake_Egg.name",
+    "Description": "server.items.Drake_Egg.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Drake_Egg.png",
+  "Categories": [
+    "Blocks.Deco"
+  ],
+  "Quality": "Legendary",
+  "MaxStack": 1,
+  "Model": "Items/HyDragon/Drake_Egg.blockymodel",
+  "Texture": "Items/HyDragon/Drake_Egg.png",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "CustomModel": "Items/HyDragon/Drake_Egg.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Items/HyDragon/Drake_Egg.png",
+        "Weight": 1
+      }
+    ],
+    "Group": "Stone",
+    "HitboxType": "Plant_Medium",
+    "Flags": {},
+    "Gathering": {
+      "Soft": {
+        "IsWeaponBreakable": false
+      }
+    },
+    "BlockParticleSetId": "Stone",
+    "BlockSoundSetId": "Stone",
+    "Support": {
+      "Down": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "RandomRotation": "YawStep1",
+    "CustomModelScale": 1.7
+  },
+  "PlayerAnimationsId": "Block",
+  "IconProperties": {
+    "Scale": 1,
+    "Rotation": [
+      355,
+      44,
+      30
+    ],
+    "Translation": [
+      2,
+      -8
+    ]
+  },
+  "Tags": {
+    "Type": [
+      "Deco"
+    ]
+  },
+  "Scale": 2,
+  "ItemSoundSetId": "ISS_Blocks_Stone",
+  "DropOnDeath": true
+}

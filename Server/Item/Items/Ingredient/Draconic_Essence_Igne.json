@@ -1,0 +1,42 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Essence_Igne.name",
+    "Description": "server.items.Draconic_Essence_Igne.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Essence_Igne.png",
+  "Quality": "Uncommon",
+  "Categories": [
+    "Items.Ingredients"
+  ],
+  "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
+  "Texture": "Items/HyDragon/Draconic_Essence_Igne.png",
+  "PlayerAnimationsId": "Item",
+  "IconProperties": {
+    "Scale": 1.8,
+    "Rotation": [
+      24,
+      35,
+      0
+    ],
+    "Translation": [
+      -6.5,
+      -23
+    ]
+  },
+  "Tags": {
+    "Type": [
+      "Ingredient"
+    ]
+  },
+  "ItemEntity": {
+    "ParticleSystemId": null
+  },
+  "Scale": 1,
+  "Light": {
+    "Color": "#420",
+    "Radius": 1
+  },
+  "MaxStack": 100,
+  "ItemSoundSetId": "ISS_Items_Gems",
+  "DropOnDeath": true
+}

@@ -1,0 +1,71 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Stone.name",
+    "Description": "server.items.Draconic_Stone.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Stone.png",
+  "Quality": "Epic",
+  "Categories": [
+    "Items.Ingredients"
+  ],
+  "Recipe": {
+    "Input": [
+      {
+        "ItemId": "Draconic_Scale",
+        "Quantity": 2
+      },
+      {
+        "ItemId": "Draconic_Essence_Cryo",
+        "Quantity": 1
+      },
+      {
+        "ItemId": "Draconic_Essence_Nature",
+        "Quantity": 1
+      }
+    ],
+    "Output": [
+      {
+        "ItemId": "Draconic_Stone",
+        "Quantity": 1
+      }
+    ],
+    "BenchRequirement": [
+      {
+        "Type": "Crafting",
+        "Id": "Arcanebench",
+        "Categories": [
+          "Arcane_Misc"
+        ]
+      }
+    ],
+    "OutputQuantity": 1,
+    "TimeSeconds": 3
+  },
+  "Model": "Items/HyDragon/Draconic_Stone.blockymodel",
+  "Texture": "Items/HyDragon/Draconic_Stone.png",
+  "PlayerAnimationsId": "Item",
+  "IconProperties": {
+    "Scale": 1.2,
+    "Rotation": [
+      342,
+      20,
+      24
+    ],
+    "Translation": [
+      6,
+      -14
+    ]
+  },
+  "Tags": {
+    "Type": [
+      "Ingredient"
+    ]
+  },
+  "ItemEntity": {
+    "ParticleSystemId": null
+  },
+  "Scale": 1.75,
+  "MaxStack": 50,
+  "ItemSoundSetId": "ISS_Items_Ingots",
+  "DropOnDeath": true
+}

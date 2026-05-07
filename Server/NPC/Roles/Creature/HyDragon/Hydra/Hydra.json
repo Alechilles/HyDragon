@@ -1,22 +1,23 @@
 {
   "Type": "Variant",
-  "Reference": "Template_HyDragon",
+  "Reference": "Template_Hydra_Intelligent",
   "Modify": {
     "Appearance": "Hydra",
     "Weapons": [],
-    "FlockArray": [
-      "Hydra"
-    ],
+    "OffHand": [],
+    "NighttimeOffhandSlot": -1,
+    "FlockArray": ["Hydra"],
     "AttitudeGroup": "PredatorsBig",
     "WanderRadius": 8,
     "ViewRange": 36,
     "HearingRange": 24,
-    "DropList": "Empty",
+    "DropList": "Drop_Hydra",
     "MaxSpeed": 7,
-    "CombatConfig": "CAE_Hydra",
+    "_CombatConfig": "CAE_Hydra",
     "UseCombatActionEvaluator": true,
     "Attack": "Root_NPC_Hydra_Attack",
-    "AttackDistance": 3.5,
+    "AttackDistance": 5,
+    "DesiredAttackDistanceRange": [0.5, 5],
     "TargetRange": 12,
     "CombatBehaviorDistance": 18,
     "CombatAlwaysMovingWeight": 10,
@@ -36,24 +37,34 @@
     "LeashDistance": 60,
     "HardLeashDistance": 100,
     "LeashMinPlayerDistance": 15,
-    "LeashTimer": [
-      12,
-      16
-    ],
-    "MaxHealth": 400,
+    "LeashTimer": [12, 16],
+    "WakingPeriod": [0, 24],
+    "MaxHealth": 800,
     "IsTameable": true,
     "TameRoleChange": "Tamed_Hydra",
-    "AttractiveItemSet": [
-      "Food_Wildmeat_Raw"
-    ],
+    "AttractiveItemSet": ["Draconic_Stone"],
     "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
-    "TranquilizerSleepThresholdSeconds": 170,
+    "TranquilizerSleepThresholdSeconds": 50,
     "InteractionConfigId": "HyDragonIntBeast",
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
     "MemoriesNameOverride": "Hydra",
     "BreathesInWater": false,
     "_InteractionVars": {
+      "Bite_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Bite_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
       "Swipe_Left_Damage": {
         "Interactions": [
           {
@@ -95,12 +106,27 @@
             }
           }
         ]
+      },
+      "Tail_Spin_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Tail_Spin_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
       }
     },
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"
     }
   },
+  "Debug": "DisplayState",
   "Parameters": {
     "NameTranslationKey": {
       "Value": "server.npcRoles.Hydra.name",

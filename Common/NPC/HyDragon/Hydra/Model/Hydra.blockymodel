@@ -257,7 +257,7 @@
                         "unwrapMode": "custom",
                         "visible": true,
                         "doubleSided": true,
-                        "shadingMode": "flat"
+                        "shadingMode": "fullbright"
                       }
                     },
                     {
@@ -285,7 +285,7 @@
                         "unwrapMode": "custom",
                         "visible": true,
                         "doubleSided": true,
-                        "shadingMode": "flat"
+                        "shadingMode": "fullbright"
                       }
                     },
                     {
@@ -313,7 +313,7 @@
                         "unwrapMode": "custom",
                         "visible": true,
                         "doubleSided": true,
-                        "shadingMode": "flat"
+                        "shadingMode": "fullbright"
                       }
                     },
                     {
