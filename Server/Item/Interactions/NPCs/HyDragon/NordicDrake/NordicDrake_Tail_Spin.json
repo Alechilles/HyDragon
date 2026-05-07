@@ -1,0 +1,55 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "NordicDrake_Default",
+    "ItemAnimationId": "TailSpin",
+    "WorldSoundEventId": "SFX_Bear_Grizzly_Attack"
+  },
+  "RunTime": 0.45,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.25,
+            "Selector": {
+              "Id": "AOECircle",
+              "Range": 8
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultOk": true,
+                  "Var": "Tail_Spin_Damage",
+                  "DefaultValue": {
+                    "Interactions": [
+                      "NordicDrake_Tail_Spin_Damage"
+                    ]
+                  }
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.45
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.25,
+            "Effects": {
+              "WorldSoundEventId": "SFX_Bear_Grizzly_Attack"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -5,7 +5,7 @@
     {
       "Type": "Simple",
       "Effects": {
-        "ItemPlayerAnimationsId": "Hydra_Default",
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
         "ItemAnimationId": "PrepareShoot"
       },
       "RunTime": 1
@@ -13,12 +13,12 @@
     {
       "Type": "Simple",
       "Effects": {
-        "ItemPlayerAnimationsId": "Hydra_Default",
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
         "ItemAnimationId": "ChargeShoot",
         "Particles": [
           {
             "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
+            "TargetNodeName": "Head",
             "SystemId": "Hydra_Ice_Ball_Charging",
             "PositionOffset": {
               "Z": 0
@@ -37,7 +37,7 @@
         "Particles": [
           {
             "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
+            "TargetNodeName": "Head",
             "SystemId": "Ice_Staff",
             "DetachedFromModel": false,
             "PositionOffset": {},
@@ -50,7 +50,7 @@
       "TargetSlot": "CAETargetSlot",
       "ImpactEffect": {
         "EffectId": "Chilled",
-        "Radius": 3.0,
+        "Radius": 3,
         "ExcludeSource": true
       },
       "Tags": {}
@@ -58,12 +58,12 @@
     {
       "Type": "Simple",
       "Effects": {
-        "ItemPlayerAnimationsId": "Hydra_Default",
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
         "ItemAnimationId": "ChargeShoot",
         "Particles": [
           {
             "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
+            "TargetNodeName": "Head",
             "SystemId": "Hydra_Ice_Ball_Charging",
             "PositionOffset": {
               "Z": 0
@@ -82,7 +82,7 @@
         "Particles": [
           {
             "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
+            "TargetNodeName": "Head",
             "SystemId": "Ice_Staff",
             "DetachedFromModel": false,
             "PositionOffset": {},
@@ -95,7 +95,7 @@
       "TargetSlot": "CAETargetSlot",
       "ImpactEffect": {
         "EffectId": "Chilled",
-        "Radius": 3.0,
+        "Radius": 3,
         "ExcludeSource": true
       },
       "Tags": {}
@@ -103,12 +103,12 @@
     {
       "Type": "Simple",
       "Effects": {
-        "ItemPlayerAnimationsId": "Hydra_Default",
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
         "ItemAnimationId": "ChargeShoot",
         "Particles": [
           {
             "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
+            "TargetNodeName": "Head",
             "SystemId": "Hydra_Ice_Ball_Charging",
             "PositionOffset": {
               "Z": 0
@@ -127,7 +127,7 @@
         "Particles": [
           {
             "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
+            "TargetNodeName": "Head",
             "SystemId": "Ice_Staff",
             "DetachedFromModel": false,
             "PositionOffset": {},
@@ -140,7 +140,7 @@
       "TargetSlot": "CAETargetSlot",
       "ImpactEffect": {
         "EffectId": "Chilled",
-        "Radius": 3.0,
+        "Radius": 3,
         "ExcludeSource": true
       },
       "Tags": {}
@@ -148,7 +148,7 @@
     {
       "Type": "Simple",
       "Effects": {
-        "ItemPlayerAnimationsId": "Hydra_Default",
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
         "ItemAnimationId": "FinishShoot"
       },
       "RunTime": 0.5

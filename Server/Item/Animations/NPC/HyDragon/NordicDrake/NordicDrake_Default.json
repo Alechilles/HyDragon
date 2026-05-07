@@ -1,67 +1,67 @@
 {
   "Animations": {
     "SwipeLeft": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Swipe_Left.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/Swipe_Left.blockyanim",
       "Speed": 1,
       "Looping": false
     },
     "SwipeRight": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Swipe_Right.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/Swipe_Right.blockyanim",
       "Speed": 1,
       "Looping": false
     },
     "Stomp": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Stomp.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/Stomp.blockyanim",
       "Speed": 1,
       "Looping": false
     },
     "Rainshoot": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Rainshoot.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/Rainshoot.blockyanim",
       "Speed": 0.5,
       "Looping": false
     },
     "PrepareRainshoot": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/PrepareRainshoot.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/PrepareRainshoot.blockyanim",
       "Speed": 1,
       "Looping": false
     },
     "ChargeRainshoot": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/ChargeRainshoot.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/ChargeRainshoot.blockyanim",
       "Speed": 1,
       "Looping": true
     },
     "FinishRainshoot": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/FinishRainshoot.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/FinishRainshoot.blockyanim",
       "Speed": 1,
       "Looping": false
     },
     "BasicShoot": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/BasicShoot.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/BasicShoot.blockyanim",
       "Speed": 0.55,
       "Looping": false
     },
     "PrepareShoot": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/PrepareShoot.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/PrepareShoot.blockyanim",
       "Speed": 1,
       "Looping": false
     },
     "ChargeShoot": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/ChargeShoot.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/ChargeShoot.blockyanim",
       "Speed": 1,
       "Looping": true
     },
     "FinishShoot": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/FinishShoot.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/FinishShoot.blockyanim",
       "Speed": 1,
       "Looping": false
     },
     "Bite": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Bite.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/Bite.blockyanim",
       "Speed": 1,
       "Looping": false
     },
     "TailSpin": {
-      "ThirdPerson": "NPC/HyDragon/Hydra/Animations/Tail_Spin.blockyanim",
+      "ThirdPerson": "NPC/HyDragon/NordicDrake/Animations/Tail_Spin.blockyanim",
       "Speed": 1,
       "Looping": false
     }

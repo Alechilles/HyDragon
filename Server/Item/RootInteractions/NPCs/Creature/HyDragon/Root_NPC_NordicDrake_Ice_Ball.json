@@ -1,0 +1,11 @@
+{
+  "Interactions": [
+    "NordicDrake_Ice_Ball"
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  },
+  "RequireNewClick": false
+}

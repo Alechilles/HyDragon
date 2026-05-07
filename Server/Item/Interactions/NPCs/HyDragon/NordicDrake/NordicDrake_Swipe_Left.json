@@ -1,0 +1,62 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "NordicDrake_Default",
+    "ItemAnimationId": "SwipeLeft"
+  },
+  "RunTime": 0.379,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.152,
+            "Selector": {
+              "Id": "Horizontal",
+              "Direction": "ToLeft",
+              "TestLineOfSight": true,
+              "ExtendTop": 0.75,
+              "ExtendBottom": 0.75,
+              "StartDistance": 1,
+              "EndDistance": 5.25,
+              "Length": 105,
+              "RollOffset": 45,
+              "YawStartOffset": -60
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultOk": true,
+                  "Var": "Swipe_Left_Damage",
+                  "DefaultValue": {
+                    "Interactions": [
+                      "NordicDrake_Swipe_Left_Damage"
+                    ]
+                  }
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.53
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.303,
+            "Effects": {
+              "WorldSoundEventId": "SFX_Bear_Grizzly_Attack"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

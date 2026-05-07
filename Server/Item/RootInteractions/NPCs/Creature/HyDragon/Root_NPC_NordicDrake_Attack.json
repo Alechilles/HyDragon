@@ -1,0 +1,19 @@
+{
+  "Interactions": [
+    {
+      "Type": "Chaining",
+      "ChainId": "NordicDrakeAttacks",
+      "ChainingAllowance": 15,
+      "Next": [
+        "NordicDrake_Swipe_Left",
+        "NordicDrake_Swipe_Right",
+        "NordicDrake_Stomp"
+      ]
+    }
+  ],
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "RockDrake_Stomp_Ground_Crack"
+    },
+    {
+      "SpawnerId": "RockDrake_Stomp_Ground_Shockwave",
+      "PositionOffset": {
+        "Y": 0.08
+      }
+    },
+    {
+      "SpawnerId": "RockDrake_Stomp_Ground_Debris",
+      "PositionOffset": {
+        "Y": 0.2
+      }
+    },
+    {
+      "SpawnerId": "RockDrake_Stomp_Ground_Smoke",
+      "PositionOffset": {
+        "Y": 0.1
+      }
+    }
+  ],
+  "BoundingRadius": 12,
+  "IsImportant": false
+}

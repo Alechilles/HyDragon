@@ -1,0 +1,90 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Hydra_Intelligent",
+  "Modify": {
+    "Appearance": "RockDrake",
+    "Weapons": [],
+    "OffHand": [],
+    "NighttimeOffhandSlot": -1,
+    "FlockArray": [
+      "RockDrake"
+    ],
+    "AttitudeGroup": "PredatorsBig",
+    "WanderRadius": 8,
+    "ViewRange": 36,
+    "HearingRange": 24,
+    "DropList": "Drop_RockDrake",
+    "MaxSpeed": 5.5,
+    "_CombatConfig": "CAE_RockDrake",
+    "UseCombatActionEvaluator": true,
+    "Attack": "Root_NPC_RockDrake_Attack",
+    "AttackDistance": 5,
+    "DesiredAttackDistanceRange": [
+      1,
+      4.5
+    ],
+    "TargetRange": 10,
+    "CombatBehaviorDistance": 14,
+    "CombatAlwaysMovingWeight": 10,
+    "CombatBackwardsRelativeSpeed": 0.4,
+    "RunThreshold": 0.3,
+    "KnockbackScale": 0.1,
+    "ClimbHeight": 2,
+    "MinJumpHeight": 1.5,
+    "AscentAnimationType": "Walk",
+    "ClimbSpeedMult": 1,
+    "ClimbSpeedPow": 1,
+    "ClimbSpeedConst": 5,
+    "DescendSpeedCompensation": 1,
+    "DescendFlatness": 0.9,
+    "DescentSteepness": 0.9,
+    "DescentBlending": 1.5,
+    "LeashDistance": 60,
+    "HardLeashDistance": 100,
+    "LeashMinPlayerDistance": 15,
+    "LeashTimer": [
+      12,
+      16
+    ],
+    "WakingPeriod": [
+      0,
+      24
+    ],
+    "MaxHealth": 650,
+    "IsTameable": false,
+    "AttractiveItemSet": [],
+    "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
+    "TranquilizerSleepThresholdSeconds": 50,
+    "InteractionConfigId": "",
+    "IsMemory": true,
+    "MemoriesCategory": "Reptile",
+    "MemoriesNameOverride": "Rock Drake",
+    "BreathesInWater": false,
+    "_InteractionVars": {
+      "Stomp_Damage": {
+        "Interactions": [
+          {
+            "Parent": "RockDrake_Stomp_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 76
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      }
+    },
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Debug": "DisplayState",
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.RockDrake.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}

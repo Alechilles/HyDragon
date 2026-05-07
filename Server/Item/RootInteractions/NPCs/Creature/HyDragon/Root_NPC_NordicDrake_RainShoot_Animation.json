@@ -6,7 +6,7 @@
         {
           "Type": "Simple",
           "Effects": {
-            "ItemPlayerAnimationsId": "Hydra_Default",
+            "ItemPlayerAnimationsId": "NordicDrake_Default",
             "ItemAnimationId": "PrepareRainshoot"
           },
           "RunTime": 0.39
@@ -14,7 +14,7 @@
         {
           "Type": "Simple",
           "Effects": {
-            "ItemPlayerAnimationsId": "Hydra_Default",
+            "ItemPlayerAnimationsId": "NordicDrake_Default",
             "ItemAnimationId": "ChargeRainshoot"
           },
           "RunTime": 5.61
@@ -22,7 +22,7 @@
         {
           "Type": "Simple",
           "Effects": {
-            "ItemPlayerAnimationsId": "Hydra_Default",
+            "ItemPlayerAnimationsId": "NordicDrake_Default",
             "ItemAnimationId": "FinishRainshoot"
           },
           "RunTime": 0.5

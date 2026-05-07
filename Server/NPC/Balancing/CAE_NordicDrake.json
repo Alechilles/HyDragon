@@ -1,0 +1,259 @@
+{
+  "Type": "CombatActionEvaluator",
+  "TargetMemoryDuration": 10,
+  "CombatActionEvaluator": {
+    "RunConditions": [
+      {
+        "Type": "TimeSinceLastUsed",
+        "Curve": {
+          "ResponseCurve": "Linear",
+          "XRange": [
+            0,
+            10
+          ]
+        }
+      },
+      {
+        "Type": "Randomiser",
+        "MinValue": 0.9,
+        "MaxValue": 1
+      }
+    ],
+    "MinRunUtility": 0.5,
+    "AvailableActions": {
+      "SelectTarget": {
+        "Type": "SelectBasicAttackTarget",
+        "Description": "Select a target",
+        "Conditions": [
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 10
+            }
+          }
+        ]
+      },
+      "MeleeAttack": {
+        "Type": "Ability",
+        "Description": "Return to melee combat",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "Ability": "Root_NPC_NordicDrake_Attack",
+        "AttackDistanceRange": [
+          1,
+          6
+        ],
+        "PostExecuteDistanceRange": [
+          3.5,
+          3.5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                10
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 3
+            }
+          }
+        ]
+      },
+      "BiteAttack": {
+        "Type": "Ability",
+        "Description": "Lunge bite at extended melee range",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "Ability": "Root_NPC_NordicDrake_Bite",
+        "AttackDistanceRange": [
+          3.5,
+          6.25
+        ],
+        "PostExecuteDistanceRange": [
+          3.5,
+          3.5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleLogistic",
+              "XRange": [
+                0,
+                8
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 4
+            }
+          }
+        ]
+      },
+      "TailSpinAttack": {
+        "Type": "Ability",
+        "Description": "Periodically spin counter-clockwise and sweep a damaging circle around the NordicDrake",
+        "Target": "Hostile",
+        "SubState": "Default",
+        "Ability": "Root_NPC_NordicDrake_Tail_Spin",
+        "WeightCoefficient": 3,
+        "AttackDistanceRange": [
+          1,
+          8
+        ],
+        "PostExecuteDistanceRange": [
+          4,
+          4
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                8
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 20
+            }
+          }
+        ],
+        "RequireAiming": false
+      },
+      "RangedAttack": {
+        "Type": "Ability",
+        "Description": "Fire an ice ball at range",
+        "Target": "Hostile",
+        "SubState": "Ranged",
+        "Ability": "Root_NPC_NordicDrake_Ice_Ball",
+        "WeightCoefficient": 2,
+        "AttackDistanceRange": [
+          6,
+          20
+        ],
+        "PostExecuteDistanceRange": [
+          3.5,
+          3.5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleLogistic",
+              "XRange": [
+                0,
+                20
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 10
+            }
+          }
+        ]
+      },
+      "RainShootAttack": {
+        "Type": "Ability",
+        "Description": "Occasionally launch an ice-barrage at melee or mid-range as area denial",
+        "Target": "Hostile",
+        "SubState": "Ranged",
+        "Ability": "Root_NPC_NordicDrake_RainShoot",
+        "WeightCoefficient": 3,
+        "AttackDistanceRange": [
+          1,
+          10
+        ],
+        "PostExecuteDistanceRange": [
+          3.5,
+          3.5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleDescendingLogistic",
+              "XRange": [
+                0,
+                12
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 45
+            }
+          }
+        ],
+        "RequireAiming": false
+      }
+    },
+    "MinActionUtility": 0.01,
+    "ActionSets": {
+      "Default": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_NordicDrake_Attack"
+          ],
+          "Randomise": false,
+          "MaxRange": 5.25,
+          "Timeout": 2,
+          "CooldownRange": [
+            2,
+            3
+          ]
+        },
+        "Actions": [
+          "SelectTarget",
+          "RainShootAttack",
+          "TailSpinAttack",
+          "RangedAttack",
+          "BiteAttack"
+        ]
+      },
+      "Ranged": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_NordicDrake_Ice_Ball"
+          ],
+          "Randomise": false,
+          "MaxRange": 20,
+          "Timeout": 1,
+          "CooldownRange": [
+            10,
+            10
+          ]
+        },
+        "Actions": [
+          "SelectTarget",
+          "RainShootAttack",
+          "TailSpinAttack",
+          "MeleeAttack",
+          "BiteAttack"
+        ]
+      }
+    }
+  }
+}

@@ -1,5 +1,7 @@
 server.npcRoles.Wyvern_Mini.name=Wyvern Mini
 server.npcRoles.Hydra.name=Hydra
+server.npcRoles.NordicDrake.name=Nordic Drake
+server.npcRoles.RockDrake.name=Rock Drake
 server.items.Draconic_Scale.name=Draconic Scale
 server.items.Draconic_Scale.description=A sturdy dragon scale prized for draconic crafting.
 server.items.Draconic_Essence_Cryo.name=Cryo Draconic Essence

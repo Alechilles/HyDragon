@@ -1,0 +1,149 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Hydra_Intelligent",
+  "Modify": {
+    "Appearance": "NordicDrake",
+    "Weapons": [],
+    "OffHand": [],
+    "NighttimeOffhandSlot": -1,
+    "FlockArray": [
+      "NordicDrake"
+    ],
+    "AttitudeGroup": "PredatorsBig",
+    "WanderRadius": 8,
+    "ViewRange": 36,
+    "HearingRange": 24,
+    "DropList": "Drop_NordicDrake",
+    "MaxSpeed": 7,
+    "_CombatConfig": "CAE_NordicDrake",
+    "UseCombatActionEvaluator": true,
+    "Attack": "Root_NPC_NordicDrake_Attack",
+    "AttackDistance": 5,
+    "DesiredAttackDistanceRange": [
+      0.5,
+      5
+    ],
+    "TargetRange": 12,
+    "CombatBehaviorDistance": 18,
+    "CombatAlwaysMovingWeight": 10,
+    "CombatBackwardsRelativeSpeed": 0.4,
+    "RunThreshold": 0.3,
+    "KnockbackScale": 0.1,
+    "ClimbHeight": 2,
+    "MinJumpHeight": 1.5,
+    "AscentAnimationType": "Walk",
+    "ClimbSpeedMult": 1,
+    "ClimbSpeedPow": 1,
+    "ClimbSpeedConst": 5,
+    "DescendSpeedCompensation": 1,
+    "DescendFlatness": 0.9,
+    "DescentSteepness": 0.9,
+    "DescentBlending": 1.5,
+    "LeashDistance": 60,
+    "HardLeashDistance": 100,
+    "LeashMinPlayerDistance": 15,
+    "LeashTimer": [
+      12,
+      16
+    ],
+    "WakingPeriod": [
+      0,
+      24
+    ],
+    "MaxHealth": 800,
+    "IsTameable": true,
+    "TameRoleChange": "Tamed_NordicDrake",
+    "AttractiveItemSet": [
+      "Draconic_Stone"
+    ],
+    "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
+    "TranquilizerSleepThresholdSeconds": 50,
+    "InteractionConfigId": "HyDragonIntBeast",
+    "IsMemory": true,
+    "MemoriesCategory": "Reptile",
+    "MemoriesNameOverride": "Nordic Drake",
+    "BreathesInWater": false,
+    "_InteractionVars": {
+      "Bite_Damage": {
+        "Interactions": [
+          {
+            "Parent": "NordicDrake_Bite_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Swipe_Left_Damage": {
+        "Interactions": [
+          {
+            "Parent": "NordicDrake_Swipe_Left_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Swipe_Right_Damage": {
+        "Interactions": [
+          {
+            "Parent": "NordicDrake_Swipe_Right_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Stomp_Damage": {
+        "Interactions": [
+          {
+            "Parent": "NordicDrake_Stomp_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Tail_Spin_Damage": {
+        "Interactions": [
+          {
+            "Parent": "NordicDrake_Tail_Spin_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 68
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      }
+    },
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Debug": "DisplayState",
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.NordicDrake.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}

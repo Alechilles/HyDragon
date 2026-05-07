@@ -1,0 +1,69 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "RockDrake_Default",
+    "ItemAnimationId": "Stomp",
+    "WorldSoundEventId": "SFX_Golem_Earth_Stomp"
+  },
+  "RunTime": 0.5,
+  "Next": {
+    "Type": "Parallel",
+    "Interactions": [
+      {
+        "Interactions": [
+          {
+            "Type": "Selector",
+            "RunTime": 0.333,
+            "Selector": {
+              "Id": "AOECircle",
+              "Range": 5.25
+            },
+            "HitEntity": {
+              "Interactions": [
+                {
+                  "Type": "Replace",
+                  "DefaultOk": true,
+                  "Var": "Stomp_Damage",
+                  "DefaultValue": {
+                    "Interactions": [
+                      "RockDrake_Stomp_Damage"
+                    ]
+                  }
+                }
+              ]
+            },
+            "Next": {
+              "Type": "Simple",
+              "RunTime": 0.334
+            }
+          }
+        ]
+      },
+      {
+        "Interactions": [
+          {
+            "Type": "Simple",
+            "RunTime": 0.7,
+            "Effects": {
+              "WorldSoundEventId": "SFX_Golem_Earth_Stomp",
+              "Particles": [
+                {
+                  "TargetEntityPart": "Entity",
+                  "TargetNodeName": "Origin",
+                  "SystemId": "RockDrake_Stomp_Ground_Hit",
+                  "DetachedFromModel": true,
+                  "PositionOffset": {
+                    "Y": 0.1,
+                    "Z": 1.6
+                  },
+                  "Scale": 1.35
+                }
+              ],
+              "CameraEffect": "Mace_Explode"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
