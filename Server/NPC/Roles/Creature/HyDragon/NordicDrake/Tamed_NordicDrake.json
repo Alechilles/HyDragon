@@ -49,6 +49,7 @@
     "AttractiveItemSet": [
       "Draconic_Stone"
     ],
+    "InteractionConfigId": "HyDragonIntBeast",
     "NeedsSeekConsumeAnimation": "",
     "CanFollow": true,
     "CanHold": true,
@@ -60,6 +61,10 @@
     "CanRecall": true,
     "CanSetHome": true,
     "CanBreedPair": true,
+    "IsMountable": true,
+    "MountAnchorX": 0,
+    "MountAnchorY": 3.0,
+    "MountAnchorZ": 0,
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
     "MemoriesNameOverride": "Nordic Drake",
