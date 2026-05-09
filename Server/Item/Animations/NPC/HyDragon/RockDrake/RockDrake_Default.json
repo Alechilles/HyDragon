@@ -4,6 +4,11 @@
       "ThirdPerson": "NPC/HyDragon/RockDrake/Animations/Stomp.blockyanim",
       "Speed": 1,
       "Looping": false
+    },
+    "Shoot": {
+      "ThirdPerson": "NPC/HyDragon/RockDrake/Animations/Shoot.blockyanim",
+      "Speed": 1,
+      "Looping": false
     }
   },
   "Camera": {

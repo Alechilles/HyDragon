@@ -23,8 +23,8 @@
       1,
       4.5
     ],
-    "TargetRange": 10,
-    "CombatBehaviorDistance": 14,
+    "TargetRange": 12,
+    "CombatBehaviorDistance": 18,
     "CombatAlwaysMovingWeight": 10,
     "CombatBackwardsRelativeSpeed": 0.4,
     "RunThreshold": 0.3,

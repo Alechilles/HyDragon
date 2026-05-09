@@ -1,0 +1,56 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "RockDrake_Default",
+        "ItemAnimationId": "Shoot",
+        "WorldSoundEventId": "SFX_Golem_Earth_Stomp",
+        "Particles": [
+          {
+            "TargetEntityPart": "Entity",
+            "TargetNodeName": "Head",
+            "SystemId": "Stone_Death",
+            "DetachedFromModel": true,
+            "PositionOffset": {
+              "Y": 0.3,
+              "Z": 0.8
+            },
+            "Scale": 0.8
+          }
+        ]
+      },
+      "RunTime": 0.75
+    },
+    {
+      "Type": "TameworkLaunchProjectile",
+      "RunTime": 0,
+      "Effects": {
+        "WorldSoundEventId": "SFX_Golem_Earth_Slam",
+        "LocalSoundEventId": "SFX_Golem_Earth_Slam",
+        "Particles": [
+          {
+            "TargetEntityPart": "Entity",
+            "TargetNodeName": "Head",
+            "SystemId": "Stone_Death",
+            "DetachedFromModel": true,
+            "PositionOffset": {
+              "Y": 0.3,
+              "Z": 0.8
+            },
+            "Scale": 1.0
+          }
+        ]
+      },
+      "ProjectileId": "RockDrake_Boulder",
+      "TrajectoryMode": "Direct",
+      "TargetSlot": "CAETargetSlot",
+      "Tags": {}
+    },
+    {
+      "Type": "Simple",
+      "RunTime": 0.35
+    }
+  ]
+}

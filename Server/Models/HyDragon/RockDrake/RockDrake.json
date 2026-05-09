@@ -366,6 +366,20 @@
           "SoundEventId": "SFX_Rex_Alerted"
         }
       ]
+    },
+    "Shoot": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/RockDrake/Animations/Shoot.blockyanim"
+        }
+      ]
+    },
+    "ShootStream": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/RockDrake/Animations/Shoot2.blockyanim"
+        }
+      ]
     }
   },
   "DetailBoxes": {

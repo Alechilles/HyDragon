@@ -1,0 +1,51 @@
+{
+  "Appearance": "RockDrake_Boulder_Projectile",
+  "Radius": 0.1,
+  "Height": 0.1,
+  "SticksVertically": false,
+  "MuzzleVelocity": 32,
+  "TerminalVelocity": 38,
+  "Gravity": 12,
+  "Bounciness": 0.35,
+  "ImpactSlowdown": 0.55,
+  "TimeToLive": 6,
+  "Damage": 42,
+  "DeathEffectsOnHit": true,
+  "DeadTime": 0,
+  "DeadTimeMiss": 0,
+  "DepthShot": 3.5,
+  "HorizontalCenterShot": 0.1,
+  "VerticalCenterShot": 0.6,
+  "PitchAdjustShot": false,
+  "HitParticles": {
+    "SystemId": "Stone_Death",
+    "Scale": 2.4
+  },
+  "DeathParticles": {
+    "SystemId": "Stone_Death",
+    "Scale": 2.4
+  },
+  "MissParticles": {
+    "SystemId": "Stone_Death",
+    "Scale": 2.0
+  },
+  "BounceSoundEventId": "SFX_Rubble_Bounce",
+  "HitSoundEventId": "SFX_Rubble_Hit",
+  "MissSoundEventId": "SFX_Rubble_Bounce",
+  "DeathSoundEventId": "SFX_Stone_Break",
+  "ExplosionConfig": {
+    "DamageEntities": true,
+    "EntityDamageRadius": 2.75,
+    "EntityDamage": 12,
+    "Knockback": {
+      "Type": "Force",
+      "Force": 7,
+      "Direction": {
+        "X": 0.35,
+        "Y": 1.2,
+        "Z": 0.35
+      }
+    },
+    "DamageBlocks": false
+  }
+}

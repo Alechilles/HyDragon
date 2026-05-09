@@ -1,0 +1,11 @@
+{
+  "Interactions": [
+    "RockDrake_Boulder_Throw"
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  },
+  "RequireNewClick": false
+}

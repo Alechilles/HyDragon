@@ -68,6 +68,42 @@
           }
         ],
         "RequireAiming": false
+      },
+      "BoulderThrowAttack": {
+        "Type": "Ability",
+        "Description": "Throw a heavy boulder at range",
+        "Target": "Hostile",
+        "SubState": "Ranged",
+        "Ability": "Root_NPC_RockDrake_Boulder_Throw",
+        "WeightCoefficient": 2.5,
+        "AttackDistanceRange": [
+          6,
+          18
+        ],
+        "PostExecuteDistanceRange": [
+          5,
+          5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleLogistic",
+              "XRange": [
+                0,
+                18
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 8
+            }
+          }
+        ],
+        "RequireAiming": true
       }
     },
     "MinActionUtility": 0.01,
@@ -83,6 +119,25 @@
           "CooldownRange": [
             2,
             3
+          ]
+        },
+        "Actions": [
+          "SelectTarget",
+          "BoulderThrowAttack",
+          "StompAttack"
+        ]
+      },
+      "Ranged": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_RockDrake_Boulder_Throw"
+          ],
+          "Randomise": false,
+          "MaxRange": 18,
+          "Timeout": 1.5,
+          "CooldownRange": [
+            8,
+            10
           ]
         },
         "Actions": [
