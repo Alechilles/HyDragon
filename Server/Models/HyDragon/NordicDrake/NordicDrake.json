@@ -46,7 +46,7 @@
     "Idle": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Walk.blockyanim",
           "Speed": 0.6
         }
       ]
@@ -68,7 +68,7 @@
     "Spawn": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Walk.blockyanim",
           "Looping": false,
           "BlendingDuration": 0
         }
@@ -77,7 +77,7 @@
     "Walk": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Walk.blockyanim",
           "SoundEventId": "SFX_Rex_Walk"
         }
       ]
@@ -85,7 +85,7 @@
     "WalkPassive": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Walk.blockyanim",
           "SoundEventId": "SFX_Rex_Walk"
         }
       ]
@@ -93,7 +93,7 @@
     "WalkBackward": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Walk.blockyanim",
           "SoundEventId": "SFX_Rex_Walk"
         }
       ]
@@ -101,7 +101,7 @@
     "Run": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Run.blockyanim",
           "SoundEventId": "SFX_Rex_Walk",
           "FootstepIntervals": [
             3
@@ -190,6 +190,36 @@
           "Looping": false,
           "BlendingDuration": 0.1,
           "SoundEventId": "SFX_Rex_Alerted"
+        }
+      ]
+    },
+    "FlyIdle": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Fly_Idle.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.15
+        }
+      ]
+    },
+    "Fly": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Fly.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.15
+        }
+      ]
+    },
+    "FlyFast": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Fly_Fast.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.15
         }
       ]
     },
