@@ -1,6 +1,6 @@
 {
   "Type": "Variant",
-  "Reference": "Template_HyDragon_Tamed",
+  "Reference": "Template_HyDragon_Dragon_Tamed",
   "Modify": {
     "Appearance": "NordicDrake",
     "Weapons": [],
@@ -49,7 +49,7 @@
     "AttractiveItemSet": [
       "Draconic_Stone"
     ],
-    "InteractionConfigId": "HyDragonIntBeast",
+    "InteractionConfigId": "HyDragonIntDragon",
     "NeedsSeekConsumeAnimation": "",
     "CanFollow": true,
     "CanHold": true,

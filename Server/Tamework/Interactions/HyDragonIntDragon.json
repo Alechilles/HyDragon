@@ -2,8 +2,8 @@
   "Enabled": true,
   "Priority": 200,
   "RoleIds": [
-    "Hydra",
-    "Tamed_Hydra"
+    "NordicDrake",
+    "Tamed_NordicDrake"
   ],
   "Interactions": [
     {
@@ -136,7 +136,8 @@
     },
     {
       "Type": "Mount",
-      "Enabled": true
+      "Enabled": true,
+      "RequireCrouching": true
     },
     {
       "Type": "Custom",

@@ -1,6 +1,6 @@
 {
   "Type": "Variant",
-  "Reference": "Template_Hydra_Intelligent",
+  "Reference": "Template_HyDragon_Dragon",
   "Modify": {
     "Appearance": "NordicDrake",
     "Weapons": [],
@@ -58,7 +58,7 @@
     ],
     "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
     "TranquilizerSleepThresholdSeconds": 50,
-    "InteractionConfigId": "HyDragonIntBeast",
+    "InteractionConfigId": "HyDragonIntDragon",
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
     "MemoriesNameOverride": "Nordic Drake",

@@ -560,6 +560,10 @@
       "Value": false,
       "Description": "Whether this NPC can be mounted."
     },
+    "InteractionConfigId": {
+      "Value": "",
+      "Description": "Optional TwInteractionConfig asset id override. If set, Tamework interaction flow is used for this role."
+    },
     "MountAnchorX": {
       "Value": 0
     },
@@ -571,6 +575,18 @@
     },
     "MountMovementConfig": {
       "Value": "Mount"
+    },
+    "MountMode": {
+      "Value": "TameworkRide"
+    },
+    "MountRideState": {
+      "Value": "Ridden"
+    },
+    "MountGroundController": {
+      "Value": "Walk"
+    },
+    "MountFlightController": {
+      "Value": "TameworkRideFly"
     }
   },
   "IsMemory": {
@@ -664,6 +680,29 @@
       "DescentBlending": {
         "Compute": "DescentBlending"
       }
+    },
+    {
+      "Type": "TameworkRideFly",
+      "MinAirSpeed": 0,
+      "MaxHorizontalSpeed": 12,
+      "MaxClimbSpeed": 8,
+      "MaxSinkSpeed": 10,
+      "MaxFallSpeed": 25,
+      "MaxSinkSpeedFluid": 4,
+      "MaxClimbAngle": 65,
+      "MaxSinkAngle": 75,
+      "Acceleration": 10,
+      "Deceleration": 12,
+      "Gravity": 18,
+      "MaxTurnSpeed": 240,
+      "MaxRollAngle": 35,
+      "MaxRollSpeed": 240,
+      "RollDamping": 0.78,
+      "MinHeightOverGround": 0,
+      "MaxHeightOverGround": 80,
+      "FastFlyThreshold": 0.55,
+      "AutoLevel": false,
+      "DesiredAltitudeWeight": 0
     }
   ],
   "StateTransitions": [
@@ -928,6 +967,10 @@
         {
           "Type": "State",
           "State": "SleepWakeResolve"
+        },
+        {
+          "Type": "State",
+          "State": "Ridden"
         }
       ]
     },
@@ -1168,6 +1211,20 @@
                 "SleepDelayAfterLastSleepRange": {
                   "Compute": "SleepDelayAfterLastSleepRange"
                 }
+              }
+            }
+          ]
+        },
+        {
+          "$Comment": "Mounted State: rider input fully drives land and flight movement.",
+          "Sensor": {
+            "Type": "State",
+            "State": "Ridden"
+          },
+          "Instructions": [
+            {
+              "BodyMotion": {
+                "Type": "TameworkRide"
               }
             }
           ]
@@ -1540,18 +1597,34 @@
     "Instructions": [
       {
         "Continue": true,
+        "Actions": [
+          {
+            "Type": "LockOnInteractionTarget",
+            "TargetSlot": "InteractionTarget"
+          }
+        ]
+      },
+      {
+        "Enabled": {
+          "Compute": "!isEmpty(InteractionConfigId)"
+        },
+        "Continue": true,
         "Sensor": {
           "Type": "Any"
         },
         "Actions": [
           {
             "Type": "TameworkInteractPrompt",
+            "ConfigId": { "Compute": "InteractionConfigId" },
             "LovedItems": { "Compute": "AttractiveItemSet" },
             "IsMountable": { "Compute": "IsMountable" }
           }
         ]
       },
       {
+        "Enabled": {
+          "Compute": "!isEmpty(InteractionConfigId)"
+        },
         "Sensor": {
           "Type": "HasInteracted"
         },
@@ -1566,8 +1639,21 @@
           },
           {
             "Type": "TameworkInteract",
+            "ConfigId": { "Compute": "InteractionConfigId" },
             "LovedItems": { "Compute": "AttractiveItemSet" },
             "IsMountable": { "Compute": "IsMountable" }
+          }
+        ]
+      },
+      {
+        "$Comment": "Only now that we've failed to match all possible interactions do we set interactability to false.",
+        "Enabled": {
+          "Compute": "isEmpty(InteractionConfigId)"
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": false
           }
         ]
       }
