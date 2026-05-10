@@ -586,7 +586,7 @@
       "Value": "Walk"
     },
     "MountFlightController": {
-      "Value": "TameworkRideFly"
+      "Value": "TameworkFly"
     }
   },
   "IsMemory": {
@@ -682,7 +682,7 @@
       }
     },
     {
-      "Type": "TameworkRideFly",
+      "Type": "TameworkFly",
       "MinAirSpeed": 0,
       "MaxHorizontalSpeed": 12,
       "MaxClimbSpeed": 8,
