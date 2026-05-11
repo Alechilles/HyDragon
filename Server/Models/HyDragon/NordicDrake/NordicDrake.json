@@ -46,24 +46,10 @@
     "Idle": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Walk.blockyanim",
-          "Speed": 0.6
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Speed": 1
         }
       ]
-    },
-    "IdlePassive": {
-      "Animations": [
-        {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle2.blockyanim",
-          "Looping": false,
-          "Weight": 1,
-          "Speed": 0.15
-        }
-      ],
-      "NextAnimationDelay": {
-        "Min": 2,
-        "Max": 8
-      }
     },
     "Spawn": {
       "Animations": [

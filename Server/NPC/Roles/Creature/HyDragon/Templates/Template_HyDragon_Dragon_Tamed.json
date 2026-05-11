@@ -114,7 +114,7 @@
       "Description": "Whether this NPC always sleeps through the whole night."
     },
     "SleepAnimation": {
-      "Value": "Sleep",
+      "Value": "",
       "Description": "Optional loop animation while in Sleep state."
     },
     "SleepEnterAnimation": {
@@ -583,7 +583,7 @@
       "Value": "Ridden"
     },
     "MountGroundController": {
-      "Value": "Walk"
+      "Value": "TameworkRideWalk"
     },
     "MountFlightController": {
       "Value": "TameworkFly"
@@ -682,17 +682,69 @@
       }
     },
     {
+      "Type": "TameworkRideWalk",
+      "MaxWalkSpeed": {
+        "Compute": "MaxSpeed"
+      },
+      "MountedMaxWalkSpeed": 50,
+      "MountedSprintMultiplier": 1.35,
+      "Gravity": 10,
+      "RunThreshold": {
+        "Compute": "RunThreshold"
+      },
+      "RunThresholdRange": 0.05,
+      "MaxFallSpeed": 15,
+      "MaxRotationSpeed": 180,
+      "Acceleration": 25,
+      "MaxClimbHeight": {
+        "Compute": "ClimbHeight"
+      },
+      "MinJumpHeight": {
+        "Compute": "MinJumpHeight"
+      },
+      "AscentAnimationType": {
+        "Compute": "AscentAnimationType"
+      },
+      "ClimbSpeedMult": {
+        "Compute": "ClimbSpeedMult"
+      },
+      "ClimbSpeedPow": {
+        "Compute": "ClimbSpeedPow"
+      },
+      "ClimbSpeedConst": {
+        "Compute": "ClimbSpeedConst"
+      },
+      "DescendSpeedCompensation": {
+        "Compute": "DescendSpeedCompensation"
+      },
+      "DescendFlatness": {
+        "Compute": "DescendFlatness"
+      },
+      "DescentSteepness": {
+        "Compute": "DescentSteepness"
+      },
+      "DescentBlending": {
+        "Compute": "DescentBlending"
+      }
+    },
+    {
       "Type": "TameworkFly",
       "MinAirSpeed": 0,
-      "MaxHorizontalSpeed": 12,
+      "MaxHorizontalSpeed": 7,
+      "MountedMaxHorizontalSpeed": 5,
       "MaxClimbSpeed": 8,
+      "MountedMaxClimbSpeed": 3,
       "MaxSinkSpeed": 10,
+      "MountedMaxSinkSpeed": 3,
       "MaxFallSpeed": 25,
       "MaxSinkSpeedFluid": 4,
       "MaxClimbAngle": 65,
       "MaxSinkAngle": 75,
-      "Acceleration": 10,
+      "Acceleration": 5,
+      "MountedAcceleration": 1,
       "Deceleration": 12,
+      "MountedDeceleration": 1,
+      "MountedSprintMultiplier": 1.70,
       "Gravity": 18,
       "MaxTurnSpeed": 240,
       "MaxRollAngle": 35,
