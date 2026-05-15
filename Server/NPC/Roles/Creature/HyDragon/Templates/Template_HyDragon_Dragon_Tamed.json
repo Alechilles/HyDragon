@@ -730,21 +730,15 @@
     {
       "Type": "TameworkFly",
       "MinAirSpeed": 0,
-      "MaxHorizontalSpeed": 7,
-      "MountedMaxHorizontalSpeed": 5,
+      "MaxHorizontalSpeed": 10,
       "MaxClimbSpeed": 8,
-      "MountedMaxClimbSpeed": 3,
       "MaxSinkSpeed": 10,
-      "MountedMaxSinkSpeed": 3,
       "MaxFallSpeed": 25,
       "MaxSinkSpeedFluid": 4,
       "MaxClimbAngle": 65,
       "MaxSinkAngle": 75,
       "Acceleration": 5,
-      "MountedAcceleration": 1,
       "Deceleration": 12,
-      "MountedDeceleration": 1,
-      "MountedSprintMultiplier": 1.70,
       "Gravity": 18,
       "MaxTurnSpeed": 240,
       "MaxRollAngle": 35,
@@ -754,7 +748,13 @@
       "MaxHeightOverGround": 80,
       "FastFlyThreshold": 0.55,
       "AutoLevel": false,
-      "DesiredAltitudeWeight": 0
+      "DesiredAltitudeWeight": 0,
+      "MountedMaxHorizontalSpeed": 20,
+      "MountedMaxClimbSpeed": 8,
+      "MountedMaxSinkSpeed": 8,
+      "MountedAcceleration": 8,
+      "MountedDeceleration": 20,
+      "MountedSprintMultiplier": 1.70
     }
   ],
   "StateTransitions": [
