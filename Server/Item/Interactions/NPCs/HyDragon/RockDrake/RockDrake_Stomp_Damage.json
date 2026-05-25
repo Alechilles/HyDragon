@@ -2,7 +2,7 @@
   "Parent": "DamageEntityParent",
   "DamageCalculator": {
     "BaseDamage": {
-      "Physical": 76
+      "Physical": 34
     },
     "RandomPercentageModifier": 0.1
   },

@@ -11,20 +11,20 @@
     ],
     "AttitudeGroup": "PredatorsBig",
     "WanderRadius": 8,
-    "ViewRange": 36,
-    "HearingRange": 24,
+    "ViewRange": 24,
+    "HearingRange": 16,
     "DropList": "Drop_RockDrake",
     "MaxSpeed": 5.5,
     "_CombatConfig": "CAE_RockDrake",
     "UseCombatActionEvaluator": true,
     "Attack": "Root_NPC_RockDrake_Attack",
-    "AttackDistance": 5,
+    "AttackDistance": 4.5,
     "DesiredAttackDistanceRange": [
       1,
       4.5
     ],
-    "TargetRange": 12,
-    "CombatBehaviorDistance": 18,
+    "TargetRange": 10,
+    "CombatBehaviorDistance": 14,
     "CombatAlwaysMovingWeight": 10,
     "CombatBackwardsRelativeSpeed": 0.4,
     "RunThreshold": 0.3,
@@ -50,7 +50,7 @@
       0,
       24
     ],
-    "MaxHealth": 650,
+    "MaxHealth": 360,
     "IsTameable": false,
     "AttractiveItemSet": [],
     "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
@@ -68,7 +68,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 76
+                "Physical": 34
               },
               "RandomPercentageModifier": 0.1
             }

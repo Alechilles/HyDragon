@@ -63,7 +63,7 @@
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "Type": "Switch",
-              "SwitchPoint": 3
+              "SwitchPoint": 4
             }
           }
         ],
@@ -75,7 +75,7 @@
         "Target": "Hostile",
         "SubState": "Ranged",
         "Ability": "Root_NPC_RockDrake_Boulder_Throw",
-        "WeightCoefficient": 2.5,
+        "WeightCoefficient": 1.7,
         "AttackDistanceRange": [
           6,
           18
@@ -99,7 +99,7 @@
             "Type": "TimeSinceLastUsed",
             "Curve": {
               "Type": "Switch",
-              "SwitchPoint": 8
+              "SwitchPoint": 11
             }
           }
         ],
@@ -117,8 +117,8 @@
           "MaxRange": 5.25,
           "Timeout": 2,
           "CooldownRange": [
-            2,
-            3
+            3,
+            4
           ]
         },
         "Actions": [
@@ -136,8 +136,8 @@
           "MaxRange": 18,
           "Timeout": 1.5,
           "CooldownRange": [
-            8,
-            10
+            11,
+            14
           ]
         },
         "Actions": [

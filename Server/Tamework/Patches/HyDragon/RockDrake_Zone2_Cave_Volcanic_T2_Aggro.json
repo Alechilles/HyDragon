@@ -2,7 +2,7 @@
   "Id": "HyDragon_RockDrake_Zone2_Cave_Volcanic_T2_Aggro",
   "Target": "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier2/Zone2_Cave_Volcanic_T2_Aggro.json",
   "Priority": 0,
-  "Enabled": true,
+  "Enabled": false,
   "Operations": [
     {
       "Id": "append-rock-drake",

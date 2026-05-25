@@ -9,7 +9,7 @@
   "Bounciness": 0.35,
   "ImpactSlowdown": 0.55,
   "TimeToLive": 6,
-  "Damage": 42,
+  "Damage": 28,
   "DeathEffectsOnHit": true,
   "DeadTime": 0,
   "DeadTimeMiss": 0,
@@ -36,7 +36,7 @@
   "ExplosionConfig": {
     "DamageEntities": true,
     "EntityDamageRadius": 2.75,
-    "EntityDamage": 12,
+    "EntityDamage": 8,
     "Knockback": {
       "Type": "Force",
       "Force": 7,
