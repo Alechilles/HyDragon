@@ -13,7 +13,7 @@
         "Id": "RockDrake"
       },
       "Value": {
-        "Weight": 10,
+        "Weight": 400,
         "SpawnBlockSet": "Volcanic",
         "Id": "RockDrake"
       }
