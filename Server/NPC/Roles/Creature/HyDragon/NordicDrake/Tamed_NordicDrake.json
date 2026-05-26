@@ -119,7 +119,7 @@
   },
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "server.npcRoles.NordicDrake.name",
+      "Value": "server.npcRoles.Tamed_NordicDrake.name",
       "Description": "Translation key for NPC name display"
     }
   }

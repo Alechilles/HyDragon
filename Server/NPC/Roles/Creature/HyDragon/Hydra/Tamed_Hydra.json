@@ -108,7 +108,7 @@
   },
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "server.npcRoles.Hydra.name",
+      "Value": "server.npcRoles.Tamed_Hydra.name",
       "Description": "Translation key for NPC name display"
     }
   }

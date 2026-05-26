@@ -22,7 +22,7 @@
   },
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "server.npcRoles.Wyvern_Mini.name",
+      "Value": "server.npcRoles.Tamed_Wyvern_Mini.name",
       "Description": "Translation key for NPC name display"
     }
   }
