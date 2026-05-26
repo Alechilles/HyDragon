@@ -1,5 +1,11 @@
 {
   "Interactions": [
     "NordicDrake_Fire_Ball"
-  ]
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  },
+  "RequireNewClick": false
 }
