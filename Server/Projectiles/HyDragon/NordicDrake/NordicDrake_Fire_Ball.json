@@ -1,0 +1,45 @@
+{
+  "Appearance": "NordicDrake_Fire_Ball_Projectile",
+  "Radius": 1.8,
+  "Height": -1,
+  "HorizontalCenterShot": 0,
+  "DepthShot": 3,
+  "PitchAdjustShot": true,
+  "SticksVertically": true,
+  "MuzzleVelocity": 32,
+  "TerminalVelocity": 48,
+  "Gravity": 5,
+  "Damage": 32,
+  "DeathEffectsOnHit": true,
+  "TimeToLive": 6,
+  "DeadTimeMiss": 0,
+  "DeathParticles": {
+    "SystemId": "Flamethrower",
+    "Scale": 1.4
+  },
+  "MissParticles": {
+    "SystemId": "Flamethrower",
+    "Scale": 1.1
+  },
+  "ImpactSlowdown": 0,
+  "VerticalCenterShot": 0,
+  "HitParticles": {
+    "SystemId": "Flamethrower",
+    "Scale": 1.3
+  },
+  "ExplosionConfig": {
+    "DamageEntities": true,
+    "EntityDamageRadius": 3.5,
+    "EntityDamage": 16,
+    "Knockback": {
+      "Type": "Force",
+      "Force": 8,
+      "Direction": {
+        "Z": 0.4,
+        "Y": 1.5,
+        "X": 0.4
+      }
+    },
+    "DamageBlocks": true
+  }
+}

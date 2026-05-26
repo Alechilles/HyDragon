@@ -15,8 +15,16 @@
     "HearingRange": 24,
     "DropList": "Drop_NordicDrake",
     "MaxSpeed": 7,
+    "FlightSpeed": 12,
     "_CombatConfig": "CAE_NordicDrake",
     "UseCombatActionEvaluator": true,
+    "UseHealthPhaseFlight": true,
+    "AirRangedAttack": "Root_NPC_NordicDrake_Fire_Ball",
+    "AirBreathAttack": "Root_NPC_NordicDrake_Flame_Breath",
+    "AirRangedAttackDistance": 28,
+    "AirRangedAttackMinimumDistance": 6,
+    "AirBreathAttackDistance": 9,
+    "AirCombatBehaviorDistance": 16,
     "Attack": "Root_NPC_NordicDrake_Attack",
     "AttackDistance": 5,
     "DesiredAttackDistanceRange": [
@@ -39,6 +47,66 @@
     "DescendFlatness": 0.9,
     "DescentSteepness": 0.9,
     "DescentBlending": 1.5,
+    "MotionControllerList": [
+      {
+        "Type": "Fly",
+        "MaxHorizontalSpeed": {
+          "Compute": "FlightSpeed"
+        },
+        "MaxSinkSpeed": 8,
+        "MaxClimbSpeed": 10,
+        "MinAirSpeed": 3,
+        "Acceleration": 6,
+        "MinHeightOverGround": 4,
+        "MaxHeightOverGround": 10,
+        "MaxRollAngle": 70,
+        "MaxTurnSpeed": 180,
+        "DesiredAltitudeWeight": 1
+      },
+      {
+        "Type": "Walk",
+        "MaxWalkSpeed": {
+          "Compute": "MaxSpeed"
+        },
+        "Gravity": 10,
+        "RunThreshold": {
+          "Compute": "RunThreshold"
+        },
+        "MaxFallSpeed": 15,
+        "MaxRotationSpeed": 360,
+        "Acceleration": 10,
+        "MaxClimbHeight": {
+          "Compute": "ClimbHeight"
+        },
+        "MinJumpHeight": {
+          "Compute": "MinJumpHeight"
+        },
+        "AscentAnimationType": {
+          "Compute": "AscentAnimationType"
+        },
+        "ClimbSpeedMult": {
+          "Compute": "ClimbSpeedMult"
+        },
+        "ClimbSpeedPow": {
+          "Compute": "ClimbSpeedPow"
+        },
+        "ClimbSpeedConst": {
+          "Compute": "ClimbSpeedConst"
+        },
+        "DescendSpeedCompensation": {
+          "Compute": "DescendSpeedCompensation"
+        },
+        "DescendFlatness": {
+          "Compute": "DescendFlatness"
+        },
+        "DescentSteepness": {
+          "Compute": "DescentSteepness"
+        },
+        "DescentBlending": {
+          "Compute": "DescentBlending"
+        }
+      }
+    ],
     "LeashDistance": 60,
     "HardLeashDistance": 100,
     "LeashMinPlayerDistance": 15,

@@ -226,6 +226,46 @@
       "Value": 0,
       "Description": "In combat, if the target gets within this distance for a certain amount of time, the NPC will attempt to flee to a safe distance instead of simply backing away. Set to 0 to disable behavior."
     },
+    "UseHealthPhaseFlight": {
+      "Value": false,
+      "Description": "Whether this dragon should split combat into a flying high-health phase and grounded low-health phase."
+    },
+    "FlightSpeed": {
+      "Value": 12,
+      "Description": "Maximum horizontal speed when using the flight combat phase."
+    },
+    "AirPhaseHealthRange": {
+      "Value": [ 0.5, 1 ],
+      "Description": "Health ratio range that keeps the dragon in the flying combat phase."
+    },
+    "GroundPhaseHealthRange": {
+      "Value": [ 0, 0.499 ],
+      "Description": "Health ratio range that forces the dragon to land and use grounded combat."
+    },
+    "AirRangedAttack": {
+      "Value": "Root_NPC_Hydra_Ice_Ball",
+      "Description": "The ranged attack used during the flying high-health phase."
+    },
+    "AirBreathAttack": {
+      "Value": "",
+      "Description": "Optional close ranged breath attack used during the flying high-health phase."
+    },
+    "AirRangedAttackDistance": {
+      "Value": 24,
+      "Description": "Maximum distance for the flying phase ranged attack."
+    },
+    "AirRangedAttackMinimumDistance": {
+      "Value": 5,
+      "Description": "Minimum preferred distance for the flying phase ranged attack."
+    },
+    "AirBreathAttackDistance": {
+      "Value": 9,
+      "Description": "Maximum distance for the flying phase breath attack."
+    },
+    "AirCombatBehaviorDistance": {
+      "Value": 14,
+      "Description": "Distance used for slowing and stopping during flying phase movement."
+    },
     "AdditionalCombatBehaviorMacroElement": {
       "Value": "Component_Instruction_Null",
       "Description": "An optional macro element for supplying more bespoke combat movement behavior. Weight for the behavior must be internally defined in the macro element."
@@ -1534,6 +1574,38 @@
               ]
             },
             {
+              "Enabled": { "Compute": "UseHealthPhaseFlight" },
+              "Continue": true,
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "State",
+                    "State": ".Default"
+                  },
+                  {
+                    "Type": "Self",
+                    "Filters": [
+                      {
+                        "Type": "Stat",
+                        "StatTarget": "Value",
+                        "RelativeTo": "Health",
+                        "Stat": "Health",
+                        "RelativeToTarget": "Max",
+                        "ValueRange": { "Compute": "AirPhaseHealthRange" }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": ".AirTakeoff"
+                }
+              ]
+            },
+            {
               "Sensor": {
                 "Type": "Or",
                 "Sensors": [
@@ -1588,6 +1660,239 @@
                   ]
                 },
                 {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".AirTakeoff",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Sensor": {
+                        "Type": "MotionController",
+                        "MotionController": "Walk"
+                      },
+                      "BodyMotion": {
+                        "Type": "TakeOff",
+                        "JumpSpeed": 4
+                      }
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "MotionController",
+                        "MotionController": "Fly"
+                      },
+                      "Actions": [
+                        {
+                          "Type": "State",
+                          "State": ".AirRanged"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "State",
+                        "State": ".AirRanged",
+                        "IgnoreMissingSetState": true
+                      },
+                      {
+                        "Type": "Self",
+                        "Filters": [
+                          {
+                            "Type": "Stat",
+                            "StatTarget": "Value",
+                            "RelativeTo": "Health",
+                            "Stat": "Health",
+                            "RelativeToTarget": "Max",
+                            "ValueRange": { "Compute": "GroundPhaseHealthRange" }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "State",
+                      "State": ".AirLand"
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".AirLand",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Sensor": {
+                        "Type": "MotionController",
+                        "MotionController": "Fly"
+                      },
+                      "Instructions": [
+                        {
+                          "Sensor": {
+                            "Type": "AdjustPosition",
+                            "Offset": [ 0, 1, 0 ],
+                            "Sensor": {
+                              "Type": "SearchRay",
+                              "Name": "LandingRay",
+                              "Range": 20,
+                              "Angle": 45,
+                              "Blocks": "Gaia"
+                            }
+                          },
+                          "BodyMotion": {
+                            "Type": "Land",
+                            "SlowDownDistance": 5,
+                            "StopDistance": 0.5,
+                            "GoalLenience": 3
+                          }
+                        },
+                        {
+                          "BodyMotion": {
+                            "Type": "Wander",
+                            "RelativeSpeed": 0.2
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "MotionController",
+                        "MotionController": "Walk"
+                      },
+                      "Actions": [
+                        {
+                          "Type": "ResetSearchRays"
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".Default"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "MotionController",
+                        "MotionController": "Fly"
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": [ 4, 6 ]
+                        },
+                        {
+                          "Type": "ResetSearchRays"
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirRanged"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".AirRanged",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "Actions": [
+                        {
+                          "Type": "OverrideAltitude",
+                          "DesiredAltitudeRange": [ 6, 10 ]
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AirBreathAttackDistance" },
+                        "MinRange": 2,
+                        "Filters": [
+                          {
+                            "Type": "LineOfSight"
+                          }
+                        ]
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "HitProbability": 1.0
+                      },
+                      "Actions": [
+                        {
+                          "Type": "Attack",
+                          "Attack": { "Compute": "AirBreathAttack" },
+                          "AimingTimeRange": [ 0.25, 0.5 ],
+                          "AttackPauseRange": [ 3, 4 ]
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AirRangedAttackDistance" },
+                        "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
+                        "Filters": [
+                          {
+                            "Type": "LineOfSight"
+                          }
+                        ]
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "Spread": 0,
+                        "HitProbability": 1,
+                        "Deflection": true,
+                        "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                      },
+                      "Actions": [
+                        {
+                          "Type": "Attack",
+                          "Attack": { "Compute": "AirRangedAttack" },
+                          "BallisticMode": "Short",
+                          "AimingTimeRange": [ 0.5, 1 ],
+                          "AttackPauseRange": [ 1.5, 2.5 ]
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AlertedRange" }
+                      },
+                      "BodyMotion": {
+                        "Type": "Seek",
+                        "SlowDownDistance": { "Compute": "AirCombatBehaviorDistance" },
+                        "StopDistance": { "Compute": "AirRangedAttackMinimumDistance" },
+                        "RelativeSpeed": 0.65
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "!UseHealthPhaseFlight" },
                   "Sensor": {
                     "Type": "And",
                     "Sensors": [

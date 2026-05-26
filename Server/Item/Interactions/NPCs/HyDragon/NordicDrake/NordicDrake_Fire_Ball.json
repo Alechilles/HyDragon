@@ -1,0 +1,75 @@
+{
+  "Type": "Serial",
+  "$Comment": "Flying phase fireball burst using the NordicDrake shoot animation and flame VFX.",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "PrepareShoot"
+      },
+      "RunTime": 0.6
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "ChargeShoot",
+        "Particles": [
+          {
+            "TargetEntityPart": "Entity",
+            "TargetNodeName": "Head",
+            "SystemId": "Flamethrower",
+            "DetachedFromModel": false,
+            "PositionOffset": {
+              "Z": 1.2
+            },
+            "RotationOffset": {
+              "Yaw": 180
+            },
+            "Scale": 0.8
+          }
+        ]
+      },
+      "RunTime": 0.8
+    },
+    {
+      "Type": "TameworkLaunchProjectile",
+      "RunTime": 0,
+      "Effects": {
+        "Particles": [
+          {
+            "TargetEntityPart": "Entity",
+            "TargetNodeName": "Head",
+            "SystemId": "Flamethrower",
+            "DetachedFromModel": false,
+            "PositionOffset": {
+              "Z": 1.2
+            },
+            "RotationOffset": {
+              "Yaw": 180
+            },
+            "Scale": 1.15
+          }
+        ]
+      },
+      "ProjectileId": "NordicDrake_Fire_Ball",
+      "TrajectoryMode": "Direct",
+      "TargetSlot": "LockedTarget",
+      "ImpactEffect": {
+        "EffectId": "Flame_Staff_Burn",
+        "Radius": 3.5,
+        "ExcludeSource": true
+      },
+      "Tags": {}
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "FinishShoot"
+      },
+      "RunTime": 0.35
+    }
+  ]
+}
