@@ -246,10 +246,6 @@
       "Value": "Root_NPC_Hydra_Ice_Ball",
       "Description": "The ranged attack used during the flying high-health phase."
     },
-    "AirBreathAttack": {
-      "Value": "",
-      "Description": "Optional close ranged breath attack used during the flying high-health phase."
-    },
     "AirRangedAttackDistance": {
       "Value": 24,
       "Description": "Maximum distance for the flying phase ranged attack."
@@ -257,10 +253,6 @@
     "AirRangedAttackMinimumDistance": {
       "Value": 5,
       "Description": "Minimum preferred distance for the flying phase ranged attack."
-    },
-    "AirBreathAttackDistance": {
-      "Value": 9,
-      "Description": "Maximum distance for the flying phase breath attack."
     },
     "AirCombatBehaviorDistance": {
       "Value": 14,
@@ -1841,30 +1833,6 @@
                     {
                       "Sensor": {
                         "Type": "Target",
-                        "Range": { "Compute": "AirBreathAttackDistance" },
-                        "MinRange": 2,
-                        "Filters": [
-                          {
-                            "Type": "LineOfSight"
-                          }
-                        ]
-                      },
-                      "HeadMotion": {
-                        "Type": "Aim",
-                        "HitProbability": 1.0
-                      },
-                      "Actions": [
-                        {
-                          "Type": "Attack",
-                          "Attack": { "Compute": "AirBreathAttack" },
-                          "AimingTimeRange": [ 0.25, 0.5 ],
-                          "AttackPauseRange": [ 3, 4 ]
-                        }
-                      ]
-                    },
-                    {
-                      "Sensor": {
-                        "Type": "Target",
                         "Range": { "Compute": "AirRangedAttackDistance" },
                         "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
                         "Filters": [
@@ -1895,11 +1863,13 @@
                         "Type": "Target",
                         "Range": { "Compute": "AlertedRange" }
                       },
+                      "HeadMotion": {
+                        "Type": "Watch"
+                      },
                       "BodyMotion": {
-                        "Type": "Seek",
-                        "SlowDownDistance": { "Compute": "AirCombatBehaviorDistance" },
-                        "StopDistance": { "Compute": "AirRangedAttackMinimumDistance" },
-                        "RelativeSpeed": 0.65
+                        "Type": "WanderInCircle",
+                        "Radius": { "Compute": "AirCombatBehaviorDistance" },
+                        "RelativeSpeed": 0.35
                       }
                     }
                   ]
