@@ -47,66 +47,6 @@
     "DescendFlatness": 0.9,
     "DescentSteepness": 0.9,
     "DescentBlending": 1.5,
-    "MotionControllerList": [
-      {
-        "Type": "Fly",
-        "MaxHorizontalSpeed": {
-          "Compute": "FlightSpeed"
-        },
-        "MaxSinkSpeed": 8,
-        "MaxClimbSpeed": 10,
-        "MinAirSpeed": 3,
-        "Acceleration": 6,
-        "MinHeightOverGround": 4,
-        "MaxHeightOverGround": 10,
-        "MaxRollAngle": 70,
-        "MaxTurnSpeed": 180,
-        "DesiredAltitudeWeight": 1
-      },
-      {
-        "Type": "Walk",
-        "MaxWalkSpeed": {
-          "Compute": "MaxSpeed"
-        },
-        "Gravity": 10,
-        "RunThreshold": {
-          "Compute": "RunThreshold"
-        },
-        "MaxFallSpeed": 15,
-        "MaxRotationSpeed": 360,
-        "Acceleration": 10,
-        "MaxClimbHeight": {
-          "Compute": "ClimbHeight"
-        },
-        "MinJumpHeight": {
-          "Compute": "MinJumpHeight"
-        },
-        "AscentAnimationType": {
-          "Compute": "AscentAnimationType"
-        },
-        "ClimbSpeedMult": {
-          "Compute": "ClimbSpeedMult"
-        },
-        "ClimbSpeedPow": {
-          "Compute": "ClimbSpeedPow"
-        },
-        "ClimbSpeedConst": {
-          "Compute": "ClimbSpeedConst"
-        },
-        "DescendSpeedCompensation": {
-          "Compute": "DescendSpeedCompensation"
-        },
-        "DescendFlatness": {
-          "Compute": "DescendFlatness"
-        },
-        "DescentSteepness": {
-          "Compute": "DescentSteepness"
-        },
-        "DescentBlending": {
-          "Compute": "DescentBlending"
-        }
-      }
-    ],
     "LeashDistance": 60,
     "HardLeashDistance": 100,
     "LeashMinPlayerDistance": 15,
