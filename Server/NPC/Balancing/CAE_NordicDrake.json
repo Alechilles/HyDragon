@@ -138,46 +138,11 @@
         ],
         "RequireAiming": false
       },
-      "RangedAttack": {
-        "Type": "Ability",
-        "Description": "Fire an ice ball at range",
-        "Target": "Hostile",
-        "SubState": "Ranged",
-        "Ability": "Root_NPC_NordicDrake_Ice_Ball",
-        "WeightCoefficient": 2,
-        "AttackDistanceRange": [
-          6,
-          20
-        ],
-        "PostExecuteDistanceRange": [
-          3.5,
-          3.5
-        ],
-        "Conditions": [
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleLogistic",
-              "XRange": [
-                0,
-                20
-              ]
-            }
-          },
-          {
-            "Type": "TimeSinceLastUsed",
-            "Curve": {
-              "Type": "Switch",
-              "SwitchPoint": 10
-            }
-          }
-        ]
-      },
       "FlameBreathAttack": {
         "Type": "Ability",
         "Description": "Breathe a short flamethrower burst at mid range",
         "Target": "Hostile",
-        "SubState": "Ranged",
+        "SubState": "Default",
         "Ability": "Root_NPC_NordicDrake_Flame_Breath",
         "WeightCoefficient": 2,
         "AttackDistanceRange": [
@@ -207,42 +172,6 @@
             }
           }
         ]
-      },
-      "RainShootAttack": {
-        "Type": "Ability",
-        "Description": "Occasionally launch an ice-barrage at melee or mid-range as area denial",
-        "Target": "Hostile",
-        "SubState": "Ranged",
-        "Ability": "Root_NPC_NordicDrake_RainShoot",
-        "WeightCoefficient": 3,
-        "AttackDistanceRange": [
-          1,
-          10
-        ],
-        "PostExecuteDistanceRange": [
-          3.5,
-          3.5
-        ],
-        "Conditions": [
-          {
-            "Type": "TargetDistance",
-            "Curve": {
-              "ResponseCurve": "SimpleDescendingLogistic",
-              "XRange": [
-                0,
-                12
-              ]
-            }
-          },
-          {
-            "Type": "TimeSinceLastUsed",
-            "Curve": {
-              "Type": "Switch",
-              "SwitchPoint": 45
-            }
-          }
-        ],
-        "RequireAiming": false
       }
     },
     "MinActionUtility": 0.01,
@@ -262,29 +191,26 @@
         },
         "Actions": [
           "SelectTarget",
-          "RainShootAttack",
           "FlameBreathAttack",
           "TailSpinAttack",
-          "RangedAttack",
           "BiteAttack"
         ]
       },
       "Ranged": {
         "BasicAttacks": {
           "Attacks": [
-            "Root_NPC_NordicDrake_Ice_Ball"
+            "Root_NPC_NordicDrake_Flame_Breath"
           ],
           "Randomise": false,
-          "MaxRange": 20,
+          "MaxRange": 9,
           "Timeout": 1,
           "CooldownRange": [
-            10,
-            10
+            18,
+            18
           ]
         },
         "Actions": [
           "SelectTarget",
-          "RainShootAttack",
           "FlameBreathAttack",
           "TailSpinAttack",
           "MeleeAttack",
