@@ -1,0 +1,30 @@
+{
+  "Parent": "DamageEntityParent",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Fire": 18
+    },
+    "RandomPercentageModifier": 0.1
+  },
+  "DamageEffects": {
+    "Knockback": {
+      "Direction": {
+        "X": 0,
+        "Y": 1.0,
+        "Z": -2.0
+      },
+      "Force": 4.0,
+      "VelocityType": "Add"
+    },
+    "WorldParticles": [
+      {
+        "SystemId": "Impact_Explosion"
+      }
+    ]
+  },
+  "Next": {
+    "Type": "ApplyEffect",
+    "EffectId": "Flame_Staff_Burn",
+    "Entity": "Target"
+  }
+}

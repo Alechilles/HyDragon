@@ -1,0 +1,166 @@
+{
+  "Type": "Serial",
+  "$Comment": "Repurposes the weapon flamethrower as a short creature breath attack.",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "PrepareShoot"
+      },
+      "RunTime": 0.5
+    },
+    {
+      "Type": "Parallel",
+      "Interactions": [
+        {
+          "Interactions": [
+            {
+              "Type": "ApplyEffect",
+              "EffectId": "FlamethrowerSource"
+            },
+            {
+              "Type": "Simple",
+              "Effects": {
+                "ItemPlayerAnimationsId": "NordicDrake_Default",
+                "ItemAnimationId": "ChargeShoot",
+                "Particles": [
+                  {
+                    "TargetEntityPart": "Entity",
+                    "TargetNodeName": "Head",
+                    "SystemId": "Flamethrower",
+                    "DetachedFromModel": false,
+                    "PositionOffset": {
+                      "Z": 1.4
+                    },
+                    "RotationOffset": {
+                      "Pitch": 0,
+                      "Roll": 0,
+                      "Yaw": 180
+                    },
+                    "Scale": 1.35
+                  }
+                ],
+                "ClearAnimationOnFinish": true
+              },
+              "RunTime": 1.2
+            }
+          ]
+        },
+        {
+          "Interactions": [
+            {
+              "Type": "Selector",
+              "RunTime": 0.05,
+              "Selector": {
+                "Id": "Stab",
+                "TestLineOfSight": true,
+                "ExtendTop": 0.75,
+                "ExtendLeft": 0.75,
+                "ExtendRight": 0.75,
+                "ExtendBottom": 0.75,
+                "StartDistance": 1.5,
+                "EndDistance": 8
+              },
+              "HitEntity": {
+                "Interactions": [
+                  "NordicDrake_Flame_Breath_Damage"
+                ]
+              },
+              "Next": {
+                "Type": "Serial",
+                "Interactions": [
+                  {
+                    "Type": "Simple",
+                    "RunTime": 0.25
+                  },
+                  {
+                    "Type": "Selector",
+                    "RunTime": 0.05,
+                    "Selector": {
+                      "Id": "Stab",
+                      "TestLineOfSight": true,
+                      "ExtendTop": 0.75,
+                      "ExtendLeft": 0.75,
+                      "ExtendRight": 0.75,
+                      "ExtendBottom": 0.75,
+                      "StartDistance": 1.5,
+                      "EndDistance": 8
+                    },
+                    "HitEntity": {
+                      "Interactions": [
+                        "NordicDrake_Flame_Breath_Damage"
+                      ]
+                    }
+                  },
+                  {
+                    "Type": "ApplyEffect",
+                    "EffectId": "FlamethrowerSource"
+                  },
+                  {
+                    "Type": "Simple",
+                    "RunTime": 0.25
+                  },
+                  {
+                    "Type": "Selector",
+                    "RunTime": 0.05,
+                    "Selector": {
+                      "Id": "Stab",
+                      "TestLineOfSight": true,
+                      "ExtendTop": 0.75,
+                      "ExtendLeft": 0.75,
+                      "ExtendRight": 0.75,
+                      "ExtendBottom": 0.75,
+                      "StartDistance": 1.5,
+                      "EndDistance": 8
+                    },
+                    "HitEntity": {
+                      "Interactions": [
+                        "NordicDrake_Flame_Breath_Damage"
+                      ]
+                    }
+                  },
+                  {
+                    "Type": "ApplyEffect",
+                    "EffectId": "FlamethrowerSource"
+                  },
+                  {
+                    "Type": "Simple",
+                    "RunTime": 0.25
+                  },
+                  {
+                    "Type": "Selector",
+                    "RunTime": 0.05,
+                    "Selector": {
+                      "Id": "Stab",
+                      "TestLineOfSight": true,
+                      "ExtendTop": 0.75,
+                      "ExtendLeft": 0.75,
+                      "ExtendRight": 0.75,
+                      "ExtendBottom": 0.75,
+                      "StartDistance": 1.5,
+                      "EndDistance": 8
+                    },
+                    "HitEntity": {
+                      "Interactions": [
+                        "NordicDrake_Flame_Breath_Damage"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "FinishShoot"
+      },
+      "RunTime": 0.4
+    }
+  ]
+}

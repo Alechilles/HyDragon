@@ -173,6 +173,41 @@
           }
         ]
       },
+      "FlameBreathAttack": {
+        "Type": "Ability",
+        "Description": "Breathe a short flamethrower burst at mid range",
+        "Target": "Hostile",
+        "SubState": "Ranged",
+        "Ability": "Root_NPC_NordicDrake_Flame_Breath",
+        "WeightCoefficient": 2,
+        "AttackDistanceRange": [
+          3,
+          9
+        ],
+        "PostExecuteDistanceRange": [
+          5,
+          5
+        ],
+        "Conditions": [
+          {
+            "Type": "TargetDistance",
+            "Curve": {
+              "ResponseCurve": "SimpleLogistic",
+              "XRange": [
+                0,
+                10
+              ]
+            }
+          },
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 18
+            }
+          }
+        ]
+      },
       "RainShootAttack": {
         "Type": "Ability",
         "Description": "Occasionally launch an ice-barrage at melee or mid-range as area denial",
@@ -228,6 +263,7 @@
         "Actions": [
           "SelectTarget",
           "RainShootAttack",
+          "FlameBreathAttack",
           "TailSpinAttack",
           "RangedAttack",
           "BiteAttack"
@@ -249,6 +285,7 @@
         "Actions": [
           "SelectTarget",
           "RainShootAttack",
+          "FlameBreathAttack",
           "TailSpinAttack",
           "MeleeAttack",
           "BiteAttack"
