@@ -1,6 +1,6 @@
 {
   "Appearance": "NordicDrake_Dragon_Fire_Ball_Projectile",
-  "Radius": 3.2,
+  "Radius": 6.4,
   "Height": -1,
   "HorizontalCenterShot": 0,
   "DepthShot": 4.25,
@@ -15,17 +15,17 @@
   "DeadTimeMiss": 0,
   "DeathParticles": {
     "SystemId": "Impact_Explosion",
-    "Scale": 1.8
+    "Scale": 2.4
   },
   "MissParticles": {
     "SystemId": "Impact_Explosion",
-    "Scale": 1.4
+    "Scale": 1.8
   },
   "ImpactSlowdown": 0,
   "VerticalCenterShot": 0,
   "HitParticles": {
     "SystemId": "Impact_Explosion",
-    "Scale": 1.8
+    "Scale": 2.4
   },
   "ExplosionConfig": {
     "DamageEntities": true,
