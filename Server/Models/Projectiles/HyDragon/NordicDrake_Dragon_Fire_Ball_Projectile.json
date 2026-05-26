@@ -1,37 +1,33 @@
 {
+  "Model": "Items/Projectiles/Fireball.blockymodel",
+  "Texture": "Items/Projectiles/Fireball.png",
   "HitBox": {
     "Max": {
-      "X": 1.2,
-      "Y": 1.2,
-      "Z": 1.2
+      "X": 0.1,
+      "Y": 0.1,
+      "Z": 0.1
     },
     "Min": {
-      "X": -1.2,
-      "Y": -1.2,
-      "Z": -1.2
+      "X": -0.1,
+      "Y": -0.1,
+      "Z": -0.1
     }
   },
-  "MinScale": 11.2,
-  "MaxScale": 14.4,
-  "DefaultAttachments": [
+  "MinScale": 4,
+  "MaxScale": 4,
+  "Particles": [
     {
-      "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
-      "Texture": "Items/HyDragon/Draconic_Essence_Igne.png"
+      "PositionOffset": {
+        "X": 0,
+        "Y": 0,
+        "Z": 0
+      },
+      "SystemId": "Fire_Projectile",
+      "TargetNodeName": ""
     }
   ],
-  "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
-  "Texture": "Items/HyDragon/Draconic_Essence_Igne.png",
   "Light": {
-    "Color": "#420",
+    "Color": "#fb8",
     "Radius": 10
-  },
-  "AnimationSets": {
-    "Idle": {
-      "Animations": [
-        {
-          "Animation": "Items/Animations/Spin_Pitch/Spin_Pitch_Down.blockyanim"
-        }
-      ]
-    }
   }
 }
