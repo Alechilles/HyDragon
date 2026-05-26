@@ -1,0 +1,37 @@
+{
+  "HitBox": {
+    "Max": {
+      "X": 0.3,
+      "Y": 0.3,
+      "Z": 0.3
+    },
+    "Min": {
+      "X": -0.3,
+      "Y": -0.3,
+      "Z": -0.3
+    }
+  },
+  "MinScale": 2.8,
+  "MaxScale": 3.6,
+  "DefaultAttachments": [
+    {
+      "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
+      "Texture": "Items/HyDragon/Draconic_Essence_Igne.png"
+    }
+  ],
+  "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
+  "Texture": "Items/HyDragon/Draconic_Essence_Igne.png",
+  "Light": {
+    "Color": "#420",
+    "Radius": 6
+  },
+  "AnimationSets": {
+    "Idle": {
+      "Animations": [
+        {
+          "Animation": "Items/Animations/Spin_Pitch/Spin_Pitch_Down.blockyanim"
+        }
+      ]
+    }
+  }
+}

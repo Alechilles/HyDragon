@@ -21,12 +21,12 @@
     {
       "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
-      "ProjectileId": "NordicDrake_Fire_Ball",
+      "ProjectileId": "NordicDrake_Dragon_Fire_Ball",
       "TrajectoryMode": "Direct",
       "TargetSlot": "LockedTarget",
       "ImpactEffect": {
         "EffectId": "Flame_Staff_Burn",
-        "Radius": 3.5,
+        "Radius": 4.5,
         "ExcludeSource": true
       },
       "Tags": {}
