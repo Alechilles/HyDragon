@@ -16,11 +16,31 @@
         "ItemPlayerAnimationsId": "NordicDrake_Default",
         "ItemAnimationId": "ChargeShoot"
       },
-      "RunTime": 0.8
+      "RunTime": 0.25
     },
     {
       "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
+      "Effects": {
+        "Particles": [
+          {
+            "TargetEntityPart": "Entity",
+            "TargetNodeName": "Jaw",
+            "SystemId": "Fire_Projectile",
+            "DetachedFromModel": true,
+            "PositionOffset": {
+              "Y": 0.2,
+              "Z": 2.6
+            },
+            "RotationOffset": {
+              "Pitch": 0,
+              "Roll": 0,
+              "Yaw": 180
+            },
+            "Scale": 1.25
+          }
+        ]
+      },
       "ProjectileId": "NordicDrake_Dragon_Fire_Ball",
       "TrajectoryMode": "Direct",
       "TargetSlot": "LockedTarget",
