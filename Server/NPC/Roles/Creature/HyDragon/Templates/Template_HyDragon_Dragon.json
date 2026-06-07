@@ -266,6 +266,26 @@
       "Value": 14,
       "Description": "Distance used for slowing and stopping during flying phase movement."
     },
+    "AirCombatAltitudeRange": {
+      "Value": [ 8, 14 ],
+      "Description": "Desired height-over-ground range while using the flying combat phase."
+    },
+    "AirCombatWanderRelativeSpeed": {
+      "Value": 0.25,
+      "Description": "Relative speed for flying combat repositioning."
+    },
+    "AirCombatWanderMinMoveDistance": {
+      "Value": 4,
+      "Description": "Minimum clear segment distance required before choosing a flying combat reposition."
+    },
+    "AirCombatWanderStopDistance": {
+      "Value": 3,
+      "Description": "Stopping distance for flying combat repositioning segments."
+    },
+    "AirCombatWanderTestsPerTick": {
+      "Value": 4,
+      "Description": "Number of candidate flight directions tested per tick while picking a combat reposition."
+    },
     "AdditionalCombatBehaviorMacroElement": {
       "Value": "Component_Instruction_Null",
       "Description": "An optional macro element for supplying more bespoke combat movement behavior. Weight for the behavior must be internally defined in the macro element."
@@ -1834,7 +1854,7 @@
                       "Actions": [
                         {
                           "Type": "OverrideAltitude",
-                          "DesiredAltitudeRange": [ 6, 10 ]
+                          "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" }
                         }
                       ]
                     },
@@ -1918,7 +1938,14 @@
                       "BodyMotion": {
                         "Type": "WanderInCircle",
                         "Radius": { "Compute": "AirCombatBehaviorDistance" },
-                        "RelativeSpeed": 0.35
+                        "UseSphere": true,
+                        "MinHeadingChange": 30,
+                        "MaxHeadingChange": 135,
+                        "MinMoveDistance": { "Compute": "AirCombatWanderMinMoveDistance" },
+                        "StopDistance": { "Compute": "AirCombatWanderStopDistance" },
+                        "TestsPerTick": { "Compute": "AirCombatWanderTestsPerTick" },
+                        "DesiredAltitudeWeight": 1,
+                        "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" }
                       }
                     }
                   ]

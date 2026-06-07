@@ -15,7 +15,7 @@
     "HearingRange": 24,
     "DropList": "Drop_NordicDrake",
     "MaxSpeed": 7,
-    "FlightSpeed": 12,
+    "FlightSpeed": 9,
     "_CombatConfig": "CAE_NordicDrake",
     "UseCombatActionEvaluator": true,
     "UseHealthPhaseFlight": true,
@@ -24,7 +24,15 @@
     "AirRangedAttackDistance": 28,
     "AirRangedAttackMinimumDistance": 6,
     "AirBreathAttackDistance": 9,
-    "AirCombatBehaviorDistance": 16,
+    "AirCombatBehaviorDistance": 24,
+    "AirCombatAltitudeRange": [
+      12,
+      18
+    ],
+    "AirCombatWanderRelativeSpeed": 0.18,
+    "AirCombatWanderMinMoveDistance": 8,
+    "AirCombatWanderStopDistance": 5,
+    "AirCombatWanderTestsPerTick": 8,
     "Attack": "Root_NPC_NordicDrake_Attack",
     "AttackDistance": 5,
     "DesiredAttackDistanceRange": [
