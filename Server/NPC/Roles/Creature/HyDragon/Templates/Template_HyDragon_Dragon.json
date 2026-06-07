@@ -1839,6 +1839,23 @@
                       ]
                     },
                     {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Nav",
+                        "NavStates": [ "Defer", "Blocked", "Aborted" ],
+                        "ThrottleDuration": 2
+                      },
+                      "Actions": [
+                        {
+                          "Type": "ResetSearchRays"
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirLand"
+                        }
+                      ]
+                    },
+                    {
                       "Sensor": {
                         "Type": "Target",
                         "Range": { "Compute": "AirBreathAttackDistance" },

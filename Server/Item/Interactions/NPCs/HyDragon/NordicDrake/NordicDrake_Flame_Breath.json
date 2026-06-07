@@ -27,11 +27,12 @@
                 "Particles": [
                   {
                     "TargetEntityPart": "Entity",
-                    "TargetNodeName": "Head",
+                    "TargetNodeName": "Jaw",
                     "SystemId": "Flamethrower",
                     "DetachedFromModel": false,
                     "PositionOffset": {
-                      "Z": 1.4
+                      "Y": 0.2,
+                      "Z": 2.6
                     },
                     "RotationOffset": {
                       "Pitch": 0,
