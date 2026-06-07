@@ -479,11 +479,12 @@
       "MaxClimbSpeed": 10,
       "MinAirSpeed": 3,
       "Acceleration": 6,
-      "MinHeightOverGround": 4,
-      "MaxHeightOverGround": 10,
+      "MinHeightOverGround": 8,
+      "MaxHeightOverGround": 25,
       "MaxRollAngle": 70,
       "MaxTurnSpeed": 180,
-      "DesiredAltitudeWeight": 1
+      "DesiredAltitudeWeight": 0.8,
+      "AutoLevel": true
     },
     {
       "Type": "Walk",
@@ -1862,7 +1863,26 @@
                       "Continue": true,
                       "Sensor": {
                         "Type": "Nav",
-                        "NavStates": [ "Defer", "Blocked", "Aborted" ],
+                        "NavStates": [ "Defer", "Blocked" ],
+                        "ThrottleDuration": 2
+                      },
+                      "BodyMotion": {
+                        "Type": "Wander",
+                        "MaxHeadingChange": 90,
+                        "RelativeSpeed": 0.7
+                      },
+                      "Actions": [
+                        {
+                          "Type": "OverrideAltitude",
+                          "DesiredAltitudeRange": [ 12, 20 ]
+                        }
+                      ]
+                    },
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Nav",
+                        "NavStates": [ "Aborted" ],
                         "ThrottleDuration": 2
                       },
                       "Actions": [
