@@ -1,45 +1,45 @@
 {
-  "Appearance": "NordicDrake_Dragon_Fire_Ball_Projectile",
-  "Radius": 2.2,
-  "Height": -1,
-  "HorizontalCenterShot": 0,
-  "DepthShot": 8.5,
-  "PitchAdjustShot": false,
-  "SticksVertically": true,
-  "MuzzleVelocity": 22,
-  "TerminalVelocity": 34,
-  "Gravity": 4,
-  "Damage": 32,
-  "DeathEffectsOnHit": true,
-  "TimeToLive": 8,
-  "DeadTimeMiss": 0,
-  "DeathParticles": {
-    "SystemId": "Impact_Explosion",
-    "Scale": 2.4
-  },
-  "MissParticles": {
-    "SystemId": "Impact_Explosion",
-    "Scale": 1.8
-  },
-  "ImpactSlowdown": 0,
-  "VerticalCenterShot": 0.75,
-  "HitParticles": {
-    "SystemId": "Impact_Explosion",
-    "Scale": 2.4
-  },
-  "ExplosionConfig": {
-    "DamageEntities": true,
-    "EntityDamageRadius": 4.5,
-    "EntityDamage": 16,
-    "Knockback": {
-      "Type": "Force",
-      "Force": 9,
-      "Direction": {
-        "Z": 0.45,
-        "Y": 1.65,
-        "X": 0.45
-      }
-    },
-    "DamageBlocks": true
-  }
+	"Appearance": "NordicDrake_Dragon_Fire_Ball_Projectile",
+	"Radius": 2.2,
+	"Height": -1,
+	"VerticalCenterShot": -1.5,
+	"HorizontalCenterShot": 0,
+	"DepthShot": 3,
+	"PitchAdjustShot": true,
+	"MuzzleVelocity": 22,
+	"TerminalVelocity": 34,
+	"Gravity": 5,
+	"ImpactSlowdown": 0,
+	"SticksVertically": true,
+	"TimeToLive": 8,
+	"HitParticles": {
+		"SystemId": "Impact_Explosion",
+		"Scale": 2.4
+	},
+	"Damage": 32,
+	"MissParticles": {
+		"SystemId": "Impact_Explosion",
+		"Scale": 1.8
+	},
+	"DeadTimeMiss": 0,
+	"DeathParticles": {
+		"SystemId": "Impact_Explosion",
+		"Scale": 2.4
+	},
+	"DeathEffectsOnHit": true,
+	"ExplosionConfig": {
+		"DamageEntities": true,
+		"DamageBlocks": true,
+		"EntityDamageRadius": 4.5,
+		"EntityDamage": 16,
+		"Knockback": {
+			"Type": "Force",
+			"Force": 9,
+			"Direction": {
+				"X": 0.45,
+				"Y": 1.65,
+				"Z": 0.45
+			}
+		}
+	}
 }
