@@ -3,7 +3,7 @@
   "Radius": 2.2,
   "Height": -1,
   "HorizontalCenterShot": 0,
-  "DepthShot": 7.25,
+  "DepthShot": 8.5,
   "PitchAdjustShot": false,
   "SticksVertically": true,
   "MuzzleVelocity": 22,
@@ -22,7 +22,7 @@
     "Scale": 1.8
   },
   "ImpactSlowdown": 0,
-  "VerticalCenterShot": 0,
+  "VerticalCenterShot": 0.75,
   "HitParticles": {
     "SystemId": "Impact_Explosion",
     "Scale": 2.4
