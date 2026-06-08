@@ -1860,6 +1860,33 @@
                       ]
                     },
                     {
+                      "$Comment": "Flying collision recovery: if the controller is physically blocked before Nav reports a terminal state, climb and pick a new heading.",
+                      "Sensor": {
+                        "Type": "And",
+                        "Sensors": [
+                          {
+                            "Type": "MotionController",
+                            "MotionController": "Fly"
+                          },
+                          {
+                            "Type": "Eval",
+                            "Expression": "blocked"
+                          }
+                        ]
+                      },
+                      "BodyMotion": {
+                        "Type": "Wander",
+                        "MaxHeadingChange": 90,
+                        "RelativeSpeed": 0.8
+                      },
+                      "Actions": [
+                        {
+                          "Type": "OverrideAltitude",
+                          "DesiredAltitudeRange": [ 12, 20 ]
+                        }
+                      ]
+                    },
+                    {
                       "Continue": true,
                       "Sensor": {
                         "Type": "Nav",
