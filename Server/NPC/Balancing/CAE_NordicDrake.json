@@ -104,7 +104,7 @@
       },
       "TailSpinAttack": {
         "Type": "Ability",
-        "Description": "Periodically spin counter-clockwise and sweep a damaging circle around the NordicDrake",
+        "Description": "Periodically spin counter-clockwise and sweep a damaging cylinder around the NordicDrake",
         "Target": "Hostile",
         "SubState": "Default",
         "Ability": "Root_NPC_NordicDrake_Tail_Spin",

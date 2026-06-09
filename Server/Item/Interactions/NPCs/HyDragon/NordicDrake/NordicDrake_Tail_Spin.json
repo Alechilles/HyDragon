@@ -15,8 +15,9 @@
             "Type": "Selector",
             "RunTime": 0.25,
             "Selector": {
-              "Id": "AOECircle",
-              "Range": 8
+              "Id": "AOECylinder",
+              "Range": 8,
+              "Height": 8
             },
             "HitEntity": {
               "Interactions": [
