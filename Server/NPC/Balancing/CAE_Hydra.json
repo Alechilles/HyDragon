@@ -140,10 +140,10 @@
       },
       "RangedAttack": {
         "Type": "Ability",
-        "Description": "Fire an ice ball at range",
+        "Description": "Enter ranged combat",
         "Target": "Hostile",
         "SubState": "Ranged",
-        "Ability": "Root_NPC_Hydra_Ice_Ball",
+        "Ability": "Root_NPC_Hydra_Enter_Ranged",
         "WeightCoefficient": 2.0,
         "AttackDistanceRange": [
           6,

@@ -1,0 +1,11 @@
+{
+  "Interactions": [
+    "Hydra_Enter_Ranged"
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  },
+  "RequireNewClick": false
+}
