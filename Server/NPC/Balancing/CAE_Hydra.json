@@ -241,7 +241,7 @@
           ],
           "Randomise": false,
           "MaxRange": 30,
-          "Timeout": 1,
+          "Timeout": 4,
           "CooldownRange": [
             10,
             10
