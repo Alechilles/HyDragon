@@ -44,6 +44,11 @@
         ]
       },
       "ProjectileId": "RockDrake_Boulder",
+      "LaunchPositionOffset": {
+        "X": 0.0,
+        "Y": -1.5,
+        "Z": 0.0
+      },
       "TrajectoryMode": "Direct",
       "TargetSlot": "CAETargetSlot",
       "Tags": {}
