@@ -26,7 +26,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -79,7 +79,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -132,7 +132,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -185,7 +185,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -238,7 +238,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -291,7 +291,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -344,7 +344,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -397,7 +397,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -450,7 +450,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -503,7 +503,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -556,7 +556,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -609,7 +609,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -662,7 +662,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -715,7 +715,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -768,7 +768,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -821,7 +821,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -874,7 +874,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -927,7 +927,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -980,7 +980,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
@@ -1033,7 +1033,7 @@
           "LaunchPositionOffset": {
             "X": 0.0,
             "Y": -1.5,
-            "Z": 2.0
+            "Z": -2.0
           },
           "RandomAroundSourceMinRadius": 6.0,
           "RandomAroundSourceMaxRadius": 15.0,
