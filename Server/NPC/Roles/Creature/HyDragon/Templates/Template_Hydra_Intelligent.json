@@ -1384,6 +1384,15 @@
                   "Type": "PlayAnimation",
                   "Slot": "Status",
                   "Animation": "Alerted"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [
+                    0,
+                    1.2,
+                    0
+                  ],
+                  "ParticleSystem": "Alerted"
                 }
               ]
             },

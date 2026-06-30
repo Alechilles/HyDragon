@@ -10,9 +10,15 @@
       "RockDrakeT1"
     ],
     "AttitudeGroup": "PredatorsBig",
-    "WanderRadius": 8,
-    "ViewRange": 24,
-    "HearingRange": 16,
+    "WanderRadius": 3,
+    "ViewRange": 0,
+    "HearingRange": 4,
+    "AbsoluteDetectionRange": 4,
+    "AlertedRange": 24,
+    "AlertedTime": [
+      0.5,
+      0.5
+    ],
     "DropList": "Drop_RockDrake",
     "MaxSpeed": 5.5,
     "_CombatConfig": "CAE_RockDrake",
@@ -43,12 +49,21 @@
     "HardLeashDistance": 100,
     "LeashMinPlayerDistance": 15,
     "LeashTimer": [
-      12,
-      16
+      3,
+      5
     ],
     "WakingPeriod": [
       0,
-      24
+      0.01
+    ],
+    "BedBlockSet": "",
+    "ConfusedTimeRange": [
+      0.5,
+      1
+    ],
+    "SearchTimeRange": [
+      5,
+      10
     ],
     "MaxHealth": 260,
     "IsTameable": false,
