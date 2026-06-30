@@ -137,6 +137,7 @@
     {
       "Type": "Mount",
       "Enabled": true,
+      "RequireMountable": false,
       "RequireCrouching": false
     },
     {
