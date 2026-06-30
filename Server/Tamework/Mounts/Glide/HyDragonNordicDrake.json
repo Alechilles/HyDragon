@@ -1,0 +1,47 @@
+{
+  "Enabled": true,
+  "Priority": 200,
+  "RoleIds": [
+    "Tamed_NordicDrake"
+  ],
+  "Input": {
+    "HeldJumpAutoFlap": true,
+    "SprintFlapMode": "FORWARD_BOOST",
+    "CrouchMode": "AIRBRAKE"
+  },
+  "Glide": {
+    "BaseSpeed": 16.0,
+    "MinSpeed": 6.0,
+    "MaxSpeed": 44.0,
+    "PassiveSinkRate": 0.65,
+    "PitchDownAcceleration": 13.0,
+    "PitchDownSink": 4.0,
+    "PitchUpLiftConversion": 10.0,
+    "PitchUpSpeedDrain": 12.0,
+    "StallThreshold": 7.5,
+    "StallSink": 6.0
+  },
+  "Flap": {
+    "CooldownSeconds": 0.75,
+    "UpwardBoostStrength": 8.5,
+    "ForwardBoostStrength": 12.0,
+    "BoostDurationSeconds": 0.3,
+    "InputGraceSeconds": 0.15
+  },
+  "Airbrake": {
+    "SpeedDecay": 10.0,
+    "SinkMultiplier": 1.85,
+    "ControlMultiplier": 1.25
+  },
+  "Safety": {
+    "StaleInputTimeoutSeconds": 0.5,
+    "MaxPitchDegrees": 60.0,
+    "MaxVerticalSpeed": 16.0,
+    "CollisionRecoveryTicks": 10
+  },
+  "Presentation": {
+    "GlideAnimation": "Fly",
+    "FlapAnimation": "FlyFast",
+    "AirbrakeAnimation": "FlyIdle"
+  }
+}

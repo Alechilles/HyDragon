@@ -577,10 +577,16 @@
       "Value": "Mount"
     },
     "MountMode": {
-      "Value": "TameworkRide"
+      "Value": "TameworkMountedGlide"
     },
     "MountRideState": {
       "Value": "Ridden"
+    },
+    "MountGlideState": {
+      "Value": "Ridden"
+    },
+    "MountGlideController": {
+      "Value": "TameworkMountedGlide"
     },
     "MountGroundController": {
       "Value": "TameworkRideWalk"
@@ -755,6 +761,29 @@
       "MountedAcceleration": 8,
       "MountedDeceleration": 20,
       "MountedSprintMultiplier": 1.70
+    },
+    {
+      "Type": "TameworkMountedGlide",
+      "MinAirSpeed": 0,
+      "MaxHorizontalSpeed": 48,
+      "MaxClimbSpeed": 16,
+      "MaxSinkSpeed": 18,
+      "MaxFallSpeed": 32,
+      "MaxSinkSpeedFluid": 4,
+      "MaxClimbAngle": 70,
+      "MaxSinkAngle": 80,
+      "Acceleration": 10,
+      "Deceleration": 16,
+      "Gravity": 14,
+      "MaxTurnSpeed": 260,
+      "MaxRollAngle": 40,
+      "MaxRollSpeed": 260,
+      "RollDamping": 0.78,
+      "MinHeightOverGround": 4,
+      "MaxHeightOverGround": 36,
+      "FastFlyThreshold": 0.55,
+      "AutoLevel": false,
+      "DesiredAltitudeWeight": 0.35
     }
   ],
   "StateTransitions": [
@@ -1276,7 +1305,7 @@
           "Instructions": [
             {
               "BodyMotion": {
-                "Type": "TameworkRide"
+                "Type": "TameworkMountedGlide"
               }
             }
           ]
