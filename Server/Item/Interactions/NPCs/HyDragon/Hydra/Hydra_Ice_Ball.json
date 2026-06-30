@@ -8,7 +8,7 @@
         "ItemPlayerAnimationsId": "Hydra_Default",
         "ItemAnimationId": "PrepareShoot"
       },
-      "RunTime": 0.6
+      "RunTime": 0.45
     },
     {
       "Type": "Simple",
