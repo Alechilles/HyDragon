@@ -1838,7 +1838,7 @@
               "Modify": {
                 "TargetSwitchTimer": { "Compute": "TargetSwitchTimer" },
                 "TargetRange": { "Compute": "TargetRange" },
-                "NextTargetRange": { "Compute": "max(ViewRange, HearingRange)" }
+                "NextTargetRange": { "Compute": "AlertedRange" }
               }
             },
             {
