@@ -27,6 +27,10 @@
       "Value": 8,
       "Description": "The range from which the target will be heard. If zero, hearing will be disabled."
     },
+    "SleepHearingRange": {
+      "Value": 8,
+      "Description": "The range from which the target will be heard while this NPC is sleeping."
+    },
     "AbsoluteDetectionRange": {
       "Value": 2,
       "Description": "The range at which a target is guaranteed to be detected. If zero, abosulte detection will be disabled."
@@ -1260,7 +1264,7 @@
                   "Reference": "Component_Instruction_Wild_Sleep_State",
                   "Modify": {
                     "_ExportStates": [ "Combat.Message", "Search.Confused", "Alerted", "Idle" ],
-                    "HearingRange": { "Compute": "HearingRange" },
+                    "HearingRange": { "Compute": "SleepHearingRange" },
                     "Attitudes": [ "Hostile", "Neutral" ],
                     "DayTimePeriod": { "Compute": "WakingPeriod" }
                   }
