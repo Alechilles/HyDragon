@@ -11,8 +11,8 @@
       "Z": -0.05
     }
   },
-  "MinScale": 2.25,
-  "MaxScale": 3,
+  "MinScale": 3.375,
+  "MaxScale": 4.5,
   "Trails": [
     {
       "PositionOffset": {
