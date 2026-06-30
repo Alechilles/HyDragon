@@ -83,7 +83,7 @@
   "Debug": "DisplayState",
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "server.npcRoles.RockDrake.name",
+      "Value": "server.npcRoles.RockDrakeT2.name",
       "Description": "Translation key for NPC name display"
     }
   }

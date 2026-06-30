@@ -5,6 +5,9 @@ npcRoles.Tamed_Hydra.name=Hydra
 npcRoles.NordicDrake.name=Nordic Drake
 npcRoles.Tamed_NordicDrake.name=Nordic Drake
 npcRoles.RockDrake.name=Rock Drake
+npcRoles.RockDrakeT1.name=Rock Drake
+npcRoles.RockDrakeT2.name=Rock Drake
+npcRoles.RockDrakeT3.name=Frost Rock Drake
 npcRoles.Template.name=Template
 
 items.Draconic_Scale.name=Draconic Scale

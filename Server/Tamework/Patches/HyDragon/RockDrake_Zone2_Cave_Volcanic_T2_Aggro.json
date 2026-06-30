@@ -5,17 +5,17 @@
   "Enabled": true,
   "Operations": [
     {
-      "Id": "append-rock-drake",
+      "Id": "append-rock-drake-t2",
       "Op": "Insert",
       "Path": "/NPCs",
       "Position": "End",
       "Existing": {
-        "Id": "RockDrake"
+        "Id": "RockDrakeT2"
       },
       "Value": {
         "Weight": 5,
         "SpawnBlockSet": "Volcanic",
-        "Id": "RockDrake"
+        "Id": "RockDrakeT2"
       }
     }
   ]

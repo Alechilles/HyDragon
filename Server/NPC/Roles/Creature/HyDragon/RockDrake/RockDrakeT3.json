@@ -2,12 +2,12 @@
   "Type": "Variant",
   "Reference": "Template_Hydra_Intelligent",
   "Modify": {
-    "Appearance": "RockDrakeT2",
+    "Appearance": "RockDrakeT3",
     "Weapons": [],
     "OffHand": [],
     "NighttimeOffhandSlot": -1,
     "FlockArray": [
-      "RockDrakeT2"
+      "RockDrakeT3"
     ],
     "AttitudeGroup": "PredatorsBig",
     "WanderRadius": 8,
@@ -50,7 +50,7 @@
       0,
       24
     ],
-    "MaxHealth": 360,
+    "MaxHealth": 460,
     "IsTameable": false,
     "AttractiveItemSet": [],
     "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
@@ -58,7 +58,7 @@
     "InteractionConfigId": "",
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
-    "MemoriesNameOverride": "Rock Drake",
+    "MemoriesNameOverride": "Frost Rock Drake",
     "BreathesInWater": false,
     "_InteractionVars": {
       "Stomp_Damage": {
@@ -68,7 +68,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 34
+                "Physical": 42
               },
               "RandomPercentageModifier": 0.1
             }
@@ -83,7 +83,7 @@
   "Debug": "DisplayState",
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "server.npcRoles.RockDrake.name",
+      "Value": "server.npcRoles.RockDrakeT3.name",
       "Description": "Translation key for NPC name display"
     }
   }
