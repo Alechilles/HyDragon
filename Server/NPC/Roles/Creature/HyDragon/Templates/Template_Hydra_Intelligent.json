@@ -1777,7 +1777,7 @@
               "Actions": [
                 {
                   "Type": "State",
-                  "State": "Search.Confused"
+                  "State": "ReturnHome"
                 }
               ]
             }
