@@ -22,6 +22,24 @@
       },
       {
         "Type": "Single",
+        "Weight": 100,
+        "Item": {
+          "ItemId": "Ore_Gold",
+          "QuantityMin": 2,
+          "QuantityMax": 5
+        }
+      },
+      {
+        "Type": "Single",
+        "Weight": 100,
+        "Item": {
+          "ItemId": "Rubble_Stone",
+          "QuantityMin": 5,
+          "QuantityMax": 10
+        }
+      },
+      {
+        "Type": "Single",
         "Weight": 6,
         "Item": {
           "ItemId": "Drake_Egg",
