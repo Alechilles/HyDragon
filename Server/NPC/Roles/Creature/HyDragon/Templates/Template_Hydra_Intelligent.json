@@ -1619,14 +1619,6 @@
                     {
                       "Type": "State",
                       "State": ".Ranged"
-                    },
-                    {
-                      "Type": "Attack",
-                      "Attack": "Root_NPC_Hydra_Ice_Ball",
-                      "AttackPauseRange": [
-                        1.5,
-                        2.5
-                      ]
                     }
                   ]
                 },
