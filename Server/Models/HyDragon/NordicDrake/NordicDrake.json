@@ -215,7 +215,7 @@
           "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Up_20.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "BlendingDuration": 0.08
+          "BlendingDuration": 0.75
         }
       ]
     },
@@ -225,7 +225,7 @@
           "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Down_20.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "BlendingDuration": 0.08
+          "BlendingDuration": 0.75
         }
       ]
     },
@@ -235,7 +235,7 @@
           "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Bank_Left_20.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "BlendingDuration": 0.08
+          "BlendingDuration": 0.75
         }
       ]
     },
@@ -245,7 +245,7 @@
           "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Bank_Right_20.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "BlendingDuration": 0.08
+          "BlendingDuration": 0.75
         }
       ]
     },
@@ -255,7 +255,7 @@
           "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Up_Bank_Left_20.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "BlendingDuration": 0.08
+          "BlendingDuration": 0.75
         }
       ]
     },
@@ -265,7 +265,7 @@
           "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Up_Bank_Right_20.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "BlendingDuration": 0.08
+          "BlendingDuration": 0.75
         }
       ]
     },
@@ -275,7 +275,7 @@
           "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Down_Bank_Left_20.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "BlendingDuration": 0.08
+          "BlendingDuration": 0.75
         }
       ]
     },
@@ -285,7 +285,7 @@
           "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Down_Bank_Right_20.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "BlendingDuration": 0.08
+          "BlendingDuration": 0.75
         }
       ]
     },
