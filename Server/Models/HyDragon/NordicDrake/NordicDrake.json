@@ -1,6 +1,6 @@
 {
   "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake.blockymodel",
-  "Texture": "NPC/HyDragon/NordicDrake/Model/Cobalt.png",
+  "Texture": "NPC/HyDragon/NordicDrake/Model/GreenBalls.png",
   "EyeHeight": 3.6,
   "CrouchOffset": -0.1,
   "HitBox": {

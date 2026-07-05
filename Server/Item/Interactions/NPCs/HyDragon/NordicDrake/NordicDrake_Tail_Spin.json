@@ -16,8 +16,8 @@
             "RunTime": 0.25,
             "Selector": {
               "Id": "AOECylinder",
-              "Range": 8,
-              "Height": 8
+              "Range": 5.2,
+              "Height": 2.23
             },
             "HitEntity": {
               "Interactions": [

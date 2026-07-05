@@ -1,6 +1,6 @@
 {
   "Model": "NPC/HyDragon/RockDrake/Model/RockDrake.blockymodel",
-  "Texture": "NPC/HyDragon/RockDrake/Model/RockDragon2.png",
+  "Texture": "NPC/HyDragon/RockDrake/Model/RockDragonfire.png",
   "EyeHeight": 3.6,
   "CrouchOffset": -0.1,
   "HitBox": {

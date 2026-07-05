@@ -19,11 +19,12 @@
               "TestLineOfSight": true,
               "ExtendTop": 0.75,
               "ExtendBottom": 0.75,
-              "StartDistance": 1,
-              "EndDistance": 5.25,
-              "Length": 105,
+              "StartDistance": 2.51,
+              "EndDistance": 5.32,
+              "Length": 67.39,
               "RollOffset": 45,
-              "YawStartOffset": -60
+              "YawStartOffset": -2.66,
+              "PitchOffset": -23.94
             },
             "HitEntity": {
               "Interactions": [

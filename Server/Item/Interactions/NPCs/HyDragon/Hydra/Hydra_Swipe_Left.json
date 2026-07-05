@@ -17,14 +17,14 @@
               "Id": "Horizontal",
               "Direction": "ToLeft",
               "TestLineOfSight": true,
-              "ExtendTop": 0.75,
-              "ExtendBottom": 0.75,
-              "StartDistance": 2.51,
-              "EndDistance": 5.32,
-              "Length": 67.39,
-              "RollOffset": 45,
-              "YawStartOffset": -2.66,
-              "PitchOffset": -23.94
+              "ExtendTop": 0.59,
+              "ExtendBottom": 1.19,
+              "StartDistance": 3.42,
+              "EndDistance": 6.24,
+              "Length": 98.02,
+              "RollOffset": 30.3,
+              "YawStartOffset": -46.34,
+              "PitchOffset": -5.35
             },
             "HitEntity": {
               "Interactions": [

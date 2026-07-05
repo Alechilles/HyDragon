@@ -75,8 +75,8 @@
         "SubState": "Default",
         "Ability": "Root_NPC_NordicDrake_Bite",
         "AttackDistanceRange": [
-          3.5,
-          6.25
+          3.0,
+          4.5
         ],
         "PostExecuteDistanceRange": [
           3.5,

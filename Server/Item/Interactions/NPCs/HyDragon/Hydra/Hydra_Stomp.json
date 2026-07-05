@@ -16,10 +16,10 @@
             "RunTime": 0.333,
             "Selector": {
               "Id": "AOECircle",
-              "Range": 2.8,
+              "Range": 3.86,
               "Offset": {
                 "Y": 0.74,
-                "Z": -1.8,
+                "Z": -3.27,
                 "X": -0.44
               }
             },

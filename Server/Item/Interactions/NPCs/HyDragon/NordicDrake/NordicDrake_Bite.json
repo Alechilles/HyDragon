@@ -15,15 +15,15 @@
             "RunTime": 0.167,
             "Selector": {
               "Id": "Horizontal",
-              "Direction": "ToLeft",
+              "Direction": "ToRight",
               "TestLineOfSight": true,
               "ExtendTop": 0.75,
               "ExtendBottom": 0.75,
-              "StartDistance": 1.5,
-              "EndDistance": 6.25,
-              "Length": 45,
+              "StartDistance": 3.12,
+              "EndDistance": 4.75,
+              "Length": 44.55,
               "RollOffset": -90,
-              "YawStartOffset": -20
+              "YawStartOffset": 2.66
             },
             "HitEntity": {
               "Interactions": [

@@ -16,7 +16,12 @@
             "RunTime": 0.333,
             "Selector": {
               "Id": "AOECircle",
-              "Range": 5.25
+              "Range": 2.8,
+              "Offset": {
+                "Y": 0.74,
+                "Z": -1.8,
+                "X": -0.44
+              }
             },
             "HitEntity": {
               "Interactions": [
