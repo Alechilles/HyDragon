@@ -249,6 +249,46 @@
         }
       ]
     },
+    "TameworkPitchUpBankLeft": {
+      "Animations": [
+        {
+          "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Up_Bank_Left_20.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.08
+        }
+      ]
+    },
+    "TameworkPitchUpBankRight": {
+      "Animations": [
+        {
+          "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Up_Bank_Right_20.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.08
+        }
+      ]
+    },
+    "TameworkPitchDownBankLeft": {
+      "Animations": [
+        {
+          "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Down_Bank_Left_20.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.08
+        }
+      ]
+    },
+    "TameworkPitchDownBankRight": {
+      "Animations": [
+        {
+          "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Down_Bank_Right_20.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.08
+        }
+      ]
+    },
     "Laydown": {
       "Animations": [
         {
