@@ -212,7 +212,7 @@
     "TameworkPitchUp": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Tamework_Pitch_Up.blockyanim",
+          "Animation": "Tamework/AvatarFlight/Animations/Origin/Pitch_Up_20.blockyanim",
           "Speed": 1,
           "Looping": true,
           "BlendingDuration": 0.08
@@ -222,7 +222,7 @@
     "TameworkPitchDown": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Tamework_Pitch_Down.blockyanim",
+          "Animation": "Tamework/AvatarFlight/Animations/Origin/Pitch_Down_20.blockyanim",
           "Speed": 1,
           "Looping": true,
           "BlendingDuration": 0.08
@@ -232,7 +232,7 @@
     "TameworkBankLeft": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Tamework_Bank_Left.blockyanim",
+          "Animation": "Tamework/AvatarFlight/Animations/Origin/Bank_Left_20.blockyanim",
           "Speed": 1,
           "Looping": true,
           "BlendingDuration": 0.08
@@ -242,7 +242,7 @@
     "TameworkBankRight": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Tamework_Bank_Right.blockyanim",
+          "Animation": "Tamework/AvatarFlight/Animations/Origin/Bank_Right_20.blockyanim",
           "Speed": 1,
           "Looping": true,
           "BlendingDuration": 0.08
