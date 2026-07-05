@@ -209,6 +209,46 @@
         }
       ]
     },
+    "TameworkPitchUp": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Tamework_Pitch_Up.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.08
+        }
+      ]
+    },
+    "TameworkPitchDown": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Tamework_Pitch_Down.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.08
+        }
+      ]
+    },
+    "TameworkBankLeft": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Tamework_Bank_Left.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.08
+        }
+      ]
+    },
+    "TameworkBankRight": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Tamework_Bank_Right.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.08
+        }
+      ]
+    },
     "Laydown": {
       "Animations": [
         {

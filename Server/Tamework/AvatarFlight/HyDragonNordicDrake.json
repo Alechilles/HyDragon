@@ -1,0 +1,26 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "Model": {
+    "ApplyModel": true,
+    "ModelId": "NordicDrake",
+    "Scale": 1.0
+  },
+  "Animation": {
+    "IdleAnimation": "FlyIdle",
+    "FlightAnimation": "Fly",
+    "FastFlightAnimation": "FlyFast",
+    "PoseAnimationsEnabled": true,
+    "PitchPoseSlot": "Status",
+    "RollPoseSlot": "Emote",
+    "PitchUpPoseAnimation": "TameworkPitchUp",
+    "PitchDownPoseAnimation": "TameworkPitchDown",
+    "BankLeftPoseAnimation": "TameworkBankLeft",
+    "BankRightPoseAnimation": "TameworkBankRight",
+    "PitchPoseThresholdDegrees": 6.0,
+    "RollPoseThresholdDegrees": 4.0,
+    "PoseResendIntervalMs": 150.0,
+    "SuppressStatusAnimation": true,
+    "SuppressEmoteAnimation": true
+  }
+}
