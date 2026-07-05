@@ -212,7 +212,7 @@
     "TameworkPitchUp": {
       "Animations": [
         {
-          "Animation": "Tamework/AvatarFlight/Animations/Origin/Pitch_Up_20.blockyanim",
+          "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Up_20.blockyanim",
           "Speed": 1,
           "Looping": true,
           "BlendingDuration": 0.08
@@ -222,7 +222,7 @@
     "TameworkPitchDown": {
       "Animations": [
         {
-          "Animation": "Tamework/AvatarFlight/Animations/Origin/Pitch_Down_20.blockyanim",
+          "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Pitch_Down_20.blockyanim",
           "Speed": 1,
           "Looping": true,
           "BlendingDuration": 0.08
@@ -232,7 +232,7 @@
     "TameworkBankLeft": {
       "Animations": [
         {
-          "Animation": "Tamework/AvatarFlight/Animations/Origin/Bank_Left_20.blockyanim",
+          "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Bank_Left_20.blockyanim",
           "Speed": 1,
           "Looping": true,
           "BlendingDuration": 0.08
@@ -242,7 +242,7 @@
     "TameworkBankRight": {
       "Animations": [
         {
-          "Animation": "Tamework/AvatarFlight/Animations/Origin/Bank_Right_20.blockyanim",
+          "Animation": "NPC/Tamework/AvatarFlight/Animations/Origin/Bank_Right_20.blockyanim",
           "Speed": 1,
           "Looping": true,
           "BlendingDuration": 0.08
