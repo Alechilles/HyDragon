@@ -26,5 +26,11 @@
     "PoseResendIntervalMs": 150.0,
     "SuppressStatusAnimation": true,
     "SuppressEmoteAnimation": true
+  },
+  "RiderVisual": {
+    "HideOwnerEquipment": true,
+    "HideOwnerArmor": false,
+    "HideOwnerHands": true,
+    "ShowRider": false
   }
 }
