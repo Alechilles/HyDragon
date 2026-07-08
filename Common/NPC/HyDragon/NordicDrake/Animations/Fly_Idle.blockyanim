@@ -215,42 +215,6 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "R-Ear": {
-      "position": [],
-      "orientation": [
-        {
-          "time": 15,
-          "delta": {"x": 0, "y": 0, "z": 0, "w": 1},
-          "interpolationType": "smooth"
-        },
-        {
-          "time": 75,
-          "delta": {"x": 0.0555, "y": 0, "z": 0, "w": 0.99846},
-          "interpolationType": "smooth"
-        }
-      ],
-      "shapeStretch": [],
-      "shapeVisible": [],
-      "shapeUvOffset": []
-    },
-    "L-Ear": {
-      "position": [],
-      "orientation": [
-        {
-          "time": 15,
-          "delta": {"x": 0.03886, "y": 0, "z": 0, "w": 0.99924},
-          "interpolationType": "smooth"
-        },
-        {
-          "time": 75,
-          "delta": {"x": 0.1284, "y": 0, "z": 0, "w": 0.99172},
-          "interpolationType": "smooth"
-        }
-      ],
-      "shapeStretch": [],
-      "shapeVisible": [],
-      "shapeUvOffset": []
-    },
     "R-Hand": {
       "position": [],
       "orientation": [
