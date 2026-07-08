@@ -3,7 +3,7 @@
   "Priority": 100,
   "Model": {
     "ApplyModel": true,
-    "ModelId": "NordicDrake",
+    "ModelId": "NordicDrake_AvatarFlight",
     "Scale": 1.0
   },
   "Animation": {
@@ -29,8 +29,8 @@
   },
   "RiderVisual": {
     "HideOwnerEquipment": true,
-    "HideOwnerArmor": false,
+    "HideOwnerArmor": true,
     "HideOwnerHands": true,
-    "ShowRider": false
+    "ShowRider": true
   }
 }
