@@ -89,9 +89,6 @@
         {
           "Animation": "NPC/HyDragon/NordicDrake/Animations/Run.blockyanim",
           "SoundEventId": "SFX_Rex_Walk",
-          "FootstepIntervals": [
-            3
-          ],
           "Looping": true,
           "Speed": 0.7
         }
