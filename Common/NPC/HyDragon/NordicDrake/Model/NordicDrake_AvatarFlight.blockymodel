@@ -38,7 +38,7 @@
       "children": [
         {
           "id": "tw_avatar_equipment_sink_Pelvis",
-          "name": "TameworkOwnerEquipmentSink_Pelvis",
+          "name": "Pelvis",
           "position": {
             "x": 0,
             "y": -100000,
@@ -75,7 +75,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_Belly",
-          "name": "TameworkOwnerEquipmentSink_Belly",
+          "name": "Belly",
           "position": {
             "x": 0,
             "y": -100000,
@@ -112,7 +112,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_Chest",
-          "name": "TameworkOwnerEquipmentSink_Chest",
+          "name": "Chest",
           "position": {
             "x": 0,
             "y": -100000,
@@ -149,7 +149,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_Neck",
-          "name": "TameworkOwnerEquipmentSink_Neck",
+          "name": "Neck",
           "position": {
             "x": 0,
             "y": -100000,
@@ -186,7 +186,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_Head",
-          "name": "TameworkOwnerEquipmentSink_Head",
+          "name": "Head",
           "position": {
             "x": 0,
             "y": -100000,
@@ -223,7 +223,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_R-Arm",
-          "name": "TameworkOwnerEquipmentSink_R-Arm",
+          "name": "R-Arm",
           "position": {
             "x": 0,
             "y": -100000,
@@ -260,7 +260,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_R-Forearm",
-          "name": "TameworkOwnerEquipmentSink_R-Forearm",
+          "name": "R-Forearm",
           "position": {
             "x": 0,
             "y": -100000,
@@ -297,7 +297,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_R-Hand",
-          "name": "TameworkOwnerEquipmentSink_R-Hand",
+          "name": "R-Hand",
           "position": {
             "x": 0,
             "y": -100000,
@@ -334,7 +334,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_L-Arm",
-          "name": "TameworkOwnerEquipmentSink_L-Arm",
+          "name": "L-Arm",
           "position": {
             "x": 0,
             "y": -100000,
@@ -371,7 +371,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_L-Forearm",
-          "name": "TameworkOwnerEquipmentSink_L-Forearm",
+          "name": "L-Forearm",
           "position": {
             "x": 0,
             "y": -100000,
@@ -408,7 +408,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_L-Hand",
-          "name": "TameworkOwnerEquipmentSink_L-Hand",
+          "name": "L-Hand",
           "position": {
             "x": 0,
             "y": -100000,
@@ -445,7 +445,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_R-Thigh",
-          "name": "TameworkOwnerEquipmentSink_R-Thigh",
+          "name": "R-Thigh",
           "position": {
             "x": 0,
             "y": -100000,
@@ -482,7 +482,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_R-Calf",
-          "name": "TameworkOwnerEquipmentSink_R-Calf",
+          "name": "R-Calf",
           "position": {
             "x": 0,
             "y": -100000,
@@ -519,7 +519,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_R-Foot",
-          "name": "TameworkOwnerEquipmentSink_R-Foot",
+          "name": "R-Foot",
           "position": {
             "x": 0,
             "y": -100000,
@@ -556,7 +556,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_L-Thigh",
-          "name": "TameworkOwnerEquipmentSink_L-Thigh",
+          "name": "L-Thigh",
           "position": {
             "x": 0,
             "y": -100000,
@@ -593,7 +593,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_L-Calf",
-          "name": "TameworkOwnerEquipmentSink_L-Calf",
+          "name": "L-Calf",
           "position": {
             "x": 0,
             "y": -100000,
@@ -630,7 +630,7 @@
         },
         {
           "id": "tw_avatar_equipment_sink_L-Foot",
-          "name": "TameworkOwnerEquipmentSink_L-Foot",
+          "name": "L-Foot",
           "position": {
             "x": 0,
             "y": -100000,
