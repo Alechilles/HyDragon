@@ -121,6 +121,35 @@
         }
       ]
     },
+    "StepWalk": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/AvatarFlight/Walk.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1
+        }
+      ]
+    },
+    "StepRun": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/AvatarFlight/Run.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "Speed": 1.1
+        }
+      ]
+    },
+    "StepSprint": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/AvatarFlight/Run.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "Speed": 1.2
+        }
+      ]
+    },
     "Jump": {
       "Animations": [
         {
