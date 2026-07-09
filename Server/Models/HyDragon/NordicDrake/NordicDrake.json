@@ -94,6 +94,16 @@
         }
       ]
     },
+    "Sprint": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Run.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk",
+          "Looping": true,
+          "Speed": 0.9
+        }
+      ]
+    },
     "Crouch": {
       "Animations": [
         {
@@ -168,6 +178,16 @@
       ]
     },
     "JumpRun": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Jump.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "Speed": 0.8
+        }
+      ]
+    },
+    "JumpSprint": {
       "Animations": [
         {
           "Animation": "NPC/HyDragon/NordicDrake/Animations/Jump.blockyanim",
