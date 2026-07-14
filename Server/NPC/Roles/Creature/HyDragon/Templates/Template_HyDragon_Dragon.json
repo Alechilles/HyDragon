@@ -258,6 +258,10 @@
       "Value": 5,
       "Description": "Minimum preferred distance for the flying phase ranged attack."
     },
+    "AirRangedAttackViewSector": {
+      "Value": 60,
+      "Description": "Forward-facing sector required before the flying phase ranged attack can fire."
+    },
     "AirBreathAttackDistance": {
       "Value": 9,
       "Description": "Maximum distance for the flying phase breath attack."
@@ -473,7 +477,7 @@
   "KnockbackScale": { "Compute": "KnockbackScale" },
   "MotionControllerList": [
     {
-      "Type": "Fly",
+      "Type": "TameworkFly",
       "MaxHorizontalSpeed": { "Compute": "FlightSpeed" },
       "MaxSinkSpeed": 8,
       "MaxClimbSpeed": 10,
@@ -1954,6 +1958,10 @@
                         "Filters": [
                           {
                             "Type": "LineOfSight"
+                          },
+                          {
+                            "Type": "ViewSector",
+                            "ViewSector": { "Compute": "AirRangedAttackViewSector" }
                           }
                         ]
                       },
@@ -1964,6 +1972,9 @@
                         "Deflection": true,
                         "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
                       },
+                      "BodyMotion": {
+                        "Type": "MatchLook"
+                      },
                       "Actions": [
                         {
                           "Type": "Attack",
@@ -1973,6 +1984,29 @@
                           "AttackPauseRange": [ 1.5, 2.5 ]
                         }
                       ]
+                    },
+                    {
+                      "$Comment": "Turn toward a visible ranged target until it enters the fireball facing sector.",
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AirRangedAttackDistance" },
+                        "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
+                        "Filters": [
+                          {
+                            "Type": "LineOfSight"
+                          }
+                        ]
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "Spread": 0,
+                        "HitProbability": 1,
+                        "Deflection": true,
+                        "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                      },
+                      "BodyMotion": {
+                        "Type": "MatchLook"
+                      }
                     },
                     {
                       "Sensor": {
