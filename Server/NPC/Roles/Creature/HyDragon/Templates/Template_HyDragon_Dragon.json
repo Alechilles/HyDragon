@@ -266,6 +266,10 @@
       "Value": 9,
       "Description": "Maximum distance for the flying phase breath attack."
     },
+    "AirBreathAttackViewSector": {
+      "Value": 60,
+      "Description": "Forward-facing sector required before the flying phase breath attack can fire."
+    },
     "AirCombatBehaviorDistance": {
       "Value": 14,
       "Description": "Distance used for slowing and stopping during flying phase movement."
@@ -1934,12 +1938,22 @@
                         "Filters": [
                           {
                             "Type": "LineOfSight"
+                          },
+                          {
+                            "Type": "ViewSector",
+                            "ViewSector": { "Compute": "AirBreathAttackViewSector" }
                           }
                         ]
                       },
                       "HeadMotion": {
                         "Type": "Aim",
-                        "HitProbability": 1.0
+                        "Spread": 0,
+                        "HitProbability": 1,
+                        "Deflection": true,
+                        "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                      },
+                      "BodyMotion": {
+                        "Type": "MatchLook"
                       },
                       "Actions": [
                         {
@@ -1951,6 +1965,37 @@
                       ]
                     },
                     {
+                      "$Comment": "Turn toward a visible close target until it enters the flame-breath facing sector.",
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AirBreathAttackDistance" },
+                        "MinRange": 2,
+                        "Filters": [
+                          {
+                            "Type": "LineOfSight"
+                          },
+                          {
+                            "Type": "Not",
+                            "Filter": {
+                              "Type": "ViewSector",
+                              "ViewSector": { "Compute": "AirBreathAttackViewSector" }
+                            }
+                          }
+                        ]
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "Spread": 0,
+                        "HitProbability": 1,
+                        "Deflection": true,
+                        "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                      },
+                      "BodyMotion": {
+                        "Type": "MatchLook"
+                      }
+                    },
+                    {
+                      "Continue": true,
                       "Sensor": {
                         "Type": "Target",
                         "Range": { "Compute": "AirRangedAttackDistance" },
@@ -1972,16 +2017,13 @@
                         "Deflection": true,
                         "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
                       },
-                      "BodyMotion": {
-                        "Type": "MatchLook"
-                      },
                       "Actions": [
                         {
                           "Type": "Attack",
                           "Attack": { "Compute": "AirRangedAttack" },
                           "BallisticMode": "Short",
                           "AimingTimeRange": [ 0.5, 1 ],
-                          "AttackPauseRange": [ 1.5, 2.5 ]
+                          "AttackPauseRange": [ 3, 6 ]
                         }
                       ]
                     },
@@ -1994,6 +2036,13 @@
                         "Filters": [
                           {
                             "Type": "LineOfSight"
+                          },
+                          {
+                            "Type": "Not",
+                            "Filter": {
+                              "Type": "ViewSector",
+                              "ViewSector": { "Compute": "AirRangedAttackViewSector" }
+                            }
                           }
                         ]
                       },
