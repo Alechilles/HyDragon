@@ -2061,7 +2061,7 @@
                               },
                               "BodyMotion": {
                                 "Type": "TameworkFlyingOrbit",
-                                "Mode": "FaceTarget",
+                                "Mode": "FACE_TARGET",
                                 "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
                                 "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
                                 "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
