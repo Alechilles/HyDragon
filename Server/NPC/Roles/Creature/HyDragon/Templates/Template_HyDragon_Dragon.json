@@ -278,6 +278,10 @@
       "Value": [ 2, 5 ],
       "Description": "Desired height-over-ground range while closing for a flying breath attack."
     },
+    "AirBreathAttackCooldownRange": {
+      "Value": [ "PT10S", "PT15S" ],
+      "Description": "Cooldown before another flying breath attack run can be selected."
+    },
     "AirCombatRunDurationRange": {
       "Value": [ 6, 8 ],
       "Description": "Duration range for each weighted flying combat run."
@@ -305,6 +309,14 @@
     "AirCombatAltitudeRange": {
       "Value": [ 8, 14 ],
       "Description": "Desired height-over-ground range while using the flying combat phase."
+    },
+    "AirCombatClimbRelativeSpeed": {
+      "Value": 1.0,
+      "Description": "Upward steering strength while returning to flying combat altitude."
+    },
+    "AirCombatSinkRelativeSpeed": {
+      "Value": 0.5,
+      "Description": "Downward steering strength while entering a lower flying attack altitude."
     },
     "AirCombatWanderRelativeSpeed": {
       "Value": 0.25,
@@ -1982,7 +1994,10 @@
                             "Mode": "Orbit",
                             "OrbitRadius": { "Compute": "AirCombatBehaviorDistance" },
                             "OrbitRadiusTolerance": { "Compute": "AirCombatWanderStopDistance" },
-                            "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" }
+                            "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
+                            "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                            "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                            "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
                           }
                         },
                         {
@@ -2045,7 +2060,11 @@
                                 "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
                               },
                               "BodyMotion": {
-                                "Type": "MatchLook"
+                                "Type": "TameworkFlyingOrbit",
+                                "Mode": "FaceTarget",
+                                "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                                "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                                "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
                               }
                             },
                             {
@@ -2061,7 +2080,10 @@
                                 "Mode": "Orbit",
                                 "OrbitRadius": { "Compute": "AirCombatBehaviorDistance" },
                                 "OrbitRadiusTolerance": { "Compute": "AirCombatWanderStopDistance" },
-                                "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" }
+                                "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
+                                "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                                "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                                "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
                               }
                             }
                           ]
@@ -2071,8 +2093,21 @@
                           "Enabled": { "Compute": "!isEmpty(AirBreathAttack)" },
                           "Weight": { "Compute": "AirCombatBreathWeight" },
                           "Sensor": {
-                            "Type": "Target",
-                            "Range": { "Compute": "AlertedRange" }
+                            "Type": "And",
+                            "Sensors": [
+                              {
+                                "Type": "Target",
+                                "Range": { "Compute": "AlertedRange" }
+                              },
+                              {
+                                "Type": "Not",
+                                "Sensor": {
+                                  "Type": "Alarm",
+                                  "Name": "AirBreathAttackCooldown",
+                                  "State": "Set"
+                                }
+                              }
+                            ]
                           },
                           "Instructions": [
                             {
@@ -2104,6 +2139,11 @@
                                   "Attack": { "Compute": "AirBreathAttack" },
                                   "AimingTimeRange": [ 0.25, 0.5 ],
                                   "AttackPauseRange": [ 3, 4 ]
+                                },
+                                {
+                                  "Type": "SetAlarm",
+                                  "Name": "AirBreathAttackCooldown",
+                                  "DurationRange": { "Compute": "AirBreathAttackCooldownRange" }
                                 }
                               ]
                             },
@@ -2120,7 +2160,10 @@
                                 "Mode": "Approach",
                                 "ApproachStopDistance": { "Compute": "AirRangedAttackMinimumDistance" },
                                 "ApproachSlowDownDistance": { "Compute": "AirCombatBehaviorDistance" },
-                                "RelativeSpeed": { "Compute": "AirBreathAttackRelativeSpeed" }
+                                "RelativeSpeed": { "Compute": "AirBreathAttackRelativeSpeed" },
+                                "DesiredAltitudeRange": { "Compute": "AirBreathAttackAltitudeRange" },
+                                "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                                "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
                               },
                               "Actions": [
                                 {
@@ -2147,7 +2190,10 @@
                         "Mode": "Approach",
                         "ApproachStopDistance": { "Compute": "AirCombatBehaviorDistance" },
                         "ApproachSlowDownDistance": { "Compute": "AirRangedAttackDistance" },
-                        "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" }
+                        "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
+                        "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                        "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                        "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
                       }
                     }
                   ]
