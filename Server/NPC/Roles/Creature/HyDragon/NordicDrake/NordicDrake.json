@@ -30,6 +30,11 @@
       18
     ],
     "AirCombatWanderRelativeSpeed": 0.36,
+    "AirCombatRunDurationRange": [ 6, 8 ],
+    "AirCombatOrbitWeight": 5,
+    "AirCombatFireballWeight": 2,
+    "AirCombatBreathWeight": 1,
+    "AirBreathAttackRelativeSpeed": 0.72,
     "AirCombatWanderMinMoveDistance": 8,
     "AirCombatWanderStopDistance": 5,
     "AirCombatWanderTestsPerTick": 8,
