@@ -1719,7 +1719,7 @@
                     {
                       "Sensor": {
                         "Type": "MotionController",
-                        "MotionController": "Fly"
+                        "MotionController": "TameworkFly"
                       },
                       "Actions": [
                         {
@@ -1775,7 +1775,7 @@
                     {
                       "Sensor": {
                         "Type": "MotionController",
-                        "MotionController": "Fly"
+                        "MotionController": "TameworkFly"
                       },
                       "Instructions": [
                         {
@@ -1823,7 +1823,7 @@
                     {
                       "Sensor": {
                         "Type": "MotionController",
-                        "MotionController": "Fly"
+                        "MotionController": "TameworkFly"
                       },
                       "ActionsBlocking": true,
                       "Actions": [
@@ -1870,7 +1870,7 @@
                         "Sensors": [
                           {
                             "Type": "MotionController",
-                            "MotionController": "Fly"
+                            "MotionController": "TameworkFly"
                           },
                           {
                             "Type": "Eval",
