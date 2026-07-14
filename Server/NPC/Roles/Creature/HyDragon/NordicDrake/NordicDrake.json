@@ -29,7 +29,7 @@
       12,
       18
     ],
-    "AirCombatWanderRelativeSpeed": 0.18,
+    "AirCombatWanderRelativeSpeed": 0.36,
     "AirCombatWanderMinMoveDistance": 8,
     "AirCombatWanderStopDistance": 5,
     "AirCombatWanderTestsPerTick": 8,

@@ -1931,6 +1931,7 @@
                       ]
                     },
                     {
+                      "Continue": true,
                       "Sensor": {
                         "Type": "Target",
                         "Range": { "Compute": "AirBreathAttackDistance" },
@@ -1951,9 +1952,6 @@
                         "HitProbability": 1,
                         "Deflection": true,
                         "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
-                      },
-                      "BodyMotion": {
-                        "Type": "MatchLook"
                       },
                       "Actions": [
                         {
@@ -1999,7 +1997,7 @@
                       "Sensor": {
                         "Type": "Target",
                         "Range": { "Compute": "AirRangedAttackDistance" },
-                        "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
+                        "MinRange": { "Compute": "AirBreathAttackDistance" },
                         "Filters": [
                           {
                             "Type": "LineOfSight"
@@ -2032,7 +2030,7 @@
                       "Sensor": {
                         "Type": "Target",
                         "Range": { "Compute": "AirRangedAttackDistance" },
-                        "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
+                        "MinRange": { "Compute": "AirBreathAttackDistance" },
                         "Filters": [
                           {
                             "Type": "LineOfSight"
@@ -2066,9 +2064,15 @@
                         "Type": "Watch"
                       },
                       "BodyMotion": {
-                        "Type": "Seek",
-                        "SlowDownDistance": { "Compute": "AirCombatBehaviorDistance" },
-                        "StopDistance": { "Compute": "AirRangedAttackMinimumDistance" },
+                        "Type": "TameworkFlyingOrbit",
+                        "OrbitRadius": { "Compute": "AirCombatBehaviorDistance" },
+                        "OrbitRadiusTolerance": { "Compute": "AirCombatWanderStopDistance" },
+                        "OrbitDurationMin": 8,
+                        "OrbitDurationMax": 12,
+                        "ApproachDurationMin": 3,
+                        "ApproachDurationMax": 5,
+                        "ApproachStopDistance": { "Compute": "AirRangedAttackMinimumDistance" },
+                        "ApproachSlowDownDistance": { "Compute": "AirCombatBehaviorDistance" },
                         "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" }
                       }
                     }
