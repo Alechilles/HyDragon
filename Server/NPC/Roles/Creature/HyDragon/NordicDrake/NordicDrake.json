@@ -34,7 +34,7 @@
     "AirCombatOrbitWeight": 4,
     "AirCombatFireballWeight": 4,
     "AirCombatBreathWeight": 2,
-    "AirRangedAttackPauseRange": [ 4, 5 ],
+    "AirRangedAttackPauseRange": [ 1, 3 ],
     "AirBreathAttackAltitudeRange": [ 2, 4 ],
     "AirBreathAttackRelativeSpeed": 0.72,
     "AirCombatWanderMinMoveDistance": 8,
