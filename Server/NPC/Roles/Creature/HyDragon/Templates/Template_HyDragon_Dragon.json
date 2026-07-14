@@ -477,11 +477,11 @@
   "KnockbackScale": { "Compute": "KnockbackScale" },
   "MotionControllerList": [
     {
-      "Type": "TameworkFly",
+      "Type": "Fly",
       "MaxHorizontalSpeed": { "Compute": "FlightSpeed" },
       "MaxSinkSpeed": 8,
       "MaxClimbSpeed": 10,
-      "MinAirSpeed": 3,
+      "MinAirSpeed": 0,
       "Acceleration": 6,
       "MinHeightOverGround": 8,
       "MaxHeightOverGround": 25,
@@ -1719,7 +1719,7 @@
                     {
                       "Sensor": {
                         "Type": "MotionController",
-                        "MotionController": "TameworkFly"
+                        "MotionController": "Fly"
                       },
                       "Actions": [
                         {
@@ -1775,7 +1775,7 @@
                     {
                       "Sensor": {
                         "Type": "MotionController",
-                        "MotionController": "TameworkFly"
+                        "MotionController": "Fly"
                       },
                       "Instructions": [
                         {
@@ -1823,7 +1823,7 @@
                     {
                       "Sensor": {
                         "Type": "MotionController",
-                        "MotionController": "TameworkFly"
+                        "MotionController": "Fly"
                       },
                       "ActionsBlocking": true,
                       "Actions": [
@@ -1870,7 +1870,7 @@
                         "Sensors": [
                           {
                             "Type": "MotionController",
-                            "MotionController": "TameworkFly"
+                            "MotionController": "Fly"
                           },
                           {
                             "Type": "Eval",
@@ -2017,15 +2017,9 @@
                         "Type": "Watch"
                       },
                       "BodyMotion": {
-                        "Type": "WanderInCircle",
-                        "Radius": { "Compute": "AirCombatBehaviorDistance" },
-                        "UseSphere": true,
-                        "MinHeadingChange": 30,
-                        "MaxHeadingChange": 135,
-                        "MinMoveDistance": { "Compute": "AirCombatWanderMinMoveDistance" },
-                        "StopDistance": { "Compute": "AirCombatWanderStopDistance" },
-                        "TestsPerTick": { "Compute": "AirCombatWanderTestsPerTick" },
-                        "DesiredAltitudeWeight": 1,
+                        "Type": "Seek",
+                        "SlowDownDistance": { "Compute": "AirCombatBehaviorDistance" },
+                        "StopDistance": { "Compute": "AirRangedAttackMinimumDistance" },
                         "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" }
                       }
                     }
