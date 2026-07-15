@@ -169,7 +169,7 @@
           "Randomise": false,
           "MaxRange": 28,
           "Timeout": 2.5,
-          "CooldownRange": [ 3, 6 ]
+          "CooldownRange": [ 1, 3 ]
         },
         "Actions": [
           "SelectTarget",

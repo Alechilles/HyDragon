@@ -31,7 +31,7 @@
     "AirCombatWanderRelativeSpeed": 0.9,
     "AirCombatWanderRadiusRange": [ 18, 36 ],
     "AirCombatWanderRetargetTimeRange": [ 4, 8 ],
-    "AirRangedAttackPauseRange": [ 3, 6 ],
+    "AirRangedAttackPauseRange": [ 1, 3 ],
     "AirBreathAttackAltitudeRange": [ 2, 4 ],
     "AirBreathAttackRelativeSpeed": 1.15,
     "AirBreathIngressTimeout": [ 6, 7 ],

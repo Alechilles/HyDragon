@@ -263,7 +263,7 @@
       "Description": "Forward-facing sector required before the flying phase ranged attack can fire."
     },
     "AirRangedAttackPauseRange": {
-      "Value": [ 3, 6 ],
+      "Value": [ 1, 3 ],
       "Description": "Cooldown range between opportunistic moving fireballs during the flying phase."
     },
     "AirFireballVolley2": {
