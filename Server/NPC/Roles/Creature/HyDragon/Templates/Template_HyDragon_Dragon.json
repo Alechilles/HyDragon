@@ -1979,135 +1979,17 @@
                       ]
                     },
                     {
-                      "$Comment": "Choose one exclusive combat-flight run so orbit and attack alignment never compete for body yaw.",
-                      "Type": "Random",
-                      "ExecuteFor": { "Compute": "AirCombatRunDurationRange" },
-                      "Sensor": {
-                        "Type": "Target",
-                        "Range": { "Compute": "AirRangedAttackDistance" }
-                      },
+                      "$Comment": "Run an available breath attack before selecting a weighted roaming or fireball run.",
                       "Instructions": [
-                        {
-                          "$Comment": "Choose loose flight destinations around the target without trying to align an attack.",
-                          "Weight": { "Compute": "AirCombatOrbitWeight" },
-                          "Sensor": {
-                            "Type": "Target",
-                            "Range": { "Compute": "AlertedRange" }
-                          },
-                          "HeadMotion": {
-                            "Type": "Watch"
-                          },
-                          "BodyMotion": {
-                            "Type": "TameworkFlyingOrbit",
-                            "Mode": "WANDER_TARGET",
-                            "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
-                            "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
-                            "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
-                            "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
-                            "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
-                            "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
-                            "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
-                          }
-                        },
-                        {
-                          "$Comment": "Hold a firing solution long enough to launch a short fireball volley.",
-                          "Weight": { "Compute": "AirCombatFireballWeight" },
-                          "Sensor": {
-                            "Type": "Target",
-                            "Range": { "Compute": "AlertedRange" }
-                          },
-                          "Instructions": [
-                            {
-                              "Continue": true,
-                              "Sensor": {
-                                "Type": "Target",
-                                "Range": { "Compute": "AirRangedAttackDistance" },
-                                "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
-                                "Filters": [
-                                  {
-                                    "Type": "LineOfSight"
-                                  },
-                                  {
-                                    "Type": "ViewSector",
-                                    "ViewSector": { "Compute": "AirRangedAttackViewSector" }
-                                  }
-                                ]
-                              },
-                              "HeadMotion": {
-                                "Type": "Aim",
-                                "Spread": 0,
-                                "HitProbability": 1,
-                                "Deflection": true,
-                                "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
-                              },
-                              "Actions": [
-                                {
-                                  "Type": "Attack",
-                                  "Attack": { "Compute": "AirRangedAttack" },
-                                  "BallisticMode": "Short",
-                                  "AimingTimeRange": [ 0.5, 1 ],
-                                  "AttackPauseRange": { "Compute": "AirRangedAttackPauseRange" }
-                                }
-                              ]
-                            },
-                            {
-                              "Sensor": {
-                                "Type": "Target",
-                                "Range": { "Compute": "AirRangedAttackDistance" },
-                                "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
-                                "Filters": [
-                                  {
-                                    "Type": "LineOfSight"
-                                  }
-                                ]
-                              },
-                              "HeadMotion": {
-                                "Type": "Aim",
-                                "Spread": 0,
-                                "HitProbability": 1,
-                                "Deflection": true,
-                                "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
-                              },
-                              "BodyMotion": {
-                                "Type": "TameworkFlyingOrbit",
-                                "Mode": "FACE_TARGET",
-                                "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
-                                "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
-                                "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
-                              }
-                            },
-                            {
-                              "Sensor": {
-                                "Type": "Target",
-                                "Range": { "Compute": "AlertedRange" }
-                              },
-                              "HeadMotion": {
-                                "Type": "Watch"
-                              },
-                              "BodyMotion": {
-                                "Type": "TameworkFlyingOrbit",
-                                "Mode": "WANDER_TARGET",
-                                "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
-                                "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
-                                "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
-                                "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
-                                "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
-                                "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
-                                "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
-                              }
-                            }
-                          ]
-                        },
                         {
                           "$Comment": "Accelerate directly at the target and breathe fire after entering close range.",
                           "Enabled": { "Compute": "!isEmpty(AirBreathAttack)" },
-                          "Weight": { "Compute": "AirCombatBreathWeight" },
                           "Sensor": {
                             "Type": "And",
                             "Sensors": [
                               {
                                 "Type": "Target",
-                                "Range": { "Compute": "AlertedRange" }
+                                "Range": { "Compute": "AirRangedAttackDistance" }
                               },
                               {
                                 "Type": "Not",
@@ -2179,6 +2061,128 @@
                                 {
                                   "Type": "OverrideAltitude",
                                   "DesiredAltitudeRange": { "Compute": "AirBreathAttackAltitudeRange" }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "$Comment": "Choose one exclusive combat-flight run so orbit and attack alignment never compete for body yaw.",
+                          "Type": "Random",
+                          "ExecuteFor": { "Compute": "AirCombatRunDurationRange" },
+                          "Sensor": {
+                            "Type": "Target",
+                            "Range": { "Compute": "AirRangedAttackDistance" }
+                          },
+                          "Instructions": [
+                            {
+                              "$Comment": "Choose loose flight destinations around the target without trying to align an attack.",
+                              "Weight": { "Compute": "AirCombatOrbitWeight" },
+                              "Sensor": {
+                                "Type": "Target",
+                                "Range": { "Compute": "AlertedRange" }
+                              },
+                              "HeadMotion": {
+                                "Type": "Watch"
+                              },
+                              "BodyMotion": {
+                                "Type": "TameworkFlyingOrbit",
+                                "Mode": "WANDER_TARGET",
+                                "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
+                                "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
+                                "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
+                                "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
+                                "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                                "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                                "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                              }
+                            },
+                            {
+                              "$Comment": "Hold a firing solution long enough to launch a short fireball volley.",
+                              "Weight": { "Compute": "AirCombatFireballWeight" },
+                              "Sensor": {
+                                "Type": "Target",
+                                "Range": { "Compute": "AlertedRange" }
+                              },
+                              "Instructions": [
+                                {
+                                  "Continue": true,
+                                  "Sensor": {
+                                    "Type": "Target",
+                                    "Range": { "Compute": "AirRangedAttackDistance" },
+                                    "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
+                                    "Filters": [
+                                      {
+                                        "Type": "LineOfSight"
+                                      },
+                                      {
+                                        "Type": "ViewSector",
+                                        "ViewSector": { "Compute": "AirRangedAttackViewSector" }
+                                      }
+                                    ]
+                                  },
+                                  "HeadMotion": {
+                                    "Type": "Aim",
+                                    "Spread": 0,
+                                    "HitProbability": 1,
+                                    "Deflection": true,
+                                    "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                                  },
+                                  "Actions": [
+                                    {
+                                      "Type": "Attack",
+                                      "Attack": { "Compute": "AirRangedAttack" },
+                                      "BallisticMode": "Short",
+                                      "AimingTimeRange": [ 0.5, 1 ],
+                                      "AttackPauseRange": { "Compute": "AirRangedAttackPauseRange" }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Sensor": {
+                                    "Type": "Target",
+                                    "Range": { "Compute": "AirRangedAttackDistance" },
+                                    "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
+                                    "Filters": [
+                                      {
+                                        "Type": "LineOfSight"
+                                      }
+                                    ]
+                                  },
+                                  "HeadMotion": {
+                                    "Type": "Aim",
+                                    "Spread": 0,
+                                    "HitProbability": 1,
+                                    "Deflection": true,
+                                    "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                                  },
+                                  "BodyMotion": {
+                                    "Type": "TameworkFlyingOrbit",
+                                    "Mode": "FACE_TARGET",
+                                    "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                                    "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                                    "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                                  }
+                                },
+                                {
+                                  "Sensor": {
+                                    "Type": "Target",
+                                    "Range": { "Compute": "AlertedRange" }
+                                  },
+                                  "HeadMotion": {
+                                    "Type": "Watch"
+                                  },
+                                  "BodyMotion": {
+                                    "Type": "TameworkFlyingOrbit",
+                                    "Mode": "WANDER_TARGET",
+                                    "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
+                                    "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
+                                    "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
+                                    "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
+                                    "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                                    "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                                    "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                                  }
                                 }
                               ]
                             }
