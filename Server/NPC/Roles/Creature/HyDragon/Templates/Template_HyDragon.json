@@ -663,9 +663,6 @@
   "MaxHealth": {
     "Compute": "MaxHealth"
   },
-  "CombatConfig": {
-    "Compute": "CombatConfig"
-  },
   "InteractionVars": {
     "Melee_Damage": {
       "Interactions": [

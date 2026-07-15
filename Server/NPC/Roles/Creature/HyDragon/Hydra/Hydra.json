@@ -126,7 +126,6 @@
       "Compute": "NameTranslationKey"
     }
   },
-  "Debug": "DisplayState",
   "Parameters": {
     "NameTranslationKey": {
       "Value": "server.npcRoles.Hydra.name",

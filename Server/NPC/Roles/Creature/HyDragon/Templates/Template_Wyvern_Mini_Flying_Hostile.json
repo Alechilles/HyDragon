@@ -735,16 +735,27 @@
                 {
                   "Continue": true,
                   "Sensor": {
-                    "Type": "Target",
-                    "Range": {
-                      "Compute": "RangedAttackDistance"
-                    },
-                    "MinRange": {
-                      "Compute": "RangedAttackMinimumDistance"
-                    },
-                    "Filters": [
+                    "Type": "And",
+                    "Sensors": [
                       {
-                        "Type": "LineOfSight"
+                        "Type": "Target",
+                        "Range": {
+                          "Compute": "RangedAttackDistance"
+                        },
+                        "Filters": [
+                          {
+                            "Type": "LineOfSight"
+                          }
+                        ]
+                      },
+                      {
+                        "Type": "Not",
+                        "Sensor": {
+                          "Type": "Target",
+                          "Range": {
+                            "Compute": "RangedAttackMinimumDistance"
+                          }
+                        }
                       }
                     ]
                   },
