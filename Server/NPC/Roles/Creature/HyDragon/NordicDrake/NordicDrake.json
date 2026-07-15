@@ -20,7 +20,7 @@
     "UseCombatActionEvaluator": true,
     "UseHealthPhaseFlight": true,
     "AirRangedAttack": "Root_NPC_NordicDrake_Fire_Ball",
-    "AirBreathAttack": "Root_NPC_NordicDrake_Flame_Breath",
+    "AirBreathAttack": "Root_NPC_NordicDrake_Flying_Flame_Breath",
     "AirRangedAttackDistance": 28,
     "AirRangedAttackMinimumDistance": 6,
     "AirBreathAttackDistance": 13,

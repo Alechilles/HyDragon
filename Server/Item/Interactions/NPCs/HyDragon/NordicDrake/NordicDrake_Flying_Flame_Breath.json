@@ -1,6 +1,6 @@
 {
   "Type": "Serial",
-  "$Comment": "Repurposes the weapon flamethrower as a short creature breath attack.",
+  "$Comment": "Longer-range flame breath used during the NordicDrake's aerial strafing run.",
   "Interactions": [
     {
       "Type": "Simple",
@@ -8,7 +8,7 @@
         "ItemPlayerAnimationsId": "NordicDrake_Default",
         "ItemAnimationId": "PrepareShoot"
       },
-      "RunTime": 0.5
+      "RunTime": 0.15
     },
     {
       "Type": "Parallel",
@@ -39,7 +39,7 @@
                       "Roll": 0,
                       "Yaw": 180
                     },
-                    "Scale": 1.35
+                    "Scale": 1.75
                   }
                 ],
                 "ClearAnimationOnFinish": true
@@ -61,7 +61,7 @@
                 "ExtendRight": 0.75,
                 "ExtendBottom": 0.75,
                 "StartDistance": 2.0,
-                "EndDistance": 8.5
+                "EndDistance": 12.5
               },
               "HitEntity": {
                 "Interactions": [
@@ -86,7 +86,7 @@
                       "ExtendRight": 0.75,
                       "ExtendBottom": 0.75,
                       "StartDistance": 1.5,
-                      "EndDistance": 8
+                      "EndDistance": 12
                     },
                     "HitEntity": {
                       "Interactions": [
@@ -113,7 +113,7 @@
                       "ExtendRight": 0.75,
                       "ExtendBottom": 0.75,
                       "StartDistance": 1.5,
-                      "EndDistance": 8
+                      "EndDistance": 12
                     },
                     "HitEntity": {
                       "Interactions": [
@@ -140,7 +140,7 @@
                       "ExtendRight": 0.75,
                       "ExtendBottom": 0.75,
                       "StartDistance": 1.5,
-                      "EndDistance": 8
+                      "EndDistance": 12
                     },
                     "HitEntity": {
                       "Interactions": [
