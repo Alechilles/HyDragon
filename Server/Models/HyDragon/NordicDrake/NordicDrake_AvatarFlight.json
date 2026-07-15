@@ -255,6 +255,16 @@
         }
       ]
     },
+    "PulseFly": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/AvatarFlight/PulseFly.blockyanim",
+          "Speed": 1,
+          "Looping": false,
+          "BlendingDuration": 0.15
+        }
+      ]
+    },
     "Laydown": {
       "Animations": [
         {

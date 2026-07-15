@@ -35,6 +35,11 @@
     "SuppressStatusAnimation": true,
     "SuppressEmoteAnimation": true
   },
+  "AbilityAnimation": {
+    "UpwardBoostAnimation": "FlyIdle",
+    "ForwardBoostAnimation": "PulseFly",
+    "AirbrakeAnimation": "FlyIdle"
+  },
   "RiderVisual": {
     "HideOwnerEquipment": true,
     "HideOwnerArmor": true,
