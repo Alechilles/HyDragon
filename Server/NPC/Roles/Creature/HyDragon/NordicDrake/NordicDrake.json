@@ -25,10 +25,8 @@
     "AirRangedAttackMinimumDistance": 6,
     "AirBreathAttackDistance": 9,
     "AirCombatBehaviorDistance": 24,
-    "AirCombatAltitudeRange": [
-      12,
-      18
-    ],
+    "AirCombatAltitudeRange": [ 8, 12 ],
+    "AirCombatClimbRelativeSpeed": 0.7,
     "AirCombatWanderRelativeSpeed": 0.36,
     "AirCombatRunDurationRange": [ 6, 10 ],
     "AirCombatOrbitWeight": 4,
