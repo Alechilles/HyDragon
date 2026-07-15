@@ -8,7 +8,7 @@
         "ItemPlayerAnimationsId": "NordicDrake_Default",
         "ItemAnimationId": "PrepareShoot"
       },
-      "RunTime": 0.5
+      "RunTime": 0.15
     },
     {
       "Type": "Parallel",

@@ -37,7 +37,7 @@
     "AirBreathIngressTimeout": [ 6, 7 ],
     "AirBreathPassDistance": 18,
     "AirBreathPassStopDistance": 2,
-    "AirBreathPassDuration": [ 2.25, 2.4 ],
+    "AirBreathPassDuration": [ 1.85, 2 ],
     "AirCombatRecoveryDuration": [ 3, 4 ],
     "AirCombatRecoveryRelativeSpeed": 1.1,
     "AirCombatRecoveryClimbRelativeSpeed": 1.5,
