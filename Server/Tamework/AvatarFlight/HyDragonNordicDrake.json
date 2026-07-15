@@ -36,6 +36,7 @@
     "SuppressEmoteAnimation": true
   },
   "AbilityAnimation": {
+    "Slot": "Movement",
     "UpwardBoostAnimation": "FlyIdle",
     "ForwardBoostAnimation": "PulseFly",
     "AirbrakeAnimation": "FlyIdle"
