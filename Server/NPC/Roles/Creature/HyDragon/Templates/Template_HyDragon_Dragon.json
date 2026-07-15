@@ -308,7 +308,7 @@
     },
     "AirCombatAltitudeRange": {
       "Value": [ 8, 14 ],
-      "Description": "Desired height-over-ground range while using the flying combat phase."
+      "Description": "Desired vertical offset range above the target while using the flying combat phase."
     },
     "AirCombatClimbRelativeSpeed": {
       "Value": 1.0,
@@ -321,6 +321,14 @@
     "AirCombatWanderRelativeSpeed": {
       "Value": 0.25,
       "Description": "Relative speed for flying combat repositioning."
+    },
+    "AirCombatWanderRadiusRange": {
+      "Value": [ 8, 18 ],
+      "Description": "Horizontal distance range used when choosing loose flying combat destinations around the target."
+    },
+    "AirCombatWanderRetargetTimeRange": {
+      "Value": [ 3, 6 ],
+      "Description": "Seconds before choosing another loose flying combat destination."
     },
     "AirCombatWanderMinMoveDistance": {
       "Value": 4,
@@ -1980,7 +1988,7 @@
                       },
                       "Instructions": [
                         {
-                          "$Comment": "Circle the target without trying to align an attack.",
+                          "$Comment": "Choose loose flight destinations around the target without trying to align an attack.",
                           "Weight": { "Compute": "AirCombatOrbitWeight" },
                           "Sensor": {
                             "Type": "Target",
@@ -1991,9 +1999,10 @@
                           },
                           "BodyMotion": {
                             "Type": "TameworkFlyingOrbit",
-                            "Mode": "Orbit",
-                            "OrbitRadius": { "Compute": "AirCombatBehaviorDistance" },
-                            "OrbitRadiusTolerance": { "Compute": "AirCombatWanderStopDistance" },
+                            "Mode": "WANDER_TARGET",
+                            "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
+                            "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
+                            "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
                             "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
                             "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
                             "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
@@ -2077,9 +2086,10 @@
                               },
                               "BodyMotion": {
                                 "Type": "TameworkFlyingOrbit",
-                                "Mode": "Orbit",
-                                "OrbitRadius": { "Compute": "AirCombatBehaviorDistance" },
-                                "OrbitRadiusTolerance": { "Compute": "AirCombatWanderStopDistance" },
+                                "Mode": "WANDER_TARGET",
+                                "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
+                                "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
+                                "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
                                 "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
                                 "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
                                 "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
