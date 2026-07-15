@@ -279,8 +279,8 @@
       "Description": "Four-shot fireball volley interaction selected by the aerial combat evaluator."
     },
     "AirBreathAttackDistance": {
-      "Value": 11,
-      "Description": "Distance at which the aerial breath pass commits, allowing the attack windup to finish near six blocks from the target."
+      "Value": 13,
+      "Description": "Distance at which the aerial breath pass commits, allowing the visible breath to begin before the drake reaches the target."
     },
     "AirBreathAttackViewSector": {
       "Value": 60,
