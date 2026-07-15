@@ -279,8 +279,8 @@
       "Description": "Four-shot fireball volley interaction selected by the aerial combat evaluator."
     },
     "AirBreathAttackDistance": {
-      "Value": 9,
-      "Description": "Maximum distance for the flying phase breath attack."
+      "Value": 11,
+      "Description": "Distance at which the aerial breath pass commits, allowing the attack windup to finish near six blocks from the target."
     },
     "AirBreathAttackViewSector": {
       "Value": 60,
@@ -307,8 +307,8 @@
       "Description": "Arrival tolerance for the aerial breath flyover destination."
     },
     "AirBreathPassDuration": {
-      "Value": [ 3, 3.5 ],
-      "Description": "Time spent continuing through and beyond the target during an aerial breath pass."
+      "Value": [ 2.25, 2.4 ],
+      "Description": "Time spent continuing through the target, aligned with the full aerial breath interaction."
     },
     "AirCombatRecoveryDuration": {
       "Value": [ 3, 4 ],
@@ -2268,7 +2268,11 @@
                         "Range": { "Compute": "AlertedRange" }
                       },
                       "HeadMotion": {
-                        "Type": "Watch"
+                        "Type": "Aim",
+                        "Spread": 0,
+                        "HitProbability": 1,
+                        "Deflection": true,
+                        "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
                       },
                       "BodyMotion": {
                         "Type": "TameworkFlyingOrbit",
@@ -2334,7 +2338,7 @@
                         {
                           "Type": "Attack",
                           "Attack": { "Compute": "AirBreathAttack" },
-                          "AimingTimeRange": [ 0, 0.2 ],
+                          "AimingTimeRange": [ 0, 0 ],
                           "AttackPauseRange": [ 8, 8 ]
                         }
                       ]
