@@ -255,11 +255,11 @@
       "Description": "Maximum distance for the flying phase ranged attack."
     },
     "AirRangedAttackMinimumDistance": {
-      "Value": 8,
+      "Value": 5,
       "Description": "Minimum preferred distance for the flying phase ranged attack."
     },
     "AirRangedAttackViewSector": {
-      "Value": 75,
+      "Value": 60,
       "Description": "Forward-facing sector required before the flying phase ranged attack can fire."
     },
     "AirRangedAttackPauseRange": {
@@ -279,7 +279,7 @@
       "Description": "Four-shot fireball volley interaction selected by the aerial combat evaluator."
     },
     "AirBreathAttackDistance": {
-      "Value": 15,
+      "Value": 13,
       "Description": "Distance at which the aerial breath pass commits, allowing the visible breath to begin before the drake reaches the target."
     },
     "AirBreathAttackViewSector": {
@@ -327,7 +327,7 @@
       "Description": "Distance used for slowing and stopping during flying phase movement."
     },
     "AirCombatAltitudeRange": {
-      "Value": [ 8, 20 ],
+      "Value": [ 8, 14 ],
       "Description": "Desired vertical offset range above the target while using the flying combat phase."
     },
     "AirCombatClimbRelativeSpeed": {
@@ -343,7 +343,7 @@
       "Description": "Relative speed for flying combat repositioning."
     },
     "AirCombatWanderRadiusRange": {
-      "Value": [ 8, 24 ],
+      "Value": [ 8, 18 ],
       "Description": "Horizontal distance range used when choosing loose flying combat destinations around the target."
     },
     "AirCombatWanderRetargetTimeRange": {
