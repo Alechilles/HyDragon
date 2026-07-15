@@ -264,7 +264,19 @@
     },
     "AirRangedAttackPauseRange": {
       "Value": [ 3, 6 ],
-      "Description": "Cooldown range between fireballs during a flying ranged attack run."
+      "Description": "Cooldown range between opportunistic moving fireballs during the flying phase."
+    },
+    "AirFireballVolley2": {
+      "Value": "Root_NPC_NordicDrake_Fire_Ball_Volley_2",
+      "Description": "Two-shot fireball volley interaction selected by the aerial combat evaluator."
+    },
+    "AirFireballVolley3": {
+      "Value": "Root_NPC_NordicDrake_Fire_Ball_Volley_3",
+      "Description": "Three-shot fireball volley interaction selected by the aerial combat evaluator."
+    },
+    "AirFireballVolley4": {
+      "Value": "Root_NPC_NordicDrake_Fire_Ball_Volley_4",
+      "Description": "Four-shot fireball volley interaction selected by the aerial combat evaluator."
     },
     "AirBreathAttackDistance": {
       "Value": 9,
@@ -278,29 +290,37 @@
       "Value": [ 2, 5 ],
       "Description": "Desired height-over-ground range while closing for a flying breath attack."
     },
-    "AirBreathAttackCooldownRange": {
-      "Value": [ "PT10S", "PT15S" ],
-      "Description": "Cooldown before another flying breath attack run can be selected."
-    },
-    "AirCombatRunDurationRange": {
-      "Value": [ 6, 8 ],
-      "Description": "Duration range for each weighted flying combat run."
-    },
-    "AirCombatOrbitWeight": {
-      "Value": 5,
-      "Description": "Relative selection weight for orbiting without attacking."
-    },
-    "AirCombatFireballWeight": {
-      "Value": 2,
-      "Description": "Relative selection weight for stationary ranged attack runs."
-    },
-    "AirCombatBreathWeight": {
-      "Value": 1,
-      "Description": "Relative selection weight for close breath attack runs."
-    },
     "AirBreathAttackRelativeSpeed": {
-      "Value": 0.7,
+      "Value": 1.15,
       "Description": "Relative flight speed while charging into breath attack range."
+    },
+    "AirBreathIngressTimeout": {
+      "Value": [ 6, 7 ],
+      "Description": "Maximum time allowed to descend and enter range for an aerial breath pass."
+    },
+    "AirBreathPassDistance": {
+      "Value": 18,
+      "Description": "Distance beyond the captured target position used for the aerial breath flyover."
+    },
+    "AirBreathPassStopDistance": {
+      "Value": 2,
+      "Description": "Arrival tolerance for the aerial breath flyover destination."
+    },
+    "AirBreathPassDuration": {
+      "Value": [ 3, 3.5 ],
+      "Description": "Time spent continuing through and beyond the target during an aerial breath pass."
+    },
+    "AirCombatRecoveryDuration": {
+      "Value": [ 3, 4 ],
+      "Description": "Duration of the outward climbing recovery after an aerial special attack."
+    },
+    "AirCombatRecoveryRelativeSpeed": {
+      "Value": 1.1,
+      "Description": "Relative flight speed while climbing back into the aerial patrol band."
+    },
+    "AirCombatRecoveryClimbRelativeSpeed": {
+      "Value": 1.5,
+      "Description": "Upward steering strength during aerial attack recovery."
     },
     "AirCombatBehaviorDistance": {
       "Value": 14,
@@ -1789,9 +1809,34 @@
                     "Type": "And",
                     "Sensors": [
                       {
-                        "Type": "State",
-                        "State": ".AirRanged",
-                        "IgnoreMissingSetState": true
+                        "Type": "Or",
+                        "Sensors": [
+                          {
+                            "Type": "State",
+                            "State": ".AirRanged",
+                            "IgnoreMissingSetState": true
+                          },
+                          {
+                            "Type": "State",
+                            "State": ".AirVolley",
+                            "IgnoreMissingSetState": true
+                          },
+                          {
+                            "Type": "State",
+                            "State": ".AirBreathIngress",
+                            "IgnoreMissingSetState": true
+                          },
+                          {
+                            "Type": "State",
+                            "State": ".AirBreathPass",
+                            "IgnoreMissingSetState": true
+                          },
+                          {
+                            "Type": "State",
+                            "State": ".AirRecovery",
+                            "IgnoreMissingSetState": true
+                          }
+                        ]
                       },
                       {
                         "Type": "Self",
@@ -1904,19 +1949,7 @@
                   },
                   "Instructions": [
                     {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Any"
-                      },
-                      "Actions": [
-                        {
-                          "Type": "OverrideAltitude",
-                          "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" }
-                        }
-                      ]
-                    },
-                    {
-                      "$Comment": "Flying collision recovery: if the controller is physically blocked before Nav reports a terminal state, climb and pick a new heading.",
+                      "$Comment": "Recover from physical or navigation blockage without abandoning aerial combat.",
                       "Sensor": {
                         "Type": "And",
                         "Sensors": [
@@ -1933,17 +1966,10 @@
                       "BodyMotion": {
                         "Type": "Wander",
                         "MaxHeadingChange": 90,
-                        "RelativeSpeed": 0.8
-                      },
-                      "Actions": [
-                        {
-                          "Type": "OverrideAltitude",
-                          "DesiredAltitudeRange": [ 12, 20 ]
-                        }
-                      ]
+                        "RelativeSpeed": 0.9
+                      }
                     },
                     {
-                      "Continue": true,
                       "Sensor": {
                         "Type": "Nav",
                         "NavStates": [ "Defer", "Blocked" ],
@@ -1952,246 +1978,49 @@
                       "BodyMotion": {
                         "Type": "Wander",
                         "MaxHeadingChange": 90,
-                        "RelativeSpeed": 0.7
-                      },
-                      "Actions": [
-                        {
-                          "Type": "OverrideAltitude",
-                          "DesiredAltitudeRange": [ 12, 20 ]
-                        }
-                      ]
+                        "RelativeSpeed": 0.9
+                      }
                     },
                     {
                       "Continue": true,
+                      "$Comment": "Opportunistic CAE basic fireball: patrol movement continues and body yaw is never forced toward the target.",
                       "Sensor": {
-                        "Type": "Nav",
-                        "NavStates": [ "Aborted" ],
-                        "ThrottleDuration": 2
-                      },
-                      "Actions": [
-                        {
-                          "Type": "ResetSearchRays"
-                        },
-                        {
-                          "Type": "State",
-                          "State": ".AirLand"
-                        }
-                      ]
-                    },
-                    {
-                      "$Comment": "Run an available breath attack before selecting a weighted roaming or fireball run.",
-                      "Instructions": [
-                        {
-                          "$Comment": "Accelerate directly at the target and breathe fire after entering close range.",
-                          "Enabled": { "Compute": "!isEmpty(AirBreathAttack)" },
-                          "Sensor": {
-                            "Type": "And",
-                            "Sensors": [
+                        "Type": "And",
+                        "Sensors": [
+                          {
+                            "Type": "Target",
+                            "Range": { "Compute": "AirRangedAttackDistance" },
+                            "Filters": [
                               {
-                                "Type": "Target",
-                                "Range": { "Compute": "AirRangedAttackDistance" }
+                                "Type": "LineOfSight"
                               },
                               {
-                                "Type": "Not",
-                                "Sensor": {
-                                  "Type": "Alarm",
-                                  "Name": "AirBreathAttackCooldown",
-                                  "State": "Set"
-                                }
+                                "Type": "ViewSector",
+                                "ViewSector": { "Compute": "AirRangedAttackViewSector" }
                               }
                             ]
                           },
-                          "Instructions": [
-                            {
-                              "Continue": true,
-                              "Sensor": {
-                                "Type": "Target",
-                                "Range": { "Compute": "AirBreathAttackDistance" },
-                                "MinRange": 2,
-                                "Filters": [
-                                  {
-                                    "Type": "LineOfSight"
-                                  },
-                                  {
-                                    "Type": "ViewSector",
-                                    "ViewSector": { "Compute": "AirBreathAttackViewSector" }
-                                  }
-                                ]
-                              },
-                              "HeadMotion": {
-                                "Type": "Aim",
-                                "Spread": 0,
-                                "HitProbability": 1,
-                                "Deflection": true,
-                                "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
-                              },
-                              "Actions": [
-                                {
-                                  "Type": "Attack",
-                                  "Attack": { "Compute": "AirBreathAttack" },
-                                  "AimingTimeRange": [ 0.25, 0.5 ],
-                                  "AttackPauseRange": [ 3, 4 ]
-                                },
-                                {
-                                  "Type": "SetAlarm",
-                                  "Name": "AirBreathAttackCooldown",
-                                  "DurationRange": { "Compute": "AirBreathAttackCooldownRange" }
-                                }
-                              ]
-                            },
-                            {
-                              "Sensor": {
-                                "Type": "Target",
-                                "Range": { "Compute": "AlertedRange" }
-                              },
-                              "HeadMotion": {
-                                "Type": "Watch"
-                              },
-                              "BodyMotion": {
-                                "Type": "TameworkFlyingOrbit",
-                                "Mode": "Approach",
-                                "ApproachStopDistance": { "Compute": "AirRangedAttackMinimumDistance" },
-                                "ApproachSlowDownDistance": { "Compute": "AirCombatBehaviorDistance" },
-                                "RelativeSpeed": { "Compute": "AirBreathAttackRelativeSpeed" },
-                                "DesiredAltitudeRange": { "Compute": "AirBreathAttackAltitudeRange" },
-                                "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
-                                "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
-                              },
-                              "Actions": [
-                                {
-                                  "Type": "OverrideAltitude",
-                                  "DesiredAltitudeRange": { "Compute": "AirBreathAttackAltitudeRange" }
-                                }
-                              ]
-                            }
-                          ]
-                        },
+                          {
+                            "Type": "CombatActionEvaluator",
+                            "TargetInRange": true
+                          }
+                        ]
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "Spread": 0,
+                        "HitProbability": 1,
+                        "Deflection": true,
+                        "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                      },
+                      "Actions": [
                         {
-                          "$Comment": "Choose one exclusive combat-flight run so orbit and attack alignment never compete for body yaw.",
-                          "Type": "Random",
-                          "ExecuteFor": { "Compute": "AirCombatRunDurationRange" },
-                          "Sensor": {
-                            "Type": "Target",
-                            "Range": { "Compute": "AirRangedAttackDistance" }
-                          },
-                          "Instructions": [
-                            {
-                              "$Comment": "Choose loose flight destinations around the target without trying to align an attack.",
-                              "Weight": { "Compute": "AirCombatOrbitWeight" },
-                              "Sensor": {
-                                "Type": "Target",
-                                "Range": { "Compute": "AlertedRange" }
-                              },
-                              "HeadMotion": {
-                                "Type": "Watch"
-                              },
-                              "BodyMotion": {
-                                "Type": "TameworkFlyingOrbit",
-                                "Mode": "WANDER_TARGET",
-                                "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
-                                "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
-                                "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
-                                "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
-                                "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
-                                "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
-                                "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
-                              }
-                            },
-                            {
-                              "$Comment": "Hold a firing solution long enough to launch a short fireball volley.",
-                              "Weight": { "Compute": "AirCombatFireballWeight" },
-                              "Sensor": {
-                                "Type": "Target",
-                                "Range": { "Compute": "AlertedRange" }
-                              },
-                              "Instructions": [
-                                {
-                                  "Continue": true,
-                                  "Sensor": {
-                                    "Type": "Target",
-                                    "Range": { "Compute": "AirRangedAttackDistance" },
-                                    "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
-                                    "Filters": [
-                                      {
-                                        "Type": "LineOfSight"
-                                      },
-                                      {
-                                        "Type": "ViewSector",
-                                        "ViewSector": { "Compute": "AirRangedAttackViewSector" }
-                                      }
-                                    ]
-                                  },
-                                  "HeadMotion": {
-                                    "Type": "Aim",
-                                    "Spread": 0,
-                                    "HitProbability": 1,
-                                    "Deflection": true,
-                                    "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
-                                  },
-                                  "Actions": [
-                                    {
-                                      "Type": "Attack",
-                                      "Attack": { "Compute": "AirRangedAttack" },
-                                      "BallisticMode": "Short",
-                                      "AimingTimeRange": [ 0.5, 1 ],
-                                      "AttackPauseRange": { "Compute": "AirRangedAttackPauseRange" }
-                                    }
-                                  ]
-                                },
-                                {
-                                  "Sensor": {
-                                    "Type": "Target",
-                                    "Range": { "Compute": "AirRangedAttackDistance" },
-                                    "MinRange": { "Compute": "AirRangedAttackMinimumDistance" },
-                                    "Filters": [
-                                      {
-                                        "Type": "LineOfSight"
-                                      }
-                                    ]
-                                  },
-                                  "HeadMotion": {
-                                    "Type": "Aim",
-                                    "Spread": 0,
-                                    "HitProbability": 1,
-                                    "Deflection": true,
-                                    "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
-                                  },
-                                  "BodyMotion": {
-                                    "Type": "TameworkFlyingOrbit",
-                                    "Mode": "FACE_TARGET",
-                                    "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
-                                    "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
-                                    "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
-                                  }
-                                },
-                                {
-                                  "Sensor": {
-                                    "Type": "Target",
-                                    "Range": { "Compute": "AlertedRange" }
-                                  },
-                                  "HeadMotion": {
-                                    "Type": "Watch"
-                                  },
-                                  "BodyMotion": {
-                                    "Type": "TameworkFlyingOrbit",
-                                    "Mode": "WANDER_TARGET",
-                                    "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
-                                    "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
-                                    "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
-                                    "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
-                                    "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
-                                    "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
-                                    "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
-                                  }
-                                }
-                              ]
-                            }
-                          ]
+                          "Type": "CombatAbility"
                         }
                       ]
                     },
                     {
-                      "$Comment": "Close to combat range before selecting a combat-flight run.",
+                      "$Comment": "Loose patrol waypoint remains stable instead of following every player movement.",
                       "Sensor": {
                         "Type": "Target",
                         "Range": { "Compute": "AlertedRange" }
@@ -2201,14 +2030,436 @@
                       },
                       "BodyMotion": {
                         "Type": "TameworkFlyingOrbit",
-                        "Mode": "Approach",
-                        "ApproachStopDistance": { "Compute": "AirCombatBehaviorDistance" },
-                        "ApproachSlowDownDistance": { "Compute": "AirRangedAttackDistance" },
+                        "Mode": "WANDER_TARGET",
+                        "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
+                        "WanderRetargetTimeRange": { "Compute": "AirCombatWanderRetargetTimeRange" },
+                        "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
                         "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" },
                         "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
                         "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
                         "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
                       }
+                    },
+                    {
+                      "BodyMotion": {
+                        "Type": "Wander",
+                        "MaxHeadingChange": 60,
+                        "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".AirVolley",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugCombatSnapshot",
+                          "Message": "NordicDrake aerial fireball volley"
+                        }
+                      ]
+                    },
+                    {
+                      "$Comment": "Choose exactly one bounded 2-4 shot volley, then force a moving recovery.",
+                      "Type": "Random",
+                      "ExecuteFor": [ 9, 9 ],
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AlertedRange" }
+                      },
+                      "Instructions": [
+                        {
+                          "Weight": 1,
+                          "Sensor": {
+                            "Type": "Target",
+                            "Range": { "Compute": "AlertedRange" }
+                          },
+                          "HeadMotion": {
+                            "Type": "Aim",
+                            "Spread": 0,
+                            "HitProbability": 1,
+                            "Deflection": true,
+                            "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                          },
+                          "BodyMotion": {
+                            "Type": "TameworkFlyingOrbit",
+                            "Mode": "FACE_TARGET",
+                            "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                            "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                            "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                          },
+                          "ActionsBlocking": true,
+                          "Actions": [
+                            {
+                              "Type": "Attack",
+                              "Attack": { "Compute": "AirFireballVolley2" },
+                              "BallisticMode": "Short",
+                              "AimingTimeRange": [ 0.25, 1 ],
+                              "AttackPauseRange": [ 10, 10 ]
+                            },
+                            {
+                              "Type": "Timeout",
+                              "Delay": [ 4, 4 ]
+                            },
+                            {
+                              "Type": "State",
+                              "State": ".AirRecovery"
+                            }
+                          ]
+                        },
+                        {
+                          "Weight": 1,
+                          "Sensor": {
+                            "Type": "Target",
+                            "Range": { "Compute": "AlertedRange" }
+                          },
+                          "HeadMotion": {
+                            "Type": "Aim",
+                            "Spread": 0,
+                            "HitProbability": 1,
+                            "Deflection": true,
+                            "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                          },
+                          "BodyMotion": {
+                            "Type": "TameworkFlyingOrbit",
+                            "Mode": "FACE_TARGET",
+                            "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                            "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                            "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                          },
+                          "ActionsBlocking": true,
+                          "Actions": [
+                            {
+                              "Type": "Attack",
+                              "Attack": { "Compute": "AirFireballVolley3" },
+                              "BallisticMode": "Short",
+                              "AimingTimeRange": [ 0.25, 1 ],
+                              "AttackPauseRange": [ 10, 10 ]
+                            },
+                            {
+                              "Type": "Timeout",
+                              "Delay": [ 5.8, 5.8 ]
+                            },
+                            {
+                              "Type": "State",
+                              "State": ".AirRecovery"
+                            }
+                          ]
+                        },
+                        {
+                          "Weight": 1,
+                          "Sensor": {
+                            "Type": "Target",
+                            "Range": { "Compute": "AlertedRange" }
+                          },
+                          "HeadMotion": {
+                            "Type": "Aim",
+                            "Spread": 0,
+                            "HitProbability": 1,
+                            "Deflection": true,
+                            "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                          },
+                          "BodyMotion": {
+                            "Type": "TameworkFlyingOrbit",
+                            "Mode": "FACE_TARGET",
+                            "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                            "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                            "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                          },
+                          "ActionsBlocking": true,
+                          "Actions": [
+                            {
+                              "Type": "Attack",
+                              "Attack": { "Compute": "AirFireballVolley4" },
+                              "BallisticMode": "Short",
+                              "AimingTimeRange": [ 0.25, 1 ],
+                              "AttackPauseRange": [ 10, 10 ]
+                            },
+                            {
+                              "Type": "Timeout",
+                              "Delay": [ 7.5, 7.5 ]
+                            },
+                            {
+                              "Type": "State",
+                              "State": ".AirRecovery"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": [ 0.25, 0.5 ]
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirRecovery"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".AirBreathIngress",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugCombatSnapshot",
+                          "Message": "NordicDrake breath ingress"
+                        }
+                      ]
+                    },
+                    {
+                      "Continue": true,
+                      "$Comment": "Commit only after descending into close range with a valid forward firing solution.",
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AirBreathAttackDistance" },
+                        "Filters": [
+                          {
+                            "Type": "LineOfSight"
+                          },
+                          {
+                            "Type": "ViewSector",
+                            "ViewSector": { "Compute": "AirBreathAttackViewSector" }
+                          }
+                        ]
+                      },
+                      "Actions": [
+                        {
+                          "Type": "State",
+                          "State": ".AirBreathPass"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AlertedRange" }
+                      },
+                      "HeadMotion": {
+                        "Type": "Watch"
+                      },
+                      "BodyMotion": {
+                        "Type": "TameworkFlyingOrbit",
+                        "Mode": "APPROACH",
+                        "ApproachStopDistance": 0,
+                        "ApproachSlowDownDistance": 12,
+                        "RelativeSpeed": { "Compute": "AirBreathAttackRelativeSpeed" },
+                        "DesiredAltitudeRange": { "Compute": "AirBreathAttackAltitudeRange" },
+                        "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                        "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": { "Compute": "AirBreathIngressTimeout" }
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirRecovery"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": [ 0.25, 0.5 ]
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirRecovery"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".AirBreathPass",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AlertedRange" },
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugCombatSnapshot",
+                          "Message": "NordicDrake breath flyover"
+                        },
+                        {
+                          "Type": "Attack",
+                          "Attack": { "Compute": "AirBreathAttack" },
+                          "AimingTimeRange": [ 0, 0.2 ],
+                          "AttackPauseRange": [ 8, 8 ]
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AlertedRange" }
+                      },
+                      "HeadMotion": {
+                        "Type": "Aim",
+                        "Spread": 0,
+                        "HitProbability": 1,
+                        "Deflection": true,
+                        "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" }
+                      },
+                      "BodyMotion": {
+                        "Type": "TameworkFlyingOrbit",
+                        "Mode": "PASS_THROUGH_TARGET",
+                        "PassThroughDistance": { "Compute": "AirBreathPassDistance" },
+                        "PassThroughStopDistance": { "Compute": "AirBreathPassStopDistance" },
+                        "RelativeSpeed": { "Compute": "AirBreathAttackRelativeSpeed" },
+                        "DesiredAltitudeRange": { "Compute": "AirBreathAttackAltitudeRange" },
+                        "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                        "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": { "Compute": "AirBreathPassDuration" }
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirRecovery"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": [ 0.25, 0.5 ]
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirRecovery"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".AirRecovery",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugCombatSnapshot",
+                          "Message": "NordicDrake aerial recovery"
+                        }
+                      ]
+                    },
+                    {
+                      "$Comment": "Climb outward into a fresh patrol waypoint before CAE can select another special.",
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AlertedRange" }
+                      },
+                      "HeadMotion": {
+                        "Type": "Watch"
+                      },
+                      "BodyMotion": {
+                        "Type": "TameworkFlyingOrbit",
+                        "Mode": "WANDER_TARGET",
+                        "WanderRadiusRange": { "Compute": "AirCombatWanderRadiusRange" },
+                        "WanderRetargetTimeRange": { "Compute": "AirCombatRecoveryDuration" },
+                        "WanderStopDistance": { "Compute": "AirCombatWanderStopDistance" },
+                        "RelativeSpeed": { "Compute": "AirCombatRecoveryRelativeSpeed" },
+                        "DesiredAltitudeRange": { "Compute": "AirCombatAltitudeRange" },
+                        "ClimbRelativeSpeed": { "Compute": "AirCombatRecoveryClimbRelativeSpeed" },
+                        "SinkRelativeSpeed": { "Compute": "AirCombatSinkRelativeSpeed" }
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": { "Compute": "AirCombatRecoveryDuration" }
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirRanged"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": [ 0.25, 0.5 ]
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirRanged"
+                        }
+                      ]
                     }
                   ]
                 },
