@@ -22,6 +22,11 @@
       "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
       "ProjectileId": "NordicDrake_Dragon_Fire_Ball",
+      "LaunchPositionOffset": {
+        "X": 0.0,
+        "Y": 1.5,
+        "Z": -3.0
+      },
       "TrajectoryMode": "Direct",
       "TargetSlot": "LockedTarget",
       "ImpactEffect": {
