@@ -26,7 +26,7 @@
       "TargetSlot": "LockedTarget",
       "ImpactEffect": {
         "EffectId": "Flame_Staff_Burn",
-        "Radius": 4.5,
+        "Radius": 3,
         "ExcludeSource": true
       },
       "Tags": {}

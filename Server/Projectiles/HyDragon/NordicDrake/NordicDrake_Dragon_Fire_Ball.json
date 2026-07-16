@@ -30,7 +30,7 @@
 	"ExplosionConfig": {
 		"DamageEntities": true,
 		"DamageBlocks": true,
-		"EntityDamageRadius": 4.5,
+		"EntityDamageRadius": 3,
 		"EntityDamage": 16,
 		"Knockback": {
 			"Type": "Force",
