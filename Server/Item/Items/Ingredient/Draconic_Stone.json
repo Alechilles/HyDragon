@@ -15,7 +15,7 @@
           "Type": "TameworkCaptureChannel",
           "Phase": "Begin",
           "BeamParticleSystem": "Beam_Lightning2",
-          "BeamNativeLength": 50.0,
+          "BeamNativeLength": 11.0,
           "ChannelDurationSeconds": 3.0,
           "Next": {
             "Type": "Charging",
