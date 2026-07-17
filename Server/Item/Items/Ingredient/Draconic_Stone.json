@@ -6,8 +6,55 @@
   "Icon": "Icons/ItemsGenerated/Draconic_Stone.png",
   "Quality": "Epic",
   "Categories": [
-    "Items.Ingredients"
+    "Items.Tools"
   ],
+  "Interactions": {
+    "Use": {
+      "Interactions": [
+        {
+          "Type": "TameworkCaptureChannel",
+          "Phase": "Begin",
+          "Next": {
+            "Type": "Charging",
+            "AllowIndefiniteHold": false,
+            "DisplayProgress": true,
+            "Effects": {
+              "Particles": [
+                {
+                  "SystemId": "Beam_Lightning2",
+                  "TargetEntityPart": "PrimaryItem",
+                  "PositionOffset": {
+                    "Y": 0.15,
+                    "Z": 0.35
+                  }
+                }
+              ],
+              "FirstPersonParticles": [
+                {
+                  "SystemId": "Beam_Lightning2",
+                  "TargetEntityPart": "PrimaryItem",
+                  "PositionOffset": {
+                    "Y": -0.1,
+                    "Z": 0.45
+                  }
+                }
+              ]
+            },
+            "Next": {
+              "0.0": {
+                "Type": "TameworkCaptureChannel",
+                "Phase": "Cancel"
+              },
+              "3.0": {
+                "Type": "TameworkCaptureChannel",
+                "Phase": "Complete"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
   "Recipe": {
     "Input": [
       {
@@ -58,14 +105,44 @@
   },
   "Tags": {
     "Type": [
-      "Ingredient"
+      "Tool"
     ]
   },
   "ItemEntity": {
     "ParticleSystemId": null
   },
   "Scale": 1.75,
-  "MaxStack": 50,
+  "MaxStack": 1,
   "ItemSoundSetId": "ISS_Items_Ingots",
-  "DropOnDeath": true
+  "DropOnDeath": true,
+  "State": {
+    "Filled": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Filled.name",
+        "Description": "server.items.Draconic_Stone_Filled.description"
+      },
+      "Interactions": {
+        "Use": {
+          "Interactions": [
+            {
+              "Type": "TameworkSpawn"
+            }
+          ]
+        }
+      },
+      "MaxStack": 1,
+      "Particles": [
+        {
+          "SystemId": "Lightning_Sword",
+          "Color": "#72D7FF",
+          "Scale": 0.35
+        }
+      ],
+      "Light": {
+        "Color": "#369DCC",
+        "Radius": 1.5
+      }
+    }
+  }
 }

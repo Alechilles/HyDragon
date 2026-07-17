@@ -80,9 +80,7 @@
     "MaxHealth": 800,
     "IsTameable": true,
     "TameRoleChange": "Tamed_NordicDrake",
-    "AttractiveItemSet": [
-      "Draconic_Stone"
-    ],
+    "AttractiveItemSet": [],
     "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
     "TranquilizerSleepThresholdSeconds": 50,
     "InteractionConfigId": "HyDragonIntDragon",

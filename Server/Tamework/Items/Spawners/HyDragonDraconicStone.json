@@ -1,0 +1,41 @@
+{
+  "EmptyItemId": "Draconic_Stone",
+  "FilledItemId": "*Draconic_Stone_State_Filled",
+  "AllowedRoles": {
+    "Mode": "Allowlist",
+    "Allowlist": [
+      "NordicDrake",
+      "Tamed_NordicDrake",
+      "Hydra",
+      "Tamed_Hydra",
+      "Wyvern_Mini",
+      "Tamed_Wyvern_Mini"
+    ]
+  },
+  "Capture": {
+    "ClearsOwner": false,
+    "RequireTamed": false,
+    "TamesTarget": true,
+    "OwnerRestricted": false,
+    "RequireOwner": false,
+    "MaxHealthPercent": 20.0,
+    "RequiredEffectId": "Tw_Status_Tranquilized",
+    "ChannelAuraEffectId": "HyDragon_DragonStone_CaptureAura",
+    "TamedRoleOverrides": {
+      "NordicDrake": "Tamed_NordicDrake",
+      "Hydra": "Tamed_Hydra",
+      "Wyvern_Mini": "Tamed_Wyvern_Mini"
+    },
+    "ParticleSystem": "Lightning_Sword",
+    "CooldownMs": 500,
+    "MaxDistance": 12.0
+  },
+  "Spawn": {
+    "AssignsOwner": true,
+    "OwnerRestricted": true,
+    "RequireOwner": true,
+    "ParticleSystem": "Lightning_Sword",
+    "CooldownMs": 500,
+    "MaxDistance": 12.0
+  }
+}

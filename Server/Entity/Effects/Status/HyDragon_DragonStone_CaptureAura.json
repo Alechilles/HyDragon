@@ -1,0 +1,18 @@
+{
+  "ApplicationEffects": {
+    "EntityBottomTint": "#143F68",
+    "EntityTopTint": "#72D7FF",
+    "Particles": [
+      {
+        "SystemId": "Lightning_Sword",
+        "LifeSpan": 3.2,
+        "Scale": 1.15
+      }
+    ]
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 3.25
+}

@@ -46,9 +46,7 @@
       16
     ],
     "MaxHealth": 400,
-    "AttractiveItemSet": [
-      "Draconic_Stone"
-    ],
+    "AttractiveItemSet": [],
     "InteractionConfigId": "HyDragonIntDragon",
     "NeedsSeekConsumeAnimation": "",
     "CanFollow": true,
