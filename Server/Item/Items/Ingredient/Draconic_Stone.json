@@ -9,47 +9,18 @@
     "Items.Tools"
   ],
   "Interactions": {
-    "Use": {
+    "Primary": {
       "Interactions": [
         {
           "Type": "TameworkCaptureChannel",
           "Phase": "Begin",
+          "BeamParticleSystem": "Beam_Lightning2",
+          "BeamNativeLength": 50.0,
+          "ChannelDurationSeconds": 3.0,
           "Next": {
             "Type": "Charging",
             "AllowIndefiniteHold": false,
             "DisplayProgress": true,
-            "Effects": {
-              "Particles": [
-                {
-                  "SystemId": "Beam_Lightning2",
-                  "TargetNodeName": "bone",
-                  "PositionOffset": {
-                    "Y": 0.15,
-                    "Z": 0.35
-                  },
-                  "RotationOffset": {
-                    "Pitch": 0,
-                    "Roll": 0,
-                    "Yaw": -90
-                  }
-                }
-              ],
-              "FirstPersonParticles": [
-                {
-                  "SystemId": "Beam_Lightning2",
-                  "TargetNodeName": "bone",
-                  "PositionOffset": {
-                    "Y": -0.1,
-                    "Z": 0.45
-                  },
-                  "RotationOffset": {
-                    "Pitch": 0,
-                    "Roll": 0,
-                    "Yaw": -90
-                  }
-                }
-              ]
-            },
             "Next": {
               "0.0": {
                 "Type": "TameworkCaptureChannel",
@@ -133,7 +104,7 @@
         "Description": "server.items.Draconic_Stone_Filled.description"
       },
       "Interactions": {
-        "Use": {
+        "Primary": {
           "Interactions": [
             {
               "Type": "TameworkSpawn"
@@ -142,13 +113,6 @@
         }
       },
       "MaxStack": 1,
-      "Particles": [
-        {
-          "SystemId": "Lightning_Sword",
-          "Color": "#72D7FF",
-          "Scale": 0.35
-        }
-      ],
       "Light": {
         "Color": "#369DCC",
         "Radius": 2

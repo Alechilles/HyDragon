@@ -26,7 +26,6 @@
       "Hydra": "Tamed_Hydra",
       "Wyvern_Mini": "Tamed_Wyvern_Mini"
     },
-    "ParticleSystem": "Lightning_Sword",
     "CooldownMs": 500,
     "MaxDistance": 12.0
   },
@@ -34,7 +33,6 @@
     "AssignsOwner": true,
     "OwnerRestricted": true,
     "RequireOwner": true,
-    "ParticleSystem": "Lightning_Sword",
     "CooldownMs": 500,
     "MaxDistance": 12.0
   }
