@@ -5,7 +5,6 @@
     "Particles": [
       {
         "SystemId": "Lightning_Sword",
-        "LifeSpan": 3.2,
         "Scale": 1.15
       }
     ]

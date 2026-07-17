@@ -22,20 +22,30 @@
               "Particles": [
                 {
                   "SystemId": "Beam_Lightning2",
-                  "TargetEntityPart": "PrimaryItem",
+                  "TargetNodeName": "bone",
                   "PositionOffset": {
                     "Y": 0.15,
                     "Z": 0.35
+                  },
+                  "RotationOffset": {
+                    "Pitch": 0,
+                    "Roll": 0,
+                    "Yaw": -90
                   }
                 }
               ],
               "FirstPersonParticles": [
                 {
                   "SystemId": "Beam_Lightning2",
-                  "TargetEntityPart": "PrimaryItem",
+                  "TargetNodeName": "bone",
                   "PositionOffset": {
                     "Y": -0.1,
                     "Z": 0.45
+                  },
+                  "RotationOffset": {
+                    "Pitch": 0,
+                    "Roll": 0,
+                    "Yaw": -90
                   }
                 }
               ]
@@ -141,7 +151,7 @@
       ],
       "Light": {
         "Color": "#369DCC",
-        "Radius": 1.5
+        "Radius": 2
       }
     }
   }
