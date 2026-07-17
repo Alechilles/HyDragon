@@ -1884,14 +1884,15 @@
                               "Name": "LandingRay",
                               "Range": 64,
                               "Angle": 90,
-                              "Blocks": "Gaia"
+                              "Blocks": "StoneAndSoil"
                             }
                           },
                           "BodyMotion": {
                             "Type": "Land",
                             "SlowDownDistance": 5,
                             "StopDistance": 0.5,
-                            "GoalLenience": 3
+                            "GoalLenience": 3,
+                            "DesiredAltitudeWeight": 0
                           }
                         },
                         {
@@ -2651,6 +2652,10 @@
             },
             {
               "Actions": [
+                {
+                  "Type": "ReleaseTarget",
+                  "TargetSlot": "LockedTarget"
+                },
                 {
                   "Type": "State",
                   "State": "Search.Confused"
