@@ -1,0 +1,13 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "HyDragon_DragonStone_CaptureBurst",
+      "PositionOffset": {
+        "Y": 0.35
+      }
+    }
+  ],
+  "LifeSpan": 0.75,
+  "IsImportant": true,
+  "CullDistance": 32.0
+}

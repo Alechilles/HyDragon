@@ -14,8 +14,8 @@
         {
           "Type": "TameworkCaptureChannel",
           "Phase": "Begin",
-          "BeamParticleSystem": "Beam_Lightning2",
-          "BeamNativeLength": 21.0,
+          "BeamParticleSystem": "HyDragon_DragonStone_CaptureBeam",
+          "BeamNativeLength": 15.0,
           "ChannelDurationSeconds": 3.0,
           "Next": {
             "Type": "Charging",
@@ -28,7 +28,8 @@
               },
               "3.0": {
                 "Type": "TameworkCaptureChannel",
-                "Phase": "Complete"
+                "Phase": "Complete",
+                "CaptureBurstParticleSystem": "HyDragon_DragonStone_CaptureBurst"
               }
             }
           }

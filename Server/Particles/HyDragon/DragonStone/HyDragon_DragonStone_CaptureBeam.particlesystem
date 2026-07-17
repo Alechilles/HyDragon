@@ -1,0 +1,12 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "HyDragon_DragonStone_CaptureBeam_Core"
+    },
+    {
+      "SpawnerId": "HyDragon_DragonStone_CaptureBeam_Lightning"
+    }
+  ],
+  "IsImportant": true,
+  "CullDistance": 32.0
+}

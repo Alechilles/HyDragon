@@ -1,0 +1,79 @@
+{
+  "RenderMode": "BlendLinear",
+  "ParticleRotationInfluence": "BillboardVelocity",
+  "MaxConcurrentParticles": 8,
+  "ParticleLifeSpan": {
+    "Min": 0.5,
+    "Max": 0.5
+  },
+  "SpawnRate": {
+    "Min": 12.0,
+    "Max": 12.0
+  },
+  "Particle": {
+    "Texture": "Particles/Textures/Rnd/Beam2.png",
+    "ScaleRatioConstraint": "None",
+    "Animation": {
+      "0": {
+        "Opacity": 0.9,
+        "Color": "#b8efff",
+        "Scale": {
+          "X": {
+            "Min": 6.0,
+            "Max": 7.0
+          },
+          "Y": {
+            "Min": 0.45,
+            "Max": 0.6
+          }
+        }
+      },
+      "75": {
+        "Opacity": 1.0,
+        "Color": "#74cfff"
+      },
+      "100": {
+        "Opacity": 0.0,
+        "Color": "#688cff"
+      }
+    },
+    "InitialAnimationFrame": {
+      "Scale": {
+        "X": {
+          "Min": 1.0,
+          "Max": 1.0
+        },
+        "Y": {
+          "Min": 1.0,
+          "Max": 1.0
+        }
+      },
+      "Opacity": 1.0,
+      "Rotation": {
+        "Z": {
+          "Min": 90.0,
+          "Max": 90.0
+        }
+      }
+    },
+    "SoftParticlesFadeFactor": 2.0
+  },
+  "LinearFiltering": true,
+  "UVMotion": {
+    "Texture": "Particles/Textures/UVMotion/FlowMapTest.png",
+    "Scale": 1.0,
+    "StrengthCurveType": "Constant",
+    "Strength": 0.0
+  },
+  "ParticleRotateWithSpawner": true,
+  "InitialVelocity": {
+    "Speed": {
+      "Min": 30.0,
+      "Max": 30.0
+    },
+    "Yaw": {
+      "Min": 90.0,
+      "Max": 90.0
+    }
+  }
+}

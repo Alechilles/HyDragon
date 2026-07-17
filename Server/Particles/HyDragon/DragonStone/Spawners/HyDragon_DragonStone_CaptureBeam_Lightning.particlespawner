@@ -1,0 +1,83 @@
+{
+  "RenderMode": "Erosion",
+  "ParticleRotationInfluence": "BillboardVelocity",
+  "MaxConcurrentParticles": 8,
+  "ParticleLifeSpan": {
+    "Min": 0.5,
+    "Max": 0.5
+  },
+  "SpawnRate": {
+    "Min": 8.0,
+    "Max": 10.0
+  },
+  "Particle": {
+    "Texture": "Particles/Textures/Basic/Flash_Spritesheet2.png",
+    "ScaleRatioConstraint": "None",
+    "Animation": {
+      "0": {
+        "Opacity": 0.8,
+        "Color": "#8ee6ff",
+        "Scale": {
+          "X": {
+            "Min": 0.25,
+            "Max": 0.35
+          },
+          "Y": {
+            "Min": 4.0,
+            "Max": 6.0
+          }
+        }
+      },
+      "75": {
+        "Opacity": 1.0,
+        "Color": "#70c7ff"
+      },
+      "100": {
+        "Opacity": 0.0,
+        "Color": "#526dff"
+      }
+    },
+    "InitialAnimationFrame": {
+      "Scale": {
+        "X": {
+          "Min": 1.0,
+          "Max": 1.0
+        },
+        "Y": {
+          "Min": 1.0,
+          "Max": 1.0
+        }
+      },
+      "Opacity": 1.0,
+      "FrameIndex": {
+        "Min": 0,
+        "Max": 3
+      }
+    },
+    "FrameSize": {
+      "Width": 128,
+      "Height": 128
+    }
+  },
+  "LinearFiltering": true,
+  "UVMotion": {
+    "Texture": "Particles/Textures/UVMotion/FlowMap3.png",
+    "Scale": 1.0,
+    "SpeedX": 0.0,
+    "StrengthCurveType": "Constant",
+    "Strength": 8.2,
+    "SpeedY": 0.96,
+    "AddRandomUVOffset": true
+  },
+  "ParticleRotateWithSpawner": true,
+  "InitialVelocity": {
+    "Speed": {
+      "Min": 30.0,
+      "Max": 30.0
+    },
+    "Yaw": {
+      "Min": 90.0,
+      "Max": 90.0
+    }
+  }
+}
