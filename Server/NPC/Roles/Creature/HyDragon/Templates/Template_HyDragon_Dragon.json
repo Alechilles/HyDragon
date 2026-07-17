@@ -1882,8 +1882,8 @@
                             "Sensor": {
                               "Type": "SearchRay",
                               "Name": "LandingRay",
-                              "Range": 20,
-                              "Angle": 45,
+                              "Range": 64,
+                              "Angle": 90,
                               "Blocks": "Gaia"
                             }
                           },
@@ -1926,14 +1926,14 @@
                       "Actions": [
                         {
                           "Type": "Timeout",
-                          "Delay": [ 4, 6 ]
+                          "Delay": [ 8, 10 ]
                         },
                         {
                           "Type": "ResetSearchRays"
                         },
                         {
                           "Type": "State",
-                          "State": ".AirRanged"
+                          "State": ".AirLand"
                         }
                       ]
                     }
