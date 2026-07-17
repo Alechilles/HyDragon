@@ -1889,6 +1889,8 @@
                           },
                           "BodyMotion": {
                             "Type": "Land",
+                            "UsePathfinder": false,
+                            "SkipSteering": false,
                             "SlowDownDistance": 5,
                             "StopDistance": 0.5,
                             "GoalLenience": 3,
