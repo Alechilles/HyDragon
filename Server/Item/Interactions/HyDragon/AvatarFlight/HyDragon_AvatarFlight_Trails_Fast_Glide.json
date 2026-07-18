@@ -1,0 +1,22 @@
+{
+  "Type": "Simple",
+  "RunTime": 3600,
+  "Effects": {
+    "Trails": [
+      {
+        "TrailId": "HyDragon_AvatarFlight_Fast_Glide",
+        "TargetNodeName": "R-Wing3",
+        "TargetEntityPart": "Entity",
+        "PositionOffset": { "X": 0, "Y": 0, "Z": 0 },
+        "RotationOffset": { "Pitch": 0, "Roll": 0, "Yaw": 0 }
+      },
+      {
+        "TrailId": "HyDragon_AvatarFlight_Fast_Glide",
+        "TargetNodeName": "L-Wing3",
+        "TargetEntityPart": "Entity",
+        "PositionOffset": { "X": 0, "Y": 0, "Z": 0 },
+        "RotationOffset": { "Pitch": 0, "Roll": 0, "Yaw": 0 }
+      }
+    ]
+  }
+}

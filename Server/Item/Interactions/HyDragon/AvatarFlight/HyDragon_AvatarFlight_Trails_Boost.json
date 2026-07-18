@@ -1,0 +1,22 @@
+{
+  "Type": "Simple",
+  "RunTime": 0.7,
+  "Effects": {
+    "Trails": [
+      {
+        "TrailId": "HyDragon_AvatarFlight_Wingtip_Burst",
+        "TargetNodeName": "R-Wing3",
+        "TargetEntityPart": "Entity",
+        "PositionOffset": { "X": 0, "Y": 0, "Z": 0 },
+        "RotationOffset": { "Pitch": 0, "Roll": 0, "Yaw": 0 }
+      },
+      {
+        "TrailId": "HyDragon_AvatarFlight_Wingtip_Burst",
+        "TargetNodeName": "L-Wing3",
+        "TargetEntityPart": "Entity",
+        "PositionOffset": { "X": 0, "Y": 0, "Z": 0 },
+        "RotationOffset": { "Pitch": 0, "Roll": 0, "Yaw": 0 }
+      }
+    ]
+  }
+}
