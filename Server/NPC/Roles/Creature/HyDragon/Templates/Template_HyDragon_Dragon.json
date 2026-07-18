@@ -1987,6 +1987,7 @@
                             "SkipSteering": false,
                             "SlowDownDistance": 5,
                             "StopDistance": 0.5,
+                            "HeightDifference": [ -3, 2 ],
                             "GoalLenience": 3,
                             "DesiredAltitudeWeight": 0
                           }
