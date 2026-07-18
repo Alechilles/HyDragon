@@ -338,6 +338,22 @@
       "Value": 0.5,
       "Description": "Downward steering strength while entering a lower flying attack altitude."
     },
+    "AirLandingApproachAltitudeRange": {
+      "Value": [ 3, 5 ],
+      "Description": "Desired height above the target during the gradual landing approach."
+    },
+    "AirLandingApproachDuration": {
+      "Value": [ 2.5, 3.5 ],
+      "Description": "Time spent descending toward the target before committing to touchdown."
+    },
+    "AirLandingApproachRelativeSpeed": {
+      "Value": 0.8,
+      "Description": "Relative forward speed during the gradual landing approach."
+    },
+    "AirLandingApproachSinkRelativeSpeed": {
+      "Value": 0.8,
+      "Description": "Downward steering strength during the gradual landing approach."
+    },
     "AirCombatWanderRelativeSpeed": {
       "Value": 0.25,
       "Description": "Relative speed for flying combat repositioning."
@@ -1870,6 +1886,84 @@
                   },
                   "Instructions": [
                     {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugCombatSnapshot",
+                          "Message": "NordicDrake landing approach"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Target",
+                        "Range": { "Compute": "AlertedRange" }
+                      },
+                      "HeadMotion": {
+                        "Type": "Watch"
+                      },
+                      "BodyMotion": {
+                        "Type": "TameworkFlyingOrbit",
+                        "Mode": "APPROACH",
+                        "ApproachStopDistance": 0,
+                        "ApproachSlowDownDistance": 8,
+                        "RelativeSpeed": { "Compute": "AirLandingApproachRelativeSpeed" },
+                        "DesiredAltitudeRange": { "Compute": "AirLandingApproachAltitudeRange" },
+                        "ClimbRelativeSpeed": { "Compute": "AirCombatClimbRelativeSpeed" },
+                        "SinkRelativeSpeed": { "Compute": "AirLandingApproachSinkRelativeSpeed" }
+                      },
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "Timeout",
+                          "Delay": { "Compute": "AirLandingApproachDuration" }
+                        },
+                        {
+                          "Type": "State",
+                          "State": ".AirTouchdown"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "Actions": [
+                        {
+                          "Type": "State",
+                          "State": ".AirTouchdown"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "State",
+                    "State": ".AirTouchdown",
+                    "IgnoreMissingSetState": true
+                  },
+                  "Instructions": [
+                    {
+                      "Continue": true,
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkDebugCombatSnapshot",
+                          "Message": "NordicDrake landing touchdown"
+                        }
+                      ]
+                    },
+                    {
                       "Sensor": {
                         "Type": "MotionController",
                         "MotionController": "Fly"
@@ -1883,7 +1977,7 @@
                               "Type": "SearchRay",
                               "Name": "LandingRay",
                               "Range": 64,
-                              "Angle": 45,
+                              "Angle": 90,
                               "Blocks": "StoneAndSoil"
                             }
                           },
@@ -1898,10 +1992,16 @@
                           }
                         },
                         {
-                          "BodyMotion": {
-                            "Type": "Wander",
-                            "RelativeSpeed": 0.2
-                          }
+                          "ActionsBlocking": true,
+                          "Actions": [
+                            {
+                              "Type": "Timeout",
+                              "Delay": [ 0.5, 1 ]
+                            },
+                            {
+                              "Type": "ResetSearchRays"
+                            }
+                          ]
                         }
                       ]
                     },
@@ -1917,26 +2017,6 @@
                         {
                           "Type": "State",
                           "State": ".Default"
-                        }
-                      ]
-                    },
-                    {
-                      "Sensor": {
-                        "Type": "MotionController",
-                        "MotionController": "Fly"
-                      },
-                      "ActionsBlocking": true,
-                      "Actions": [
-                        {
-                          "Type": "Timeout",
-                          "Delay": [ 8, 10 ]
-                        },
-                        {
-                          "Type": "ResetSearchRays"
-                        },
-                        {
-                          "Type": "State",
-                          "State": ".AirLand"
                         }
                       ]
                     }
