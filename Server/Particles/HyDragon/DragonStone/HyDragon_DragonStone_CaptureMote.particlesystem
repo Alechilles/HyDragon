@@ -1,7 +1,16 @@
 {
   "Spawners": [
     {
-      "SpawnerId": "HyDragon_DragonStone_CaptureMote_Particle"
+      "SpawnerId": "HyDragon_DragonStone_CaptureMote_Particle",
+      "FixedRotation": false
+    },
+    {
+      "SpawnerId": "HyDragon_DragonStone_CaptureMote_Trail",
+      "FixedRotation": false
+    },
+    {
+      "SpawnerId": "HyDragon_DragonStone_CaptureMote_Sparks",
+      "FixedRotation": false
     }
   ],
   "IsImportant": true,

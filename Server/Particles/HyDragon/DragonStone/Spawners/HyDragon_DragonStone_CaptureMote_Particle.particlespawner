@@ -1,59 +1,49 @@
 {
-  "RenderMode": "Erosion",
+  "RenderMode": "BlendAdd",
   "ParticleRotationInfluence": "Billboard",
-  "MaxConcurrentParticles": 1,
-  "TotalParticles": {
-    "Min": 1,
-    "Max": 1
-  },
+  "MaxConcurrentParticles": 6,
   "ParticleLifeSpan": {
-    "Min": 2.25,
-    "Max": 2.25
+    "Min": 0.08,
+    "Max": 0.12
   },
   "SpawnRate": {
-    "Min": 1.0,
-    "Max": 1.0
+    "Min": 45.0,
+    "Max": 45.0
   },
   "Particle": {
-    "Texture": "Particles/Textures/Basic/Ball3.png",
+    "Texture": "Particles/Textures/Circles/Circle_Glow.png",
     "FrameSize": {
-      "Width": 32,
-      "Height": 32
+      "Height": 0
     },
     "ScaleRatioConstraint": "OneToOne",
-    "UVOption": "RandomFlipU",
     "Animation": {
       "0": {
-        "Opacity": 0.0,
+        "Opacity": 0.92,
         "Color": "#F4FDFF",
         "Scale": {
           "X": {
-            "Min": 0.42,
-            "Max": 0.52
+            "Min": 0.22,
+            "Max": 0.28
           }
         }
       },
-      "12": {
+      "35": {
         "Opacity": 1.0,
-        "Color": "#C9F5FF"
-      },
-      "72": {
-        "Opacity": 0.9,
-        "Color": "#54CAFF",
+        "Color": "#8CEBFF",
         "Scale": {
           "X": {
-            "Min": 0.5,
-            "Max": 0.62
+            "Min": 0.28,
+            "Max": 0.34
           }
         }
       },
       "100": {
         "Opacity": 0.0,
-        "Color": "#6378FF",
+        "Color": "#326DFF",
         "Scale": {
           "X": {
-            "Min": 0.28,
-            "Max": 0.36
+            "Min": 0.12,
+            "Max": 0.18
           }
         }
       }
@@ -61,8 +51,8 @@
     "InitialAnimationFrame": {
       "Scale": {
         "X": {
-          "Min": 0.42,
-          "Max": 0.52
+          "Min": 0.22,
+          "Max": 0.28
         }
       },
       "Opacity": 1.0,
@@ -70,7 +60,8 @@
     }
   },
   "LinearFiltering": true,
-  "SpawnBurst": true,
+  "LightInfluence": 0,
+  "SpawnBurst": false,
   "ParticleRotateWithSpawner": false,
   "UseEmitDirection": false
 }
