@@ -258,17 +258,20 @@
     "Laydown": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Laydown.blockyanim",
           "Looping": false,
-          "Speed": 0.5
+          "Speed": 1,
+          "BlendingDuration": 0.2
         }
       ]
     },
     "Sleep": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
-          "Speed": 0.25
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Sleep.blockyanim",
+          "Looping": true,
+          "Speed": 0.8,
+          "BlendingDuration": 0.2
         }
       ]
     },
