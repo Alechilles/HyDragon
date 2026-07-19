@@ -1,6 +1,6 @@
 {
   "TexturePath": "Trails/White.png",
-  "LifeSpan": 10,
+  "LifeSpan": 5,
   "Roll": 0,
   "Start": {
     "Color": "#b8fff0d9",
