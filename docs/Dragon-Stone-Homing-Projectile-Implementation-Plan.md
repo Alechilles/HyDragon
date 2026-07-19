@@ -1,6 +1,6 @@
 # Dragon Stone Homing VFX Projectile Implementation Plan
 
-- Status: Proposed
+- Status: Implemented; in-game visual tuning pending
 - Scope: Tamework framework plus HyDragon Dragon Stone assets/configuration
 - Target runtime: Hytale 0.5.6
 
