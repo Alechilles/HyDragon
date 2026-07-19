@@ -7,8 +7,8 @@
     "Max": 1
   },
   "ParticleLifeSpan": {
-    "Min": 0.5,
-    "Max": 0.5
+    "Min": 1.5,
+    "Max": 1.5
   },
   "SpawnRate": {
     "Min": 1.0,
@@ -75,8 +75,8 @@
   "UseEmitDirection": false,
   "InitialVelocity": {
     "Speed": {
-      "Min": 30.0,
-      "Max": 30.0
+      "Min": 8.0,
+      "Max": 8.0
     },
     "Yaw": {
       "Min": 89.0,
