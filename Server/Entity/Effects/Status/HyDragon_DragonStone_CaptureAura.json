@@ -1,13 +1,8 @@
 {
   "ApplicationEffects": {
-    "EntityBottomTint": "#143F68",
+    "EntityBottomTint": "#071827",
     "EntityTopTint": "#72D7FF",
-    "Particles": [
-      {
-        "SystemId": "Lightning_Sword",
-        "Scale": 1.15
-      }
-    ]
+    "ModelVFXId": "HyDragon_DragonStone_Capture"
   },
   "OverlapBehavior": "Overwrite",
   "RemovalBehavior": "Duration",
