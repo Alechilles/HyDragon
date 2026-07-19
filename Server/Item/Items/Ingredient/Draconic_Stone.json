@@ -16,6 +16,7 @@
           "Phase": "Begin",
           "BeamParticleSystem": "HyDragon_DragonStone_CaptureBeam",
           "BeamNativeLength": 15.0,
+          "ScaleBeamToTarget": false,
           "ChannelDurationSeconds": 3.0,
           "Next": {
             "Type": "Charging",
