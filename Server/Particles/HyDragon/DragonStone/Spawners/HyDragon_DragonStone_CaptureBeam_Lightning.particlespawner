@@ -1,83 +1,84 @@
 {
-  "RenderMode": "Erosion",
-  "ParticleRotationInfluence": "BillboardVelocity",
-  "MaxConcurrentParticles": 8,
+  "RenderMode": "BlendAdd",
+  "ParticleRotationInfluence": "Billboard",
+  "MaxConcurrentParticles": 16,
   "ParticleLifeSpan": {
     "Min": 0.5,
     "Max": 0.5
   },
   "SpawnRate": {
-    "Min": 8.0,
-    "Max": 10.0
+    "Min": 14.0,
+    "Max": 18.0
   },
   "Particle": {
-    "Texture": "Particles/Textures/Basic/Flash_Spritesheet2.png",
-    "ScaleRatioConstraint": "None",
+    "Texture": "Particles/Textures/Circles/Circle_Glow.png",
+    "ScaleRatioConstraint": "OneToOne",
     "Animation": {
       "0": {
-        "Opacity": 0.8,
-        "Color": "#8ee6ff",
+        "Opacity": 0.0,
+        "Color": "#DDF8FF",
         "Scale": {
           "X": {
-            "Min": 0.25,
-            "Max": 0.35
-          },
-          "Y": {
-            "Min": 4.0,
-            "Max": 6.0
+            "Min": 0.2,
+            "Max": 0.32
           }
         }
       },
-      "75": {
-        "Opacity": 1.0,
-        "Color": "#70c7ff"
+      "15": {
+        "Opacity": 0.75,
+        "Color": "#76DDFF"
+      },
+      "70": {
+        "Opacity": 0.5,
+        "Color": "#499DFF",
+        "Scale": {
+          "X": {
+            "Min": 0.3,
+            "Max": 0.45
+          }
+        }
       },
       "100": {
         "Opacity": 0.0,
-        "Color": "#526dff"
+        "Color": "#6759FF"
       }
     },
     "InitialAnimationFrame": {
       "Scale": {
         "X": {
-          "Min": 1.0,
-          "Max": 1.0
-        },
-        "Y": {
-          "Min": 1.0,
-          "Max": 1.0
+          "Min": 0.2,
+          "Max": 0.32
         }
       },
-      "Opacity": 1.0,
-      "FrameIndex": {
-        "Min": 0,
-        "Max": 3
-      }
-    },
-    "FrameSize": {
-      "Width": 128,
-      "Height": 128
+      "Opacity": 1.0
     }
   },
   "LinearFiltering": true,
-  "UVMotion": {
-    "Texture": "Particles/Textures/UVMotion/FlowMap3.png",
-    "Scale": 1.0,
-    "SpeedX": 0.0,
-    "StrengthCurveType": "Constant",
-    "Strength": 8.2,
-    "SpeedY": 0.96,
-    "AddRandomUVOffset": true
+  "Shape": "Cube",
+  "EmitOffset": {
+    "Y": {
+      "Min": -0.04,
+      "Max": 0.04
+    },
+    "Z": {
+      "Min": -0.04,
+      "Max": 0.04
+    }
   },
   "ParticleRotateWithSpawner": true,
+  "UseEmitDirection": false,
   "InitialVelocity": {
     "Speed": {
       "Min": 30.0,
       "Max": 30.0
     },
     "Yaw": {
-      "Min": 90.0,
-      "Max": 90.0
+      "Min": 89.0,
+      "Max": 91.0
+    },
+    "Pitch": {
+      "Min": -0.8,
+      "Max": 0.8
     }
   }
 }

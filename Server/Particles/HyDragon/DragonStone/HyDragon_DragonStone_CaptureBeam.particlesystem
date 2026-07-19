@@ -7,6 +7,7 @@
       "SpawnerId": "HyDragon_DragonStone_CaptureBeam_Lightning"
     }
   ],
+  "LifeSpan": 0.55,
   "IsImportant": true,
   "CullDistance": 32.0
 }
