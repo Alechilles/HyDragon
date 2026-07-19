@@ -23,6 +23,12 @@
     "FastGlideStartSpeedRatio": 0.92,
     "FastGlideStopSpeedRatio": 0.86
   },
+  "Audio": {
+    "IdleFlightFlapSoundEvent": "SFX_Tamework_AvatarFlight_Wing_Flap_Footstep",
+    "IdleFlightFlapIntervalMs": 2000.0,
+    "FlightFlapSoundEvent": "SFX_Tamework_AvatarFlight_Wing_Flap_Footstep",
+    "FlightFlapIntervalMs": 1000.0
+  },
   "Animation": {
     "IdleAnimation": "FlyIdle",
     "FlightAnimation": "Fly",
