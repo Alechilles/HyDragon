@@ -1,0 +1,9 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "HyDragon_DragonStone_CaptureMote_Particle"
+    }
+  ],
+  "IsImportant": true,
+  "CullDistance": 32.0
+}
