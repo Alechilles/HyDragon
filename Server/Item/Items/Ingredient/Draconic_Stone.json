@@ -18,6 +18,7 @@
           "BeamNativeLength": 12.0,
           "BeamNativeDurationSeconds": 1.5,
           "ScaleBeamToTarget": false,
+          "BeamFromTarget": true,
           "ChannelDurationSeconds": 3.0,
           "Next": {
             "Type": "Charging",
