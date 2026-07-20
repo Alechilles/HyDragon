@@ -4,18 +4,7 @@
   "holdLastKeyframe": false,
   "nodeAnimations": {
     "AF_Pelvis": {
-      "position": [
-        {
-          "time": 0,
-          "delta": {"x": 0, "y": 0, "z": 0},
-          "interpolationType": "smooth"
-        },
-        {
-          "time": 30,
-          "delta": {"x": 0, "y": -4.13448, "z": -0.01854},
-          "interpolationType": "smooth"
-        }
-      ],
+      "position": [],
       "orientation": [
         {
           "time": 0,
@@ -601,18 +590,7 @@
       "shapeUvOffset": []
     },
     "Origin": {
-      "position": [
-        {
-          "time": 0,
-          "delta": {"x": 0, "y": 0, "z": 0},
-          "interpolationType": "linear"
-        },
-        {
-          "time": 24,
-          "delta": {"x": 0, "y": 55, "z": 0},
-          "interpolationType": "linear"
-        }
-      ],
+      "position": [],
       "orientation": [],
       "shapeStretch": [],
       "shapeVisible": [],
