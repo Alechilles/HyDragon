@@ -4,7 +4,13 @@
   "Model": {
     "ApplyModel": true,
     "ModelId": "NordicDrake_AvatarFlight",
-    "Scale": 1.0
+    "Scale": 1.0,
+    "CameraPositionOffset": {
+      "X": 1.0,
+      "Y": 0.0,
+      "Z": 8.0
+    },
+    "EyeHeight": 4.65
   },
   "Vfx": {
     "LaunchChargeMinScale": 3.9,
