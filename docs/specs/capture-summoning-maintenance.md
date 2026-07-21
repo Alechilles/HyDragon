@@ -257,7 +257,7 @@ Legacy captured Miniwyverns follow the migration rules in [Soul Bond and Miniwyv
 | `Server/HyDragon/DragonSpecies/*.json` | Resistance, minimum tier, encounter eligibility |
 | `Server/HyDragon/StoneMaintenance/Default.json` | Repair balance and disabled future-extension flags; it does not duplicate the vessel cooldown |
 | `Common/Items/HyDragon/` and `Common/Icons/ItemsGenerated/` | Tier, filled, active, and damaged visuals |
-| Localization assets | Names, descriptions, prompts, failures, cooldown/repair status |
+| `Server/Languages/{en-US,pt-BR,de-DE,fr-FR,es-ES}/server.lang` | Names, descriptions, prompts, failures, and cooldown/repair status with exact key/placeholder parity per the [content localization contract](dragon-content-encounters.md#53-localization-catalogs) |
 
 These paths match the config families fixed by the [Tamework integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md).
 

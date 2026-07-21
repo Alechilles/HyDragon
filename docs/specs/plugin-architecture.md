@@ -35,6 +35,7 @@ Normative Tamework dependencies:
 5. Runtime features perform capability checks even when the manifest version range is satisfied.
 6. Miniwyvern is Soul Bond-exclusive and cannot be captured by a Draconic Stone.
 7. Tamework's Flightmaster's Talisman is the only flight-unlock item. HyDragon has no external flight-mod dependency or compatibility bridge in scope.
+8. Canonical HyDragon asset IDs and filenames use English terminology. Player-facing localization ships in `en-US`, `pt-BR`, `de-DE`, `fr-FR`, and `es-ES`.
 
 ## 3. Requirements
 
@@ -43,7 +44,7 @@ Normative Tamework dependencies:
 - **HYD-ARCH-001:** The build MUST produce one plugin JAR that contains compiled Java classes, `manifest.json`, and the complete `Common/` and `Server/` trees.
 - **HYD-ARCH-002:** The initial Maven build MUST consume the current root-layout assets directly. It MUST NOT require moving those assets into `src/main/resources`.
 - **HYD-ARCH-003:** `manifest.json` MUST declare `Main`, keep `IncludesAssetPack: true`, and declare `Alechilles:Alec's Tamework!` with range `>=3.0.0 <4.0.0`.
-- **HYD-ARCH-004:** Public IDs already shipped by the asset pack MUST remain stable unless a migration rule is documented. New Java types, profile-data keys, config IDs, and commands MUST use the HyDragon namespace.
+- **HYD-ARCH-004:** Correct English public IDs already shipped by the asset pack MUST remain stable unless a migration rule is documented. Untranslated or semantically mismatched legacy IDs MUST migrate to canonical English IDs through an explicit, lossless, versioned alias map; new asset IDs, Java types, profile-data keys, config IDs, and commands MUST use English terminology and the HyDragon namespace where namespacing is supported.
 
 ### Runtime boundary
 
@@ -246,7 +247,9 @@ Stop new operations, cancel scheduled ability/encounter tasks, flush durable sta
 | `Server/HyDragon/StoneMaintenance/*.json` | HyDragon config | Death-repair policy and future extension flags; swap cooldown is authored in Tamework vessel config |
 | `Server/HyDragon/MiniwyvernArchetypes/*.json` | HyDragon config | Attunement and ability definitions |
 | `Server/HyDragon/Encounters/*.json` | HyDragon config | Plugin-controlled encounter definitions |
+| `Server/HyDragon/Migrations/LegacyAssetIds.json` | HyDragon migration config | One-to-one legacy non-English/mismatched ID to canonical English ID mappings |
 | `Server/Tamework/**` | Tamework assets | Generic companion, capture, vessel, population, and inventory declarations |
+| `Server/Languages/{en-US,pt-BR,de-DE,fr-FR,es-ES}/server.lang` | Localization | Complete, key-parity server catalogs with English as the default/source language |
 | `Common/**`, `Server/Item/**`, `Server/NPC/**` | Content assets | Models, items, recipes, roles, effects, projectiles, audio, localization |
 
 Every domain-config codec must reject invalid identifiers, ranges, negative durations, mutually incompatible modes, and references to missing required content at load time. Validation errors must name the asset ID and field path.
@@ -257,9 +260,11 @@ Every domain-config codec must reject invalid identifiers, ranges, negative dura
 2. Add `Main`, retain `IncludesAssetPack: true`, and update the dependency range from `>=2.17.0` to `>=3.0.0 <4.0.0`.
 3. Package the unmodified asset trees and compare the JAR archive against the pre-conversion asset-pack ZIP.
 4. Introduce the public API adapter and diagnostics before enabling domain runtime features.
-5. Migrate current Draconic Stone and Miniwyvern behavior according to the dedicated specifications; never silently reinterpret a filled legacy stone.
-6. Remove any third-party flight dependency or documentation. Keep the existing Nordic Drake `TameworkAvatarFlight` integration and gate it with Tamework's Flightmaster's Talisman.
-7. Only after parity is proven may a separate change move assets into `src/main/resources`.
+5. Migrate untranslated/mismatched asset IDs to their documented English canonical IDs without duplicating or deleting persisted items; reject alias chains, cycles, and collisions.
+6. Add complete `en-US`, `pt-BR`, `de-DE`, `fr-FR`, and `es-ES` catalogs with identical keys and placeholders.
+7. Migrate current Draconic Stone and Miniwyvern behavior according to the dedicated specifications; never silently reinterpret a filled legacy stone.
+8. Remove any third-party flight dependency or documentation. Keep the existing Nordic Drake `TameworkAvatarFlight` integration and gate it with Tamework's Flightmaster's Talisman.
+9. Only after parity is proven may a separate change move assets into `src/main/resources`.
 
 ## 12. Acceptance criteria
 
@@ -272,6 +277,8 @@ Every domain-config codec must reject invalid identifiers, ranges, negative dura
 - Restarting during each multi-step mutation converges to one valid companion/profile/item outcome without duplicated items or companions.
 - Config reload failure leaves the last valid configuration active.
 - Packaging tests prove root-layout assets are included and `HyDragon.zip`, docs, build outputs, and IDE files are excluded.
+- Identifier validation rejects untranslated canonical asset IDs and unresolved legacy references outside the versioned migration allowlist.
+- All five required `server.lang` catalogs load successfully, contain identical HyDragon key/placeholder sets, and include reviewed locale-appropriate values.
 - The Miniwyvern capture path remains unavailable even though companion inventory is not part of the initial release.
 - Flying a configured dragon checks only Tamework's Flightmaster's Talisman.
 

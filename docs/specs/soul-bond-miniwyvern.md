@@ -142,10 +142,10 @@ When that update is implemented, the backpack feature is capability-gated. Missi
 
 | Archetype | Accepted essence semantic ID | Existing asset reuse |
 | --- | --- | --- |
-| Lightning | `lightning` | Storm/Thunder art may be adapted |
+| Lightning | `lightning` | Legacy Storm/Thunder art may be adapted, then renamed to canonical English Lightning asset filenames |
 | Wind | `wind` | New canonical essence and appearance required |
-| Ice | `ice` | Cryo assets may be adapted |
-| Fire | `fire` | Igne/Igneo assets may be adapted |
+| Ice | `ice` | Legacy Cryo art may be adapted, then renamed to canonical English Ice asset filenames |
+| Fire | `fire` | Legacy Igne/Igneo art may be adapted, then renamed to canonical English Fire asset filenames |
 | Water | `water` | New canonical essence and appearance required |
 | Nature | `nature` | Nature assets may be adapted |
 | Void | `void` | Void assets may be adapted |

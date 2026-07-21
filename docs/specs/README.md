@@ -16,6 +16,7 @@ Locked product decisions:
 - MVP stone maintenance is a short configurable summon/store swap cooldown plus death damage/Revitalizing Essence repair. Duration and energy budgets are deferred optional extensions.
 - A player may own multiple full dragons but have only one active full dragon; their one Soul Bond Miniwyvern uses a separate active group.
 - The Miniwyvern backpack and Tamework companion-inventory capability are deferred to a post-MVP update.
+- Canonical HyDragon asset IDs use English terminology. Every player-facing key ships in default English plus Brazilian Portuguese, German, French, and Spanish `server.lang` catalogs.
 
 ## 2. Documents
 
@@ -134,7 +135,7 @@ Every normative `HYD-*` requirement in this suite appears below. “Layer” ide
 | ID | Source/design intent | Layer | Tamework dependency | Acceptance |
 | --- | --- | --- | --- | --- |
 | `HYD-CONT-001` | Complete draconic/elemental material set | Assets | None | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
-| `HYD-CONT-002` | Preserve existing item IDs while filling semantic gaps | Assets + migration | None | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
+| `HYD-CONT-002` | Replace untranslated canonical IDs through lossless English-ID migration | Assets + migration | None | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
 | `HYD-CONT-003` | Dragons source crafting materials | Drop assets/config | None | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
 | `HYD-CONT-004` | Dedicated Draconic Altar replaces Arcanebench recipes | Bench/recipe assets | None | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
 | `HYD-CONT-005` | Altar crafts stones, repair essence, and Soul Bond | Recipe assets | None | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
@@ -149,6 +150,7 @@ Every normative `HYD-*` requirement in this suite appears below. “Layer” ide
 | `HYD-CONT-014` | Aerial fight must be lured to a capture-ready ground phase | Plugin + NPC/effect assets | Capture special-requirement hook | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
 | `HYD-CONT-015` | Rare encounters are concurrency/restart safe | Plugin persistence | Event/profile integration | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
 | `HYD-CONT-016` | Content/reference/test gate prevents partial species | Validation/test | Linked contracts | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
+| `HYD-CONT-017` | Complete English, Brazilian Portuguese, German, French, and Spanish localization | Language assets + validation | None | [Content §12](dragon-content-encounters.md#12-acceptance-criteria) |
 
 ## 6. Requirement and change-control rules
 
