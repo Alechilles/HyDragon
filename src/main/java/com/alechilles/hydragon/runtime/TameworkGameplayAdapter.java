@@ -9,6 +9,13 @@ import com.alechilles.alecstamework.api.BondedVesselView;
 import com.alechilles.alecstamework.api.CompanionProvisioningDisposition;
 import com.alechilles.alecstamework.api.CompanionProvisioningRequest;
 import com.alechilles.alecstamework.api.CompanionProvisioningResult;
+import com.alechilles.alecstamework.api.ProfileDataCompareAndSetRequest;
+import com.alechilles.alecstamework.api.ProfileDataCompareAndSetResult;
+import com.alechilles.alecstamework.api.ProfileDataEntryView;
+import com.alechilles.alecstamework.api.ProfileDataOperationView;
+import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
+import com.alechilles.alecstamework.api.ProvisionedCompanionTransition;
+import com.alechilles.alecstamework.api.ProvisionedCompanionTransitionRequest;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
 import java.util.EnumSet;
@@ -38,6 +45,10 @@ public final class TameworkGameplayAdapter {
             TameworkApiCapability.POPULATION_GROUPS,
             TameworkApiCapability.BONDED_VESSELS
     );
+    private static final EnumSet<TameworkApiCapability> PROFILE_DATA_TRANSACTION_CAPABILITIES = EnumSet.of(
+            TameworkApiCapability.PROFILE_DATA,
+            TameworkApiCapability.PROFILE_DATA_TRANSACTIONS
+    );
 
     private final TameworkApi api;
     private final EnumSet<TameworkApiCapability> capabilities;
@@ -55,17 +66,30 @@ public final class TameworkGameplayAdapter {
         return readiness(REPAIR_CAPABILITIES, null);
     }
 
-    /**
-     * ProfileDataApi 0.9 exposes put/delete but no revision-fenced compare-and-set or durable operation query.
-     * Therefore exact-once concurrent attunement is intentionally not advertised as ready.
-     */
     public Readiness attunementReadiness() {
-        Readiness base = readiness(EnumSet.of(TameworkApiCapability.PROFILE_DATA), null);
-        return base.ready()
-                ? new Readiness(false,
-                "Tamework 0.9 ProfileDataApi requires compareAndSet(profileId, namespace, key, "
-                        + "expectedRevision, operationId, payload) plus findOperation(namespace, operationId)")
-                : base;
+        return readiness(PROFILE_DATA_TRANSACTION_CAPABILITIES, null);
+    }
+
+    public Readiness abilityStateReadiness() {
+        return readiness(PROFILE_DATA_TRANSACTION_CAPABILITIES, null);
+    }
+
+    public Optional<ProfileDataEntryView> findVersionedProfileData(
+            String profileId,
+            String namespace,
+            String key) {
+        return api.profileData().getVersioned(profileId, namespace, key);
+    }
+
+    public CompletionStage<ProfileDataCompareAndSetResult> compareAndSetProfileData(
+            ProfileDataCompareAndSetRequest request) {
+        return api.profileData().compareAndSet(request);
+    }
+
+    public CompletionStage<Optional<ProfileDataOperationView>> findProfileDataOperation(
+            String namespace,
+            String operationId) {
+        return api.profileData().findOperation(namespace, operationId);
     }
 
     public CompletionStage<CompanionProvisioningResult> provisionDormantMiniwyvern(
@@ -84,6 +108,26 @@ public final class TameworkGameplayAdapter {
                 null,
                 null,
                 CompanionProvisioningRequest.CURRENT_POLICY_REVISION
+        ));
+    }
+
+    public CompletionStage<CompanionProvisioningResult> activateDormantMiniwyvern(
+            UUID playerUuid,
+            String operationId,
+            String profileId,
+            long expectedProfileRevision,
+            String ownershipWorldName,
+            int chunkX,
+            int chunkZ) {
+        return api.companionProvisioning().transition(new ProvisionedCompanionTransitionRequest(
+                CALLER_NAMESPACE,
+                operationId,
+                playerUuid,
+                profileId,
+                expectedProfileRevision,
+                ProvisionedCompanionTransition.ACTIVATE,
+                ownershipWorldName,
+                new PopulationAdmissionLocation(ownershipWorldName, chunkX, chunkZ)
         ));
     }
 
