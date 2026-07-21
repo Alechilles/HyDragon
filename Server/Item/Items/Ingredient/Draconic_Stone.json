@@ -136,6 +136,29 @@
       "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
       "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
     },
+    "Active": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Active.name",
+        "Description": "server.items.Draconic_Stone_Active.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [
+            {
+              "Type": "TameworkSpawn"
+            }
+          ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": {
+        "Color": "#5AD9FF",
+        "Radius": 3
+      },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
+    },
     "Damaged": {
       "Variant": true,
       "TranslationProperties": {
