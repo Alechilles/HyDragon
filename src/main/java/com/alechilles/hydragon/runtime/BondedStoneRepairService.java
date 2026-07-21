@@ -128,8 +128,7 @@ public final class BondedStoneRepairService {
     private CompletionStage<GameplayResult> afterCommit(BondedVesselTransitionRequest request,
                                                          ConsumableReservation essence,
                                                          BondedVesselOperationResult result) {
-        if (result.status() == BondedVesselOperationResult.Status.COMMITTED
-                || result.status() == BondedVesselOperationResult.Status.APPLIED) {
+        if (result.status() == BondedVesselOperationResult.Status.COMMITTED) {
             OperationJournal.Decision closed = journal.transition(
                     essence.operationId(), OperationJournal.Phase.MATERIAL_CONSUMED,
                     OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
@@ -137,6 +136,10 @@ public final class BondedStoneRepairService {
                     closed == OperationJournal.Decision.APPLIED || closed == OperationJournal.Decision.ALREADY_APPLIED
                             ? GameplayResult.applied("bonded stone repaired")
                             : GameplayResult.reconciliation("repair applied; local journal closure is pending"));
+        }
+        if (result.status() == BondedVesselOperationResult.Status.APPLIED) {
+            return java.util.concurrent.CompletableFuture.completedFuture(
+                    GameplayResult.reconciliation("repair applied; Tamework source closure is still pending"));
         }
         return recoverAfterMaterial(request, essence);
     }
@@ -149,12 +152,15 @@ public final class BondedStoneRepairService {
                         GameplayResult.reconciliation("repair authority is indeterminate; no refund permitted"));
             }
             BondedVesselOperationView view = found.orElseThrow();
-            if (view.status() == BondedVesselDurableOperationStatus.COMMITTED
-                    || view.status() == BondedVesselDurableOperationStatus.APPLIED) {
+            if (view.status() == BondedVesselDurableOperationStatus.COMMITTED) {
                 journal.transition(essence.operationId(), OperationJournal.Phase.MATERIAL_CONSUMED,
                         OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
                 return java.util.concurrent.CompletableFuture.completedFuture(
                         GameplayResult.applied("bonded stone repaired"));
+            }
+            if (view.status() == BondedVesselDurableOperationStatus.APPLIED) {
+                return java.util.concurrent.CompletableFuture.completedFuture(
+                        GameplayResult.reconciliation("repair applied; Tamework source closure is still pending"));
             }
             if (view.status() != BondedVesselDurableOperationStatus.TERMINAL_DENIED) {
                 return java.util.concurrent.CompletableFuture.completedFuture(
