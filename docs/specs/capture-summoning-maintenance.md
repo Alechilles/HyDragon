@@ -34,7 +34,7 @@ Related specifications:
 
 - **HYD-CAP-001:** Initial Draconic Stone capture MUST allow only configured wild full-dragon roles; storing may target only the exact linked tamed full-dragon profile. Miniwyvern roles MUST always be denied, including after config reload or capability degradation.
 - **HYD-CAP-002:** A wild capture attempt MUST require a living target, capture-eligible role, range and line-of-interaction validity, health at or below the configured threshold, and `Tw_Status_Tranquilized`. The current 20% health threshold is the initial default.
-- **HYD-CAP-003:** HyDragon MUST ship Iron, Thorium, Cobalt, Adamantium, and Ancient/Mithril stone tiers with strictly increasing capture power. The existing `Draconic_Stone` item ID remains the Iron-tier compatibility ID.
+- **HYD-CAP-003:** HyDragon MUST ship Iron, Thorium, Cobalt, Adamantium, and Ancient/Mithril stone tiers with strictly increasing capture power. The current English `Draconic_Stone` source asset becomes the canonical Iron-tier item.
 - **HYD-CAP-004:** Each full-dragon species/difficulty MUST declare capture resistance, minimum eligible stone tier, base chance or modifier inputs, and whether special encounter conditions are required.
 - **HYD-CAP-005:** The Ancient/Mithril tier MUST succeed with 100% probability once every non-probability eligibility condition is satisfied. It MUST NOT bypass health, tranquilizer, ownership, encounter, capacity, or role requirements.
 - **HYD-CAP-006:** Capture validation and the random roll MUST execute within the Tamework capture-policy transaction. HyDragon MUST provide policy inputs and presentation but MUST NOT perform an independent pre-roll.
@@ -45,7 +45,7 @@ Related specifications:
 - **HYD-CAP-008:** A successful capture MUST atomically tame/assign the dragon, create or preserve one canonical Tamework profile, and bind that profile to the stone used for capture.
 - **HYD-CAP-009:** The bonded item MUST remain linked while the dragon is stored, active, dead, damaged, unloaded, or temporarily unavailable. Summoning MUST NOT turn it back into an unlinked empty capture item.
 - **HYD-CAP-010:** The vessel lifecycle MUST implement the states and transitions in section 5, with item appearance and interaction availability derived from authoritative lifecycle state.
-- **HYD-CAP-011:** Every full-dragon species MUST join population group `hydragon:full_dragons`, configured as unlimited owned and one active per owner. Summon, revive, migration, and encounter-recovery paths MUST all use Tamework admission rather than a HyDragon-only count.
+- **HYD-CAP-011:** Every full-dragon species MUST join population group `hydragon:full_dragons`, configured as unlimited owned and one active per owner. Summon, revive, and encounter-recovery paths MUST all use Tamework admission rather than a HyDragon-only count.
 - **HYD-CAP-012:** The owner MUST be able to summon a stored healthy dragon, store the active linked dragon, recall it, issue supported combat/follow commands, and inspect why an unavailable state cannot transition.
 - **HYD-CAP-013:** Store/recall MUST act only on the stone's linked profile. Proximity lookup, role lookup, or a newly spawned replacement MUST never substitute for an unavailable linked dragon.
 
@@ -57,7 +57,7 @@ Related specifications:
 - **HYD-CAP-017:** When a bonded full dragon dies, Tamework's death record MUST be preserved and the vessel MUST become `DAMAGED`. A damaged stone cannot summon until repaired and must use cracked/red/weakened visual treatment.
 - **HYD-CAP-018:** Repair MUST verify the owner, linked dead profile, damaged state, Revitalizing Essence input, and population admission before committing. Success consumes the configured essence quantity exactly once, invokes the Tamework recovery/revive contract, restores `BONDED_STORED`, and never creates a new profile.
 - **HYD-CAP-019:** All lifecycle, cooldown, ownership, and operation identifiers MUST survive server restart, item movement, player logout, chunk unload, and ordinary Tamework capture/profile persistence.
-- **HYD-CAP-020:** Legacy stones and captured companions MUST migrate non-destructively according to section 10. Ambiguous or duplicated links MUST be quarantined from activation and reported, not guessed or deleted.
+- **HYD-CAP-020:** The first release MUST use only the canonical bonded-stone/profile model defined here. It MUST NOT ship readers, aliases, adoption flows, or compatibility states for development-only pre-release stone data.
 
 ## 4. Stone tier and policy data
 
@@ -65,7 +65,7 @@ Related specifications:
 
 | Tier | Capture power | Item ID | Material identity | Rule |
 | --- | ---: | --- | --- | --- |
-| Iron | 1 | `Draconic_Stone` | Iron | Preserves the shipped item ID |
+| Iron | 1 | `Draconic_Stone` | Iron | Canonical base asset |
 | Thorium | 2 | `Draconic_Stone_Thorium` | Thorium | New asset |
 | Cobalt | 3 | `Draconic_Stone_Cobalt` | Cobalt | New asset |
 | Adamantium | 4 | `Draconic_Stone_Adamantium` | Adamantium | New asset |
@@ -212,7 +212,7 @@ Repair MUST use the durable cross-plugin saga defined by Tamework's [bonded-vess
 
 Restart recovery MUST query Tamework by caller/idempotency key rather than persist a process-local preparation token.
 
-The config schema may reserve namespaced data for a future `DURATION` or `ENERGY` extension, but those modes are not release requirements. If implemented later, they must be mutually exclusive, reuse the Tamework bonded-vessel lifecycle, and receive their own acceptance tests and migration rules. MVP must not drain energy, auto-store on a timer, or use Revitalizing Essence as routine fuel.
+The config schema may reserve namespaced data for a future `DURATION` or `ENERGY` extension, but those modes are not release requirements. If implemented later, they must be mutually exclusive, reuse the Tamework bonded-vessel lifecycle, and receive their own acceptance tests and data-version contract. MVP must not drain energy, auto-store on a timer, or use Revitalizing Essence as routine fuel.
 
 ## 9. Failure and concurrency safety
 
@@ -223,13 +223,13 @@ The config schema may reserve namespaced data for a future `DURATION` or `ENERGY
 - A dropped stolen stone remains linked to its original owner. A non-owner can inspect it but cannot summon, store, repair, or transfer it.
 - Administrative recovery must relink or return the unique vessel; it must never clone the profile into a second stone.
 
-## 10. Current-state migration
+## 10. Pre-release asset and configuration changes
 
-Current implementation gaps and migrations:
+Current implementation gaps and required first-release changes:
 
-| Current state | Required migration |
+| Current state | Required change |
 | --- | --- |
-| One `Draconic_Stone` tier | Preserve ID as Iron; add four tiers and parented Tamework configs |
+| One `Draconic_Stone` tier | Use it as the canonical Iron tier; add four tiers and parented Tamework configs |
 | Capture is deterministic | Introduce Tamework capture-policy data; Ancient only is guaranteed |
 | One allowlist mixes wild capture and tamed roles | Restrict initial capture to wild roles; use the bonded-vessel store path only for the exact linked tamed profile |
 | Filled state returns to empty on spawn | Enable the Tamework bonded-vessel mode; never clear the link on summon |
@@ -239,15 +239,13 @@ Current implementation gaps and migrations:
 | No damaged/active item states | Add item variants, icons/models, localization, and lifecycle mapping |
 | No HyDragon command asset/config | Add a role-scoped command surface or expose equivalent bonded-stone actions |
 
-Legacy filled stones require a migration reader for the prior captured metadata. If exactly one valid profile can be resolved, it becomes that item's bonded link. If zero or multiple profiles resolve, the item is preserved but set `UNAVAILABLE`, and diagnostics provide an operator recovery path.
-
-Legacy captured Miniwyverns follow the migration rules in [Soul Bond and Miniwyvern](soul-bond-miniwyvern.md); they are never converted into full-dragon vessels.
+HyDragon has never been released. Development-only filled stones, captured profiles, and test worlds are not supported upgrade inputs and may be reset while implementing this model. The release MUST NOT contain a reader or compatibility path for their earlier formats.
 
 ## 11. Configuration and asset map
 
 | Asset/config | Work |
 | --- | --- |
-| `Server/Item/Items/Ingredient/Draconic_Stone.json` | Preserve as Iron; add bonded/active/damaged presentation and new interaction mapping |
+| `Server/Item/Items/Ingredient/Draconic_Stone.json` | Use as canonical Iron; add bonded/active/damaged presentation and new interaction mapping |
 | `Server/Item/Items/Ingredient/Draconic_Stone_{Thorium,Cobalt,Adamantium,Ancient}.json` | New tier items and recipes |
 | `Server/Tamework/Items/Spawners/HyDragonDraconicStone*.json` | Tiered stone power, probability mode, and bonded-vessel declarations; no Miniwyvern roles |
 | `Server/Tamework/CapturePolicies/HyDragonDragons.json` | Per-role capture resistance, minimum power, chance multiplier, missing-health bonus, and Ancient-tier guarantee |
@@ -273,6 +271,7 @@ These paths match the config families fixed by the [Tamework integration contrac
 - Summon/store swap cooldown survives restart, blocks rapid swapping without altering the active dragon, and reports its remaining duration.
 - Dragon death produces a damaged stone; a repeated repair request consumes one essence and restores one profile.
 - Non-owner, inventory-full, unsafe-placement, missing-capability, and restart-mid-operation tests leave recoverable state and no duplicates.
+- A clean first-release installation uses only the canonical bonded-stone schema and contains no pre-release compatibility reader, alias, or adoption path.
 
 ## 13. Phased dependencies
 
@@ -280,6 +279,6 @@ These paths match the config families fixed by the [Tamework integration contrac
 | --- | --- | --- |
 | C0 | Remove Miniwyvern from stone allowlist; add role/content validation | Existing public API |
 | C1 | Add tier items, recipes, species capture data, and UX | [Capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) |
-| C2 | Convert filled stones to persistent bonded states | [Bonded vessels](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/bonded-vessels.md) |
+| C2 | Implement persistent bonded-stone states | [Bonded vessels](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/bonded-vessels.md) |
 | C3 | Enforce one active full dragon | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) |
-| C4 | Add swap cooldown, death damage, repair, and migration | C1-C3 and [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) |
+| C4 | Add swap cooldown, death damage, repair, and restart recovery | C1-C3 and [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) |

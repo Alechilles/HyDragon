@@ -7,7 +7,7 @@ Scope: The unique, Soul Bond-exclusive Miniwyvern companion
 
 The Draconic Soul Bond grants each player one persistent Miniwyvern. The companion stays small, follows and assists its owner, and may be re-attuned to seven elemental archetypes. It is not a capturable dragon and does not occupy the one-active-full-dragon slot. A small backpack is planned for a later update and is not part of the initial plugin release.
 
-HyDragon owns the one-time entitlement, elemental meanings, abilities, presentation, and migration policy. Tamework owns canonical companion profiles, active population admission, dynamic attachments, and lifecycle events. The deferred backpack will use Tamework's future generic companion inventory rather than a HyDragon-local storage system.
+HyDragon owns the one-time entitlement, elemental meanings, abilities, and presentation. Tamework owns canonical companion profiles, active population admission, dynamic attachments, and lifecycle events. The deferred backpack will use Tamework's future generic companion inventory rather than a HyDragon-local storage system.
 
 Related specifications:
 
@@ -58,8 +58,11 @@ Related specifications:
 - **HYD-SOUL-016:** Fire MUST use frequent fireball attacks with damage-over-time; Water MUST provide burst combat healing; Nature MUST provide lower-intensity periodic regeneration for sustained support.
 - **HYD-SOUL-017:** Void MUST use projectiles or pulses that apply a bounded defense-reduction debuff. No archetype may apply an unbounded stacking modifier.
 - **HYD-SOUL-018:** Archetype buffs, debuffs, healing, targeting, cooldowns, and stacking rules MUST be data-driven, source-keyed, owner-safe, world-thread-safe, and removed or reconciled when the Miniwyvern is inactive, dead, re-attuned, or no longer owned.
-- **HYD-SOUL-019:** Legacy Miniwyvern profiles/items MUST migrate without deletion or duplicate entitlement. Ambiguous cases MUST be inactive and operator-resolvable as defined in section 11.
-- **HYD-SOUL-020:** Soul Bond creation, attunement, ability, death/recovery, and migration behavior MUST pass the MVP acceptance matrix in section 13 before the initial plugin release. The deferred backpack has a separate later release gate.
+
+### First-release constraints
+
+- **HYD-SOUL-019:** The first release MUST create Miniwyverns only through the Soul Bond entitlement flow. It MUST NOT ship a captured-Miniwyvern adoption path or compatibility state for development-only pre-release profiles/items.
+- **HYD-SOUL-020:** Soul Bond creation, attunement, ability, and death/recovery behavior MUST pass the MVP acceptance matrix in section 13 before the initial plugin release. The deferred backpack has a separate later release gate.
 
 ## 4. Player and profile data model
 
@@ -134,7 +137,7 @@ Required behavior:
 - Death does not spill contents by default.
 - Full/incompatible item restrictions, if added later, are Tamework inventory policy rather than hardcoded slot logic.
 
-When that update is implemented, the backpack feature is capability-gated. Missing inventory support leaves the companion and its existing inventory data intact while removing only the open-backpack action. Until then, HyDragon does not query `COMPANION_INVENTORY` or register a backpack action.
+When that update is implemented, the backpack feature is capability-gated. Missing inventory support removes only the open-backpack action and does not affect the companion lifecycle. Until then, HyDragon does not query `COMPANION_INVENTORY` or register a backpack action.
 
 ## 8. Attunement transaction
 
@@ -142,15 +145,15 @@ When that update is implemented, the backpack feature is capability-gated. Missi
 
 | Archetype | Accepted essence semantic ID | Existing asset reuse |
 | --- | --- | --- |
-| Lightning | `lightning` | Legacy Storm/Thunder art may be adapted, then renamed to canonical English Lightning asset filenames |
+| Lightning | `lightning` | Current Storm/Thunder source art may be adapted, then renamed to canonical English Lightning asset filenames |
 | Wind | `wind` | New canonical essence and appearance required |
-| Ice | `ice` | Legacy Cryo art may be adapted, then renamed to canonical English Ice asset filenames |
-| Fire | `fire` | Legacy Igne/Igneo art may be adapted, then renamed to canonical English Fire asset filenames |
+| Ice | `ice` | Current Cryo source art may be adapted, then renamed to canonical English Ice asset filenames |
+| Fire | `fire` | Current Igne/Igneo source art may be adapted, then renamed to canonical English Fire asset filenames |
 | Water | `water` | New canonical essence and appearance required |
 | Nature | `nature` | Nature assets may be adapted |
 | Void | `void` | Void assets may be adapted |
 
-Item IDs and compatibility mappings are defined in [Dragon content and encounters](dragon-content-encounters.md).
+Canonical item IDs and direct pre-release renames are defined in [Dragon content and encounters](dragon-content-encounters.md).
 
 ### Transaction order
 
@@ -209,7 +212,7 @@ If the base game cannot safely express one requested modifier, that ability must
 ### Plugin runtime work
 
 - Once-per-player ledger and crash-safe claim transaction.
-- Provisioned-profile creation/link reconciliation and migration.
+- Provisioned-profile creation/link reconciliation.
 - Attunement interaction extension and atomic essence consumption.
 - Ability scheduler/targeting and source-keyed buff/debuff cleanup.
 - Capability gating and operator diagnostics.
@@ -220,16 +223,14 @@ If the base game cannot safely express one requested modifier, that ability must
 - Group limit `one owned / one active` enforcement.
 - Post-MVP only: generic nine-slot inventory persistence/UI/transactions.
 
-## 11. Current-state migration
+## 11. Pre-release configuration cleanup
 
-Miniwyvern is currently allowed by `Server/Tamework/Items/Spawners/HyDragonDraconicStone.json` even though it has no production world spawn. Migration must occur before Soul Bond release:
+Miniwyvern is currently allowed by `Server/Tamework/Items/Spawners/HyDragonDraconicStone.json` even though it has no production world spawn. Before the first release:
 
 1. Remove `Wyvern_Mini`, `Tamed_Wyvern_Mini`, and the corresponding tamed-role override from every stone config.
-2. Do not delete any existing Miniwyvern profile, live entity, or filled legacy item.
-3. For an owner with exactly one valid pre-existing Miniwyvern and no Soul Bond record, offer/perform an idempotent legacy adoption that links that profile and marks the entitlement `CLAIMED` without consuming a Soul Bond item.
-4. If an owner has multiple candidate profiles, admit none as a second active Miniwyvern. Mark `NEEDS_OPERATOR`, preserve every profile/item, and provide deterministic diagnostics so the owner/operator can choose the canonical profile.
-5. If a legacy filled stone holds the chosen Miniwyvern, detach it through the Tamework migration contract and return/preserve the now-empty full-dragon stone only after the Soul Bond link commits.
-6. Existing appearance texture alone must not infer an archetype. Use explicit known metadata mappings; otherwise migrate to `neutral` and preserve the old appearance reference for operator review.
+2. Remove any development-only capture/adoption configuration and start the released entitlement ledger at `UNCLAIMED` for every player.
+3. Do not implement profile adoption, filled-stone conversion, alias states, or other compatibility behavior for pre-release Miniwyvern data.
+4. Reset development/test profiles or worlds when needed to validate the clean first-release path.
 
 ## 12. Configuration and asset map
 
@@ -241,7 +242,7 @@ Miniwyvern is currently allowed by `Server/Tamework/Items/Spawners/HyDragonDraco
 | `Server/Tamework/Interactions/HyDragonIntWyvernMini.json` | MVP Feed, mode, and attunement entry points; backpack action added only in the later update |
 | Tamework population-group asset path | `hydragon:soulbound_mini`, one owned/one active |
 | Deferred Tamework companion-inventory asset path | Post-MVP nine-slot owner-only backpack |
-| `Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/` | Tamed role; wild role retained only if required internally/migration |
+| `Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/` | Tamed role; wild role retained only if required internally for provisioning |
 | `Server/Models/HyDragon/Wyvern_Mini/` | Neutral and archetype appearances |
 | `Common/NPC/HyDragon/Wyvern_Mini/` | Model, textures, animations |
 | `Server/Projectiles/HyDragon/Wyvern_Mini/` | Fire/Ice/Void/etc. projectile assets |
@@ -260,7 +261,7 @@ Final Tamework asset paths must follow its linked specifications rather than ill
 - Each essence changes the same profile to the correct appearance and behavior while preserving name, health ratio, and progression.
 - Repeated/retried attunement consumes one essence, not zero or two, and removes the previous archetype's runtime effects.
 - Buff/debuff tests prove source-keyed refresh, configured caps, friendly-target rejection, and cleanup on inactive/dead/re-attuned state.
-- Legacy adoption preserves all profiles/items and requires operator choice for ambiguous ownership instead of deleting extras.
+- A clean installation has no Miniwyvern capture/adoption path: every owned Miniwyvern originates from one committed Soul Bond claim.
 
 Deferred backpack acceptance, not part of the initial release gate:
 

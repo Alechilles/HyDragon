@@ -25,7 +25,7 @@ The plugin must not replace static spawning or crafting that these schemas alrea
 ### Materials and crafting
 
 - **HYD-CONT-001:** HyDragon MUST ship Draconic Essence, Draconic Scale, Revitalizing Essence, and seven elemental essence semantics: Fire, Ice, Water, Nature, Lightning, Wind, and Void.
-- **HYD-CONT-002:** Every canonical HyDragon asset ID and asset filename MUST use clear English terminology. The legacy IDs `Draconic_Essence_Igne`, `Draconic_Essence_Cryo`, and `Draconic_Essence_Storm` MUST migrate respectively to `Draconic_Essence_Fire`, `Draconic_Essence_Ice`, and `Draconic_Essence_Lightning`; they MUST NOT remain canonical recipe, drop, config, or API outputs.
+- **HYD-CONT-002:** Every canonical HyDragon asset ID and asset filename MUST use clear English terminology. Before the first release, the current source IDs `Draconic_Essence_Igne`, `Draconic_Essence_Cryo`, and `Draconic_Essence_Storm` MUST be renamed respectively to `Draconic_Essence_Fire`, `Draconic_Essence_Ice`, and `Draconic_Essence_Lightning`, with every reference updated in the same change. HyDragon MUST NOT ship aliases, compatibility shims, or persisted-item conversion code for these unreleased IDs.
 - **HYD-CONT-003:** Full-dragon drop lists MUST provide configured sources for Draconic Scale, generic Draconic Essence, and applicable elemental essences. Drop chance and quantity MUST be balance data per species/difficulty.
 - **HYD-CONT-004:** HyDragon MUST add a placeable Draconic Altar crafting bench with dedicated categories and localized presentation. Draconic Stones, Revitalizing Essence, and Draconic Soul Bond MUST require that altar rather than `Arcanebench`.
 - **HYD-CONT-005:** The altar MUST provide recipes for all five stone tiers, Revitalizing Essence, and Draconic Soul Bond. Stone recipes MUST use the corresponding Iron, Thorium, Cobalt, Adamantium, or Mithril/Ancient material plus configured draconic ingredients.
@@ -45,7 +45,7 @@ The plugin must not replace static spawning or crafting that these schemas alrea
 - **HYD-CONT-013:** HyDragon MUST support a special high-altitude encounter whose admission verifies the eligible player has an active, rideable avatar-flight dragon and access to Tamework's Flightmaster's Talisman.
 - **HYD-CONT-014:** The high-altitude encounter MUST begin as an aerial confrontation, require a configured lure/stagger sequence before the target becomes grounded, and open capture eligibility only after the grounded condition is authoritative.
 - **HYD-CONT-015:** Plugin-controlled encounters MUST enforce per-region/global concurrency, player-safe placement, deterministic ownership/credit, cleanup, retry cooldown, and restart reconciliation without duplicating or silently deleting a target.
-- **HYD-CONT-016:** Content assets, domain configs, migrations, and all static/dynamic spawn paths MUST pass schema/reference validation and the acceptance criteria in section 12 before release.
+- **HYD-CONT-016:** Content assets, domain configs, and all static/dynamic spawn paths MUST pass schema/reference validation and the acceptance criteria in section 12 before release.
 
 ### Localization and naming
 
@@ -60,7 +60,7 @@ The plugin must not replace static spawning or crafting that these schemas alrea
 | Rock Drake T1/T2/T3 | Wild tiers, combat, cave spawn patches | Add tamed mappings, capture declarations, commands, mount policy, and tier metadata |
 | Miniwyvern | Wild/tamed roles and basic feed/follow assets, no world spawn, incorrectly capturable | Remove ordinary capture; keep production wild spawning disabled; implement Soul Bond lifecycle/archetypes |
 | Draconic Stone | One recipe at `Arcanebench` | Treat existing ID as Iron; add four tiers and altar-only recipes |
-| Essences | Legacy Cryo, Igne, Nature, Storm, and Void assets; current dragon drops primarily source Cryo/Nature | Rename untranslated/mismatched IDs to canonical English, migrate old stacks, add generic/Water/Wind/Revitalizing, and configure drop sources for the full set |
+| Essences | Current Cryo, Igne, Nature, Storm, and Void source assets; current dragon drops primarily source Cryo/Nature | Rename untranslated/mismatched IDs directly to canonical English, update every reference, add generic/Water/Wind/Revitalizing, and configure drop sources for the full set |
 | Draconic Scale | Item and some drops | Retain; tune per-species sourcing |
 | Draconic Altar | Missing | Add bench block/model/icon/categories/recipes/localization |
 
@@ -68,40 +68,40 @@ The plugin must not replace static spawning or crafting that these schemas alrea
 
 ### 5.1 Canonical English semantic map
 
-| Semantic ID | Player-facing name | Item ID | Migration rule |
+| Semantic ID | Player-facing name | Item ID | Pre-release asset work |
 | --- | --- | --- | --- |
 | `draconic` | Draconic Essence | `Draconic_Essence` | New |
 | `scale` | Draconic Scale | `Draconic_Scale` | Preserve |
-| `fire` | Fire Essence | `Draconic_Essence_Fire` | Migrate `Draconic_Essence_Igne` one-to-one |
-| `ice` | Ice Essence | `Draconic_Essence_Ice` | Migrate `Draconic_Essence_Cryo` one-to-one |
+| `fire` | Fire Essence | `Draconic_Essence_Fire` | Rename current `Draconic_Essence_Igne` asset and references |
+| `ice` | Ice Essence | `Draconic_Essence_Ice` | Rename current `Draconic_Essence_Cryo` asset and references |
 | `water` | Water Essence | `Draconic_Essence_Water` | New |
 | `nature` | Nature Essence | `Draconic_Essence_Nature` | Preserve |
-| `lightning` | Lightning Essence | `Draconic_Essence_Lightning` | Migrate `Draconic_Essence_Storm` one-to-one |
+| `lightning` | Lightning Essence | `Draconic_Essence_Lightning` | Rename current `Draconic_Essence_Storm` asset and references |
 | `wind` | Wind Essence | `Draconic_Essence_Wind` | New |
 | `void` | Void Essence | `Draconic_Essence_Void` | Preserve |
 | `revitalizing` | Revitalizing Essence | `Revitalizing_Essence` | New |
 
-Semantic IDs insulate Java/config logic from legacy flavor names. New recipes and archetype definitions reference semantic IDs through validated config; item interactions resolve them only to the canonical English item IDs.
+Semantic IDs insulate Java/config logic from asset filenames. New recipes and archetype definitions reference semantic IDs through validated config; item interactions resolve them only to the canonical English item IDs.
 
-### 5.2 English identifier and migration policy
+### 5.2 English identifier policy and pre-release cleanup
 
 Canonical asset IDs, JSON filenames, model/texture/icon filenames, config IDs, localization-key ID segments, and references MUST use English descriptive terms. Proper nouns such as Hydra and Nordic Drake, stable Tamework IDs, and engine-defined schema/type names are not translations and remain unchanged.
 
-The release adds a versioned one-to-one legacy map under `Server/HyDragon/Migrations/LegacyAssetIds.json`. At minimum it contains:
+The current worktree contains three untranslated or semantically mismatched source IDs that must be renamed before release:
 
-| Legacy source ID | Canonical target ID |
+| Current source ID | Required canonical ID |
 | --- | --- |
 | `Draconic_Essence_Igne` | `Draconic_Essence_Fire` |
 | `Draconic_Essence_Cryo` | `Draconic_Essence_Ice` |
 | `Draconic_Essence_Storm` | `Draconic_Essence_Lightning` |
 
-Migration MUST update recipes, drops, item assets, icons, textures, models, projectile references, Tamework/HyDragon configs, localization keys, tests, and supported persisted item locations. Stack quantity and compatible metadata are preserved. The migration is idempotent, rejects chains/cycles/colliding targets, and never turns one legacy stack into both legacy and canonical copies.
+The rename change MUST update recipes, drops, item assets, icons, textures, models, projectile references, Tamework/HyDragon configs, localization keys, and tests together. The repository must have no unresolved references to the replaced IDs after the rename.
 
-Legacy IDs may exist temporarily only as non-obtainable, explicitly allowlisted compatibility shims while persisted-location coverage is incomplete. No new recipe, drop, command, config, or API result may create them. Once migration coverage is verified, the shims are removed; untranslated IDs never remain canonical.
+HyDragon has never been released, so there are no supported player inventories, profiles, worlds, or public API consumers containing these IDs. The first release MUST NOT include an alias registry, compatibility items, old localization keys, persisted-item conversion, or any other runtime upgrade path for them. Development/test worlds may be reset when the pre-release schema or IDs change.
 
-The repository validator scans asset filenames and identifier-bearing JSON/string fields. Any non-English or legacy identifier outside the versioned migration allowlist fails release validation.
+The repository validator scans asset filenames and identifier-bearing JSON/string fields. Any untranslated replaced identifier fails release validation.
 
-Revision note (2026-07-21): this replaces the earlier `HYD-CONT-002` policy that preserved Igne/Cryo/Storm as canonical item IDs. The new policy favors English canonical IDs while retaining player inventory through explicit migration.
+Revision note (2026-07-21): this replaces the earlier `HYD-CONT-002` compatibility policy. Because HyDragon has never been released, the incorrect source IDs are renamed directly and receive no runtime compatibility layer.
 
 ### 5.3 Localization catalogs
 
@@ -278,9 +278,9 @@ The existing Hydra interaction currently exposes Mount while the tamed role is n
 ## 12. Acceptance criteria
 
 - Asset validation finds every required item, icon/model, recipe input, drop reference, species role, tamed mapping, effect, projectile, and localization key.
-- Canonical-ID validation finds no untranslated or legacy asset ID outside the explicit migration allowlist; all recipe/drop/config/model/texture/icon/localization references resolve to the English canonical IDs.
-- Only the Draconic Altar lists recipes for the five stones, Revitalizing Essence, and Soul Bond after migration; crafting consumes/produces the configured quantities once.
-- Existing Igne, Cryo, and Storm stacks migrate exactly once to Fire, Ice, and Lightning without quantity/metadata loss; Nature and Void remain valid; legacy IDs are no longer obtainable.
+- Canonical-ID validation finds no untranslated replaced asset ID, alias, or compatibility shim; all recipe/drop/config/model/texture/icon/localization references resolve directly to the English canonical IDs.
+- Only the Draconic Altar lists recipes for the five stones, Revitalizing Essence, and Soul Bond after the pre-release content update; crafting consumes/produces the configured quantities once.
+- The release artifact contains Fire, Ice, and Lightning—not Igne, Cryo, or Storm—as the canonical essence IDs, and no runtime conversion code exists for the unreleased names.
 - The five `server.lang` catalogs have identical key sets and placeholder signatures, load without parser errors, and show reviewed English, Brazilian Portuguese, German, French, and Spanish values for every HyDragon player-facing string.
 - Hydra and each Rock Drake tier spawn only in their configured supported ordinary conditions; Nordic's selected spawn/encounter path is discoverable; Miniwyvern never appears through production spawning.
 - Every capture-eligible wild role resolves to one valid tamed role and species capture record.
@@ -290,10 +290,10 @@ The existing Hydra interaction currently exposes Mount while the tamed role is n
 - The aerial target cannot be captured before the grounded phase; grounding retains health/tranquilizer/minimum-tier requirements.
 - Capture at the cleanup boundary produces one captured profile and no subsequent encounter despawn or replacement.
 
-## 13. Current-state migration
+## 13. Pre-release implementation sequence
 
-1. Add the English canonical asset IDs, migration map, and five complete localization catalogs before any new recipe/drop emits renamed items.
-2. Migrate legacy Igne/Cryo/Storm references and persisted stacks to Fire/Ice/Lightning; retain a non-obtainable shim only where unverified persisted-location coverage requires it.
+1. Rename the current Igne/Cryo/Storm source assets and all references directly to Fire/Ice/Lightning; do not add aliases, shims, or persisted-data readers.
+2. Add the five complete localization catalogs using only the canonical English localization keys.
 3. Add missing generic, Water, Wind, and Revitalizing item assets and semantic mappings.
 4. Add the Draconic Altar and move the current stone recipe off `Arcanebench` only when the altar is available in the same release.
 5. Normalize existing Hydra/Rock spawn patches into the documented species records while preserving intended weights/conditions.
@@ -303,13 +303,13 @@ The existing Hydra interaction currently exposes Mount while the tamed role is n
 9. Resolve Hydra's Mount interaction/role mismatch.
 10. Preserve Tamework's Nordic flight integration and delete stale documentation or metadata describing another flight dependency.
 
-No migration may delete unknown player items, profiles, or live entities. Broken references are disabled and reported.
+No release artifact may retain a reference to a replaced pre-release identifier. Broken references fail validation rather than being handled by a runtime compatibility path.
 
 ## 14. Phased dependencies
 
 | Phase | Asset/config work | Plugin/runtime work | Dependency |
 | --- | --- | --- | --- |
-| D0 | English canonical-ID migration, missing items, and five complete locale catalogs | Identifier/localization/config validation | [Plugin architecture](plugin-architecture.md) A0-A2 |
+| D0 | Direct English canonical-ID cleanup, missing items, and five complete locale catalogs | Identifier/localization/config validation | [Plugin architecture](plugin-architecture.md) A0-A2 |
 | D1 | Draconic Altar and recipes | None beyond validation | Hytale `CraftingRecipe` 0.5.6 contract |
 | D2 | Complete tamed roles, commands, drops, ordinary spawns | Species repository | Tamework 3.0.0 and [capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) |
 | D3 | Ground/avatar-flight content and verification | Talisman capability/status messaging | Tamework avatar flight |

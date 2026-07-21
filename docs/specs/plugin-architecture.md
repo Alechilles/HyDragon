@@ -30,7 +30,7 @@ Normative Tamework dependencies:
 
 1. HyDragon becomes one distributable JAR containing Java classes and the existing asset pack.
 2. The first conversion keeps `Common/`, `Server/`, and `manifest.json` at the repository root and configures Maven to package them at the JAR root.
-3. A later move to `src/main/resources` is optional and must be a deliberate, separately tested migration. It is not a prerequisite for the plugin conversion.
+3. A later move to `src/main/resources` is optional and must be a deliberate, separately tested relocation. It is not a prerequisite for the plugin conversion.
 4. HyDragon depends on Tamework `>=3.0.0 <4.0.0` and uses only Tamework's public API and documented asset contracts. The new integration surface targets public API `0.9.0`; individual capability checks remain authoritative.
 5. Runtime features perform capability checks even when the manifest version range is satisfied.
 6. Miniwyvern is Soul Bond-exclusive and cannot be captured by a Draconic Stone.
@@ -44,22 +44,22 @@ Normative Tamework dependencies:
 - **HYD-ARCH-001:** The build MUST produce one plugin JAR that contains compiled Java classes, `manifest.json`, and the complete `Common/` and `Server/` trees.
 - **HYD-ARCH-002:** The initial Maven build MUST consume the current root-layout assets directly. It MUST NOT require moving those assets into `src/main/resources`.
 - **HYD-ARCH-003:** `manifest.json` MUST declare `Main`, keep `IncludesAssetPack: true`, and declare `Alechilles:Alec's Tamework!` with range `>=3.0.0 <4.0.0`.
-- **HYD-ARCH-004:** Correct English public IDs already shipped by the asset pack MUST remain stable unless a migration rule is documented. Untranslated or semantically mismatched legacy IDs MUST migrate to canonical English IDs through an explicit, lossless, versioned alias map; new asset IDs, Java types, profile-data keys, config IDs, and commands MUST use English terminology and the HyDragon namespace where namespacing is supported.
+- **HYD-ARCH-004:** All first-release asset IDs, Java types, profile-data keys, config IDs, and commands MUST use English terminology and the HyDragon namespace where namespacing is supported. Because HyDragon has never been released, untranslated or semantically mismatched worktree IDs MUST be renamed directly before release; the plugin MUST NOT add aliases or runtime conversion machinery for them.
 
 ### Runtime boundary
 
 - **HYD-ARCH-005:** HyDragon MUST integrate through the Tamework public API, documented asset families, registered interaction extensions, events, profile data, and declared capability identifiers. It MUST NOT import Tamework implementation packages or use reflection to reach internal services.
 - **HYD-ARCH-006:** Startup MUST check all required Tamework capabilities and record the result in a queryable feature-status registry.
 - **HYD-ARCH-007:** A missing required capability MUST fail the affected feature closed, leave unrelated HyDragon assets usable, and emit one actionable diagnostic naming the missing capability and required Tamework range.
-- **HYD-ARCH-008:** Java services MUST be separated by domain: integration/capabilities, persistence, Draconic Stone lifecycle, Soul Bond, Miniwyvern archetypes, special encounters, migration, and diagnostics.
+- **HYD-ARCH-008:** Java services MUST be separated by domain: integration/capabilities, persistence, Draconic Stone lifecycle, Soul Bond, Miniwyvern archetypes, special encounters, and diagnostics.
 - **HYD-ARCH-009:** Balance and content choices MUST be data-driven under `Server/HyDragon/`; Java MUST enforce lifecycle, ownership, atomicity, and behavior that assets cannot safely express.
 
 ### Persistence and safety
 
-- **HYD-ARCH-010:** HyDragon-owned player and profile records MUST contain a schema version and support forward, idempotent migrations without deleting an unknown or unsupported record.
+- **HYD-ARCH-010:** HyDragon-owned player and profile records MUST contain the first-release schema version. The initial plugin supports only that version and MUST fail closed without mutating a record whose schema version it does not understand; no pre-release data conversion system is required.
 - **HYD-ARCH-011:** Item consumption, profile creation/linking, archetype changes, repairs, and any later inventory mutations MUST be transactional or compensating. Retrying an event after interruption MUST NOT create a second companion or consume the same input twice.
 - **HYD-ARCH-012:** World/entity access and delayed work MUST obey the game thread-affinity contract. Deferred tasks MUST retain stable identifiers and resolve live entities on the owning world thread rather than retaining component objects.
-- **HYD-ARCH-013:** The plugin MUST expose structured startup diagnostics and an operator-readable status command covering version, capabilities, config load errors, disabled features, migration results, and orphaned links.
+- **HYD-ARCH-013:** The plugin MUST expose structured startup diagnostics and an operator-readable status command covering version, capabilities, config load errors, disabled features, pending reconciliation, and orphaned links.
 - **HYD-ARCH-014:** Automated release verification MUST prove that the JAR contains its entry point, manifest, assets, service metadata if used, and no duplicate or development-only resource trees.
 
 ## 4. Repository and package layout
@@ -111,12 +111,11 @@ Other existing manifest metadata remains unchanged unless release packaging requ
 | `HyDragonPlugin` | Lifecycle orchestration, service construction, orderly shutdown | Domain logic |
 | `TameworkBridge` | Public API acquisition, capability checks, event/extension registration | Tamework internals |
 | `HyDragonConfigRepository` | Load and validate `Server/HyDragon/*` domain configs | NPC or item asset parsing already owned by Hytale/Tamework |
-| `HyDragonDataStore` | Player ledger, encounter records, schema migrations | Tamework's canonical companion profile |
+| `HyDragonDataStore` | Player ledger, encounter records, and schema-version validation | Tamework's canonical companion profile |
 | `DraconicStoneService` | Capture outcomes, vessel maintenance policy, repair orchestration | Generic capture transaction or vessel identity |
 | `SoulBondService` | Once-per-player claim and stable Miniwyvern link | Generic population admission |
 | `MiniwyvernArchetypeService` | Attunement and domain-specific abilities | Generic attachment/inventory implementation |
 | `DragonEncounterService` | Weather/player-gated and multi-stage encounters | Static weighted world spawning |
-| `MigrationService` | Non-destructive conversion of legacy stone/Miniwyvern state | Silent deletion or arbitrary winner selection |
 | `HyDragonDiagnostics` | Status snapshots, counters, validation errors, orphan reports | Player-facing gameplay state |
 
 Implementations may use different class names, but these ownership boundaries are normative.
@@ -163,7 +162,6 @@ HyDragonPlayerRecord
     state                 UNCLAIMED | PENDING | CLAIMED | NEEDS_RECONCILIATION
     miniwyvernProfileId   nullable
     claimedAt             nullable
-    migrationStatus       NONE | MIGRATED | NEEDS_OPERATOR
   processedOperationIds   bounded/idempotency metadata
 ```
 
@@ -182,7 +180,7 @@ HyDragonProfileData
   lastAppliedOperationId nullable
 ```
 
-The generic vessel/lifecycle record, rather than this extension, is authoritative for stored, active, dead/damaged, lost, and unavailable state. Unknown fields and unknown future enum values must be preserved during migration. If an unknown state cannot be interpreted safely, mutation is disabled for that record and diagnostics must identify it.
+The generic vessel/lifecycle record, rather than this extension, is authoritative for stored, active, dead/damaged, lost, and unavailable state. If a schema version or state cannot be interpreted safely, mutation is disabled for that record and diagnostics must identify it.
 
 ### 7.4 Encounter record
 
@@ -212,7 +210,7 @@ Ordinary `WorldNPCSpawn` and `BeaconNPCSpawn` assets do not create HyDragon reco
 2. Acquire the Tamework public API and verify the manifest-supported version.
 3. Query capabilities and populate feature gates.
 4. Register namespaced interaction extensions and event listeners exactly once.
-5. Open HyDragon persistence and run idempotent schema migrations.
+5. Open HyDragon persistence and validate that stored records use the supported first-release schema.
 6. Reconcile pending Soul Bond operations, vessel/profile references, and active encounter records.
 7. Publish one structured readiness report.
 
@@ -230,7 +228,7 @@ Stop new operations, cancel scheduled ability/encounter tasks, flush durable sta
 - Treat callbacks and events as at-least-once. Use operation IDs or current-state comparisons to make handlers idempotent.
 - If a Tamework transaction fails, HyDragon must not independently patch the item or NPC into the expected success state.
 - If HyDragon persistence fails after a Tamework commit, record a recoverable pending reconciliation; do not issue a second capture/profile-create operation.
-- Do not delete duplicate or orphaned legacy data automatically. Quarantine it from activation and surface an operator action.
+- Do not delete duplicate or orphaned records automatically. Quarantine them from activation and surface an operator action.
 - Never fall back from Soul Bond-exclusive Miniwyvern creation to ordinary capture.
 - Never create a Miniwyvern directly when `COMPANION_PROVISIONING` is unavailable.
 - Never bypass population admission because the population service is unavailable.
@@ -242,27 +240,26 @@ Stop new operations, cancel scheduled ability/encounter tasks, flush durable sta
 | `manifest.json` | Packaging | Entry point, combined asset-pack flag, dependency range |
 | `pom.xml` | Packaging | Java build and explicit root resource mappings |
 | `src/main/java/com/alechilles/hydragon/` | Plugin | Services and integration adapter |
-| `src/test/java/com/alechilles/hydragon/` | Tests | Unit/contract/migration tests |
+| `src/test/java/com/alechilles/hydragon/` | Tests | Unit, contract, restart-recovery, and asset-validation tests |
 | `Server/HyDragon/DragonSpecies/*.json` | HyDragon config | Species difficulty, capture metadata, mount policy |
 | `Server/HyDragon/StoneMaintenance/*.json` | HyDragon config | Death-repair policy and future extension flags; swap cooldown is authored in Tamework vessel config |
 | `Server/HyDragon/MiniwyvernArchetypes/*.json` | HyDragon config | Attunement and ability definitions |
 | `Server/HyDragon/Encounters/*.json` | HyDragon config | Plugin-controlled encounter definitions |
-| `Server/HyDragon/Migrations/LegacyAssetIds.json` | HyDragon migration config | One-to-one legacy non-English/mismatched ID to canonical English ID mappings |
 | `Server/Tamework/**` | Tamework assets | Generic companion, capture, vessel, population, and inventory declarations |
 | `Server/Languages/{en-US,pt-BR,de-DE,fr-FR,es-ES}/server.lang` | Localization | Complete, key-parity server catalogs with English as the default/source language |
 | `Common/**`, `Server/Item/**`, `Server/NPC/**` | Content assets | Models, items, recipes, roles, effects, projectiles, audio, localization |
 
 Every domain-config codec must reject invalid identifiers, ranges, negative durations, mutually incompatible modes, and references to missing required content at load time. Validation errors must name the asset ID and field path.
 
-## 11. Migration from the current asset pack
+## 11. Pre-release conversion from the current asset pack
 
 1. Add Maven and Java source directories without moving root assets.
 2. Add `Main`, retain `IncludesAssetPack: true`, and update the dependency range from `>=2.17.0` to `>=3.0.0 <4.0.0`.
 3. Package the unmodified asset trees and compare the JAR archive against the pre-conversion asset-pack ZIP.
 4. Introduce the public API adapter and diagnostics before enabling domain runtime features.
-5. Migrate untranslated/mismatched asset IDs to their documented English canonical IDs without duplicating or deleting persisted items; reject alias chains, cycles, and collisions.
+5. Rename untranslated/mismatched worktree asset IDs directly to their documented English canonical IDs and update every reference in the same change; add no alias or persisted-data conversion layer.
 6. Add complete `en-US`, `pt-BR`, `de-DE`, `fr-FR`, and `es-ES` catalogs with identical keys and placeholders.
-7. Migrate current Draconic Stone and Miniwyvern behavior according to the dedicated specifications; never silently reinterpret a filled legacy stone.
+7. Replace the current development-only Draconic Stone and Miniwyvern configurations according to the dedicated specifications. Development/test data may be reset; it is not a supported release input.
 8. Remove any third-party flight dependency or documentation. Keep the existing Nordic Drake `TameworkAvatarFlight` integration and gate it with Tamework's Flightmaster's Talisman.
 9. Only after parity is proven may a separate change move assets into `src/main/resources`.
 
@@ -277,7 +274,7 @@ Every domain-config codec must reject invalid identifiers, ranges, negative dura
 - Restarting during each multi-step mutation converges to one valid companion/profile/item outcome without duplicated items or companions.
 - Config reload failure leaves the last valid configuration active.
 - Packaging tests prove root-layout assets are included and `HyDragon.zip`, docs, build outputs, and IDE files are excluded.
-- Identifier validation rejects untranslated canonical asset IDs and unresolved legacy references outside the versioned migration allowlist.
+- Identifier validation rejects untranslated canonical asset IDs, replaced worktree references, aliases, and compatibility shims.
 - All five required `server.lang` catalogs load successfully, contain identical HyDragon key/placeholder sets, and include reviewed locale-appropriate values.
 - The Miniwyvern capture path remains unavailable even though companion inventory is not part of the initial release.
 - Flying a configured dragon checks only Tamework's Flightmaster's Talisman.
@@ -288,7 +285,7 @@ Every domain-config codec must reject invalid identifiers, ranges, negative dura
 | --- | --- | --- | --- |
 | A0 | Combined plugin packaging | Current asset pack | Loadable JAR with unchanged asset behavior |
 | A1 | Public API adapter and diagnostics | Tamework 3.0.0+ with public API 0.9.0 integration capabilities | Capability matrix visible; features fail closed |
-| A2 | Persistence and migration foundation | A1 | Versioned records and restart reconciliation tested |
+| A2 | Persistence and recovery foundation | A1 | First-release schema validation and restart reconciliation tested |
 | A3 | Capture/vessel integration | Tamework capture, vessel, and population specifications | [Capture specification](capture-summoning-maintenance.md) accepted |
 | A4 | Soul Bond and archetypes | A2, A3, Tamework provisioning/population/profile contracts | [Soul Bond specification](soul-bond-miniwyvern.md) accepted |
 | A5 | Dynamic encounters | A2, A4 | [Content specification](dragon-content-encounters.md) accepted |
