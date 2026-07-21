@@ -6,10 +6,12 @@ import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
 import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.diagnostics.HyDragonStatusCommand;
+import com.alechilles.hydragon.diagnostics.HyDragonPersistenceStatus;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonRepairBondedStoneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
+import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.assetstore.event.RemovedAssetsEvent;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
@@ -17,6 +19,7 @@ import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import java.io.IOException;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,6 +29,8 @@ public final class HyDragonPlugin extends JavaPlugin {
     private static HyDragonPlugin instance;
     private final HyDragonConfigRepository configRepository = new HyDragonConfigRepository();
     private TameworkBridge tameworkBridge;
+    private HyDragonStateStore stateStore;
+    private String persistenceFailure;
 
     public HyDragonPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -39,7 +44,8 @@ public final class HyDragonPlugin extends JavaPlugin {
         registerConfigAssets();
         getCommandRegistry().registerCommand(new HyDragonStatusCommand(
                 configRepository::snapshot,
-                () -> tameworkBridge));
+                () -> tameworkBridge,
+                this::getPersistenceStatus));
         getLogger().at(Level.INFO).log("HyDragon plugin setup complete.");
     }
 
@@ -47,17 +53,26 @@ public final class HyDragonPlugin extends JavaPlugin {
     protected void start() {
         tameworkBridge = TameworkBridge.connect();
         configRepository.refreshFromAssetRegistry();
+        openStateStore();
         HyDragonConfigRepository.Snapshot config = configRepository.snapshot();
         Level level = config.isValid() ? Level.INFO : Level.WARNING;
         getLogger().at(level).log("HyDragon enabled with %d species, %d Miniwyvern archetypes, "
                         + "%d encounters, %d config issue(s), and Tamework Public API %s.",
                 config.species().size(), config.archetypes().size(), config.encounters().size(), config.issues().size(),
                 tameworkBridge.snapshot().apiVersion());
+        HyDragonPersistenceStatus persistence = getPersistenceStatus();
+        getLogger().at(persistence.writable() ? Level.INFO : Level.WARNING).log(
+                "HyDragon persistence %s: players=%d, profiles=%d, encounters=%d, quarantined=%d, reconcile=%d.",
+                persistence.writable() ? "ready" : "unavailable/read-only",
+                persistence.players(), persistence.profiles(), persistence.encounters(),
+                persistence.quarantined(), persistence.pendingReconciliation());
     }
 
     @Override
     protected void shutdown() {
         getLogger().at(Level.INFO).log("HyDragon disabled.");
+        stateStore = null;
+        persistenceFailure = null;
         tameworkBridge = null;
         instance = null;
     }
@@ -76,6 +91,27 @@ public final class HyDragonPlugin extends JavaPlugin {
     @Nullable
     public TameworkBridge getTameworkBridge() {
         return tameworkBridge;
+    }
+
+    @Nullable
+    public HyDragonStateStore getStateStore() {
+        return stateStore;
+    }
+
+    @Nonnull
+    public HyDragonPersistenceStatus getPersistenceStatus() {
+        return HyDragonPersistenceStatus.from(stateStore, persistenceFailure);
+    }
+
+    private void openStateStore() {
+        try {
+            stateStore = new HyDragonStateStore(getDataDirectory().resolve("hydragon-state.properties"));
+            persistenceFailure = null;
+        } catch (IOException | RuntimeException failure) {
+            stateStore = null;
+            persistenceFailure = "state store open failed: " + failure.getClass().getSimpleName();
+            getLogger().at(Level.SEVERE).withCause(failure).log("Unable to open HyDragon persistence; mutations disabled.");
+        }
     }
 
     private void registerInteractionCodecs() {

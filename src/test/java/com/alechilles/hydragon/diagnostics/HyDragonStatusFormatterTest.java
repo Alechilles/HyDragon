@@ -32,12 +32,15 @@ class HyDragonStatusFormatterTest {
         TameworkRuntimeDiagnostics.Snapshot diagnostics = new TameworkRuntimeDiagnostics.Snapshot(
                 true, "HEALTHY", null, 0, "READY", "COMPLETE", "READ_WRITE", null);
 
-        List<String> lines = HyDragonStatusFormatter.format(config, bridge, diagnostics);
+        HyDragonPersistenceStatus localPersistence = new HyDragonPersistenceStatus(
+                true, true, 1, 1, 0, 0, 2, null);
+        List<String> lines = HyDragonStatusFormatter.format(config, bridge, diagnostics, localPersistence);
 
         assertTrue(lines.stream().anyMatch(line -> line.contains("Config: INVALID")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("missing bundled assets")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("CAPTURE_AND_BOND: DISABLED")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("TAMEWORK_DIAGNOSTICS: READY")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("Tamework persistence: HEALTHY")));
+        assertTrue(lines.stream().anyMatch(line -> line.contains("HyDragon persistence: READ_WRITE")));
     }
 }

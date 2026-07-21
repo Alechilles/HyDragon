@@ -20,13 +20,16 @@ public final class HyDragonStatusCommand extends AbstractPlayerCommand {
     public static final String PERMISSION = "hydragon.command.status";
     private final Supplier<HyDragonConfigRepository.Snapshot> configSupplier;
     private final Supplier<TameworkBridge> bridgeSupplier;
+    private final Supplier<HyDragonPersistenceStatus> persistenceSupplier;
 
     public HyDragonStatusCommand(
             Supplier<HyDragonConfigRepository.Snapshot> configSupplier,
-            Supplier<TameworkBridge> bridgeSupplier) {
+            Supplier<TameworkBridge> bridgeSupplier,
+            Supplier<HyDragonPersistenceStatus> persistenceSupplier) {
         super("hydragon", "Inspect HyDragon config and Tamework feature readiness.");
         this.configSupplier = configSupplier;
         this.bridgeSupplier = bridgeSupplier;
+        this.persistenceSupplier = persistenceSupplier;
         requirePermission(PERMISSION);
         setAllowsExtraArguments(true);
     }
@@ -49,7 +52,8 @@ public final class HyDragonStatusCommand extends AbstractPlayerCommand {
             return;
         }
         TameworkRuntimeDiagnostics.Snapshot diagnostics = TameworkRuntimeDiagnostics.read(bridge);
-        for (String line : HyDragonStatusFormatter.format(configSupplier.get(), bridge.snapshot(), diagnostics)) {
+        for (String line : HyDragonStatusFormatter.format(
+                configSupplier.get(), bridge.snapshot(), diagnostics, persistenceSupplier.get())) {
             context.sendMessage(Message.raw(line));
         }
     }

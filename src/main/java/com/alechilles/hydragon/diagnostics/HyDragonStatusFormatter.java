@@ -16,7 +16,8 @@ public final class HyDragonStatusFormatter {
     public static List<String> format(
             HyDragonConfigRepository.Snapshot config,
             TameworkBridge.Snapshot tamework,
-            TameworkRuntimeDiagnostics.Snapshot diagnostics) {
+            TameworkRuntimeDiagnostics.Snapshot diagnostics,
+            HyDragonPersistenceStatus localPersistence) {
         List<String> lines = new ArrayList<>();
         lines.add("HyDragon status");
         lines.add("Config: " + (config.isValid() ? "READY" : "INVALID")
@@ -43,6 +44,17 @@ public final class HyDragonStatusFormatter {
                 + "; resilience=" + diagnostics.resilienceState());
         if (!diagnostics.available() && diagnostics.persistenceReason() != null) {
             lines.add("  diagnostics: " + diagnostics.persistenceReason());
+        }
+        lines.add("HyDragon persistence: "
+                + (!localPersistence.available() ? "UNAVAILABLE"
+                : localPersistence.writable() ? "READ_WRITE" : "READ_ONLY")
+                + "; players=" + localPersistence.players()
+                + ", profiles=" + localPersistence.profiles()
+                + ", encounters=" + localPersistence.encounters()
+                + ", quarantined=" + localPersistence.quarantined()
+                + ", reconcile=" + localPersistence.pendingReconciliation());
+        if (localPersistence.reason() != null) {
+            lines.add("  local persistence: " + localPersistence.reason());
         }
         return List.copyOf(lines);
     }
