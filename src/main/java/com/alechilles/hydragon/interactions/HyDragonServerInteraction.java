@@ -119,7 +119,7 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
                 ChunkUtil.chunkCoordinate(transform.getPosition().z()));
 
         HyDragonInteractionRuntime.dispatch(
-                        action(), player.getUuid(), world.getName(), destination, archetypeId(),
+                        action(), requiredFeature(), player.getUuid(), world.getName(), destination, archetypeId(),
                         reserved.orElseThrow(), heldItemLocator)
                 .whenComplete((result, failure) -> sendResult(
                         worldUuid,

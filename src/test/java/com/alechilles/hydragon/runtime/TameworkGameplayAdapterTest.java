@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.alecstamework.api.*;
+import com.alechilles.hydragon.integration.HyDragonFeature;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,6 +70,19 @@ class TameworkGameplayAdapterTest {
     }
 
     @Test
+    void adapterReadinessUsesThePublishedFeatureContracts() {
+        assertEachCapabilityIsRequired(
+                HyDragonFeature.SOUL_BOND_CLAIM,
+                adapter -> adapter.soulBondReadiness());
+        assertEachCapabilityIsRequired(
+                HyDragonFeature.BONDED_STONE_REPAIR,
+                adapter -> adapter.repairReadiness());
+        assertEachCapabilityIsRequired(
+                HyDragonFeature.MINIWYVERN_ATTUNEMENT,
+                adapter -> adapter.attunementReadiness());
+    }
+
+    @Test
     void onlyTerminalDeniedProvesRepairRefundIsSafe() {
         BondedVesselOperationView terminal = operation(BondedVesselDurableOperationStatus.TERMINAL_DENIED);
         BondedVesselOperationView applied = operation(BondedVesselDurableOperationStatus.APPLIED);
@@ -87,6 +101,22 @@ class TameworkGameplayAdapterTest {
 
     private static TameworkApi api(EnumSet<TameworkApiCapability> capabilities) {
         return api(capabilities, null);
+    }
+
+    private static void assertEachCapabilityIsRequired(
+            HyDragonFeature feature,
+            java.util.function.Function<TameworkGameplayAdapter, TameworkGameplayAdapter.Readiness> readiness) {
+        EnumSet<TameworkApiCapability> complete = EnumSet.noneOf(TameworkApiCapability.class);
+        feature.requiredCapabilities().stream().map(TameworkApiCapability::valueOf).forEach(complete::add);
+        assertTrue(readiness.apply(new TameworkGameplayAdapter(api(complete))).ready());
+        for (TameworkApiCapability capability : complete) {
+            EnumSet<TameworkApiCapability> incomplete = complete.clone();
+            incomplete.remove(capability);
+            TameworkGameplayAdapter.Readiness result = readiness.apply(
+                    new TameworkGameplayAdapter(api(incomplete)));
+            assertFalse(result.ready());
+            assertTrue(result.reason().contains(capability.name()));
+        }
     }
 
     private static TameworkApi api(

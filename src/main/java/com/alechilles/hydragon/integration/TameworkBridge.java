@@ -5,7 +5,6 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -54,34 +53,9 @@ public final class TameworkBridge {
     static Snapshot evaluate(@Nullable String apiVersion, Set<String> capabilities, @Nullable String bootstrapIssue) {
         Set<String> present = Set.copyOf(capabilities);
         Map<HyDragonFeature, FeatureGate> gates = new EnumMap<>(HyDragonFeature.class);
-        gates.put(HyDragonFeature.CAPTURE_AND_BOND, gate(
-                HyDragonFeature.CAPTURE_AND_BOND, present,
-                Set.of("CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS"), List.of(), bootstrapIssue));
-        gates.put(HyDragonFeature.BONDED_STONE_TRANSITIONS, gate(
-                HyDragonFeature.BONDED_STONE_TRANSITIONS, present,
-                Set.of("BONDED_VESSELS", "POPULATION_GROUPS"), List.of(), bootstrapIssue));
-        gates.put(HyDragonFeature.BONDED_STONE_REPAIR, gate(
-                HyDragonFeature.BONDED_STONE_REPAIR, present,
-                Set.of("BONDED_VESSELS", "POPULATION_GROUPS"), List.of(), bootstrapIssue));
-        gates.put(HyDragonFeature.SOUL_BOND_CLAIM, gate(
-                HyDragonFeature.SOUL_BOND_CLAIM, present,
-                Set.of("PROFILES", "POLICY", "PERSISTENCE_RESILIENCE", "COMPANION_PROVISIONING",
-                        "POPULATION_GROUPS", "INTERACTION_EXTENSIONS"),
-                List.of(), bootstrapIssue));
-        gates.put(HyDragonFeature.MINIWYVERN_ATTUNEMENT, gate(
-                HyDragonFeature.MINIWYVERN_ATTUNEMENT, present,
-                Set.of("PROFILES", "PROFILE_DATA", "PROFILE_DATA_TRANSACTIONS", "PROGRESSION_MUTATIONS"),
-                List.of(), bootstrapIssue));
-        gates.put(HyDragonFeature.MINIWYVERN_ABILITIES, gate(
-                HyDragonFeature.MINIWYVERN_ABILITIES, present,
-                Set.of("EVENTS", "PROFILE_DATA", "PROFILE_DATA_TRANSACTIONS", "TRAIT_EFFECTS"),
-                List.of(), bootstrapIssue));
-        gates.put(HyDragonFeature.DYNAMIC_ENCOUNTERS, gate(
-                HyDragonFeature.DYNAMIC_ENCOUNTERS, present,
-                Set.of("CAPTURE_POLICY", "POPULATION_GROUPS"), List.of(), bootstrapIssue));
-        gates.put(HyDragonFeature.TAMEWORK_DIAGNOSTICS, gate(
-                HyDragonFeature.TAMEWORK_DIAGNOSTICS, present,
-                Set.of("DIAGNOSTICS"), List.of(), bootstrapIssue));
+        for (HyDragonFeature feature : HyDragonFeature.values()) {
+            gates.put(feature, gate(feature, present, feature.requiredCapabilities(), bootstrapIssue));
+        }
         return new Snapshot(
                 apiVersion == null ? "unavailable" : apiVersion,
                 present,
@@ -94,11 +68,11 @@ public final class TameworkBridge {
             HyDragonFeature feature,
             Set<String> present,
             Set<String> required,
-            List<String> blockers,
             @Nullable String bootstrapIssue) {
         Set<String> missing = new LinkedHashSet<>(required);
         missing.removeAll(present);
-        List<String> effectiveBlockers = bootstrapIssue == null ? blockers : List.of(bootstrapIssue);
+        java.util.List<String> effectiveBlockers = bootstrapIssue == null
+                ? java.util.List.of() : java.util.List.of(bootstrapIssue);
         boolean available = bootstrapIssue == null && missing.isEmpty() && effectiveBlockers.isEmpty();
         return new FeatureGate(feature, available, required, missing, effectiveBlockers);
     }

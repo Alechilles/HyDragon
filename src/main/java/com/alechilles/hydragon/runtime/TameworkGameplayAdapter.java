@@ -18,6 +18,7 @@ import com.alechilles.alecstamework.api.ProvisionedCompanionTransition;
 import com.alechilles.alecstamework.api.ProvisionedCompanionTransitionRequest;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
+import com.alechilles.hydragon.integration.HyDragonFeature;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,26 +31,6 @@ public final class TameworkGameplayAdapter {
     public static final String CALLER_NAMESPACE = "Alechilles:HyDragon";
     public static final String SOULBOUND_MINIWYVERN_ROLE = "Tamed_Wyvern_Mini";
 
-    private static final EnumSet<TameworkApiCapability> SOUL_BOND_CAPABILITIES = EnumSet.of(
-            TameworkApiCapability.PROFILES,
-            TameworkApiCapability.POLICY,
-            TameworkApiCapability.PERSISTENCE_RESILIENCE,
-            TameworkApiCapability.POPULATION_GROUPS,
-            TameworkApiCapability.COMPANION_PROVISIONING,
-            TameworkApiCapability.INTERACTION_EXTENSIONS
-    );
-    private static final EnumSet<TameworkApiCapability> REPAIR_CAPABILITIES = EnumSet.of(
-            TameworkApiCapability.PROFILES,
-            TameworkApiCapability.POLICY,
-            TameworkApiCapability.PERSISTENCE_RESILIENCE,
-            TameworkApiCapability.POPULATION_GROUPS,
-            TameworkApiCapability.BONDED_VESSELS
-    );
-    private static final EnumSet<TameworkApiCapability> PROFILE_DATA_TRANSACTION_CAPABILITIES = EnumSet.of(
-            TameworkApiCapability.PROFILE_DATA,
-            TameworkApiCapability.PROFILE_DATA_TRANSACTIONS
-    );
-
     private final TameworkApi api;
     private final EnumSet<TameworkApiCapability> capabilities;
 
@@ -59,19 +40,19 @@ public final class TameworkGameplayAdapter {
     }
 
     public Readiness soulBondReadiness() {
-        return readiness(SOUL_BOND_CAPABILITIES, null);
+        return readiness(HyDragonFeature.SOUL_BOND_CLAIM);
     }
 
     public Readiness repairReadiness() {
-        return readiness(REPAIR_CAPABILITIES, null);
+        return readiness(HyDragonFeature.BONDED_STONE_REPAIR);
     }
 
     public Readiness attunementReadiness() {
-        return readiness(PROFILE_DATA_TRANSACTION_CAPABILITIES, null);
+        return readiness(HyDragonFeature.MINIWYVERN_ATTUNEMENT);
     }
 
     public Readiness abilityStateReadiness() {
-        return readiness(PROFILE_DATA_TRANSACTION_CAPABILITIES, null);
+        return readiness(HyDragonFeature.MINIWYVERN_ATTUNEMENT);
     }
 
     public Optional<ProfileDataEntryView> findVersionedProfileData(
@@ -160,11 +141,14 @@ public final class TameworkGameplayAdapter {
                 && operation.orElseThrow().status() == BondedVesselDurableOperationStatus.TERMINAL_DENIED;
     }
 
-    private Readiness readiness(EnumSet<TameworkApiCapability> required, String extraIssue) {
+    private Readiness readiness(HyDragonFeature feature) {
+        EnumSet<TameworkApiCapability> required = EnumSet.noneOf(TameworkApiCapability.class);
+        for (String capability : feature.requiredCapabilities()) {
+            required.add(TameworkApiCapability.valueOf(capability));
+        }
         EnumSet<TameworkApiCapability> missing = required.clone();
         missing.removeAll(capabilities);
         if (!missing.isEmpty()) return new Readiness(false, "missing Tamework capabilities " + missing);
-        if (extraIssue != null) return new Readiness(false, extraIssue);
         return new Readiness(true, "ready");
     }
 

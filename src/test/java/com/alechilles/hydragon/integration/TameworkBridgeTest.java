@@ -48,6 +48,35 @@ class TameworkBridgeTest {
     }
 
     @Test
+    void liveRuntimeDependenciesArePartOfTheirReportedGates() {
+        Set<String> capabilities = new HashSet<>(BASELINE_08);
+        capabilities.addAll(Set.of(
+                "CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS", "COMPANION_PROVISIONING",
+                "PROFILE_DATA_TRANSACTIONS"));
+        capabilities.remove("PROFILES");
+
+        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("0.9.0", capabilities, null);
+
+        assertFalse(snapshot.feature(HyDragonFeature.BONDED_STONE_REPAIR).available());
+        assertFalse(snapshot.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS).available());
+        assertFalse(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
+        assertTrue(snapshot.feature(HyDragonFeature.BONDED_STONE_REPAIR).reason().contains("PROFILES"));
+        assertTrue(snapshot.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS).reason().contains("PROFILES"));
+        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).reason().contains("PROFILES"));
+    }
+
+    @Test
+    void localAbilityEffectsDoNotRequireTameworkTraitEffects() {
+        Set<String> capabilities = new HashSet<>(BASELINE_08);
+        capabilities.add("PROFILE_DATA_TRANSACTIONS");
+        capabilities.remove("TRAIT_EFFECTS");
+
+        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("0.9.0", capabilities, null);
+
+        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
+    }
+
+    @Test
     void bootstrapFailureDisablesEverythingWithOneStableReason() {
         TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate(null, Set.of(), "not loaded");
 
