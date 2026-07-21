@@ -123,6 +123,13 @@ def require_files(errors: list[str]) -> None:
         "Server/Item/Items/Ingredient/Draconic_Soul_Bond.json",
         "Server/Tamework/PopulationGroups/HyDragonFullDragons.json",
         "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json",
+        "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json",
+        "Server/HyDragon/StoneMaintenance/Default.json",
+        "Server/Tamework/CapturePolicies/HyDragonHydra.json",
+        "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json",
+        "Server/Tamework/CapturePolicies/HyDragonRockDrakeT1.json",
+        "Server/Tamework/CapturePolicies/HyDragonRockDrakeT2.json",
+        "Server/Tamework/CapturePolicies/HyDragonRockDrakeT3.json",
     ]
     required.extend(
         f"Server/Item/Items/Ingredient/Draconic_Stone_{tier}.json"
@@ -131,6 +138,14 @@ def require_files(errors: list[str]) -> None:
     required.extend(
         f"Server/HyDragon/MiniwyvernArchetypes/{name}.json"
         for name in ("Neutral", "Lightning", "Wind", "Ice", "Fire", "Water", "Nature", "Void")
+    )
+    required.extend(
+        f"Server/HyDragon/DragonSpecies/{name}.json"
+        for name in ("Hydra", "NordicDrake", "RockDrakeT1", "RockDrakeT2", "RockDrakeT3")
+    )
+    required.extend(
+        f"Server/Tamework/Items/Spawners/HyDragonDraconicStone{suffix}.json"
+        for suffix in ("", "Thorium", "Cobalt", "Adamantium", "Ancient")
     )
     for relative in required:
         if not (ROOT / relative).is_file():
@@ -156,6 +171,61 @@ def validate_capture_configs(parsed: dict[Path, object], errors: list[str]) -> N
             overlap = sorted(overrides & banned_roles)
             if overlap:
                 fail(errors, f"Miniwyvern tamed override in {path.relative_to(ROOT)}: {', '.join(overlap)}")
+
+
+def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
+    spawner_root = ROOT / "Server" / "Tamework" / "Items" / "Spawners"
+    tiers = (
+        ("HyDragonDraconicStone.json", 1),
+        ("HyDragonDraconicStoneThorium.json", 2),
+        ("HyDragonDraconicStoneCobalt.json", 3),
+        ("HyDragonDraconicStoneAdamantium.json", 4),
+        ("HyDragonDraconicStoneAncient.json", 5),
+    )
+    observed: list[int] = []
+    for filename, expected_power in tiers:
+        path = spawner_root / filename
+        data = parsed.get(path)
+        if not isinstance(data, dict):
+            continue
+        capture = data.get("Capture")
+        power = capture.get("Power") if isinstance(capture, dict) else None
+        if power != expected_power:
+            fail(errors, f"invalid capture power in {path.relative_to(ROOT)}: expected {expected_power}, got {power}")
+        if isinstance(power, int):
+            observed.append(power)
+    if observed and observed != sorted(set(observed)):
+        fail(errors, f"stone capture powers are not strictly increasing: {observed}")
+
+    ancient_path = spawner_root / "HyDragonDraconicStoneAncient.json"
+    ancient = parsed.get(ancient_path)
+    ancient_capture = ancient.get("Capture") if isinstance(ancient, dict) else None
+    if not isinstance(ancient_capture, dict) or ancient_capture.get("MaximumChance") != 1.0:
+        fail(errors, "Ancient stone must cap eligible capture probability at 1.0")
+
+
+def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str]) -> None:
+    spawn_roots = (
+        ROOT / "Server" / "NPC" / "Spawn",
+        ROOT / "Server" / "Tamework" / "Patches",
+    )
+    banned = {"Wyvern_Mini", "Tamed_Wyvern_Mini"}
+
+    def visit(value: object) -> bool:
+        if isinstance(value, str):
+            return value in banned
+        if isinstance(value, list):
+            return any(visit(item) for item in value)
+        if isinstance(value, dict):
+            return any(visit(item) for item in value.values())
+        return False
+
+    for root in spawn_roots:
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*.json"):
+            if visit(parsed.get(path)):
+                fail(errors, f"production Miniwyvern spawn path remains: {path.relative_to(ROOT)}")
 
 
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
@@ -206,6 +276,8 @@ def main() -> int:
     validate_locales(errors)
     require_files(errors)
     validate_capture_configs(parsed, errors)
+    validate_stone_tiers(parsed, errors)
+    validate_no_miniwyvern_spawns(parsed, errors)
     validate_altar_recipes(parsed, errors)
     if errors:
         for error in errors:
