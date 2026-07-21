@@ -502,6 +502,21 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
         fail(errors, f"HyDragon command role allowlist mismatch: {sorted(actual_roles)}")
 
 
+def validate_repair_interaction(parsed: dict[Path, object], errors: list[str]) -> None:
+    stone_path = ROOT / "Server/Item/Items/Ingredient/Draconic_Stone.json"
+    essence_path = ROOT / "Server/Item/Items/Ingredient/Revitalizing_Essence.json"
+    stone = parsed.get(stone_path)
+    essence = parsed.get(essence_path)
+    damaged = stone.get("State", {}).get("Damaged", {}) if isinstance(stone, dict) else {}
+    primary = damaged.get("Interactions", {}).get("Primary", {}).get("Interactions", []) \
+        if isinstance(damaged, dict) else []
+    repair_types = [entry.get("Type") for entry in primary if isinstance(entry, dict)]
+    if repair_types != ["HyDragonRepairBondedStone"]:
+        fail(errors, "repair interaction must be attached to the held Damaged stone state")
+    if isinstance(essence, dict) and "HyDragonRepairBondedStone" in json.dumps(essence):
+        fail(errors, "Revitalizing Essence must be reserved from inventory, not used as the held repair authority")
+
+
 def main() -> int:
     errors: list[str] = []
     parsed = load_json_assets(errors)
@@ -516,6 +531,7 @@ def main() -> int:
     validate_spawn_patch_role_identity(parsed, errors)
     validate_altar_recipes(parsed, errors)
     validate_command_item(parsed, errors)
+    validate_repair_interaction(parsed, errors)
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)

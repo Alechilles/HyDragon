@@ -33,7 +33,8 @@ public final class HyDragonInteractionRuntime {
                                                      UUID playerUuid,
                                                      String worldName,
                                                      String archetypeId,
-                                                     ConsumableReservation reservation) {
+                                                     ConsumableReservation reservation,
+                                                     HeldItemLocator heldItemLocator) {
         Handler handler = HANDLER.get();
         if (handler == null) {
             return reservation.release().handle((ignored, failure) ->
@@ -43,7 +44,7 @@ public final class HyDragonInteractionRuntime {
             return switch (action) {
                 case SOUL_BOND -> handler.soulBond(playerUuid, worldName, reservation);
                 case ATTUNE -> handler.attune(playerUuid, archetypeId, reservation);
-                case REPAIR -> handler.repair(playerUuid, worldName, reservation);
+                case REPAIR -> handler.repair(playerUuid, worldName, heldItemLocator, reservation);
             };
         } catch (RuntimeException failure) {
             return reservation.release().handle((ignored, releaseFailure) ->
@@ -61,6 +62,29 @@ public final class HyDragonInteractionRuntime {
                 UUID playerUuid, String archetypeId, ConsumableReservation reservation);
 
         CompletionStage<GameplayResult> repair(
-                UUID playerUuid, String worldName, ConsumableReservation reservation);
+                UUID playerUuid,
+                String worldName,
+                HeldItemLocator heldItemLocator,
+                ConsumableReservation reservation);
+    }
+
+    /** Location-only evidence; Tamework resolves canonical revision/fingerprint and binding identity. */
+    public record HeldItemLocator(
+            String holderEvidenceId,
+            String containerPath,
+            int inventorySlot,
+            String expectedItemId) {
+        public HeldItemLocator {
+            holderEvidenceId = required(holderEvidenceId, "holderEvidenceId");
+            containerPath = required(containerPath, "containerPath");
+            expectedItemId = required(expectedItemId, "expectedItemId");
+            if (inventorySlot < 0) throw new IllegalArgumentException("inventorySlot cannot be negative");
+        }
+
+        private static String required(String value, String field) {
+            String normalized = Objects.requireNonNull(value, field).trim();
+            if (normalized.isEmpty()) throw new IllegalArgumentException(field + " is required");
+            return normalized;
+        }
     }
 }

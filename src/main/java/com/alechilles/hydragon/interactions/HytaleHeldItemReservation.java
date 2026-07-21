@@ -74,6 +74,71 @@ final class HytaleHeldItemReservation implements ConsumableReservation {
             return Optional.empty();
         }
 
+        return reserveSlot(player, container, slot, current, expectedItemId, requestedOperationId,
+                quantity, Math.max(0, context.getOperationCounter()), player.getUuid().toString());
+    }
+
+    /** Reserves one material stack from a non-held hotbar slot, preferring an existing replay receipt. */
+    static Optional<HytaleHeldItemReservation> reserveHotbarMaterial(
+            InteractionContext context,
+            PlayerRef player,
+            InventoryComponent.Hotbar hotbar,
+            String expectedItemId,
+            String requestedOperationId,
+            int quantity,
+            short excludedSlot) {
+        Objects.requireNonNull(context, "context");
+        Objects.requireNonNull(player, "player");
+        Objects.requireNonNull(hotbar, "hotbar");
+        expectedItemId = required(expectedItemId, "expectedItemId");
+        requestedOperationId = required(requestedOperationId, "requestedOperationId");
+        if (quantity <= 0) throw new IllegalArgumentException("quantity must be positive");
+        if (player.getWorldUuid() == null) return Optional.empty();
+
+        ItemContainer container = hotbar.getInventory();
+        short replaySlot = findMaterialSlot(container, expectedItemId, requestedOperationId,
+                quantity, excludedSlot, true);
+        short selected = replaySlot >= 0 ? replaySlot : findMaterialSlot(
+                container, expectedItemId, requestedOperationId, quantity, excludedSlot, false);
+        if (selected < 0) return Optional.empty();
+        ItemStack current = container.getItemStack(selected);
+        return reserveSlot(player, container, selected, current, expectedItemId, requestedOperationId,
+                quantity, Math.max(0, context.getOperationCounter()), "player:" + player.getUuid());
+    }
+
+    private static short findMaterialSlot(ItemContainer container,
+                                          String expectedItemId,
+                                          String operationId,
+                                          int quantity,
+                                          short excludedSlot,
+                                          boolean replayOnly) {
+        short[] selected = {-1};
+        container.forEach((slot, stack) -> {
+            if (selected[0] >= 0 || slot == excludedSlot || ItemStack.isEmpty(stack)
+                    || !expectedItemId.equals(stack.getItemId()) || stack.getQuantity() < quantity) return;
+            String raw = stack.getFromMetadataOrNull(RECEIPT_METADATA_KEY, Codec.STRING);
+            Receipt receipt = raw == null ? null : Receipt.decode(raw);
+            boolean replay = receipt != null && operationId.equals(receipt.operationId());
+            if ((replayOnly && replay) || (!replayOnly && receipt == null)) selected[0] = slot;
+        });
+        return selected[0];
+    }
+
+    private static Optional<HytaleHeldItemReservation> reserveSlot(
+            PlayerRef player,
+            ItemContainer container,
+            short slot,
+            ItemStack current,
+            String expectedItemId,
+            String requestedOperationId,
+            int quantity,
+            long inventoryRevision,
+            String holderEvidenceId) {
+        if (current == null || current.isEmpty() || !expectedItemId.equals(current.getItemId())
+                || current.getQuantity() < quantity || slot < 0 || player.getWorldUuid() == null) {
+            return Optional.empty();
+        }
+
         String existing = current.getFromMetadataOrNull(RECEIPT_METADATA_KEY, Codec.STRING);
         Receipt decoded = existing == null ? null : Receipt.decode(existing);
         if (decoded != null && !decoded.operationId().equals(requestedOperationId)) {
@@ -105,10 +170,10 @@ final class HytaleHeldItemReservation implements ConsumableReservation {
         }
         SourceEvidence evidence = new SourceEvidence(
                 expectedItemId,
-                player.getUuid().toString(),
+                holderEvidenceId,
                 "hotbar",
                 slot,
-                Math.max(0, context.getOperationCounter()),
+                inventoryRevision,
                 fingerprint,
                 decoded == null ? current.getQuantity() : decoded.stackQuantity());
         return Optional.of(new HytaleHeldItemReservation(
@@ -122,6 +187,24 @@ final class HytaleHeldItemReservation implements ConsumableReservation {
                 : current.getFromMetadataOrNull(RECEIPT_METADATA_KEY, Codec.STRING);
         Receipt receipt = raw == null ? null : Receipt.decode(raw);
         return receipt == null ? Optional.empty() : Optional.of(receipt.operationId());
+    }
+
+    static Optional<String> existingHotbarMaterialOperationId(
+            InventoryComponent.Hotbar hotbar,
+            String expectedItemId,
+            short excludedSlot) {
+        if (hotbar == null || expectedItemId == null || expectedItemId.isBlank()) return Optional.empty();
+        String[] operationId = {null};
+        hotbar.getInventory().forEach((slot, stack) -> {
+            if (operationId[0] != null || slot == excludedSlot || ItemStack.isEmpty(stack)
+                    || !expectedItemId.equals(stack.getItemId())) return;
+            String raw = stack.getFromMetadataOrNull(RECEIPT_METADATA_KEY, Codec.STRING);
+            Receipt receipt = raw == null ? null : Receipt.decode(raw);
+            if (receipt != null && expectedItemId.equals(receipt.itemId())) {
+                operationId[0] = receipt.operationId();
+            }
+        });
+        return Optional.ofNullable(operationId[0]);
     }
 
     @Override

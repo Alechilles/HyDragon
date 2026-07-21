@@ -7,9 +7,6 @@
   "Icon": "Icons/ItemsGenerated/Revitalizing_Essence.png",
   "Texture": "Items/HyDragon/Revitalizing_Essence.png",
   "Quality": "Rare",
-  "Interactions": {
-    "Secondary": { "Interactions": [ { "Type": "HyDragonRepairBondedStone" } ] }
-  },
   "Recipe": {
     "Input": [
       { "ItemId": "Draconic_Essence", "Quantity": 3 },

@@ -38,13 +38,26 @@ public final class HyDragonGameplayRuntime implements HyDragonInteractionRuntime
 
     @Override
     public CompletionStage<GameplayResult> repair(
-            UUID playerUuid, String worldName, ConsumableReservation reservation) {
-        Resolution resolution = repairRequests.resolve(playerUuid, worldName, reservation.operationId());
-        if (resolution.request().isEmpty() || resolution.damagedStone().isEmpty()) {
-            return reservation.release().handle((ignored, failure) -> GameplayResult.unavailable(resolution.reason()));
+            UUID playerUuid,
+            String worldName,
+            HyDragonInteractionRuntime.HeldItemLocator heldItemLocator,
+            ConsumableReservation reservation) {
+        if (heldItemLocator == null) {
+            return reservation.release().handle((ignored, failure) ->
+                    GameplayResult.unavailable("damaged bonded stone location is unavailable"));
         }
-        return repairs.repair(
-                resolution.request().orElseThrow(), resolution.damagedStone().orElseThrow(), reservation);
+        return repairRequests.resolve(
+                        playerUuid, worldName, reservation.operationId(), heldItemLocator)
+                .thenCompose(resolution -> {
+                    if (resolution.request().isEmpty() || resolution.damagedStone().isEmpty()) {
+                        return reservation.release().handle((ignored, failure) ->
+                                GameplayResult.unavailable(resolution.reason()));
+                    }
+                    return repairs.repair(
+                            resolution.request().orElseThrow(),
+                            resolution.damagedStone().orElseThrow(),
+                            reservation);
+                });
     }
 
     /**
@@ -52,13 +65,17 @@ public final class HyDragonGameplayRuntime implements HyDragonInteractionRuntime
      * when Tamework exposes resolveTransitionSource(holder/container/slot/fingerprint).
      */
     public interface BondedRepairRequestResolver {
-        Resolution resolve(UUID playerUuid, String worldName, String operationId);
+        CompletionStage<Resolution> resolve(
+                UUID playerUuid,
+                String worldName,
+                String operationId,
+                HyDragonInteractionRuntime.HeldItemLocator heldItemLocator);
 
         static BondedRepairRequestResolver unavailable() {
-            return (playerUuid, worldName, operationId) -> new Resolution(
+            return (playerUuid, worldName, operationId, heldItemLocator) ->
+                    java.util.concurrent.CompletableFuture.completedFuture(new Resolution(
                     Optional.empty(), Optional.empty(),
-                    "Tamework BondedVesselsApi requires resolveTransitionSource("
-                            + "actorUuid, holderEvidenceId, containerPath, slot, itemFingerprint)");
+                    "Tamework bonded-vessel held-item locator is unavailable"));
         }
     }
 

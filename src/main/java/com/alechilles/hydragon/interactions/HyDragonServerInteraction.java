@@ -10,6 +10,8 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -68,10 +70,33 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
             fail(context, firstRun, time, type, cooldownHandler);
             return;
         }
-        String operationId = HytaleHeldItemReservation.existingOperationId(context)
-                .orElseGet(() -> newOperationId(player.getUuid()));
-        Optional<HytaleHeldItemReservation> reserved = HytaleHeldItemReservation.reserve(
-                context, player, expectedItemId(), operationId, consumedQuantity());
+        HyDragonInteractionRuntime.HeldItemLocator heldItemLocator = null;
+        Optional<HytaleHeldItemReservation> reserved;
+        String operationId;
+        if (action() == HyDragonInteractionRuntime.Action.REPAIR) {
+            ItemStack heldStone = context.getHeldItem();
+            short heldSlot = context.getHeldItemSlot();
+            InventoryComponent.Hotbar hotbar = commandBuffer.getComponent(
+                    playerEntity, InventoryComponent.Hotbar.getComponentType());
+            if (ItemStack.isEmpty(heldStone) || heldStone.getItemId() == null
+                    || heldStone.getItemId().isBlank() || heldSlot < 0 || hotbar == null) {
+                commandBuffer.run(store -> player.sendMessage(invalidMessage()));
+                fail(context, firstRun, time, type, cooldownHandler);
+                return;
+            }
+            operationId = HytaleHeldItemReservation.existingHotbarMaterialOperationId(
+                            hotbar, expectedItemId(), heldSlot)
+                    .orElseGet(() -> newOperationId(player.getUuid()));
+            reserved = HytaleHeldItemReservation.reserveHotbarMaterial(
+                    context, player, hotbar, expectedItemId(), operationId, consumedQuantity(), heldSlot);
+            heldItemLocator = new HyDragonInteractionRuntime.HeldItemLocator(
+                    "player:" + player.getUuid(), "hotbar", heldSlot, heldStone.getItemId());
+        } else {
+            operationId = HytaleHeldItemReservation.existingOperationId(context)
+                    .orElseGet(() -> newOperationId(player.getUuid()));
+            reserved = HytaleHeldItemReservation.reserve(
+                    context, player, expectedItemId(), operationId, consumedQuantity());
+        }
         if (reserved.isEmpty()) {
             commandBuffer.run(store -> player.sendMessage(invalidMessage()));
             fail(context, firstRun, time, type, cooldownHandler);
@@ -79,7 +104,8 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
         }
 
         HyDragonInteractionRuntime.dispatch(
-                        action(), player.getUuid(), world.getName(), archetypeId(), reserved.orElseThrow())
+                        action(), player.getUuid(), world.getName(), archetypeId(),
+                        reserved.orElseThrow(), heldItemLocator)
                 .whenComplete((result, failure) -> sendResult(
                         worldUuid,
                         player.getUuid(),
