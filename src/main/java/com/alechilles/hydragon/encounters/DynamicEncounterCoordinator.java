@@ -6,6 +6,7 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
+import com.alechilles.hydragon.persistence.EncounterDefinitionSnapshot;
 import com.alechilles.hydragon.persistence.EncounterRecord;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.persistence.MutationOutcome;
@@ -84,7 +85,8 @@ public final class DynamicEncounterCoordinator {
 
             EncounterRecord admitted = record(
                     encounterId, definition.getId(), candidate, EncounterCheckpoint.of(EncounterPhase.ADMITTED),
-                    Optional.empty(), Set.of(candidate.playerUuid()), nowMs, nowMs, 0L);
+                    EncounterDefinitionSnapshot.capture(definition), Optional.empty(),
+                    Set.of(candidate.playerUuid()), nowMs, nowMs, 0L);
             if (!put(admitted)) return AdmissionResult.denied("admission-checkpoint-failed");
 
             EncounterWorldGateway.SpawnResult spawn;
@@ -95,7 +97,7 @@ public final class DynamicEncounterCoordinator {
                 spawn = EncounterWorldGateway.SpawnResult.failure("spawn-gateway-failed");
             }
             if (!spawn.spawned()) {
-                return enterCooldown(admitted, definition, nowMs)
+                return enterCooldown(admitted, admitted.definitionSnapshot(), nowMs)
                         ? AdmissionResult.denied(spawn.reason())
                         : new AdmissionResult(false, "spawn-failed-cooldown-checkpoint-pending", encounterId, null);
             }
@@ -115,7 +117,6 @@ public final class DynamicEncounterCoordinator {
             UUID targetNpcUuid,
             String sourceId,
             double buildup,
-            DragonEncounterConfig definition,
             EncounterWorldGateway world,
             long nowMs) {
         Objects.requireNonNull(targetNpcUuid, "targetNpcUuid");
@@ -127,24 +128,25 @@ public final class DynamicEncounterCoordinator {
             if (current == null || current.targetNpcUuid().filter(targetNpcUuid::equals).isEmpty()) {
                 return TransitionResult.denied("encounter-target-mismatch");
             }
+            EncounterDefinitionSnapshot definition = current.definitionSnapshot();
             EncounterCheckpoint checkpoint = decode(current);
             if (checkpoint.phase() != EncounterPhase.AERIAL && checkpoint.phase() != EncounterPhase.GROUNDING) {
                 return TransitionResult.denied("encounter-not-airborne");
             }
-            if (!definition.getGrounding().getBuildupSourceIds().contains(sourceId)) {
+            if (!definition.buildupSourceIds().contains(sourceId)) {
                 return TransitionResult.denied("grounding-source-not-allowed");
             }
             if (checkpoint.phase() == EncounterPhase.AERIAL
-                    && !definition.getGrounding().getLureSourceId().equals(sourceId)) {
+                    && !definition.lureSourceId().equals(sourceId)) {
                 return TransitionResult.denied("grounding-lure-required");
             }
             if (checkpoint.phase() == EncounterPhase.GROUNDING
-                    && !definition.getGrounding().getStaggerSourceIds().contains(sourceId)) {
+                    && !definition.staggerSourceIds().contains(sourceId)) {
                 return TransitionResult.denied("grounding-stagger-required");
             }
-            double total = Math.min(definition.getGrounding().getThreshold(), checkpoint.groundingBuildup() + buildup);
+            double total = Math.min(definition.groundingThreshold(), checkpoint.groundingBuildup() + buildup);
             if (checkpoint.phase() == EncounterPhase.AERIAL
-                    || total < definition.getGrounding().getThreshold()) {
+                    || total < definition.groundingThreshold()) {
                 EncounterRecord grounding = update(current,
                         new EncounterCheckpoint(EncounterPhase.GROUNDING, total), current.targetNpcUuid(),
                         checkpoint.phase() == EncounterPhase.GROUNDING ? current.phaseStartedAtEpochMillis() : nowMs,
@@ -166,25 +168,24 @@ public final class DynamicEncounterCoordinator {
 
     public void onCaptureResolved(
             CaptureAttemptResolvedEvent event,
-            DragonEncounterConfig definition,
             EncounterWorldGateway world) {
         if (event == null || event.outcome() != CaptureAttemptOutcome.CAPTURED || !world.isWorldThread()) return;
         synchronized (lock) {
             findByTarget(event.targetNpcUuid()).ifPresent(record -> enterCooldown(
-                    record, definition, Math.max(0L, event.resolvedAtMs())));
+                    record, record.definitionSnapshot(), Math.max(0L, event.resolvedAtMs())));
         }
     }
 
     /** Times out active phases while honoring a last-moment committed Tamework capture. */
     public TransitionResult tick(
             String encounterId,
-            DragonEncounterConfig definition,
             EncounterWorldGateway world,
             long nowMs) {
         if (!world.isWorldThread()) return TransitionResult.denied("not-world-thread");
         synchronized (lock) {
             EncounterRecord current = stateStore.snapshot().encounter(requiredText(encounterId, "encounterId")).orElse(null);
             if (current == null) return TransitionResult.denied("encounter-missing");
+            EncounterDefinitionSnapshot definition = current.definitionSnapshot();
             EncounterCheckpoint checkpoint = decode(current);
             if (checkpoint.phase() == EncounterPhase.COOLDOWN) {
                 if (current.cooldownUntilEpochMillis() <= nowMs) {
@@ -195,11 +196,11 @@ public final class DynamicEncounterCoordinator {
                 return TransitionResult.denied("cooldown-active");
             }
             if (checkpoint.phase() == EncounterPhase.GROUNDING
-                    && checkpoint.groundingBuildup() >= definition.getGrounding().getThreshold()) {
+                    && checkpoint.groundingBuildup() >= definition.groundingThreshold()) {
                 return advanceGrounding(current, definition, world, nowMs);
             }
             boolean expired = nowMs >= saturatingAdd(current.createdAtEpochMillis(),
-                    definition.getCleanupAndCooldown().getEncounterTimeoutMs());
+                    definition.encounterTimeoutMs());
             if (checkpoint.phase() == EncounterPhase.GROUNDED_CAPTURE_WINDOW) {
                 expired |= nowMs >= current.cooldownUntilEpochMillis();
             }
@@ -226,13 +227,13 @@ public final class DynamicEncounterCoordinator {
     /** Reattaches persisted targets, blocks ambiguous admissions, and never assumes absence. */
     public TransitionResult reconcile(
             String encounterId,
-            DragonEncounterConfig definition,
             EncounterWorldGateway world,
             long nowMs) {
         if (!world.isWorldThread()) return TransitionResult.denied("not-world-thread");
         synchronized (lock) {
             EncounterRecord current = stateStore.snapshot().encounter(requiredText(encounterId, "encounterId")).orElse(null);
             if (current == null) return TransitionResult.denied("encounter-missing");
+            EncounterDefinitionSnapshot definition = current.definitionSnapshot();
             EncounterCheckpoint currentCheckpoint = decode(current);
             if (currentCheckpoint.phase() == EncounterPhase.COOLDOWN) {
                 return new TransitionResult(true, "cooldown-preserved", EncounterPhase.COOLDOWN, 0.0D);
@@ -278,13 +279,13 @@ public final class DynamicEncounterCoordinator {
 
     private TransitionResult advanceGrounding(
             EncounterRecord current,
-            DragonEncounterConfig definition,
+            EncounterDefinitionSnapshot definition,
             EncounterWorldGateway world,
             long nowMs) {
         UUID target = current.targetNpcUuid().orElse(null);
         if (target == null) return TransitionResult.denied("encounter-target-missing");
         if (!world.applyGroundedState(target,
-                definition.getGrounding().getGroundedState(), definition.getGrounding().getGroundedEffectId())) {
+                definition.groundedState(), definition.groundedEffectId())) {
             return TransitionResult.denied("grounding-sequence-apply-failed");
         }
         double buildup = decode(current).groundingBuildup();
@@ -293,7 +294,7 @@ public final class DynamicEncounterCoordinator {
         }
         EncounterRecord grounded = update(current,
                 EncounterCheckpoint.of(EncounterPhase.GROUNDED_CAPTURE_WINDOW), current.targetNpcUuid(),
-                nowMs, nowMs, saturatingAdd(nowMs, definition.getGrounding().getCaptureWindowMs()));
+                nowMs, nowMs, saturatingAdd(nowMs, definition.captureWindowMs()));
         return put(grounded)
                 ? new TransitionResult(true, "capture-window-open", EncounterPhase.GROUNDED_CAPTURE_WINDOW, buildup)
                 : TransitionResult.denied("grounded-checkpoint-failed");
@@ -333,9 +334,9 @@ public final class DynamicEncounterCoordinator {
                 && region < definition.getAdmission().getPerRegionLimit();
     }
 
-    private boolean enterCooldown(EncounterRecord current, DragonEncounterConfig definition, long nowMs) {
+    private boolean enterCooldown(EncounterRecord current, EncounterDefinitionSnapshot definition, long nowMs) {
         return put(update(current, EncounterCheckpoint.of(EncounterPhase.COOLDOWN), Optional.empty(),
-                nowMs, nowMs, saturatingAdd(nowMs, definition.getCleanupAndCooldown().getRetryCooldownMs())));
+                nowMs, nowMs, saturatingAdd(nowMs, definition.retryCooldownMs())));
     }
 
     private boolean put(EncounterRecord record) {
@@ -358,10 +359,12 @@ public final class DynamicEncounterCoordinator {
 
     private static EncounterRecord record(
             String id, String definitionId, EncounterCandidate candidate, EncounterCheckpoint phase,
-            Optional<UUID> target, Set<UUID> players, long created, long phaseStarted, long cooldownUntil) {
+            EncounterDefinitionSnapshot definitionSnapshot, Optional<UUID> target, Set<UUID> players,
+            long created, long phaseStarted, long cooldownUntil) {
         return new EncounterRecord(
                 EncounterRecord.SCHEMA_VERSION, id, definitionId, candidate.worldName(), candidate.regionKey(),
-                phase.encode(), target, players, created, phaseStarted, phaseStarted, cooldownUntil);
+                phase.encode(), definitionSnapshot, target, players,
+                created, phaseStarted, phaseStarted, cooldownUntil);
     }
 
     private static EncounterRecord update(
@@ -369,7 +372,8 @@ public final class DynamicEncounterCoordinator {
             long phaseStarted, long updated, long cooldownUntil) {
         return new EncounterRecord(
                 current.schemaVersion(), current.encounterId(), current.definitionId(), current.worldName(),
-                current.regionKey(), phase.encode(), target, current.eligiblePlayerUuids(),
+                current.regionKey(), phase.encode(), current.definitionSnapshot(), target,
+                current.eligiblePlayerUuids(),
                 current.createdAtEpochMillis(), Math.max(current.createdAtEpochMillis(), phaseStarted),
                 Math.max(Math.max(current.createdAtEpochMillis(), phaseStarted), updated), cooldownUntil);
     }

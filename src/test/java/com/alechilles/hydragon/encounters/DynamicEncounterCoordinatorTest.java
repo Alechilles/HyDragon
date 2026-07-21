@@ -15,17 +15,22 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
+import com.alechilles.hydragon.persistence.EncounterRecord;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.persistence.ProfileExtensionRecord;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -63,18 +68,18 @@ class DynamicEncounterCoordinatorTest {
 
         DynamicEncounterCoordinator.TransitionResult progress = coordinator.groundingHit(
                 admitted.encounterId(), TARGET, "projectile:Lure+item:LureTool", 40.0D,
-                definition, world, 61_000L);
+                world, 61_000L);
         assertEquals(EncounterPhase.GROUNDING, progress.phase());
         assertEquals(40.0D, progress.buildup());
 
         DynamicEncounterCoordinator.TransitionResult recovered = coordinator.reconcile(
-                admitted.encounterId(), definition, world, 62_000L);
+                admitted.encounterId(), world, 62_000L);
         assertEquals(EncounterPhase.GROUNDING, recovered.phase());
         assertEquals(40.0D, recovered.buildup());
 
         DynamicEncounterCoordinator.TransitionResult grounded = coordinator.groundingHit(
                 admitted.encounterId(), TARGET, "projectile:Stagger+item:StaggerTool", 60.0D,
-                definition, world, 63_000L);
+                world, 63_000L);
         assertEquals(EncounterPhase.GROUNDED_CAPTURE_WINDOW, grounded.phase());
         assertTrue(coordinator.captureAllowed(TARGET));
         assertEquals(1, world.groundedCalls);
@@ -96,26 +101,26 @@ class DynamicEncounterCoordinatorTest {
 
         DynamicEncounterCoordinator.TransitionResult outOfOrder = coordinator.groundingHit(
                 admitted.encounterId(), TARGET, "projectile:Stagger+item:StaggerTool", 100.0D,
-                definition, world, 61_000L);
+                world, 61_000L);
         assertFalse(outOfOrder.transitioned());
         assertEquals("grounding-lure-required", outOfOrder.reason());
 
         DynamicEncounterCoordinator.TransitionResult lure = coordinator.groundingHit(
                 admitted.encounterId(), TARGET, "projectile:Lure+item:LureTool", 100.0D,
-                definition, world, 62_000L);
+                world, 62_000L);
         assertEquals(EncounterPhase.GROUNDING, lure.phase());
         assertFalse(coordinator.captureAllowed(TARGET));
 
         DynamicEncounterCoordinator.TransitionResult descent = coordinator.groundingHit(
                 admitted.encounterId(), TARGET, "projectile:Stagger+item:StaggerTool", 1.0D,
-                definition, world, 63_000L);
+                world, 63_000L);
         assertEquals("grounding-descent-active", descent.reason());
         assertEquals(EncounterPhase.GROUNDING, descent.phase());
         assertFalse(coordinator.captureAllowed(TARGET));
 
         world.grounded = true;
         DynamicEncounterCoordinator.TransitionResult landed = coordinator.tick(
-                admitted.encounterId(), definition, world, 64_000L);
+                admitted.encounterId(), world, 64_000L);
         assertEquals("capture-window-open", landed.reason());
         assertEquals(EncounterPhase.GROUNDED_CAPTURE_WINDOW, landed.phase());
         assertTrue(coordinator.captureAllowed(TARGET));
@@ -154,11 +159,67 @@ class DynamicEncounterCoordinatorTest {
 
         captured.set(true);
         DynamicEncounterCoordinator.TransitionResult result = coordinator.tick(
-                admitted.encounterId(), definition, world, 71_000L);
+                admitted.encounterId(), world, 71_000L);
         assertTrue(result.transitioned());
         assertEquals("captured-at-cleanup-boundary", result.reason());
         assertEquals(0, world.retireCalls);
         assertFalse(coordinator.captureAllowed(TARGET));
+    }
+
+    @Test
+    void removedDefinitionCannotStrandPersistedEncounterAcrossRestart() throws Exception {
+        Path statePath = temporaryDirectory.resolve("removed-definition.properties");
+        TameworkApi api = api(new AtomicBoolean(false));
+        HyDragonStateStore initialStore = new HyDragonStateStore(statePath);
+        initialStore.putProfileExtension(ProfileExtensionRecord.fullDragon(
+                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
+        DragonEncounterConfig definition = encounterConfig();
+        DynamicEncounterCoordinator initialCoordinator = new DynamicEncounterCoordinator(
+                api, initialStore, new EncounterEligibilityService(api, initialStore));
+        FakeWorld initialWorld = new FakeWorld();
+        DynamicEncounterCoordinator.AdmissionResult admitted = initialCoordinator.admit(
+                definition, snapshot(definition, speciesConfig()),
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                initialWorld, true, 60_000L);
+        assertTrue(admitted.admitted());
+
+        HyDragonStateStore restartedStore = new HyDragonStateStore(statePath);
+        EncounterRecord restartedRecord = restartedStore.snapshot().encounter(admitted.encounterId()).orElseThrow();
+        assertEquals(100.0D, restartedRecord.definitionSnapshot().groundingThreshold());
+        assertEquals(10_000L, restartedRecord.definitionSnapshot().encounterTimeoutMs());
+
+        FakeWorld restartedWorld = new FakeWorld();
+        AtomicInteger dispatches = new AtomicInteger();
+        DynamicEncounterCoordinator restartedCoordinator = new DynamicEncounterCoordinator(
+                api, restartedStore, new EncounterEligibilityService(api, restartedStore));
+        HyDragonConfigRepository.Snapshot definitionRemoved = new HyDragonConfigRepository.Snapshot(
+                Map.of(), Map.of(), Map.of(), Map.of(), java.util.List.of());
+        DynamicEncounterRuntime runtime = new DynamicEncounterRuntime(
+                api,
+                restartedStore,
+                () -> definitionRemoved,
+                () -> null,
+                (worldName, targetNpcUuid, callback) -> {
+                    dispatches.incrementAndGet();
+                    callback.accept(restartedWorld);
+                },
+                restartedCoordinator,
+                Clock.fixed(Instant.ofEpochMilli(62_000L), ZoneOffset.UTC));
+
+        runtime.reconcileAll();
+
+        assertEquals(1, dispatches.get(), "removed definitions must not suppress restart reconciliation");
+        EncounterRecord reattached = restartedStore.snapshot().encounter(admitted.encounterId()).orElseThrow();
+        assertEquals(EncounterPhase.AERIAL, EncounterCheckpoint.decode(reattached.phase()).phase());
+        assertEquals(Optional.of(TARGET), reattached.targetNpcUuid());
+
+        restartedWorld.targetPresence = EncounterWorldGateway.TargetPresence.ABSENT;
+        runtime.reconcileAll();
+
+        EncounterRecord cooledDown = restartedStore.snapshot().encounter(admitted.encounterId()).orElseThrow();
+        assertEquals(EncounterPhase.COOLDOWN, EncounterCheckpoint.decode(cooledDown.phase()).phase());
+        assertTrue(cooledDown.targetNpcUuid().isEmpty());
+        assertEquals(82_000L, cooledDown.cooldownUntilEpochMillis());
     }
 
     private HyDragonStateStore stateStore() throws Exception {
@@ -299,6 +360,7 @@ class DynamicEncounterCoordinatorTest {
         int groundedCalls;
         int retireCalls;
         boolean grounded = true;
+        TargetPresence targetPresence = TargetPresence.PRESENT;
 
         @Override public boolean isWorldThread() { return true; }
         @Override public SpawnResult spawn(SpawnRequest request) {
@@ -306,7 +368,11 @@ class DynamicEncounterCoordinatorTest {
             return SpawnResult.success(TARGET);
         }
         @Override public TargetLookup findTarget(String encounterId, String worldName, UUID expectedTargetUuid) {
-            return TargetLookup.present(TARGET);
+            return switch (targetPresence) {
+                case PRESENT -> TargetLookup.present(TARGET);
+                case ABSENT -> TargetLookup.absent();
+                case UNKNOWN -> TargetLookup.unknown();
+            };
         }
         @Override public boolean applyGroundedState(UUID targetNpcUuid, String groundedState, String effectId) {
             groundedCalls++;

@@ -272,12 +272,26 @@ class HyDragonStateStoreTest {
                 "Orbis",
                 "glacial-ridge:14:9",
                 "GROUNDING",
+                encounterDefinitionSnapshot(),
                 Optional.of(TARGET_NPC),
                 Set.of(PLAYER_ONE, PLAYER_TWO),
                 100,
                 200,
                 250,
                 1_000);
+    }
+
+    private static EncounterDefinitionSnapshot encounterDefinitionSnapshot() {
+        return new EncounterDefinitionSnapshot(
+                Set.of("projectile:Lure", "projectile:Stagger"),
+                "projectile:Lure",
+                Set.of("projectile:Stagger"),
+                100.0D,
+                "Combat.AirLand",
+                "HyDragon_Grounded",
+                45_000L,
+                120_000L,
+                60_000L);
     }
 
     private static void storeProperties(Path file, Properties properties) throws IOException {

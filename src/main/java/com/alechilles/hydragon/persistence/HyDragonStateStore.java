@@ -49,6 +49,15 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
             "worldName",
             "regionKey",
             "phase",
+            "definitionBuildupSourceIds",
+            "definitionLureSourceId",
+            "definitionStaggerSourceIds",
+            "definitionGroundingThreshold",
+            "definitionGroundedState",
+            "definitionGroundedEffectId",
+            "definitionCaptureWindowMs",
+            "definitionEncounterTimeoutMs",
+            "definitionRetryCooldownMs",
             "targetNpcUuid",
             "eligiblePlayerUuids",
             "createdAtEpochMillis",
@@ -757,6 +766,16 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
                 requiredText(properties, prefix + "worldName"),
                 requiredText(properties, prefix + "regionKey"),
                 requiredText(properties, prefix + "phase"),
+                new EncounterDefinitionSnapshot(
+                        textSet(properties, prefix + "definitionBuildupSourceIds"),
+                        requiredText(properties, prefix + "definitionLureSourceId"),
+                        textSet(properties, prefix + "definitionStaggerSourceIds"),
+                        requiredDouble(properties, prefix + "definitionGroundingThreshold"),
+                        requiredText(properties, prefix + "definitionGroundedState"),
+                        requiredText(properties, prefix + "definitionGroundedEffectId"),
+                        requiredLong(properties, prefix + "definitionCaptureWindowMs"),
+                        requiredLong(properties, prefix + "definitionEncounterTimeoutMs"),
+                        requiredLong(properties, prefix + "definitionRetryCooldownMs")),
                 optionalUuid(properties, prefix + "targetNpcUuid"),
                 uuidSet(properties, prefix + "eligiblePlayerUuids"),
                 requiredLong(properties, prefix + "createdAtEpochMillis"),
@@ -875,6 +894,16 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
         properties.setProperty(prefix + "worldName", record.worldName());
         properties.setProperty(prefix + "regionKey", record.regionKey());
         properties.setProperty(prefix + "phase", record.phase());
+        EncounterDefinitionSnapshot definition = record.definitionSnapshot();
+        properties.setProperty(prefix + "definitionBuildupSourceIds", joinTextSet(definition.buildupSourceIds()));
+        properties.setProperty(prefix + "definitionLureSourceId", definition.lureSourceId());
+        properties.setProperty(prefix + "definitionStaggerSourceIds", joinTextSet(definition.staggerSourceIds()));
+        properties.setProperty(prefix + "definitionGroundingThreshold", Double.toString(definition.groundingThreshold()));
+        properties.setProperty(prefix + "definitionGroundedState", definition.groundedState());
+        properties.setProperty(prefix + "definitionGroundedEffectId", definition.groundedEffectId());
+        properties.setProperty(prefix + "definitionCaptureWindowMs", Long.toString(definition.captureWindowMs()));
+        properties.setProperty(prefix + "definitionEncounterTimeoutMs", Long.toString(definition.encounterTimeoutMs()));
+        properties.setProperty(prefix + "definitionRetryCooldownMs", Long.toString(definition.retryCooldownMs()));
         setOptional(properties, prefix + "targetNpcUuid", record.targetNpcUuid().map(UUID::toString));
         String eligiblePlayers = record.eligiblePlayerUuids().stream()
                 .map(UUID::toString)
@@ -1071,6 +1100,10 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
         return Long.parseLong(requiredText(properties, key));
     }
 
+    private static double requiredDouble(Properties properties, String key) {
+        return Double.parseDouble(requiredText(properties, key));
+    }
+
     private static OptionalLong optionalLong(Properties properties, String key) {
         String value = properties.getProperty(key);
         if (value == null) {
@@ -1096,6 +1129,24 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
             result.add(UUID.fromString(requiredText(item, key)));
         }
         return Set.copyOf(result);
+    }
+
+    private static Set<String> textSet(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value == null) throw new IllegalArgumentException("Missing required property " + key);
+        if (value.isBlank()) return Set.of();
+        Set<String> result = new TreeSet<>();
+        for (String item : value.split(",", -1)) result.add(requiredText(item, key));
+        return Set.copyOf(result);
+    }
+
+    private static String joinTextSet(Set<String> values) {
+        for (String value : values) {
+            if (value.indexOf(',') >= 0) {
+                throw new IllegalArgumentException("Persisted encounter source IDs cannot contain commas");
+            }
+        }
+        return values.stream().sorted().collect(Collectors.joining(","));
     }
 
     private static <E extends Enum<E>> E requiredEnum(Properties properties, String key, Class<E> type) {

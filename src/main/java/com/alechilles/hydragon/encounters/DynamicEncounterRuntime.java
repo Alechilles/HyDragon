@@ -84,13 +84,12 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
             double buildup,
             EncounterWorldGateway world) {
         EncounterRecord record = stateStore.snapshot().encounters().get(encounterId);
-        DragonEncounterConfig definition = record == null ? null : configs.get().encounters().get(record.definitionId());
-        if (definition == null) {
+        if (record == null) {
             return new DynamicEncounterCoordinator.TransitionResult(
-                    false, "encounter-definition-missing", EncounterPhase.RECONCILING, 0.0D);
+                    false, "encounter-missing", EncounterPhase.RECONCILING, 0.0D);
         }
         return coordinator.groundingHit(
-                encounterId, targetNpcUuid, sourceId, buildup, definition, world, clock.millis());
+                encounterId, targetNpcUuid, sourceId, buildup, world, clock.millis());
     }
 
     /** Read-only lookup used by the registered Hytale damage bridge. */
@@ -102,10 +101,8 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
     public void reconcileAll() {
         long now = clock.millis();
         for (EncounterRecord record : stateStore.snapshot().encounters().values()) {
-            DragonEncounterConfig definition = configs.get().encounters().get(record.definitionId());
-            if (definition == null) continue;
             worlds.dispatch(record.worldName(), record.targetNpcUuid().orElse(null),
-                    world -> coordinator.reconcile(record.encounterId(), definition, world, now));
+                    world -> coordinator.reconcile(record.encounterId(), world, now));
         }
     }
 
@@ -129,11 +126,8 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         int count = Math.min(maximumRecords, records.size());
         for (int offset = 0; offset < count; offset++) {
             EncounterRecord record = records.get((start + offset) % records.size());
-            DragonEncounterConfig definition = configs.get().encounters().get(record.definitionId());
-            if (definition != null) {
-                worlds.dispatch(record.worldName(), record.targetNpcUuid().orElse(null),
-                        world -> coordinator.tick(record.encounterId(), definition, world, now));
-            }
+            worlds.dispatch(record.worldName(), record.targetNpcUuid().orElse(null),
+                    world -> coordinator.tick(record.encounterId(), world, now));
             tickCursor = record.encounterId();
         }
         return count;
@@ -166,10 +160,8 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
                 .filter(candidate -> candidate.targetNpcUuid().filter(event.targetNpcUuid()::equals).isPresent())
                 .findFirst().orElse(null);
         if (record == null) return;
-        DragonEncounterConfig definition = configs.get().encounters().get(record.definitionId());
-        if (definition == null) return;
         worlds.dispatch(record.worldName(), event.targetNpcUuid(),
-                world -> coordinator.onCaptureResolved(event, definition, world));
+                world -> coordinator.onCaptureResolved(event, world));
     }
 
     private void retryProfileProjections(int maximum) {

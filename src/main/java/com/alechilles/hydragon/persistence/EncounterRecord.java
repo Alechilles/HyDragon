@@ -13,13 +13,14 @@ public record EncounterRecord(
         String worldName,
         String regionKey,
         String phase,
+        EncounterDefinitionSnapshot definitionSnapshot,
         Optional<UUID> targetNpcUuid,
         Set<UUID> eligiblePlayerUuids,
         long createdAtEpochMillis,
         long phaseStartedAtEpochMillis,
         long updatedAtEpochMillis,
         long cooldownUntilEpochMillis) {
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
 
     public EncounterRecord {
         if (schemaVersion != SCHEMA_VERSION) {
@@ -30,6 +31,7 @@ public record EncounterRecord(
         worldName = requiredText(worldName, "worldName");
         regionKey = requiredText(regionKey, "regionKey");
         phase = requiredText(phase, "phase");
+        definitionSnapshot = Objects.requireNonNull(definitionSnapshot, "definitionSnapshot");
         targetNpcUuid = Objects.requireNonNull(targetNpcUuid, "targetNpcUuid");
         Objects.requireNonNull(eligiblePlayerUuids, "eligiblePlayerUuids");
         if (eligiblePlayerUuids.stream().anyMatch(Objects::isNull)) {
