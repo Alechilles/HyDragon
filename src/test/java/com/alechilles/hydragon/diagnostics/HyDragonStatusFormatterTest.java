@@ -33,7 +33,7 @@ class HyDragonStatusFormatterTest {
                 true, "HEALTHY", null, 0, "READY", "COMPLETE", "READ_WRITE", null);
 
         HyDragonPersistenceStatus localPersistence = new HyDragonPersistenceStatus(
-                true, true, 1, 1, 0, 0, 2, null);
+                true, true, 1, 1, 0, 3, 0, 5, null);
         List<String> lines = HyDragonStatusFormatter.format(config, bridge, diagnostics, localPersistence);
 
         assertTrue(lines.stream().anyMatch(line -> line.contains("Config: INVALID")));
@@ -42,5 +42,6 @@ class HyDragonStatusFormatterTest {
         assertTrue(lines.stream().anyMatch(line -> line.contains("TAMEWORK_DIAGNOSTICS: READY")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("Tamework persistence: HEALTHY")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("HyDragon persistence: READ_WRITE")));
+        assertTrue(lines.stream().anyMatch(line -> line.contains("pendingProfileProjections=3")));
     }
 }

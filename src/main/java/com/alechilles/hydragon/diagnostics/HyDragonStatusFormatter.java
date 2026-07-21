@@ -51,6 +51,7 @@ public final class HyDragonStatusFormatter {
                 + "; players=" + localPersistence.players()
                 + ", profiles=" + localPersistence.profiles()
                 + ", encounters=" + localPersistence.encounters()
+                + ", pendingProfileProjections=" + localPersistence.pendingProfileProjections()
                 + ", quarantined=" + localPersistence.quarantined()
                 + ", reconcile=" + localPersistence.pendingReconciliation());
         if (localPersistence.reason() != null) {

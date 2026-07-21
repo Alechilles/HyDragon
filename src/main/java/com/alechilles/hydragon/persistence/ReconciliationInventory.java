@@ -9,6 +9,7 @@ public record ReconciliationInventory(
         List<PlayerSoulBondRecord> claimedSoulBondsToVerify,
         List<ProfileExtensionRecord> profileExtensionsToVerify,
         List<EncounterRecord> encountersToResumeOrCleanUp,
+        List<PendingProfileProjectionRecord> profileProjectionsToRetry,
         List<ConsumableTransactionRecord> consumableTransactionsToReconcile,
         List<QuarantinedRecord> quarantinedRecords) {
     public ReconciliationInventory {
@@ -20,6 +21,8 @@ public record ReconciliationInventory(
                 Objects.requireNonNull(profileExtensionsToVerify, "profileExtensionsToVerify"));
         encountersToResumeOrCleanUp = List.copyOf(
                 Objects.requireNonNull(encountersToResumeOrCleanUp, "encountersToResumeOrCleanUp"));
+        profileProjectionsToRetry = List.copyOf(
+                Objects.requireNonNull(profileProjectionsToRetry, "profileProjectionsToRetry"));
         consumableTransactionsToReconcile = List.copyOf(
                 Objects.requireNonNull(consumableTransactionsToReconcile, "consumableTransactionsToReconcile"));
         quarantinedRecords = List.copyOf(Objects.requireNonNull(quarantinedRecords, "quarantinedRecords"));

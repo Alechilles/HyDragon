@@ -94,10 +94,12 @@ public final class HyDragonPlugin extends JavaPlugin {
                 tameworkBridge.snapshot().apiVersion());
         HyDragonPersistenceStatus persistence = getPersistenceStatus();
         getLogger().at(persistence.writable() ? Level.INFO : Level.WARNING).log(
-                "HyDragon persistence %s: players=%d, profiles=%d, encounters=%d, quarantined=%d, reconcile=%d.",
+                "HyDragon persistence %s: players=%d, profiles=%d, encounters=%d, "
+                        + "pendingProfileProjections=%d, quarantined=%d, reconcile=%d.",
                 persistence.writable() ? "ready" : "unavailable/read-only",
                 persistence.players(), persistence.profiles(), persistence.encounters(),
-                persistence.quarantined(), persistence.pendingReconciliation());
+                persistence.pendingProfileProjections(), persistence.quarantined(),
+                persistence.pendingReconciliation());
     }
 
     @Override

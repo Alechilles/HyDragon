@@ -15,12 +15,15 @@ public record HyDragonStateSnapshot(
         Map<UUID, PlayerSoulBondRecord> playerSoulBonds,
         Map<UUID, ProfileExtensionRecord> profileExtensions,
         Map<String, EncounterRecord> encounters,
+        Map<UUID, PendingProfileProjectionRecord> pendingProfileProjections,
         Map<String, ConsumableTransactionRecord> consumableTransactions,
         List<QuarantinedRecord> quarantinedRecords) {
     public HyDragonStateSnapshot {
         playerSoulBonds = Map.copyOf(Objects.requireNonNull(playerSoulBonds, "playerSoulBonds"));
         profileExtensions = Map.copyOf(Objects.requireNonNull(profileExtensions, "profileExtensions"));
         encounters = Map.copyOf(Objects.requireNonNull(encounters, "encounters"));
+        pendingProfileProjections = Map.copyOf(
+                Objects.requireNonNull(pendingProfileProjections, "pendingProfileProjections"));
         consumableTransactions = Map.copyOf(
                 Objects.requireNonNull(consumableTransactions, "consumableTransactions"));
         quarantinedRecords = List.copyOf(Objects.requireNonNull(quarantinedRecords, "quarantinedRecords"));
@@ -36,6 +39,11 @@ public record HyDragonStateSnapshot(
 
     public Optional<EncounterRecord> encounter(String encounterId) {
         return Optional.ofNullable(encounters.get(Objects.requireNonNull(encounterId, "encounterId")));
+    }
+
+    public Optional<PendingProfileProjectionRecord> pendingProfileProjection(UUID operationId) {
+        return Optional.ofNullable(pendingProfileProjections.get(
+                Objects.requireNonNull(operationId, "operationId")));
     }
 
     public Optional<ConsumableTransactionRecord> consumableTransaction(String operationId) {
@@ -60,6 +68,9 @@ public record HyDragonStateSnapshot(
         List<EncounterRecord> persistedEncounters = encounters.values().stream()
                 .sorted(Comparator.comparing(EncounterRecord::encounterId))
                 .toList();
+        List<PendingProfileProjectionRecord> pendingProjections = pendingProfileProjections.values().stream()
+                .sorted(Comparator.comparing(record -> record.operationId().toString()))
+                .toList();
         List<ConsumableTransactionRecord> transactionSagas = consumableTransactions.values().stream()
                 .filter(record -> !record.status().terminal()
                         || record.status() == ConsumableTransactionStatus.QUARANTINED)
@@ -73,6 +84,7 @@ public record HyDragonStateSnapshot(
                 claimed,
                 profiles,
                 persistedEncounters,
+                pendingProjections,
                 transactionSagas,
                 quarantined);
     }

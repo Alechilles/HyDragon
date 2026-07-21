@@ -29,13 +29,14 @@ import java.util.stream.Collectors;
  * immutable snapshots only after a same-directory atomic replacement succeeds. All mutations are serialized
  * under one private lock; snapshot reads are lock-free.</p>
  */
-public final class HyDragonStateStore {
+public final class HyDragonStateStore implements PendingProfileProjectionStore {
     public static final int STORE_SCHEMA_VERSION = 1;
 
     private static final String STORE_SCHEMA_KEY = "store.schema";
     private static final String PLAYER_PREFIX = "player.";
     private static final String PROFILE_PREFIX = "profile.";
     private static final String ENCOUNTER_PREFIX = "encounter.";
+    private static final String PROFILE_PROJECTION_PREFIX = "profileProjection.";
     private static final String TRANSACTION_PREFIX = "transaction.";
     private static final Set<String> PLAYER_FIELDS = Set.of(
             "schema", "state", "operationId", "profileId", "claimedAtEpochMillis");
@@ -54,6 +55,8 @@ public final class HyDragonStateStore {
             "phaseStartedAtEpochMillis",
             "updatedAtEpochMillis",
             "cooldownUntilEpochMillis");
+    private static final Set<String> PROFILE_PROJECTION_FIELDS = Set.of(
+            "schema", "operationId", "profileId", "roleId", "recordedAtEpochMillis");
     private static final Set<String> TRANSACTION_FIELDS = Set.of(
             "schema",
             "operationId",
@@ -344,6 +347,47 @@ public final class HyDragonStateStore {
         }
     }
 
+    @Override
+    public Map<UUID, PendingProfileProjectionRecord> pendingProfileProjections() {
+        return snapshot.pendingProfileProjections();
+    }
+
+    /** Durably queues minimal capture evidence before profile projection is attempted. */
+    @Override
+    public MutationOutcome putPendingProfileProjection(PendingProfileProjectionRecord record) throws IOException {
+        Objects.requireNonNull(record, "record");
+        synchronized (mutationLock) {
+            String persistentId = record.operationId().toString();
+            MutationOutcome blocked = mutationBlock(PersistentRecordType.PENDING_PROFILE_PROJECTION, persistentId);
+            if (blocked != null) return blocked;
+            PendingProfileProjectionRecord current = snapshot.pendingProfileProjections().get(record.operationId());
+            if (record.matchesEvidence(current)) return MutationOutcome.ALREADY_APPLIED;
+            if (current != null) return MutationOutcome.CONFLICT;
+            Properties next = copyProperties(committedProperties);
+            writePendingProfileProjection(next, record);
+            commit(next);
+            return MutationOutcome.APPLIED;
+        }
+    }
+
+    /** Removes a projection only after its projection result is known to be terminal. */
+    @Override
+    public MutationOutcome removePendingProfileProjection(UUID operationId) throws IOException {
+        Objects.requireNonNull(operationId, "operationId");
+        synchronized (mutationLock) {
+            String persistentId = operationId.toString();
+            MutationOutcome blocked = mutationBlock(PersistentRecordType.PENDING_PROFILE_PROJECTION, persistentId);
+            if (blocked != null) return blocked;
+            if (!snapshot.pendingProfileProjections().containsKey(operationId)) {
+                return MutationOutcome.ALREADY_APPLIED;
+            }
+            Properties next = copyProperties(committedProperties);
+            removePrefix(next, profileProjectionPropertyPrefix(operationId));
+            commit(next);
+            return MutationOutcome.APPLIED;
+        }
+    }
+
     /**
      * Durably opens a consumable saga before the source stack is changed.
      *
@@ -601,6 +645,24 @@ public final class HyDragonStateStore {
             }
         }
 
+        Map<UUID, PendingProfileProjectionRecord> pendingProfileProjections = new LinkedHashMap<>();
+        for (String persistentId : collectRecordSegments(properties, PROFILE_PROJECTION_PREFIX)) {
+            String prefix = PROFILE_PROJECTION_PREFIX + persistentId + ".";
+            try {
+                UUID operationId = UUID.fromString(persistentId);
+                PendingProfileProjectionRecord record = parsePendingProfileProjection(
+                        properties, prefix, operationId);
+                pendingProfileProjections.put(operationId, record);
+            } catch (RuntimeException exception) {
+                quarantined.add(quarantine(
+                        PersistentRecordType.PENDING_PROFILE_PROJECTION,
+                        persistentId,
+                        exception,
+                        properties,
+                        prefix));
+            }
+        }
+
         Map<String, ConsumableTransactionRecord> transactions = new LinkedHashMap<>();
         for (String encodedId : collectRecordSegments(properties, TRANSACTION_PREFIX)) {
             String prefix = TRANSACTION_PREFIX + encodedId + ".";
@@ -650,6 +712,7 @@ public final class HyDragonStateStore {
                 players,
                 profiles,
                 encounters,
+                pendingProfileProjections,
                 transactions,
                 quarantined);
     }
@@ -700,6 +763,25 @@ public final class HyDragonStateStore {
                 requiredLong(properties, prefix + "phaseStartedAtEpochMillis"),
                 requiredLong(properties, prefix + "updatedAtEpochMillis"),
                 requiredLong(properties, prefix + "cooldownUntilEpochMillis"));
+    }
+
+    private static PendingProfileProjectionRecord parsePendingProfileProjection(
+            Properties properties,
+            String prefix,
+            UUID operationId) {
+        int schema = requiredInt(properties, prefix + "schema");
+        requireSchema(schema, PendingProfileProjectionRecord.SCHEMA_VERSION, "pending profile projection");
+        UUID persistedOperationId = UUID.fromString(requiredText(properties, prefix + "operationId"));
+        if (!operationId.equals(persistedOperationId)) {
+            throw new IllegalArgumentException(
+                    "Pending profile projection operation id does not match its property key");
+        }
+        return new PendingProfileProjectionRecord(
+                schema,
+                operationId,
+                requiredText(properties, prefix + "profileId"),
+                requiredText(properties, prefix + "roleId"),
+                requiredLong(properties, prefix + "recordedAtEpochMillis"));
     }
 
     private static ConsumableTransactionRecord parseTransaction(
@@ -805,6 +887,19 @@ public final class HyDragonStateStore {
         properties.setProperty(prefix + "cooldownUntilEpochMillis", Long.toString(record.cooldownUntilEpochMillis()));
     }
 
+    private static void writePendingProfileProjection(
+            Properties properties,
+            PendingProfileProjectionRecord record) {
+        String prefix = profileProjectionPropertyPrefix(record.operationId());
+        clearKnownFields(properties, prefix, PROFILE_PROJECTION_FIELDS);
+        properties.setProperty(prefix + "schema", Integer.toString(record.schemaVersion()));
+        properties.setProperty(prefix + "operationId", record.operationId().toString());
+        properties.setProperty(prefix + "profileId", record.profileId());
+        properties.setProperty(prefix + "roleId", record.roleId());
+        properties.setProperty(
+                prefix + "recordedAtEpochMillis", Long.toString(record.recordedAtEpochMillis()));
+    }
+
     private static void writeTransaction(Properties properties, ConsumableTransactionRecord record) {
         String prefix = transactionPropertyPrefix(record.operationId());
         clearKnownFields(properties, prefix, TRANSACTION_FIELDS);
@@ -900,6 +995,10 @@ public final class HyDragonStateStore {
 
     private static String transactionPropertyPrefix(String operationId) {
         return TRANSACTION_PREFIX + encodeRecordId(operationId) + ".";
+    }
+
+    private static String profileProjectionPropertyPrefix(UUID operationId) {
+        return PROFILE_PROJECTION_PREFIX + operationId + ".";
     }
 
     private static String encodeRecordId(String recordId) {

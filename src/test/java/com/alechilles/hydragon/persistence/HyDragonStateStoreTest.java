@@ -96,6 +96,32 @@ class HyDragonStateStoreTest {
     }
 
     @Test
+    void pendingProfileProjectionRoundTripsAndIsRemovedIdempotently() throws Exception {
+        Path file = temporaryDirectory.resolve("pending-projection.properties");
+        UUID operationId = UUID.randomUUID();
+        PendingProfileProjectionRecord record = PendingProfileProjectionRecord.captured(
+                operationId, PROFILE_TWO.toString(), "NordicDrake", 123L);
+        HyDragonStateStore first = new HyDragonStateStore(file);
+
+        assertEquals(MutationOutcome.APPLIED, first.putPendingProfileProjection(record));
+        assertEquals(MutationOutcome.ALREADY_APPLIED, first.putPendingProfileProjection(record));
+        assertEquals(MutationOutcome.ALREADY_APPLIED, first.putPendingProfileProjection(
+                PendingProfileProjectionRecord.captured(
+                        operationId, PROFILE_TWO.toString(), "NordicDrake", 999L)));
+        assertEquals(MutationOutcome.CONFLICT, first.putPendingProfileProjection(
+                PendingProfileProjectionRecord.captured(
+                        operationId, PROFILE_ONE.toString(), "NordicDrake", 123L)));
+
+        HyDragonStateStore restarted = new HyDragonStateStore(file);
+        assertEquals(record, restarted.snapshot().pendingProfileProjection(operationId).orElseThrow());
+        assertEquals(List.of(record), restarted.startupInventory().profileProjectionsToRetry());
+
+        assertEquals(MutationOutcome.APPLIED, restarted.removePendingProfileProjection(operationId));
+        assertEquals(MutationOutcome.ALREADY_APPLIED, restarted.removePendingProfileProjection(operationId));
+        assertTrue(new HyDragonStateStore(file).snapshot().pendingProfileProjections().isEmpty());
+    }
+
+    @Test
     void preservesUnknownGlobalAndRecordPropertiesDuringMutation() throws Exception {
         Path file = temporaryDirectory.resolve("unknown.properties");
         Properties initial = new Properties();
