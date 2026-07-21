@@ -2,5 +2,12 @@
   "Parent": "HyDragonDraconicStone",
   "EmptyItemId": "Draconic_Stone_Cobalt",
   "FilledItemId": "*Draconic_Stone_Cobalt_State_Filled",
-  "Capture": { "Power": 3 }
+  "Capture": { "Power": 3 },
+  "Vessel": {
+    "StateItemIds": {
+      "Stored": "*Draconic_Stone_Cobalt_State_Filled",
+      "Active": "*Draconic_Stone_Cobalt_State_Active",
+      "Dead": "*Draconic_Stone_Cobalt_State_Damaged"
+    }
+  }
 }

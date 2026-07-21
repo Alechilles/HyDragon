@@ -5,5 +5,12 @@
   "Capture": {
     "Power": 5,
     "MaximumChance": 1.0
+  },
+  "Vessel": {
+    "StateItemIds": {
+      "Stored": "*Draconic_Stone_Ancient_State_Filled",
+      "Active": "*Draconic_Stone_Ancient_State_Active",
+      "Dead": "*Draconic_Stone_Ancient_State_Damaged"
+    }
   }
 }

@@ -228,6 +228,29 @@ def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
     if not isinstance(ancient_capture, dict) or ancient_capture.get("MaximumChance") != 1.0:
         fail(errors, "Ancient stone must cap eligible capture probability at 1.0")
 
+    for filename, _ in tiers:
+        path = spawner_root / filename
+        data = parsed.get(path)
+        if not isinstance(data, dict):
+            continue
+        item_id = data.get("EmptyItemId")
+        suffix = "" if item_id == "Draconic_Stone" else item_id.removeprefix("Draconic_Stone")
+        expected_prefix = f"*Draconic_Stone{suffix}_State_"
+        vessel = data.get("Vessel")
+        if not isinstance(vessel, dict):
+            # The base config authors the authoritative inherited map.
+            if filename != "HyDragonDraconicStone.json":
+                fail(errors, f"{path.relative_to(ROOT)} must override tier-specific vessel state items")
+            continue
+        states = vessel.get("StateItemIds")
+        expected = {
+            "Stored": expected_prefix + "Filled",
+            "Active": expected_prefix + "Active",
+            "Dead": expected_prefix + "Damaged",
+        }
+        if states != expected:
+            fail(errors, f"tier-specific vessel state map mismatch in {path.relative_to(ROOT)}: {states}")
+
 
 def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str]) -> None:
     spawn_roots = (
