@@ -5,5 +5,6 @@ public enum PersistentRecordType {
     STORE,
     PLAYER_SOUL_BOND,
     PROFILE_EXTENSION,
-    ENCOUNTER
+    ENCOUNTER,
+    CONSUMABLE_TRANSACTION
 }

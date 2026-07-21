@@ -36,6 +36,7 @@ public final class HyDragonStateStore {
     private static final String PLAYER_PREFIX = "player.";
     private static final String PROFILE_PREFIX = "profile.";
     private static final String ENCOUNTER_PREFIX = "encounter.";
+    private static final String TRANSACTION_PREFIX = "transaction.";
     private static final Set<String> PLAYER_FIELDS = Set.of(
             "schema", "state", "operationId", "profileId", "claimedAtEpochMillis");
     private static final Set<String> PROFILE_FIELDS = Set.of(
@@ -53,6 +54,40 @@ public final class HyDragonStateStore {
             "phaseStartedAtEpochMillis",
             "updatedAtEpochMillis",
             "cooldownUntilEpochMillis");
+    private static final Set<String> TRANSACTION_FIELDS = Set.of(
+            "schema",
+            "operationId",
+            "correlationId",
+            "kind",
+            "status",
+            "callerNamespace",
+            "idempotencyKey",
+            "ownerUuid",
+            "intentId",
+            "sourceItemId",
+            "sourceHolderEvidenceId",
+            "sourceContainerPath",
+            "sourceInventorySlot",
+            "sourceInventoryRevision",
+            "sourceItemFingerprint",
+            "sourceStackQuantityAtPrepare",
+            "materialQuantity",
+            "authoritySourceItemId",
+            "authoritySourceHolderEvidenceId",
+            "authoritySourceContainerPath",
+            "authoritySourceInventorySlot",
+            "authoritySourceInventoryRevision",
+            "authoritySourceItemFingerprint",
+            "authoritySourceStackQuantityAtPrepare",
+            "authorityOperationId",
+            "profileId",
+            "bindingId",
+            "bindingGeneration",
+            "profileRevision",
+            "revision",
+            "createdAtEpochMillis",
+            "updatedAtEpochMillis",
+            "quarantineReason");
 
     private final Object mutationLock = new Object();
     private final Path file;
@@ -255,6 +290,125 @@ public final class HyDragonStateStore {
         }
     }
 
+    /**
+     * Durably opens a consumable saga before the source stack is changed.
+     *
+     * <p>Both the operation ID and the cross-plugin origin are unique. An exact retry is a no-op; an attempt
+     * to reuse either identity for different evidence fails closed.</p>
+     */
+    public MutationOutcome beginConsumableTransaction(ConsumableTransactionRecord record) throws IOException {
+        Objects.requireNonNull(record, "record");
+        if (record.status() != ConsumableTransactionStatus.PREPARED || record.revision() != 0) {
+            throw new IllegalArgumentException("A new consumable transaction must be PREPARED at revision 0");
+        }
+        synchronized (mutationLock) {
+            MutationOutcome blocked = mutationBlock(
+                    PersistentRecordType.CONSUMABLE_TRANSACTION,
+                    record.operationId());
+            if (blocked != null) {
+                return blocked;
+            }
+            ConsumableTransactionRecord current = snapshot.consumableTransactions().get(record.operationId());
+            if (record.equals(current)) {
+                return MutationOutcome.ALREADY_APPLIED;
+            }
+            if (current != null) {
+                return MutationOutcome.CONFLICT;
+            }
+            boolean originAlreadyUsed = snapshot.consumableTransactions().values().stream()
+                    .anyMatch(existing -> existing.origin().equals(record.origin()));
+            if (originAlreadyUsed) {
+                return MutationOutcome.CONFLICT;
+            }
+            Properties next = copyProperties(committedProperties);
+            writeTransaction(next, record);
+            commit(next);
+            return MutationOutcome.APPLIED;
+        }
+    }
+
+    /**
+     * Compare-and-sets one saga phase and revision. Replaying the completed transition returns
+     * {@link MutationOutcome#ALREADY_APPLIED} without another disk write.
+     */
+    public MutationOutcome advanceConsumableTransaction(
+            String operationId,
+            long expectedRevision,
+            ConsumableTransactionStatus expectedStatus,
+            ConsumableTransactionStatus nextStatus,
+            long updatedAtEpochMillis,
+            Optional<String> authorityOperationId,
+            Optional<String> profileId,
+            OptionalLong profileRevision,
+            Optional<String> quarantineReason) throws IOException {
+        operationId = requiredText(operationId, "operationId");
+        if (expectedRevision < 0) {
+            throw new IllegalArgumentException("expectedRevision must not be negative");
+        }
+        Objects.requireNonNull(expectedStatus, "expectedStatus");
+        Objects.requireNonNull(nextStatus, "nextStatus");
+        if (!expectedStatus.mayTransitionTo(nextStatus)) {
+            throw new IllegalArgumentException(
+                    "Illegal consumable transaction transition " + expectedStatus + " -> " + nextStatus);
+        }
+        Objects.requireNonNull(authorityOperationId, "authorityOperationId");
+        Objects.requireNonNull(profileId, "profileId");
+        Objects.requireNonNull(profileRevision, "profileRevision");
+        Objects.requireNonNull(quarantineReason, "quarantineReason");
+        synchronized (mutationLock) {
+            MutationOutcome blocked = mutationBlock(PersistentRecordType.CONSUMABLE_TRANSACTION, operationId);
+            if (blocked != null) {
+                return blocked;
+            }
+            ConsumableTransactionRecord current = snapshot.consumableTransactions().get(operationId);
+            if (current == null) {
+                return MutationOutcome.CONFLICT;
+            }
+            if (current.status() == nextStatus && current.revision() == expectedRevision + 1
+                    && compatible(current.authorityOperationId(), authorityOperationId)
+                    && compatible(current.profileId(), profileId)
+                    && compatible(current.profileRevision(), profileRevision)
+                    && compatible(current.quarantineReason(), quarantineReason)) {
+                return MutationOutcome.ALREADY_APPLIED;
+            }
+            if (current.revision() != expectedRevision || current.status() != expectedStatus) {
+                return MutationOutcome.CONFLICT;
+            }
+            if (!canResolve(current.authorityOperationId(), authorityOperationId)
+                    || !canResolve(current.profileId(), profileId)
+                    || !canResolve(current.profileRevision(), profileRevision)) {
+                return MutationOutcome.CONFLICT;
+            }
+            ConsumableTransactionRecord replacement = current.transitionTo(
+                    nextStatus,
+                    updatedAtEpochMillis,
+                    authorityOperationId,
+                    profileId,
+                    profileRevision,
+                    quarantineReason);
+            Properties next = copyProperties(committedProperties);
+            writeTransaction(next, replacement);
+            commit(next);
+            return MutationOutcome.APPLIED;
+        }
+    }
+
+    private static boolean compatible(Optional<String> recorded, Optional<String> supplied) {
+        return supplied.isEmpty() || recorded.equals(supplied);
+    }
+
+    private static boolean compatible(OptionalLong recorded, OptionalLong supplied) {
+        return supplied.isEmpty() || (recorded.isPresent() && recorded.getAsLong() == supplied.getAsLong());
+    }
+
+    private static boolean canResolve(Optional<String> recorded, Optional<String> supplied) {
+        return recorded.isEmpty() || supplied.isEmpty() || recorded.equals(supplied);
+    }
+
+    private static boolean canResolve(OptionalLong recorded, OptionalLong supplied) {
+        return recorded.isEmpty() || supplied.isEmpty() || recorded.getAsLong() == supplied.getAsLong();
+    }
+
     private MutationOutcome putPlayerSoulBondLocked(PlayerSoulBondRecord record) throws IOException {
         MutationOutcome blocked = mutationBlock(PersistentRecordType.PLAYER_SOUL_BOND, record.playerUuid().toString());
         if (blocked != null) {
@@ -393,6 +547,47 @@ public final class HyDragonStateStore {
             }
         }
 
+        Map<String, ConsumableTransactionRecord> transactions = new LinkedHashMap<>();
+        for (String encodedId : collectRecordSegments(properties, TRANSACTION_PREFIX)) {
+            String prefix = TRANSACTION_PREFIX + encodedId + ".";
+            String persistentId = encodedId;
+            try {
+                String operationId = decodeRecordId(encodedId, "operationId");
+                persistentId = operationId;
+                ConsumableTransactionRecord record = parseTransaction(properties, prefix, operationId);
+                ConsumableTransactionRecord duplicate = transactions.putIfAbsent(operationId, record);
+                if (duplicate != null) {
+                    throw new IllegalArgumentException("Duplicate encoded transaction operation id " + operationId);
+                }
+            } catch (RuntimeException exception) {
+                quarantined.add(quarantine(
+                        PersistentRecordType.CONSUMABLE_TRANSACTION,
+                        persistentId,
+                        exception,
+                        properties,
+                        prefix));
+            }
+        }
+
+        Map<OperationOrigin, String> origins = new LinkedHashMap<>();
+        for (ConsumableTransactionRecord record : List.copyOf(transactions.values())) {
+            String existingOperation = origins.putIfAbsent(record.origin(), record.operationId());
+            if (existingOperation != null) {
+                transactions.remove(record.operationId());
+                transactions.remove(existingOperation);
+                quarantined.add(new QuarantinedRecord(
+                        PersistentRecordType.CONSUMABLE_TRANSACTION,
+                        existingOperation,
+                        "Duplicate durable operation origin also used by " + record.operationId(),
+                        rawWithPrefix(properties, transactionPropertyPrefix(existingOperation))));
+                quarantined.add(new QuarantinedRecord(
+                        PersistentRecordType.CONSUMABLE_TRANSACTION,
+                        record.operationId(),
+                        "Duplicate durable operation origin also used by " + existingOperation,
+                        rawWithPrefix(properties, transactionPropertyPrefix(record.operationId()))));
+            }
+        }
+
         quarantined.sort(Comparator.comparing((QuarantinedRecord record) -> record.type().name())
                 .thenComparing(QuarantinedRecord::persistentId));
         return new HyDragonStateSnapshot(
@@ -401,6 +596,7 @@ public final class HyDragonStateStore {
                 players,
                 profiles,
                 encounters,
+                transactions,
                 quarantined);
     }
 
@@ -452,6 +648,68 @@ public final class HyDragonStateStore {
                 requiredLong(properties, prefix + "cooldownUntilEpochMillis"));
     }
 
+    private static ConsumableTransactionRecord parseTransaction(
+            Properties properties,
+            String prefix,
+            String operationId) {
+        int schema = requiredInt(properties, prefix + "schema");
+        requireSchema(schema, ConsumableTransactionRecord.SCHEMA_VERSION, "consumable transaction");
+        String persistedOperationId = requiredText(properties, prefix + "operationId");
+        if (!operationId.equals(persistedOperationId)) {
+            throw new IllegalArgumentException("Transaction operation id does not match its encoded property key");
+        }
+        return new ConsumableTransactionRecord(
+                schema,
+                operationId,
+                requiredText(properties, prefix + "correlationId"),
+                requiredEnum(properties, prefix + "kind", ConsumableTransactionKind.class),
+                requiredEnum(properties, prefix + "status", ConsumableTransactionStatus.class),
+                new OperationOrigin(
+                        requiredText(properties, prefix + "callerNamespace"),
+                        requiredText(properties, prefix + "idempotencyKey")),
+                UUID.fromString(requiredText(properties, prefix + "ownerUuid")),
+                requiredText(properties, prefix + "intentId"),
+                new SourceItemEvidence(
+                        requiredText(properties, prefix + "sourceItemId"),
+                        requiredText(properties, prefix + "sourceHolderEvidenceId"),
+                        requiredText(properties, prefix + "sourceContainerPath"),
+                        requiredInt(properties, prefix + "sourceInventorySlot"),
+                        requiredLong(properties, prefix + "sourceInventoryRevision"),
+                        requiredText(properties, prefix + "sourceItemFingerprint"),
+                        requiredInt(properties, prefix + "sourceStackQuantityAtPrepare")),
+                requiredInt(properties, prefix + "materialQuantity"),
+                optionalSourceItem(properties, prefix, "authoritySource"),
+                optionalText(properties, prefix + "authorityOperationId"),
+                optionalText(properties, prefix + "profileId"),
+                optionalUuid(properties, prefix + "bindingId"),
+                optionalLong(properties, prefix + "bindingGeneration"),
+                optionalLong(properties, prefix + "profileRevision"),
+                requiredLong(properties, prefix + "revision"),
+                requiredLong(properties, prefix + "createdAtEpochMillis"),
+                requiredLong(properties, prefix + "updatedAtEpochMillis"),
+                optionalText(properties, prefix + "quarantineReason"));
+    }
+
+    private static Optional<SourceItemEvidence> optionalSourceItem(
+            Properties properties,
+            String prefix,
+            String fieldPrefix) {
+        String itemIdKey = prefix + fieldPrefix + "ItemId";
+        boolean present = properties.stringPropertyNames().stream()
+                .anyMatch(key -> key.startsWith(prefix + fieldPrefix));
+        if (!present) {
+            return Optional.empty();
+        }
+        return Optional.of(new SourceItemEvidence(
+                requiredText(properties, itemIdKey),
+                requiredText(properties, prefix + fieldPrefix + "HolderEvidenceId"),
+                requiredText(properties, prefix + fieldPrefix + "ContainerPath"),
+                requiredInt(properties, prefix + fieldPrefix + "InventorySlot"),
+                requiredLong(properties, prefix + fieldPrefix + "InventoryRevision"),
+                requiredText(properties, prefix + fieldPrefix + "ItemFingerprint"),
+                requiredInt(properties, prefix + fieldPrefix + "StackQuantityAtPrepare")));
+    }
+
     private static void writePlayer(Properties properties, PlayerSoulBondRecord record) {
         String prefix = PLAYER_PREFIX + record.playerUuid() + ".";
         clearKnownFields(properties, prefix, PLAYER_FIELDS);
@@ -493,6 +751,62 @@ public final class HyDragonStateStore {
         properties.setProperty(prefix + "cooldownUntilEpochMillis", Long.toString(record.cooldownUntilEpochMillis()));
     }
 
+    private static void writeTransaction(Properties properties, ConsumableTransactionRecord record) {
+        String prefix = transactionPropertyPrefix(record.operationId());
+        clearKnownFields(properties, prefix, TRANSACTION_FIELDS);
+        properties.setProperty(prefix + "schema", Integer.toString(record.schemaVersion()));
+        properties.setProperty(prefix + "operationId", record.operationId());
+        properties.setProperty(prefix + "correlationId", record.correlationId());
+        properties.setProperty(prefix + "kind", record.kind().name());
+        properties.setProperty(prefix + "status", record.status().name());
+        properties.setProperty(prefix + "callerNamespace", record.origin().callerNamespace());
+        properties.setProperty(prefix + "idempotencyKey", record.origin().idempotencyKey());
+        properties.setProperty(prefix + "ownerUuid", record.ownerUuid().toString());
+        properties.setProperty(prefix + "intentId", record.intentId());
+        properties.setProperty(prefix + "sourceItemId", record.sourceItem().itemId());
+        properties.setProperty(prefix + "sourceHolderEvidenceId", record.sourceItem().holderEvidenceId());
+        properties.setProperty(prefix + "sourceContainerPath", record.sourceItem().containerPath());
+        properties.setProperty(prefix + "sourceInventorySlot", Integer.toString(record.sourceItem().inventorySlot()));
+        properties.setProperty(
+                prefix + "sourceInventoryRevision",
+                Long.toString(record.sourceItem().inventoryRevision()));
+        properties.setProperty(prefix + "sourceItemFingerprint", record.sourceItem().itemFingerprint());
+        properties.setProperty(
+                prefix + "sourceStackQuantityAtPrepare",
+                Integer.toString(record.sourceItem().stackQuantityAtPrepare()));
+        properties.setProperty(prefix + "materialQuantity", Integer.toString(record.materialQuantity()));
+        writeOptionalSourceItem(properties, prefix, "authoritySource", record.authoritySourceItem());
+        setOptional(properties, prefix + "authorityOperationId", record.authorityOperationId());
+        setOptional(properties, prefix + "profileId", record.profileId());
+        setOptional(properties, prefix + "bindingId", record.bindingId().map(UUID::toString));
+        setOptionalLong(properties, prefix + "bindingGeneration", record.bindingGeneration());
+        setOptionalLong(properties, prefix + "profileRevision", record.profileRevision());
+        properties.setProperty(prefix + "revision", Long.toString(record.revision()));
+        properties.setProperty(prefix + "createdAtEpochMillis", Long.toString(record.createdAtEpochMillis()));
+        properties.setProperty(prefix + "updatedAtEpochMillis", Long.toString(record.updatedAtEpochMillis()));
+        setOptional(properties, prefix + "quarantineReason", record.quarantineReason());
+    }
+
+    private static void writeOptionalSourceItem(
+            Properties properties,
+            String prefix,
+            String fieldPrefix,
+            Optional<SourceItemEvidence> evidence) {
+        if (evidence.isEmpty()) {
+            return;
+        }
+        SourceItemEvidence value = evidence.orElseThrow();
+        properties.setProperty(prefix + fieldPrefix + "ItemId", value.itemId());
+        properties.setProperty(prefix + fieldPrefix + "HolderEvidenceId", value.holderEvidenceId());
+        properties.setProperty(prefix + fieldPrefix + "ContainerPath", value.containerPath());
+        properties.setProperty(prefix + fieldPrefix + "InventorySlot", Integer.toString(value.inventorySlot()));
+        properties.setProperty(prefix + fieldPrefix + "InventoryRevision", Long.toString(value.inventoryRevision()));
+        properties.setProperty(prefix + fieldPrefix + "ItemFingerprint", value.itemFingerprint());
+        properties.setProperty(
+                prefix + fieldPrefix + "StackQuantityAtPrepare",
+                Integer.toString(value.stackQuantityAtPrepare()));
+    }
+
     private static void clearKnownFields(Properties properties, String prefix, Set<String> fields) {
         for (String field : fields) {
             properties.remove(prefix + field);
@@ -527,22 +841,30 @@ public final class HyDragonStateStore {
     }
 
     private static String encounterPropertyPrefix(String encounterId) {
-        return ENCOUNTER_PREFIX + encodeEncounterId(encounterId) + ".";
+        return ENCOUNTER_PREFIX + encodeRecordId(encounterId) + ".";
     }
 
-    private static String encodeEncounterId(String encounterId) {
+    private static String transactionPropertyPrefix(String operationId) {
+        return TRANSACTION_PREFIX + encodeRecordId(operationId) + ".";
+    }
+
+    private static String encodeRecordId(String recordId) {
         return Base64.getUrlEncoder()
                 .withoutPadding()
-                .encodeToString(encounterId.getBytes(StandardCharsets.UTF_8));
+                .encodeToString(recordId.getBytes(StandardCharsets.UTF_8));
     }
 
     private static String decodeEncounterId(String encodedId) {
+        return decodeRecordId(encodedId, "encounterId");
+    }
+
+    private static String decodeRecordId(String encodedId, String field) {
         byte[] decoded = Base64.getUrlDecoder().decode(encodedId);
         String value = new String(decoded, StandardCharsets.UTF_8);
-        if (!encodeEncounterId(value).equals(encodedId)) {
-            throw new IllegalArgumentException("Encounter key is not canonical base64url");
+        if (!encodeRecordId(value).equals(encodedId)) {
+            throw new IllegalArgumentException(field + " key is not canonical base64url");
         }
-        return requiredText(value, "encounterId");
+        return requiredText(value, field);
     }
 
     private static Set<String> collectRecordSegments(Properties properties, String familyPrefix) {

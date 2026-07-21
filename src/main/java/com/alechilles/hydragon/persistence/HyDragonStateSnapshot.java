@@ -15,11 +15,14 @@ public record HyDragonStateSnapshot(
         Map<UUID, PlayerSoulBondRecord> playerSoulBonds,
         Map<UUID, ProfileExtensionRecord> profileExtensions,
         Map<String, EncounterRecord> encounters,
+        Map<String, ConsumableTransactionRecord> consumableTransactions,
         List<QuarantinedRecord> quarantinedRecords) {
     public HyDragonStateSnapshot {
         playerSoulBonds = Map.copyOf(Objects.requireNonNull(playerSoulBonds, "playerSoulBonds"));
         profileExtensions = Map.copyOf(Objects.requireNonNull(profileExtensions, "profileExtensions"));
         encounters = Map.copyOf(Objects.requireNonNull(encounters, "encounters"));
+        consumableTransactions = Map.copyOf(
+                Objects.requireNonNull(consumableTransactions, "consumableTransactions"));
         quarantinedRecords = List.copyOf(Objects.requireNonNull(quarantinedRecords, "quarantinedRecords"));
     }
 
@@ -33,6 +36,10 @@ public record HyDragonStateSnapshot(
 
     public Optional<EncounterRecord> encounter(String encounterId) {
         return Optional.ofNullable(encounters.get(Objects.requireNonNull(encounterId, "encounterId")));
+    }
+
+    public Optional<ConsumableTransactionRecord> consumableTransaction(String operationId) {
+        return Optional.ofNullable(consumableTransactions.get(Objects.requireNonNull(operationId, "operationId")));
     }
 
     /** Builds deterministic reconciliation work lists from this snapshot. */
@@ -53,6 +60,11 @@ public record HyDragonStateSnapshot(
         List<EncounterRecord> persistedEncounters = encounters.values().stream()
                 .sorted(Comparator.comparing(EncounterRecord::encounterId))
                 .toList();
+        List<ConsumableTransactionRecord> transactionSagas = consumableTransactions.values().stream()
+                .filter(record -> !record.status().terminal()
+                        || record.status() == ConsumableTransactionStatus.QUARANTINED)
+                .sorted(Comparator.comparing(ConsumableTransactionRecord::operationId))
+                .toList();
         List<QuarantinedRecord> quarantined = new ArrayList<>(quarantinedRecords);
         quarantined.sort(Comparator.comparing((QuarantinedRecord record) -> record.type().name())
                 .thenComparing(QuarantinedRecord::persistentId));
@@ -61,6 +73,7 @@ public record HyDragonStateSnapshot(
                 claimed,
                 profiles,
                 persistedEncounters,
+                transactionSagas,
                 quarantined);
     }
 }
