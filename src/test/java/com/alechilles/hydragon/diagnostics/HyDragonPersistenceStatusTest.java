@@ -6,11 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
+import com.alechilles.hydragon.persistence.ConsumableTransactionKind;
+import com.alechilles.hydragon.persistence.ConsumableTransactionRecord;
+import com.alechilles.hydragon.persistence.OperationOrigin;
 import com.alechilles.hydragon.persistence.ProfileExtensionRecord;
+import com.alechilles.hydragon.persistence.SourceItemEvidence;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Properties;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -46,6 +51,29 @@ class HyDragonPersistenceStatusTest {
                 "hydragon:miniwyvern",
                 "neutral",
                 Optional.of("soul:claimed")));
+        store.beginConsumableTransaction(ConsumableTransactionRecord.prepared(
+                "soul:item:pending",
+                "corr:soul:item:pending",
+                ConsumableTransactionKind.SOUL_BOND,
+                new OperationOrigin("hydragon", "soul-bond:owner:once"),
+                PLAYER_ONE,
+                "Wyvern_Mini",
+                new SourceItemEvidence(
+                        "Draconic_Soul_Bond",
+                        PLAYER_ONE.toString(),
+                        "player-inventory/main",
+                        4,
+                        23,
+                        "sha256:soul-source",
+                        1),
+                1,
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                OptionalLong.empty(),
+                OptionalLong.empty(),
+                1_001));
 
         HyDragonPersistenceStatus status = HyDragonPersistenceStatus.from(store, null);
 
@@ -53,7 +81,7 @@ class HyDragonPersistenceStatusTest {
         assertTrue(status.writable());
         assertEquals(2, status.players());
         assertEquals(1, status.profiles());
-        assertEquals(3, status.pendingReconciliation());
+        assertEquals(4, status.pendingReconciliation());
         assertNull(status.reason());
     }
 

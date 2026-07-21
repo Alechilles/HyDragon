@@ -32,7 +32,8 @@ public record HyDragonPersistenceStatus(
                 inventory.soulBondsNeedingReconciliation().size()
                         + inventory.claimedSoulBondsToVerify().size()
                         + inventory.profileExtensionsToVerify().size()
-                        + inventory.encountersToResumeOrCleanUp().size(),
+                        + inventory.encountersToResumeOrCleanUp().size()
+                        + inventory.consumableTransactionsToReconcile().size(),
                 snapshot.writable() ? null : "unsupported store schema or quarantined store"
         );
     }
