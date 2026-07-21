@@ -1,11 +1,11 @@
 package com.alechilles.hydragon.diagnostics;
 
 import com.alechilles.hydragon.interactions.HytaleConsumableRefundDelivery;
+import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -34,12 +34,12 @@ public final class HyDragonRefundClaimCommand extends AbstractPlayerCommand {
             @Nonnull World world) {
         ConsumableRefundClaimService service = serviceSupplier.get();
         if (service == null) {
-            context.sendMessage(Message.raw("HyDragon refund recovery is currently unavailable."));
+            context.sendMessage(HyDragonMessages.refundUnavailable());
             return;
         }
         List<ConsumableRefundClaimService.Claim> claims = service.claims(playerRef.getUuid());
         if (claims.isEmpty()) {
-            context.sendMessage(Message.raw("You have no pending HyDragon refund claims."));
+            context.sendMessage(HyDragonMessages.refundNone());
             return;
         }
         ConsumableRefundClaimService.Claim claim = claims.getFirst();
@@ -50,9 +50,13 @@ public final class HyDragonRefundClaimCommand extends AbstractPlayerCommand {
 
     private static void sendResult(CommandContext context, GameplayResult result, Throwable failure) {
         if (failure != null || result == null) {
-            context.sendMessage(Message.raw("HyDragon refund recovery remains pending."));
+            context.sendMessage(HyDragonMessages.refundPending());
             return;
         }
-        context.sendMessage(Message.raw(result.reason()));
+        context.sendMessage(result.succeeded()
+                ? HyDragonMessages.refundRecovered()
+                : result.status() == GameplayResult.Status.DENIED
+                ? HyDragonMessages.refundNoSpace()
+                : HyDragonMessages.refundPending());
     }
 }

@@ -19,6 +19,11 @@ public final class HyDragonMessages {
     public static Message attunementUnavailable() { return translated("attunement.unavailable"); }
     public static Message repairSuccess() { return translated("repair.success"); }
     public static Message repairInvalid() { return translated("repair.invalid"); }
+    public static Message refundUnavailable() { return translated("refund.unavailable"); }
+    public static Message refundNone() { return translated("refund.none"); }
+    public static Message refundRecovered() { return translated("refund.recovered"); }
+    public static Message refundNoSpace() { return translated("refund.noSpace"); }
+    public static Message refundPending() { return translated("refund.pending"); }
     public static Message vesselUnavailable() { return translated("vessel.unavailable"); }
 
     /** Server-side resolution for non-client sinks and locale contract tests. */
