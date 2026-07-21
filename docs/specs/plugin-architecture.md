@@ -24,7 +24,7 @@ Normative Tamework dependencies:
 - [Capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md)
 - [Bonded vessels](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/bonded-vessels.md)
 - [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md)
-- [Companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md)
+- Deferred post-MVP: [Companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md)
 
 ## 2. Architectural decisions
 
@@ -56,7 +56,7 @@ Normative Tamework dependencies:
 ### Persistence and safety
 
 - **HYD-ARCH-010:** HyDragon-owned player and profile records MUST contain a schema version and support forward, idempotent migrations without deleting an unknown or unsupported record.
-- **HYD-ARCH-011:** Item consumption, profile creation/linking, archetype changes, repairs, and inventory mutations MUST be transactional or compensating. Retrying an event after interruption MUST NOT create a second companion or consume the same input twice.
+- **HYD-ARCH-011:** Item consumption, profile creation/linking, archetype changes, repairs, and any later inventory mutations MUST be transactional or compensating. Retrying an event after interruption MUST NOT create a second companion or consume the same input twice.
 - **HYD-ARCH-012:** World/entity access and delayed work MUST obey the game thread-affinity contract. Deferred tasks MUST retain stable identifiers and resolve live entities on the owning world thread rather than retaining component objects.
 - **HYD-ARCH-013:** The plugin MUST expose structured startup diagnostics and an operator-readable status command covering version, capabilities, config load errors, disabled features, migration results, and orphaned links.
 - **HYD-ARCH-014:** Automated release verification MUST prove that the JAR contains its entry point, manifest, assets, service metadata if used, and no duplicate or development-only resource trees.
@@ -133,7 +133,7 @@ Feature gates:
 | One active full dragon / one Miniwyvern | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) | Deny admission; never bypass the cap locally |
 | Soul Bond creation | Tamework `COMPANION_PROVISIONING`, population groups, and the [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) | Disable new claims; preserve existing entitlement/profile data |
 | Soul Bond metadata and archetypes | Tamework profile data and event API in the [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) | Disable mutation; preserve existing data |
-| Miniwyvern backpack | [Companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md) | Disable backpack interaction only |
+| Deferred Miniwyvern backpack | Future [companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md) | Not queried or registered in the initial release; capability-gate the later update |
 
 Version acceptance is necessary but not sufficient. Capability checks protect development snapshots, selectively disabled modules, and compatible future releases that omit optional features.
 
@@ -147,7 +147,7 @@ Tamework remains authoritative for:
 - provisioned-profile identity and `PROVISIONED_DORMANT` recovery state;
 - bonded-vessel link and anti-duplication token;
 - population-group admission;
-- generic captured health, name, attachments, progression, and inventory contents;
+- generic captured health, name, attachments, and progression; companion inventory contents join this authority only after the deferred system ships;
 - capture roll result and committed capture transaction.
 
 HyDragon reads or mutates these only through the public integration contract.
@@ -272,7 +272,7 @@ Every domain-config codec must reject invalid identifiers, ranges, negative dura
 - Restarting during each multi-step mutation converges to one valid companion/profile/item outcome without duplicated items or companions.
 - Config reload failure leaves the last valid configuration active.
 - Packaging tests prove root-layout assets are included and `HyDragon.zip`, docs, build outputs, and IDE files are excluded.
-- The Miniwyvern capture path remains unavailable even when Soul Bond or companion inventory is capability-disabled.
+- The Miniwyvern capture path remains unavailable even though companion inventory is not part of the initial release.
 - Flying a configured dragon checks only Tamework's Flightmaster's Talisman.
 
 ## 13. Phased dependencies
@@ -284,4 +284,5 @@ Every domain-config codec must reject invalid identifiers, ranges, negative dura
 | A2 | Persistence and migration foundation | A1 | Versioned records and restart reconciliation tested |
 | A3 | Capture/vessel integration | Tamework capture, vessel, and population specifications | [Capture specification](capture-summoning-maintenance.md) accepted |
 | A4 | Soul Bond and archetypes | A2, A3, Tamework provisioning/population/profile contracts | [Soul Bond specification](soul-bond-miniwyvern.md) accepted |
-| A5 | Dynamic encounters and backpack | A2, A4, optional inventory contract | [Content specification](dragon-content-encounters.md) accepted |
+| A5 | Dynamic encounters | A2, A4 | [Content specification](dragon-content-encounters.md) accepted |
+| Post-MVP A6 | Miniwyvern backpack update | A4 plus the future inventory capability | Deferred [companion-inventory specification](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md) accepted |

@@ -1,13 +1,13 @@
 # Draconic Soul Bond and Miniwyvern Specification
 
-Status: Draft implementation contract
+Status: Draft implementation contract; backpack deferred post-MVP
 Scope: The unique, Soul Bond-exclusive Miniwyvern companion
 
 ## 1. Purpose and boundaries
 
-The Draconic Soul Bond grants each player one persistent Miniwyvern. The companion stays small, follows and assists its owner, carries a small backpack, and may be re-attuned to seven elemental archetypes. It is not a capturable dragon and does not occupy the one-active-full-dragon slot.
+The Draconic Soul Bond grants each player one persistent Miniwyvern. The companion stays small, follows and assists its owner, and may be re-attuned to seven elemental archetypes. It is not a capturable dragon and does not occupy the one-active-full-dragon slot. A small backpack is planned for a later update and is not part of the initial plugin release.
 
-HyDragon owns the one-time entitlement, elemental meanings, abilities, presentation, and migration policy. Tamework owns canonical companion profiles, active population admission, dynamic attachments, lifecycle events, and the generic companion inventory.
+HyDragon owns the one-time entitlement, elemental meanings, abilities, presentation, and migration policy. Tamework owns canonical companion profiles, active population admission, dynamic attachments, and lifecycle events. The deferred backpack will use Tamework's future generic companion inventory rather than a HyDragon-local storage system.
 
 Related specifications:
 
@@ -15,7 +15,7 @@ Related specifications:
 - [Capture, summoning, and maintenance](capture-summoning-maintenance.md)
 - [Dragon content and encounters](dragon-content-encounters.md)
 - Tamework [population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md)
-- Tamework [companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md)
+- Deferred Tamework [companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md)
 - Tamework [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md)
 
 ## 2. Locked decisions
@@ -24,7 +24,7 @@ Related specifications:
 - Each player may claim exactly one Soul Bond and own exactly one Soul Bond Miniwyvern.
 - The Miniwyvern uses a canonical Tamework profile and remains the same companion through attunement, death/recovery, logout, and restart.
 - The Miniwyvern may be active alongside one full dragon because it belongs to a separate population group.
-- The backpack is generic Tamework companion inventory; HyDragon only configures capacity, access, and presentation.
+- The backpack is deferred post-MVP. When implemented, it uses generic Tamework companion inventory; HyDragon only configures capacity, access, and presentation.
 - Elemental archetype mechanics are HyDragon domain behavior and do not belong in Tamework core.
 
 ## 3. Requirements
@@ -36,27 +36,30 @@ Related specifications:
 - **HYD-SOUL-003:** If the player already has a claimed or recoverable Soul Bond, use MUST be denied without consuming the item or creating another profile.
 - **HYD-SOUL-004:** `Wyvern_Mini` and `Tamed_Wyvern_Mini` MUST be excluded from every Draconic Stone capture declaration. Production world-spawn assets MUST not spawn wild Miniwyverns.
 - **HYD-SOUL-005:** Soul Bond Miniwyverns MUST join `hydragon:soulbound_mini`, configured as one owned and one active per owner. They MUST NOT count against `hydragon:full_dragons`.
-- **HYD-SOUL-006:** The Miniwyvern's profile ID, name, health/lifecycle, archetype, appearance, progression, and inventory MUST survive logout, restart, unload, and ordinary Tamework recovery.
+- **HYD-SOUL-006:** The Miniwyvern's profile ID, name, health/lifecycle, archetype, appearance, and progression MUST survive logout, restart, unload, and ordinary Tamework recovery. Any later attached inventory MUST follow the same identity.
 - **HYD-SOUL-007:** Death MUST never revoke the once-per-player entitlement or permit a replacement claim. Provisioned Miniwyverns MUST qualify for command-link-independent `DEAD_REVIVABLE` recovery, restoring the linked profile through Tamework rather than creating a new Miniwyvern.
 
-### Core companion behavior and backpack
+### Core companion behavior
 
 - **HYD-SOUL-008:** The base Miniwyvern MUST remain visibly small, follow or hold on command, assist its owner with a basic bite, and use owner-safe target selection.
 - **HYD-SOUL-009:** Miniwyvern MUST be non-mountable and MUST not use or require the Flightmaster's Talisman.
-- **HYD-SOUL-010:** The Miniwyvern MUST expose a nine-slot owner-only backpack backed by Tamework companion inventory. Inventory mutations MUST remain authoritative and persistent through capture-independent lifecycle changes.
-- **HYD-SOUL-011:** Backpack access MUST be denied to non-owners, during an unresolved/dead transition, or when the inventory capability is unavailable. Denial MUST not drop, duplicate, or clear stored items.
+
+### Deferred post-MVP backpack
+
+- **HYD-SOUL-010 (DEFERRED):** A later Miniwyvern update MUST expose a nine-slot owner-only backpack backed by Tamework companion inventory. Inventory mutations MUST remain authoritative and persistent through capture-independent lifecycle changes. This is not an initial-release requirement.
+- **HYD-SOUL-011 (DEFERRED):** When the backpack update ships, access MUST be denied to non-owners, during an unresolved/dead transition, or when the inventory capability is unavailable. Denial MUST not drop, duplicate, or clear stored items. This is not an initial-release requirement.
 
 ### Elemental attunement
 
 - **HYD-SOUL-012:** HyDragon MUST support exactly these v1 archetype IDs: `lightning`, `wind`, `ice`, `fire`, `water`, `nature`, and `void`, plus an initial neutral/unattuned state.
-- **HYD-SOUL-013:** The owner MUST be able to re-attune the same Miniwyvern by consuming one configured elemental essence through an atomic interaction. Attunement MUST preserve identity, name, health ratio, progression, and backpack contents.
+- **HYD-SOUL-013:** The owner MUST be able to re-attune the same Miniwyvern by consuming one configured elemental essence through an atomic interaction. Attunement MUST preserve identity, name, health ratio, and progression plus backpack contents after the deferred backpack is introduced.
 - **HYD-SOUL-014:** Every archetype MUST provide a distinct appearance, effects/audio vocabulary, ability definition, and localized description. Appearance-only assets MUST not be treated as proof that runtime abilities are active.
 - **HYD-SOUL-015:** Lightning MUST increase owner movement/action speed; Wind MUST increase owner movement, jump, and mobility; Ice MUST apply area slow/freeze buildup culminating in a bounded stun or equivalent reduced-mobility control.
 - **HYD-SOUL-016:** Fire MUST use frequent fireball attacks with damage-over-time; Water MUST provide burst combat healing; Nature MUST provide lower-intensity periodic regeneration for sustained support.
 - **HYD-SOUL-017:** Void MUST use projectiles or pulses that apply a bounded defense-reduction debuff. No archetype may apply an unbounded stacking modifier.
 - **HYD-SOUL-018:** Archetype buffs, debuffs, healing, targeting, cooldowns, and stacking rules MUST be data-driven, source-keyed, owner-safe, world-thread-safe, and removed or reconciled when the Miniwyvern is inactive, dead, re-attuned, or no longer owned.
 - **HYD-SOUL-019:** Legacy Miniwyvern profiles/items MUST migrate without deletion or duplicate entitlement. Ambiguous cases MUST be inactive and operator-resolvable as defined in section 11.
-- **HYD-SOUL-020:** Soul Bond creation, attunement, backpack, ability, death/recovery, and migration behavior MUST pass the acceptance matrix in section 13 before release.
+- **HYD-SOUL-020:** Soul Bond creation, attunement, ability, death/recovery, and migration behavior MUST pass the MVP acceptance matrix in section 13 before the initial plugin release. The deferred backpack has a separate later release gate.
 
 ## 4. Player and profile data model
 
@@ -118,9 +121,9 @@ The basic bite remains available in every archetype. Elemental attacks supplemen
 
 Automated abilities must reject the owner, same-owner companions, allies according to game attitude/team rules, dead/invalid entities, unloaded entities, and targets outside the configured world/range. Healing/support targets the owner in v1; party-wide support is out of scope unless a later config/API contract defines party membership.
 
-## 7. Backpack contract
+## 7. Deferred post-MVP backpack contract
 
-HyDragon configures one nine-slot inventory for `hydragon:soulbound_mini` through the Tamework [companion-inventory specification](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md).
+No backpack interaction, inventory config, capability requirement, persistence table, or UI is included in the initial HyDragon plugin release. This section preserves the later update contract: HyDragon will configure one nine-slot inventory for `hydragon:soulbound_mini` through the deferred Tamework [companion-inventory specification](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md).
 
 Required behavior:
 
@@ -131,7 +134,7 @@ Required behavior:
 - Death does not spill contents by default.
 - Full/incompatible item restrictions, if added later, are Tamework inventory policy rather than hardcoded slot logic.
 
-The backpack feature is capability-gated. Missing inventory support leaves the companion and its existing inventory data intact while removing only the open-backpack action.
+When that update is implemented, the backpack feature is capability-gated. Missing inventory support leaves the companion and its existing inventory data intact while removing only the open-backpack action. Until then, HyDragon does not query `COMPANION_INVENTORY` or register a backpack action.
 
 ## 8. Attunement transaction
 
@@ -200,7 +203,7 @@ If the base game cannot safely express one requested modifier, that ability must
 - Soul Bond item, icon, model, localization, and Draconic Altar recipe.
 - Miniwyvern neutral plus seven archetype textures/models or dynamic attachment selections.
 - Bite, projectile, status-effect, particle, sound, and animation assets.
-- Tamed role parameters and Tamework interaction/companion/population/inventory configs.
+- Tamed role parameters and Tamework interaction/companion/population configs; inventory config is deferred.
 - `Server/HyDragon/MiniwyvernArchetypes/*.json` domain definitions.
 
 ### Plugin runtime work
@@ -215,7 +218,7 @@ If the base game cannot safely express one requested modifier, that ability must
 
 - Canonical profile, ownership, events, profile data, attachment synchronization.
 - Group limit `one owned / one active` enforcement.
-- Generic nine-slot inventory persistence/UI/transactions.
+- Post-MVP only: generic nine-slot inventory persistence/UI/transactions.
 
 ## 11. Current-state migration
 
@@ -235,9 +238,9 @@ Miniwyvern is currently allowed by `Server/Tamework/Items/Spawners/HyDragonDraco
 | `Server/Item/Items/Ingredient/Draconic_Soul_Bond.json` | Craftable one-time-use item and plugin interaction |
 | `Server/HyDragon/MiniwyvernArchetypes/*.json` | Seven archetype behavior definitions |
 | `Server/Tamework/Companion/HyDragonMiniwyvern.json` | Recall/recovery/cross-world behavior |
-| `Server/Tamework/Interactions/HyDragonIntWyvernMini.json` | Feed, mode, backpack, and attunement entry points |
+| `Server/Tamework/Interactions/HyDragonIntWyvernMini.json` | MVP Feed, mode, and attunement entry points; backpack action added only in the later update |
 | Tamework population-group asset path | `hydragon:soulbound_mini`, one owned/one active |
-| Tamework companion-inventory asset path | Nine-slot owner-only backpack |
+| Deferred Tamework companion-inventory asset path | Post-MVP nine-slot owner-only backpack |
 | `Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/` | Tamed role; wild role retained only if required internally/migration |
 | `Server/Models/HyDragon/Wyvern_Mini/` | Neutral and archetype appearances |
 | `Common/NPC/HyDragon/Wyvern_Mini/` | Model, textures, animations |
@@ -254,11 +257,15 @@ Final Tamework asset paths must follow its linked specifications rather than ill
 - One Miniwyvern and one full dragon can be active together; a second Miniwyvern admission is denied by Tamework.
 - Missing `COMPANION_PROVISIONING` denies a new Soul Bond without item loss while leaving existing Miniwyverns usable.
 - Follow, Hold, Defend/Attack Target, bite, logout/reload, death/recovery, and cross-world policy preserve the same profile ID.
-- The owner can store and retrieve nine backpack stacks across unload, death, and restart; a non-owner and a concurrent second UI session cannot mutate contents.
-- Each essence changes the same profile to the correct appearance and behavior while preserving name, health ratio, progression, and inventory.
+- Each essence changes the same profile to the correct appearance and behavior while preserving name, health ratio, and progression.
 - Repeated/retried attunement consumes one essence, not zero or two, and removes the previous archetype's runtime effects.
 - Buff/debuff tests prove source-keyed refresh, configured caps, friendly-target rejection, and cleanup on inactive/dead/re-attuned state.
 - Legacy adoption preserves all profiles/items and requires operator choice for ambiguous ownership instead of deleting extras.
+
+Deferred backpack acceptance, not part of the initial release gate:
+
+- The owner can store and retrieve nine backpack stacks across unload, death, and restart; a non-owner and a concurrent second UI session cannot mutate contents.
+- Attunement and lifecycle transitions preserve all backpack contents once the feature exists.
 
 ## 14. Phased dependencies
 
@@ -269,4 +276,4 @@ Final Tamework asset paths must follow its linked specifications rather than ill
 | S2 | Enforce unique Miniwyvern lifecycle | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) |
 | S3 | Ship neutral Miniwyvern plus Fire and Nature vertical slice | S1-S2 and Tamework profile/attachment APIs |
 | S4 | Add remaining five archetypes and full ability safety matrix | S3 |
-| S5 | Enable nine-slot backpack | [Companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md) |
+| Post-MVP S5 | Enable nine-slot backpack in a later update | Deferred [companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md) |
