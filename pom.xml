@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.alechilles</groupId>
+    <artifactId>hydragon</artifactId>
+    <version>0.2.1</version>
+    <packaging>jar</packaging>
+
+    <name>HyDragon</name>
+    <description>Dragon capture, bonding, companion, and encounter gameplay for Hytale.</description>
+
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <hytale.install.path.release>C:/Users/22ale/AppData/Roaming/Hytale/install/release/package/game/latest</hytale.install.path.release>
+        <hytale.install.path.prerelease>C:/Users/22ale/AppData/Roaming/Hytale/install/pre-release/package/game/latest</hytale.install.path.prerelease>
+        <hytale.install.path>${hytale.install.path.release}</hytale.install.path>
+        <tamework.version>3.0.0</tamework.version>
+        <tamework.jar.path>${project.basedir}/../alecstamework/target/Alec's Tamework! v${tamework.version}.jar</tamework.jar.path>
+        <junit.version>5.10.2</junit.version>
+        <argLine></argLine>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hypixel.hytale</groupId>
+            <artifactId>HytaleServer</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${hytale.install.path}/Server/HytaleServer.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.alechilles</groupId>
+            <artifactId>alecstamework</artifactId>
+            <version>${tamework.version}</version>
+            <scope>system</scope>
+            <systemPath>${tamework.jar.path}</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>HyDragon v${project.version}</finalName>
+        <!-- Keep the existing root-layout asset pack intact during the Java conversion. -->
+        <resources>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>manifest.json</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/Common</directory>
+                <targetPath>Common</targetPath>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/Server</directory>
+                <targetPath>Server</targetPath>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>clear-stale-output</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete dir="${project.build.outputDirectory}" quiet="true"/>
+                                <mkdir dir="${project.build.outputDirectory}"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Plugin-Group>${project.groupId}</Plugin-Group>
+                            <Plugin-Name>${project.artifactId}</Plugin-Name>
+                            <Plugin-Version>${project.version}</Plugin-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <argLine>@{argLine} -Djava.util.logging.manager=com.hypixel.hytale.logger.backend.HytaleLogManager</argLine>
+                    <useModulePath>false</useModulePath>
+                    <systemPropertyVariables>
+                        <hydragon.project.basedir>${project.basedir}</hydragon.project.basedir>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>prerelease</id>
+            <activation>
+                <property>
+                    <name>prerelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <hytale.install.path>${hytale.install.path.prerelease}</hytale.install.path>
+            </properties>
+        </profile>
+    </profiles>
+</project>
