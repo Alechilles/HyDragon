@@ -2,7 +2,6 @@ package com.alechilles.hydragon.abilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
@@ -36,6 +35,7 @@ class MiniwyvernAbilityServiceTest {
         assertEquals(1, first.abilitiesExecuted());
         assertEquals(1, world.projectiles);
         assertEquals(1, world.effects);
+        assertEquals(1, world.presentations);
         assertTrue(world.sawCommittedCooldownBeforeMutation);
         assertEquals("Wyvern_Mini_Fire", world.appearanceId);
 
@@ -45,6 +45,7 @@ class MiniwyvernAbilityServiceTest {
         assertEquals(0, replay.abilitiesExecuted());
         assertEquals(1, world.projectiles);
         assertEquals(1, world.effects);
+        assertEquals(1, world.presentations);
     }
 
     @Test
@@ -100,7 +101,7 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
-    void unsupportedRequiredOwnerModifiersFailClosedBeforeAppearanceOrAbilities() throws Exception {
+    void unsupportedOptionalOwnerModifierDoesNotSuppressAppearanceMovementOrCombat() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
         world.ownerModifiersSupported = false;
@@ -108,12 +109,93 @@ class MiniwyvernAbilityServiceTest {
         MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
                 context("lightning"), Map.of("lightning", lightningConfig()), world, 1_000L);
 
-        assertFalse(result.ready());
-        assertTrue(result.reason().startsWith("owner-modifier-capability-unavailable:"));
-        assertNull(world.appearanceId);
-        assertEquals(0, world.projectiles);
-        assertEquals(0, world.effects);
+        assertTrue(result.ready());
+        assertTrue(result.reason().contains("owner-modifier-unavailable:ActionSpeedMultiplier"));
+        assertEquals("Wyvern_Mini_Lightning", world.appearanceId);
+        assertEquals(1, world.effects, "the validated horizontal-speed effect remains active");
+        assertEquals(1, world.damageApplications, "the archetype's combat ability remains active");
         assertEquals(0, world.ownerModifierApplications);
+    }
+
+    @Test
+    void unavailableMovementEffectDoesNotDisableAppearanceOrArchetype() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.ownerModifiersSupported = false;
+        world.passiveModifierEffectSupported = false;
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context("lightning"), Map.of("lightning", lightningConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertTrue(result.reason().contains("owner-modifier-effect-unavailable:MovementSpeedMultiplier"));
+        assertEquals("Wyvern_Mini_Lightning", world.appearanceId);
+        assertEquals(0, world.effects);
+        assertEquals(1, world.damageApplications);
+    }
+
+    @Test
+    void triggerSemanticsPreventOwnerHealthAbilityAboveThreshold() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.ownerHealth = new MiniwyvernAbilityWorld.Health(80.0D, 100.0D);
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context("water"), Map.of("water", waterConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertEquals(0, result.abilitiesExecuted());
+        assertEquals(0, world.healApplications);
+        assertFalse(states.current.cooldownUntilByAbility().containsKey("restorative_surge"));
+    }
+
+    @Test
+    void unsupportedEffectStackingFailsOnlyTheEffectChannel() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.effectStackingSupported = false;
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context(), Map.of("fire", fireConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertTrue(result.reason().contains("effect-stacking-unavailable:fireball"));
+        assertEquals(1, result.abilitiesExecuted(), "the projectile channel still executes");
+        assertEquals(1, world.projectiles);
+        assertEquals(0, world.effects);
+        assertEquals(1, world.presentations);
+    }
+
+    @Test
+    void voidExecutionVerifiesConfiguredDefenseFloorAndReductionCap() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.boundedDefenseSupported = true;
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context("void"), Map.of("void", voidConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertEquals("ready", result.reason());
+        assertEquals(1, world.effects);
+        assertEquals(0.12D, world.requestedReduction);
+        assertEquals(0.50D, world.minimumDefenseMultiplier);
+        assertEquals(0.12D, world.maximumReduction);
+    }
+
+    @Test
+    void unavailableVoidBoundsSkipOnlyDebuffWhileProjectileRemainsFunctional() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context("void"), Map.of("void", voidConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertTrue(result.reason().contains("void-defense-bounds-unavailable:void_exposure"));
+        assertEquals(0, world.effects);
+        assertEquals(1, world.projectiles);
+        assertEquals(1, result.abilitiesExecuted());
     }
 
     private static MiniwyvernAbilityService.ProfileContext context() {
@@ -131,7 +213,7 @@ class MiniwyvernAbilityServiceTest {
         set(config, "essenceSemanticId", "fire");
         set(config, "essenceItemId", "Draconic_Essence_Fire");
         set(config, "appearanceId", "Wyvern_Mini_Fire");
-        set(config, "particleAndSoundIds", new String[0]);
+        set(config, "particleAndSoundIds", new String[] { "test-presentation" });
         set(config, "passiveEffects", new String[0]);
         set(config, "passiveModifiers", Map.of());
         set(config, "fallbackBehavior", "BASIC_BITE");
@@ -197,8 +279,77 @@ class MiniwyvernAbilityServiceTest {
         set(config, "passiveModifiers", Map.of(
                 "MovementSpeedMultiplier", 1.15D,
                 "ActionSpeedMultiplier", 1.10D));
-        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[0]);
+        set(config, "passiveModifierEffects", Map.of(
+                "MovementSpeedMultiplier", "test-lightning-boon"));
+        MiniwyvernArchetypeConfig.Ability ability = construct(MiniwyvernArchetypeConfig.Ability.class);
+        set(ability, "id", "lightning_strike");
+        set(ability, "trigger", "COMBAT_INTERVAL");
+        set(ability, "targetPolicy", "OWNER_HOSTILE_ONLY");
+        set(ability, "range", 18.0D);
+        set(ability, "cooldownSeconds", 4.0D);
+        set(ability, "magnitude", 12.0D);
+        set(ability, "durationSeconds", 0.0D);
+        set(ability, "stackingPolicy", "SOURCE_REFRESH");
+        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[] { ability });
         set(config, "fallbackBehavior", "BASIC_BITE");
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig waterConfig() throws Exception {
+        MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
+        set(config, "id", "water");
+        set(config, "essenceSemanticId", "water");
+        set(config, "essenceItemId", "Draconic_Essence_Water");
+        set(config, "appearanceId", "Wyvern_Mini_Water");
+        set(config, "particleAndSoundIds", new String[] { "test-water-presentation" });
+        set(config, "passiveEffects", new String[0]);
+        set(config, "passiveModifiers", Map.of());
+        set(config, "fallbackBehavior", "BASIC_BITE");
+
+        MiniwyvernArchetypeConfig.Ability ability = construct(MiniwyvernArchetypeConfig.Ability.class);
+        set(ability, "id", "restorative_surge");
+        set(ability, "trigger", "OWNER_HEALTH_BELOW_PERCENT");
+        set(ability, "targetPolicy", "OWNER_ONLY");
+        set(ability, "range", 16.0D);
+        set(ability, "cooldownSeconds", 20.0D);
+        set(ability, "effectId", "test-water-effect");
+        set(ability, "magnitude", 12.0D);
+        set(ability, "ownerHealthThreshold", 0.60D);
+        set(ability, "maximumHealFraction", 0.20D);
+        set(ability, "durationSeconds", 1.0D);
+        set(ability, "stackingPolicy", "NON_STACKING");
+        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[] { ability });
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig voidConfig() throws Exception {
+        MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
+        set(config, "id", "void");
+        set(config, "essenceSemanticId", "void");
+        set(config, "essenceItemId", "Draconic_Essence_Void");
+        set(config, "appearanceId", "Wyvern_Mini_Void");
+        set(config, "particleAndSoundIds", new String[] { "test-void-presentation" });
+        set(config, "passiveEffects", new String[0]);
+        set(config, "passiveModifiers", Map.of());
+        set(config, "fallbackBehavior", "BASIC_BITE");
+
+        MiniwyvernArchetypeConfig.Ability ability = construct(MiniwyvernArchetypeConfig.Ability.class);
+        set(ability, "id", "void_exposure");
+        set(ability, "trigger", "COMBAT_INTERVAL");
+        set(ability, "targetPolicy", "OWNER_HOSTILE_ONLY");
+        set(ability, "range", 18.0D);
+        set(ability, "cooldownSeconds", 7.0D);
+        set(ability, "effectId", "test-void-effect");
+        set(ability, "projectileId", "test-void-projectile");
+        set(ability, "magnitude", 0.12D);
+        set(ability, "maximumStacks", 1);
+        set(ability, "minimumDefenseMultiplier", 0.50D);
+        set(ability, "maximumReduction", 0.12D);
+        set(ability, "durationSeconds", 6.0D);
+        set(ability, "stackingPolicy", "SOURCE_REFRESH");
+        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[] { ability });
         assertTrue(config.validate().isEmpty(), config.validate().toString());
         return config;
     }
@@ -238,9 +389,19 @@ class MiniwyvernAbilityServiceTest {
         int effects;
         int projectiles;
         int ownerModifierApplications;
+        int damageApplications;
+        int healApplications;
+        int presentations;
         String appearanceId;
         boolean sawCommittedCooldownBeforeMutation;
         boolean ownerModifiersSupported = true;
+        boolean passiveModifierEffectSupported = true;
+        boolean effectStackingSupported = true;
+        boolean boundedDefenseSupported;
+        double requestedReduction;
+        double minimumDefenseMultiplier;
+        double maximumReduction;
+        Health ownerHealth = new Health(50.0D, 100.0D);
         final List<UUID> projectileTargets = new ArrayList<>();
         final List<UUID> effectTargets = new ArrayList<>();
 
@@ -265,7 +426,9 @@ class MiniwyvernAbilityServiceTest {
             appearanceId = requestedAppearanceId;
             return true;
         }
-        @Override public Health health(UUID entityUuid) { return new Health(50.0D, 100.0D); }
+        @Override public Health health(UUID entityUuid) {
+            return OWNER.equals(entityUuid) ? ownerHealth : new Health(50.0D, 100.0D);
+        }
         @Override public boolean applyEffect(UUID entityUuid, String sourceKey, String effectId, double durationSeconds) {
             assertCooldownCommitted();
             effects++;
@@ -276,20 +439,46 @@ class MiniwyvernAbilityServiceTest {
         @Override public boolean supportsOwnerModifiers(Map<String, Double> modifiers) {
             return ownerModifiersSupported;
         }
+        @Override public boolean supportsPassiveModifierEffect(
+                String modifierId, double requestedValue, double configuredMaximum, String effectId) {
+            return "MovementSpeedMultiplier".equals(modifierId)
+                    && passiveModifierEffectSupported
+                    && requestedValue <= configuredMaximum && effectId.startsWith("test-");
+        }
+        @Override public boolean supportsEffectStacking(String effectId, String stackingPolicy, int maximumStacks) {
+            return effectStackingSupported && maximumStacks == 1;
+        }
+        @Override public boolean supportsBoundedDefenseReduction(
+                String effectId, double requested, double minimum, double maximum) {
+            requestedReduction = requested;
+            minimumDefenseMultiplier = minimum;
+            maximumReduction = maximum;
+            return boundedDefenseSupported;
+        }
         @Override public boolean applyOwnerModifiers(UUID ownerUuid, String sourceKey, Map<String, Double> modifiers,
                                                      double durationSeconds) {
             ownerModifierApplications++;
             return true;
         }
         @Override public boolean removeOwnerModifiers(UUID ownerUuid, String sourceKey) { return true; }
+        @Override public int emitPresentation(UUID entityUuid, List<String> particleAndSoundIds) {
+            presentations += particleAndSoundIds.size();
+            return particleAndSoundIds.size();
+        }
         @Override public boolean launchProjectile(UUID sourceUuid, UUID targetUuid, String projectileId) {
             assertCooldownCommitted();
             projectiles++;
             projectileTargets.add(targetUuid);
             return true;
         }
-        @Override public boolean dealDamage(UUID sourceUuid, UUID targetUuid, double amount) { return true; }
-        @Override public boolean heal(UUID entityUuid, double amount) { return true; }
+        @Override public boolean dealDamage(UUID sourceUuid, UUID targetUuid, double amount) {
+            damageApplications++;
+            return true;
+        }
+        @Override public boolean heal(UUID entityUuid, double amount) {
+            healApplications++;
+            return true;
+        }
         @Override public boolean areAllies(UUID ownerUuid, UUID targetUuid) { return OWNER.equals(targetOwner); }
 
         private void assertCooldownCommitted() {

@@ -14,7 +14,9 @@ import com.hypixel.hytale.server.core.asset.type.entityeffect.config.OverlapBeha
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.RemovalBehavior;
 import com.hypixel.hytale.server.core.asset.type.model.config.Model;
 import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
+import com.hypixel.hytale.server.core.asset.type.particle.config.ParticleSystem;
 import com.hypixel.hytale.server.core.asset.type.projectile.config.Projectile;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
@@ -25,6 +27,7 @@ import com.hypixel.hytale.server.core.modules.entity.EntityModule;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageCause;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageSystems;
+import com.hypixel.hytale.server.core.modules.entity.damage.ResistanceModifier;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
@@ -32,17 +35,23 @@ import com.hypixel.hytale.server.core.modules.physics.util.PhysicsMath;
 import com.hypixel.hytale.server.core.modules.time.TimeResource;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
+import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.protocol.SoundCategory;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import org.joml.Vector3d;
 
 /**
@@ -51,6 +60,8 @@ import org.joml.Vector3d;
  */
 public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernAbilityWorldDispatcher {
     private static final String[] HOSTILE_TARGET_SLOTS = {"CAETargetSlot", "LockedTarget", "AttackTarget"};
+    private static final Logger LOGGER = Logger.getLogger(HytaleMiniwyvernAbilityWorldDispatcher.class.getName());
+    private static final Set<String> PRESENTATION_WARNINGS = ConcurrentHashMap.newKeySet();
     private final TameworkApi api;
     private final SourceKeyedEffectRegistry effectSources = new SourceKeyedEffectRegistry();
 
@@ -237,6 +248,87 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
         }
 
         @Override
+        public boolean supportsPassiveModifierEffect(
+                String modifierId,
+                double requestedValue,
+                double configuredMaximum,
+                String effectId) {
+            if (!"MovementSpeedMultiplier".equals(modifierId)
+                    || !Double.isFinite(requestedValue) || requestedValue <= 0.0D
+                    || !Double.isFinite(configuredMaximum) || configuredMaximum < requestedValue
+                    || effectId == null || effectId.isBlank()) {
+                return false;
+            }
+            EntityEffect effect = EntityEffect.getAssetMap().getAsset(effectId);
+            if (effect == null || effect.getApplicationEffects() == null) return false;
+            float actual = effect.getApplicationEffects().getHorizontalSpeedMultiplier();
+            return Float.isFinite(actual) && approximatelyEqual(actual, requestedValue);
+        }
+
+        @Override
+        public boolean supportsEffectStacking(String effectId, String stackingPolicy, int maximumStacks) {
+            if (effectId == null || effectId.isBlank() || stackingPolicy == null
+                    || maximumStacks != 1) {
+                return false;
+            }
+            EntityEffect effect = EntityEffect.getAssetMap().getAsset(effectId);
+            if (effect == null) return false;
+            String policy = stackingPolicy.trim().toUpperCase(java.util.Locale.ROOT);
+            if (!Set.of("SOURCE_REFRESH", "NON_STACKING", "CLAMPED", "THRESHOLD_STUN_100")
+                    .contains(policy)) {
+                return false;
+            }
+            // Hytale 0.5.6 exposes one controller slot per effect asset. A stable logical source
+            // with overwrite/ignore behavior truthfully implements refresh or one capped stack;
+            // it cannot express a bounded stack count greater than one.
+            return effect.getOverlapBehavior() == OverlapBehavior.OVERWRITE
+                    || effect.getOverlapBehavior() == OverlapBehavior.IGNORE;
+        }
+
+        @Override
+        public boolean supportsBoundedDefenseReduction(
+                String effectId,
+                double requestedReduction,
+                double minimumDefenseMultiplier,
+                double maximumReduction) {
+            if (effectId == null || effectId.isBlank()
+                    || !Double.isFinite(requestedReduction) || requestedReduction <= 0.0D
+                    || !Double.isFinite(minimumDefenseMultiplier)
+                    || minimumDefenseMultiplier <= 0.0D || minimumDefenseMultiplier > 1.0D
+                    || !Double.isFinite(maximumReduction)
+                    || maximumReduction <= 0.0D || maximumReduction >= 1.0D) {
+                return false;
+            }
+            EntityEffect effect = EntityEffect.getAssetMap().getAsset(effectId);
+            if (effect == null || effect.getDamageResistanceValues() == null
+                    || effect.getDamageResistanceValues().isEmpty()) {
+                return false;
+            }
+            boolean matchedRequestedReduction = false;
+            for (ResistanceModifier[] modifiers : effect.getDamageResistanceValues().values()) {
+                if (modifiers == null || modifiers.length == 0) return false;
+                for (ResistanceModifier modifier : modifiers) {
+                    if (modifier == null
+                            || modifier.getCalculationType()
+                            != ResistanceModifier.ResistanceCalculationType.PERCENT
+                            || !Float.isFinite(modifier.getAmount())
+                            || modifier.getAmount() >= 0.0F) {
+                        return false;
+                    }
+                    double reduction = -modifier.getAmount();
+                    if (reduction > maximumReduction + 0.000_001D
+                            || 1.0D - reduction < minimumDefenseMultiplier - 0.000_001D) {
+                        return false;
+                    }
+                    matchedRequestedReduction |= approximatelyEqual(reduction, requestedReduction);
+                }
+            }
+            return matchedRequestedReduction
+                    && requestedReduction <= maximumReduction + 0.000_001D
+                    && 1.0D - requestedReduction >= minimumDefenseMultiplier - 0.000_001D;
+        }
+
+        @Override
         public boolean supportsOwnerModifiers(Map<String, Double> modifiers) {
             // 0.5.6 EntityEffect assets express horizontal speed, but expose no safe source-keyed
             // action-speed/jump/mobility mutation API. Lightning/Wind therefore stay disabled.
@@ -252,6 +344,37 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
         @Override
         public boolean removeOwnerModifiers(UUID ownerUuid, String sourceKey) {
             return true;
+        }
+
+        @Override
+        public int emitPresentation(UUID entityUuid, List<String> particleAndSoundIds) {
+            Ref<EntityStore> ref = resolve(entityUuid);
+            TransformComponent transform = valid(ref)
+                    ? store.getComponent(ref, TransformComponent.getComponentType()) : null;
+            if (transform == null || particleAndSoundIds == null || particleAndSoundIds.isEmpty()) return 0;
+            int emitted = 0;
+            Vector3d position = transform.getPosition();
+            for (String rawId : particleAndSoundIds) {
+                String id = rawId == null ? "" : rawId.trim();
+                if (id.isEmpty()) continue;
+                try {
+                    if (ParticleSystem.getAssetMap().getAsset(id) != null) {
+                        ParticleUtil.spawnParticleEffect(id, position, store);
+                        emitted++;
+                        continue;
+                    }
+                    int soundIndex = SoundEvent.getAssetMap().getIndex(id);
+                    if (soundIndex >= 0) {
+                        SoundUtil.playSoundEvent3d(soundIndex, SoundCategory.SFX, position, store);
+                        emitted++;
+                        continue;
+                    }
+                    warnPresentationOnce(id, "asset is neither a loaded ParticleSystem nor SoundEvent");
+                } catch (RuntimeException failure) {
+                    warnPresentationOnce(id, failure.getClass().getSimpleName());
+                }
+            }
+            return emitted;
         }
 
         @Override
@@ -350,6 +473,17 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
 
         private static long saturatingAdd(long left, long right) {
             return right > Long.MAX_VALUE - left ? Long.MAX_VALUE : left + right;
+        }
+
+        private static boolean approximatelyEqual(double left, double right) {
+            return Math.abs(left - right) <= 0.000_01D;
+        }
+
+        private static void warnPresentationOnce(String id, String reason) {
+            String key = id + ':' + reason;
+            if (PRESENTATION_WARNINGS.add(key)) {
+                LOGGER.warning("Miniwyvern presentation asset '" + id + "' was skipped: " + reason);
+            }
         }
     }
 }

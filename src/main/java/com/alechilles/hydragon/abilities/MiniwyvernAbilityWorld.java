@@ -32,11 +32,43 @@ public interface MiniwyvernAbilityWorld {
 
     boolean removeEffect(UUID entityUuid, String sourceKey, String effectId);
 
+    /**
+     * Verifies that a data-selected effect implements one exact passive modifier semantic.
+     * This keeps engine capabilities granular: an unavailable jump or action-speed channel does
+     * not suppress a separately supported horizontal-speed effect.
+     */
+    default boolean supportsPassiveModifierEffect(
+            String modifierId,
+            double requestedValue,
+            double configuredMaximum,
+            String effectId) {
+        return false;
+    }
+
+    /** Verifies the configured effect/source stacking contract before an effect is applied. */
+    default boolean supportsEffectStacking(String effectId, String stackingPolicy, int maximumStacks) {
+        return maximumStacks == 1;
+    }
+
+    /** Verifies that the selected effect asset honors the configured Void defense bounds. */
+    default boolean supportsBoundedDefenseReduction(
+            String effectId,
+            double requestedReduction,
+            double minimumDefenseMultiplier,
+            double maximumReduction) {
+        return false;
+    }
+
     boolean supportsOwnerModifiers(Map<String, Double> modifiers);
 
     boolean applyOwnerModifiers(UUID ownerUuid, String sourceKey, Map<String, Double> modifiers, double durationSeconds);
 
     boolean removeOwnerModifiers(UUID ownerUuid, String sourceKey);
+
+    /** Emits every valid particle/sound asset at the requested entity and returns the emitted count. */
+    default int emitPresentation(UUID entityUuid, List<String> particleAndSoundIds) {
+        return 0;
+    }
 
     boolean launchProjectile(UUID sourceUuid, UUID targetUuid, String projectileId);
 

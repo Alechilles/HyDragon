@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -32,10 +33,53 @@ BANNED_PRE_RELEASE_TOKENS = (
     "MusgTexture",
 )
 PLACEHOLDER = re.compile(r"\{[^{}]+\}|%(?:\d+\$)?[a-zA-Z]")
+WORLD_SPAWN_FIELDS_056 = {
+    "Parent", "NPCs", "Despawn", "DayTimeRange", "MoonPhaseRange", "LightRanges",
+    "ScaleDayTimeRange", "Tags", "Environments", "MoonPhaseWeightModifiers",
+}
+BEACON_SPAWN_FIELDS_056 = WORLD_SPAWN_FIELDS_056 | {
+    "Model", "TargetDistanceFromPlayer", "MinDistanceFromPlayer", "YRange",
+    "MaxSpawnedNPCs", "ConcurrentSpawnsRange", "SpawnAfterGameTimeRange",
+    "SpawnAfterRealTimeRange", "InitialSpawnDelayRange", "NPCIdleDespawnTime",
+    "BeaconVacantDespawnGameTime", "BeaconRadius", "SpawnRadius", "NPCSpawnState",
+    "NPCSpawnSubState", "TargetSlot", "SpawnSuppression", "OverrideSpawnSuppressors",
+    "MaxSpawnsScalingCurve", "ConcurrentSpawnsScalingCurve", "Debug",
+}
+ROLE_SPAWN_FIELDS_056 = {
+    "Id", "Weight", "SpawnBlockSet", "SpawnFluidTag", "MovementModes",
+    "EnableSafeSpawning", "Flock",
+}
+WORKSHOP_056_PATCH_TARGETS = {
+    "Server/NPC/Spawn/Beacons/Zone1/Zone1_Cave_Tier2/Zone1_Cave_Forests_Aggro.json": (
+        "Env_Zone1_Caves_Forests", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier2/Zone2_Cave_Volcanic_T2_Aggro.json": (
+        "Env_Zone2_Caves_Volcanic_T2", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier3/Zone2_Cave_Volcanic_T3_Aggro.json": (
+        "Env_Zone2_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier3/Zone3_Cave_Glacial_Aggro.json": (
+        "Env_Zone3_Caves_Glacial", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+}
 
 
 def fail(errors: list[str], message: str) -> None:
     errors.append(message)
+
+
+def hytale_asset_root(errors: list[str]) -> Path | None:
+    configured = os.environ.get("HYTALE_ASSETS_PATH")
+    candidates = [] if not configured else [Path(configured)]
+    appdata = os.environ.get("APPDATA")
+    if appdata:
+        candidates.append(Path(appdata) / "Hytale/install/release/package/game/latest/Assets")
+    for candidate in candidates:
+        if (candidate / "Server").is_dir() and (candidate / "Common").is_dir():
+            return candidate.resolve()
+    fail(errors, "Hytale 0.5.6 Assets directory unavailable; set HYTALE_ASSETS_PATH for base-reference validation")
+    return None
+
+
+def asset_stems(root: Path) -> set[str]:
+    return {path.stem for path in root.rglob("*") if path.is_file()}
 
 
 def load_json_assets(errors: list[str]) -> dict[Path, object]:
@@ -199,6 +243,83 @@ def validate_capture_configs(parsed: dict[Path, object], errors: list[str]) -> N
             overlap = sorted(overrides & banned_roles)
             if overlap:
                 fail(errors, f"Miniwyvern tamed override in {path.relative_to(ROOT)}: {', '.join(overlap)}")
+
+
+def validate_miniwyvern_ability_contract(parsed: dict[Path, object], errors: list[str]) -> None:
+    archetype_root = ROOT / "Server/HyDragon/MiniwyvernArchetypes"
+    effect_root = ROOT / "Server/Entity/Effects/Status"
+    hostile_policies = {"OWNER_HOSTILE_ONLY", "OWNER_HOSTILE_AREA"}
+    for path in sorted(archetype_root.glob("*.json")):
+        data = parsed.get(path)
+        if not isinstance(data, dict):
+            continue
+        presentation_ids = data.get("ParticleAndSoundIds", [])
+        if not isinstance(presentation_ids, list) or any(
+            not isinstance(asset_id, str) or not asset_id.strip() for asset_id in presentation_ids
+        ):
+            fail(errors, f"invalid Miniwyvern presentation IDs in {path.relative_to(ROOT)}")
+
+        modifiers = data.get("PassiveModifiers", {})
+        modifier_effects = data.get("PassiveModifierEffects", {})
+        if not isinstance(modifiers, dict) or not isinstance(modifier_effects, dict):
+            fail(errors, f"invalid Miniwyvern passive modifier maps in {path.relative_to(ROOT)}")
+            continue
+        for semantic, effect_id in modifier_effects.items():
+            if semantic != "MovementSpeedMultiplier":
+                fail(errors, f"unsupported Miniwyvern modifier effect semantic {semantic} in {path.relative_to(ROOT)}")
+                continue
+            effect_path = effect_root / f"{effect_id}.json"
+            effect = parsed.get(effect_path)
+            application = effect.get("ApplicationEffects") if isinstance(effect, dict) else None
+            actual = application.get("HorizontalSpeedMultiplier") if isinstance(application, dict) else None
+            requested = modifiers.get(semantic)
+            maximum = modifiers.get("MaximumMovementSpeedMultiplier", requested)
+            if not isinstance(actual, (int, float)) or not isinstance(requested, (int, float)) \
+                    or abs(float(actual) - float(requested)) > 0.00001:
+                fail(errors, f"{semantic} effect {effect_id} does not match its configured value in {path.relative_to(ROOT)}")
+            if isinstance(maximum, (int, float)) and isinstance(requested, (int, float)) \
+                    and float(requested) > float(maximum):
+                fail(errors, f"{semantic} exceeds its configured maximum in {path.relative_to(ROOT)}")
+
+        for ability in data.get("ActiveAbilities", []):
+            if not isinstance(ability, dict):
+                continue
+            trigger = ability.get("Trigger")
+            policy = ability.get("TargetPolicy")
+            if trigger == "COMBAT_INTERVAL" and policy not in hostile_policies:
+                fail(errors, f"COMBAT_INTERVAL has non-hostile target policy in {path.relative_to(ROOT)}")
+            if trigger == "OWNER_HEALTH_BELOW_PERCENT" and policy != "OWNER_ONLY":
+                fail(errors, f"OWNER_HEALTH_BELOW_PERCENT must target OWNER_ONLY in {path.relative_to(ROOT)}")
+            if trigger not in {"COMBAT_INTERVAL", "OWNER_HEALTH_BELOW_PERCENT"}:
+                fail(errors, f"unsupported Miniwyvern trigger {trigger!r} in {path.relative_to(ROOT)}")
+            maximum_stacks = ability.get("MaximumStacks")
+            if maximum_stacks is not None and (ability.get("EffectId") is None or maximum_stacks != 1):
+                fail(errors, f"Hytale 0.5.6 supports only one capped effect stack in {path.relative_to(ROOT)}")
+
+            if data.get("Id") != "void":
+                continue
+            effect_id = ability.get("EffectId")
+            effect = parsed.get(effect_root / f"{effect_id}.json")
+            resistance = effect.get("DamageResistance") if isinstance(effect, dict) else None
+            minimum = ability.get("MinimumDefenseMultiplier")
+            maximum = ability.get("MaximumReduction")
+            requested = abs(float(ability.get("Magnitude", 0.0)))
+            amounts: list[object] = []
+            if isinstance(resistance, dict):
+                for entries in resistance.values():
+                    if isinstance(entries, list):
+                        amounts.extend(
+                            entry.get("Amount") for entry in entries if isinstance(entry, dict)
+                        )
+            if not amounts or not isinstance(minimum, (int, float)) or not isinstance(maximum, (int, float)):
+                fail(errors, f"Void defense bounds are not backed by an effect asset in {path.relative_to(ROOT)}")
+                continue
+            reductions = [-float(amount) for amount in amounts if isinstance(amount, (int, float)) and amount < 0]
+            if len(reductions) != len(amounts) or not any(abs(value - requested) <= 0.00001 for value in reductions):
+                fail(errors, f"Void effect reduction does not match Magnitude in {path.relative_to(ROOT)}")
+            if any(value > float(maximum) + 0.000001 or 1.0 - value < float(minimum) - 0.000001
+                   for value in reductions):
+                fail(errors, f"Void effect crosses its configured defense bounds in {path.relative_to(ROOT)}")
 
 
 def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
@@ -555,6 +676,7 @@ def main() -> int:
     validate_interaction_message_localization(parsed, errors)
     require_files(errors)
     validate_capture_configs(parsed, errors)
+    validate_miniwyvern_ability_contract(parsed, errors)
     validate_stone_tiers(parsed, errors)
     validate_no_miniwyvern_spawns(parsed, errors)
     validate_miniwyvern_role_wiring(parsed, errors)

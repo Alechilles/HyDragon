@@ -4,10 +4,13 @@
   "EssenceItemId": "Draconic_Essence_Lightning",
   "AppearanceId": "Wyvern_Mini_Lightning",
   "ParticleAndSoundIds": [ "Void_Lightning", "SFX_Eye_Void_Attack_Blast" ],
-  "PassiveEffects": [ "HyDragon_Miniwyvern_Lightning_Boon" ],
+  "PassiveEffects": [],
   "PassiveModifiers": {
     "MovementSpeedMultiplier": 1.15,
     "ActionSpeedMultiplier": 1.10
+  },
+  "PassiveModifierEffects": {
+    "MovementSpeedMultiplier": "HyDragon_Miniwyvern_Lightning_Boon"
   },
   "ActiveAbilities": [
     {
@@ -19,7 +22,6 @@
       "EffectId": null,
       "ProjectileId": null,
       "Magnitude": 12.0,
-      "MaximumStacks": 1,
       "DurationSeconds": 0.0,
       "StackingPolicy": "SOURCE_REFRESH"
     }

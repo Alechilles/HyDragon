@@ -56,6 +56,31 @@ class HyDragonConfigRepositoryTest {
     }
 
     @Test
+    void rejectsUnknownOrMismatchedAbilityTriggers() {
+        MiniwyvernArchetypeConfig.Ability unknown = validAbility("unknown_trigger");
+        unknown.trigger = "SOMETIMES";
+        MiniwyvernArchetypeConfig fire = validArchetype("fire");
+        fire.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{unknown};
+        assertTrue(fire.validate().stream().anyMatch(issue -> issue.contains("Trigger is unsupported")));
+
+        MiniwyvernArchetypeConfig.Ability mismatched = validAbility("mismatched_trigger");
+        mismatched.trigger = "OWNER_HEALTH_BELOW_PERCENT";
+        mismatched.ownerHealthThreshold = 0.5;
+        fire.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{mismatched};
+        assertTrue(fire.validate().stream().anyMatch(issue -> issue.contains("requires OWNER_ONLY")));
+    }
+
+    @Test
+    void rejectsModifierEffectMappingWithoutMatchingSemantic() {
+        MiniwyvernArchetypeConfig lightning = validArchetype("lightning");
+        lightning.passiveModifierEffects = Map.of("JumpMultiplier", "Some_Effect");
+
+        List<String> issues = lightning.validate();
+        assertTrue(issues.stream().anyMatch(issue -> issue.contains("does not name a configured")));
+        assertTrue(issues.stream().anyMatch(issue -> issue.contains("MovementSpeedMultiplier is required")));
+    }
+
+    @Test
     void rejectsBrokenSpeciesEncounterCrossReference() {
         DragonSpeciesConfig species = validSpecies();
         DragonEncounterConfig encounter = validEncounter();
@@ -185,6 +210,8 @@ class HyDragonConfigRepositoryTest {
             archetype.passiveModifiers = Map.of(
                     "MovementSpeedMultiplier", 1.15,
                     "ActionSpeedMultiplier", 1.10);
+            archetype.passiveModifierEffects = Map.of(
+                    "MovementSpeedMultiplier", "HyDragon_Miniwyvern_Lightning_Boon");
         } else if (id.equals("wind")) {
             archetype.passiveModifiers = Map.of(
                     "MovementSpeedMultiplier", 1.12,
@@ -192,6 +219,8 @@ class HyDragonConfigRepositoryTest {
                     "MobilityMultiplier", 1.10,
                     "MaximumMovementSpeedMultiplier", 1.20,
                     "MaximumJumpMultiplier", 1.25);
+            archetype.passiveModifierEffects = Map.of(
+                    "MovementSpeedMultiplier", "HyDragon_Miniwyvern_Wind_Boon");
         } else if (id.equals("nature")) {
             archetype.passiveModifiers = Map.of(
                     "RegenerationTickSeconds", 2.0,

@@ -25,6 +25,8 @@ public final class MiniwyvernArchetypeConfig
     private static final Ability[] EMPTY_ABILITIES = new Ability[0];
     private static final MapCodec<Double, Map<String, Double>> PASSIVE_MODIFIERS_CODEC =
             new MapCodec<>(Codec.DOUBLE, LinkedHashMap::new);
+    private static final MapCodec<String, Map<String, String>> PASSIVE_MODIFIER_EFFECTS_CODEC =
+            new MapCodec<>(Codec.STRING, LinkedHashMap::new);
     private static final Set<String> ALLOWED_ARCHETYPES = Set.of(
             "neutral", "lightning", "wind", "ice", "fire", "water", "nature", "void"
     );
@@ -157,6 +159,10 @@ public final class MiniwyvernArchetypeConfig
                     (asset, value) -> asset.passiveModifiers = value == null ? Map.of() : value,
                     asset -> asset.passiveModifiers)
             .add()
+            .<Map<String, String>>append(new KeyedCodec<>("PassiveModifierEffects", PASSIVE_MODIFIER_EFFECTS_CODEC),
+                    (asset, value) -> asset.passiveModifierEffects = value == null ? Map.of() : value,
+                    asset -> asset.passiveModifierEffects)
+            .add()
             .<Ability[]>append(new KeyedCodec<>("ActiveAbilities", ABILITY_ARRAY_CODEC),
                     (asset, value) -> asset.activeAbilities = value == null ? EMPTY_ABILITIES : value,
                     asset -> asset.activeAbilities)
@@ -176,6 +182,7 @@ public final class MiniwyvernArchetypeConfig
     String[] particleAndSoundIds = EMPTY;
     String[] passiveEffects = EMPTY;
     Map<String, Double> passiveModifiers = Map.of();
+    Map<String, String> passiveModifierEffects = Map.of();
     Ability[] activeAbilities = EMPTY_ABILITIES;
     String fallbackBehavior;
 
@@ -195,6 +202,14 @@ public final class MiniwyvernArchetypeConfig
         }
         if (blank(appearanceId)) errors.add("AppearanceId is required");
         if (blank(fallbackBehavior)) errors.add("FallbackBehavior is required");
+        Set<String> presentationIds = new java.util.HashSet<>();
+        for (String presentationId : particleAndSoundIds) {
+            if (blank(presentationId)) {
+                errors.add("ParticleAndSoundIds cannot contain blank values");
+            } else if (!presentationIds.add(trim(presentationId))) {
+                errors.add("ParticleAndSoundIds contains duplicate " + trim(presentationId));
+            }
+        }
         if (Set.of("fire", "ice", "water", "void").contains(normalized) && activeAbilities.length == 0) {
             errors.add("Archetype " + normalized + " requires at least one active ability");
         }
@@ -217,6 +232,7 @@ public final class MiniwyvernArchetypeConfig
     public List<String> getParticleAndSoundIds() { return List.of(particleAndSoundIds.clone()); }
     public List<String> getPassiveEffects() { return List.of(passiveEffects.clone()); }
     public Map<String, Double> getPassiveModifiers() { return Map.copyOf(passiveModifiers); }
+    public Map<String, String> getPassiveModifierEffects() { return Map.copyOf(passiveModifierEffects); }
     public List<Ability> getActiveAbilities() { return List.of(activeAbilities.clone()); }
     public String getFallbackBehavior() { return trim(fallbackBehavior); }
 
@@ -249,6 +265,17 @@ public final class MiniwyvernArchetypeConfig
             if (blank(id)) errors.add("ActiveAbilities.Id is required");
             if (blank(trigger)) errors.add("ActiveAbilities.Trigger is required for " + trim(id));
             if (blank(targetPolicy)) errors.add("ActiveAbilities.TargetPolicy is required for " + trim(id));
+            String normalizedTrigger = trim(trigger).toUpperCase(Locale.ROOT);
+            String normalizedTargetPolicy = trim(targetPolicy).toUpperCase(Locale.ROOT);
+            if (!Set.of("COMBAT_INTERVAL", "OWNER_HEALTH_BELOW_PERCENT").contains(normalizedTrigger)) {
+                errors.add("ActiveAbilities.Trigger is unsupported for " + trim(id) + ": " + trim(trigger));
+            } else if (normalizedTrigger.equals("COMBAT_INTERVAL")
+                    && !Set.of("OWNER_HOSTILE_ONLY", "OWNER_HOSTILE_AREA").contains(normalizedTargetPolicy)) {
+                errors.add("COMBAT_INTERVAL requires a hostile target policy for " + trim(id));
+            } else if (normalizedTrigger.equals("OWNER_HEALTH_BELOW_PERCENT")
+                    && !normalizedTargetPolicy.equals("OWNER_ONLY")) {
+                errors.add("OWNER_HEALTH_BELOW_PERCENT requires OWNER_ONLY for " + trim(id));
+            }
             if (!Double.isFinite(range) || range < 0.0) errors.add("ActiveAbilities.Range must be non-negative");
             if (maximumTargets != null && maximumTargets <= 0) {
                 errors.add("ActiveAbilities.MaximumTargets must be positive");
@@ -265,6 +292,9 @@ public final class MiniwyvernArchetypeConfig
             if (!Double.isFinite(magnitude)) errors.add("ActiveAbilities.Magnitude must be finite");
             if (maximumStacks != null && maximumStacks <= 0) {
                 errors.add("ActiveAbilities.MaximumStacks must be positive");
+            }
+            if (maximumStacks != null && blank(effectId)) {
+                errors.add("ActiveAbilities.MaximumStacks requires EffectId for " + trim(id));
             }
             if (!Double.isFinite(durationSeconds) || durationSeconds < 0.0) {
                 errors.add("ActiveAbilities.DurationSeconds must be non-negative");
@@ -362,6 +392,19 @@ public final class MiniwyvernArchetypeConfig
             if (entry.getValue() == null || !Double.isFinite(entry.getValue())) {
                 errors.add("PassiveModifiers." + entry.getKey() + " must be finite");
             }
+        }
+        for (Map.Entry<String, String> entry : passiveModifierEffects.entrySet()) {
+            if (!passiveModifiers.containsKey(entry.getKey())) {
+                errors.add("PassiveModifierEffects." + entry.getKey()
+                        + " does not name a configured PassiveModifiers semantic");
+            }
+            if (blank(entry.getValue())) {
+                errors.add("PassiveModifierEffects." + entry.getKey() + " must name an EntityEffect asset");
+            }
+        }
+        if (Set.of("lightning", "wind").contains(archetypeId)
+                && !passiveModifierEffects.containsKey("MovementSpeedMultiplier")) {
+            errors.add("PassiveModifierEffects.MovementSpeedMultiplier is required for " + archetypeId);
         }
         return errors;
     }

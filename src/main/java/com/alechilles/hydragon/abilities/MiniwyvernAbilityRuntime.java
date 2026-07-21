@@ -15,12 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 /** Tamework-event-aware runtime facade around {@link MiniwyvernAbilityService}. */
 public final class MiniwyvernAbilityRuntime implements AutoCloseable {
     public static final String CALLER_NAMESPACE = "hydragon";
+    private static final Logger LOGGER = Logger.getLogger(MiniwyvernAbilityRuntime.class.getName());
 
     private final TameworkApi api;
     private final HyDragonStateStore stateStore;
@@ -30,6 +34,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
     private final MiniwyvernAbilityService service;
     private final Clock clock;
     private final List<AutoCloseable> subscriptions = new ArrayList<>();
+    private final Set<String> reportedDegradations = ConcurrentHashMap.newKeySet();
     private boolean started;
     private String tickCursor;
 
@@ -118,8 +123,17 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
                 true,
                 true,
                 gate != null && gate.available());
-        worlds.dispatch(profile.ownerUuid(), profile.currentNpcUuid(), world -> service.tick(
-                context, configs.get().archetypes(), world, nowMs));
+        worlds.dispatch(profile.ownerUuid(), profile.currentNpcUuid(), world -> {
+            MiniwyvernAbilityService.TickResult result = service.tick(
+                    context, configs.get().archetypes(), world, nowMs);
+            if (result.ready() && result.reason().startsWith("ready-with-degraded-semantics:")) {
+                String diagnosticKey = extension.archetypeId().orElseThrow() + ':' + result.reason();
+                if (reportedDegradations.add(diagnosticKey)) {
+                    LOGGER.warning("Miniwyvern archetype '" + extension.archetypeId().orElseThrow()
+                            + "' remains active with unavailable optional semantics: " + result.reason());
+                }
+            }
+        });
     }
 
     private void onProfileChanged(NpcProfileChangedEvent event) {
@@ -167,6 +181,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         subscriptions.clear();
         started = false;
         tickCursor = null;
+        reportedDegradations.clear();
     }
 
     private static int insertionPointAfter(List<String> values, String cursor) {
