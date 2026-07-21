@@ -28,6 +28,7 @@ public final class HyDragonConfigRepository {
     private Map<String, MiniwyvernArchetypeConfig> archetypeAssets = Map.of();
     private Map<String, DragonEncounterConfig> encounterAssets = Map.of();
     private volatile Snapshot snapshot = Snapshot.empty();
+    private volatile List<String> lastReloadIssues = snapshot.issues();
 
     /** Reads all registered asset maps. Safe to call at start and during reconciliation. */
     public void refreshFromAssetRegistry() {
@@ -85,6 +86,12 @@ public final class HyDragonConfigRepository {
         return snapshot;
     }
 
+    /** Issues from the most recent candidate generation, including a rejected reload. */
+    @Nonnull
+    public List<String> lastReloadIssues() {
+        return lastReloadIssues;
+    }
+
     private void replaceSpecies(@Nullable DefaultAssetMap<String, DragonSpeciesConfig> map) {
         synchronized (reloadLock) {
             speciesAssets = copy(map);
@@ -114,12 +121,25 @@ public final class HyDragonConfigRepository {
     }
 
     private void rebuild() {
-        snapshot = buildSnapshot(
+        publishCandidate(buildSnapshot(
                 speciesAssets.values(),
                 maintenanceAssets.values(),
                 archetypeAssets.values(),
                 encounterAssets.values()
-        );
+        ));
+    }
+
+    /**
+     * Publishes a valid atomic generation. Before the first valid load, an invalid candidate remains
+     * visible so startup can fail closed; after readiness, invalid reloads retain the last-known-good view.
+     */
+    boolean publishCandidate(Snapshot candidate) {
+        lastReloadIssues = candidate.issues();
+        if (candidate.isValid() || !snapshot.isValid()) {
+            snapshot = candidate;
+            return true;
+        }
+        return false;
     }
 
     /** Pure snapshot builder exposed for deterministic validation tests. */

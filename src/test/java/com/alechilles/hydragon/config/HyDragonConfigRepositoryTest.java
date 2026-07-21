@@ -1,6 +1,8 @@
 package com.alechilles.hydragon.config;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -65,6 +67,23 @@ class HyDragonConfigRepositoryTest {
         assertFalse(snapshot.isValid());
         assertTrue(snapshot.issues().stream().anyMatch(issue -> issue.contains("targeting")));
         assertTrue(snapshot.issues().stream().anyMatch(issue -> issue.contains("missing species")));
+    }
+
+    @Test
+    void invalidReloadRetainsLastKnownGoodSnapshotAndReportsCandidateIssues() {
+        HyDragonConfigRepository repository = new HyDragonConfigRepository();
+        HyDragonConfigRepository.Snapshot valid = HyDragonConfigRepository.buildSnapshot(
+                List.of(validSpecies()), List.of(validMaintenance()), allArchetypes(), List.of(validEncounter()));
+        DragonEncounterConfig brokenEncounter = validEncounter();
+        brokenEncounter.targetSpeciesId = "hydragon:missing";
+        HyDragonConfigRepository.Snapshot invalid = HyDragonConfigRepository.buildSnapshot(
+                List.of(validSpecies()), List.of(validMaintenance()), allArchetypes(), List.of(brokenEncounter));
+
+        assertTrue(repository.publishCandidate(valid));
+        assertFalse(repository.publishCandidate(invalid));
+
+        assertSame(valid, repository.snapshot());
+        assertEquals(invalid.issues(), repository.lastReloadIssues());
     }
 
     private static DragonSpeciesConfig validSpecies() {
