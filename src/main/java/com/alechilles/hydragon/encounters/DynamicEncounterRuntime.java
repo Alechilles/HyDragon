@@ -12,13 +12,16 @@ import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /** Capture-policy registration, event dispatch, restart reconciliation, and timeout ticking facade. */
 public final class DynamicEncounterRuntime implements AutoCloseable {
     public static final String CAPTURE_REQUIREMENT_ID = "hydragon:special_encounter_capture_ready";
+    private static final System.Logger LOGGER = System.getLogger(DynamicEncounterRuntime.class.getName());
 
     private final TameworkApi api;
     private final HyDragonStateStore stateStore;
@@ -26,6 +29,8 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
     private final Supplier<FeatureGate> gate;
     private final EncounterWorldDispatcher worlds;
     private final DynamicEncounterCoordinator coordinator;
+    private final FullDragonProfileProjection fullDragonProfiles;
+    private final Map<UUID, CaptureAttemptResolvedEvent> pendingProfileProjections = new ConcurrentHashMap<>();
     private final Clock clock;
     private final List<AutoCloseable> handles = new ArrayList<>();
     private boolean started;
@@ -45,6 +50,7 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         this.gate = Objects.requireNonNull(gate, "gate");
         this.worlds = Objects.requireNonNull(worlds, "worlds");
         this.coordinator = Objects.requireNonNull(coordinator, "coordinator");
+        this.fullDragonProfiles = new FullDragonProfileProjection(stateStore, configs);
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
@@ -111,6 +117,7 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
     /** Round-robin bounded polling entry point for the live server bridge. */
     public synchronized int tickSome(int maximumRecords) {
         if (maximumRecords <= 0) throw new IllegalArgumentException("maximumRecords must be positive");
+        retryProfileProjections(Math.min(16, maximumRecords));
         long now = clock.millis();
         List<EncounterRecord> records = stateStore.snapshot().encounters().values().stream()
                 .sorted(java.util.Comparator.comparing(EncounterRecord::encounterId))
@@ -148,6 +155,19 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
 
     private void onCaptureResolved(CaptureAttemptResolvedEvent event) {
         if (event == null) return;
+        FullDragonProfileProjection.Result projection = fullDragonProfiles.project(event);
+        if (projection == FullDragonProfileProjection.Result.UNAVAILABLE) {
+            pendingProfileProjections.put(event.operationId(), event);
+        } else {
+            pendingProfileProjections.remove(event.operationId());
+            if (projection == FullDragonProfileProjection.Result.INVALID
+                    || projection == FullDragonProfileProjection.Result.AMBIGUOUS
+                    || projection == FullDragonProfileProjection.Result.CONFLICT) {
+                LOGGER.log(System.Logger.Level.WARNING,
+                        "HyDragon could not project captured full-dragon profile for operation {0}: {1}",
+                        event.operationId(), projection);
+            }
+        }
         EncounterRecord record = stateStore.snapshot().encounters().values().stream()
                 .filter(candidate -> candidate.targetNpcUuid().filter(event.targetNpcUuid()::equals).isPresent())
                 .findFirst().orElse(null);
@@ -156,6 +176,23 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         if (definition == null) return;
         worlds.dispatch(record.worldName(), event.targetNpcUuid(),
                 world -> coordinator.onCaptureResolved(event, definition, world));
+    }
+
+    private void retryProfileProjections(int maximum) {
+        if (maximum <= 0 || pendingProfileProjections.isEmpty()) return;
+        pendingProfileProjections.values().stream()
+                .sorted(java.util.Comparator.comparing(event -> event.operationId().toString()))
+                .limit(maximum)
+                .forEach(event -> {
+                    FullDragonProfileProjection.Result result = fullDragonProfiles.project(event);
+                    if (result != FullDragonProfileProjection.Result.UNAVAILABLE) {
+                        pendingProfileProjections.remove(event.operationId(), event);
+                    }
+                });
+    }
+
+    public int pendingProfileProjectionCount() {
+        return pendingProfileProjections.size();
     }
 
     @Override
@@ -170,6 +207,7 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         handles.clear();
         started = false;
         tickCursor = null;
+        pendingProfileProjections.clear();
     }
 
     private static int insertionPointAfter(List<EncounterRecord> records, String cursor) {
