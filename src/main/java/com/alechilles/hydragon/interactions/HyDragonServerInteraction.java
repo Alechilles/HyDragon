@@ -11,9 +11,9 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 
@@ -51,8 +51,8 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
             fail(context, firstRun, time, type, cooldownHandler);
             return;
         }
-        Player player = commandBuffer.getComponent(playerEntity, Player.getComponentType());
-        if (player == null || player.getPlayerRef() == null || !isRequestValid()) {
+        PlayerRef player = commandBuffer.getComponent(playerEntity, PlayerRef.getComponentType());
+        if (player == null || !isRequestValid()) {
             fail(context, firstRun, time, type, cooldownHandler);
             return;
         }
@@ -65,7 +65,7 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
                 : gate.available() ? "the public transaction adapter is not installed" : gate.reason();
 
         // No item or profile mutation is attempted until the public transaction adapter is installed.
-        commandBuffer.run(store -> player.getPlayerRef().sendMessage(Message.raw(
+        commandBuffer.run(store -> player.sendMessage(Message.raw(
                 "HyDragon: " + actionLabel() + " unavailable — " + reason)));
         fail(context, firstRun, time, type, cooldownHandler);
     }

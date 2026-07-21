@@ -5,6 +5,7 @@ import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
 import com.alechilles.hydragon.config.StoneMaintenanceConfig;
+import com.alechilles.hydragon.diagnostics.HyDragonStatusCommand;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonRepairBondedStoneInteraction;
@@ -36,6 +37,9 @@ public final class HyDragonPlugin extends JavaPlugin {
         registerInteractionCodecs();
         tameworkBridge = TameworkBridge.connect();
         registerConfigAssets();
+        getCommandRegistry().registerCommand(new HyDragonStatusCommand(
+                configRepository::snapshot,
+                () -> tameworkBridge));
         getLogger().at(Level.INFO).log("HyDragon plugin setup complete.");
     }
 
