@@ -309,7 +309,7 @@ public final class HyDragonStateStore {
                 return blocked;
             }
             ConsumableTransactionRecord current = snapshot.consumableTransactions().get(record.operationId());
-            if (record.equals(current)) {
+            if (current != null && current.matchesPreparation(record)) {
                 return MutationOutcome.ALREADY_APPLIED;
             }
             if (current != null) {

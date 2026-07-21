@@ -68,6 +68,25 @@ class ConsumableTransactionJournalTest {
                         Optional.of(PROFILE),
                         OptionalLong.of(7),
                         Optional.empty()));
+        ConsumableTransactionRecord replayedBegin = ConsumableTransactionRecord.prepared(
+                prepared.operationId(),
+                prepared.correlationId(),
+                prepared.kind(),
+                prepared.origin(),
+                prepared.ownerUuid(),
+                prepared.intentId(),
+                prepared.sourceItem(),
+                prepared.materialQuantity(),
+                prepared.authoritySourceItem(),
+                Optional.empty(),
+                Optional.empty(),
+                prepared.bindingId(),
+                prepared.bindingGeneration(),
+                OptionalLong.empty(),
+                9_999);
+        assertEquals(
+                MutationOutcome.ALREADY_APPLIED,
+                restartedBeforeConsumption.beginConsumableTransaction(replayedBegin));
 
         HyDragonStateStore restartedAfterConsumption = new HyDragonStateStore(file);
         ConsumableTransactionRecord consumed = restartedAfterConsumption.snapshot()

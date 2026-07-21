@@ -194,6 +194,39 @@ public record ConsumableTransactionRecord(
                 quarantineReason);
     }
 
+    /**
+     * Returns whether another revision-zero request represents this row's exact frozen preparation.
+     * Mutable phase/revision/timestamps and authority fields resolved after preparation are intentionally ignored.
+     */
+    public boolean matchesPreparation(ConsumableTransactionRecord candidate) {
+        Objects.requireNonNull(candidate, "candidate");
+        return candidate.status == ConsumableTransactionStatus.PREPARED
+                && candidate.revision == 0
+                && operationId.equals(candidate.operationId)
+                && correlationId.equals(candidate.correlationId)
+                && kind == candidate.kind
+                && origin.equals(candidate.origin)
+                && ownerUuid.equals(candidate.ownerUuid)
+                && intentId.equals(candidate.intentId)
+                && sourceItem.equals(candidate.sourceItem)
+                && materialQuantity == candidate.materialQuantity
+                && authoritySourceItem.equals(candidate.authoritySourceItem)
+                && bindingId.equals(candidate.bindingId)
+                && bindingGeneration.equals(candidate.bindingGeneration)
+                && optionalMatches(authorityOperationId, candidate.authorityOperationId)
+                && optionalMatches(profileId, candidate.profileId)
+                && optionalMatches(profileRevision, candidate.profileRevision);
+    }
+
+    private static boolean optionalMatches(Optional<String> recorded, Optional<String> candidate) {
+        return candidate.isEmpty() || recorded.equals(candidate);
+    }
+
+    private static boolean optionalMatches(OptionalLong recorded, OptionalLong candidate) {
+        return candidate.isEmpty()
+                || (recorded.isPresent() && recorded.getAsLong() == candidate.getAsLong());
+    }
+
     private static Optional<String> merge(Optional<String> current, Optional<String> supplied, String field) {
         current = normalized(current, field);
         supplied = normalized(supplied, field);
