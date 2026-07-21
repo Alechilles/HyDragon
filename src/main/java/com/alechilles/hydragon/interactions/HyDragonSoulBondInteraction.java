@@ -1,9 +1,12 @@
 package com.alechilles.hydragon.interactions;
 
 import com.alechilles.hydragon.integration.HyDragonFeature;
+import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import javax.annotation.Nonnull;
+import com.hypixel.hytale.server.core.Message;
+import java.util.UUID;
 
 /** Soul Bond item interaction. Runtime provisioning remains capability/contract gated. */
 public final class HyDragonSoulBondInteraction extends HyDragonServerInteraction {
@@ -32,5 +35,37 @@ public final class HyDragonSoulBondInteraction extends HyDragonServerInteraction
     @Override
     protected String actionLabel() {
         return "Soul Bond claim";
+    }
+
+    @Nonnull
+    @Override
+    protected HyDragonInteractionRuntime.Action action() {
+        return HyDragonInteractionRuntime.Action.SOUL_BOND;
+    }
+
+    @Nonnull
+    @Override
+    protected String expectedItemId() {
+        return "Draconic_Soul_Bond";
+    }
+
+    @Override
+    protected String newOperationId(UUID playerUuid) {
+        return "hydragon:soul-bond:" + playerUuid;
+    }
+
+    @Override
+    protected Message successMessage() {
+        return HyDragonMessages.soulBondClaimed();
+    }
+
+    @Override
+    protected Message invalidMessage() {
+        return HyDragonMessages.soulBondAlreadyClaimed();
+    }
+
+    @Override
+    protected Message unavailableMessage() {
+        return HyDragonMessages.soulBondUnavailable();
     }
 }

@@ -1,9 +1,8 @@
 package com.alechilles.hydragon.interactions;
 
-import com.alechilles.hydragon.HyDragonPlugin;
-import com.alechilles.hydragon.integration.FeatureGate;
+import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.integration.HyDragonFeature;
-import com.alechilles.hydragon.integration.TameworkBridge;
+import com.alechilles.hydragon.runtime.GameplayResult;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionState;
@@ -14,8 +13,12 @@ import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
+import java.util.Optional;
+import java.util.UUID;
 
 /** Common server-authoritative fail-closed dispatch for HyDragon item interactions. */
 abstract class HyDragonServerInteraction extends SimpleInteraction {
@@ -57,17 +60,31 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
             return;
         }
 
-        HyDragonPlugin plugin = HyDragonPlugin.getInstance();
-        TameworkBridge bridge = plugin == null ? null : plugin.getTameworkBridge();
-        FeatureGate gate = bridge == null ? null : bridge.snapshot().feature(requiredFeature());
-        String reason = gate == null
-                ? "HyDragon runtime is not ready"
-                : gate.available() ? "the public transaction adapter is not installed" : gate.reason();
+        UUID worldUuid = player.getWorldUuid();
+        Universe universe = Universe.get();
+        World world = universe == null || worldUuid == null ? null : universe.getWorld(worldUuid);
+        if (world == null || !HyDragonInteractionRuntime.installed()) {
+            commandBuffer.run(store -> player.sendMessage(unavailableMessage()));
+            fail(context, firstRun, time, type, cooldownHandler);
+            return;
+        }
+        String operationId = HytaleHeldItemReservation.existingOperationId(context)
+                .orElseGet(() -> newOperationId(player.getUuid()));
+        Optional<HytaleHeldItemReservation> reserved = HytaleHeldItemReservation.reserve(
+                context, player, expectedItemId(), operationId, consumedQuantity());
+        if (reserved.isEmpty()) {
+            commandBuffer.run(store -> player.sendMessage(invalidMessage()));
+            fail(context, firstRun, time, type, cooldownHandler);
+            return;
+        }
 
-        // No item or profile mutation is attempted until the public transaction adapter is installed.
-        commandBuffer.run(store -> player.sendMessage(Message.raw(
-                "HyDragon: " + actionLabel() + " unavailable — " + reason)));
-        fail(context, firstRun, time, type, cooldownHandler);
+        HyDragonInteractionRuntime.dispatch(
+                        action(), player.getUuid(), world.getName(), archetypeId(), reserved.orElseThrow())
+                .whenComplete((result, failure) -> sendResult(
+                        worldUuid,
+                        player.getUuid(),
+                        failure == null ? result : GameplayResult.retryable("interaction callback failed")));
+        super.tick0(true, time, type, context, cooldownHandler);
     }
 
     @Override
@@ -92,6 +109,56 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
 
     @Nonnull
     protected abstract String actionLabel();
+
+    @Nonnull
+    protected abstract HyDragonInteractionRuntime.Action action();
+
+    @Nonnull
+    protected abstract String expectedItemId();
+
+    protected String archetypeId() {
+        return "";
+    }
+
+    protected int consumedQuantity() {
+        return 1;
+    }
+
+    protected String newOperationId(UUID playerUuid) {
+        return "hydragon:" + action().name().toLowerCase(java.util.Locale.ROOT) + ":" + UUID.randomUUID();
+    }
+
+    protected Message successMessage() {
+        return HyDragonMessages.vesselUnavailable();
+    }
+
+    protected Message invalidMessage() {
+        return unavailableMessage();
+    }
+
+    protected Message unavailableMessage() {
+        return HyDragonMessages.vesselUnavailable();
+    }
+
+    private void sendResult(UUID worldUuid, UUID playerUuid, GameplayResult result) {
+        Universe universe = Universe.get();
+        World world = universe == null ? null : universe.getWorld(worldUuid);
+        if (world == null) return;
+        try {
+            world.execute(() -> {
+                Ref<EntityStore> ref = world.getEntityRef(playerUuid);
+                if (ref == null || !ref.isValid() || world.getEntityStore() == null) return;
+                PlayerRef player = world.getEntityStore().getStore().getComponent(ref, PlayerRef.getComponentType());
+                if (player != null) {
+                    player.sendMessage(result != null && result.succeeded() ? successMessage()
+                            : result != null && result.status() == GameplayResult.Status.DENIED
+                            ? invalidMessage() : unavailableMessage());
+                }
+            });
+        } catch (RuntimeException ignored) {
+            // Feedback is best-effort; transaction state remains journal-authoritative.
+        }
+    }
 
     private void fail(
             InteractionContext context,

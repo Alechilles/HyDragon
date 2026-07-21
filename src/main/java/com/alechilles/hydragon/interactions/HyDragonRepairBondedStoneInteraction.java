@@ -1,9 +1,11 @@
 package com.alechilles.hydragon.interactions;
 
 import com.alechilles.hydragon.integration.HyDragonFeature;
+import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import javax.annotation.Nonnull;
+import com.hypixel.hytale.server.core.Message;
 
 /** Revitalizing Essence interaction for one damaged bonded stone. */
 public final class HyDragonRepairBondedStoneInteraction extends HyDragonServerInteraction {
@@ -32,5 +34,32 @@ public final class HyDragonRepairBondedStoneInteraction extends HyDragonServerIn
     @Override
     protected String actionLabel() {
         return "bonded stone repair";
+    }
+
+    @Nonnull
+    @Override
+    protected HyDragonInteractionRuntime.Action action() {
+        return HyDragonInteractionRuntime.Action.REPAIR;
+    }
+
+    @Nonnull
+    @Override
+    protected String expectedItemId() {
+        return "Revitalizing_Essence";
+    }
+
+    @Override
+    protected Message successMessage() {
+        return HyDragonMessages.repairSuccess();
+    }
+
+    @Override
+    protected Message invalidMessage() {
+        return HyDragonMessages.repairInvalid();
+    }
+
+    @Override
+    protected Message unavailableMessage() {
+        return HyDragonMessages.vesselUnavailable();
     }
 }
