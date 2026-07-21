@@ -132,8 +132,8 @@ class HyDragonConfigRepositoryTest {
         encounter.admission.globalLimit = 2;
         encounter.phases = new String[]{"AERIAL", "GROUNDING", "GROUNDED_CAPTURE_WINDOW"};
         encounter.grounding.buildupSourceIds = new String[]{
-                "projectile:Projectile_Config_Ice_Ball+item:Weapon_Staff_Frost",
-                "projectile:Projectile_Config_Bow_Pull_Pullshot+item:Weapon_Shortbow_Pull"
+                "projectile:Ice_Ball+item:Weapon_Staff_Frost",
+                "projectile:Spear_Thorium+item:Weapon_Spear_Thorium"
         };
         encounter.grounding.threshold = 100;
         encounter.grounding.groundedState = "Combat.AirLand";

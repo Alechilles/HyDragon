@@ -25,8 +25,8 @@
   "Phases": [ "AERIAL", "GROUNDING", "GROUNDED_CAPTURE_WINDOW" ],
   "Grounding": {
     "BuildupSourceIds": [
-      "projectile:Projectile_Config_Ice_Ball+item:Weapon_Staff_Frost",
-      "projectile:Projectile_Config_Bow_Pull_Pullshot+item:Weapon_Shortbow_Pull"
+      "projectile:Ice_Ball+item:Weapon_Staff_Frost",
+      "projectile:Spear_Thorium+item:Weapon_Spear_Thorium"
     ],
     "Threshold": 100,
     "GroundedState": "Combat.AirLand",
