@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
  * exposes an older optional capability set.</p>
  */
 public final class TameworkBridge {
+    public static final String REQUIRED_TAMEWORK_RANGE = ">=3.0.0 <4.0.0";
     private static final String API_UNAVAILABLE = "Tamework public API is unavailable";
     private final TameworkApi api;
     private final Snapshot snapshot;

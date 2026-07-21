@@ -21,8 +21,10 @@ public final class HyDragonStatusCommand extends AbstractPlayerCommand {
     private final Supplier<HyDragonConfigRepository.Snapshot> configSupplier;
     private final Supplier<TameworkBridge> bridgeSupplier;
     private final Supplier<HyDragonPersistenceStatus> persistenceSupplier;
+    private final String pluginVersion;
 
     public HyDragonStatusCommand(
+            String pluginVersion,
             Supplier<HyDragonConfigRepository.Snapshot> configSupplier,
             Supplier<TameworkBridge> bridgeSupplier,
             Supplier<HyDragonPersistenceStatus> persistenceSupplier) {
@@ -30,6 +32,7 @@ public final class HyDragonStatusCommand extends AbstractPlayerCommand {
         this.configSupplier = configSupplier;
         this.bridgeSupplier = bridgeSupplier;
         this.persistenceSupplier = persistenceSupplier;
+        this.pluginVersion = pluginVersion;
         requirePermission(PERMISSION);
         setAllowsExtraArguments(true);
     }
@@ -53,7 +56,7 @@ public final class HyDragonStatusCommand extends AbstractPlayerCommand {
         }
         TameworkRuntimeDiagnostics.Snapshot diagnostics = TameworkRuntimeDiagnostics.read(bridge);
         for (String line : HyDragonStatusFormatter.format(
-                configSupplier.get(), bridge.snapshot(), diagnostics, persistenceSupplier.get())) {
+                pluginVersion, configSupplier.get(), bridge.snapshot(), diagnostics, persistenceSupplier.get())) {
             context.sendMessage(Message.raw(line));
         }
     }

@@ -37,6 +37,7 @@ class HyDragonPersistenceStatusTest {
         assertFalse(status.writable());
         assertEquals(0, status.players());
         assertEquals(0, status.pendingReconciliation());
+        assertTrue(status.orphanedLinks().isEmpty());
         assertEquals("state store not initialized", status.reason());
     }
 
@@ -82,7 +83,25 @@ class HyDragonPersistenceStatusTest {
         assertEquals(2, status.players());
         assertEquals(1, status.profiles());
         assertEquals(4, status.pendingReconciliation());
+        assertTrue(status.orphanedLinks().isEmpty());
         assertNull(status.reason());
+    }
+
+    @Test
+    void identifiesOrphanedSoulBondLinksWithAnOperatorAction() throws Exception {
+        HyDragonStateStore store = new HyDragonStateStore(temporaryDirectory.resolve("orphaned-state.properties"));
+        store.beginSoulBond(PLAYER_ONE, "soul:orphaned");
+        store.completeSoulBond(PLAYER_ONE, "soul:orphaned", PROFILE_ONE, 1_000);
+
+        HyDragonPersistenceStatus status = HyDragonPersistenceStatus.from(store, null);
+
+        assertEquals(1, status.orphanedLinks().size());
+        HyDragonPersistenceStatus.OrphanedLink orphan = status.orphanedLinks().getFirst();
+        assertEquals("SOUL_BOND_PROFILE_MISSING", orphan.kind());
+        assertTrue(orphan.identity().contains(PLAYER_ONE.toString()));
+        assertTrue(orphan.identity().contains(PROFILE_ONE.toString()));
+        assertTrue(orphan.operatorAction().contains("restore"));
+        assertTrue(orphan.operatorAction().contains("quarantine"));
     }
 
     @Test

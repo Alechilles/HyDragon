@@ -73,6 +73,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         tameworkBridge = TameworkBridge.connect();
         registerConfigAssets();
         getCommandRegistry().registerCommand(new HyDragonStatusCommand(
+                getManifest().getVersion().toString(),
                 configRepository::snapshot,
                 () -> tameworkBridge,
                 this::getPersistenceStatus));

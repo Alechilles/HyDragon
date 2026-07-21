@@ -14,12 +14,13 @@ public final class HyDragonStatusFormatter {
     }
 
     public static List<String> format(
+            String pluginVersion,
             HyDragonConfigRepository.Snapshot config,
             TameworkBridge.Snapshot tamework,
             TameworkRuntimeDiagnostics.Snapshot diagnostics,
             HyDragonPersistenceStatus localPersistence) {
         List<String> lines = new ArrayList<>();
-        lines.add("HyDragon status");
+        lines.add("HyDragon " + pluginVersion + " status");
         lines.add("Config: " + (config.isValid() ? "READY" : "INVALID")
                 + "; species=" + config.species().size()
                 + ", archetypes=" + config.archetypes().size()
@@ -32,7 +33,8 @@ public final class HyDragonStatusFormatter {
             lines.add("  config: ... and " + (config.issues().size() - 5) + " more");
         }
 
-        lines.add("Tamework Public API: " + tamework.apiVersion()
+        lines.add("Tamework: required=" + TameworkBridge.REQUIRED_TAMEWORK_RANGE
+                + "; Public API=" + tamework.apiVersion()
                 + "; capabilities=" + tamework.capabilities().size());
         for (HyDragonFeature feature : HyDragonFeature.values()) {
             FeatureGate gate = tamework.feature(feature);
@@ -53,7 +55,15 @@ public final class HyDragonStatusFormatter {
                 + ", encounters=" + localPersistence.encounters()
                 + ", pendingProfileProjections=" + localPersistence.pendingProfileProjections()
                 + ", quarantined=" + localPersistence.quarantined()
-                + ", reconcile=" + localPersistence.pendingReconciliation());
+                + ", reconcile=" + localPersistence.pendingReconciliation()
+                + ", orphanedLinks=" + localPersistence.orphanedLinks().size());
+        for (HyDragonPersistenceStatus.OrphanedLink orphan : localPersistence.orphanedLinks().stream().limit(5).toList()) {
+            lines.add("  orphan[" + orphan.kind() + "]: " + orphan.identity()
+                    + "; action=" + orphan.operatorAction());
+        }
+        if (localPersistence.orphanedLinks().size() > 5) {
+            lines.add("  orphan: ... and " + (localPersistence.orphanedLinks().size() - 5) + " more");
+        }
         if (localPersistence.reason() != null) {
             lines.add("  local persistence: " + localPersistence.reason());
         }
