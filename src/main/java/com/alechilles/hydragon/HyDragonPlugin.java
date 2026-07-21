@@ -11,6 +11,7 @@ import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
 import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.diagnostics.HyDragonStatusCommand;
 import com.alechilles.hydragon.diagnostics.HyDragonPersistenceStatus;
+import com.alechilles.hydragon.diagnostics.HyDragonRefundClaimCommand;
 import com.alechilles.hydragon.encounters.DynamicEncounterRuntime;
 import com.alechilles.hydragon.encounters.HyDragonEncounterRegistrationFacade;
 import com.alechilles.hydragon.encounters.HyDragonEncounterServerRuntime;
@@ -22,6 +23,8 @@ import com.alechilles.hydragon.interactions.HyDragonRepairBondedStoneInteraction
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.runtime.BondedStoneRepairService;
+import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
+import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
 import com.alechilles.hydragon.runtime.HyDragonGameplayRuntime;
 import com.alechilles.hydragon.runtime.MiniwyvernAttunementService;
 import com.alechilles.hydragon.runtime.SoulBondLedger;
@@ -54,6 +57,8 @@ public final class HyDragonPlugin extends JavaPlugin {
     private HyDragonGameplayRuntime gameplayRuntime;
     private DynamicEncounterRuntime encounterRuntime;
     private MiniwyvernAbilityRuntime abilityRuntime;
+    private ConsumableSagaRecoveryRuntime sagaRecoveryRuntime;
+    private ConsumableRefundClaimService refundClaims;
 
     public HyDragonPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -71,6 +76,7 @@ public final class HyDragonPlugin extends JavaPlugin {
                 configRepository::snapshot,
                 () -> tameworkBridge,
                 this::getPersistenceStatus));
+        getCommandRegistry().registerCommand(new HyDragonRefundClaimCommand(() -> refundClaims));
         getLogger().at(Level.INFO).log("HyDragon plugin setup complete.");
     }
 
@@ -169,13 +175,16 @@ public final class HyDragonPlugin extends JavaPlugin {
                     journal,
                     new StateStoreMiniwyvernProfileProjection(store));
             BondedStoneRepairService repairService = new BondedStoneRepairService(adapter, journal);
+            sagaRecoveryRuntime = new ConsumableSagaRecoveryRuntime(
+                    journal, soulBondService, repairService);
+            refundClaims = new ConsumableRefundClaimService(journal);
 
             gameplayRuntime = new HyDragonGameplayRuntime(
                     soulBondService,
                     attunementService,
                     repairService,
                     new TameworkBondedRepairRequestResolver(api));
-            HyDragonInteractionRuntime.install(gameplayRuntime);
+            HyDragonInteractionRuntime.install(gameplayRuntime, () -> bridge.snapshot());
 
             encounterRuntime = HyDragonEncounterRegistrationFacade.install(
                     api,
@@ -189,7 +198,8 @@ public final class HyDragonPlugin extends JavaPlugin {
                     configRepository::snapshot,
                     () -> bridge.snapshot().feature(HyDragonFeature.MINIWYVERN_ABILITIES),
                     new HytaleMiniwyvernAbilityWorldDispatcher(api));
-            serverRuntime.start(encounterRuntime, abilityRuntime, configRepository::snapshot);
+            serverRuntime.start(
+                    encounterRuntime, abilityRuntime, sagaRecoveryRuntime, configRepository::snapshot);
             getLogger().at(Level.INFO).log("HyDragon gameplay, encounter, and Miniwyvern runtimes are active.");
         } catch (RuntimeException | LinkageError failure) {
             stopRuntimes();
@@ -208,6 +218,8 @@ public final class HyDragonPlugin extends JavaPlugin {
         gameplayRuntime = null;
         encounterRuntime = null;
         abilityRuntime = null;
+        sagaRecoveryRuntime = null;
+        refundClaims = null;
     }
 
     private void closeRuntime(String label, AutoCloseable runtime) {

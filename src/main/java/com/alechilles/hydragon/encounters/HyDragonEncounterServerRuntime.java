@@ -4,6 +4,7 @@ import com.alechilles.hydragon.abilities.MiniwyvernAbilityRuntime;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.persistence.EncounterRecord;
+import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
 import com.hypixel.hytale.builtin.weather.components.WeatherTracker;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -45,6 +46,7 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
     static final int MAX_DEFINITIONS_PER_PLAYER = 8;
     static final int MAX_ENCOUNTERS_PER_TICK = 64;
     static final int MAX_MINIWYVERNS_PER_TICK = 64;
+    static final int MAX_SAGAS_PER_TICK = 16;
     private static final long TICK_PERIOD_SECONDS = 1L;
     private static final int ADMISSION_SCAN_INTERVAL_TICKS = 5;
     private static final int REGION_SIZE_BLOCKS = 512;
@@ -69,13 +71,15 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
     public void start(
             DynamicEncounterRuntime encounters,
             MiniwyvernAbilityRuntime abilities,
+            ConsumableSagaRecoveryRuntime sagaRecovery,
             Supplier<HyDragonConfigRepository.Snapshot> configs) {
         Objects.requireNonNull(encounters, "encounters");
         Objects.requireNonNull(abilities, "abilities");
+        Objects.requireNonNull(sagaRecovery, "sagaRecovery");
         Objects.requireNonNull(configs, "configs");
         synchronized (lifecycleLock) {
             if (scheduled != null) return;
-            bindings = new Bindings(encounters, abilities, configs);
+            bindings = new Bindings(encounters, abilities, sagaRecovery, configs);
             executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
                 Thread thread = new Thread(runnable, "HyDragon-live-runtime");
                 thread.setDaemon(true);
@@ -92,6 +96,7 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
             if (active == null) return;
             active.encounters().tickSome(MAX_ENCOUNTERS_PER_TICK);
             active.abilities().tickSome(MAX_MINIWYVERNS_PER_TICK);
+            active.sagaRecovery().tickSome(MAX_SAGAS_PER_TICK);
             cycle++;
             if (cycle % ADMISSION_SCAN_INTERVAL_TICKS == 0) queueAdmissionScans(active);
         } catch (RuntimeException ignored) {
@@ -277,6 +282,7 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
     private record Bindings(
             DynamicEncounterRuntime encounters,
             MiniwyvernAbilityRuntime abilities,
+            ConsumableSagaRecoveryRuntime sagaRecovery,
             Supplier<HyDragonConfigRepository.Snapshot> configs) {
     }
 }
