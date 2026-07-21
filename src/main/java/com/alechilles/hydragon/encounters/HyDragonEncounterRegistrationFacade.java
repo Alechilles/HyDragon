@@ -43,8 +43,13 @@ public final class HyDragonEncounterRegistrationFacade {
         DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(api, stateStore, eligibility);
         DynamicEncounterRuntime runtime = new DynamicEncounterRuntime(
                 api, stateStore, configs, featureGate, worlds, coordinator, Clock.systemUTC());
-        runtime.start();
-        runtime.reconcileAll();
-        return runtime;
+        try {
+            runtime.start();
+            runtime.reconcileAll();
+            return runtime;
+        } catch (RuntimeException | Error failure) {
+            runtime.close();
+            throw failure;
+        }
     }
 }

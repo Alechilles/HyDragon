@@ -24,7 +24,12 @@ public final class HyDragonAbilityRegistrationFacade {
                 new TameworkMiniwyvernAbilityStateRepository(api.profileData()));
         MiniwyvernAbilityRuntime runtime = new MiniwyvernAbilityRuntime(
                 api, stateStore, configs, featureGate, worlds, service, Clock.systemUTC());
-        runtime.start();
-        return runtime;
+        try {
+            runtime.start();
+            return runtime;
+        } catch (RuntimeException | Error failure) {
+            runtime.close();
+            throw failure;
+        }
     }
 }

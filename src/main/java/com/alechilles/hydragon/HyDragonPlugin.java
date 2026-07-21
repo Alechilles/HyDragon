@@ -1,5 +1,9 @@
 package com.alechilles.hydragon;
 
+import com.alechilles.alecstamework.api.TameworkApi;
+import com.alechilles.hydragon.abilities.HyDragonAbilityRegistrationFacade;
+import com.alechilles.hydragon.abilities.HytaleMiniwyvernAbilityWorldDispatcher;
+import com.alechilles.hydragon.abilities.MiniwyvernAbilityRuntime;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
@@ -7,11 +11,26 @@ import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
 import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.diagnostics.HyDragonStatusCommand;
 import com.alechilles.hydragon.diagnostics.HyDragonPersistenceStatus;
+import com.alechilles.hydragon.encounters.DynamicEncounterRuntime;
+import com.alechilles.hydragon.encounters.HyDragonEncounterRegistrationFacade;
+import com.alechilles.hydragon.encounters.HyDragonEncounterServerRuntime;
+import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
+import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
 import com.alechilles.hydragon.interactions.HyDragonRepairBondedStoneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
+import com.alechilles.hydragon.runtime.BondedStoneRepairService;
+import com.alechilles.hydragon.runtime.HyDragonGameplayRuntime;
+import com.alechilles.hydragon.runtime.MiniwyvernAttunementService;
+import com.alechilles.hydragon.runtime.SoulBondLedger;
+import com.alechilles.hydragon.runtime.SoulBondService;
+import com.alechilles.hydragon.runtime.StateStoreMiniwyvernProfileProjection;
+import com.alechilles.hydragon.runtime.StateStoreOperationJournal;
+import com.alechilles.hydragon.runtime.StateStoreSoulBondLedger;
+import com.alechilles.hydragon.runtime.TameworkBondedRepairRequestResolver;
+import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
 import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.assetstore.event.RemovedAssetsEvent;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
@@ -31,6 +50,10 @@ public final class HyDragonPlugin extends JavaPlugin {
     private TameworkBridge tameworkBridge;
     private HyDragonStateStore stateStore;
     private String persistenceFailure;
+    private HyDragonEncounterServerRuntime serverRuntime;
+    private HyDragonGameplayRuntime gameplayRuntime;
+    private DynamicEncounterRuntime encounterRuntime;
+    private MiniwyvernAbilityRuntime abilityRuntime;
 
     public HyDragonPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -40,6 +63,8 @@ public final class HyDragonPlugin extends JavaPlugin {
     @Override
     protected void setup() {
         registerInteractionCodecs();
+        // The persistent encounter marker and damage system must exist before any world loads.
+        serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
         tameworkBridge = TameworkBridge.connect();
         registerConfigAssets();
         getCommandRegistry().registerCommand(new HyDragonStatusCommand(
@@ -54,6 +79,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         tameworkBridge = TameworkBridge.connect();
         configRepository.refreshFromAssetRegistry();
         openStateStore();
+        startRuntimes();
         HyDragonConfigRepository.Snapshot config = configRepository.snapshot();
         Level level = config.isValid() ? Level.INFO : Level.WARNING;
         getLogger().at(level).log("HyDragon enabled with %d species, %d Miniwyvern archetypes, "
@@ -70,10 +96,12 @@ public final class HyDragonPlugin extends JavaPlugin {
 
     @Override
     protected void shutdown() {
+        stopRuntimes();
         getLogger().at(Level.INFO).log("HyDragon disabled.");
         stateStore = null;
         persistenceFailure = null;
         tameworkBridge = null;
+        serverRuntime = null;
         instance = null;
     }
 
@@ -111,6 +139,84 @@ public final class HyDragonPlugin extends JavaPlugin {
             stateStore = null;
             persistenceFailure = "state store open failed: " + failure.getClass().getSimpleName();
             getLogger().at(Level.SEVERE).withCause(failure).log("Unable to open HyDragon persistence; mutations disabled.");
+        }
+    }
+
+    private void startRuntimes() {
+        TameworkBridge bridge = tameworkBridge;
+        HyDragonStateStore store = stateStore;
+        TameworkApi api = bridge == null ? null : bridge.api();
+        if (api == null || store == null || !store.snapshot().writable()) {
+            getLogger().at(Level.WARNING).log(
+                    "HyDragon gameplay runtimes remain disabled until Tamework and writable persistence are available.");
+            return;
+        }
+        if (serverRuntime == null) {
+            getLogger().at(Level.SEVERE).log(
+                    "HyDragon live runtime was not registered during setup; gameplay remains disabled.");
+            return;
+        }
+
+        try {
+            TameworkGameplayAdapter adapter = new TameworkGameplayAdapter(api);
+            SoulBondLedger soulBonds = new StateStoreSoulBondLedger(store);
+            StateStoreOperationJournal journal = new StateStoreOperationJournal(store, System::currentTimeMillis);
+            SoulBondService soulBondService = new SoulBondService(
+                    adapter, soulBonds, journal, System::currentTimeMillis);
+            MiniwyvernAttunementService attunementService = new MiniwyvernAttunementService(
+                    adapter,
+                    soulBonds,
+                    journal,
+                    new StateStoreMiniwyvernProfileProjection(store));
+            BondedStoneRepairService repairService = new BondedStoneRepairService(adapter, journal);
+
+            gameplayRuntime = new HyDragonGameplayRuntime(
+                    soulBondService,
+                    attunementService,
+                    repairService,
+                    new TameworkBondedRepairRequestResolver(api));
+            HyDragonInteractionRuntime.install(gameplayRuntime);
+
+            encounterRuntime = HyDragonEncounterRegistrationFacade.install(
+                    api,
+                    store,
+                    configRepository::snapshot,
+                    () -> bridge.snapshot().feature(HyDragonFeature.DYNAMIC_ENCOUNTERS),
+                    serverRuntime.worlds());
+            abilityRuntime = HyDragonAbilityRegistrationFacade.install(
+                    api,
+                    store,
+                    configRepository::snapshot,
+                    () -> bridge.snapshot().feature(HyDragonFeature.MINIWYVERN_ABILITIES),
+                    new HytaleMiniwyvernAbilityWorldDispatcher(api));
+            serverRuntime.start(encounterRuntime, abilityRuntime, configRepository::snapshot);
+            getLogger().at(Level.INFO).log("HyDragon gameplay, encounter, and Miniwyvern runtimes are active.");
+        } catch (RuntimeException | LinkageError failure) {
+            stopRuntimes();
+            getLogger().at(Level.SEVERE).withCause(failure).log(
+                    "HyDragon runtime startup failed; gameplay interactions are disabled.");
+        }
+    }
+
+    private void stopRuntimes() {
+        closeRuntime("live server", serverRuntime);
+        closeRuntime("Miniwyvern ability", abilityRuntime);
+        closeRuntime("dynamic encounter", encounterRuntime);
+        if (gameplayRuntime != null) {
+            HyDragonInteractionRuntime.uninstall(gameplayRuntime);
+        }
+        gameplayRuntime = null;
+        encounterRuntime = null;
+        abilityRuntime = null;
+    }
+
+    private void closeRuntime(String label, AutoCloseable runtime) {
+        if (runtime == null) return;
+        try {
+            runtime.close();
+        } catch (Exception failure) {
+            getLogger().at(Level.WARNING).withCause(failure).log(
+                    "Unable to close HyDragon %s runtime cleanly.", label);
         }
     }
 
