@@ -51,11 +51,15 @@
   "Recipe": {
     "Input": [
       {
+        "ItemId": "Ingredient_Bar_Iron",
+        "Quantity": 4
+      },
+      {
         "ItemId": "Draconic_Scale",
         "Quantity": 2
       },
       {
-        "ItemId": "Draconic_Essence_Cryo",
+        "ItemId": "Draconic_Essence_Ice",
         "Quantity": 1
       },
       {
@@ -72,9 +76,9 @@
     "BenchRequirement": [
       {
         "Type": "Crafting",
-        "Id": "Arcanebench",
+        "Id": "Draconic_Altar",
         "Categories": [
-          "Arcane_Misc"
+          "Draconic_Altar_Stones"
         ]
       }
     ],
@@ -128,7 +132,28 @@
       "Light": {
         "Color": "#369DCC",
         "Radius": 2
-      }
+      },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
+    },
+    "Damaged": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Damaged.name",
+        "Description": "server.items.Draconic_Stone_Damaged.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": []
+        }
+      },
+      "MaxStack": 1,
+      "Light": {
+        "Color": "#CC3636",
+        "Radius": 1
+      },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
     }
   }
 }

@@ -46,6 +46,11 @@
   },
   "Vessel": {
     "Mode": "Bonded",
+    "StateItemIds": {
+      "Stored": "*Draconic_Stone_State_Filled",
+      "Active": "*Draconic_Stone_State_Filled",
+      "Dead": "*Draconic_Stone_State_Damaged"
+    },
     "TransitionCooldownMs": 10000,
     "StoreMaxDistance": 12.0,
     "RequireOwner": true,
