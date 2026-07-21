@@ -170,7 +170,13 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
     }
 
     private static int insertionPointAfter(List<String> values, String cursor) {
-        int index = java.util.Collections.binarySearch(values, cursor);
-        return index >= 0 ? (index + 1) % values.size() : Math.min(values.size() - 1, -index - 1);
+        int low = 0;
+        int high = values.size() - 1;
+        while (low <= high) {
+            int middle = (low + high) >>> 1;
+            if (values.get(middle).compareTo(cursor) <= 0) low = middle + 1;
+            else high = middle - 1;
+        }
+        return low >= values.size() ? 0 : low;
     }
 }
