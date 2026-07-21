@@ -16,6 +16,9 @@ public interface MiniwyvernAbilityWorld {
 
     Optional<Target> hostileTarget(double maximumRange);
 
+    /** Applies the archetype's canonical model while preserving the live entity and its scale. */
+    boolean synchronizeAppearance(UUID entityUuid, String appearanceId);
+
     Health health(UUID entityUuid);
 
     boolean applyEffect(UUID entityUuid, String sourceKey, String effectId, double durationSeconds);

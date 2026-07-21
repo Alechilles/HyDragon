@@ -34,6 +34,7 @@ class MiniwyvernAbilityServiceTest {
         assertEquals(1, world.projectiles);
         assertEquals(1, world.effects);
         assertTrue(world.sawCommittedCooldownBeforeMutation);
+        assertEquals("Wyvern_Mini_Fire", world.appearanceId);
 
         MiniwyvernAbilityService.TickResult replay = service.tick(
                 context, Map.of("fire", fireConfig()), world, 1_000L);
@@ -139,6 +140,7 @@ class MiniwyvernAbilityServiceTest {
         UUID targetOwner;
         int effects;
         int projectiles;
+        String appearanceId;
         boolean sawCommittedCooldownBeforeMutation;
 
         private FakeWorld(MemoryRepository states) { this.states = states; }
@@ -153,6 +155,11 @@ class MiniwyvernAbilityServiceTest {
         }
         @Override public Optional<Target> hostileTarget(double maximumRange) {
             return Optional.of(new Target(ENEMY, targetOwner, "world", 5.0D, true));
+        }
+        @Override public boolean synchronizeAppearance(UUID entityUuid, String requestedAppearanceId) {
+            if (!NPC.equals(entityUuid)) return false;
+            appearanceId = requestedAppearanceId;
+            return true;
         }
         @Override public Health health(UUID entityUuid) { return new Health(50.0D, 100.0D); }
         @Override public boolean applyEffect(UUID entityUuid, String sourceKey, String effectId, double durationSeconds) {

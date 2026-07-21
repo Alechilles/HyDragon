@@ -54,6 +54,9 @@ public final class MiniwyvernAbilityService {
         if (config == null || !config.validate().isEmpty()) {
             return cleanupAndDeny(context, archetypes, world, "archetype-config-invalid", nowMs);
         }
+        if (!world.synchronizeAppearance(context.npcUuid(), config.getAppearanceId())) {
+            return cleanupAndDeny(context, archetypes, world, "appearance-sync-unavailable", nowMs);
+        }
         boolean modifiersUnavailable = !config.getId().equals("nature")
                 && !config.getPassiveModifiers().isEmpty()
                 && !world.supportsOwnerModifiers(config.getPassiveModifiers());
