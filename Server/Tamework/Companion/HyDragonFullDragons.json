@@ -1,0 +1,29 @@
+{
+  "Parent": "TwCompanionDefault",
+  "General": {
+    "Enabled": true,
+    "Priority": 100
+  },
+  "RoleIds": [
+    "Tamed_NordicDrake",
+    "Tamed_Hydra",
+    "Tamed_RockDrakeT1",
+    "Tamed_RockDrakeT2",
+    "Tamed_RockDrakeT3"
+  ],
+  "Command": {
+    "ReturnHomeTeleportDistance": 128.0,
+    "ReturnHomePathDistanceBeforeTeleport": 32.0,
+    "RecallSafeSpawnDistance": 24.0,
+    "RecallForceRelocateDistance": 96.0,
+    "Travel": {
+      "CrossWorldRecallEnabled": true,
+      "OnTransferFailure": "QueueForRecall",
+      "FollowMasterOnWorldChange": false,
+      "FollowMasterOnWorldChangeStateFilter": [ "Follow", "Defend", "Aggressive" ]
+    },
+    "DeadRespawnCooldownMins": 0,
+    "PlacementMinRelativeY": -4.0,
+    "PlacementMaxRelativeY": 8.0
+  }
+}

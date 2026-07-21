@@ -1,0 +1,9 @@
+{
+  "Parent": "HyDragonDraconicStone",
+  "EmptyItemId": "Draconic_Stone_Ancient",
+  "FilledItemId": "*Draconic_Stone_Ancient_State_Filled",
+  "Capture": {
+    "Power": 5,
+    "MaximumChance": 1.0
+  }
+}

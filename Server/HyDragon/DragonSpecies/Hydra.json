@@ -1,0 +1,23 @@
+{
+  "Id": "hydragon:hydra",
+  "WildRoleIds": [ "Hydra" ],
+  "TamedRoleIdByWildRole": { "Hydra": "Tamed_Hydra" },
+  "DifficultyId": "epic",
+  "StatsAndBehaviorAssetIds": [ "CAE_Hydra", "Root_NPC_Hydra_Attack" ],
+  "DropListId": "Drop_Hydra",
+  "Mount": { "Mode": "GROUND", "AvatarFlightConfigId": null },
+  "Capture": {
+    "Resistance": 0.20,
+    "MinimumStoneTier": 3,
+    "MaxHealthPercentOverride": 20.0,
+    "SpecialRequirementIds": []
+  },
+  "Spawn": {
+    "OrdinarySpawnAssetIds": [ "Spawns_Zone3_Glacial_HyDragon_Predator" ],
+    "PluginEncounterIds": []
+  },
+  "Presentation": {
+    "LocalizationPrefix": "server.npcRoles.Hydra",
+    "ModelIds": [ "Hydra" ]
+  }
+}

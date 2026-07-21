@@ -1,0 +1,23 @@
+{
+  "Parent": "TwCompanionDefault",
+  "General": {
+    "Enabled": true,
+    "Priority": 100
+  },
+  "RoleIds": [ "Tamed_Wyvern_Mini" ],
+  "Command": {
+    "ReturnHomeTeleportDistance": 72.0,
+    "ReturnHomePathDistanceBeforeTeleport": 18.0,
+    "RecallSafeSpawnDistance": 12.0,
+    "RecallForceRelocateDistance": 48.0,
+    "Travel": {
+      "CrossWorldRecallEnabled": true,
+      "OnTransferFailure": "QueueForRecall",
+      "FollowMasterOnWorldChange": true,
+      "FollowMasterOnWorldChangeStateFilter": [ "Follow", "Defend", "Aggressive" ]
+    },
+    "DeadRespawnCooldownMins": 0,
+    "PlacementMinRelativeY": -2.0,
+    "PlacementMaxRelativeY": 6.0
+  }
+}

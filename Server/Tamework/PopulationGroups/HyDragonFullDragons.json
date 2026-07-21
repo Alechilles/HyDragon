@@ -1,0 +1,17 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "GroupId": "hydragon:full_dragons",
+  "RoleIds": [
+    "Tamed_NordicDrake",
+    "Tamed_Hydra",
+    "Tamed_RockDrakeT1",
+    "Tamed_RockDrakeT2",
+    "Tamed_RockDrakeT3"
+  ],
+  "Limits": {
+    "MaxOwnedPerOwner": 0,
+    "MaxActivePerOwner": 1,
+    "Scope": "Global"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "Parent": "HyDragonDraconicStone",
+  "EmptyItemId": "Draconic_Stone_Thorium",
+  "FilledItemId": "*Draconic_Stone_Thorium_State_Filled",
+  "Capture": { "Power": 2 }
+}

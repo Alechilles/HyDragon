@@ -1,0 +1,38 @@
+{
+  "Id": "hydragon:nordic_drake_high_altitude",
+  "Enabled": true,
+  "TargetSpeciesId": "hydragon:nordic_drake",
+  "RegionsAndAltitude": {
+    "EnvironmentIds": [ "Env_Zone3_Glacial", "Env_Zone3_Mountains" ],
+    "MinY": 180,
+    "MaxY": 320
+  },
+  "WeatherPredicate": {
+    "Mode": "AnyOf",
+    "WeatherIds": [ "Zone3_Snow_Heavy", "Zone3_Snow_Storm" ]
+  },
+  "PlayerEligibility": {
+    "ActiveCompanionGroup": "hydragon:full_dragons",
+    "RequiredMountMode": "AVATAR_FLIGHT",
+    "RequiredItemId": "Tamework_Flightmasters_Talisman"
+  },
+  "Admission": {
+    "Chance": 0.08,
+    "EvaluationCooldownSeconds": 300,
+    "PerRegionLimit": 1,
+    "GlobalLimit": 2
+  },
+  "Phases": [ "AERIAL", "GROUNDING", "GROUNDED_CAPTURE_WINDOW" ],
+  "Grounding": {
+    "BuildupSourceIds": [ "hydragon:lure_hit", "hydragon:stagger_hit" ],
+    "Threshold": 100,
+    "GroundedState": "Grounded",
+    "GroundedEffectId": "HyDragon_NordicDrake_Grounded",
+    "CaptureWindowSeconds": 45
+  },
+  "CleanupAndCooldown": {
+    "EncounterTimeoutSeconds": 900,
+    "RetryCooldownSeconds": 1800,
+    "EligibilityGraceSeconds": 30
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "Id": "fire",
+  "EssenceSemanticId": "fire",
+  "EssenceItemId": "Draconic_Essence_Fire",
+  "AppearanceId": "Wyvern_Mini_Fire",
+  "ParticleAndSoundIds": [ "Effect_Fire", "SFX_Effect_Burn_World" ],
+  "PassiveEffects": [],
+  "ActiveAbilities": [
+    {
+      "Id": "fireball",
+      "Trigger": "COMBAT_INTERVAL",
+      "TargetPolicy": "OWNER_HOSTILE_ONLY",
+      "Range": 18.0,
+      "CooldownSeconds": 2.5,
+      "EffectId": "HyDragon_Miniwyvern_Fire_Burn",
+      "ProjectileId": "NordicDrake_Dragon_Fire_Ball",
+      "Magnitude": 10.0,
+      "MaximumStacks": 1,
+      "DurationSeconds": 4.0,
+      "StackingPolicy": "SOURCE_REFRESH"
+    }
+  ],
+  "FallbackBehavior": "BASIC_BITE"
+}

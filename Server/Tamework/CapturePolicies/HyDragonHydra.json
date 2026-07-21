@@ -1,0 +1,12 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": [ "Hydra" ],
+  "Difficulty": {
+    "MinimumPower": 3,
+    "Resistance": 0.20,
+    "ChanceMultiplier": 0.70,
+    "MissingHealthBonus": 0.25,
+    "GuaranteedAtPower": 5
+  }
+}

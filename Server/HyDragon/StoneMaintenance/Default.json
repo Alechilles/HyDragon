@@ -1,0 +1,10 @@
+{
+  "Repair": {
+    "ItemId": "Revitalizing_Essence",
+    "Quantity": 1
+  },
+  "FutureExtensions": {
+    "DurationEnabled": false,
+    "EnergyEnabled": false
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "Id": "hydragon:rock_drake_t2",
+  "WildRoleIds": [ "RockDrakeT2" ],
+  "TamedRoleIdByWildRole": { "RockDrakeT2": "Tamed_RockDrakeT2" },
+  "DifficultyId": "uncommon",
+  "StatsAndBehaviorAssetIds": [ "CAE_RockDrake", "Root_NPC_RockDrake_Attack" ],
+  "DropListId": "Drop_RockDrake",
+  "Mount": { "Mode": "GROUND", "AvatarFlightConfigId": null },
+  "Capture": {
+    "Resistance": 0.10,
+    "MinimumStoneTier": 2,
+    "MaxHealthPercentOverride": 20.0,
+    "SpecialRequirementIds": []
+  },
+  "Spawn": {
+    "OrdinarySpawnAssetIds": [
+      "RockDrake_Zone2_Cave_Volcanic_T2_Aggro",
+      "RockDrake_Zone2_Cave_Volcanic_T3_Aggro"
+    ],
+    "PluginEncounterIds": []
+  },
+  "Presentation": {
+    "LocalizationPrefix": "server.npcRoles.RockDrakeT2",
+    "ModelIds": [ "RockDrakeT2" ]
+  }
+}

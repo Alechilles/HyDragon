@@ -1,0 +1,25 @@
+{
+  "Id": "water",
+  "EssenceSemanticId": "water",
+  "EssenceItemId": "Draconic_Essence_Water",
+  "AppearanceId": "Wyvern_Mini_Water",
+  "ParticleAndSoundIds": [ "Pet_Heal", "SFX_Deployable_Totem_Heal_Effect_Local" ],
+  "PassiveEffects": [],
+  "ActiveAbilities": [
+    {
+      "Id": "restorative_surge",
+      "Trigger": "OWNER_HEALTH_BELOW_PERCENT",
+      "TargetPolicy": "OWNER_ONLY",
+      "Range": 16.0,
+      "CooldownSeconds": 20.0,
+      "EffectId": "HyDragon_Miniwyvern_Water_Heal",
+      "ProjectileId": null,
+      "Magnitude": 12.0,
+      "OwnerHealthThreshold": 0.60,
+      "MaximumHealFraction": 0.20,
+      "DurationSeconds": 1.0,
+      "StackingPolicy": "NON_STACKING"
+    }
+  ],
+  "FallbackBehavior": "BASIC_BITE"
+}

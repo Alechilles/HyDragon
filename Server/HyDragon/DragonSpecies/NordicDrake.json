@@ -1,0 +1,23 @@
+{
+  "Id": "hydragon:nordic_drake",
+  "WildRoleIds": [ "NordicDrake" ],
+  "TamedRoleIdByWildRole": { "NordicDrake": "Tamed_NordicDrake" },
+  "DifficultyId": "legendary",
+  "StatsAndBehaviorAssetIds": [ "CAE_NordicDrake", "Root_NPC_NordicDrake_Attack" ],
+  "DropListId": "Drop_NordicDrake",
+  "Mount": { "Mode": "AVATAR_FLIGHT", "AvatarFlightConfigId": "HyDragonNordicDrake" },
+  "Capture": {
+    "Resistance": 0.25,
+    "MinimumStoneTier": 4,
+    "MaxHealthPercentOverride": 20.0,
+    "SpecialRequirementIds": [ "hydragon:special_encounter_capture_ready" ]
+  },
+  "Spawn": {
+    "OrdinarySpawnAssetIds": [],
+    "PluginEncounterIds": [ "hydragon:nordic_drake_high_altitude" ]
+  },
+  "Presentation": {
+    "LocalizationPrefix": "server.npcRoles.NordicDrake",
+    "ModelIds": [ "NordicDrake", "NordicDrake_AvatarFlight" ]
+  }
+}

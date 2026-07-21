@@ -5,11 +5,10 @@
     "Mode": "Allowlist",
     "Allowlist": [
       "NordicDrake",
-      "Tamed_NordicDrake",
       "Hydra",
-      "Tamed_Hydra",
-      "Wyvern_Mini",
-      "Tamed_Wyvern_Mini"
+      "RockDrakeT1",
+      "RockDrakeT2",
+      "RockDrakeT3"
     ]
   },
   "Capture": {
@@ -24,8 +23,17 @@
     "TamedRoleOverrides": {
       "NordicDrake": "Tamed_NordicDrake",
       "Hydra": "Tamed_Hydra",
-      "Wyvern_Mini": "Tamed_Wyvern_Mini"
+      "RockDrakeT1": "Tamed_RockDrakeT1",
+      "RockDrakeT2": "Tamed_RockDrakeT2",
+      "RockDrakeT3": "Tamed_RockDrakeT3"
     },
+    "ChanceMode": "Probability",
+    "Power": 1,
+    "BaseChance": 0.42,
+    "ChancePerPower": 0.10,
+    "MinimumChance": 0.05,
+    "MaximumChance": 0.95,
+    "FailureCooldownMs": 2500,
     "CooldownMs": 500,
     "MaxDistance": 12.0
   },
@@ -35,5 +43,12 @@
     "RequireOwner": true,
     "CooldownMs": 500,
     "MaxDistance": 12.0
+  },
+  "Vessel": {
+    "Mode": "Bonded",
+    "TransitionCooldownMs": 10000,
+    "StoreMaxDistance": 12.0,
+    "RequireOwner": true,
+    "AllowStoreInCombat": false
   }
 }

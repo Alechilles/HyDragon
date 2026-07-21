@@ -1,0 +1,12 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": [ "RockDrakeT1" ],
+  "Difficulty": {
+    "MinimumPower": 1,
+    "Resistance": 0.05,
+    "ChanceMultiplier": 0.95,
+    "MissingHealthBonus": 0.20,
+    "GuaranteedAtPower": 5
+  }
+}

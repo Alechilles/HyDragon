@@ -1,0 +1,11 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "GroupId": "hydragon:soulbound_mini",
+  "RoleIds": [ "Tamed_Wyvern_Mini" ],
+  "Limits": {
+    "MaxOwnedPerOwner": 1,
+    "MaxActivePerOwner": 1,
+    "Scope": "Global"
+  }
+}

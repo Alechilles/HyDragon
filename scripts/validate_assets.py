@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+"""Deterministic preflight validation for HyDragon's authored asset surface."""
+
+from __future__ import annotations
+
+import json
+import re
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+ASSET_ROOTS = (ROOT / "Common", ROOT / "Server")
+JSON_SUFFIXES = {".json", ".particlesystem", ".particlespawner", ".blockymodel", ".blockyanim"}
+LOCALES = ("en-US", "pt-BR", "de-DE", "fr-FR", "es-ES")
+BANNED_PRE_RELEASE_TOKENS = (
+    "Draconic_Essence_Igne",
+    "Draconic_Essence_Cryo",
+    "Draconic_Essence_Storm",
+    "WyverNature",
+    "WyverStorm",
+    "WyverThunder",
+    "WyverToxic",
+    "WyvernIgneo",
+    "WyvernVoid",
+)
+PLACEHOLDER = re.compile(r"\{[^{}]+\}|%(?:\d+\$)?[a-zA-Z]")
+
+
+def fail(errors: list[str], message: str) -> None:
+    errors.append(message)
+
+
+def load_json_assets(errors: list[str]) -> dict[Path, object]:
+    parsed: dict[Path, object] = {}
+    for root in ASSET_ROOTS:
+        for path in root.rglob("*"):
+            if not path.is_file() or path.suffix not in JSON_SUFFIXES:
+                continue
+            try:
+                parsed[path] = json.loads(path.read_text(encoding="utf-8-sig"))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                fail(errors, f"invalid JSON: {path.relative_to(ROOT)}: {exc}")
+    return parsed
+
+
+def validate_english_ids(errors: list[str]) -> None:
+    for root in ASSET_ROOTS:
+        for path in root.rglob("*"):
+            if not path.is_file():
+                continue
+            relative = path.relative_to(ROOT).as_posix()
+            for token in BANNED_PRE_RELEASE_TOKENS:
+                if token in relative:
+                    fail(errors, f"pre-release identifier remains in filename: {relative}")
+            if path.suffix.lower() in {".png", ".zip"}:
+                continue
+            try:
+                text = path.read_text(encoding="utf-8-sig")
+            except (OSError, UnicodeError):
+                continue
+            for token in BANNED_PRE_RELEASE_TOKENS:
+                if token in text:
+                    fail(errors, f"pre-release identifier remains in content: {relative}: {token}")
+
+
+def read_lang(path: Path, errors: list[str]) -> dict[str, str]:
+    values: dict[str, str] = {}
+    for line_number, raw in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            fail(errors, f"invalid localization line: {path.relative_to(ROOT)}:{line_number}")
+            continue
+        key, value = line.split("=", 1)
+        if key in values:
+            fail(errors, f"duplicate localization key: {path.relative_to(ROOT)}:{line_number}: {key}")
+        if not key or not value:
+            fail(errors, f"empty localization key/value: {path.relative_to(ROOT)}:{line_number}")
+        values[key] = value
+    return values
+
+
+def validate_locales(errors: list[str]) -> None:
+    catalogs: dict[str, dict[str, str]] = {}
+    for locale in LOCALES:
+        path = ROOT / "Server" / "Languages" / locale / "server.lang"
+        if not path.is_file():
+            fail(errors, f"missing localization catalog: {path.relative_to(ROOT)}")
+            continue
+        catalogs[locale] = read_lang(path, errors)
+    source = catalogs.get("en-US", {})
+    for locale in LOCALES[1:]:
+        translated = catalogs.get(locale, {})
+        missing = sorted(set(source) - set(translated))
+        extra = sorted(set(translated) - set(source))
+        if missing:
+            fail(errors, f"{locale} missing keys: {', '.join(missing)}")
+        if extra:
+            fail(errors, f"{locale} extra keys: {', '.join(extra)}")
+        for key in sorted(set(source) & set(translated)):
+            if PLACEHOLDER.findall(source[key]) != PLACEHOLDER.findall(translated[key]):
+                fail(errors, f"placeholder mismatch: {locale}:{key}")
+
+
+def require_files(errors: list[str]) -> None:
+    required = [
+        "Server/Item/Items/Bench/Draconic_Altar.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Fire.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Ice.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Water.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Nature.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Lightning.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Wind.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Void.json",
+        "Server/Item/Items/Ingredient/Revitalizing_Essence.json",
+        "Server/Item/Items/Ingredient/Draconic_Soul_Bond.json",
+        "Server/Tamework/PopulationGroups/HyDragonFullDragons.json",
+        "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json",
+    ]
+    required.extend(
+        f"Server/Item/Items/Ingredient/Draconic_Stone_{tier}.json"
+        for tier in ("Thorium", "Cobalt", "Adamantium", "Ancient")
+    )
+    required.extend(
+        f"Server/HyDragon/MiniwyvernArchetypes/{name}.json"
+        for name in ("Neutral", "Lightning", "Wind", "Ice", "Fire", "Water", "Nature", "Void")
+    )
+    for relative in required:
+        if not (ROOT / relative).is_file():
+            fail(errors, f"missing required asset: {relative}")
+
+
+def validate_capture_configs(parsed: dict[Path, object], errors: list[str]) -> None:
+    spawner_root = ROOT / "Server" / "Tamework" / "Items" / "Spawners"
+    banned_roles = {"Wyvern_Mini", "Tamed_Wyvern_Mini"}
+    for path in spawner_root.glob("HyDragonDraconicStone*.json"):
+        data = parsed.get(path)
+        if not isinstance(data, dict):
+            continue
+        allowed = data.get("AllowedRoles")
+        if isinstance(allowed, dict):
+            roles = set(allowed.get("Allowlist", []))
+            overlap = sorted(roles & banned_roles)
+            if overlap:
+                fail(errors, f"Miniwyvern capture role in {path.relative_to(ROOT)}: {', '.join(overlap)}")
+        capture = data.get("Capture")
+        if isinstance(capture, dict):
+            overrides = set(capture.get("TamedRoleOverrides", {}))
+            overlap = sorted(overrides & banned_roles)
+            if overlap:
+                fail(errors, f"Miniwyvern tamed override in {path.relative_to(ROOT)}: {', '.join(overlap)}")
+
+
+def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
+    outputs = {
+        "Draconic_Stone",
+        "Draconic_Stone_Thorium",
+        "Draconic_Stone_Cobalt",
+        "Draconic_Stone_Adamantium",
+        "Draconic_Stone_Ancient",
+        "Revitalizing_Essence",
+        "Draconic_Soul_Bond",
+    }
+    seen: set[str] = set()
+    item_root = ROOT / "Server" / "Item" / "Items"
+    for path in item_root.rglob("*.json"):
+        data = parsed.get(path)
+        if not isinstance(data, dict):
+            continue
+        recipe = data.get("Recipe")
+        if not isinstance(recipe, dict):
+            continue
+        output_ids = {
+            entry.get("ItemId")
+            for entry in recipe.get("Output", [])
+            if isinstance(entry, dict)
+        }
+        targets = outputs & output_ids
+        if not targets:
+            continue
+        seen.update(targets)
+        benches = recipe.get("BenchRequirement", [])
+        if not any(
+            isinstance(bench, dict)
+            and bench.get("Type") == "Crafting"
+            and bench.get("Id") == "Draconic_Altar"
+            for bench in benches
+        ):
+            fail(errors, f"draconic recipe is not altar-only: {path.relative_to(ROOT)}")
+    missing = sorted(outputs - seen)
+    if missing:
+        fail(errors, f"missing altar recipe outputs: {', '.join(missing)}")
+
+
+def main() -> int:
+    errors: list[str] = []
+    parsed = load_json_assets(errors)
+    validate_english_ids(errors)
+    validate_locales(errors)
+    require_files(errors)
+    validate_capture_configs(parsed, errors)
+    validate_altar_recipes(parsed, errors)
+    if errors:
+        for error in errors:
+            print(f"ERROR: {error}", file=sys.stderr)
+        print(f"HyDragon asset validation failed with {len(errors)} error(s).", file=sys.stderr)
+        return 1
+    print(f"HyDragon asset validation passed ({len(parsed)} JSON assets, {len(LOCALES)} locales).")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

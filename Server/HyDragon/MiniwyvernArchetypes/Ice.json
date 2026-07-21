@@ -1,0 +1,28 @@
+{
+  "Id": "ice",
+  "EssenceSemanticId": "ice",
+  "EssenceItemId": "Draconic_Essence_Ice",
+  "AppearanceId": "Wyvern_Mini_Ice",
+  "ParticleAndSoundIds": [ "Hydra_Rain_Impact_Ice", "SFX_Staff_Ice_Shoot" ],
+  "PassiveEffects": [],
+  "ActiveAbilities": [
+    {
+      "Id": "ice_buildup",
+      "Trigger": "COMBAT_INTERVAL",
+      "TargetPolicy": "OWNER_HOSTILE_AREA",
+      "Range": 10.0,
+      "CooldownSeconds": 6.0,
+      "EffectId": "HyDragon_Miniwyvern_Ice_Slow",
+      "ProjectileId": "Hydra_Ice_Ball",
+      "Magnitude": 25.0,
+      "BuildupPerHit": 25.0,
+      "BuildupThreshold": 100.0,
+      "BuildupCap": 100.0,
+      "ControlEffectId": "HyDragon_Miniwyvern_Ice_Stun",
+      "ControlImmunitySeconds": 12.0,
+      "DurationSeconds": 4.0,
+      "StackingPolicy": "THRESHOLD_STUN_100"
+    }
+  ],
+  "FallbackBehavior": "BASIC_BITE"
+}

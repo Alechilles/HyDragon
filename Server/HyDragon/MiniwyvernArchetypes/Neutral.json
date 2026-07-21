@@ -1,0 +1,10 @@
+{
+  "Id": "neutral",
+  "EssenceSemanticId": null,
+  "EssenceItemId": null,
+  "AppearanceId": "Wyvern_Mini",
+  "ParticleAndSoundIds": [],
+  "PassiveEffects": [],
+  "ActiveAbilities": [],
+  "FallbackBehavior": "BASIC_BITE"
+}

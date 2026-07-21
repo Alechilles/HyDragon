@@ -1,0 +1,31 @@
+{
+  "Id": "wind",
+  "EssenceSemanticId": "wind",
+  "EssenceItemId": "Draconic_Essence_Wind",
+  "AppearanceId": "Wyvern_Mini_Wind",
+  "ParticleAndSoundIds": [ "Wind_Spirit_Hand", "SFX_Emit_Wind_Gusts" ],
+  "PassiveEffects": [ "HyDragon_Miniwyvern_Wind_Boon" ],
+  "PassiveModifiers": {
+    "MovementSpeedMultiplier": 1.12,
+    "JumpMultiplier": 1.15,
+    "MobilityMultiplier": 1.10,
+    "MaximumMovementSpeedMultiplier": 1.20,
+    "MaximumJumpMultiplier": 1.25
+  },
+  "ActiveAbilities": [
+    {
+      "Id": "wind_burst",
+      "Trigger": "COMBAT_INTERVAL",
+      "TargetPolicy": "OWNER_HOSTILE_ONLY",
+      "Range": 14.0,
+      "CooldownSeconds": 8.0,
+      "EffectId": null,
+      "ProjectileId": "Feran_Windwalker_Wind_Burst",
+      "Magnitude": 1.5,
+      "MaximumStacks": 1,
+      "DurationSeconds": 0.0,
+      "StackingPolicy": "CLAMPED"
+    }
+  ],
+  "FallbackBehavior": "BASIC_BITE"
+}

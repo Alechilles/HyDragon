@@ -1,0 +1,6 @@
+{
+  "Parent": "HyDragonDraconicStone",
+  "EmptyItemId": "Draconic_Stone_Cobalt",
+  "FilledItemId": "*Draconic_Stone_Cobalt_State_Filled",
+  "Capture": { "Power": 3 }
+}

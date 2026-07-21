@@ -1,0 +1,28 @@
+{
+  "Id": "lightning",
+  "EssenceSemanticId": "lightning",
+  "EssenceItemId": "Draconic_Essence_Lightning",
+  "AppearanceId": "Wyvern_Mini_Lightning",
+  "ParticleAndSoundIds": [ "Void_Lightning", "SFX_Eye_Void_Attack_Blast" ],
+  "PassiveEffects": [ "HyDragon_Miniwyvern_Lightning_Boon" ],
+  "PassiveModifiers": {
+    "MovementSpeedMultiplier": 1.15,
+    "ActionSpeedMultiplier": 1.10
+  },
+  "ActiveAbilities": [
+    {
+      "Id": "lightning_strike",
+      "Trigger": "COMBAT_INTERVAL",
+      "TargetPolicy": "OWNER_HOSTILE_ONLY",
+      "Range": 18.0,
+      "CooldownSeconds": 4.0,
+      "EffectId": null,
+      "ProjectileId": null,
+      "Magnitude": 12.0,
+      "MaximumStacks": 1,
+      "DurationSeconds": 0.0,
+      "StackingPolicy": "SOURCE_REFRESH"
+    }
+  ],
+  "FallbackBehavior": "BASIC_BITE"
+}
