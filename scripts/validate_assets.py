@@ -74,7 +74,7 @@ def hytale_asset_root(errors: list[str]) -> Path | None:
     for candidate in candidates:
         if (candidate / "Server").is_dir() and (candidate / "Common").is_dir():
             return candidate.resolve()
-    fail(errors, "Hytale 0.5.6 Assets directory unavailable; set HYTALE_ASSETS_PATH for base-reference validation")
+    fail(errors, "installed Hytale Assets directory unavailable; set HYTALE_ASSETS_PATH for base-reference validation")
     return None
 
 
@@ -585,6 +585,231 @@ def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[
                 fail(errors, f"spawn patch {patch_path.relative_to(ROOT)} inserts {sorted(inserted_roles)} but species declares {sorted(wild_roles)}")
 
 
+def validate_range(value: object, size: int, minimum: float, maximum: float) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) == size
+        and all(isinstance(item, (int, float)) and minimum <= item <= maximum for item in value)
+        and value[0] <= value[-1]
+    )
+
+
+def validate_role_spawn(entry: object, context: str, known_assets: set[str], errors: list[str]) -> None:
+    if not isinstance(entry, dict):
+        fail(errors, f"{context} contains a non-object NPC spawn entry")
+        return
+    unknown = sorted(set(entry) - ROLE_SPAWN_FIELDS_056)
+    if unknown:
+        fail(errors, f"{context} has fields outside Hytale 0.5.6 RoleSpawnParameters: {unknown}")
+    role_id = entry.get("Id")
+    if not isinstance(role_id, str) or role_id not in known_assets:
+        fail(errors, f"{context} references unresolved NPC role: {role_id}")
+    weight = entry.get("Weight")
+    if not isinstance(weight, (int, float)) or weight <= 0:
+        fail(errors, f"{context} requires a positive NPC weight")
+    block_set = entry.get("SpawnBlockSet")
+    if block_set is not None and (not isinstance(block_set, str) or block_set not in known_assets):
+        fail(errors, f"{context} references unresolved SpawnBlockSet: {block_set}")
+
+
+def validate_spawn_shape(
+    data: object,
+    asset_type: str,
+    context: str,
+    known_assets: set[str],
+    errors: list[str],
+) -> None:
+    if not isinstance(data, dict):
+        fail(errors, f"{context} is not a JSON object")
+        return
+    allowed = WORLD_SPAWN_FIELDS_056 if asset_type == "WorldNPCSpawn" else BEACON_SPAWN_FIELDS_056
+    unknown = sorted(set(data) - allowed)
+    if unknown:
+        fail(errors, f"{context} has fields outside Hytale 0.5.6 {asset_type}: {unknown}")
+    environments = data.get("Environments")
+    if not isinstance(environments, list) or not environments or any(
+        not isinstance(value, str) or value not in known_assets for value in environments
+    ):
+        fail(errors, f"{context} has an empty or unresolved Environments list: {environments}")
+    npcs = data.get("NPCs")
+    if not isinstance(npcs, list) or not npcs:
+        fail(errors, f"{context} must declare at least one NPC")
+    else:
+        for index, entry in enumerate(npcs):
+            validate_role_spawn(entry, f"{context}.NPCs[{index}]", known_assets, errors)
+    for field, size, minimum, maximum in (
+        ("DayTimeRange", 2, 0, 24),
+        ("MoonPhaseRange", 2, 0, 4),
+    ):
+        if field in data and data[field] is not None and not validate_range(data[field], size, minimum, maximum):
+            fail(errors, f"{context}.{field} violates the Hytale 0.5.6 range contract")
+    lights = data.get("LightRanges")
+    if lights is not None:
+        allowed_lights = {"Light", "SkyLight", "Sunlight", "RedLight", "GreenLight", "BlueLight"}
+        if not isinstance(lights, dict) or set(lights) - allowed_lights:
+            fail(errors, f"{context}.LightRanges has unsupported Hytale 0.5.6 keys")
+        elif any(not validate_range(value, 2, 0, 100) for value in lights.values()):
+            fail(errors, f"{context}.LightRanges contains an invalid range")
+    if "YRange" in data and data["YRange"] is not None and not validate_range(data["YRange"], 2, -4096, 4096):
+        fail(errors, f"{context}.YRange must contain two ordered integer offsets")
+
+
+def validate_static_spawn_contracts(
+    parsed: dict[Path, object],
+    base_root: Path | None,
+    known_assets: set[str],
+    errors: list[str],
+) -> None:
+    """Validate authored spawns plus base patches against Workshop's 0.5.6 contracts."""
+    world_root = ROOT / "Server/NPC/Spawn/World"
+    local_spawn_ids: set[str] = set()
+    for path in sorted(world_root.rglob("*.json")):
+        local_spawn_ids.add(path.stem)
+        validate_spawn_shape(parsed.get(path), "WorldNPCSpawn", path.relative_to(ROOT).as_posix(), known_assets, errors)
+
+    patch_root = ROOT / "Server/Tamework/Patches/HyDragon"
+    patch_ids: set[str] = set()
+    for path in sorted(patch_root.glob("*.json")):
+        data = parsed.get(path)
+        context = path.relative_to(ROOT).as_posix()
+        if not isinstance(data, dict):
+            continue
+        if set(data) - {"Id", "Target", "Priority", "Enabled", "Operations"}:
+            fail(errors, f"{context} has unsupported patch fields")
+        patch_id = data.get("Id")
+        if not isinstance(patch_id, str) or not patch_id:
+            fail(errors, f"{context} has no stable Id")
+        else:
+            patch_ids.add(path.stem)
+            if patch_id != f"HyDragon_{path.stem}":
+                fail(errors, f"{context} Id must be HyDragon_{path.stem}")
+        target = data.get("Target")
+        if target not in WORKSHOP_056_PATCH_TARGETS:
+            fail(errors, f"{context} target is not in the verified Workshop 0.5.6 manifest: {target}")
+            continue
+        if base_root is None:
+            continue
+        target_path = base_root / str(target)
+        if not target_path.is_file():
+            fail(errors, f"{context} base target does not exist in the installed Hytale assets: {target}")
+            continue
+        try:
+            base = json.loads(target_path.read_text(encoding="utf-8-sig"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            fail(errors, f"cannot read base spawn target {target}: {exc}")
+            continue
+        expected_environment, required_fields = WORKSHOP_056_PATCH_TARGETS[str(target)]
+        if expected_environment not in base.get("Environments", []):
+            fail(errors, f"{context} base target environment drifted from Workshop 0.5.6 evidence")
+        missing_fields = sorted(required_fields - set(base))
+        if missing_fields:
+            fail(errors, f"{context} base target lost required static-spawn fields: {missing_fields}")
+        merged = dict(base)
+        merged["NPCs"] = list(base.get("NPCs", []))
+        operations = data.get("Operations")
+        if not isinstance(operations, list) or not operations:
+            fail(errors, f"{context} must contain at least one patch operation")
+            continue
+        operation_ids: set[str] = set()
+        for index, operation in enumerate(operations):
+            operation_context = f"{context}.Operations[{index}]"
+            if not isinstance(operation, dict) or set(operation) - {"Id", "Op", "Path", "Position", "Existing", "Value"}:
+                fail(errors, f"{operation_context} has an invalid patch operation shape")
+                continue
+            operation_id = operation.get("Id")
+            if not isinstance(operation_id, str) or not operation_id or operation_id in operation_ids:
+                fail(errors, f"{operation_context} has a blank or duplicate operation Id")
+            else:
+                operation_ids.add(operation_id)
+            if (operation.get("Op"), operation.get("Path"), operation.get("Position")) != ("Insert", "/NPCs", "End"):
+                fail(errors, f"{operation_context} must append to the schema-defined NPCs array")
+                continue
+            value = operation.get("Value")
+            validate_role_spawn(value, f"{operation_context}.Value", known_assets, errors)
+            if isinstance(value, dict):
+                merged["NPCs"].append(value)
+        validate_spawn_shape(merged, "BeaconNPCSpawn", f"{context} effective target", known_assets, errors)
+
+    species_root = ROOT / "Server/HyDragon/DragonSpecies"
+    available_routes = local_spawn_ids | patch_ids
+    for path in sorted(species_root.glob("*.json")):
+        species = parsed.get(path)
+        spawn = species.get("Spawn") if isinstance(species, dict) else None
+        ordinary = spawn.get("OrdinarySpawnAssetIds", []) if isinstance(spawn, dict) else []
+        for asset_id in ordinary:
+            if asset_id not in available_routes:
+                fail(errors, f"{path.relative_to(ROOT)} references unresolved ordinary spawn route: {asset_id}")
+
+
+def validate_domain_references(
+    parsed: dict[Path, object], known_assets: set[str], errors: list[str]
+) -> None:
+    """Resolve release-critical species, encounter, and archetype references to local/base assets."""
+    species_root = ROOT / "Server/HyDragon/DragonSpecies"
+    species_ids: set[str] = set()
+    for path in sorted(species_root.glob("*.json")):
+        species = parsed.get(path)
+        if not isinstance(species, dict):
+            continue
+        species_ids.add(species.get("Id"))
+        fields = {
+            "WildRoleIds": species.get("WildRoleIds", []),
+            "TamedRoleIdByWildRole": list(species.get("TamedRoleIdByWildRole", {}).values()),
+            "StatsAndBehaviorAssetIds": species.get("StatsAndBehaviorAssetIds", []),
+            "DropListId": [species.get("DropListId")],
+        }
+        presentation = species.get("Presentation", {})
+        fields["Presentation.ModelIds"] = presentation.get("ModelIds", []) if isinstance(presentation, dict) else []
+        mount = species.get("Mount", {})
+        avatar = mount.get("AvatarFlightConfigId") if isinstance(mount, dict) else None
+        if avatar:
+            fields["Mount.AvatarFlightConfigId"] = [avatar]
+        for field, references in fields.items():
+            for reference in references:
+                if not isinstance(reference, str) or reference not in known_assets:
+                    fail(errors, f"{path.relative_to(ROOT)} unresolved {field} reference: {reference}")
+
+    for path in sorted((ROOT / "Server/HyDragon/Encounters").glob("*.json")):
+        encounter = parsed.get(path)
+        if not isinstance(encounter, dict):
+            continue
+        target_species = encounter.get("TargetSpeciesId")
+        if target_species not in species_ids:
+            fail(errors, f"{path.relative_to(ROOT)} unresolved TargetSpeciesId: {target_species}")
+        grounding = encounter.get("Grounding", {})
+        grounded_effect = grounding.get("GroundedEffectId") if isinstance(grounding, dict) else None
+        if grounded_effect not in known_assets:
+            fail(errors, f"{path.relative_to(ROOT)} unresolved GroundedEffectId: {grounded_effect}")
+        for source in grounding.get("BuildupSourceIds", []) if isinstance(grounding, dict) else []:
+            for segment in source.split("+"):
+                _, separator, reference = segment.partition(":")
+                if not separator or reference not in known_assets:
+                    fail(errors, f"{path.relative_to(ROOT)} unresolved grounding source asset: {source}")
+
+    for path in sorted((ROOT / "Server/HyDragon/MiniwyvernArchetypes").glob("*.json")):
+        archetype = parsed.get(path)
+        if not isinstance(archetype, dict):
+            continue
+        references: list[tuple[str, object]] = []
+        for field in ("EssenceItemId", "AppearanceId"):
+            if archetype.get(field) is not None:
+                references.append((field, archetype[field]))
+        references.extend(("ParticleAndSoundIds", value) for value in archetype.get("ParticleAndSoundIds", []))
+        references.extend(("PassiveEffects", value) for value in archetype.get("PassiveEffects", []))
+        passive_modifier_effects = archetype.get("PassiveModifierEffects", {})
+        if isinstance(passive_modifier_effects, dict):
+            references.extend(("PassiveModifierEffects", value) for value in passive_modifier_effects.values())
+        for ability in archetype.get("ActiveAbilities", []):
+            if not isinstance(ability, dict):
+                continue
+            for field in ("EffectId", "ProjectileId", "ControlEffectId"):
+                if ability.get(field) is not None:
+                    references.append((f"ActiveAbilities.{field}", ability[field]))
+        for field, reference in references:
+            if not isinstance(reference, str) or reference not in known_assets:
+                fail(errors, f"{path.relative_to(ROOT)} unresolved {field} reference: {reference}")
+
+
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
     outputs = {
         "Draconic_Stone",
@@ -671,6 +896,10 @@ def validate_repair_interaction(parsed: dict[Path, object], errors: list[str]) -
 def main() -> int:
     errors: list[str] = []
     parsed = load_json_assets(errors)
+    base_root = hytale_asset_root(errors)
+    known_assets = asset_stems(ROOT / "Common") | asset_stems(ROOT / "Server")
+    if base_root is not None:
+        known_assets |= asset_stems(base_root)
     validate_english_ids(errors)
     validate_locales(errors)
     validate_interaction_message_localization(parsed, errors)
@@ -681,6 +910,8 @@ def main() -> int:
     validate_no_miniwyvern_spawns(parsed, errors)
     validate_miniwyvern_role_wiring(parsed, errors)
     validate_spawn_patch_role_identity(parsed, errors)
+    validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
+    validate_domain_references(parsed, known_assets, errors)
     validate_altar_recipes(parsed, errors)
     validate_command_item(parsed, errors)
     validate_repair_interaction(parsed, errors)

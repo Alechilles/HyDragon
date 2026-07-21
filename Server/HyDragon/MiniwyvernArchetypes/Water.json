@@ -3,7 +3,7 @@
   "EssenceSemanticId": "water",
   "EssenceItemId": "Draconic_Essence_Water",
   "AppearanceId": "Wyvern_Mini_Water",
-  "ParticleAndSoundIds": [ "Pet_Heal", "SFX_Deployable_Totem_Heal_Effect_Local" ],
+  "ParticleAndSoundIds": [ "Effect_Heal", "SFX_Deployable_Totem_Heal_Effect_Local" ],
   "PassiveEffects": [],
   "ActiveAbilities": [
     {

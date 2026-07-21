@@ -3,7 +3,7 @@
   "EssenceSemanticId": "nature",
   "EssenceItemId": "Draconic_Essence_Nature",
   "AppearanceId": "Wyvern_Mini_Nature",
-  "ParticleAndSoundIds": [ "Pet_Heal", "SFX_Fen_Stalker_Eat" ],
+  "ParticleAndSoundIds": [ "Effect_Heal", "SFX_Fen_Stalker_Eat" ],
   "PassiveEffects": [ "HyDragon_Miniwyvern_Nature_Regeneration" ],
   "PassiveModifiers": {
     "RegenerationTickSeconds": 2.0,
