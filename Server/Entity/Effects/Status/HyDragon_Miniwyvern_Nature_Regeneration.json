@@ -1,9 +1,9 @@
 {
-  "Parent": "HealthRegen_Buff_T2",
   "Name": "server.effects.miniwyvernNatureRegeneration.name",
-  "StatModifiers": { "Health": 0.5 },
-  "ValueType": "Percent",
-  "DamageCalculatorCooldown": 2,
+  "ApplicationEffects": {
+    "EntityBottomTint": "#22C55E",
+    "EntityTopTint": "#BBF7D0"
+  },
   "Duration": 10.0,
   "OverlapBehavior": "Overwrite"
 }

@@ -1,8 +1,9 @@
 {
-  "Parent": "Healing_Totem_Heal",
   "Name": "server.effects.miniwyvernWaterHeal.name",
-  "StatModifiers": { "Health": 12 },
-  "DamageCalculatorCooldown": 1,
+  "ApplicationEffects": {
+    "EntityBottomTint": "#38BDF8",
+    "EntityTopTint": "#E0F2FE"
+  },
   "Duration": 1.0,
   "OverlapBehavior": "Overwrite"
 }

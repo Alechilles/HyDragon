@@ -1,6 +1,7 @@
 package com.alechilles.hydragon.config;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.assetstore.JsonAsset;
@@ -31,6 +32,19 @@ class BundledConfigAssetContractTest {
         HyDragonConfigRepository.Snapshot snapshot = HyDragonConfigRepository.buildSnapshot(
                 species, maintenance, archetypes, encounters);
         assertTrue(snapshot.isValid(), () -> String.join("\n", snapshot.issues()));
+    }
+
+    @Test
+    void serviceOwnedHealingEffectsArePresentationOnly() throws IOException {
+        for (String asset : List.of(
+                "HyDragon_Miniwyvern_Nature_Regeneration.json",
+                "HyDragon_Miniwyvern_Water_Heal.json")) {
+            Path path = Path.of("Server", "Entity", "Effects", "Status", asset);
+            String json = Files.readString(path);
+            assertFalse(json.contains("\"Parent\""), path + " must not inherit an additional healing mechanic");
+            assertFalse(json.contains("\"StatModifiers\""), path + " must not apply health outside the capped service");
+            assertTrue(json.contains("\"ApplicationEffects\""), path + " should retain visible feedback");
+        }
     }
 
     private static <T extends JsonAsset<String>> List<T> decodeDirectory(

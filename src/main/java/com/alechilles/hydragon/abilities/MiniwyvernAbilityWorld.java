@@ -1,5 +1,6 @@
 package com.alechilles.hydragon.abilities;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +16,12 @@ public interface MiniwyvernAbilityWorld {
     Optional<Target> companion();
 
     Optional<Target> hostileTarget(double maximumRange);
+
+    /** Returns a deterministic, bounded set of hostile targets around the companion. */
+    default List<Target> hostileTargets(double maximumRange, int maximumTargets) {
+        if (maximumTargets <= 0) return List.of();
+        return hostileTarget(maximumRange).stream().limit(maximumTargets).toList();
+    }
 
     /** Applies the archetype's canonical model while preserving the live entity and its scale. */
     boolean synchronizeAppearance(UUID entityUuid, String appearanceId);

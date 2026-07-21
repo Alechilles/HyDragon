@@ -11,6 +11,7 @@
       "Trigger": "COMBAT_INTERVAL",
       "TargetPolicy": "OWNER_HOSTILE_AREA",
       "Range": 10.0,
+      "MaximumTargets": 8,
       "CooldownSeconds": 6.0,
       "EffectId": "HyDragon_Miniwyvern_Ice_Slow",
       "ProjectileId": "Hydra_Ice_Ball",

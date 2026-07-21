@@ -6,6 +6,7 @@ import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.spatial.SpatialResource;
 import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.asset.type.attitude.Attitude;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
@@ -20,6 +21,7 @@ import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.Intangible;
 import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.modules.entity.EntityModule;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageCause;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageSystems;
@@ -32,6 +34,9 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,6 +52,7 @@ import org.joml.Vector3d;
 public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernAbilityWorldDispatcher {
     private static final String[] HOSTILE_TARGET_SLOTS = {"CAETargetSlot", "LockedTarget", "AttackTarget"};
     private final TameworkApi api;
+    private final SourceKeyedEffectRegistry effectSources = new SourceKeyedEffectRegistry();
 
     public HytaleMiniwyvernAbilityWorldDispatcher(TameworkApi api) {
         this.api = Objects.requireNonNull(api, "api");
@@ -69,7 +75,7 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
                     // companion projection has already disappeared. Normal ticks fail their
                     // projection check through companion().
                     if (!valid(ownerRef)) return;
-                    callback.accept(new Port(api, world, store, ownerUuid, npcUuid, ownerRef, npcRef));
+                    callback.accept(new Port(api, effectSources, world, store, ownerUuid, npcUuid, ownerRef, npcRef));
                 });
             } catch (RejectedExecutionException ignored) {
                 // World shutdown is a normal fail-closed lifecycle boundary.
@@ -83,6 +89,7 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
 
     private static final class Port implements MiniwyvernAbilityWorld {
         private final TameworkApi api;
+        private final SourceKeyedEffectRegistry effectSources;
         private final World world;
         private final Store<EntityStore> store;
         private final UUID ownerUuid;
@@ -90,9 +97,10 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
         private final Ref<EntityStore> ownerRef;
         private final Ref<EntityStore> npcRef;
 
-        private Port(TameworkApi api, World world, Store<EntityStore> store,
+        private Port(TameworkApi api, SourceKeyedEffectRegistry effectSources, World world, Store<EntityStore> store,
                      UUID ownerUuid, UUID npcUuid, Ref<EntityStore> ownerRef, Ref<EntityStore> npcRef) {
             this.api = api;
+            this.effectSources = effectSources;
             this.world = world;
             this.store = store;
             this.ownerUuid = ownerUuid;
@@ -125,6 +133,38 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
                 }
             }
             return Optional.empty();
+        }
+
+        @Override
+        public List<Target> hostileTargets(double maximumRange, int maximumTargets) {
+            if (!valid(npcRef) || maximumTargets <= 0 || !Double.isFinite(maximumRange) || maximumRange < 0.0D) {
+                return List.of();
+            }
+            NPCEntity npc = store.getComponent(npcRef, NPCEntity.getComponentType());
+            TransformComponent transform = store.getComponent(npcRef, TransformComponent.getComponentType());
+            SpatialResource<Ref<EntityStore>, EntityStore> spatial =
+                    store.getResource(EntityModule.get().getEntitySpatialResourceType());
+            if (npc == null || npc.getRole() == null || transform == null || spatial == null) return List.of();
+
+            List<Ref<EntityStore>> nearby = SpatialResource.getThreadLocalReferenceList();
+            spatial.getSpatialStructure().collect(transform.getPosition(), maximumRange, nearby);
+            List<Target> targets = new ArrayList<>();
+            for (Ref<EntityStore> candidate : nearby) {
+                if (!valid(candidate) || candidate.equals(ownerRef) || candidate.equals(npcRef)) continue;
+                Target resolved = target(candidate, resolveOwner(candidate)).orElse(null);
+                if (resolved == null || !resolved.alive() || resolved.distance() > maximumRange) continue;
+                try {
+                    if (npc.getRole().getWorldSupport().getAttitude(npcRef, candidate, store) == Attitude.HOSTILE) {
+                        targets.add(resolved);
+                    }
+                } catch (RuntimeException ignored) {
+                    // Unknown attitude is not hostile.
+                }
+            }
+            return targets.stream()
+                    .sorted(Comparator.comparingDouble(Target::distance).thenComparing(Target::entityUuid))
+                    .limit(maximumTargets)
+                    .toList();
         }
 
         @Override
@@ -164,7 +204,16 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
             if (effect == null || controller == null) return false;
             float duration = durationSeconds > 0.0D && Double.isFinite(durationSeconds)
                     ? (float) durationSeconds : Math.max(0.05F, effect.getDuration());
-            return controller.addEffect(ref, effect, duration, OverlapBehavior.OVERWRITE, store);
+            long nowMs = System.currentTimeMillis();
+            long requestedExpiry = saturatingAdd(nowMs, Math.max(1L, Math.round(duration * 1_000.0D)));
+            SourceKeyedEffectRegistry.EffectKey key =
+                    new SourceKeyedEffectRegistry.EffectKey(world.getName(), entityUuid, effectId);
+            SourceKeyedEffectRegistry.RetainResult retained =
+                    effectSources.retain(key, sourceKey, requestedExpiry, nowMs);
+            float effectiveDuration = Math.max(0.05F, (retained.effectiveExpiryMs() - nowMs) / 1_000.0F);
+            boolean applied = controller.addEffect(ref, effect, effectiveDuration, OverlapBehavior.OVERWRITE, store);
+            if (!applied) effectSources.rollback(key, sourceKey, retained.previousExpiryMs());
+            return applied;
         }
 
         @Override
@@ -174,6 +223,11 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
             // idempotent cleanup success so durable source tracking can converge.
             if (!valid(ref)) return true;
             if (effectId == null || effectId.isBlank()) return false;
+            SourceKeyedEffectRegistry.ReleaseResult release = effectSources.release(
+                    new SourceKeyedEffectRegistry.EffectKey(world.getName(), entityUuid, effectId),
+                    sourceKey,
+                    System.currentTimeMillis());
+            if (!release.removeUnderlyingEffect()) return true;
             int index = EntityEffect.getAssetMap().getIndex(effectId);
             EffectControllerComponent controller = store.getComponent(ref, EffectControllerComponent.getComponentType());
             if (index < 0 || controller == null) return false;
@@ -292,6 +346,10 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
             if (uuid.equals(ownerUuid)) return ownerRef;
             if (uuid.equals(npcUuid)) return npcRef;
             return world.getEntityRef(uuid);
+        }
+
+        private static long saturatingAdd(long left, long right) {
+            return right > Long.MAX_VALUE - left ? Long.MAX_VALUE : left + right;
         }
     }
 }

@@ -46,6 +46,10 @@ public final class MiniwyvernArchetypeConfig
                     (ability, value) -> ability.range = value == null ? 0.0 : value,
                     ability -> ability.range)
             .add()
+            .<Integer>append(new KeyedCodec<>("MaximumTargets", Codec.INTEGER),
+                    (ability, value) -> ability.maximumTargets = value,
+                    ability -> ability.maximumTargets)
+            .add()
             .<Double>append(new KeyedCodec<>("CooldownSeconds", Codec.DOUBLE),
                     (ability, value) -> ability.cooldownSeconds = value == null ? 0.0 : value,
                     ability -> ability.cooldownSeconds)
@@ -222,6 +226,7 @@ public final class MiniwyvernArchetypeConfig
         String trigger;
         String targetPolicy;
         double range;
+        Integer maximumTargets;
         double cooldownSeconds;
         String effectId;
         String projectileId;
@@ -245,6 +250,12 @@ public final class MiniwyvernArchetypeConfig
             if (blank(trigger)) errors.add("ActiveAbilities.Trigger is required for " + trim(id));
             if (blank(targetPolicy)) errors.add("ActiveAbilities.TargetPolicy is required for " + trim(id));
             if (!Double.isFinite(range) || range < 0.0) errors.add("ActiveAbilities.Range must be non-negative");
+            if (maximumTargets != null && maximumTargets <= 0) {
+                errors.add("ActiveAbilities.MaximumTargets must be positive");
+            }
+            if ("OWNER_HOSTILE_AREA".equalsIgnoreCase(trim(targetPolicy)) && maximumTargets == null) {
+                errors.add("Area abilities require ActiveAbilities.MaximumTargets");
+            }
             if (!Double.isFinite(cooldownSeconds) || cooldownSeconds < 0.0) {
                 errors.add("ActiveAbilities.CooldownSeconds must be non-negative");
             }
@@ -309,6 +320,7 @@ public final class MiniwyvernArchetypeConfig
         public String getTrigger() { return trim(trigger); }
         public String getTargetPolicy() { return trim(targetPolicy); }
         public double getRange() { return range; }
+        public int getMaximumTargets() { return maximumTargets == null ? 1 : maximumTargets; }
         public double getCooldownSeconds() { return cooldownSeconds; }
         @Nullable public String getEffectId() { return blank(effectId) ? null : effectId.trim(); }
         @Nullable public String getProjectileId() { return blank(projectileId) ? null : projectileId.trim(); }

@@ -54,12 +54,17 @@ public final class MiniwyvernAbilityService {
         if (config == null || !config.validate().isEmpty()) {
             return cleanupAndDeny(context, archetypes, world, "archetype-config-invalid", nowMs);
         }
+        boolean requiresUnsupportedModifiers = !config.getId().equals("nature")
+                && !config.getPassiveModifiers().isEmpty()
+                && !world.supportsOwnerModifiers(config.getPassiveModifiers());
+        if (requiresUnsupportedModifiers) {
+            return cleanupAndDeny(context, archetypes, world,
+                    "owner-modifier-capability-unavailable:" + String.join(",", config.getPassiveModifiers().keySet()),
+                    nowMs);
+        }
         if (!world.synchronizeAppearance(context.npcUuid(), config.getAppearanceId())) {
             return cleanupAndDeny(context, archetypes, world, "appearance-sync-unavailable", nowMs);
         }
-        boolean modifiersUnavailable = !config.getId().equals("nature")
-                && !config.getPassiveModifiers().isEmpty()
-                && !world.supportsOwnerModifiers(config.getPassiveModifiers());
 
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(context.profileId());
         if (loaded.status() == MiniwyvernAbilityStateRepository.Status.UNAVAILABLE) {
@@ -72,32 +77,37 @@ public final class MiniwyvernAbilityService {
             state = MiniwyvernAbilityState.empty(archetypeId, nowMs);
         }
         MutableState mutable = new MutableState(state);
-        PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs, modifiersUnavailable);
+        PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs);
         // Establish source ownership and every non-idempotent cooldown before mutating the world.
         if (!states.save(context.profileId(), mutable.freeze(archetypeId))) {
             return TickResult.denied("ability-state-unavailable");
         }
 
-        int effectsApplied = executePassives(context, config, passive, world, modifiersUnavailable);
+        int effectsApplied = executePassives(context, config, passive, world);
         int abilitiesExecuted = 0;
         for (MiniwyvernArchetypeConfig.Ability ability : config.getActiveAbilities()) {
             if (nowMs < mutable.cooldowns.getOrDefault(ability.getId(), 0L)) continue;
-            AbilityExecution execution = prepareExecution(context, config, ability, world, mutable, nowMs);
-            if (!execution.ready()) continue;
+            List<AbilityExecution> executions = prepareExecutions(context, config, ability, world, mutable, nowMs);
+            if (executions.isEmpty()) continue;
 
             long cooldownUntil = saturatingAdd(nowMs, secondsToMs(ability.getCooldownSeconds()));
             mutable.cooldowns.put(ability.getId(), cooldownUntil);
-            String source = sourceKey(context.profileId(), config.getId(), ability.getId());
-            mutable.sources.add(source);
-            mutable.targetsBySource.put(source, execution.targetUuid());
+            for (AbilityExecution execution : executions) {
+                String source = executionSourceKey(context, config, ability, execution.targetUuid());
+                mutable.sources.add(source);
+                mutable.targetsBySource.put(source, execution.targetUuid());
+            }
             mutable.updatedAt = nowMs;
             MiniwyvernAbilityState beforeMutation = mutable.freeze(archetypeId);
             if (!states.save(context.profileId(), beforeMutation)) {
                 return new TickResult(false, "ability-state-commit-failed", effectsApplied, abilitiesExecuted);
             }
-            if (execute(context, config, ability, execution, world, mutable, nowMs)) {
-                abilitiesExecuted++;
+            boolean executed = false;
+            for (AbilityExecution execution : executions) {
+                String source = executionSourceKey(context, config, ability, execution.targetUuid());
+                executed |= execute(context, config, ability, execution, source, world, mutable, nowMs);
             }
+            if (executed) abilitiesExecuted++;
         }
 
         mutable.prune(nowMs);
@@ -105,10 +115,7 @@ public final class MiniwyvernAbilityService {
         if (!finalState.equals(state) && !states.save(context.profileId(), finalState)) {
             return new TickResult(false, "ability-state-finalize-failed", effectsApplied, abilitiesExecuted);
         }
-        return new TickResult(true,
-                modifiersUnavailable ? "owner-modifier-capability-unavailable" : "ready",
-                effectsApplied,
-                abilitiesExecuted);
+        return new TickResult(true, "ready", effectsApplied, abilitiesExecuted);
     }
 
     /** Removes all tracked effects when lifecycle state changes, even if the ability gate is unavailable. */
@@ -150,8 +157,7 @@ public final class MiniwyvernAbilityService {
             MiniwyvernArchetypeConfig config,
             MiniwyvernAbilityWorld world,
             MutableState state,
-            long nowMs,
-            boolean modifiersUnavailable) {
+            long nowMs) {
         String passiveSource = sourceKey(context.profileId(), config.getId(), "passive");
         boolean hasPassive = !config.getPassiveEffects().isEmpty() || !config.getPassiveModifiers().isEmpty();
         if (hasPassive) {
@@ -179,15 +185,14 @@ public final class MiniwyvernAbilityService {
             ProfileContext context,
             MiniwyvernArchetypeConfig config,
             PassiveExecution passive,
-            MiniwyvernAbilityWorld world,
-            boolean modifiersUnavailable) {
+            MiniwyvernAbilityWorld world) {
         int applied = 0;
         if (passive.hasPassive()) {
             double refreshSeconds = passiveRefreshSeconds(config);
             for (String effectId : config.getPassiveEffects()) {
                 if (world.applyEffect(context.ownerUuid(), passive.sourceKey(), effectId, refreshSeconds)) applied++;
             }
-            if (!modifiersUnavailable && !config.getPassiveModifiers().isEmpty()
+            if (!config.getPassiveModifiers().isEmpty()
                     && world.applyOwnerModifiers(context.ownerUuid(), passive.sourceKey(),
                     config.getPassiveModifiers(), refreshSeconds)) {
                 applied++;
@@ -197,7 +202,7 @@ public final class MiniwyvernAbilityService {
         return applied;
     }
 
-    private AbilityExecution prepareExecution(
+    private List<AbilityExecution> prepareExecutions(
             ProfileContext context,
             MiniwyvernArchetypeConfig config,
             MiniwyvernArchetypeConfig.Ability ability,
@@ -208,26 +213,32 @@ public final class MiniwyvernAbilityService {
         if (policy.equals("OWNER_ONLY")) {
             MiniwyvernAbilityWorld.Health health = world.health(context.ownerUuid());
             Double threshold = ability.getOwnerHealthThreshold();
-            if (threshold != null && health.fraction() > threshold) return AbilityExecution.notReady();
-            return new AbilityExecution(true, context.ownerUuid(), health);
+            if (threshold != null && health.fraction() > threshold) return List.of();
+            return List.of(new AbilityExecution(context.ownerUuid(), health));
         }
 
-        Optional<MiniwyvernAbilityWorld.Target> candidate = world.hostileTarget(ability.getRange());
-        if (candidate.isEmpty()) return AbilityExecution.notReady();
-        MiniwyvernAbilityWorld.Target target = candidate.orElseThrow();
-        if (!target.alive() || target.distance() > ability.getRange()
-                || !world.worldName().equals(target.worldName())
-                || target.entityUuid().equals(context.ownerUuid())
-                || target.entityUuid().equals(context.npcUuid())
-                || context.ownerUuid().equals(target.ownerUuid())
-                || world.areAllies(context.ownerUuid(), target.entityUuid())) {
-            return AbilityExecution.notReady();
+        List<MiniwyvernAbilityWorld.Target> candidates = policy.equals("OWNER_HOSTILE_AREA")
+                ? world.hostileTargets(ability.getRange(), ability.getMaximumTargets()).stream()
+                        .limit(ability.getMaximumTargets())
+                        .toList()
+                : world.hostileTarget(ability.getRange()).stream().toList();
+        Map<UUID, AbilityExecution> valid = new LinkedHashMap<>();
+        for (MiniwyvernAbilityWorld.Target target : candidates) {
+            if (!target.alive() || target.distance() > ability.getRange()
+                    || !world.worldName().equals(target.worldName())
+                    || target.entityUuid().equals(context.ownerUuid())
+                    || target.entityUuid().equals(context.npcUuid())
+                    || context.ownerUuid().equals(target.ownerUuid())
+                    || world.areAllies(context.ownerUuid(), target.entityUuid())) {
+                continue;
+            }
+            if (config.getId().equals("ice")
+                    && nowMs < state.immunityUntil.getOrDefault(target.entityUuid(), 0L)) {
+                continue;
+            }
+            valid.putIfAbsent(target.entityUuid(), new AbilityExecution(target.entityUuid(), world.health(target.entityUuid())));
         }
-        if (config.getId().equals("ice")
-                && nowMs < state.immunityUntil.getOrDefault(target.entityUuid(), 0L)) {
-            return AbilityExecution.notReady();
-        }
-        return new AbilityExecution(true, target.entityUuid(), world.health(target.entityUuid()));
+        return List.copyOf(valid.values());
     }
 
     private boolean execute(
@@ -235,11 +246,11 @@ public final class MiniwyvernAbilityService {
             MiniwyvernArchetypeConfig config,
             MiniwyvernArchetypeConfig.Ability ability,
             AbilityExecution execution,
+            String source,
             MiniwyvernAbilityWorld world,
             MutableState state,
             long nowMs) {
         UUID target = execution.targetUuid();
-        String source = sourceKey(context.profileId(), config.getId(), ability.getId());
         boolean applied = false;
 
         if (ability.getProjectileId() != null) {
@@ -339,6 +350,17 @@ public final class MiniwyvernAbilityService {
                 + normalize(archetypeId) + ":" + requiredText(abilityId, "abilityId");
     }
 
+    private static String executionSourceKey(
+            ProfileContext context,
+            MiniwyvernArchetypeConfig config,
+            MiniwyvernArchetypeConfig.Ability ability,
+            UUID targetUuid) {
+        String suffix = ability.getTargetPolicy().equalsIgnoreCase("OWNER_HOSTILE_AREA")
+                ? ability.getId() + ":" + targetUuid
+                : ability.getId();
+        return sourceKey(context.profileId(), config.getId(), suffix);
+    }
+
     private static long secondsToMs(double seconds) {
         if (!Double.isFinite(seconds) || seconds < 0.0D) return Long.MAX_VALUE;
         double millis = seconds * 1000.0D;
@@ -388,10 +410,7 @@ public final class MiniwyvernAbilityService {
         }
     }
 
-    private record AbilityExecution(boolean ready, UUID targetUuid, MiniwyvernAbilityWorld.Health health) {
-        static AbilityExecution notReady() {
-            return new AbilityExecution(false, new UUID(0L, 0L), new MiniwyvernAbilityWorld.Health(0, 0));
-        }
+    private record AbilityExecution(UUID targetUuid, MiniwyvernAbilityWorld.Health health) {
     }
 
     private record PassiveExecution(String sourceKey, boolean hasPassive, double natureHeal) {
