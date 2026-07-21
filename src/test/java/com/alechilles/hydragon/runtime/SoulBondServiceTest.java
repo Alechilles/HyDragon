@@ -70,6 +70,34 @@ class SoulBondServiceTest {
         assertTrue(store.snapshot().playerSoulBonds().isEmpty());
     }
 
+    @Test
+    void restartAfterMaterialConsumedClosesWithoutProvisioningOrSecondConsumption() throws Exception {
+        UUID owner = UUID.randomUUID();
+        CountingProvisioning provisioning = new CountingProvisioning(owner, UUID.randomUUID(), UUID.randomUUID());
+        HyDragonStateStore store = new HyDragonStateStore(temp.resolve("restart.properties"));
+        StateStoreOperationJournal journal = new StateStoreOperationJournal(store, () -> 5L);
+        String operationId = "hydragon:soul-bond:" + owner;
+        FakeReservation item = new FakeReservation(operationId);
+        assertEquals(OperationJournal.Decision.APPLIED, journal.begin(new OperationJournal.Descriptor(
+                operationId, operationId, OperationJournal.Kind.SOUL_BOND, owner, "soul_bond",
+                item.sourceEvidence(), 1, Optional.empty(), Optional.of(UUID.randomUUID().toString()),
+                Optional.of(UUID.randomUUID().toString()), Optional.empty(), java.util.OptionalLong.empty(),
+                java.util.OptionalLong.empty())));
+        assertEquals(OperationJournal.Decision.APPLIED, journal.transition(
+                operationId, OperationJournal.Phase.PREPARED, OperationJournal.Phase.MATERIAL_CONSUMED,
+                OperationJournal.Update.EMPTY));
+        SoulBondService service = new SoulBondService(
+                new TameworkGameplayAdapter(api(fullSoulCapabilities(), provisioning)),
+                new StateStoreSoulBondLedger(store), journal, () -> 5L);
+
+        GameplayResult result = service.claim(owner, "default", item).toCompletableFuture().join();
+
+        assertEquals(GameplayResult.Status.ALREADY_APPLIED, result.status());
+        assertEquals(0, provisioning.calls);
+        assertEquals(0, item.consumeCalls);
+        assertEquals(OperationJournal.Phase.COMMITTED, journal.find(operationId).orElseThrow().phase());
+    }
+
     private static EnumSet<TameworkApiCapability> fullSoulCapabilities() {
         return EnumSet.of(
                 TameworkApiCapability.PROFILES,

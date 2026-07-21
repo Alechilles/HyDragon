@@ -39,8 +39,32 @@ public final class SoulBondService {
 
         String operationId = item.operationId();
         Optional<OperationJournal.Entry> prior = journal.find(operationId);
-        if (prior.isPresent() && prior.orElseThrow().phase() == OperationJournal.Phase.COMMITTED) {
-            return released(item, GameplayResult.denied("Soul Bond entitlement already consumed"));
+        if (prior.isPresent()) {
+            OperationJournal.Entry entry = prior.orElseThrow();
+            if (entry.kind() != OperationJournal.Kind.SOUL_BOND
+                    || !entry.descriptor().ownerUuid().equals(playerUuid)
+                    || !entry.descriptor().source().itemFingerprint()
+                    .equals(item.sourceEvidence().itemFingerprint())) {
+                return released(item, GameplayResult.reconciliation(
+                        "Soul Bond operation identity conflicts with durable evidence"));
+            }
+            if (entry.phase() == OperationJournal.Phase.COMMITTED) {
+                return released(item, GameplayResult.denied("Soul Bond entitlement already consumed"));
+            }
+            if (entry.phase() == OperationJournal.Phase.MATERIAL_CONSUMED) {
+                OperationJournal.Decision closed = journal.transition(
+                        operationId, OperationJournal.Phase.MATERIAL_CONSUMED,
+                        OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
+                return released(item,
+                        closed == OperationJournal.Decision.APPLIED
+                                || closed == OperationJournal.Decision.ALREADY_APPLIED
+                                ? new GameplayResult(GameplayResult.Status.ALREADY_APPLIED, "Soul Bond claimed")
+                                : GameplayResult.reconciliation("Soul Bond journal closure is pending"));
+            }
+            if (entry.phase() != OperationJournal.Phase.PREPARED) {
+                return released(item, GameplayResult.reconciliation(
+                        "Soul Bond operation requires operator reconciliation"));
+            }
         }
 
         SoulBondLedger.Reservation reservation = ledger.reserve(playerUuid, operationId);
@@ -55,7 +79,9 @@ public final class SoulBondService {
             return released(item, GameplayResult.unavailable("Soul Bond entitlement store is unavailable"));
         }
 
-        OperationJournal.Decision begun = journal.begin(new OperationJournal.Descriptor(
+        OperationJournal.Decision begun = prior.isPresent()
+                ? OperationJournal.Decision.ALREADY_APPLIED
+                : journal.begin(new OperationJournal.Descriptor(
                 operationId,
                 operationId,
                 OperationJournal.Kind.SOUL_BOND,
