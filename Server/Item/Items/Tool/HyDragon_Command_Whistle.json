@@ -1,0 +1,26 @@
+{
+  "Parent": "Tamework_Command_Whistle_Example",
+  "TranslationProperties": {
+    "Name": "server.items.HyDragon_Command_Whistle.name",
+    "Description": "server.items.HyDragon_Command_Whistle.description"
+  },
+  "Quality": "Epic",
+  "Recipe": {
+    "Input": [
+      { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 2 },
+      { "ItemId": "Draconic_Scale", "Quantity": 2 },
+      { "ItemId": "Draconic_Essence", "Quantity": 1 }
+    ],
+    "Output": [
+      { "ItemId": "HyDragon_Command_Whistle", "Quantity": 1 }
+    ],
+    "BenchRequirement": [
+      {
+        "Type": "Crafting",
+        "Id": "Draconic_Altar",
+        "Categories": [ "Draconic_Altar_Bonding" ]
+      }
+    ],
+    "TimeSeconds": 4
+  }
+}

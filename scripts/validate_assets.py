@@ -144,6 +144,8 @@ def require_files(errors: list[str]) -> None:
         "Server/Item/Items/Ingredient/Draconic_Essence_Void.json",
         "Server/Item/Items/Ingredient/Revitalizing_Essence.json",
         "Server/Item/Items/Ingredient/Draconic_Soul_Bond.json",
+        "Server/Item/Items/Tool/HyDragon_Command_Whistle.json",
+        "Server/Tamework/Items/Commands/HyDragonDragonCommand.json",
         "Server/Tamework/PopulationGroups/HyDragonFullDragons.json",
         "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json",
         "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json",
@@ -445,6 +447,7 @@ def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> Non
         "Draconic_Stone_Ancient",
         "Revitalizing_Essence",
         "Draconic_Soul_Bond",
+        "HyDragon_Command_Whistle",
     }
     seen: set[str] = set()
     item_root = ROOT / "Server" / "Item" / "Items"
@@ -477,6 +480,28 @@ def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> Non
         fail(errors, f"missing altar recipe outputs: {', '.join(missing)}")
 
 
+def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None:
+    item_path = ROOT / "Server/Item/Items/Tool/HyDragon_Command_Whistle.json"
+    config_path = ROOT / "Server/Tamework/Items/Commands/HyDragonDragonCommand.json"
+    item = parsed.get(item_path)
+    config = parsed.get(config_path)
+    if not isinstance(item, dict) or item.get("Parent") != "Tamework_Command_Whistle_Example":
+        fail(errors, "HyDragon command whistle must inherit Tamework's supported command interaction")
+    if not isinstance(config, dict) or config.get("Parent") != "TwCommandExample":
+        fail(errors, "HyDragon command config must inherit the supported Tamework command set")
+        return
+    if config.get("ItemIds") != ["HyDragon_Command_Whistle"]:
+        fail(errors, "HyDragon command config must bind only the production HyDragon whistle")
+    allowed = config.get("AllowedRoles")
+    required_roles = {
+        "Tamed_Hydra", "Tamed_NordicDrake", "Tamed_RockDrakeT1",
+        "Tamed_RockDrakeT2", "Tamed_RockDrakeT3", "Tamed_Wyvern_Mini",
+    }
+    actual_roles = set(allowed.get("Allowlist", [])) if isinstance(allowed, dict) else set()
+    if actual_roles != required_roles:
+        fail(errors, f"HyDragon command role allowlist mismatch: {sorted(actual_roles)}")
+
+
 def main() -> int:
     errors: list[str] = []
     parsed = load_json_assets(errors)
@@ -490,6 +515,7 @@ def main() -> int:
     validate_miniwyvern_role_wiring(parsed, errors)
     validate_spawn_patch_role_identity(parsed, errors)
     validate_altar_recipes(parsed, errors)
+    validate_command_item(parsed, errors)
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)

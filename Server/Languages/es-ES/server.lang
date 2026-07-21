@@ -125,3 +125,5 @@ messages.mode.staying=Quedándose
 messages.mode.defending=Defendiendo
 messages.mode.aggressive=Agresivo
 messages.mode.wandering=Deambulando
+items.HyDragon_Command_Whistle.name=Silbato de mando dracónico
+items.HyDragon_Command_Whistle.description=Vincula a tus compañeros enlazados y da órdenes de seguir, esperar, regresar, volver a casa, moverse, descansar y atacar.

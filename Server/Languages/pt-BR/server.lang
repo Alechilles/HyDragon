@@ -125,3 +125,5 @@ messages.mode.staying=Parado
 messages.mode.defending=Defendendo
 messages.mode.aggressive=Agressivo
 messages.mode.wandering=Vagando
+items.HyDragon_Command_Whistle.name=Apito de Comando Dracônico
+items.HyDragon_Command_Whistle.description=Vincula seus companheiros ligados e emite comandos de seguir, ficar, retornar, casa, movimento, repouso e ataque.
