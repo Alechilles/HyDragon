@@ -45,15 +45,15 @@
       "Cycle": [
         {
           "State": "Follow",
-          "Message": "Following"
+          "Message": "server.messages.mode.following"
         },
         {
           "State": "Hold",
-          "Message": "Staying"
+          "Message": "server.messages.mode.staying"
         },
         {
           "State": "Idle",
-          "Message": "Wandering"
+          "Message": "server.messages.mode.wandering"
         }
       ],
       "ShowFloatingText": true

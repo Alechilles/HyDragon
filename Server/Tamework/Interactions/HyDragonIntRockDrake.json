@@ -12,11 +12,11 @@
       "Type": "ModeCycle",
       "Enabled": true,
       "Cycle": [
-        { "State": "Follow", "Message": "Following" },
-        { "State": "Hold", "Message": "Staying" },
-        { "State": "Defend", "Message": "Defending" },
-        { "State": "Aggressive", "Message": "Aggressive" },
-        { "State": "Idle", "Message": "Wandering" }
+        { "State": "Follow", "Message": "server.messages.mode.following" },
+        { "State": "Hold", "Message": "server.messages.mode.staying" },
+        { "State": "Defend", "Message": "server.messages.mode.defending" },
+        { "State": "Aggressive", "Message": "server.messages.mode.aggressive" },
+        { "State": "Idle", "Message": "server.messages.mode.wandering" }
       ],
       "ShowFloatingText": true
     }

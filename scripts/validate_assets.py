@@ -108,6 +108,29 @@ def validate_locales(errors: list[str]) -> None:
                 fail(errors, f"placeholder mismatch: {locale}:{key}")
 
 
+def validate_interaction_message_localization(parsed: dict[Path, object], errors: list[str]) -> None:
+    english_path = ROOT / "Server/Languages/en-US/server.lang"
+    english = read_lang(english_path, errors) if english_path.is_file() else {}
+
+    def visit(value: object, path: Path) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if key == "Message" and isinstance(child, str):
+                    if not child.startswith("server."):
+                        fail(errors, f"raw player-facing interaction message: {path.relative_to(ROOT)}: {child}")
+                    elif child.removeprefix("server.") not in english:
+                        fail(errors, f"missing interaction message localization: {path.relative_to(ROOT)}: {child}")
+                else:
+                    visit(child, path)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child, path)
+
+    interaction_root = ROOT / "Server/Tamework/Interactions"
+    for path in sorted(interaction_root.glob("*.json")):
+        visit(parsed.get(path), path)
+
+
 def require_files(errors: list[str]) -> None:
     required = [
         "Server/Item/Items/Bench/Draconic_Altar.json",
@@ -308,6 +331,7 @@ def main() -> int:
     parsed = load_json_assets(errors)
     validate_english_ids(errors)
     validate_locales(errors)
+    validate_interaction_message_localization(parsed, errors)
     require_files(errors)
     validate_capture_configs(parsed, errors)
     validate_stone_tiers(parsed, errors)
