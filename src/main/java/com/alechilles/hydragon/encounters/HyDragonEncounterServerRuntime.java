@@ -198,10 +198,18 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
             Store<EntityStore> store,
             CommandBuffer<EntityStore> commandBuffer) {
         Bindings active = bindings;
-        if (active == null || !(damage.getSource() instanceof Damage.EntitySource entitySource)) return;
-        Ref<EntityStore> sourceRef = entitySource.getRef();
-        if (sourceRef == null || !sourceRef.isValid()
-                || commandBuffer.getComponent(sourceRef, PlayerRef.getComponentType()) == null) {
+        ProjectileDamageRefs damageRefs = projectileDamageRefs(damage);
+        if (active == null || damageRefs == null) return;
+        Ref<EntityStore> sourceRef = damageRefs.shooterRef();
+        Ref<EntityStore> projectileRef = damageRefs.projectileRef();
+        if (!validInStore(sourceRef, store) || !validInStore(projectileRef, store)) {
+            return;
+        }
+        PlayerRef sourcePlayer = commandBuffer.getComponent(sourceRef, PlayerRef.getComponentType());
+        if (sourcePlayer == null || !sourcePlayer.isValid()) return;
+        ProjectileComponent projectile = store.getComponent(projectileRef, ProjectileComponent.getComponentType());
+        if (projectile == null || projectile.getCreatorUuid() == null
+                || !projectile.getCreatorUuid().equals(sourcePlayer.getUuid())) {
             return;
         }
         UUIDComponent targetIdentity = store.getComponent(targetRef, UUIDComponent.getComponentType());
@@ -210,7 +218,16 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
         if (record == null) return;
         DragonEncounterConfig definition = active.configs().get().encounters().get(record.definitionId());
         if (definition == null) return;
-        String sourceId = resolveGroundingSource(definition, damage, sourceRef, store);
+        ItemStack held = InventoryComponent.getItemInHand(store, sourceRef);
+        String itemId = ItemStack.isEmpty(held) ? null : held.getItemId();
+        String damageCauseId = damage.getCause() == null ? null : damage.getCause().getId();
+        String sourceId = resolveGroundingSource(
+                definition,
+                new GroundingHitEvidence(
+                        projectile.getProjectileAssetName(),
+                        itemId,
+                        damageCauseId,
+                        true));
         if (sourceId == null) return;
         float amount = damage.getAmount();
         if (!Float.isFinite(amount) || amount <= 0.0F) return;
@@ -219,27 +236,40 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
                 encounterId, targetIdentity.getUuid(), sourceId, amount, gateway));
     }
 
+    /**
+     * Extracts the two authoritative references encoded by Hytale projectile damage.
+     * ProjectileSource extends EntitySource, so it must be selected before accepting any
+     * generic entity damage; melee and other ordinary entity damage never ground encounters.
+     */
+    static ProjectileDamageRefs projectileDamageRefs(Damage damage) {
+        if (damage == null || !(damage.getSource() instanceof Damage.ProjectileSource projectileSource)) {
+            return null;
+        }
+        return new ProjectileDamageRefs(projectileSource.getRef(), projectileSource.getProjectile());
+    }
+
+    private static boolean validInStore(Ref<EntityStore> ref, Store<EntityStore> store) {
+        return ref != null && ref.isValid() && ref.getStore() == store;
+    }
+
     static String resolveGroundingSource(
             DragonEncounterConfig definition,
-            Damage damage,
-            Ref<EntityStore> sourceRef,
-            Store<EntityStore> store) {
-        Set<String> allowed = Set.copyOf(definition.getGrounding().getBuildupSourceIds());
-        LinkedHashSet<String> candidates = new LinkedHashSet<>();
-        String projectileId = null;
-        if (damage.getSource() instanceof Damage.ProjectileSource projectileSource) {
-            Ref<EntityStore> projectileRef = projectileSource.getProjectile();
-            ProjectileComponent projectile = projectileRef != null && projectileRef.isValid()
-                    ? store.getComponent(projectileRef, ProjectileComponent.getComponentType()) : null;
-            if (projectile != null && projectile.getProjectileAssetName() != null) {
-                projectileId = projectile.getProjectileAssetName();
-            }
-        }
-        ItemStack held = InventoryComponent.getItemInHand(store, sourceRef);
-        String itemId = ItemStack.isEmpty(held) ? null : held.getItemId();
-        String damageCauseId = damage.getCause() == null ? null : damage.getCause().getId();
-        candidates.addAll(groundingSourceCandidates(projectileId, itemId, damageCauseId));
-        return candidates.stream().filter(allowed::contains).findFirst().orElse(null);
+            GroundingHitEvidence evidence) {
+        Objects.requireNonNull(definition, "definition");
+        Objects.requireNonNull(evidence, "evidence");
+        return resolveGroundingSource(
+                Set.copyOf(definition.getGrounding().getBuildupSourceIds()),
+                evidence);
+    }
+
+    static String resolveGroundingSource(Set<String> allowed, GroundingHitEvidence evidence) {
+        Objects.requireNonNull(allowed, "allowed");
+        Objects.requireNonNull(evidence, "evidence");
+        if (!evidence.projectileOwnedBySource()) return null;
+        return groundingSourceCandidates(
+                evidence.projectileId(),
+                evidence.itemId(),
+                evidence.damageCauseId()).stream().filter(allowed::contains).findFirst().orElse(null);
     }
 
     static List<String> groundingSourceCandidates(String projectileId, String itemId, String damageCauseId) {
@@ -264,6 +294,18 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
     private static void addCombination(Set<String> candidates, String... parts) {
         for (String part : parts) if (part == null) return;
         candidates.add(String.join("+", parts));
+    }
+
+    record ProjectileDamageRefs(
+            Ref<EntityStore> shooterRef,
+            Ref<EntityStore> projectileRef) {
+    }
+
+    record GroundingHitEvidence(
+            String projectileId,
+            String itemId,
+            String damageCauseId,
+            boolean projectileOwnedBySource) {
     }
 
     @Override
