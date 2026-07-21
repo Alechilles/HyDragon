@@ -7,6 +7,8 @@ import com.alechilles.alecstamework.api.PopulationCompanionLifecycle;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.LongSupplier;
@@ -67,14 +69,7 @@ public final class SoulBondService {
                 return released(item, GameplayResult.denied("Soul Bond entitlement already consumed"));
             }
             if (entry.phase() == OperationJournal.Phase.MATERIAL_CONSUMED) {
-                OperationJournal.Decision closed = journal.transition(
-                        operationId, OperationJournal.Phase.MATERIAL_CONSUMED,
-                        OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
-                return released(item,
-                        closed == OperationJournal.Decision.APPLIED
-                                || closed == OperationJournal.Decision.ALREADY_APPLIED
-                                ? new GameplayResult(GameplayResult.Status.ALREADY_APPLIED, "Soul Bond claimed")
-                                : GameplayResult.reconciliation("Soul Bond journal closure is pending"));
+                return recover(entry).thenCompose(result -> released(item, result));
             }
             if (entry.phase() != OperationJournal.Phase.PREPARED) {
                 return released(item, GameplayResult.reconciliation(
@@ -101,7 +96,7 @@ public final class SoulBondService {
                 operationId,
                 OperationJournal.Kind.SOUL_BOND,
                 playerUuid,
-                "soul_bond",
+                intent(destination),
                 item.sourceEvidence(),
                 item.quantity(),
                 Optional.empty(),
@@ -175,20 +170,63 @@ public final class SoulBondService {
                 return CompletableFuture.completedFuture(GameplayResult.reconciliation(
                         "Soul Bond consumed; journal closure requires reconciliation"));
             }
-            OperationJournal.Decision closed = journal.transition(
-                    operationId, OperationJournal.Phase.MATERIAL_CONSUMED,
-                    OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
-            if (closed != OperationJournal.Decision.APPLIED
-                    && closed != OperationJournal.Decision.ALREADY_APPLIED) {
-                return CompletableFuture.completedFuture(GameplayResult.reconciliation(
-                        "Soul Bond succeeded; final journal closure is pending"));
-            }
-            return activate(playerUuid, operationId, profileId, result.profileRevision(),
-                    ownershipWorldName, destination);
+            OperationJournal.Entry recoverable = journal.find(operationId).orElse(null);
+            return recoverable == null
+                    ? CompletableFuture.completedFuture(GameplayResult.reconciliation(
+                    "Soul Bond consumed; activation journal is unavailable"))
+                    : recover(recoverable);
         });
     }
 
-    private CompletionStage<GameplayResult> activate(
+    /** Restarts a consumed Soul Bond's dormant-to-active transition without the consumed item receipt. */
+    public CompletionStage<GameplayResult> recover(OperationJournal.Entry entry) {
+        Objects.requireNonNull(entry, "entry");
+        if (entry.kind() != OperationJournal.Kind.SOUL_BOND) {
+            return CompletableFuture.completedFuture(GameplayResult.denied("not a Soul Bond operation"));
+        }
+        if (entry.phase() == OperationJournal.Phase.COMMITTED) {
+            return CompletableFuture.completedFuture(
+                    new GameplayResult(GameplayResult.Status.ALREADY_APPLIED, "Soul Bond claimed"));
+        }
+        if (entry.phase() != OperationJournal.Phase.MATERIAL_CONSUMED
+                || entry.descriptor().profileId().isEmpty()
+                || entry.descriptor().profileRevision().isEmpty()) {
+            return CompletableFuture.completedFuture(GameplayResult.reconciliation(
+                    "Soul Bond activation is not recoverable from this journal phase"));
+        }
+        SoulBondIntent intent = decodeIntent(entry.descriptor().intentId());
+        if (intent == null) {
+            return CompletableFuture.completedFuture(GameplayResult.reconciliation(
+                    "Soul Bond activation destination is invalid"));
+        }
+        UUID profileId;
+        try {
+            profileId = UUID.fromString(entry.descriptor().profileId().orElseThrow());
+        } catch (IllegalArgumentException failure) {
+            return CompletableFuture.completedFuture(GameplayResult.reconciliation(
+                    "Soul Bond activation profile is invalid"));
+        }
+        return activate(
+                entry.descriptor().ownerUuid(),
+                entry.operationId(),
+                profileId,
+                entry.descriptor().profileRevision().getAsLong(),
+                intent.worldName(),
+                new PopulationAdmissionLocation(intent.worldName(), intent.chunkX(), intent.chunkZ()))
+                .thenApply(activation -> {
+                    if (!activation.active()) return activation.result();
+                    OperationJournal.Decision closed = journal.transition(
+                            entry.operationId(), OperationJournal.Phase.MATERIAL_CONSUMED,
+                            OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
+                    return closed == OperationJournal.Decision.APPLIED
+                            || closed == OperationJournal.Decision.ALREADY_APPLIED
+                            ? activation.result()
+                            : GameplayResult.reconciliation(
+                            "Miniwyvern activated; final Soul Bond journal closure is pending");
+                });
+    }
+
+    private CompletionStage<Activation> activate(
             UUID playerUuid,
             String operationId,
             UUID profileId,
@@ -205,17 +243,35 @@ public final class SoulBondService {
                         destination.chunkZ())
                 .handle((result, failure) -> {
                     if (failure != null || result == null) {
-                        return GameplayResult.applied(
-                                "Soul Bond claimed; Miniwyvern activation is pending recovery");
+                        return new Activation(false, GameplayResult.reconciliation(
+                                "Soul Bond claimed; Miniwyvern activation is pending recovery"));
                     }
                     boolean active = result.accepted()
                             && result.lifecycle() == PopulationCompanionLifecycle.ACTIVE
                             && result.projectionStatus() == CompanionProvisioningProjectionStatus.ACTIVE;
-                    return active
+                    return new Activation(active, active
                             ? GameplayResult.applied("Soul Bond claimed and Miniwyvern activated")
-                            : GameplayResult.applied(
-                            "Soul Bond claimed; Miniwyvern activation is pending recovery");
+                            : GameplayResult.reconciliation(
+                            "Soul Bond claimed; Miniwyvern activation is pending recovery"));
                 });
+    }
+
+    private static String intent(PopulationAdmissionLocation destination) {
+        String world = Base64.getUrlEncoder().withoutPadding().encodeToString(
+                destination.worldName().getBytes(StandardCharsets.UTF_8));
+        return "soul_bond:" + world + ':' + destination.chunkX() + ':' + destination.chunkZ();
+    }
+
+    private static SoulBondIntent decodeIntent(String value) {
+        try {
+            String[] parts = value.split(":", -1);
+            if (parts.length != 4 || !"soul_bond".equals(parts[0])) return null;
+            String world = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+            if (world.isBlank()) return null;
+            return new SoulBondIntent(world, Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+        } catch (RuntimeException failure) {
+            return null;
+        }
     }
 
     private CompletionStage<GameplayResult> keepPending(UUID playerUuid,
@@ -235,6 +291,15 @@ public final class SoulBondService {
         String normalized = Objects.requireNonNull(value, field).trim();
         if (normalized.isEmpty()) throw new IllegalArgumentException(field + " is required");
         return normalized;
+    }
+
+    private record Activation(boolean active, GameplayResult result) {
+        private Activation {
+            Objects.requireNonNull(result, "result");
+        }
+    }
+
+    private record SoulBondIntent(String worldName, int chunkX, int chunkZ) {
     }
 
 }

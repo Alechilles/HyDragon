@@ -1,6 +1,7 @@
 package com.alechilles.hydragon.runtime;
 
 import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.UUID;
@@ -11,6 +12,11 @@ import java.util.UUID;
  */
 public interface OperationJournal {
     Optional<Entry> find(String operationId);
+
+    /** Immutable recovery scan; production journals override this with durable entries. */
+    default List<Entry> entries() {
+        return List.of();
+    }
 
     Decision begin(Descriptor descriptor);
 

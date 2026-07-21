@@ -9,6 +9,7 @@ import com.alechilles.hydragon.persistence.OperationOrigin;
 import com.alechilles.hydragon.persistence.SourceItemEvidence;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.LongSupplier;
@@ -26,6 +27,14 @@ public final class StateStoreOperationJournal implements OperationJournal {
     @Override
     public Optional<Entry> find(String operationId) {
         return store.snapshot().consumableTransaction(operationId).map(StateStoreOperationJournal::entry);
+    }
+
+    @Override
+    public List<Entry> entries() {
+        return store.snapshot().consumableTransactions().values().stream()
+                .map(StateStoreOperationJournal::entry)
+                .sorted(java.util.Comparator.comparing(Entry::operationId))
+                .toList();
     }
 
     @Override

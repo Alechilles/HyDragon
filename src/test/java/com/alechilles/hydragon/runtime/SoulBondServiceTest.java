@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import org.junit.jupiter.api.Test;
@@ -76,7 +78,7 @@ class SoulBondServiceTest {
     }
 
     @Test
-    void restartAfterMaterialConsumedClosesWithoutProvisioningOrSecondConsumption() throws Exception {
+    void restartAfterMaterialConsumedActivatesWithoutProvisioningOrSecondConsumption() throws Exception {
         UUID owner = UUID.randomUUID();
         CountingProvisioning provisioning = new CountingProvisioning(owner, UUID.randomUUID(), UUID.randomUUID());
         HyDragonStateStore store = new HyDragonStateStore(temp.resolve("restart.properties"));
@@ -84,10 +86,10 @@ class SoulBondServiceTest {
         String operationId = "hydragon:soul-bond:" + owner;
         FakeReservation item = new FakeReservation(operationId);
         assertEquals(OperationJournal.Decision.APPLIED, journal.begin(new OperationJournal.Descriptor(
-                operationId, operationId, OperationJournal.Kind.SOUL_BOND, owner, "soul_bond",
+                operationId, operationId, OperationJournal.Kind.SOUL_BOND, owner, soulBondIntent("default", 0, 0),
                 item.sourceEvidence(), 1, Optional.empty(), Optional.of(UUID.randomUUID().toString()),
                 Optional.of(UUID.randomUUID().toString()), Optional.empty(), java.util.OptionalLong.empty(),
-                java.util.OptionalLong.empty())));
+                java.util.OptionalLong.of(0L))));
         assertEquals(OperationJournal.Decision.APPLIED, journal.transition(
                 operationId, OperationJournal.Phase.PREPARED, OperationJournal.Phase.MATERIAL_CONSUMED,
                 OperationJournal.Update.EMPTY));
@@ -97,7 +99,7 @@ class SoulBondServiceTest {
 
         GameplayResult result = service.claim(owner, "default", item).toCompletableFuture().join();
 
-        assertEquals(GameplayResult.Status.ALREADY_APPLIED, result.status());
+        assertEquals(GameplayResult.Status.APPLIED, result.status());
         assertEquals(0, provisioning.calls);
         assertEquals(0, item.consumeCalls);
         assertEquals(OperationJournal.Phase.COMMITTED, journal.find(operationId).orElseThrow().phase());
@@ -111,6 +113,11 @@ class SoulBondServiceTest {
                 TameworkApiCapability.POPULATION_GROUPS,
                 TameworkApiCapability.COMPANION_PROVISIONING,
                 TameworkApiCapability.INTERACTION_EXTENSIONS);
+    }
+
+    private static String soulBondIntent(String worldName, int chunkX, int chunkZ) {
+        return "soul_bond:" + Base64.getUrlEncoder().withoutPadding().encodeToString(
+                worldName.getBytes(StandardCharsets.UTF_8)) + ':' + chunkX + ':' + chunkZ;
     }
 
     private static TameworkApi api(EnumSet<TameworkApiCapability> capabilities,
@@ -166,7 +173,20 @@ class SoulBondServiceTest {
                     0L));
         }
         public CompletionStage<CompanionProvisioningResult> transition(ProvisionedCompanionTransitionRequest request) {
-            return CompletableFuture.completedFuture(CompanionProvisioningResult.unavailable("unused"));
+            return CompletableFuture.completedFuture(new CompanionProvisioningResult(
+                    CompanionProvisioningResult.Status.TRANSITIONED,
+                    "active",
+                    request.callerNamespace(),
+                    request.idempotencyKey(),
+                    UUID.randomUUID(),
+                    profile.toString(),
+                    owner,
+                    TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE,
+                    PopulationCompanionLifecycle.ACTIVE,
+                    CompanionProvisioningProjectionStatus.ACTIVE,
+                    "active",
+                    null,
+                    1L));
         }
         public CompletionStage<Optional<CompanionProvisioningOperationView>> findOperation(
                 String callerNamespace, String idempotencyKey) {
