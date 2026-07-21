@@ -1,0 +1,14 @@
+{
+  "Name": "server.effects.miniwyvernIceStun.name",
+  "ApplicationEffects": {
+    "EntityBottomTint": "#38BDF8",
+    "EntityTopTint": "#E0F2FE",
+    "MovementEffects": { "DisableAll": true },
+    "AbilityEffects": { "Disabled": [ "Primary", "Secondary", "Ability1", "Ability2", "Ability3" ] }
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 1.5
+}

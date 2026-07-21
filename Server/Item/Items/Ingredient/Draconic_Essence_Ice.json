@@ -1,15 +1,18 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Draconic_Essence_Cryo.name",
-    "Description": "server.items.Draconic_Essence_Cryo.description"
+    "Name": "server.items.Draconic_Essence_Ice.name",
+    "Description": "server.items.Draconic_Essence_Ice.description"
   },
-  "Icon": "Icons/ItemsGenerated/Draconic_Essence_Cryo.png",
+  "Icon": "Icons/ItemsGenerated/Draconic_Essence_Ice.png",
   "Quality": "Uncommon",
   "Categories": [
     "Items.Ingredients"
   ],
+  "Interactions": {
+    "Secondary": { "Interactions": [ { "Type": "HyDragonMiniwyvernAttune", "ArchetypeId": "ice" } ] }
+  },
   "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
-  "Texture": "Items/HyDragon/Draconic_Essence_Cryo.png",
+  "Texture": "Items/HyDragon/Draconic_Essence_Ice.png",
   "PlayerAnimationsId": "Item",
   "IconProperties": {
     "Scale": 1.8,

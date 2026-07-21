@@ -1,0 +1,31 @@
+{
+  "Parent": "Draconic_Stone",
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Stone_Thorium.name",
+    "Description": "server.items.Draconic_Stone_Thorium.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Stone_Thorium.png",
+  "Texture": "Items/HyDragon/Draconic_Stone_Thorium.png",
+  "Recipe": {
+    "Input": [
+      { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 4 },
+      { "ItemId": "Draconic_Scale", "Quantity": 4 },
+      { "ItemId": "Draconic_Essence", "Quantity": 2 }
+    ],
+    "Output": [ { "ItemId": "Draconic_Stone_Thorium", "Quantity": 1 } ],
+    "BenchRequirement": [
+      { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Stones" ] }
+    ],
+    "TimeSeconds": 4
+  },
+  "Light": { "Color": "#7DD3FC", "Radius": 2 },
+  "State": {
+    "Filled": {
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Thorium_Filled.name",
+        "Description": "server.items.Draconic_Stone_Thorium_Filled.description"
+      },
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Thorium.png"
+    }
+  }
+}

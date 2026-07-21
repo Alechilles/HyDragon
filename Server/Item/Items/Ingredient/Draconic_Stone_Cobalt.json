@@ -1,0 +1,31 @@
+{
+  "Parent": "Draconic_Stone",
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Stone_Cobalt.name",
+    "Description": "server.items.Draconic_Stone_Cobalt.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Stone_Cobalt.png",
+  "Texture": "Items/HyDragon/Draconic_Stone_Cobalt.png",
+  "Recipe": {
+    "Input": [
+      { "ItemId": "Ingredient_Bar_Cobalt", "Quantity": 4 },
+      { "ItemId": "Draconic_Scale", "Quantity": 6 },
+      { "ItemId": "Draconic_Essence", "Quantity": 3 }
+    ],
+    "Output": [ { "ItemId": "Draconic_Stone_Cobalt", "Quantity": 1 } ],
+    "BenchRequirement": [
+      { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Stones" ] }
+    ],
+    "TimeSeconds": 5
+  },
+  "Light": { "Color": "#2563EB", "Radius": 2 },
+  "State": {
+    "Filled": {
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Cobalt_Filled.name",
+        "Description": "server.items.Draconic_Stone_Cobalt_Filled.description"
+      },
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Cobalt.png"
+    }
+  }
+}

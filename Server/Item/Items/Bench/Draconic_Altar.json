@@ -1,0 +1,79 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Altar.name",
+    "Description": "server.items.Draconic_Altar.description"
+  },
+  "Icon": "Blocks/HyDragon/Draconic_Altar/Draconic_Altar.png",
+  "Categories": [ "Furniture.Benches" ],
+  "Recipe": {
+    "TimeSeconds": 6,
+    "Input": [
+      { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 10 },
+      { "ItemId": "Draconic_Scale", "Quantity": 8 },
+      { "ItemId": "Draconic_Essence", "Quantity": 4 }
+    ],
+    "BenchRequirement": [
+      {
+        "Id": "Workbench",
+        "Type": "Crafting",
+        "Categories": [ "Workbench_Crafting" ],
+        "RequiredTierLevel": 2
+      }
+    ]
+  },
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "CustomModel": "Blocks/HyDragon/Draconic_Altar/Draconic_Altar.blockymodel",
+    "CustomModelTexture": [
+      { "Texture": "Blocks/HyDragon/Draconic_Altar/Draconic_Altar.png", "Weight": 1 }
+    ],
+    "CustomModelAnimation": "Blocks/HyDragon/Draconic_Altar/Draconic_Altar_Idle.blockyanim",
+    "Looping": true,
+    "HitboxType": "Bench_Alchemy",
+    "VariantRotation": "NESW",
+    "Bench": {
+      "Type": "Crafting",
+      "LocalOpenSoundEventId": "SFX_Arcane_Workbench_Open_Local",
+      "LocalCloseSoundEventId": "SFX_Arcane_Workbench_Close_Local",
+      "CompletedSoundEventId": "SFX_Arcane_Workbench_Craft",
+      "Categories": [
+        {
+          "Id": "Draconic_Altar_Stones",
+          "Icon": "Icons/CraftingCategories/Arcane/Bench_Memories.png",
+          "Name": "server.items.Draconic_Altar.bench.categories.stones.name"
+        },
+        {
+          "Id": "Draconic_Altar_Bonding",
+          "Icon": "Icons/CraftingCategories/Arcane/Portal_Device.png",
+          "Name": "server.items.Draconic_Altar.bench.categories.bonding.name"
+        },
+        {
+          "Id": "Draconic_Altar_Restoration",
+          "Icon": "Icons/CraftingCategories/Arcane/Bench_Memories.png",
+          "Name": "server.items.Draconic_Altar.bench.categories.restoration.name"
+        }
+      ],
+      "Id": "Draconic_Altar"
+    },
+    "BlockEntity": { "Components": { "BenchBlock": {} } },
+    "Gathering": { "Breaking": { "GatherType": "Benches" } },
+    "BlockParticleSetId": "Wood",
+    "ParticleColor": "#663399",
+    "Support": { "Down": [ { "FaceType": "Full" } ] },
+    "BlockSoundSetId": "Stone",
+    "PhysicalMaterialId": "Stone",
+    "TextureComputedColor": "#4A3728"
+  },
+  "PlayerAnimationsId": "Block",
+  "IconProperties": {
+    "Scale": 0.35,
+    "Rotation": [ 22.5, 45.0, 22.5 ],
+    "Translation": [ 11.4, -18.6 ]
+  },
+  "Tags": { "Type": [ "Bench" ] },
+  "MaxStack": 1,
+  "ItemLevel": 10,
+  "ItemSoundSetId": "ISS_Blocks_Wood"
+}

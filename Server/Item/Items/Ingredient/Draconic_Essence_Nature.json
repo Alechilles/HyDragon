@@ -8,6 +8,9 @@
   "Categories": [
     "Items.Ingredients"
   ],
+  "Interactions": {
+    "Secondary": { "Interactions": [ { "Type": "HyDragonMiniwyvernAttune", "ArchetypeId": "nature" } ] }
+  },
   "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
   "Texture": "Items/HyDragon/Draconic_Essence_Nature.png",
   "PlayerAnimationsId": "Item",

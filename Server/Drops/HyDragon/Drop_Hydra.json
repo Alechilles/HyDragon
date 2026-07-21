@@ -15,9 +15,36 @@
         "Type": "Single",
         "Weight": 100.0,
         "Item": {
-          "ItemId": "Draconic_Essence_Cryo",
+          "ItemId": "Draconic_Essence",
+          "QuantityMin": 1,
+          "QuantityMax": 3
+        }
+      },
+      {
+        "Type": "Single",
+        "Weight": 55.0,
+        "Item": {
+          "ItemId": "Draconic_Essence_Ice",
           "QuantityMin": 2,
           "QuantityMax": 4
+        }
+      },
+      {
+        "Type": "Single",
+        "Weight": 45.0,
+        "Item": {
+          "ItemId": "Draconic_Essence_Water",
+          "QuantityMin": 1,
+          "QuantityMax": 3
+        }
+      },
+      {
+        "Type": "Single",
+        "Weight": 8.0,
+        "Item": {
+          "ItemId": "Draconic_Essence_Void",
+          "QuantityMin": 1,
+          "QuantityMax": 1
         }
       },
       {

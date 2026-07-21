@@ -2,7 +2,6 @@
   "Enabled": true,
   "Priority": 200,
   "RoleIds": [
-    "Hydra",
     "Tamed_Hydra"
   ],
   "Interactions": [

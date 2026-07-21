@@ -1,0 +1,16 @@
+{
+  "Parent": "Draconic_Essence_Ice",
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Essence_Water.name",
+    "Description": "server.items.Draconic_Essence_Water.description"
+  },
+  "Interactions": {
+    "Secondary": { "Interactions": [ { "Type": "HyDragonMiniwyvernAttune", "ArchetypeId": "water" } ] }
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Essence_Water.png",
+  "Texture": "Items/HyDragon/Draconic_Essence_Water.png",
+  "Light": {
+    "Color": "#0369A1",
+    "Radius": 1
+  }
+}

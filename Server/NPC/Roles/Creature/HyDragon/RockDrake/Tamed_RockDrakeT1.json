@@ -1,0 +1,42 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_HyDragon_Tamed",
+  "Modify": {
+    "Appearance": "RockDrakeT1",
+    "Weapons": [],
+    "FlockArray": [ "Tamed_RockDrakeT1" ],
+    "AttitudeGroup": "PredatorsBig",
+    "DropList": "Empty",
+    "WanderRadius": 8,
+    "ViewRange": 28,
+    "HearingRange": 20,
+    "MaxSpeed": 5.5,
+    "Attack": "Root_NPC_RockDrake_Attack",
+    "AttackDistance": 4.5,
+    "TargetRange": 10,
+    "CombatBehaviorDistance": 14,
+    "KnockbackScale": 0.1,
+    "ClimbHeight": 2,
+    "MaxHealth": 260,
+    "CanFollow": true,
+    "CanHold": true,
+    "CanDefend": true,
+    "CanAggressive": true,
+    "CanAttackTarget": true,
+    "CanMoveToLocation": true,
+    "CanReturnHome": true,
+    "CanRecall": true,
+    "CanSetHome": true,
+    "IsMountable": true,
+    "MountAnchorX": 0,
+    "MountAnchorY": 1.8,
+    "MountAnchorZ": 0,
+    "NameTranslationKey": { "Compute": "NameTranslationKey" }
+  },
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Tamed_RockDrakeT1.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "Parent": "Flame_Staff_Burn",
+  "Name": "server.effects.miniwyvernFireBurn.name",
+  "DamageCalculator": { "BaseDamage": { "Fire": 2 } },
+  "DamageCalculatorCooldown": 1,
+  "OverlapBehavior": "Overwrite",
+  "Duration": 4.0
+}

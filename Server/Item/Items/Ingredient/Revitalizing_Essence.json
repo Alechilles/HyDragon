@@ -1,0 +1,29 @@
+{
+  "Parent": "Draconic_Essence_Fire",
+  "TranslationProperties": {
+    "Name": "server.items.Revitalizing_Essence.name",
+    "Description": "server.items.Revitalizing_Essence.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Revitalizing_Essence.png",
+  "Texture": "Items/HyDragon/Revitalizing_Essence.png",
+  "Quality": "Rare",
+  "Interactions": {
+    "Secondary": { "Interactions": [ { "Type": "HyDragonRepairBondedStone" } ] }
+  },
+  "Recipe": {
+    "Input": [
+      { "ItemId": "Draconic_Essence", "Quantity": 3 },
+      { "ItemId": "Draconic_Essence_Nature", "Quantity": 1 },
+      { "ItemId": "Ingredient_Life_Essence", "Quantity": 1 }
+    ],
+    "Output": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 } ],
+    "BenchRequirement": [
+      { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Restoration" ] }
+    ],
+    "TimeSeconds": 6
+  },
+  "Light": {
+    "Color": "#DC2626",
+    "Radius": 2
+  }
+}

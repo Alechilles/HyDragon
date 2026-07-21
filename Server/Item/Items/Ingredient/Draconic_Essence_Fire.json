@@ -1,15 +1,18 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Draconic_Essence_Storm.name",
-    "Description": "server.items.Draconic_Essence_Storm.description"
+    "Name": "server.items.Draconic_Essence_Fire.name",
+    "Description": "server.items.Draconic_Essence_Fire.description"
   },
-  "Icon": "Icons/ItemsGenerated/Draconic_Essence_Storm.png",
+  "Icon": "Icons/ItemsGenerated/Draconic_Essence_Fire.png",
   "Quality": "Uncommon",
   "Categories": [
     "Items.Ingredients"
   ],
+  "Interactions": {
+    "Secondary": { "Interactions": [ { "Type": "HyDragonMiniwyvernAttune", "ArchetypeId": "fire" } ] }
+  },
   "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
-  "Texture": "Items/HyDragon/Draconic_Essence_Storm.png",
+  "Texture": "Items/HyDragon/Draconic_Essence_Fire.png",
   "PlayerAnimationsId": "Item",
   "IconProperties": {
     "Scale": 1.8,
@@ -33,7 +36,7 @@
   },
   "Scale": 1,
   "Light": {
-    "Color": "#032",
+    "Color": "#420",
     "Radius": 1
   },
   "MaxStack": 100,

@@ -1,0 +1,58 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Soul_Bond.name",
+    "Description": "server.items.Draconic_Soul_Bond.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Soul_Bond.png",
+  "Quality": "Epic",
+  "Categories": [
+    "Items.Tools"
+  ],
+  "Interactions": {
+    "Primary": {
+      "Interactions": [
+        {
+          "Type": "HyDragonSoulBond"
+        }
+      ]
+    }
+  },
+  "Recipe": {
+    "Input": [
+      { "ItemId": "Draconic_Essence", "Quantity": 4 },
+      { "ItemId": "Draconic_Scale", "Quantity": 4 },
+      { "ItemId": "Draconic_Essence_Nature", "Quantity": 1 },
+      { "ItemId": "Draconic_Essence_Wind", "Quantity": 1 }
+    ],
+    "Output": [
+      { "ItemId": "Draconic_Soul_Bond", "Quantity": 1 }
+    ],
+    "BenchRequirement": [
+      {
+        "Type": "Crafting",
+        "Id": "Draconic_Altar",
+        "Categories": [ "Draconic_Altar_Bonding" ]
+      }
+    ],
+    "TimeSeconds": 8
+  },
+  "Model": "Items/HyDragon/Draconic_Soul_Bond.blockymodel",
+  "Texture": "Items/HyDragon/Draconic_Soul_Bond.png",
+  "PlayerAnimationsId": "Item",
+  "IconProperties": {
+    "Scale": 1.6,
+    "Rotation": [ 0, 19, 3 ],
+    "Translation": [ 1, -5 ]
+  },
+  "Tags": {
+    "Type": [ "Tool" ]
+  },
+  "Scale": 2,
+  "MaxStack": 1,
+  "Light": {
+    "Color": "#A855F7",
+    "Radius": 2
+  },
+  "ItemSoundSetId": "ISS_Items_Gems",
+  "DropOnDeath": true
+}

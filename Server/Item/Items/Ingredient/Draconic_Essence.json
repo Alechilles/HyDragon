@@ -1,0 +1,13 @@
+{
+  "Parent": "Draconic_Essence_Nature",
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Essence.name",
+    "Description": "server.items.Draconic_Essence.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Essence.png",
+  "Texture": "Items/HyDragon/Draconic_Essence.png",
+  "Light": {
+    "Color": "#446688",
+    "Radius": 1
+  }
+}

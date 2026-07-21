@@ -1,0 +1,24 @@
+{
+  "Enabled": true,
+  "Priority": 200,
+  "RoleIds": [
+    "Tamed_RockDrakeT1",
+    "Tamed_RockDrakeT2",
+    "Tamed_RockDrakeT3"
+  ],
+  "Interactions": [
+    { "Type": "Mount", "Enabled": true },
+    {
+      "Type": "ModeCycle",
+      "Enabled": true,
+      "Cycle": [
+        { "State": "Follow", "Message": "Following" },
+        { "State": "Hold", "Message": "Staying" },
+        { "State": "Defend", "Message": "Defending" },
+        { "State": "Aggressive", "Message": "Aggressive" },
+        { "State": "Idle", "Message": "Wandering" }
+      ],
+      "ShowFloatingText": true
+    }
+  ]
+}

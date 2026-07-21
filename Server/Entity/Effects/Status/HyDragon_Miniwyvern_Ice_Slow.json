@@ -1,0 +1,13 @@
+{
+  "Name": "server.effects.miniwyvernIceSlow.name",
+  "ApplicationEffects": {
+    "HorizontalSpeedMultiplier": 0.5,
+    "EntityBottomTint": "#38BDF8",
+    "EntityTopTint": "#E0F2FE"
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 4.0
+}

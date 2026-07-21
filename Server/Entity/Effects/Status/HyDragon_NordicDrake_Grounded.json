@@ -1,0 +1,13 @@
+{
+  "Name": "Grounded",
+  "ApplicationEffects": {
+    "HorizontalSpeedMultiplier": 0.35,
+    "EntityBottomTint": "#6B7280",
+    "EntityTopTint": "#CBD5E1"
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 45.0
+}

@@ -1,0 +1,11 @@
+{
+  "Name": "server.effects.miniwyvernLightningBoon.name",
+  "ApplicationEffects": {
+    "HorizontalSpeedMultiplier": 1.15,
+    "EntityBottomTint": "#EAB308",
+    "EntityTopTint": "#FEF08A"
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Duration": 8.0
+}

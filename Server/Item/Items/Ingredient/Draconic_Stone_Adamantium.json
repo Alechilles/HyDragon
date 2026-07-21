@@ -1,0 +1,32 @@
+{
+  "Parent": "Draconic_Stone",
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Stone_Adamantium.name",
+    "Description": "server.items.Draconic_Stone_Adamantium.description"
+  },
+  "Icon": "Icons/ItemsGenerated/Draconic_Stone_Adamantium.png",
+  "Texture": "Items/HyDragon/Draconic_Stone_Adamantium.png",
+  "Recipe": {
+    "Input": [
+      { "ItemId": "Ingredient_Bar_Adamantite", "Quantity": 4 },
+      { "ItemId": "Draconic_Scale", "Quantity": 8 },
+      { "ItemId": "Draconic_Essence", "Quantity": 4 },
+      { "ItemId": "Draconic_Essence_Fire", "Quantity": 1 }
+    ],
+    "Output": [ { "ItemId": "Draconic_Stone_Adamantium", "Quantity": 1 } ],
+    "BenchRequirement": [
+      { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Stones" ] }
+    ],
+    "TimeSeconds": 6
+  },
+  "Light": { "Color": "#DC2626", "Radius": 2 },
+  "State": {
+    "Filled": {
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Adamantium_Filled.name",
+        "Description": "server.items.Draconic_Stone_Adamantium_Filled.description"
+      },
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Adamantium.png"
+    }
+  }
+}

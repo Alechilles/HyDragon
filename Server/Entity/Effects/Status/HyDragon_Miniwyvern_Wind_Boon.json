@@ -1,0 +1,11 @@
+{
+  "Name": "server.effects.miniwyvernWindBoon.name",
+  "ApplicationEffects": {
+    "HorizontalSpeedMultiplier": 1.12,
+    "EntityBottomTint": "#10B981",
+    "EntityTopTint": "#A7F3D0"
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Duration": 8.0
+}

@@ -16,11 +16,11 @@
   "DefaultAttachments": [
     {
       "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
-      "Texture": "Items/HyDragon/Draconic_Essence_Igne.png"
+      "Texture": "Items/HyDragon/Draconic_Essence_Fire.png"
     }
   ],
   "Model": "Items/HyDragon/Draconic_Essence.blockymodel",
-  "Texture": "Items/HyDragon/Draconic_Essence_Igne.png",
+  "Texture": "Items/HyDragon/Draconic_Essence_Fire.png",
   "Light": {
     "Color": "#420",
     "Radius": 4
