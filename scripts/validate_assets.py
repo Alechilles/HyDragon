@@ -23,6 +23,10 @@ BANNED_PRE_RELEASE_TOKENS = (
     "WyverToxic",
     "WyvernIgneo",
     "WyvernVoid",
+    "AlbineTexture",
+    "IgnesTexture",
+    "LumenTexture",
+    "MusgTexture",
 )
 PLACEHOLDER = re.compile(r"\{[^{}]+\}|%(?:\d+\$)?[a-zA-Z]")
 
