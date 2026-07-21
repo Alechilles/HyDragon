@@ -47,6 +47,10 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
         Universe universe = Universe.get();
         World world = universe == null ? null : universe.getWorlds().get(worldName);
         if (world == null) return;
+        if (world.isInThread()) {
+            callback.accept(new Port(world, markerType));
+            return;
+        }
         try {
             world.execute(() -> callback.accept(new Port(world, markerType)));
         } catch (RejectedExecutionException ignored) {

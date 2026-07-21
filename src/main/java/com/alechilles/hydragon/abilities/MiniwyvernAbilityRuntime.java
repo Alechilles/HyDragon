@@ -31,6 +31,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
     private final Clock clock;
     private final List<AutoCloseable> subscriptions = new ArrayList<>();
     private boolean started;
+    private String tickCursor;
 
     public MiniwyvernAbilityRuntime(
             TameworkApi api,
@@ -62,11 +63,30 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
 
     /** Reconciles every persisted Soul Bond Miniwyvern; intended for a bounded periodic scheduler. */
     public void tickAll() {
-        long nowMs = clock.millis();
-        for (ProfileExtensionRecord extension : stateStore.snapshot().profileExtensions().values()) {
-            if (extension.kind() != ProfileKind.SOULBOUND_MINIWYVERN) continue;
-            tickProfile(extension.profileId().toString(), nowMs);
+        tickSome(Integer.MAX_VALUE);
+    }
+
+    /** Round-robin bounded polling entry point for the live server bridge. */
+    public synchronized int tickSome(int maximumProfiles) {
+        if (maximumProfiles <= 0) throw new IllegalArgumentException("maximumProfiles must be positive");
+        List<String> profileIds = stateStore.snapshot().profileExtensions().values().stream()
+                .filter(extension -> extension.kind() == ProfileKind.SOULBOUND_MINIWYVERN)
+                .map(extension -> extension.profileId().toString())
+                .sorted()
+                .toList();
+        if (profileIds.isEmpty()) {
+            tickCursor = null;
+            return 0;
         }
+        int start = tickCursor == null ? 0 : insertionPointAfter(profileIds, tickCursor);
+        int count = Math.min(maximumProfiles, profileIds.size());
+        long nowMs = clock.millis();
+        for (int offset = 0; offset < count; offset++) {
+            String profileId = profileIds.get((start + offset) % profileIds.size());
+            tickProfile(profileId, nowMs);
+            tickCursor = profileId;
+        }
+        return count;
     }
 
     public void tickProfile(String profileId, long nowMs) {
@@ -146,5 +166,11 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         }
         subscriptions.clear();
         started = false;
+        tickCursor = null;
+    }
+
+    private static int insertionPointAfter(List<String> values, String cursor) {
+        int index = java.util.Collections.binarySearch(values, cursor);
+        return index >= 0 ? (index + 1) % values.size() : Math.min(values.size() - 1, -index - 1);
     }
 }

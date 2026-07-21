@@ -29,6 +29,7 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
     private final Clock clock;
     private final List<AutoCloseable> handles = new ArrayList<>();
     private boolean started;
+    private String tickCursor;
 
     public DynamicEncounterRuntime(
             TameworkApi api,
@@ -87,6 +88,12 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
                 encounterId, targetNpcUuid, sourceId, buildup, definition, world, clock.millis());
     }
 
+    /** Read-only lookup used by the registered Hytale damage bridge. */
+    public EncounterRecord find(String encounterId) {
+        if (encounterId == null || encounterId.isBlank()) return null;
+        return stateStore.snapshot().encounters().get(encounterId);
+    }
+
     public void reconcileAll() {
         long now = clock.millis();
         for (EncounterRecord record : stateStore.snapshot().encounters().values()) {
@@ -98,13 +105,32 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
     }
 
     public void tickAll() {
+        tickSome(Integer.MAX_VALUE);
+    }
+
+    /** Round-robin bounded polling entry point for the live server bridge. */
+    public synchronized int tickSome(int maximumRecords) {
+        if (maximumRecords <= 0) throw new IllegalArgumentException("maximumRecords must be positive");
         long now = clock.millis();
-        for (EncounterRecord record : stateStore.snapshot().encounters().values()) {
-            DragonEncounterConfig definition = configs.get().encounters().get(record.definitionId());
-            if (definition == null) continue;
-            worlds.dispatch(record.worldName(), record.targetNpcUuid().orElse(null),
-                    world -> coordinator.tick(record.encounterId(), definition, world, now));
+        List<EncounterRecord> records = stateStore.snapshot().encounters().values().stream()
+                .sorted(java.util.Comparator.comparing(EncounterRecord::encounterId))
+                .toList();
+        if (records.isEmpty()) {
+            tickCursor = null;
+            return 0;
         }
+        int start = insertionPointAfter(records, tickCursor);
+        int count = Math.min(maximumRecords, records.size());
+        for (int offset = 0; offset < count; offset++) {
+            EncounterRecord record = records.get((start + offset) % records.size());
+            DragonEncounterConfig definition = configs.get().encounters().get(record.definitionId());
+            if (definition != null) {
+                worlds.dispatch(record.worldName(), record.targetNpcUuid().orElse(null),
+                        world -> coordinator.tick(record.encounterId(), definition, world, now));
+            }
+            tickCursor = record.encounterId();
+        }
+        return count;
     }
 
     private CaptureRequirementDecision captureRequirement(UUID targetNpcUuid, CaptureRequirementSpec spec) {
@@ -143,5 +169,19 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         }
         handles.clear();
         started = false;
+        tickCursor = null;
+    }
+
+    private static int insertionPointAfter(List<EncounterRecord> records, String cursor) {
+        if (cursor == null) return 0;
+        int low = 0;
+        int high = records.size() - 1;
+        while (low <= high) {
+            int middle = (low + high) >>> 1;
+            int comparison = records.get(middle).encounterId().compareTo(cursor);
+            if (comparison <= 0) low = middle + 1;
+            else high = middle - 1;
+        }
+        return low >= records.size() ? 0 : low;
     }
 }

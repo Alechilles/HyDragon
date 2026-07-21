@@ -21,6 +21,17 @@ public final class HyDragonEncounterRegistrationFacade {
         return HyDragonEncounterComponent.register(plugin);
     }
 
+    /**
+     * Setup-time registration for the persistent marker and post-filter damage system.
+     * Bind the returned runtime after both feature runtimes are installed during plugin start.
+     */
+    public static HyDragonEncounterServerRuntime registerServerRuntime(JavaPlugin plugin) {
+        ComponentType<EntityStore, HyDragonEncounterComponent> marker = registerComponents(plugin);
+        HyDragonEncounterServerRuntime runtime = new HyDragonEncounterServerRuntime(marker);
+        plugin.getEntityStoreRegistry().registerSystem(new HyDragonEncounterDamageSystem(runtime, marker));
+        return runtime;
+    }
+
     public static DynamicEncounterRuntime install(
             TameworkApi api,
             HyDragonStateStore stateStore,
