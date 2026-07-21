@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.alecstamework.api.*;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
+import com.alechilles.hydragon.persistence.ProfileKind;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Optional;
@@ -44,6 +45,10 @@ class SoulBondServiceTest {
         assertEquals(0, retry.consumeCalls);
         assertEquals(1, retry.releaseCalls);
         assertEquals(profile, store.snapshot().playerSoulBond(owner).orElseThrow().profileId().orElseThrow());
+        var extension = store.snapshot().profileExtension(profile).orElseThrow();
+        assertEquals(ProfileKind.SOULBOUND_MINIWYVERN, extension.kind());
+        assertEquals(Optional.of("neutral"), extension.archetypeId());
+        assertEquals(Optional.of(operationId), extension.lastOperationId());
         assertEquals(OperationJournal.Phase.COMMITTED,
                 new StateStoreOperationJournal(store, () -> 1234L).find(operationId).orElseThrow().phase());
     }

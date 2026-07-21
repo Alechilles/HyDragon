@@ -182,6 +182,60 @@ public final class HyDragonStateStore {
     }
 
     /**
+     * Atomically completes a Soul Bond and creates the HyDragon-owned neutral Miniwyvern extension.
+     * Neither record is published unless the same file generation contains both.
+     */
+    public MutationOutcome completeSoulBondWithMiniwyvernProfile(
+            UUID playerUuid,
+            String operationId,
+            UUID profileId,
+            long claimedAtEpochMillis) throws IOException {
+        Objects.requireNonNull(playerUuid, "playerUuid");
+        operationId = requiredText(operationId, "operationId");
+        Objects.requireNonNull(profileId, "profileId");
+        if (claimedAtEpochMillis < 0) {
+            throw new IllegalArgumentException("claimedAtEpochMillis must not be negative");
+        }
+        synchronized (mutationLock) {
+            MutationOutcome playerBlock = mutationBlock(
+                    PersistentRecordType.PLAYER_SOUL_BOND, playerUuid.toString());
+            if (playerBlock != null) return playerBlock;
+            MutationOutcome profileBlock = mutationBlock(
+                    PersistentRecordType.PROFILE_EXTENSION, profileId.toString());
+            if (profileBlock != null) return profileBlock;
+
+            PlayerSoulBondRecord currentPlayer = snapshot.playerSoulBonds().get(playerUuid);
+            if (currentPlayer == null || currentPlayer.state() == SoulBondState.UNCLAIMED
+                    || !hasOperation(currentPlayer, operationId)) {
+                return MutationOutcome.CONFLICT;
+            }
+            if (currentPlayer.profileId().isPresent()
+                    && !currentPlayer.profileId().orElseThrow().equals(profileId)) {
+                return MutationOutcome.CONFLICT;
+            }
+
+            ProfileExtensionRecord desiredProfile = ProfileExtensionRecord.soulboundMiniwyvern(
+                    profileId, "miniwyvern", "neutral", Optional.of(operationId));
+            ProfileExtensionRecord currentProfile = snapshot.profileExtensions().get(profileId);
+            if (currentProfile != null && !currentProfile.equals(desiredProfile)) {
+                return MutationOutcome.CONFLICT;
+            }
+
+            PlayerSoulBondRecord desiredPlayer = PlayerSoulBondRecord.claimed(
+                    playerUuid, operationId, profileId, claimedAtEpochMillis);
+            if (desiredPlayer.equals(currentPlayer) && desiredProfile.equals(currentProfile)) {
+                return MutationOutcome.ALREADY_APPLIED;
+            }
+
+            Properties next = copyProperties(committedProperties);
+            writePlayer(next, desiredPlayer);
+            writeProfile(next, desiredProfile);
+            commit(next);
+            return MutationOutcome.APPLIED;
+        }
+    }
+
+    /**
      * Records an ambiguous external result for startup repair. This may create a record when an external
      * operation succeeded before the local pending write was observed.
      */

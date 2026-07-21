@@ -31,6 +31,27 @@ class HyDragonStateStoreTest {
     Path temporaryDirectory;
 
     @Test
+    void completesSoulBondAndNeutralMiniwyvernExtensionInOneGeneration() throws Exception {
+        UUID owner = UUID.randomUUID();
+        UUID profile = UUID.randomUUID();
+        String operationId = "hydragon:soul-bond:" + owner;
+        HyDragonStateStore store = new HyDragonStateStore(
+                temporaryDirectory.resolve("atomic-soul-bond.properties"));
+
+        assertEquals(MutationOutcome.APPLIED, store.beginSoulBond(owner, operationId));
+        assertEquals(MutationOutcome.APPLIED,
+                store.completeSoulBondWithMiniwyvernProfile(owner, operationId, profile, 42L));
+        assertEquals(MutationOutcome.ALREADY_APPLIED,
+                store.completeSoulBondWithMiniwyvernProfile(owner, operationId, profile, 42L));
+
+        assertEquals(profile, store.snapshot().playerSoulBond(owner).orElseThrow().profileId().orElseThrow());
+        ProfileExtensionRecord extension = store.snapshot().profileExtension(profile).orElseThrow();
+        assertEquals(ProfileKind.SOULBOUND_MINIWYVERN, extension.kind());
+        assertEquals(Optional.of("neutral"), extension.archetypeId());
+        assertEquals(Optional.of(operationId), extension.lastOperationId());
+    }
+
+    @Test
     void restartRoundTripBuildsReconciliationInventory() throws Exception {
         Path file = temporaryDirectory.resolve("hydragon-state.properties");
         HyDragonStateStore first = new HyDragonStateStore(file);
