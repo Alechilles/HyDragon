@@ -59,27 +59,23 @@ public final class TameworkBridge {
                 Set.of("CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS"), List.of(), bootstrapIssue));
         gates.put(HyDragonFeature.BONDED_STONE_TRANSITIONS, gate(
                 HyDragonFeature.BONDED_STONE_TRANSITIONS, present,
-                Set.of("BONDED_VESSELS", "POPULATION_GROUPS"),
-                List.of("Bonded SUMMON/STORE needs a documented item-projection claim/apply/commit protocol"),
-                bootstrapIssue));
+                Set.of("BONDED_VESSELS", "POPULATION_GROUPS"), List.of(), bootstrapIssue));
         gates.put(HyDragonFeature.BONDED_STONE_REPAIR, gate(
                 HyDragonFeature.BONDED_STONE_REPAIR, present,
                 Set.of("BONDED_VESSELS", "POPULATION_GROUPS"), List.of(), bootstrapIssue));
         gates.put(HyDragonFeature.SOUL_BOND_CLAIM, gate(
                 HyDragonFeature.SOUL_BOND_CLAIM, present,
-                Set.of("COMPANION_PROVISIONING", "POPULATION_GROUPS", "PROFILE_DATA"),
-                List.of("Provisioning needs query-by-profile revision/origin and restart-safe activate/revive transitions"),
-                bootstrapIssue));
+                Set.of("PROFILES", "POLICY", "PERSISTENCE_RESILIENCE", "COMPANION_PROVISIONING",
+                        "POPULATION_GROUPS", "INTERACTION_EXTENSIONS"),
+                List.of(), bootstrapIssue));
         gates.put(HyDragonFeature.MINIWYVERN_ATTUNEMENT, gate(
                 HyDragonFeature.MINIWYVERN_ATTUNEMENT, present,
-                Set.of("PROFILE_DATA", "PROGRESSION_MUTATIONS"),
-                List.of("Profile data queue acceptance is not a durable CAS/item-consumption transaction"),
-                bootstrapIssue));
+                Set.of("PROFILES", "PROFILE_DATA", "PROFILE_DATA_TRANSACTIONS", "PROGRESSION_MUTATIONS"),
+                List.of(), bootstrapIssue));
         gates.put(HyDragonFeature.MINIWYVERN_ABILITIES, gate(
                 HyDragonFeature.MINIWYVERN_ABILITIES, present,
-                Set.of("EVENTS", "PROFILE_DATA", "TRAIT_EFFECTS"),
-                List.of("Provisioned companion events need origin namespace and command-link-independent lifecycle coverage"),
-                bootstrapIssue));
+                Set.of("EVENTS", "PROFILE_DATA", "PROFILE_DATA_TRANSACTIONS", "TRAIT_EFFECTS"),
+                List.of(), bootstrapIssue));
         gates.put(HyDragonFeature.DYNAMIC_ENCOUNTERS, gate(
                 HyDragonFeature.DYNAMIC_ENCOUNTERS, present,
                 Set.of("CAPTURE_POLICY", "POPULATION_GROUPS"), List.of(), bootstrapIssue));

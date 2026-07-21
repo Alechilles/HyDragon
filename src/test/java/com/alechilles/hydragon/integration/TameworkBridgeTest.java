@@ -25,24 +25,26 @@ class TameworkBridgeTest {
                 .containsAll(Set.of("CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS")));
         assertFalse(snapshot.feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
         assertFalse(snapshot.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT).available());
-        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT).missingCapabilities().isEmpty());
-        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT).reason().contains("durable CAS"));
+        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT).missingCapabilities()
+                .contains("PROFILE_DATA_TRANSACTIONS"));
     }
 
     @Test
     void newCapabilitiesEnableOnlyFullySpecifiedContracts() {
         Set<String> capabilities = new HashSet<>(BASELINE_08);
         capabilities.addAll(Set.of(
-                "CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS", "COMPANION_PROVISIONING"));
+                "CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS", "COMPANION_PROVISIONING",
+                "PROFILE_DATA_TRANSACTIONS"));
 
         TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("0.9.0", capabilities, null);
 
         assertTrue(snapshot.feature(HyDragonFeature.CAPTURE_AND_BOND).available());
         assertTrue(snapshot.feature(HyDragonFeature.BONDED_STONE_REPAIR).available());
         assertTrue(snapshot.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS).available());
-        assertFalse(snapshot.feature(HyDragonFeature.BONDED_STONE_TRANSITIONS).available());
-        assertFalse(snapshot.feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
-        assertFalse(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
+        assertTrue(snapshot.feature(HyDragonFeature.BONDED_STONE_TRANSITIONS).available());
+        assertTrue(snapshot.feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
+        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT).available());
+        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
     }
 
     @Test
