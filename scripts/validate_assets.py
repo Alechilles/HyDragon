@@ -515,6 +515,10 @@ def validate_repair_interaction(parsed: dict[Path, object], errors: list[str]) -
         fail(errors, "repair interaction must be attached to the held Damaged stone state")
     if isinstance(essence, dict) and "HyDragonRepairBondedStone" in json.dumps(essence):
         fail(errors, "Revitalizing Essence must be reserved from inventory, not used as the held repair authority")
+    secondary = essence.get("Interactions", {}).get("Secondary", {}).get("Interactions") \
+        if isinstance(essence, dict) else None
+    if secondary != []:
+        fail(errors, "Revitalizing Essence must explicitly clear the Fire Essence attunement interaction it inherits")
 
 
 def main() -> int:

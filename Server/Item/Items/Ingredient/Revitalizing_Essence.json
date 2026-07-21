@@ -7,6 +7,11 @@
   "Icon": "Icons/ItemsGenerated/Revitalizing_Essence.png",
   "Texture": "Items/HyDragon/Revitalizing_Essence.png",
   "Quality": "Rare",
+  "Interactions": {
+    "Secondary": {
+      "Interactions": []
+    }
+  },
   "Recipe": {
     "Input": [
       { "ItemId": "Draconic_Essence", "Quantity": 3 },
