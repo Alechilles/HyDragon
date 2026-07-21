@@ -24,9 +24,12 @@
   },
   "Phases": [ "AERIAL", "GROUNDING", "GROUNDED_CAPTURE_WINDOW" ],
   "Grounding": {
-    "BuildupSourceIds": [ "hydragon:lure_hit", "hydragon:stagger_hit" ],
+    "BuildupSourceIds": [
+      "projectile:Projectile_Config_Ice_Ball+item:Weapon_Staff_Frost",
+      "projectile:Projectile_Config_Bow_Pull_Pullshot+item:Weapon_Shortbow_Pull"
+    ],
     "Threshold": 100,
-    "GroundedState": "Grounded",
+    "GroundedState": "Combat.AirLand",
     "GroundedEffectId": "HyDragon_NordicDrake_Grounded",
     "CaptureWindowSeconds": 45
   },

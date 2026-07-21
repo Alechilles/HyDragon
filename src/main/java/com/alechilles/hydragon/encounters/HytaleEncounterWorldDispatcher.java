@@ -167,9 +167,18 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
                     || states.getStateHelper().getStateIndex(groundedState) < 0) {
                 return false;
             }
+            if (effects.hasEffect(effect)) return true;
             states.setState(target, groundedState, null, store);
             return effects.addEffect(target, effect, Math.max(0.05F, effect.getDuration()),
                     OverlapBehavior.OVERWRITE, store);
+        }
+
+        @Override
+        public boolean isGrounded(UUID targetNpcUuid) {
+            Ref<EntityStore> target = world.getEntityRef(targetNpcUuid);
+            if (!valid(target)) return false;
+            NPCEntity npc = store.getComponent(target, NPCEntity.getComponentType());
+            return npc != null && npc.getRole() != null && npc.getRole().isOnGround();
         }
 
         @Override

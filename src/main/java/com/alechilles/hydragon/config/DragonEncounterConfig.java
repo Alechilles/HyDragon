@@ -328,7 +328,18 @@ public final class DragonEncounterConfig
 
         private List<String> validate() {
             List<String> errors = new ArrayList<>();
-            if (buildupSourceIds.length == 0) errors.add("Grounding.BuildupSourceIds must not be empty");
+            if (buildupSourceIds.length < 2) {
+                errors.add("Grounding.BuildupSourceIds must declare a lure source followed by at least one stagger source");
+            }
+            java.util.Set<String> distinctSources = new java.util.LinkedHashSet<>();
+            for (String sourceId : buildupSourceIds) {
+                String normalized = trim(sourceId);
+                if (!isConcreteGroundingSource(normalized)) {
+                    errors.add("Grounding.BuildupSourceIds contains unsupported source: " + normalized);
+                } else if (!distinctSources.add(normalized)) {
+                    errors.add("Grounding.BuildupSourceIds contains duplicate source: " + normalized);
+                }
+            }
             if (!Double.isFinite(threshold) || threshold <= 0.0) errors.add("Grounding.Threshold must be positive");
             if (blank(groundedState)) errors.add("Grounding.GroundedState is required");
             if (blank(groundedEffectId)) errors.add("Grounding.GroundedEffectId is required");
@@ -339,10 +350,35 @@ public final class DragonEncounterConfig
         }
 
         public List<String> getBuildupSourceIds() { return List.of(buildupSourceIds.clone()); }
+        public String getLureSourceId() {
+            return buildupSourceIds.length == 0 ? "" : trim(buildupSourceIds[0]);
+        }
+        public List<String> getStaggerSourceIds() {
+            if (buildupSourceIds.length < 2) return List.of();
+            String[] stagger = java.util.Arrays.copyOfRange(buildupSourceIds, 1, buildupSourceIds.length);
+            return java.util.Arrays.stream(stagger).map(DragonEncounterConfig::trim).toList();
+        }
         public double getThreshold() { return threshold; }
         public String getGroundedState() { return trim(groundedState); }
         public String getGroundedEffectId() { return trim(groundedEffectId); }
         public long getCaptureWindowMs() { return secondsToMs(captureWindowSeconds); }
+
+        private static boolean isConcreteGroundingSource(String sourceId) {
+            if (sourceId.isEmpty()) return false;
+            String[] parts = sourceId.split("\\+", -1);
+            if (parts.length == 0 || parts.length > 3) return false;
+            java.util.Set<String> kinds = new java.util.HashSet<>();
+            for (String part : parts) {
+                int separator = part.indexOf(':');
+                if (separator <= 0 || separator == part.length() - 1) return false;
+                String kind = part.substring(0, separator);
+                if (!kind.equals("projectile") && !kind.equals("item") && !kind.equals("damage_cause")) {
+                    return false;
+                }
+                if (!kinds.add(kind)) return false;
+            }
+            return true;
+        }
     }
 
     public static final class CleanupSettings {

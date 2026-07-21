@@ -14,6 +14,9 @@ public interface EncounterWorldGateway {
 
     boolean applyGroundedState(UUID targetNpcUuid, String groundedState, String groundedEffectId);
 
+    /** Returns true only after the NPC's motion controller has authoritatively reached ground. */
+    boolean isGrounded(UUID targetNpcUuid);
+
     boolean retireTarget(UUID targetNpcUuid, String reason);
 
     record SpawnRequest(

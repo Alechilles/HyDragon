@@ -221,23 +221,44 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
             Store<EntityStore> store) {
         Set<String> allowed = Set.copyOf(definition.getGrounding().getBuildupSourceIds());
         LinkedHashSet<String> candidates = new LinkedHashSet<>();
+        String projectileId = null;
         if (damage.getSource() instanceof Damage.ProjectileSource projectileSource) {
             Ref<EntityStore> projectileRef = projectileSource.getProjectile();
             ProjectileComponent projectile = projectileRef != null && projectileRef.isValid()
                     ? store.getComponent(projectileRef, ProjectileComponent.getComponentType()) : null;
             if (projectile != null && projectile.getProjectileAssetName() != null) {
-                candidates.add("projectile:" + projectile.getProjectileAssetName());
+                projectileId = projectile.getProjectileAssetName();
             }
-            candidates.add("hydragon:lure_hit");
-        } else {
-            ItemStack held = InventoryComponent.getItemInHand(store, sourceRef);
-            if (!ItemStack.isEmpty(held) && held.getItemId() != null) candidates.add("item:" + held.getItemId());
-            candidates.add("hydragon:stagger_hit");
         }
-        if (damage.getCause() != null && damage.getCause().getId() != null) {
-            candidates.add("damage_cause:" + damage.getCause().getId());
-        }
+        ItemStack held = InventoryComponent.getItemInHand(store, sourceRef);
+        String itemId = ItemStack.isEmpty(held) ? null : held.getItemId();
+        String damageCauseId = damage.getCause() == null ? null : damage.getCause().getId();
+        candidates.addAll(groundingSourceCandidates(projectileId, itemId, damageCauseId));
         return candidates.stream().filter(allowed::contains).findFirst().orElse(null);
+    }
+
+    static List<String> groundingSourceCandidates(String projectileId, String itemId, String damageCauseId) {
+        String projectile = sourcePart("projectile", projectileId);
+        String item = sourcePart("item", itemId);
+        String cause = sourcePart("damage_cause", damageCauseId);
+        LinkedHashSet<String> candidates = new LinkedHashSet<>();
+        addCombination(candidates, projectile, item, cause);
+        addCombination(candidates, projectile, item);
+        addCombination(candidates, projectile, cause);
+        addCombination(candidates, item, cause);
+        addCombination(candidates, projectile);
+        addCombination(candidates, item);
+        addCombination(candidates, cause);
+        return List.copyOf(candidates);
+    }
+
+    private static String sourcePart(String kind, String id) {
+        return id == null || id.isBlank() ? null : kind + ':' + id.trim();
+    }
+
+    private static void addCombination(Set<String> candidates, String... parts) {
+        for (String part : parts) if (part == null) return;
+        candidates.add(String.join("+", parts));
     }
 
     @Override

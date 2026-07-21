@@ -62,7 +62,8 @@ class DynamicEncounterCoordinatorTest {
         assertEquals(1, world.spawnCalls);
 
         DynamicEncounterCoordinator.TransitionResult progress = coordinator.groundingHit(
-                admitted.encounterId(), TARGET, "hydragon:lure_hit", 40.0D, definition, world, 61_000L);
+                admitted.encounterId(), TARGET, "projectile:Lure+item:LureTool", 40.0D,
+                definition, world, 61_000L);
         assertEquals(EncounterPhase.GROUNDING, progress.phase());
         assertEquals(40.0D, progress.buildup());
 
@@ -72,10 +73,52 @@ class DynamicEncounterCoordinatorTest {
         assertEquals(40.0D, recovered.buildup());
 
         DynamicEncounterCoordinator.TransitionResult grounded = coordinator.groundingHit(
-                admitted.encounterId(), TARGET, "hydragon:stagger_hit", 60.0D, definition, world, 63_000L);
+                admitted.encounterId(), TARGET, "projectile:Stagger+item:StaggerTool", 60.0D,
+                definition, world, 63_000L);
         assertEquals(EncounterPhase.GROUNDED_CAPTURE_WINDOW, grounded.phase());
         assertTrue(coordinator.captureAllowed(TARGET));
         assertEquals(1, world.groundedCalls);
+    }
+
+    @Test
+    void staggerCannotSkipLureAndCaptureWaitsForPhysicalGrounding() throws Exception {
+        TameworkApi api = api(new AtomicBoolean(false));
+        HyDragonStateStore stateStore = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, stateStore, new EncounterEligibilityService(api, stateStore));
+        FakeWorld world = new FakeWorld();
+        world.grounded = false;
+        DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
+                definition, snapshot(definition, speciesConfig()),
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L);
+
+        DynamicEncounterCoordinator.TransitionResult outOfOrder = coordinator.groundingHit(
+                admitted.encounterId(), TARGET, "projectile:Stagger+item:StaggerTool", 100.0D,
+                definition, world, 61_000L);
+        assertFalse(outOfOrder.transitioned());
+        assertEquals("grounding-lure-required", outOfOrder.reason());
+
+        DynamicEncounterCoordinator.TransitionResult lure = coordinator.groundingHit(
+                admitted.encounterId(), TARGET, "projectile:Lure+item:LureTool", 100.0D,
+                definition, world, 62_000L);
+        assertEquals(EncounterPhase.GROUNDING, lure.phase());
+        assertFalse(coordinator.captureAllowed(TARGET));
+
+        DynamicEncounterCoordinator.TransitionResult descent = coordinator.groundingHit(
+                admitted.encounterId(), TARGET, "projectile:Stagger+item:StaggerTool", 1.0D,
+                definition, world, 63_000L);
+        assertEquals("grounding-descent-active", descent.reason());
+        assertEquals(EncounterPhase.GROUNDING, descent.phase());
+        assertFalse(coordinator.captureAllowed(TARGET));
+
+        world.grounded = true;
+        DynamicEncounterCoordinator.TransitionResult landed = coordinator.tick(
+                admitted.encounterId(), definition, world, 64_000L);
+        assertEquals("capture-window-open", landed.reason());
+        assertEquals(EncounterPhase.GROUNDED_CAPTURE_WINDOW, landed.phase());
+        assertTrue(coordinator.captureAllowed(TARGET));
     }
 
     @Test
@@ -183,9 +226,12 @@ class DynamicEncounterCoordinatorTest {
         set(config.getAdmission(), "globalLimit", 2);
         set(config, "phases", new String[] { "AERIAL", "GROUNDING", "GROUNDED_CAPTURE_WINDOW" });
         set(config.getGrounding(), "buildupSourceIds",
-                new String[] { "hydragon:lure_hit", "hydragon:stagger_hit" });
+                new String[] {
+                        "projectile:Lure+item:LureTool",
+                        "projectile:Stagger+item:StaggerTool"
+                });
         set(config.getGrounding(), "threshold", 100.0D);
-        set(config.getGrounding(), "groundedState", "Grounded");
+        set(config.getGrounding(), "groundedState", "Combat.AirLand");
         set(config.getGrounding(), "groundedEffectId", "test-grounded");
         set(config.getGrounding(), "captureWindowSeconds", 45.0D);
         set(config.getCleanupAndCooldown(), "encounterTimeoutSeconds", 10.0D);
@@ -252,6 +298,7 @@ class DynamicEncounterCoordinatorTest {
         int spawnCalls;
         int groundedCalls;
         int retireCalls;
+        boolean grounded = true;
 
         @Override public boolean isWorldThread() { return true; }
         @Override public SpawnResult spawn(SpawnRequest request) {
@@ -265,6 +312,7 @@ class DynamicEncounterCoordinatorTest {
             groundedCalls++;
             return true;
         }
+        @Override public boolean isGrounded(UUID targetNpcUuid) { return grounded; }
         @Override public boolean retireTarget(UUID targetNpcUuid, String reason) {
             retireCalls++;
             return true;

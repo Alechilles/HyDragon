@@ -134,8 +134,17 @@ public final class DynamicEncounterCoordinator {
             if (!definition.getGrounding().getBuildupSourceIds().contains(sourceId)) {
                 return TransitionResult.denied("grounding-source-not-allowed");
             }
+            if (checkpoint.phase() == EncounterPhase.AERIAL
+                    && !definition.getGrounding().getLureSourceId().equals(sourceId)) {
+                return TransitionResult.denied("grounding-lure-required");
+            }
+            if (checkpoint.phase() == EncounterPhase.GROUNDING
+                    && !definition.getGrounding().getStaggerSourceIds().contains(sourceId)) {
+                return TransitionResult.denied("grounding-stagger-required");
+            }
             double total = Math.min(definition.getGrounding().getThreshold(), checkpoint.groundingBuildup() + buildup);
-            if (total < definition.getGrounding().getThreshold()) {
+            if (checkpoint.phase() == EncounterPhase.AERIAL
+                    || total < definition.getGrounding().getThreshold()) {
                 EncounterRecord grounding = update(current,
                         new EncounterCheckpoint(EncounterPhase.GROUNDING, total), current.targetNpcUuid(),
                         checkpoint.phase() == EncounterPhase.GROUNDING ? current.phaseStartedAtEpochMillis() : nowMs,
@@ -151,16 +160,7 @@ public final class DynamicEncounterCoordinator {
             if (!put(thresholdReached)) {
                 return TransitionResult.denied("grounding-threshold-checkpoint-failed");
             }
-            if (!world.applyGroundedState(targetNpcUuid,
-                    definition.getGrounding().getGroundedState(), definition.getGrounding().getGroundedEffectId())) {
-                return TransitionResult.denied("grounded-state-apply-failed");
-            }
-            EncounterRecord grounded = update(thresholdReached,
-                    EncounterCheckpoint.of(EncounterPhase.GROUNDED_CAPTURE_WINDOW), thresholdReached.targetNpcUuid(),
-                    nowMs, nowMs, saturatingAdd(nowMs, definition.getGrounding().getCaptureWindowMs()));
-            return put(grounded)
-                    ? new TransitionResult(true, "capture-window-open", EncounterPhase.GROUNDED_CAPTURE_WINDOW, total)
-                    : TransitionResult.denied("grounded-checkpoint-failed");
+            return advanceGrounding(thresholdReached, definition, world, nowMs);
         }
     }
 
@@ -193,6 +193,10 @@ public final class DynamicEncounterCoordinator {
                             : TransitionResult.denied("cooldown-remove-failed");
                 }
                 return TransitionResult.denied("cooldown-active");
+            }
+            if (checkpoint.phase() == EncounterPhase.GROUNDING
+                    && checkpoint.groundingBuildup() >= definition.getGrounding().getThreshold()) {
+                return advanceGrounding(current, definition, world, nowMs);
             }
             boolean expired = nowMs >= saturatingAdd(current.createdAtEpochMillis(),
                     definition.getCleanupAndCooldown().getEncounterTimeoutMs());
@@ -270,6 +274,29 @@ public final class DynamicEncounterCoordinator {
                 .map(EncounterCheckpoint::phase)
                 .filter(EncounterPhase.GROUNDED_CAPTURE_WINDOW::equals)
                 .isPresent();
+    }
+
+    private TransitionResult advanceGrounding(
+            EncounterRecord current,
+            DragonEncounterConfig definition,
+            EncounterWorldGateway world,
+            long nowMs) {
+        UUID target = current.targetNpcUuid().orElse(null);
+        if (target == null) return TransitionResult.denied("encounter-target-missing");
+        if (!world.applyGroundedState(target,
+                definition.getGrounding().getGroundedState(), definition.getGrounding().getGroundedEffectId())) {
+            return TransitionResult.denied("grounding-sequence-apply-failed");
+        }
+        double buildup = decode(current).groundingBuildup();
+        if (!world.isGrounded(target)) {
+            return new TransitionResult(true, "grounding-descent-active", EncounterPhase.GROUNDING, buildup);
+        }
+        EncounterRecord grounded = update(current,
+                EncounterCheckpoint.of(EncounterPhase.GROUNDED_CAPTURE_WINDOW), current.targetNpcUuid(),
+                nowMs, nowMs, saturatingAdd(nowMs, definition.getGrounding().getCaptureWindowMs()));
+        return put(grounded)
+                ? new TransitionResult(true, "capture-window-open", EncounterPhase.GROUNDED_CAPTURE_WINDOW, buildup)
+                : TransitionResult.denied("grounded-checkpoint-failed");
     }
 
     private CaptureStatus captureStatus(UUID targetNpcUuid) {
