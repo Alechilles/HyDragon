@@ -19,8 +19,8 @@
     "AttitudeGroup": "Predators",
     "CombatRelativeTurnSpeed": 1.5,
     "MaxHealth": 80,
-    "IsTameable": true,
-    "TameRoleChange": "Tamed_Wyvern_Mini",
+    "IsTameable": false,
+    "TameRoleChange": "",
     "AttractiveItemSet": [
       "Food_Wildmeat_Raw",
       "Food_Chicken_Raw",

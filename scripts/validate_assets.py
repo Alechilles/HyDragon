@@ -227,6 +227,40 @@ def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str])
             if visit(parsed.get(path)):
                 fail(errors, f"production Miniwyvern spawn path remains: {path.relative_to(ROOT)}")
 
+    wild_role_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
+    wild_role = parsed.get(wild_role_path)
+    modify = wild_role.get("Modify") if isinstance(wild_role, dict) else None
+    if isinstance(modify, dict):
+        if modify.get("IsTameable") is not False:
+            fail(errors, "Soul Bond-only Miniwyvern wild role must set IsTameable to false")
+        if modify.get("TameRoleChange") not in (None, ""):
+            fail(errors, "Soul Bond-only Miniwyvern wild role must not expose TameRoleChange")
+
+
+def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[str]) -> None:
+    species_root = ROOT / "Server/HyDragon/DragonSpecies"
+    patch_root = ROOT / "Server/Tamework/Patches/HyDragon"
+    for species_path in sorted(species_root.glob("*.json")):
+        species = parsed.get(species_path)
+        if not isinstance(species, dict):
+            continue
+        wild_roles = set(species.get("WildRoleIds", []))
+        spawn = species.get("Spawn")
+        ordinary_ids = spawn.get("OrdinarySpawnAssetIds", []) if isinstance(spawn, dict) else []
+        for asset_id in ordinary_ids:
+            patch_path = patch_root / f"{asset_id}.json"
+            if not patch_path.is_file():
+                continue
+            patch = parsed.get(patch_path)
+            operations = patch.get("Operations", []) if isinstance(patch, dict) else []
+            inserted_roles = {
+                operation.get("Value", {}).get("Id")
+                for operation in operations
+                if isinstance(operation, dict) and isinstance(operation.get("Value"), dict)
+            }
+            if not inserted_roles.intersection(wild_roles):
+                fail(errors, f"spawn patch {patch_path.relative_to(ROOT)} inserts {sorted(inserted_roles)} but species declares {sorted(wild_roles)}")
+
 
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
     outputs = {
@@ -278,6 +312,7 @@ def main() -> int:
     validate_capture_configs(parsed, errors)
     validate_stone_tiers(parsed, errors)
     validate_no_miniwyvern_spawns(parsed, errors)
+    validate_spawn_patch_role_identity(parsed, errors)
     validate_altar_recipes(parsed, errors)
     if errors:
         for error in errors:

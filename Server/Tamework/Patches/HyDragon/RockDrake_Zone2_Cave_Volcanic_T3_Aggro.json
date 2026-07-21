@@ -17,6 +17,20 @@
         "SpawnBlockSet": "Volcanic",
         "Id": "RockDrakeT2"
       }
+    },
+    {
+      "Id": "append-rock-drake-t3",
+      "Op": "Insert",
+      "Path": "/NPCs",
+      "Position": "End",
+      "Existing": {
+        "Id": "RockDrakeT3"
+      },
+      "Value": {
+        "Weight": 4,
+        "SpawnBlockSet": "Volcanic",
+        "Id": "RockDrakeT3"
+      }
     }
   ]
 }
