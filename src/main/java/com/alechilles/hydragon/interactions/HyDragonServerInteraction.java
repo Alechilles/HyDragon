@@ -1,10 +1,12 @@
 package com.alechilles.hydragon.interactions;
 
+import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
@@ -14,6 +16,7 @@ import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -102,9 +105,21 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
             fail(context, firstRun, time, type, cooldownHandler);
             return;
         }
+        TransformComponent transform = commandBuffer.getComponent(
+                playerEntity, TransformComponent.getComponentType());
+        if (transform == null) {
+            reserved.orElseThrow().release();
+            commandBuffer.run(store -> player.sendMessage(unavailableMessage()));
+            fail(context, firstRun, time, type, cooldownHandler);
+            return;
+        }
+        PopulationAdmissionLocation destination = new PopulationAdmissionLocation(
+                world.getName(),
+                ChunkUtil.chunkCoordinate(transform.getPosition().x()),
+                ChunkUtil.chunkCoordinate(transform.getPosition().z()));
 
         HyDragonInteractionRuntime.dispatch(
-                        action(), player.getUuid(), world.getName(), archetypeId(),
+                        action(), player.getUuid(), world.getName(), destination, archetypeId(),
                         reserved.orElseThrow(), heldItemLocator)
                 .whenComplete((result, failure) -> sendResult(
                         worldUuid,

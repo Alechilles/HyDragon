@@ -1,6 +1,7 @@
 package com.alechilles.hydragon.runtime;
 
 import com.alechilles.alecstamework.api.BondedVesselTransitionRequest;
+import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,8 +27,11 @@ public final class HyDragonGameplayRuntime implements HyDragonInteractionRuntime
 
     @Override
     public CompletionStage<GameplayResult> soulBond(
-            UUID playerUuid, String worldName, ConsumableReservation reservation) {
-        return soulBonds.claim(playerUuid, worldName, reservation);
+            UUID playerUuid,
+            String worldName,
+            PopulationAdmissionLocation destination,
+            ConsumableReservation reservation) {
+        return soulBonds.claim(playerUuid, worldName, destination, reservation);
     }
 
     @Override

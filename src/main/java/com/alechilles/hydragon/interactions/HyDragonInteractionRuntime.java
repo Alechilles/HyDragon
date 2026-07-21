@@ -1,5 +1,6 @@
 package com.alechilles.hydragon.interactions;
 
+import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.runtime.ConsumableReservation;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import java.util.Objects;
@@ -32,6 +33,7 @@ public final class HyDragonInteractionRuntime {
     static CompletionStage<GameplayResult> dispatch(Action action,
                                                      UUID playerUuid,
                                                      String worldName,
+                                                     PopulationAdmissionLocation destination,
                                                      String archetypeId,
                                                      ConsumableReservation reservation,
                                                      HeldItemLocator heldItemLocator) {
@@ -42,7 +44,7 @@ public final class HyDragonInteractionRuntime {
         }
         try {
             return switch (action) {
-                case SOUL_BOND -> handler.soulBond(playerUuid, worldName, reservation);
+                case SOUL_BOND -> handler.soulBond(playerUuid, worldName, destination, reservation);
                 case ATTUNE -> handler.attune(playerUuid, archetypeId, reservation);
                 case REPAIR -> handler.repair(playerUuid, worldName, heldItemLocator, reservation);
             };
@@ -56,7 +58,10 @@ public final class HyDragonInteractionRuntime {
 
     public interface Handler {
         CompletionStage<GameplayResult> soulBond(
-                UUID playerUuid, String worldName, ConsumableReservation reservation);
+                UUID playerUuid,
+                String worldName,
+                PopulationAdmissionLocation destination,
+                ConsumableReservation reservation);
 
         CompletionStage<GameplayResult> attune(
                 UUID playerUuid, String archetypeId, ConsumableReservation reservation);

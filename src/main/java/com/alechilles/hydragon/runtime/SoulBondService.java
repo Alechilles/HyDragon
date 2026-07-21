@@ -1,6 +1,9 @@
 package com.alechilles.hydragon.runtime;
 
 import com.alechilles.alecstamework.api.CompanionProvisioningResult;
+import com.alechilles.alecstamework.api.CompanionProvisioningProjectionStatus;
+import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
+import com.alechilles.alecstamework.api.PopulationCompanionLifecycle;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,8 +31,20 @@ public final class SoulBondService {
     public CompletionStage<GameplayResult> claim(UUID playerUuid,
                                                   String ownershipWorldName,
                                                   ConsumableReservation item) {
+        return claim(playerUuid, ownershipWorldName,
+                new PopulationAdmissionLocation(ownershipWorldName, 0, 0), item);
+    }
+
+    public CompletionStage<GameplayResult> claim(UUID playerUuid,
+                                                  String ownershipWorldName,
+                                                  PopulationAdmissionLocation destination,
+                                                  ConsumableReservation item) {
         Objects.requireNonNull(playerUuid, "playerUuid");
         ownershipWorldName = requiredText(ownershipWorldName, "ownershipWorldName");
+        Objects.requireNonNull(destination, "destination");
+        if (!ownershipWorldName.equals(destination.worldName())) {
+            throw new IllegalArgumentException("destination must be in the ownership world");
+        }
         Objects.requireNonNull(item, "item");
         TameworkGameplayAdapter.Readiness readiness = tamework.soulBondReadiness();
         if (!readiness.ready()) return released(item, GameplayResult.unavailable(readiness.reason()));
@@ -105,16 +120,19 @@ public final class SoulBondService {
         }
 
         final String world = ownershipWorldName;
+        final PopulationAdmissionLocation activationDestination = destination;
         return tamework.provisionDormantMiniwyvern(playerUuid, operationId, world)
                 .handle((result, failure) -> failure == null ? result : null)
                 .thenCompose(result -> result == null
                         ? keepPending(playerUuid, operationId, Optional.empty(), item,
                         "Tamework provisioning result is unknown")
-                        : afterProvision(playerUuid, operationId, item, result));
+                        : afterProvision(playerUuid, operationId, world, activationDestination, item, result));
     }
 
     private CompletionStage<GameplayResult> afterProvision(UUID playerUuid,
                                                             String operationId,
+                                                            String ownershipWorldName,
+                                                            PopulationAdmissionLocation destination,
                                                             ConsumableReservation item,
                                                             CompanionProvisioningResult result) {
         if (!result.accepted() || result.profileId() == null) {
@@ -137,11 +155,12 @@ public final class SoulBondService {
             return keepPending(playerUuid, operationId, Optional.of(profileId), item,
                     "Miniwyvern exists but HyDragon could not durably link it");
         }
-        return item.consume().thenApply(consumed -> {
+        return item.consume().thenCompose(consumed -> {
             if (consumed != ConsumableReservation.Disposition.APPLIED
                     && consumed != ConsumableReservation.Disposition.ALREADY_APPLIED) {
                 ledger.reconcile(playerUuid, operationId, Optional.of(profileId));
-                return GameplayResult.reconciliation("Miniwyvern linked; Soul Bond consumption requires reconciliation");
+                return CompletableFuture.completedFuture(GameplayResult.reconciliation(
+                        "Miniwyvern linked; Soul Bond consumption requires reconciliation"));
             }
             OperationJournal.Decision material = journal.transition(
                     operationId, OperationJournal.Phase.PREPARED,
@@ -149,19 +168,54 @@ public final class SoulBondService {
                     new OperationJournal.Update(
                             Optional.of(result.operationId().toString()),
                             Optional.of(profileId.toString()),
-                            java.util.OptionalLong.empty(),
+                            java.util.OptionalLong.of(result.profileRevision()),
                             Optional.empty()));
             if (material == OperationJournal.Decision.CONFLICT || material == OperationJournal.Decision.UNAVAILABLE) {
                 ledger.reconcile(playerUuid, operationId, Optional.of(profileId));
-                return GameplayResult.reconciliation("Soul Bond consumed; journal closure requires reconciliation");
+                return CompletableFuture.completedFuture(GameplayResult.reconciliation(
+                        "Soul Bond consumed; journal closure requires reconciliation"));
             }
             OperationJournal.Decision closed = journal.transition(
                     operationId, OperationJournal.Phase.MATERIAL_CONSUMED,
                     OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
-            return closed == OperationJournal.Decision.APPLIED || closed == OperationJournal.Decision.ALREADY_APPLIED
-                    ? GameplayResult.applied("Soul Bond claimed")
-                    : GameplayResult.reconciliation("Soul Bond succeeded; final journal closure is pending");
+            if (closed != OperationJournal.Decision.APPLIED
+                    && closed != OperationJournal.Decision.ALREADY_APPLIED) {
+                return CompletableFuture.completedFuture(GameplayResult.reconciliation(
+                        "Soul Bond succeeded; final journal closure is pending"));
+            }
+            return activate(playerUuid, operationId, profileId, result.profileRevision(),
+                    ownershipWorldName, destination);
         });
+    }
+
+    private CompletionStage<GameplayResult> activate(
+            UUID playerUuid,
+            String operationId,
+            UUID profileId,
+            long expectedProfileRevision,
+            String ownershipWorldName,
+            PopulationAdmissionLocation destination) {
+        return tamework.activateDormantMiniwyvern(
+                        playerUuid,
+                        operationId + ":activate",
+                        profileId.toString(),
+                        expectedProfileRevision,
+                        ownershipWorldName,
+                        destination.chunkX(),
+                        destination.chunkZ())
+                .handle((result, failure) -> {
+                    if (failure != null || result == null) {
+                        return GameplayResult.applied(
+                                "Soul Bond claimed; Miniwyvern activation is pending recovery");
+                    }
+                    boolean active = result.accepted()
+                            && result.lifecycle() == PopulationCompanionLifecycle.ACTIVE
+                            && result.projectionStatus() == CompanionProvisioningProjectionStatus.ACTIVE;
+                    return active
+                            ? GameplayResult.applied("Soul Bond claimed and Miniwyvern activated")
+                            : GameplayResult.applied(
+                            "Soul Bond claimed; Miniwyvern activation is pending recovery");
+                });
     }
 
     private CompletionStage<GameplayResult> keepPending(UUID playerUuid,
