@@ -2,7 +2,6 @@
   "Enabled": true,
   "Priority": 200,
   "RoleIds": [
-    "Wyvern_Mini",
     "Tamed_Wyvern_Mini"
   ],
   "Interactions": [
@@ -31,7 +30,7 @@
           "Pitch": 2
         },
         "SpawnParticles": {
-          "ParticleSystem": "Pet_Heal",
+          "ParticleSystem": "Effect_Heal",
           "Color": "#fe6969",
           "Offset": [
             0,
@@ -53,6 +52,10 @@
         {
           "State": "Hold",
           "Message": "server.messages.mode.staying"
+        },
+        {
+          "State": "Defend",
+          "Message": "server.messages.mode.defending"
         },
         {
           "State": "Idle",

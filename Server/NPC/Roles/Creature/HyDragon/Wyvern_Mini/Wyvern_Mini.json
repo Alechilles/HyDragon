@@ -26,7 +26,7 @@
       "Food_Chicken_Raw",
       "Food_Fish_Raw"
     ],
-    "InteractionConfigId": "HyDragonIntWyvernMini",
+    "InteractionConfigId": "",
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"
     }

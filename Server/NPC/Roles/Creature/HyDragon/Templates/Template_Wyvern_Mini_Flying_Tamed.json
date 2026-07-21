@@ -4,7 +4,7 @@
   "Appearance": {
     "Compute": "Appearance"
   },
-  "StartState": "Idle",
+  "StartState": "Follow",
   "Parameters": {
     "Appearance": {
       "Value": "Wyvern_Mini",
@@ -55,6 +55,47 @@
       "Value": "",
       "Description": "Optional TwInteractionConfig asset id override."
     },
+    "MasterTargetSlot": {
+      "Value": "MasterTarget",
+      "Description": "Marked target slot containing the companion owner."
+    },
+    "HardLeashDistance": {
+      "Value": 30,
+      "Description": "Maximum distance from the owner before combat is cancelled and Follow resumes."
+    },
+    "AbsoluteDetectionRange": {
+      "Value": 4,
+      "Description": "Range where a hostile threat to the owner is detected regardless of sight or sound."
+    },
+    "Attack": {
+      "Value": "Root_NPC_Wyvern_Mini_Bite",
+      "Description": "Base bite used for Defend and Attack Target combat assistance."
+    },
+    "AttackDistance": {
+      "Value": 2.75,
+      "Description": "Distance at which the Miniwyvern can execute its bite."
+    },
+    "AttackPauseRange": {
+      "Value": [
+        1.25,
+        1.75
+      ],
+      "Description": "Minimum delay between bite attacks."
+    },
+    "CombatAttackPreDelay": {
+      "Value": [
+        0.15,
+        0.25
+      ],
+      "Description": "Delay before a committed bite."
+    },
+    "CombatAttackPostDelay": {
+      "Value": [
+        0.3,
+        0.45
+      ],
+      "Description": "Recovery delay after a bite."
+    },
     "CanFollow": {
       "Value": true,
       "Description": "Whether command-driven Follow behavior is enabled for this role."
@@ -62,6 +103,18 @@
     "CanHold": {
       "Value": true,
       "Description": "Whether command-driven Hold behavior is enabled for this role."
+    },
+    "CanDefend": {
+      "Value": true,
+      "Description": "Whether command-driven Defend behavior is enabled for this role."
+    },
+    "CanAttackTarget": {
+      "Value": true,
+      "Description": "Whether an owner may command this role to attack an explicitly selected valid target."
+    },
+    "IsMountable": {
+      "Value": false,
+      "Description": "Soulbound Miniwyverns are companions and can never be mounted."
     },
     "IsMemory": {
       "Value": true,
@@ -155,7 +208,110 @@
         },
         {
           "Type": "State",
+          "State": "Defend"
+        },
+        {
+          "Type": "State",
           "State": "Land"
+        }
+      ]
+    },
+    {
+      "$Comment": "Keep owner-relative modes bounded and fail safe when their owner target is unavailable.",
+      "Continue": true,
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          {
+            "Type": "Or",
+            "Sensors": [
+              {
+                "Type": "State",
+                "State": "Idle"
+              },
+              {
+                "Type": "State",
+                "State": "Defend"
+              }
+            ]
+          },
+          {
+            "Type": "Target",
+            "TargetSlot": {
+              "Compute": "MasterTargetSlot"
+            }
+          },
+          {
+            "Type": "Not",
+            "Sensor": {
+              "Type": "Target",
+              "TargetSlot": {
+                "Compute": "MasterTargetSlot"
+              },
+              "Range": {
+                "Compute": "HardLeashDistance"
+              }
+            }
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "ReleaseTarget",
+          "TargetSlot": "LockedTarget"
+        },
+        {
+          "Type": "State",
+          "State": "Follow"
+        }
+      ]
+    },
+    {
+      "$Comment": "Reject the owner and friendly/allied locked targets before Defend can attack.",
+      "Continue": true,
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          {
+            "Type": "State",
+            "State": "Defend"
+          },
+          {
+            "Type": "Or",
+            "Sensors": [
+              {
+                "Type": "Target",
+                "TargetSlot": "LockedTarget",
+                "Filters": [
+                  {
+                    "Type": "TameworkIsOwner"
+                  }
+                ]
+              },
+              {
+                "Type": "Target",
+                "TargetSlot": "LockedTarget",
+                "Filters": [
+                  {
+                    "Type": "TameworkAttitudeFromTargetSlot",
+                    "SourceTargetSlot": {
+                      "Compute": "MasterTargetSlot"
+                    },
+                    "Attitudes": [
+                      "Friendly"
+                    ],
+                    "UseSelfWhenSourceMissing": false
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "ReleaseTarget",
+          "TargetSlot": "LockedTarget"
         }
       ]
     },
@@ -287,6 +443,67 @@
                 "FollowSeekRelativeSpeed": 0.9,
                 "FollowHoverRadius": 1.75,
                 "FollowHoverRelativeSpeed": 0.12
+              }
+            }
+          ]
+        },
+        {
+          "$Comment": "Defend and Attack Target share Tamework's owner-safe combat state and retain the Miniwyvern bite.",
+          "Enabled": {
+            "Compute": "CanDefend || CanAttackTarget"
+          },
+          "Sensor": {
+            "Type": "State",
+            "State": "Defend"
+          },
+          "Instructions": [
+            {
+              "Reference": "Component_Tamework_Instruction_Defend",
+              "Modify": {
+                "HardLeashDistance": {
+                  "Compute": "HardLeashDistance"
+                },
+                "AlertedRange": {
+                  "Compute": "ViewRange"
+                },
+                "ViewSector": {
+                  "Compute": "ViewSector"
+                },
+                "HearingRange": {
+                  "Compute": "HearingRange"
+                },
+                "AbsoluteDetectionRange": {
+                  "Compute": "AbsoluteDetectionRange"
+                },
+                "ViewRange": {
+                  "Compute": "ViewRange"
+                },
+                "Attack": {
+                  "Compute": "Attack"
+                },
+                "AttackDistance": {
+                  "Compute": "AttackDistance"
+                },
+                "AttackPauseRange": {
+                  "Compute": "AttackPauseRange"
+                },
+                "CombatAttackPreDelay": {
+                  "Compute": "CombatAttackPreDelay"
+                },
+                "CombatAttackPostDelay": {
+                  "Compute": "CombatAttackPostDelay"
+                },
+                "CombatBehaviorDistance": 8,
+                "CombatBackOffDistanceRange": [
+                  2.5,
+                  4
+                ],
+                "CombatStrafeWeight": 4,
+                "CombatDirectWeight": 8,
+                "CombatAlwaysMovingWeight": 8,
+                "ChaseRelativeSpeed": 0.9,
+                "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Flying",
+                "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
               }
             }
           ]
@@ -532,6 +749,9 @@
             },
             "LovedItems": {
               "Compute": "AttractiveItemSet"
+            },
+            "IsMountable": {
+              "Compute": "IsMountable"
             }
           }
         ]
@@ -559,6 +779,9 @@
             },
             "LovedItems": {
               "Compute": "AttractiveItemSet"
+            },
+            "IsMountable": {
+              "Compute": "IsMountable"
             }
           }
         ]
