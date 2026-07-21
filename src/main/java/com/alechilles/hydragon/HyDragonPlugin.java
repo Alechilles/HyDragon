@@ -5,10 +5,15 @@ import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
 import com.alechilles.hydragon.config.StoneMaintenanceConfig;
+import com.alechilles.hydragon.integration.TameworkBridge;
+import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
+import com.alechilles.hydragon.interactions.HyDragonRepairBondedStoneInteraction;
+import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
 import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.assetstore.event.RemovedAssetsEvent;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import java.util.logging.Level;
@@ -19,6 +24,7 @@ import javax.annotation.Nullable;
 public final class HyDragonPlugin extends JavaPlugin {
     private static HyDragonPlugin instance;
     private final HyDragonConfigRepository configRepository = new HyDragonConfigRepository();
+    private TameworkBridge tameworkBridge;
 
     public HyDragonPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -27,23 +33,28 @@ public final class HyDragonPlugin extends JavaPlugin {
 
     @Override
     protected void setup() {
+        registerInteractionCodecs();
+        tameworkBridge = TameworkBridge.connect();
         registerConfigAssets();
         getLogger().at(Level.INFO).log("HyDragon plugin setup complete.");
     }
 
     @Override
     protected void start() {
+        tameworkBridge = TameworkBridge.connect();
         configRepository.refreshFromAssetRegistry();
         HyDragonConfigRepository.Snapshot config = configRepository.snapshot();
         Level level = config.isValid() ? Level.INFO : Level.WARNING;
         getLogger().at(level).log("HyDragon enabled with %d species, %d Miniwyvern archetypes, "
-                        + "%d encounters, and %d config issue(s).",
-                config.species().size(), config.archetypes().size(), config.encounters().size(), config.issues().size());
+                        + "%d encounters, %d config issue(s), and Tamework Public API %s.",
+                config.species().size(), config.archetypes().size(), config.encounters().size(), config.issues().size(),
+                tameworkBridge.snapshot().apiVersion());
     }
 
     @Override
     protected void shutdown() {
         getLogger().at(Level.INFO).log("HyDragon disabled.");
+        tameworkBridge = null;
         instance = null;
     }
 
@@ -56,6 +67,26 @@ public final class HyDragonPlugin extends JavaPlugin {
     @Nonnull
     public HyDragonConfigRepository getConfigRepository() {
         return configRepository;
+    }
+
+    @Nullable
+    public TameworkBridge getTameworkBridge() {
+        return tameworkBridge;
+    }
+
+    private void registerInteractionCodecs() {
+        getCodecRegistry(Interaction.CODEC).register(
+                HyDragonSoulBondInteraction.TYPE_ID,
+                HyDragonSoulBondInteraction.class,
+                HyDragonSoulBondInteraction.CODEC);
+        getCodecRegistry(Interaction.CODEC).register(
+                HyDragonMiniwyvernAttuneInteraction.TYPE_ID,
+                HyDragonMiniwyvernAttuneInteraction.class,
+                HyDragonMiniwyvernAttuneInteraction.CODEC);
+        getCodecRegistry(Interaction.CODEC).register(
+                HyDragonRepairBondedStoneInteraction.TYPE_ID,
+                HyDragonRepairBondedStoneInteraction.class,
+                HyDragonRepairBondedStoneInteraction.CODEC);
     }
 
     private void registerConfigAssets() {
