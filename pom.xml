@@ -21,6 +21,7 @@
         <tamework.version>3.0.0</tamework.version>
         <tamework.jar.path>${project.basedir}/../alecstamework/target/Alec's Tamework! v${tamework.version}.jar</tamework.jar.path>
         <junit.version>5.10.2</junit.version>
+        <hydragon.python.executable>python</hydragon.python.executable>
         <argLine></argLine>
     </properties>
 
@@ -105,6 +106,27 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>validate-hydragon-assets</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${hydragon.python.executable}</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+                                <argument>${project.basedir}/scripts/validate_assets.py</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.4.2</version>
@@ -127,6 +149,25 @@
                     <useModulePath>false</useModulePath>
                     <systemPropertyVariables>
                         <hydragon.project.basedir>${project.basedir}</hydragon.project.basedir>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                    <systemPropertyVariables>
+                        <hydragon.packaged.jar>${project.build.directory}/${project.build.finalName}.jar</hydragon.packaged.jar>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
