@@ -1,7 +1,6 @@
 package com.alechilles.hydragon.abilities;
 
 import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -10,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 /**
@@ -158,7 +158,8 @@ public final class MiniwyvernAbilityService {
         String passiveSource = sourceKey(context.profileId(), config.getId(), "passive");
         Map<String, String> supportedEffectModifiers = new LinkedHashMap<>();
         Map<String, Double> supportedRawModifiers = new LinkedHashMap<>();
-        List<String> diagnostics = new ArrayList<>();
+        Map<String, Double> rawModifierCandidates = new LinkedHashMap<>();
+        Set<String> unsupportedModifiers = new TreeSet<>();
         for (Map.Entry<String, Double> modifier : config.getPassiveModifiers().entrySet()) {
             String modifierId = modifier.getKey();
             if (isModifierConstraint(modifierId) || isNatureSchedulerSetting(modifierId)) continue;
@@ -169,23 +170,40 @@ public final class MiniwyvernAbilityService {
                         modifierId, modifier.getValue(), maximum, effectId)) {
                     supportedEffectModifiers.put(modifierId, effectId);
                 } else {
-                    diagnostics.add("owner-modifier-effect-unavailable:" + modifierId);
+                    unsupportedModifiers.add(modifierId);
                 }
-            } else if (world.supportsOwnerModifiers(Map.of(modifierId, modifier.getValue()))) {
-                supportedRawModifiers.put(modifierId, modifier.getValue());
             } else {
-                diagnostics.add("owner-modifier-unavailable:" + modifierId);
+                rawModifierCandidates.put(modifierId, modifier.getValue());
             }
         }
-        boolean hasPassive = !config.getPassiveEffects().isEmpty()
-                || !supportedEffectModifiers.isEmpty() || !supportedRawModifiers.isEmpty();
+        if (!rawModifierCandidates.isEmpty()) {
+            if (world.supportsOwnerModifiers(rawModifierCandidates)) {
+                supportedRawModifiers.putAll(rawModifierCandidates);
+            } else {
+                unsupportedModifiers.addAll(rawModifierCandidates.keySet());
+            }
+        }
+        boolean passiveDisabled = !unsupportedModifiers.isEmpty();
+        List<String> diagnostics = passiveDisabled
+                ? List.of("passive-ability-disabled:" + String.join("+", unsupportedModifiers))
+                : List.of();
+        boolean hasPassive = !passiveDisabled && (!config.getPassiveEffects().isEmpty()
+                || !supportedEffectModifiers.isEmpty() || !supportedRawModifiers.isEmpty());
+        boolean cleanupDisabledPassive = false;
+        if (passiveDisabled) {
+            cleanupDisabledPassive = state.sources.remove(passiveSource);
+            cleanupDisabledPassive |= state.targetsBySource.remove(passiveSource) != null;
+            if (cleanupDisabledPassive) state.updatedAt = nowMs;
+            supportedEffectModifiers.clear();
+            supportedRawModifiers.clear();
+        }
         if (hasPassive) {
             state.sources.add(passiveSource);
             state.targetsBySource.put(passiveSource, context.ownerUuid());
         }
 
         double natureHeal = 0.0D;
-        if (config.getId().equals("nature")) {
+        if (!passiveDisabled && config.getId().equals("nature")) {
             String abilityId = "nature_regeneration";
             long next = state.cooldowns.getOrDefault(abilityId, 0L);
             if (nowMs >= next) {
@@ -200,6 +218,7 @@ public final class MiniwyvernAbilityService {
         return new PassiveExecution(
                 passiveSource,
                 hasPassive,
+                cleanupDisabledPassive,
                 natureHeal,
                 Map.copyOf(supportedEffectModifiers),
                 Map.copyOf(supportedRawModifiers),
@@ -213,6 +232,15 @@ public final class MiniwyvernAbilityService {
             MiniwyvernAbilityWorld world) {
         int applied = 0;
         boolean gameplayApplied = false;
+        if (passive.cleanupDisabledPassive()) {
+            for (String effectId : config.getPassiveEffects()) {
+                world.removeEffect(context.ownerUuid(), passive.sourceKey(), effectId);
+            }
+            for (String effectId : new LinkedHashSet<>(config.getPassiveModifierEffects().values())) {
+                world.removeEffect(context.ownerUuid(), passive.sourceKey(), effectId);
+            }
+            world.removeOwnerModifiers(context.ownerUuid(), passive.sourceKey());
+        }
         if (passive.hasPassive()) {
             double refreshSeconds = passiveRefreshSeconds(config);
             for (String effectId : config.getPassiveEffects()) {
@@ -490,6 +518,7 @@ public final class MiniwyvernAbilityService {
     private record PassiveExecution(
             String sourceKey,
             boolean hasPassive,
+            boolean cleanupDisabledPassive,
             double natureHeal,
             Map<String, String> effectModifiers,
             Map<String, Double> rawModifiers,

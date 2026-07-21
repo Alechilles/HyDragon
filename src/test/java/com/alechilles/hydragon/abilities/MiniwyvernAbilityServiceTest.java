@@ -101,7 +101,7 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
-    void unsupportedOptionalOwnerModifierDoesNotSuppressAppearanceMovementOrCombat() throws Exception {
+    void unsupportedLightningModifierDisablesWholePassiveButKeepsAppearanceAndCombat() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
         world.ownerModifiersSupported = false;
@@ -110,9 +110,11 @@ class MiniwyvernAbilityServiceTest {
                 context("lightning"), Map.of("lightning", lightningConfig()), world, 1_000L);
 
         assertTrue(result.ready());
-        assertTrue(result.reason().contains("owner-modifier-unavailable:ActionSpeedMultiplier"));
+        assertEquals(
+                "ready-with-degraded-semantics:passive-ability-disabled:ActionSpeedMultiplier",
+                result.reason());
         assertEquals("Wyvern_Mini_Lightning", world.appearanceId);
-        assertEquals(1, world.effects, "the validated horizontal-speed effect remains active");
+        assertEquals(0, world.effects, "a partial movement-only substitute is forbidden");
         assertEquals(1, world.damageApplications, "the archetype's combat ability remains active");
         assertEquals(0, world.ownerModifierApplications);
     }
@@ -128,10 +130,59 @@ class MiniwyvernAbilityServiceTest {
                 context("lightning"), Map.of("lightning", lightningConfig()), world, 1_000L);
 
         assertTrue(result.ready());
-        assertTrue(result.reason().contains("owner-modifier-effect-unavailable:MovementSpeedMultiplier"));
+        assertEquals(
+                "ready-with-degraded-semantics:passive-ability-disabled:"
+                        + "ActionSpeedMultiplier+MovementSpeedMultiplier",
+                result.reason());
         assertEquals("Wyvern_Mini_Lightning", world.appearanceId);
         assertEquals(0, world.effects);
         assertEquals(1, world.damageApplications);
+    }
+
+    @Test
+    void unsupportedWindModifiersDisableWholePassiveButKeepAppearanceAndCombat() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.ownerModifiersSupported = false;
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context("wind"), Map.of("wind", windConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertEquals(
+                "ready-with-degraded-semantics:passive-ability-disabled:JumpMultiplier+MobilityMultiplier",
+                result.reason());
+        assertEquals("Wyvern_Mini_Wind", world.appearanceId);
+        assertEquals(0, world.effects, "movement cannot survive as a partial passive substitute");
+        assertEquals(0, world.ownerModifierApplications);
+        assertEquals(1, world.projectiles, "the independent wind attack remains active");
+    }
+
+    @Test
+    void disablingPassiveRemovesPreviouslyAppliedSourceAndEffect() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+        MiniwyvernArchetypeConfig lightning = lightningConfig();
+
+        MiniwyvernAbilityService.TickResult supported = service.tick(
+                context("lightning"), Map.of("lightning", lightning), world, 1_000L);
+        assertEquals("ready", supported.reason());
+        assertEquals(1, world.effects);
+        assertEquals(1, world.ownerModifierApplications);
+        assertTrue(states.current.appliedSourceKeys().stream().anyMatch(key -> key.endsWith(":passive")));
+
+        world.ownerModifiersSupported = false;
+        MiniwyvernAbilityService.TickResult disabled = service.tick(
+                context("lightning"), Map.of("lightning", lightning), world, 2_000L);
+
+        assertEquals(
+                "ready-with-degraded-semantics:passive-ability-disabled:ActionSpeedMultiplier",
+                disabled.reason());
+        assertEquals(1, world.removedEffects);
+        assertEquals(1, world.ownerModifierRemovals);
+        assertFalse(states.current.appliedSourceKeys().stream().anyMatch(key -> key.endsWith(":passive")));
+        assertFalse(states.current.targetBySourceKey().keySet().stream().anyMatch(key -> key.endsWith(":passive")));
     }
 
     @Test
@@ -324,6 +375,39 @@ class MiniwyvernAbilityServiceTest {
         return config;
     }
 
+    private static MiniwyvernArchetypeConfig windConfig() throws Exception {
+        MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
+        set(config, "id", "wind");
+        set(config, "essenceSemanticId", "wind");
+        set(config, "essenceItemId", "Draconic_Essence_Wind");
+        set(config, "appearanceId", "Wyvern_Mini_Wind");
+        set(config, "particleAndSoundIds", new String[0]);
+        set(config, "passiveEffects", new String[0]);
+        set(config, "passiveModifiers", Map.of(
+                "MovementSpeedMultiplier", 1.12D,
+                "JumpMultiplier", 1.15D,
+                "MobilityMultiplier", 1.10D,
+                "MaximumMovementSpeedMultiplier", 1.20D,
+                "MaximumJumpMultiplier", 1.25D));
+        set(config, "passiveModifierEffects", Map.of(
+                "MovementSpeedMultiplier", "test-wind-boon"));
+        set(config, "fallbackBehavior", "BASIC_BITE");
+
+        MiniwyvernArchetypeConfig.Ability ability = construct(MiniwyvernArchetypeConfig.Ability.class);
+        set(ability, "id", "wind_burst");
+        set(ability, "trigger", "COMBAT_INTERVAL");
+        set(ability, "targetPolicy", "OWNER_HOSTILE_ONLY");
+        set(ability, "range", 14.0D);
+        set(ability, "cooldownSeconds", 8.0D);
+        set(ability, "projectileId", "test-wind-projectile");
+        set(ability, "magnitude", 1.5D);
+        set(ability, "durationSeconds", 0.0D);
+        set(ability, "stackingPolicy", "CLAMPED");
+        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[] { ability });
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
     private static MiniwyvernArchetypeConfig voidConfig() throws Exception {
         MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
         set(config, "id", "void");
@@ -389,6 +473,8 @@ class MiniwyvernAbilityServiceTest {
         int effects;
         int projectiles;
         int ownerModifierApplications;
+        int ownerModifierRemovals;
+        int removedEffects;
         int damageApplications;
         int healApplications;
         int presentations;
@@ -435,7 +521,10 @@ class MiniwyvernAbilityServiceTest {
             effectTargets.add(entityUuid);
             return true;
         }
-        @Override public boolean removeEffect(UUID entityUuid, String sourceKey, String effectId) { return true; }
+        @Override public boolean removeEffect(UUID entityUuid, String sourceKey, String effectId) {
+            removedEffects++;
+            return true;
+        }
         @Override public boolean supportsOwnerModifiers(Map<String, Double> modifiers) {
             return ownerModifiersSupported;
         }
@@ -460,7 +549,10 @@ class MiniwyvernAbilityServiceTest {
             ownerModifierApplications++;
             return true;
         }
-        @Override public boolean removeOwnerModifiers(UUID ownerUuid, String sourceKey) { return true; }
+        @Override public boolean removeOwnerModifiers(UUID ownerUuid, String sourceKey) {
+            ownerModifierRemovals++;
+            return true;
+        }
         @Override public int emitPresentation(UUID entityUuid, List<String> particleAndSoundIds) {
             presentations += particleAndSoundIds.size();
             return particleAndSoundIds.size();
