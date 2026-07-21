@@ -1,6 +1,6 @@
 # Draconic Capture, Summoning, and Maintenance Specification
 
-Status: Draft implementation contract
+Status: Implementation complete; release verification pending
 Scope: Full-sized dragons only; Miniwyvern is specified separately
 
 ## 1. Purpose and boundaries
@@ -34,7 +34,7 @@ Related specifications:
 
 - **HYD-CAP-001:** Initial Draconic Stone capture MUST allow only configured wild full-dragon roles; storing may target only the exact linked tamed full-dragon profile. Miniwyvern roles MUST always be denied, including after config reload or capability degradation.
 - **HYD-CAP-002:** A wild capture attempt MUST require a living target, capture-eligible role, range and line-of-interaction validity, health at or below the configured threshold, and `Tw_Status_Tranquilized`. The current 20% health threshold is the initial default.
-- **HYD-CAP-003:** HyDragon MUST ship Iron, Thorium, Cobalt, Adamantium, and Ancient/Mithril stone tiers with strictly increasing capture power. The current English `Draconic_Stone` source asset becomes the canonical Iron-tier item.
+- **HYD-CAP-003:** HyDragon MUST ship Iron, Thorium, Cobalt, Adamantium, and Ancient/Mithril stone tiers with strictly increasing capture power. The English `Draconic_Stone` asset is the canonical Iron-tier item.
 - **HYD-CAP-004:** Each full-dragon species/difficulty MUST declare capture resistance, minimum eligible stone tier, base chance or modifier inputs, and whether special encounter conditions are required.
 - **HYD-CAP-005:** The Ancient/Mithril tier MUST succeed with 100% probability once every non-probability eligibility condition is satisfied. It MUST NOT bypass health, tranquilizer, ownership, encounter, capacity, or role requirements.
 - **HYD-CAP-006:** Capture validation and the random roll MUST execute within the Tamework capture-policy transaction. HyDragon MUST provide policy inputs and presentation but MUST NOT perform an independent pre-roll.
@@ -223,23 +223,23 @@ The config schema may reserve namespaced data for a future `DURATION` or `ENERGY
 - A dropped stolen stone remains linked to its original owner. A non-owner can inspect it but cannot summon, store, repair, or transfer it.
 - Administrative recovery must relink or return the unique vessel; it must never clone the profile into a second stone.
 
-## 10. Pre-release asset and configuration changes
+## 10. Implemented asset and configuration changes
 
-Current implementation gaps and required first-release changes:
+The implementation contains the following first-release changes. Release verification must still prove the resulting assets, runtime paths, and packaged references together.
 
-| Current state | Required change |
+| Earlier source state | Implemented result |
 | --- | --- |
-| One `Draconic_Stone` tier | Use it as the canonical Iron tier; add four tiers and parented Tamework configs |
-| Capture is deterministic | Introduce Tamework capture-policy data; Ancient only is guaranteed |
-| One allowlist mixes wild capture and tamed roles | Restrict initial capture to wild roles; use the bonded-vessel store path only for the exact linked tamed profile |
-| Filled state returns to empty on spawn | Enable the Tamework bonded-vessel mode; never clear the link on summon |
-| Stone allows Miniwyvern | Remove both Miniwyvern roles and their tamed override before enabling Soul Bond |
-| Rock Drakes are absent from allowlist | Add only after their tamed roles and species capture data pass validation |
-| 500 ms capture/spawn cooldown | Retain only as/replace with explicit technical anti-spam cooldown; do not present as balance cooldown |
-| No damaged/active item states | Add item variants, icons/models, localization, and lifecycle mapping |
-| No HyDragon command asset/config | Add a role-scoped command surface or expose equivalent bonded-stone actions |
+| One `Draconic_Stone` tier | `Draconic_Stone` is the canonical Iron tier; four higher tiers and parented Tamework configs are present. |
+| Deterministic-only capture | Tamework capture-policy data provides tiered probability; Ancient is guaranteed only after eligibility. |
+| Mixed wild/tamed allowlist | Initial capture is wild-role-only; storage targets the exact linked tamed profile through the vessel path. |
+| Filled state returned to empty | Bonded-vessel mode preserves the profile link across summon/store states. |
+| Stone allowed Miniwyvern | Wild and tamed Miniwyvern roles are excluded; Soul Bond provisioning is their only creation path. |
+| Rock Drakes absent from capture data | Rock Drake tamed roles and tier-specific capture declarations are included. |
+| Technical 500 ms cooldown | Technical anti-spam and the Tamework-owned 10,000 ms transition cooldown are distinct. |
+| No damaged/active item states | Active, stored, damaged/dead, lost, and unavailable mappings have canonical assets and localization. |
+| No HyDragon command asset/config | The role-scoped Tamework command configuration is present. |
 
-HyDragon has never been released. Development-only filled stones, captured profiles, and test worlds are not supported upgrade inputs and may be reset while implementing this model. The release MUST NOT contain a reader or compatibility path for their earlier formats.
+HyDragon has never been released. There are zero HyDragon migration or legacy-compatibility requirements: development-only filled stones, captured profiles, and test worlds are not supported upgrade inputs. The first release contains no reader, alias, adoption flow, or compatibility path for earlier development formats.
 
 ## 11. Configuration and asset map
 
@@ -273,12 +273,12 @@ These paths match the config families fixed by the [Tamework integration contrac
 - Non-owner, inventory-full, unsafe-placement, missing-capability, and restart-mid-operation tests leave recoverable state and no duplicates.
 - A clean first-release installation uses only the canonical bonded-stone schema and contains no pre-release compatibility reader, alias, or adoption path.
 
-## 13. Phased dependencies
+## 13. Implemented dependency map
 
 | Phase | HyDragon work | Required Tamework work |
 | --- | --- | --- |
-| C0 | Remove Miniwyvern from stone allowlist; add role/content validation | Existing public API |
-| C1 | Add tier items, recipes, species capture data, and UX | [Capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) |
-| C2 | Implement persistent bonded-stone states | [Bonded vessels](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/bonded-vessels.md) |
+| C0 | Miniwyvern exclusion and role/content validation | Existing public API |
+| C1 | Tier items, recipes, species capture data, and UX | [Capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) |
+| C2 | Persistent bonded-stone states | [Bonded vessels](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/bonded-vessels.md) |
 | C3 | Enforce one active full dragon | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) |
-| C4 | Add swap cooldown, death damage, repair, and restart recovery | C1-C3 and [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) |
+| C4 | Swap cooldown, death damage, repair, and restart recovery | C1-C3 and [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) |

@@ -1,6 +1,7 @@
 # Draconic Soul Bond and Miniwyvern Specification
 
-Status: Draft implementation contract; backpack deferred post-MVP
+Status: Implementation complete; release verification pending
+Deferred: Miniwyvern backpack and Tamework companion inventory remain post-MVP
 Scope: The unique, Soul Bond-exclusive Miniwyvern companion
 
 ## 1. Purpose and boundaries
@@ -145,13 +146,13 @@ When that update is implemented, the backpack feature is capability-gated. Missi
 
 | Archetype | Accepted essence semantic ID | Existing asset reuse |
 | --- | --- | --- |
-| Lightning | `lightning` | Current Storm/Thunder source art may be adapted, then renamed to canonical English Lightning asset filenames |
-| Wind | `wind` | New canonical essence and appearance required |
-| Ice | `ice` | Current Cryo source art may be adapted, then renamed to canonical English Ice asset filenames |
-| Fire | `fire` | Current Igne/Igneo source art may be adapted, then renamed to canonical English Fire asset filenames |
-| Water | `water` | New canonical essence and appearance required |
-| Nature | `nature` | Nature assets may be adapted |
-| Void | `void` | Void assets may be adapted |
+| Lightning | `lightning` | Canonical English Lightning essence and appearance assets |
+| Wind | `wind` | Canonical Wind essence and appearance assets |
+| Ice | `ice` | Canonical English Ice essence and appearance assets |
+| Fire | `fire` | Canonical English Fire essence and appearance assets |
+| Water | `water` | Canonical Water essence and appearance assets |
+| Nature | `nature` | Canonical Nature essence and appearance assets |
+| Void | `void` | Canonical Void essence and appearance assets |
 
 Canonical item IDs and direct pre-release renames are defined in [Dragon content and encounters](dragon-content-encounters.md).
 
@@ -209,7 +210,7 @@ If the base game cannot safely express one requested modifier, that ability must
 - Tamed role parameters and Tamework interaction/companion/population configs; inventory config is deferred.
 - `Server/HyDragon/MiniwyvernArchetypes/*.json` domain definitions.
 
-### Plugin runtime work
+### Implemented plugin runtime
 
 - Once-per-player ledger and crash-safe claim transaction.
 - Provisioned-profile creation/link reconciliation.
@@ -217,20 +218,20 @@ If the base game cannot safely express one requested modifier, that ability must
 - Ability scheduler/targeting and source-keyed buff/debuff cleanup.
 - Capability gating and operator diagnostics.
 
-### Tamework work
+### Implemented Tamework dependencies
 
 - Canonical profile, ownership, events, profile data, attachment synchronization.
 - Group limit `one owned / one active` enforcement.
 - Post-MVP only: generic nine-slot inventory persistence/UI/transactions.
 
-## 11. Pre-release configuration cleanup
+## 11. Completed pre-release configuration cleanup
 
-Miniwyvern is currently allowed by `Server/Tamework/Items/Spawners/HyDragonDraconicStone.json` even though it has no production world spawn. Before the first release:
+The implemented configuration establishes the following clean first-release state:
 
-1. Remove `Wyvern_Mini`, `Tamed_Wyvern_Mini`, and the corresponding tamed-role override from every stone config.
-2. Remove any development-only capture/adoption configuration and start the released entitlement ledger at `UNCLAIMED` for every player.
-3. Do not implement profile adoption, filled-stone conversion, alias states, or other compatibility behavior for pre-release Miniwyvern data.
-4. Reset development/test profiles or worlds when needed to validate the clean first-release path.
+1. `Wyvern_Mini`, `Tamed_Wyvern_Mini`, and the corresponding tamed-role override are absent from every stone config.
+2. The Soul Bond entitlement ledger starts at `UNCLAIMED`; no development capture/adoption configuration is registered.
+3. No profile adoption, filled-stone conversion, alias state, or other compatibility behavior exists for pre-release Miniwyvern data.
+4. Because HyDragon has never been released, no migration of development/test profiles or worlds is supported or required.
 
 ## 12. Configuration and asset map
 
@@ -240,7 +241,7 @@ Miniwyvern is currently allowed by `Server/Tamework/Items/Spawners/HyDragonDraco
 | `Server/HyDragon/MiniwyvernArchetypes/*.json` | Seven archetype behavior definitions |
 | `Server/Tamework/Companion/HyDragonMiniwyvern.json` | Recall/recovery/cross-world behavior |
 | `Server/Tamework/Interactions/HyDragonIntWyvernMini.json` | MVP Feed, mode, and attunement entry points; backpack action added only in the later update |
-| Tamework population-group asset path | `hydragon:soulbound_mini`, one owned/one active |
+| `Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json` | `hydragon:soulbound_mini`, one owned/one active |
 | Deferred Tamework companion-inventory asset path | Post-MVP nine-slot owner-only backpack |
 | `Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/` | Tamed role; wild role retained only if required internally for provisioning |
 | `Server/Models/HyDragon/Wyvern_Mini/` | Neutral and archetype appearances |
@@ -248,7 +249,7 @@ Miniwyvern is currently allowed by `Server/Tamework/Items/Spawners/HyDragonDraco
 | `Server/Projectiles/HyDragon/Wyvern_Mini/` | Fire/Ice/Void/etc. projectile assets |
 | Status, particle, sound, and localization assets | Archetype presentation and mechanics |
 
-Final Tamework asset paths must follow its linked specifications rather than illustrative names in this document.
+Implemented Tamework asset paths are authoritative; the linked Tamework specifications define their reusable semantics.
 
 ## 13. Acceptance criteria
 
@@ -268,13 +269,13 @@ Deferred backpack acceptance, not part of the initial release gate:
 - The owner can store and retrieve nine backpack stacks across unload, death, and restart; a non-owner and a concurrent second UI session cannot mutate contents.
 - Attunement and lifecycle transitions preserve all backpack contents once the feature exists.
 
-## 14. Phased dependencies
+## 14. Implemented dependency map
 
 | Phase | HyDragon work | Required Tamework work |
 | --- | --- | --- |
-| S0 | Remove ordinary capture; finalize item/model/effect IDs | Existing config/API |
-| S1 | Add durable player ledger and one-time Soul Bond transaction | Tamework `COMPANION_PROVISIONING` and [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) |
-| S2 | Enforce unique Miniwyvern lifecycle | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) |
-| S3 | Ship neutral Miniwyvern plus Fire and Nature vertical slice | S1-S2 and Tamework profile/attachment APIs |
-| S4 | Add remaining five archetypes and full ability safety matrix | S3 |
+| S0 | Ordinary-capture exclusion and canonical item/model/effect IDs | Existing config/API |
+| S1 | Durable player ledger and one-time Soul Bond transaction | Tamework `COMPANION_PROVISIONING` and [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) |
+| S2 | Unique Miniwyvern lifecycle | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) |
+| S3 | Neutral Miniwyvern plus Fire and Nature vertical slice | S1-S2 and Tamework profile/attachment APIs |
+| S4 | Remaining five archetypes and full ability safety matrix | S3 |
 | Post-MVP S5 | Enable nine-slot backpack in a later update | Deferred [companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md) |

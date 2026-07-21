@@ -1,12 +1,12 @@
 # HyDragon Plugin Architecture Specification
 
-Status: Draft implementation contract
+Status: Implementation complete; release verification pending
 Target HyDragon release: first plugin release compatible with Tamework `3.x`
 Required Tamework range: `>=3.0.0 <4.0.0`
 
 ## 1. Purpose
 
-HyDragon currently ships as a root-layout asset pack. This specification converts it into one combined Java plugin and asset pack without requiring an initial mass move of `Common/`, `Server/`, or `manifest.json`.
+HyDragon is implemented as one combined Java plugin and root-layout asset pack without moving `Common/`, `Server/`, or `manifest.json`.
 
 The Java layer owns HyDragon-specific state and behavior. Assets remain responsible for models, textures, items, recipes, NPC roles, static spawn data, effects, projectiles, audio, and localization. Generic companion mechanics remain in Tamework.
 
@@ -44,7 +44,7 @@ Normative Tamework dependencies:
 - **HYD-ARCH-001:** The build MUST produce one plugin JAR that contains compiled Java classes, `manifest.json`, and the complete `Common/` and `Server/` trees.
 - **HYD-ARCH-002:** The initial Maven build MUST consume the current root-layout assets directly. It MUST NOT require moving those assets into `src/main/resources`.
 - **HYD-ARCH-003:** `manifest.json` MUST declare `Main`, keep `IncludesAssetPack: true`, and declare `Alechilles:Alec's Tamework!` with range `>=3.0.0 <4.0.0`.
-- **HYD-ARCH-004:** All first-release asset IDs, Java types, profile-data keys, config IDs, and commands MUST use English terminology and the HyDragon namespace where namespacing is supported. Because HyDragon has never been released, untranslated or semantically mismatched worktree IDs MUST be renamed directly before release; the plugin MUST NOT add aliases or runtime conversion machinery for them.
+- **HYD-ARCH-004:** All first-release asset IDs, Java types, profile-data keys, config IDs, and commands MUST use English terminology and the HyDragon namespace where namespacing is supported. Removed untranslated or semantically mismatched development IDs MUST remain absent; because HyDragon has never been released, the plugin MUST NOT add aliases or runtime conversion machinery for them.
 
 ### Runtime boundary
 
@@ -251,17 +251,17 @@ Stop new operations, cancel scheduled ability/encounter tasks, flush durable sta
 
 Every domain-config codec must reject invalid identifiers, ranges, negative durations, mutually incompatible modes, and references to missing required content at load time. Validation errors must name the asset ID and field path.
 
-## 11. Pre-release conversion from the current asset pack
+## 11. Implemented conversion from the asset pack
 
-1. Add Maven and Java source directories without moving root assets.
-2. Add `Main`, retain `IncludesAssetPack: true`, and update the dependency range from `>=2.17.0` to `>=3.0.0 <4.0.0`.
-3. Package the unmodified asset trees and compare the JAR archive against the pre-conversion asset-pack ZIP.
-4. Introduce the public API adapter and diagnostics before enabling domain runtime features.
-5. Rename untranslated/mismatched worktree asset IDs directly to their documented English canonical IDs and update every reference in the same change; add no alias or persisted-data conversion layer.
-6. Add complete `en-US`, `pt-BR`, `de-DE`, `fr-FR`, and `es-ES` catalogs with identical keys and placeholders.
-7. Replace the current development-only Draconic Stone and Miniwyvern configurations according to the dedicated specifications. Development/test data may be reset; it is not a supported release input.
-8. Remove any third-party flight dependency or documentation. Keep the existing Nordic Drake `TameworkAvatarFlight` integration and gate it with Tamework's Flightmaster's Talisman.
-9. Only after parity is proven may a separate change move assets into `src/main/resources`.
+1. Maven and Java source directories coexist with the root asset trees.
+2. `manifest.json` declares `Main`, retains `IncludesAssetPack: true`, and requires Tamework `>=3.0.0 <4.0.0`.
+3. The build packages the root asset trees; clean archive comparison remains a release-verification gate.
+4. The public API adapter and diagnostics gate domain runtime features.
+5. Canonical English asset IDs replaced untranslated/mismatched development IDs and references directly, with no alias or persisted-data conversion layer.
+6. Complete `en-US`, `pt-BR`, `de-DE`, `fr-FR`, and `es-ES` catalogs contain identical keys and placeholders.
+7. Draconic Stone and Miniwyvern configuration follows the dedicated specifications; no development/test data is a supported release input.
+8. Nordic Drake retains `TameworkAvatarFlight` and uses Tamework's Flightmaster's Talisman; no third-party flight dependency remains.
+9. Moving assets into `src/main/resources` is unnecessary for the implemented root-layout packaging and remains out of scope.
 
 ## 12. Acceptance criteria
 
@@ -279,7 +279,7 @@ Every domain-config codec must reject invalid identifiers, ranges, negative dura
 - The Miniwyvern capture path remains unavailable even though companion inventory is not part of the initial release.
 - Flying a configured dragon checks only Tamework's Flightmaster's Talisman.
 
-## 13. Phased dependencies
+## 13. Implemented dependency map
 
 | Phase | Deliverable | Entry dependency | Exit condition |
 | --- | --- | --- | --- |

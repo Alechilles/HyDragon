@@ -1,12 +1,14 @@
 # HyDragon Implementation Specification Suite
 
-Status: Draft for implementation planning
+Status: Implementation complete; release verification pending
 Source: collaborator-provided `HydragonBaseMod.docx`, reconciled with the current HyDragon asset pack and Tamework 3.0.0 source
 Required Tamework range: `>=3.0.0 <4.0.0`
 
 ## 1. Outcome
 
-HyDragon will become a combined Java plugin and asset pack. Existing content stays in the current root `Common/` and `Server/` layout during the first conversion; Maven packages it beside the Java entry point. HyDragon owns dragon-specific content, economy, Soul Bond, elemental abilities, stone maintenance, and special encounters. Tamework owns reusable capture, profile, bonded-vessel, population, and command mechanics; generic companion inventory is reserved for a later update.
+HyDragon is implemented as a combined Java plugin and asset pack. Existing content stays in the root `Common/` and `Server/` layout, and Maven packages it beside the Java entry point. HyDragon owns dragon-specific content, economy, Soul Bond, elemental abilities, stone maintenance, and special encounters. Tamework owns reusable capture, profile, bonded-vessel, population, and command mechanics; generic companion inventory remains reserved for a later update.
+
+The implementation is present in source, assets, configuration, and focused tests. Final clean-build, packaged-JAR, cross-repository integration, and live-server release gates are still pending; this status does not claim that those gates have passed.
 
 Locked product decisions:
 
@@ -45,15 +47,15 @@ Normative Tamework companion specifications:
 | Tamework | Public companion API, capture policy engine, bonded vessels and durable transition cooldown, profile lifecycle, commands, population groups, and later generic companion inventory | HyDragon lore, species balance, elemental effects, Altar/economy |
 | Base Hytale assets/runtime | `CraftingRecipe`, `WorldNPCSpawn`, `BeaconNPCSpawn`, NPC/item/effect/projectile execution | Weather/owned-companion-gated multi-stage HyDragon encounter policy |
 
-## 4. Delivery sequence
+## 4. Implemented delivery map
 
-1. **Foundation:** Convert packaging without moving root assets; set manifest `Main`, `IncludesAssetPack: true`, and the Tamework range; add capability diagnostics and versioned storage.
-2. **Tamework primitives:** Land capture policy, bonded vessel, population-group, and companion-provisioning contracts before enabling their dependent HyDragon behavior.
-3. **Full-dragon vertical slice:** Draconic Altar, Iron/Ancient stone paths, one completed species, bonded summon/store, cooldown, death damage, and repair.
-4. **Roster completion:** Remaining stone tiers, Rock Drake tamed roles, commands, mounts, drops, and static spawns.
-5. **Soul Bond vertical slice:** Once-only claim, neutral Miniwyvern, Fire and Nature archetypes, and unique active-group enforcement.
-6. **Companion completion:** Remaining archetypes and their full ability safety matrix.
-7. **Special encounters:** Weather/player-gated high-altitude encounter, grounding sequence, persistence, and tuning.
+1. **Foundation:** Combined packaging, manifest entry point/asset pack, Tamework range, capability diagnostics, and versioned storage.
+2. **Tamework primitives:** Capture policy, bonded vessels, population groups, and companion provisioning behind Public API `0.9.0` capability checks.
+3. **Full-dragon loop:** Draconic Altar, five stone tiers, bonded summon/store, transition cooldown, death damage, and repair.
+4. **Roster:** Dragon roles, tamed mappings, commands, mounts, drops, and static spawns.
+5. **Soul Bond:** Once-only claim, Soul Bond-exclusive Miniwyvern provisioning, archetype selection, and unique-group enforcement.
+6. **Companion abilities:** Seven archetype definitions with fail-closed runtime support checks.
+7. **Special encounters:** Weather/player-gated encounter orchestration, grounding, and durable recovery.
 
 The Tamework-backed nine-slot Miniwyvern backpack is a separate post-MVP update after phase 7. Each numbered phase is releasable only after the linked MVP acceptance criteria pass. A missing Tamework capability blocks its dependent feature; it does not authorize a private HyDragon reimplementation.
 
@@ -157,7 +159,7 @@ Every normative `HYD-*` requirement in this suite appears below. “Layer” ide
 - `MUST`/`MUST NOT` are release requirements; `SHOULD` identifies the preferred default unless asset or playtest evidence justifies another choice; `MAY` is optional.
 - A requirement ID is stable. Changed semantics require a documented revision note rather than silently reusing the ID.
 - The HyDragon document is authoritative for domain behavior; the linked Tamework document is authoritative for generic API/config mechanics. If they conflict, implementation pauses until both documents are reconciled.
-- Config/file paths described as illustrative must be replaced by the final path from the Tamework integration contract before implementation.
+- Config/file paths described as illustrative are subordinate to the implemented paths in the Tamework integration contract and repository assets.
 - Deferred energy/duration maintenance is not an MVP acceptance requirement. Adding either requires a new or revised requirement, an explicit data-version contract, and dedicated tests.
 - The two deferred backpack requirement IDs are retained as stable post-MVP requirements but are explicitly excluded from the initial plugin release gate. Enabling them requires the deferred Tamework companion-inventory contract and its own release acceptance pass.
 - Traceability is checked by ensuring every `HYD-*` ID occurs in exactly one normative requirements section and at least once in this matrix.
