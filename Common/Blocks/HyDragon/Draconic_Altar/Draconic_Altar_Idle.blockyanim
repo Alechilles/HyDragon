@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "duration": 57,
+  "duration": 228,
   "holdLastKeyframe": false,
   "nodeAnimations": {
     "bone": {
@@ -11,7 +11,7 @@
           "interpolationType": "linear"
         },
         {
-          "time": 38,
+          "time": 152,
           "delta": {"x": 0, "y": 6, "z": 0},
           "interpolationType": "linear"
         }
@@ -23,12 +23,12 @@
           "interpolationType": "linear"
         },
         {
-          "time": 30,
+          "time": 120,
           "delta": {"x": 0, "y": -0.99993, "z": 0, "w": 0.01152},
           "interpolationType": "linear"
         },
         {
-          "time": 57,
+          "time": 228,
           "delta": {"x": 0, "y": -0.02181, "z": 0, "w": -0.99976},
           "interpolationType": "linear"
         }

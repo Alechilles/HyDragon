@@ -31,7 +31,7 @@
     ],
     "CustomModelAnimation": "Blocks/HyDragon/Draconic_Altar/Draconic_Altar_Idle.blockyanim",
     "Looping": true,
-    "HitboxType": "Bench_Alchemy",
+    "HitboxType": "Statue_Small",
     "VariantRotation": "NESW",
     "Bench": {
       "Type": "Crafting",
