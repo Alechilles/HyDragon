@@ -28,7 +28,7 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("new StateStoreOperationJournal(store, System::currentTimeMillis)"));
         assertTrue(source.contains("new StateStoreMiniwyvernProfileProjection(store)"));
         assertTrue(source.contains("new TameworkBondedRepairRequestResolver(api)"));
-        assertTrue(source.contains("HyDragonInteractionRuntime.install(gameplayRuntime, () -> bridge.snapshot());"));
+        assertTrue(source.contains("() -> configRepository.snapshot().repairRequirement()"));
         assertTrue(source.contains("new ConsumableSagaRecoveryRuntime("));
         assertTrue(source.contains("new ConsumableRefundClaimService(journal)"));
         assertTrue(source.contains("HyDragonEncounterRegistrationFacade.install("));

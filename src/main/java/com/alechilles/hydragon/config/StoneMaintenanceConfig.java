@@ -9,6 +9,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -24,7 +25,7 @@ public final class StoneMaintenanceConfig
                     settings -> settings.itemId)
             .add()
             .<Integer>append(new KeyedCodec<>("Quantity", Codec.INTEGER),
-                    (settings, value) -> settings.quantity = value == null ? 1 : value,
+                    (settings, value) -> settings.quantity = value == null ? 0 : value,
                     settings -> settings.quantity)
             .add()
             .build();
@@ -88,10 +89,19 @@ public final class StoneMaintenanceConfig
     public RepairSettings getRepair() { return repair; }
     public FutureExtensions getFutureExtensions() { return futureExtensions; }
 
+    /** Immutable request-time copy of the configured repair material policy. */
+    public record RepairRequirement(String itemId, int quantity) {
+        public RepairRequirement {
+            itemId = Objects.requireNonNull(itemId, "itemId").trim();
+            if (itemId.isEmpty()) throw new IllegalArgumentException("itemId is required");
+            if (quantity <= 0) throw new IllegalArgumentException("quantity must be positive");
+        }
+    }
+
     /** Required item and count for a bonded-stone repair. */
     public static final class RepairSettings {
-        String itemId = "Revitalizing_Essence";
-        int quantity = 1;
+        String itemId = "";
+        int quantity;
 
         public String getItemId() { return itemId == null ? "" : itemId.trim(); }
         public int getQuantity() { return quantity; }

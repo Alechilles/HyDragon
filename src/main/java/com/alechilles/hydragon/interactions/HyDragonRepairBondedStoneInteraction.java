@@ -2,12 +2,14 @@ package com.alechilles.hydragon.interactions;
 
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.HyDragonMessages;
+import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import javax.annotation.Nonnull;
 import com.hypixel.hytale.server.core.Message;
+import java.util.Optional;
 
-/** Revitalizing Essence interaction for one damaged bonded stone. */
+/** Configured repair-material interaction for one damaged bonded stone. */
 public final class HyDragonRepairBondedStoneInteraction extends HyDragonServerInteraction {
     public static final String TYPE_ID = "HyDragonRepairBondedStone";
     public static final BuilderCodec<HyDragonRepairBondedStoneInteraction> CODEC = BuilderCodec.builder(
@@ -44,8 +46,8 @@ public final class HyDragonRepairBondedStoneInteraction extends HyDragonServerIn
 
     @Nonnull
     @Override
-    protected String expectedItemId() {
-        return "Revitalizing_Essence";
+    protected Optional<StoneMaintenanceConfig.RepairRequirement> consumableRequirement() {
+        return HyDragonInteractionRuntime.repairRequirement();
     }
 
     @Override

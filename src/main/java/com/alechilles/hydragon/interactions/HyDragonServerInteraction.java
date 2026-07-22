@@ -3,6 +3,7 @@ package com.alechilles.hydragon.interactions;
 import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.integration.HyDragonFeature;
+import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -65,6 +66,14 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
             return;
         }
 
+        Optional<StoneMaintenanceConfig.RepairRequirement> requirement = consumableRequirement();
+        if (requirement.isEmpty()) {
+            commandBuffer.run(store -> player.sendMessage(unavailableMessage()));
+            fail(context, firstRun, time, type, cooldownHandler);
+            return;
+        }
+        StoneMaintenanceConfig.RepairRequirement consumable = requirement.orElseThrow();
+
         UUID worldUuid = player.getWorldUuid();
         Universe universe = Universe.get();
         World world = universe == null || worldUuid == null ? null : universe.getWorld(worldUuid);
@@ -88,17 +97,17 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
                 return;
             }
             operationId = HytaleHeldItemReservation.existingHotbarMaterialOperationId(
-                            hotbar, expectedItemId(), heldSlot)
+                            hotbar, consumable.itemId(), heldSlot)
                     .orElseGet(() -> newOperationId(player.getUuid()));
             reserved = HytaleHeldItemReservation.reserveHotbarMaterial(
-                    context, player, hotbar, expectedItemId(), operationId, consumedQuantity(), heldSlot);
+                    context, player, hotbar, consumable.itemId(), operationId, consumable.quantity(), heldSlot);
             heldItemLocator = new HyDragonInteractionRuntime.HeldItemLocator(
                     "player:" + player.getUuid(), "hotbar", heldSlot, heldStone.getItemId());
         } else {
             operationId = HytaleHeldItemReservation.existingOperationId(context)
                     .orElseGet(() -> newOperationId(player.getUuid()));
             reserved = HytaleHeldItemReservation.reserve(
-                    context, player, expectedItemId(), operationId, consumedQuantity());
+                    context, player, consumable.itemId(), operationId, consumable.quantity());
         }
         if (reserved.isEmpty()) {
             commandBuffer.run(store -> player.sendMessage(invalidMessage()));
@@ -155,7 +164,9 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
     protected abstract HyDragonInteractionRuntime.Action action();
 
     @Nonnull
-    protected abstract String expectedItemId();
+    protected String expectedItemId() {
+        return "";
+    }
 
     protected String archetypeId() {
         return "";
@@ -163,6 +174,16 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
 
     protected int consumedQuantity() {
         return 1;
+    }
+
+    /** Captures one immutable material policy for the entire request. */
+    protected Optional<StoneMaintenanceConfig.RepairRequirement> consumableRequirement() {
+        try {
+            return Optional.of(new StoneMaintenanceConfig.RepairRequirement(
+                    expectedItemId(), consumedQuantity()));
+        } catch (IllegalArgumentException | NullPointerException invalid) {
+            return Optional.empty();
+        }
     }
 
     protected String newOperationId(UUID playerUuid) {

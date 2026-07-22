@@ -4,9 +4,11 @@ import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
+import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.runtime.ConsumableReservation;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,13 +22,23 @@ public final class HyDragonInteractionRuntime {
     }
 
     public static void install(Handler handler) {
-        install(handler, () -> null);
+        install(handler, () -> null, Optional::empty);
     }
 
     /** Installs gameplay plus the same immutable capability snapshot used by status diagnostics. */
     public static void install(Handler handler, Supplier<TameworkBridge.Snapshot> gates) {
+        install(handler, gates, Optional::empty);
+    }
+
+    /** Installs gameplay, capability gates, and the current immutable stone-repair policy. */
+    public static void install(
+            Handler handler,
+            Supplier<TameworkBridge.Snapshot> gates,
+            Supplier<Optional<StoneMaintenanceConfig.RepairRequirement>> repairRequirements) {
         Installation installation = new Installation(
-                Objects.requireNonNull(handler, "handler"), Objects.requireNonNull(gates, "gates"));
+                Objects.requireNonNull(handler, "handler"),
+                Objects.requireNonNull(gates, "gates"),
+                Objects.requireNonNull(repairRequirements, "repairRequirements"));
         if (!INSTALLATION.compareAndSet(null, installation)) {
             throw new IllegalStateException("HyDragon interaction runtime is already installed");
         }
@@ -39,6 +51,19 @@ public final class HyDragonInteractionRuntime {
 
     public static boolean installed() {
         return INSTALLATION.get() != null;
+    }
+
+    /** Resolves one request-time copy; missing, invalid, or failing config suppliers fail closed. */
+    static Optional<StoneMaintenanceConfig.RepairRequirement> repairRequirement() {
+        Installation installation = INSTALLATION.get();
+        if (installation == null) return Optional.empty();
+        try {
+            Optional<StoneMaintenanceConfig.RepairRequirement> requirement =
+                    installation.repairRequirements().get();
+            return requirement == null ? Optional.empty() : requirement;
+        } catch (RuntimeException failure) {
+            return Optional.empty();
+        }
     }
 
     static CompletionStage<GameplayResult> dispatch(Action action,
@@ -82,7 +107,10 @@ public final class HyDragonInteractionRuntime {
 
     enum Action { SOUL_BOND, ATTUNE, REPAIR }
 
-    private record Installation(Handler handler, Supplier<TameworkBridge.Snapshot> gates) {
+    private record Installation(
+            Handler handler,
+            Supplier<TameworkBridge.Snapshot> gates,
+            Supplier<Optional<StoneMaintenanceConfig.RepairRequirement>> repairRequirements) {
     }
 
     public interface Handler {

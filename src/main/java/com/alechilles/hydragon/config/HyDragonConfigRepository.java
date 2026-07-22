@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -260,6 +261,23 @@ public final class HyDragonConfigRepository {
         @Nullable
         public StoneMaintenanceConfig defaultMaintenance() {
             return maintenance.get("Default");
+        }
+
+        /**
+         * Copies the repair policy from this exact generation. Invalid or incomplete generations
+         * expose no policy so callers fail closed instead of falling back to hardcoded gameplay.
+         */
+        public Optional<StoneMaintenanceConfig.RepairRequirement> repairRequirement() {
+            if (!isValid()) return Optional.empty();
+            StoneMaintenanceConfig config = defaultMaintenance();
+            if (config == null || !config.validate().isEmpty()) return Optional.empty();
+            StoneMaintenanceConfig.RepairSettings repair = config.getRepair();
+            try {
+                return Optional.of(new StoneMaintenanceConfig.RepairRequirement(
+                        repair.getItemId(), repair.getQuantity()));
+            } catch (IllegalArgumentException | NullPointerException invalid) {
+                return Optional.empty();
+            }
         }
     }
 }

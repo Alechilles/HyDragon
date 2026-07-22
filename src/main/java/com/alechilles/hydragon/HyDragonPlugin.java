@@ -187,7 +187,10 @@ public final class HyDragonPlugin extends JavaPlugin {
                     attunementService,
                     repairService,
                     new TameworkBondedRepairRequestResolver(api));
-            HyDragonInteractionRuntime.install(gameplayRuntime, () -> bridge.snapshot());
+            HyDragonInteractionRuntime.install(
+                    gameplayRuntime,
+                    () -> bridge.snapshot(),
+                    () -> configRepository.snapshot().repairRequirement());
 
             encounterRuntime = HyDragonEncounterRegistrationFacade.install(
                     api,

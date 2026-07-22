@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class HyDragonConfigRepositoryTest {
@@ -97,8 +98,11 @@ class HyDragonConfigRepositoryTest {
     @Test
     void invalidReloadRetainsLastKnownGoodSnapshotAndReportsCandidateIssues() {
         HyDragonConfigRepository repository = new HyDragonConfigRepository();
+        StoneMaintenanceConfig firstMaintenance = validMaintenance();
+        firstMaintenance.repair.itemId = "Alternate_Repair_Material";
+        firstMaintenance.repair.quantity = 4;
         HyDragonConfigRepository.Snapshot valid = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), List.of(validMaintenance()), allArchetypes(), List.of(validEncounter()));
+                List.of(validSpecies()), List.of(firstMaintenance), allArchetypes(), List.of(validEncounter()));
         DragonEncounterConfig brokenEncounter = validEncounter();
         brokenEncounter.targetSpeciesId = "hydragon:missing";
         HyDragonConfigRepository.Snapshot invalid = HyDragonConfigRepository.buildSnapshot(
@@ -109,6 +113,56 @@ class HyDragonConfigRepositoryTest {
 
         assertSame(valid, repository.snapshot());
         assertEquals(invalid.issues(), repository.lastReloadIssues());
+        assertEquals(
+                Optional.of(new StoneMaintenanceConfig.RepairRequirement("Alternate_Repair_Material", 4)),
+                repository.snapshot().repairRequirement());
+
+        StoneMaintenanceConfig reloadedMaintenance = validMaintenance();
+        reloadedMaintenance.repair.itemId = "Reloaded_Repair_Material";
+        reloadedMaintenance.repair.quantity = 2;
+        HyDragonConfigRepository.Snapshot reloaded = HyDragonConfigRepository.buildSnapshot(
+                List.of(validSpecies()), List.of(reloadedMaintenance), allArchetypes(), List.of(validEncounter()));
+
+        assertTrue(repository.publishCandidate(reloaded));
+        assertSame(reloaded, repository.snapshot());
+        assertEquals(
+                Optional.of(new StoneMaintenanceConfig.RepairRequirement("Reloaded_Repair_Material", 2)),
+                repository.snapshot().repairRequirement());
+    }
+
+    @Test
+    void repairRequirementCopiesConfiguredItemAndNonDefaultQuantity() {
+        StoneMaintenanceConfig maintenance = validMaintenance();
+        maintenance.repair.itemId = "Dragon_Heart_Shard";
+        maintenance.repair.quantity = 3;
+
+        HyDragonConfigRepository.Snapshot snapshot = HyDragonConfigRepository.buildSnapshot(
+                List.of(validSpecies()), List.of(maintenance), allArchetypes(), List.of(validEncounter()));
+
+        assertEquals(
+                Optional.of(new StoneMaintenanceConfig.RepairRequirement("Dragon_Heart_Shard", 3)),
+                snapshot.repairRequirement());
+    }
+
+    @Test
+    void missingOrInvalidMaintenanceExposesNoRepairRequirement() {
+        HyDragonConfigRepository.Snapshot missing = HyDragonConfigRepository.buildSnapshot(
+                List.of(validSpecies()), List.of(), allArchetypes(), List.of(validEncounter()));
+        StoneMaintenanceConfig incompleteMaintenance = new StoneMaintenanceConfig();
+        incompleteMaintenance.assetKey = "Default";
+        HyDragonConfigRepository.Snapshot incomplete = HyDragonConfigRepository.buildSnapshot(
+                List.of(validSpecies()), List.of(incompleteMaintenance), allArchetypes(), List.of(validEncounter()));
+        StoneMaintenanceConfig invalidMaintenance = validMaintenance();
+        invalidMaintenance.repair.quantity = 0;
+        HyDragonConfigRepository.Snapshot invalid = HyDragonConfigRepository.buildSnapshot(
+                List.of(validSpecies()), List.of(invalidMaintenance), allArchetypes(), List.of(validEncounter()));
+
+        assertFalse(missing.isValid());
+        assertTrue(missing.repairRequirement().isEmpty());
+        assertFalse(incomplete.isValid());
+        assertTrue(incomplete.repairRequirement().isEmpty());
+        assertFalse(invalid.isValid());
+        assertTrue(invalid.repairRequirement().isEmpty());
     }
 
     private static DragonSpeciesConfig validSpecies() {

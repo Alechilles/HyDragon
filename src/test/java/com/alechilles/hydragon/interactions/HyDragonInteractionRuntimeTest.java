@@ -1,19 +1,23 @@
 package com.alechilles.hydragon.interactions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
+import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.runtime.ConsumableReservation;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 class HyDragonInteractionRuntimeTest {
@@ -100,6 +104,47 @@ class HyDragonInteractionRuntimeTest {
             assertEquals(GameplayResult.Status.UNAVAILABLE, result.status());
             assertEquals(0, handler.calls.get());
             assertEquals(1, reservation.releases.get());
+        } finally {
+            HyDragonInteractionRuntime.uninstall(handler);
+        }
+    }
+
+    @Test
+    void repairRequirementTracksCurrentConfigGeneration() {
+        CountingHandler handler = new CountingHandler();
+        AtomicReference<Optional<StoneMaintenanceConfig.RepairRequirement>> repair = new AtomicReference<>(
+                Optional.of(new StoneMaintenanceConfig.RepairRequirement("Alternate_Repair_Material", 5)));
+        HyDragonInteractionRuntime.install(handler, () -> null, repair::get);
+        try {
+            assertEquals(repair.get(), HyDragonInteractionRuntime.repairRequirement());
+
+            repair.set(Optional.of(new StoneMaintenanceConfig.RepairRequirement("Reloaded_Material", 2)));
+            assertEquals(repair.get(), HyDragonInteractionRuntime.repairRequirement());
+        } finally {
+            HyDragonInteractionRuntime.uninstall(handler);
+        }
+    }
+
+    @Test
+    void missingOrFailingRepairConfigFailsClosed() {
+        CountingHandler handler = new CountingHandler();
+        AtomicReference<Optional<StoneMaintenanceConfig.RepairRequirement>> repair =
+                new AtomicReference<>(Optional.empty());
+        HyDragonInteractionRuntime.install(handler, () -> null, repair::get);
+        try {
+            assertTrue(HyDragonInteractionRuntime.repairRequirement().isEmpty());
+
+            repair.set(null);
+            assertTrue(HyDragonInteractionRuntime.repairRequirement().isEmpty());
+        } finally {
+            HyDragonInteractionRuntime.uninstall(handler);
+        }
+
+        HyDragonInteractionRuntime.install(handler, () -> null, () -> {
+            throw new IllegalStateException("config reload failed");
+        });
+        try {
+            assertTrue(HyDragonInteractionRuntime.repairRequirement().isEmpty());
         } finally {
             HyDragonInteractionRuntime.uninstall(handler);
         }
