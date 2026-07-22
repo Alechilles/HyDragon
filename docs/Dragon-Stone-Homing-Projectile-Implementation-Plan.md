@@ -1,5 +1,7 @@
 # Dragon Stone Homing VFX Projectile Implementation Plan
 
+> **Redesign note:** The channel VFX remains usable, but the [command-roster capture specification](specs/capture-summoning-maintenance.md) supersedes every filled-stone/finalizer statement below. Implementation must use consume-on-resolved-attempt and in-place tame/link behavior. This plan is not authoritative for capture outcome or item lifecycle.
+
 - Status: Implemented; in-game visual tuning pending
 - Scope: Tamework framework plus HyDragon Dragon Stone assets/configuration
 - Target runtime: Hytale 0.5.6

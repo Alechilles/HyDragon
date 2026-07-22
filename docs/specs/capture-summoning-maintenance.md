@@ -1,285 +1,239 @@
-# Draconic Capture, Summoning, and Maintenance Specification
+# Draconic Capture, Dragon Horn, and Revival Specification
 
-Status: Implementation and automated release verification complete
-Scope: Full-sized dragons only; Miniwyvern is specified separately
+Status: Proposed redesign; supersedes the unreleased bonded-stone implementation
+Scope: Full-sized dragons, the shared Dragon Horn roster, and paid revival
+Target dependency: Tamework `>=3.0.0 <4.0.0`
 
-## 1. Purpose and boundaries
+## 1. Purpose
 
-This specification defines HyDragon's player-facing Draconic Stone loop: weaken and tranquilize a wild dragon, attempt a tiered capture, retain that exact dragon in a bonded stone, summon or store it, enforce one active full dragon, and recover the bond after death through repair.
+Draconic Stones are consumable capture attempts, not storage containers. A player weakens and tranquilizes a wild dragon, channels a tiered stone, and spends that stone when Tamework resolves the capture roll. A successful roll tames the existing dragon and adds its canonical profile to the player's Dragon Horn. A failed roll spends the stone but leaves the dragon eligible for another attempt after the retry cooldown.
 
-HyDragon supplies the items, balance data, messages, effects, and maintenance rules. Tamework owns the generic capture transaction, bonded-vessel identity, profile lifecycle, and population admission.
+The Dragon Horn is the single interface for selecting, commanding, locating, recalling, and reviving owned dragons. No dragon is stored inside a stone, and no filled, active, damaged, lost, or unavailable stone state exists.
 
 Related specifications:
 
-- [Plugin architecture](plugin-architecture.md)
-- [Dragon content and encounters](dragon-content-encounters.md)
 - [Soul Bond and Miniwyvern](soul-bond-miniwyvern.md)
+- [Dragon content and encounters](dragon-content-encounters.md)
+- [Plugin architecture](plugin-architecture.md)
 - Tamework [capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md)
-- Tamework [bonded vessels](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/bonded-vessels.md)
+- Tamework [command-roster capture and revival](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md)
 - Tamework [population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md)
 - Tamework [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md)
 
-## 2. Locked decisions
+## 2. Locked product decisions
 
-- Miniwyvern is Soul Bond-exclusive. `Wyvern_Mini` and `Tamed_Wyvern_Mini` are removed from every Draconic Stone allowlist and override map.
-- Full dragon flight uses Tamework's Flightmaster's Talisman only.
-- A captured dragon remains the same Tamework profile for the lifetime of the bonded stone.
-- A player may own multiple bonded full-dragon stones but may have at most one full dragon active at a time.
-- Stones are bound to the capturing owner. Dropping or trading the item does not transfer profile ownership.
-- The shipped maintenance policy is a short configurable summon/store swap cooldown plus death repair. Duration and energy budgets are deferred optional extensions, not MVP behavior.
+- Every resolved, eligible capture roll consumes exactly one Draconic Stone, including a failed roll.
+- Invalid targeting, failed preflight, interrupted channeling, or eligibility lost before the roll consumes no stone and obtains no random result.
+- Higher-tier stones improve success probability. Low-tier stones are intentionally consumable resources that may take several attempts against powerful dragons.
+- A successful capture tames and links the existing dragon in place. It does not despawn the dragon or create a filled stone.
+- All owned full dragons and the player's Soul Bond Miniwyvern appear in the same Dragon Horn roster.
+- The Dragon Horn is an access item, not the canonical save. Tamework owns the durable owner-and-command-family roster.
+- A dead dragon stays in the roster and costs configured Draconic revival essence to revive. Ordinary gameplay never grants a free cooldown-only revival.
+- Full dragon flight uses Tamework's Flightmaster's Talisman.
+- The prior bonded-vessel system is removed in full. HyDragon has never shipped, so no migration, alias, adoption, or compatibility path is required.
 
-## 3. Requirements
+## 3. Ownership boundary
+
+| Layer | Owns |
+| --- | --- |
+| HyDragon | Stone and Dragon Horn assets, recipes, tier balance, role allowlists, capture feedback, revival item/quantity configuration, dragon-specific localization and effects |
+| Tamework | Eligibility and exactly-once roll, source-item consumption, tame/role/profile transaction, durable command-family roster, profile lifecycle, command UI/actions, population admission, paid revival transaction and recovery |
+| Hytale runtime | Inventory and ECS primitives, world placement, NPC role/effect execution |
+
+HyDragon must use Tamework's public, capability-gated contracts. It must not reproduce command links, profile identity, population counts, or revival state in a private second database.
+
+## 4. Functional requirements
 
 ### Capture eligibility and tiers
 
-- **HYD-CAP-001:** Initial Draconic Stone capture MUST allow only configured wild full-dragon roles; storing may target only the exact linked tamed full-dragon profile. Miniwyvern roles MUST always be denied, including after config reload or capability degradation.
-- **HYD-CAP-002:** A wild capture attempt MUST require a living target, capture-eligible role, range and line-of-interaction validity, health at or below the configured threshold, and `Tw_Status_Tranquilized`. The current 20% health threshold is the initial default.
-- **HYD-CAP-003:** HyDragon MUST ship Iron, Thorium, Cobalt, Adamantium, and Ancient/Mithril stone tiers with strictly increasing capture power. The English `Draconic_Stone` asset is the canonical Iron-tier item.
-- **HYD-CAP-004:** Each full-dragon species/difficulty MUST declare capture resistance, minimum eligible stone tier, base chance or modifier inputs, and whether special encounter conditions are required.
-- **HYD-CAP-005:** The Ancient/Mithril tier MUST succeed with 100% probability once every non-probability eligibility condition is satisfied. It MUST NOT bypass health, tranquilizer, ownership, encounter, capacity, or role requirements.
-- **HYD-CAP-005A:** Stone item quality MUST increase with the tier as Common, Uncommon, Rare, Epic, and Legendary. Every tier MUST use a distinct runtime texture and inventory icon whose material palette matches Iron, Thorium, Cobalt, Adamantium, or Mithril respectively, while retaining a common physical and icon scale because every stone stores exactly one dragon.
-- **HYD-CAP-006:** Capture validation and the random roll MUST execute within the Tamework capture-policy transaction. HyDragon MUST provide policy inputs and presentation but MUST NOT perform an independent pre-roll.
-- **HYD-CAP-007:** Failed validation MUST consume nothing. An eligible failed roll MUST leave the target alive and uncaptured, retain the unchanged empty stone, clear the channel presentation, and apply the configured retry cooldown.
+- **HYD-CAP-001:** Draconic Stones MUST target only configured wild full-dragon roles. `Wyvern_Mini` and `Tamed_Wyvern_Mini` MUST be denied by every stone tier.
+- **HYD-CAP-002:** A capture attempt MUST require a living target, an allowed wild role, valid range and line of interaction, health at or below the configured threshold, and `Tw_Status_Tranquilized`. The initial health threshold is 20 percent.
+- **HYD-CAP-003:** HyDragon MUST ship Iron, Thorium, Cobalt, Adamantium, and Ancient/Mithril tiers with increasing capture power and Common, Uncommon, Rare, Epic, and Legendary item qualities respectively.
+- **HYD-CAP-004:** Each target role MUST configure capture resistance, minimum eligible power, chance modifiers, and any special encounter requirements.
+- **HYD-CAP-005:** Ancient/Mithril MUST guarantee capture after every non-probability requirement passes. It MUST NOT bypass health, tranquilizer, role, ownership, capacity, range, or encounter requirements.
+- **HYD-CAP-006:** Tamework MUST perform one authoritative terminal roll. HyDragon MUST NOT pre-roll or retry entropy in callbacks.
 
-### Bonded vessel and active companion
+### Stone consumption boundary
 
-- **HYD-CAP-008:** A successful capture MUST atomically tame/assign the dragon, create or preserve one canonical Tamework profile, and bind that profile to the stone used for capture.
-- **HYD-CAP-009:** The bonded item MUST remain linked while the dragon is stored, active, dead, damaged, unloaded, or temporarily unavailable. Summoning MUST NOT turn it back into an unlinked empty capture item.
-- **HYD-CAP-010:** The vessel lifecycle MUST implement the states and transitions in section 5, with item appearance and interaction availability derived from authoritative lifecycle state.
-- **HYD-CAP-011:** Every full-dragon species MUST join population group `hydragon:full_dragons`, configured as unlimited owned and one active per owner. Summon, revive, and encounter-recovery paths MUST all use Tamework admission rather than a HyDragon-only count.
-- **HYD-CAP-012:** The owner MUST be able to summon a stored healthy dragon, store the active linked dragon, recall it, issue supported combat/follow commands, and inspect why an unavailable state cannot transition.
-- **HYD-CAP-013:** Store/recall MUST act only on the stone's linked profile. Proximity lookup, role lookup, or a newly spawned replacement MUST never substitute for an unavailable linked dragon.
+- **HYD-CAP-007:** Preflight denial, missing Dragon Horn, interrupted channeling, stale target, target death, lost range, lost tranquilizer, or any denial before durable roll resolution MUST consume nothing.
+- **HYD-CAP-008:** The transition from an unrolled attempt to a resolved success or resolved failure is the gameplay-spend boundary. Exactly one source stone MUST be consumed for either result.
+- **HYD-CAP-009:** Duplicate completion callbacks and restart recovery MUST return the recorded result without consuming another stone or obtaining another roll.
+- **HYD-CAP-010:** A failed roll MUST leave the target alive, wild, untamed, unowned, and otherwise unchanged; apply the configured retry cooldown; and report that the stone was spent.
+- **HYD-CAP-011:** If an inventory fault prevents the source stone from being consumed, the roll MUST NOT become externally final. Recovery MUST converge to either one consumed stone and one recorded result, or a canceled pre-roll attempt with no mutation. It MUST never grant a free resolved attempt.
+- **HYD-CAP-011A:** If a successful result was charged but an internal fault makes tame/link terminally impossible, recovery MUST cancel prepared positive mutations and create one replacement-stone recovery claim. Ordinary failed rolls and player-caused invalidation after commitment are not refundable. Capture and refund MUST be mutually exclusive.
 
-### Flight and maintenance
+### Successful capture and Dragon Horn membership
 
-- **HYD-CAP-014:** A dragon configured for avatar flight MUST require Tamework's Flightmaster's Talisman and no other mod item. Ground-mount-only dragons MUST not require the talisman.
-- **HYD-CAP-015:** HyDragon MUST author a short summon/store swap cooldown through Tamework's bonded-vessel `TransitionCooldownMs` field. Tamework MUST be the sole enforcement and durable-state authority; the cooldown prevents rapid swapping without imposing a maximum summon duration or energy budget.
-- **HYD-CAP-016:** The vessel integration MUST expose safe, versioned extension hooks for a future mutually exclusive duration or energy budget, but MVP MUST ship both extensions disabled. Revitalizing Essence MUST be used only for death repair in MVP.
-- **HYD-CAP-017:** When a bonded full dragon dies, Tamework's death record MUST be preserved and the vessel MUST become `DAMAGED`. A damaged stone cannot summon until repaired, must use cracked/red/weakened visual treatment, and has zero durability until repair restores its single intact durability point.
-- **HYD-CAP-018:** Repair MUST verify the owner, linked dead profile, damaged state, Revitalizing Essence input, and population admission before committing. Success consumes the configured essence quantity exactly once, invokes the Tamework recovery/revive contract, restores `BONDED_STORED`, and never creates a new profile.
-- **HYD-CAP-019:** All lifecycle, cooldown, ownership, and operation identifiers MUST survive server restart, item movement, player logout, chunk unload, and ordinary Tamework capture/profile persistence.
-- **HYD-CAP-020:** The first release MUST use only the canonical bonded-stone/profile model defined here. It MUST NOT ship readers, aliases, adoption flows, or compatibility states for development-only pre-release stone data.
+- **HYD-CAP-012:** Success MUST preserve the target's canonical identity, tame and assign the configured tamed role, establish the owner, create or update exactly one Tamework profile, and add that profile to command family `hydragon:dragon_horn`.
+- **HYD-CAP-013:** The live target MUST remain projected at its capture location after success. Capture MUST NOT use the ordinary captured-item despawn/filled-item finalizer.
+- **HYD-CAP-014:** Capture preflight MUST require the player to hold at least one registered Dragon Horn access item in an inventory compartment Tamework can atomically validate. If none exists, no roll or consumption occurs and localized feedback explains how to acquire one.
+- **HYD-CAP-015:** One or more physical Dragon Horn copies owned by the same player MUST expose the same authoritative roster. Destroying, dropping, replacing, or copying a horn MUST NOT delete, duplicate, transfer, or fork companion ownership.
+- **HYD-CAP-016:** A non-owner holding another player's horn MUST see no transferable authority. The roster is resolved from the acting owner and command family, never trusted from copied item metadata alone.
+- **HYD-CAP-017:** A committed capture that cannot immediately refresh the horn UI MUST remain linked durably and appear after retry, relog, restart, or receiving a replacement horn.
 
-## 4. Stone tier and policy data
+### Commands, placement, and population
 
-### 4.1 Stable item IDs
+- **HYD-CAP-018:** The Dragon Horn MUST expose supported Tamework commands and linked-panel actions for loaded, unloaded, lost, and dead dragons: Follow, Hold, Idle/Wander, Defend, Aggressive, Attack Target, Clear Target, Move To, Locate, Recall, Set Home, Return Home, Unlink where policy permits, and Revive when dead.
+- **HYD-CAP-019:** Recall, initial post-revival placement, and Soul Bond Miniwyvern projection MUST choose safe positions in front of the player. Behind-player recall placement is removed globally from the relevant Tamework defaults.
+- **HYD-CAP-020:** Every full dragon MUST join `hydragon:full_dragons`, configured as unlimited owned and one active per owner. Capture, recall, cross-world transfer, lost recovery, and revival MUST use the same Tamework admission authority.
+- **HYD-CAP-021:** A capacity denial MUST leave the profile and roster row intact and report why it cannot currently be projected.
+- **HYD-CAP-022:** Avatar-flight dragons MUST require only `Tamework_Flightmasters_Talisman`. Ground mounts and ordinary follow/combat behavior remain available without it.
 
-| Tier | Capture power | Quality | Item ID | Material identity | Rule |
-| --- | ---: | --- | --- | --- | --- |
-| Iron | 1 | Common | `Draconic_Stone` | Iron | Canonical base asset |
-| Thorium | 2 | Uncommon | `Draconic_Stone_Thorium` | Thorium | New asset |
-| Cobalt | 3 | Rare | `Draconic_Stone_Cobalt` | Cobalt | New asset |
-| Adamantium | 4 | Epic | `Draconic_Stone_Adamantium` | Adamantium | New asset |
-| Ancient | 5 | Legendary | `Draconic_Stone_Ancient` | Mithril/ancient material | Guaranteed after eligibility |
+### Death and paid revival
 
-Recipes and material tags are defined in [Dragon content and encounters](dragon-content-encounters.md). Exact chance curves remain balance data, not Java constants.
+- **HYD-CAP-023:** Death MUST preserve the exact profile and Dragon Horn roster row in `DEAD_REVIVABLE`; it MUST NOT create an item, damage a stone, unlink the dragon, or create a replacement profile.
+- **HYD-CAP-024:** The Horn's Revive action MUST display the configured item ID and quantity before confirmation. HyDragon's initial currency is `Revitalizing_Essence`; quantities remain species/difficulty balance data and MUST be positive for every revivable HyDragon role.
+- **HYD-CAP-025:** Tamework MUST validate ownership, dead state, command-family membership, population admission, safe placement, and exact inventory cost before revival can commit.
+- **HYD-CAP-026:** Successful revival MUST consume the configured cost exactly once, revive the same profile, and project it safely in front of the player. The configured gameplay cooldown for HyDragon revival is zero; a short technical click debounce may remain.
+- **HYD-CAP-027:** If revival cannot commit, the dragon stays dead and visible in the roster. The player pays nothing unless a durable operation has reserved/consumed the cost and recovery can prove the corresponding revive result.
+- **HYD-CAP-028:** Crash recovery MUST converge to exactly one of: no charge and no revival; one charge and one revival; or one durable refund/recovery claim when a charge occurred but revival is terminally impossible. It MUST never produce a free revive, double charge, duplicate profile, or duplicate projection.
 
-### 4.2 Policy inputs
+### Removal and clean first release
 
-HyDragon's Tamework spawner/capture declarations must provide or reference:
+- **HYD-CAP-029:** Remove all HyDragon filled, active, damaged, lost, and unavailable stone assets, recipes, localization, interactions, runtime services, tests, and configuration references.
+- **HYD-CAP-030:** Remove stone-based summon, store, re-capture, durability, death damage, repair, and Revitalizing-Essence repair interaction behavior.
+- **HYD-CAP-031:** Remove every HyDragon `Vessel` section and all use of Tamework bonded-vessel capabilities or APIs.
+- **HYD-CAP-032:** Do not implement migration. Development worlds, filled stones, bonded records, Soul Bound Wyvern items, and other unreleased formats are disposable test data.
 
-```text
-stoneTierId
-chanceMode: Probability
-capturePower
-guaranteedWhenEligible
-allowedRoleIds
-tamedRoleOverrides
-maxHealthPercent
-requiredEffectId
-retryCooldown
-```
+## 5. Stone tier data
 
-Species data must provide:
+| Tier | Power | Quality | Canonical item ID | Material treatment |
+| --- | ---: | --- | --- | --- |
+| Iron | 1 | Common | `Draconic_Stone` | Iron |
+| Thorium | 2 | Uncommon | `Draconic_Stone_Thorium` | Thorium |
+| Cobalt | 3 | Rare | `Draconic_Stone_Cobalt` | Cobalt |
+| Adamantium | 4 | Epic | `Draconic_Stone_Adamantium` | Adamantium |
+| Ancient | 5 | Legendary | `Draconic_Stone_Ancient` | Mithril/ancient metal |
 
-```text
-captureResistance
-minimumStoneTier
-rarityModifier
-difficultyModifier
-conditionCurve
-specialEligibilityRequirementIds
-```
+Every tier uses the same world and icon scale but a distinct metal-matched texture and quality. Exact success curves remain asset data. The tier progression must be strictly more reliable against the same eligible target; Ancient is guaranteed.
 
-The Tamework [capture-policy specification](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) is authoritative for formula evaluation, random-source injection, validation ordering, result reasons, and transaction boundaries. HyDragon assets are authoritative for the values.
-
-## 5. Vessel lifecycle
+## 6. Capture state machine
 
 ```mermaid
 stateDiagram-v2
-    [*] --> EMPTY
-    EMPTY --> CAPTURE_CHANNELING: eligible channel begins
-    CAPTURE_CHANNELING --> EMPTY: cancel / invalid / failed roll
-    CAPTURE_CHANNELING --> BONDED_STORED: capture commits
-    BONDED_STORED --> BONDED_ACTIVE: summon admitted
-    BONDED_ACTIVE --> BONDED_STORED: store / safe auto-store
-    BONDED_ACTIVE --> DAMAGED: linked dragon dies
-    BONDED_STORED --> DAMAGED: deferred death reconciliation
-    DAMAGED --> BONDED_STORED: repair + recovery commits
-    BONDED_STORED --> UNAVAILABLE: unresolved/lost projection
-    BONDED_ACTIVE --> UNAVAILABLE: lifecycle reconciliation needed
-    UNAVAILABLE --> BONDED_STORED: Tamework reconciliation succeeds
+    [*] --> READY
+    READY --> CHANNELING: preflight passes
+    CHANNELING --> READY: canceled or eligibility lost
+    CHANNELING --> RESOLVING: terminal validation passes
+    RESOLVING --> FAILED: stone consumed + failed roll committed
+    RESOLVING --> CAPTURED: stone consumed + success committed
+    FAILED --> READY: cooldown expires
+    CAPTURED --> HORN_ROSTER: profile tamed and linked
 ```
 
-`UNAVAILABLE` is a protective state, not a new gameplay penalty. It prevents duplicate summoning while Tamework determines whether the linked entity is active, lost, in another world, or awaiting recovery. The player receives a reason and a safe retry path.
+The stone is spent only on entry to `FAILED` or `CAPTURED`. `RESOLVING` is durable and idempotent; it is not a client-visible third outcome.
 
-### State presentation
+## 7. Transaction requirements
 
-| State | Primary interaction | Visual expectation |
-| --- | --- | --- |
-| `EMPTY` | Capture channel | Existing neutral stone |
-| `CAPTURE_CHANNELING` | Cancel/complete channel | Existing homing mote, beam, aura, burst |
-| `BONDED_STORED` | Summon linked dragon | Elemental glow plus stored dragon name/species |
-| `BONDED_ACTIVE` | Store or command linked dragon | Active/radiating state distinct from stored |
-| `DAMAGED` | Repair | Cracks, red tint, weakened/intermittent glow |
-| `UNAVAILABLE` | Inspect/reconcile | Muted state; no summon action |
+### Eligible failed roll
 
-Item states may be implemented through Hytale item variants and Tamework vessel metadata, but visual state must never be the authoritative lifecycle source.
+1. Revalidate target, player, source stack, Dragon Horn access, population authority, and exact config revisions.
+2. Persist the attempt and all immutable formula inputs without rolling.
+3. Fence the exact stone stack and target/profile revision.
+4. Resolve one result and atomically claim the one-stone consumption operation.
+5. Exact-CAS decrement the source stack by one.
+6. Commit `FAILED_ROLL`, cooldown, and one feedback event.
+7. Leave the target unchanged.
 
-## 6. Capture flow
+### Successful capture
 
-1. Player targets a permitted full dragon with an empty stone.
-2. Tamework and registered HyDragon policy inputs validate role, life state, owner rules, capacity, minimum tier, health, tranquilizer, distance, and special requirements.
-3. On success, the existing three-second `TameworkCaptureChannel` presentation begins.
-4. Completion revalidates all volatile conditions and performs exactly one capture roll.
-5. A failed roll emits a localized result with useful cause/category, leaves the NPC and stone in valid states, and starts retry cooldown.
-6. A successful roll commits capture/profile/owner/vessel linkage as one operation.
-7. HyDragon adds domain metadata only after receiving the committed capture result, keyed by the Tamework operation/profile identifiers.
+1. Perform steps 1 through 5 above.
+2. Prepare owner, profile, role, population, and `hydragon:dragon_horn` roster mutations under the same operation ID.
+3. Tame and role-map the existing target on its owning world thread.
+4. Commit the canonical profile and command-family membership.
+5. Commit the attempt and emit one capture/link event.
+6. Refresh Horn projections opportunistically; failure to refresh does not undo durable success.
 
-The current homing projectile effect remains presentation only and cannot determine capture success.
+After a recorded successful roll, a transient apply failure remains recoverable under the same operation ID. It must not roll again or consume another stone. A proven terminal internal apply failure creates one replacement-stone recovery claim and commits no capture.
 
-## 7. Summon, store, commands, and mounts
+## 8. Dragon Horn contract
 
-### Summon preflight
+HyDragon supplies one canonical command item:
 
-A summon is admitted only when:
+```text
+ItemId: HyDragon_Dragon_Horn
+CommandConfigId: HyDragonDragonHorn
+CommandFamilyId: hydragon:dragon_horn
+RosterStorage: OwnerCommandFamily
+MembershipMode: LinkedOnly
+RequireOwner: true
+RequireTamed: true
+```
 
-- the actor owns the linked profile;
-- the vessel is healthy and stored;
-- the profile is not already projected or being transitioned;
-- `hydragon:full_dragons` has active capacity;
-- target placement is safe and within the configured range;
-- Tamework's bonded-vessel transition cooldown allows it;
-- all required Tamework capabilities are available.
+The physical item opens and operates the roster but is not its persistence authority. A replacement Horn reconstructs its visible rows from Tamework's owner-command-family membership. Item metadata may cache UI details but cannot grant membership, transfer ownership, or suppress a canonical row.
 
-On failure, the item and profile remain unchanged and the player sees a stable reason code translated by HyDragon.
+The current `HyDragon_Command_Whistle` ID is renamed directly because HyDragon is unreleased. No alias is required.
 
-### Commands
+## 9. Revival configuration
 
-Tamed full-dragon roles should expose, where behaviorally supported:
-
-- Follow, Hold, and Idle/Wander;
-- Defend and Aggressive modes;
-- Attack Target and Clear Target;
-- Move To, Recall, Set Home, and Return Home;
-- Mount for configured ground or avatar-flight roles.
-
-HyDragon may expose these through the bonded stone and/or a HyDragon command item, but must delegate canonical profile linking and command execution to Tamework.
-
-### Flight
-
-The current Nordic Drake `MountMode: TameworkAvatarFlight` and `AvatarFlightConfig: HyDragonNordicDrake` remain the reference integration. Other flying species require their own validated avatar-flight assets. Mount entry is denied with a localized Flightmaster's Talisman requirement when the player lacks the Tamework item.
-
-## 8. MVP maintenance policy and extension hooks
-
-The Draconic Stone's Tamework spawner asset sets the sole authoritative swap duration through `Vessel.TransitionCooldownMs`; the initial HyDragon tuning value is `10000` ms. Tamework starts, persists, enforces, and reports that cooldown after both a successful summon and a successful store. HyDragon localizes the returned remaining duration but MUST NOT mirror `cooldown_until_ms` or enforce a second balance cooldown.
-
-`Server/HyDragon/StoneMaintenance/Default.json` controls the HyDragon-owned death-repair policy and records that duration/energy extensions remain disabled:
+Role-scoped HyDragon companion configuration declares:
 
 ```json
 {
-  "Repair": {
-    "ItemId": "Revitalizing_Essence",
-    "Quantity": 1
-  },
-  "FutureExtensions": {
-    "DurationEnabled": false,
-    "EnergyEnabled": false
+  "Command": {
+    "Revive": {
+      "Enabled": true,
+      "GameplayCooldownMs": 0,
+      "Costs": [
+        { "ItemId": "Revitalizing_Essence", "Quantity": 1 }
+      ]
+    }
   }
 }
 ```
 
-The repair quantity remains data-driven. Death damage and repair are independent of the Tamework transition cooldown. Tamework's existing technical anti-spam guard remains an implementation safeguard, not a separately advertised HyDragon balance timer.
+The example quantity shows the schema, not a universal balance value. Each full-dragon and Miniwyvern role must resolve a non-empty cost. Parent/child inheritance follows Tamework's normal nested config contract; an explicit `Costs` array replaces the inherited array.
 
-### Repair transaction
+## 10. Player feedback and localization
 
-Repair MUST use the durable cross-plugin saga defined by Tamework's [bonded-vessel death and repair contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/bonded-vessels.md#death-and-lost-state):
+Every player-facing key ships in `en-US`, `pt-BR`, `de-DE`, `fr-FR`, and `es-ES` with identical key and placeholder sets. Required outcomes include:
 
-1. HyDragon derives a stable caller namespace/idempotency key and asks Tamework to prepare `DEAD(g) -> STORED(g+1)` for the exact binding, generation, owner, and damaged source fingerprint. Preparation reserves the transition without consuming material.
-2. HyDragon durably records the repair operation, exact-CAS consumes Revitalizing Essence once, and records `MATERIAL_CONSUMED` under the same key.
-3. HyDragon commits the prepared Tamework operation. Retries query or commit with that same key; they never prepare a second transition or consume a second essence.
-4. HyDragon marks the local operation committed only after Tamework reports terminal success. An unknown or transient result remains pending and is not refunded while Tamework might still commit.
-5. Only a terminal pre-apply denial authorizes an idempotent refund to the exact source. When exact reinsertion is unsafe, HyDragon creates a durable owner recovery claim instead. A repair can converge to a repaired vessel or one refund/recovery claim, never both.
+- invalid role, health, tranquilizer, range, ownership, capacity, or special condition;
+- Dragon Horn required;
+- channel interrupted without cost;
+- failed roll and consumed stone;
+- successful capture and Horn addition;
+- retry cooldown remaining;
+- dead/revival cost/insufficient essence;
+- revival placement, capacity, persistence, and recovery-pending failures.
 
-Restart recovery MUST query Tamework by caller/idempotency key rather than persist a process-local preparation token.
+Asset IDs remain canonical English in every locale.
 
-The config schema may reserve namespaced data for a future `DURATION` or `ENERGY` extension, but those modes are not release requirements. If implemented later, they must be mutually exclusive, reuse the Tamework bonded-vessel lifecycle, and receive their own acceptance tests and data-version contract. MVP must not drain energy, auto-store on a timer, or use Revitalizing Essence as routine fuel.
+## 11. Implementation removal map
 
-## 9. Failure and concurrency safety
-
-- One operation lock per vessel/profile pair covers capture, summon, store, cooldown updates, death reconciliation, and repair.
-- Population admission is obtained before projection and released only through the Tamework lifecycle result.
-- A repaired dragon is restored once. Retried repair callbacks follow the section 8 saga and reuse its caller/idempotency key across both systems.
-- If a store transition fails transiently, the dragon is made non-interactive for duplicate transitions and retried on the world thread. It is not killed or replaced.
-- A dropped stolen stone remains linked to its original owner. A non-owner can inspect it but cannot summon, store, repair, or transfer it.
-- Administrative recovery must relink or return the unique vessel; it must never clone the profile into a second stone.
-
-## 10. Implemented asset and configuration changes
-
-The implementation contains the following first-release changes. Release verification must still prove the resulting assets, runtime paths, and packaged references together.
-
-| Earlier source state | Implemented result |
+| Remove | Replace with |
 | --- | --- |
-| One `Draconic_Stone` tier | `Draconic_Stone` is the canonical Iron tier; four higher tiers and parented Tamework configs are present. |
-| Deterministic-only capture | Tamework capture-policy data provides tiered probability; Ancient is guaranteed only after eligibility. |
-| Mixed wild/tamed allowlist | Initial capture is wild-role-only; storage targets the exact linked tamed profile through the vessel path. |
-| Filled state returned to empty | Bonded-vessel mode preserves the profile link across summon/store states. |
-| Stone allowed Miniwyvern | Wild and tamed Miniwyvern roles are excluded; Soul Bond provisioning is their only creation path. |
-| Rock Drakes absent from capture data | Rock Drake tamed roles and tier-specific capture declarations are included. |
-| Technical 500 ms cooldown | Technical anti-spam and the Tamework-owned 10,000 ms transition cooldown are distinct. |
-| No damaged/active item states | Active, stored, damaged/dead, lost, and unavailable mappings have canonical assets and localization. |
-| No HyDragon command asset/config | The role-scoped Tamework command configuration is present. |
-
-HyDragon has never been released. There are zero HyDragon migration or legacy-compatibility requirements: development-only filled stones, captured profiles, and test worlds are not supported upgrade inputs. The first release contains no reader, alias, adoption flow, or compatibility path for earlier development formats.
-
-## 11. Configuration and asset map
-
-| Asset/config | Work |
-| --- | --- |
-| `Server/Item/Items/Ingredient/Draconic_Stone.json` | Use as canonical Iron; add bonded/active/damaged presentation and new interaction mapping |
-| `Server/Item/Items/Ingredient/Draconic_Stone_{Thorium,Cobalt,Adamantium,Ancient}.json` | New tier items and recipes |
-| `Server/Tamework/Items/Spawners/HyDragonDraconicStone*.json` | Tiered stone power, probability mode, and bonded-vessel declarations; no Miniwyvern roles |
-| `Server/Tamework/CapturePolicies/HyDragon{Hydra,NordicDrake,RockDrakeT1,RockDrakeT2,RockDrakeT3}.json` | Per-role capture resistance, minimum power, chance multiplier, missing-health bonus, and Ancient-tier guarantee |
-| `Server/Tamework/Companion/HyDragonFullDragons.json` | Role-scoped revive/placement/recall behavior |
-| `Server/Tamework/Items/Commands/HyDragonDragonCommand.json` | Commands if not exposed through vessel actions |
-| `Server/Tamework/PopulationGroups/HyDragonFullDragons.json` | `hydragon:full_dragons` membership and active cap |
-| `Server/HyDragon/DragonSpecies/*.json` | Resistance, minimum tier, encounter eligibility |
-| `Server/HyDragon/StoneMaintenance/Default.json` | Repair balance and disabled future-extension flags; it does not duplicate the vessel cooldown |
-| `Common/Items/HyDragon/` and `Common/Icons/ItemsGenerated/` | Tier, filled, active, and damaged visuals |
-| `Server/Languages/{en-US,pt-BR,de-DE,fr-FR,es-ES}/server.lang` | Names, descriptions, prompts, failures, and cooldown/repair status with exact key/placeholder parity per the [content localization contract](dragon-content-encounters.md#53-localization-catalogs) |
-
-These paths match the config families fixed by the [Tamework integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md).
+| `Vessel` blocks in all five stone spawner configs | `SourceConsumption: ResolvedAttempt`, `SuccessDisposition: TameAndCommandLink`, and Dragon Horn command-family fields |
+| Filled/active/damaged/lost/unavailable stone item states | No replacement; empty tier item is consumed |
+| Bonded stone repair interaction and journal | Tamework command revival cost transaction |
+| Stone summon/store/re-capture flow | Dragon Horn commands, Recall, and persistent roster |
+| `Soul_Bound_Wyvern` item | Wyvern Egg claim adds Miniwyvern to Dragon Horn |
+| `HyDragon_Command_Whistle` | `HyDragon_Dragon_Horn` |
+| HyDragon bonded-vessel capability checks | Tamework capture-policy, command-roster, provisioning, population, and paid-revival capability checks |
 
 ## 12. Acceptance criteria
 
-- Hydra, Nordic Drake, and each completed full-sized Rock Drake role can be configured for capture; Miniwyvern is denied with every tier.
-- At 21% health or without tranquilizer, no stone is consumed and no random roll occurs.
-- A low-tier stone is rejected below a species minimum; Ancient succeeds every eligible deterministic test.
-- Seeded policy tests cover success, failed roll, cancellation, moved-out-of-range, target death, simultaneous capturers, and stale channel completion.
-- Capturing, summoning, storing, restarting, and summoning again always returns the same profile ID and preserved name/health/progression.
-- Two different bonded stones cannot project two full dragons for one owner; the rejected stone remains unchanged.
-- Losing the Flightmaster's Talisman blocks avatar-flight mount entry but not ground mount or ordinary follow/combat behavior.
-- Summon/store swap cooldown survives restart, blocks rapid swapping without altering the active dragon, and reports its remaining duration.
-- Dragon death produces a damaged stone; a repeated repair request consumes one essence and restores one profile.
-- Non-owner, inventory-full, unsafe-placement, missing-capability, and restart-mid-operation tests leave recoverable state and no duplicates.
-- A clean first-release installation uses only the canonical bonded-stone schema and contains no pre-release compatibility reader, alias, or adoption path.
+- Invalid targeting and interrupted channels consume no stone and obtain no roll.
+- A seeded eligible failed roll consumes exactly one stone, leaves the dragon wild and unchanged, and applies one cooldown.
+- A seeded success consumes exactly one stone, tames the same entity/profile, leaves it in the world, and adds one Horn roster row.
+- Duplicate completion and restart recovery obtain one result and consume one stone total.
+- Multiple low-tier attempts can each consume a stone before success; higher tiers produce strictly higher configured chance for the same target and conditions.
+- Ancient captures every eligible supported role but cannot bypass deterministic requirements.
+- Capture is denied without a Dragon Horn and consumes nothing.
+- Losing or replacing a Horn does not lose a roster; another player's Horn grants no access.
+- One Horn controls all owned full dragons and the one Miniwyvern while preserving their distinct population-group limits.
+- Recall and revival place companions safely in front of the player.
+- Death leaves one dead roster row. Successful revival consumes the configured essence once and restores the same profile once.
+- Insufficient essence, capacity denial, unsafe placement, missing capability, and persistence unavailability cause no charge and no revival.
+- Restart at every capture and revival checkpoint converges without duplicate profiles, projections, charges, refunds, or free rolls; a terminal charged capture fault produces one replacement claim and no capture.
+- The packaged mod contains no bonded-stone item states, runtime paths, config sections, migration readers, or `Soul_Bound_Wyvern` item.
 
-## 13. Implemented dependency map
+## 13. Delivery order
 
-| Phase | HyDragon work | Required Tamework work |
-| --- | --- | --- |
-| C0 | Miniwyvern exclusion and role/content validation | Existing public API |
-| C1 | Tier items, recipes, species capture data, and UX | [Capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) |
-| C2 | Persistent bonded-stone states | [Bonded vessels](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/bonded-vessels.md) |
-| C3 | Enforce one active full dragon | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) |
-| C4 | Swap cooldown, death damage, repair, and restart recovery | C1-C3 and [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) |
+1. Tamework command-family roster authority and public capability.
+2. Tamework capture `ResolvedAttempt` consumption and `TameAndCommandLink` success disposition.
+3. Tamework paid command revival and recovery.
+4. HyDragon Dragon Horn item/config/localization.
+5. HyDragon stone config conversion and bonded-state removal.
+6. Miniwyvern Egg-to-Horn claim conversion.
+7. Cross-repository unit, integration, packaged-asset, restart, and in-game acceptance tests.

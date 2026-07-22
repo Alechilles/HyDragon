@@ -7,7 +7,7 @@ Base-game evidence target: Hytale Workshop corpus `0.5.6`
 
 This specification completes HyDragon's content layer and separates ordinary asset-driven content from encounters that require Java orchestration. It covers materials, the Draconic Altar, recipes, the current dragon roster, difficulty metadata, static spawning, mounts, and special multi-stage encounters.
 
-Capture/vessel mechanics are defined in [Capture, summoning, and maintenance](capture-summoning-maintenance.md). Miniwyvern content is defined in [Soul Bond and Miniwyvern](soul-bond-miniwyvern.md). Runtime boundaries follow [Plugin architecture](plugin-architecture.md) and the Tamework [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md).
+Capture spending, Dragon Horn membership, and paid revival are defined in [Draconic capture, Dragon Horn, and revival](capture-summoning-maintenance.md). Miniwyvern content is defined in [Wyvern Egg, Soul Bond, and Miniwyvern](soul-bond-miniwyvern.md). Runtime boundaries follow [Plugin architecture](plugin-architecture.md) and the Tamework [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md).
 
 ## 2. Base-game asset boundary
 
@@ -59,7 +59,7 @@ The plugin must not replace static spawning or crafting that these schemas alrea
 | Nordic Drake | Wild/tamed roles, species data, combat, capture mapping, encounter coverage, and `TameworkAvatarFlight` config | Avatar flight using only Tamework's Flightmaster's Talisman |
 | Rock Drake T1/T2/T3 | Wild/tamed roles, capture declarations, commands, cave spawning, mount policy, and tier metadata | Tier balance, commands, spawning, and mounting in game |
 | Miniwyvern | Soul Bond provisioning, seven archetypes, production wild spawning disabled, and ordinary capture denied | Once-only entitlement, population limits, and ability safety |
-| Draconic Stones | Iron, Thorium, Cobalt, Adamantium, and Ancient tiers with altar-only recipes | Tier eligibility, probability, vessel lifecycle, repair, and cooldown |
+| Draconic Stones | Iron, Thorium, Cobalt, Adamantium, and Ancient tiers with altar-only recipes | Tier eligibility, probability, consume-on-roll behavior, tame/link, and cooldown |
 | Essences | Generic, Fire, Ice, Water, Nature, Lightning, Wind, Void, and Revitalizing canonical items and configured sources | Drop balance, crafting, references, and localization parity |
 | Draconic Scale | Canonical item and configured dragon drops | Per-species sourcing and balance |
 | Draconic Altar | Bench block, model, icon, categories, recipes, and five locale catalogs | Placement, recipe availability, and packaged references |
@@ -115,7 +115,7 @@ HyDragon ships these complete server catalogs:
 | `fr-FR` | French | `Server/Languages/fr-FR/server.lang` |
 | `es-ES` | Spanish | `Server/Languages/es-ES/server.lang` |
 
-Every catalog contains the same key set for items, item descriptions, NPC/role names, the Draconic Altar and categories, interaction prompts, validation/failure reasons, cooldown/repair status, Soul Bond, archetypes/abilities, and player-visible encounter messages. Required locales MUST NOT rely on English fallback for a missing HyDragon key.
+Every catalog contains the same key set for items, item descriptions, NPC/role names, the Draconic Altar and categories, interaction prompts, validation/failure reasons, capture cooldown and paid-revival status, Soul Bond, archetypes/abilities, and player-visible encounter messages. Required locales MUST NOT rely on English fallback for a missing HyDragon key.
 
 Files are UTF-8, preserve interpolation placeholders/markup exactly across locales, and use canonical English ID segments in keys—for example, each file defines `items.Draconic_Essence_Fire.name`, while an item asset references `server.items.Draconic_Essence_Fire.name`. Translation changes values, never asset IDs or localization keys.
 
