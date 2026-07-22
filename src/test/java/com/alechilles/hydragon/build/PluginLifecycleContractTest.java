@@ -57,6 +57,19 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("entry.present() ? Level.INFO : Level.WARNING"));
     }
 
+    @Test
+    void commandDescriptionsUseServerTranslationKeys() throws IOException {
+        String statusSource = Files.readString(projectRoot.resolve(
+                "src/main/java/com/alechilles/hydragon/diagnostics/HyDragonStatusCommand.java"));
+        String refundSource = Files.readString(projectRoot.resolve(
+                "src/main/java/com/alechilles/hydragon/diagnostics/HyDragonRefundClaimCommand.java"));
+
+        assertTrue(statusSource.contains(
+                "super(\"hydragon\", \"server.messages.status.description\")"));
+        assertTrue(refundSource.contains(
+                "super(\"hydragonclaim\", \"server.messages.refund.description\")"));
+    }
+
     private String pluginSource() throws IOException {
         return Files.readString(projectRoot.resolve(
                 "src/main/java/com/alechilles/hydragon/HyDragonPlugin.java"));

@@ -31,7 +31,7 @@ public final class HyDragonStatusCommand extends AbstractPlayerCommand {
             Supplier<List<String>> reloadIssuesSupplier,
             Supplier<TameworkBridge> bridgeSupplier,
             Supplier<HyDragonPersistenceStatus> persistenceSupplier) {
-        super("hydragon", "Inspect HyDragon config and Tamework feature readiness.");
+        super("hydragon", "server.messages.status.description");
         this.configSupplier = configSupplier;
         this.reloadIssuesSupplier = reloadIssuesSupplier;
         this.bridgeSupplier = bridgeSupplier;

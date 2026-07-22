@@ -21,7 +21,7 @@ public final class HyDragonRefundClaimCommand extends AbstractPlayerCommand {
     private final Supplier<ConsumableRefundClaimService> serviceSupplier;
 
     public HyDragonRefundClaimCommand(Supplier<ConsumableRefundClaimService> serviceSupplier) {
-        super("hydragonclaim", "Claim a pending HyDragon repair-material refund.");
+        super("hydragonclaim", "server.messages.refund.description");
         this.serviceSupplier = Objects.requireNonNull(serviceSupplier, "serviceSupplier");
     }
 
