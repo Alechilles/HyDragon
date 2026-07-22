@@ -21,7 +21,8 @@ public record EncounterDefinitionSnapshot(
         String groundedEffectId,
         long captureWindowMs,
         long encounterTimeoutMs,
-        long retryCooldownMs) {
+        long retryCooldownMs,
+        long eligibilityGraceMs) {
 
     public EncounterDefinitionSnapshot {
         buildupSourceIds = normalizedSet(buildupSourceIds, "buildupSourceIds");
@@ -43,6 +44,9 @@ public record EncounterDefinitionSnapshot(
         if (retryCooldownMs < 0L) {
             throw new IllegalArgumentException("retryCooldownMs must not be negative");
         }
+        if (eligibilityGraceMs < 0L) {
+            throw new IllegalArgumentException("eligibilityGraceMs must not be negative");
+        }
     }
 
     public static EncounterDefinitionSnapshot capture(DragonEncounterConfig definition) {
@@ -58,7 +62,8 @@ public record EncounterDefinitionSnapshot(
                 grounding.getGroundedEffectId(),
                 grounding.getCaptureWindowMs(),
                 cleanup.getEncounterTimeoutMs(),
-                cleanup.getRetryCooldownMs());
+                cleanup.getRetryCooldownMs(),
+                cleanup.getEligibilityGraceMs());
     }
 
     private static Set<String> normalizedSet(Set<String> values, String field) {

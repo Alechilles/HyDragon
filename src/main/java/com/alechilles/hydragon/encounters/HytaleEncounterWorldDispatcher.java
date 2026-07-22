@@ -18,6 +18,8 @@ import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import com.hypixel.hytale.server.spawning.ISpawnableWithModel;
 import com.hypixel.hytale.server.spawning.SpawnTestResult;
 import com.hypixel.hytale.server.spawning.SpawningContext;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.RejectedExecutionException;
@@ -34,6 +36,8 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
     };
 
     private final ComponentType<EntityStore, HyDragonEncounterComponent> markerType;
+    private final RemovalLedger removals = new RemovalLedger();
+    private final AtomicReference<TargetRemovalListener> removalListener = new AtomicReference<>();
 
     public HytaleEncounterWorldDispatcher(
             ComponentType<EntityStore, HyDragonEncounterComponent> markerType) {
@@ -48,25 +52,48 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
         World world = universe == null ? null : universe.getWorlds().get(worldName);
         if (world == null) return;
         if (world.isInThread()) {
-            callback.accept(new Port(world, markerType));
+            callback.accept(new Port(world, markerType, removals));
             return;
         }
         try {
-            world.execute(() -> callback.accept(new Port(world, markerType)));
+            world.execute(() -> callback.accept(new Port(world, markerType, removals)));
         } catch (RejectedExecutionException ignored) {
             // World shutdown is an expected fail-closed lifecycle boundary.
         }
+    }
+
+    void observeTargetAdded(String worldName, String encounterId, UUID targetUuid) {
+        removals.observeAdded(worldName, encounterId, targetUuid);
+    }
+
+    void observeTargetRemoved(String worldName, String encounterId, UUID targetUuid) {
+        removals.observeRemoved(worldName, encounterId, targetUuid);
+        TargetRemovalListener listener = removalListener.get();
+        if (listener != null) listener.onRemoved(worldName, encounterId, targetUuid);
+    }
+
+    AutoCloseable subscribeToPermanentRemovals(TargetRemovalListener listener) {
+        Objects.requireNonNull(listener, "listener");
+        if (!removalListener.compareAndSet(null, listener)) {
+            throw new IllegalStateException("Permanent target removal listener is already installed");
+        }
+        return () -> removalListener.compareAndSet(listener, null);
     }
 
     private static final class Port implements EncounterWorldGateway {
         private final World world;
         private final Store<EntityStore> store;
         private final ComponentType<EntityStore, HyDragonEncounterComponent> markerType;
+        private final RemovalLedger removals;
 
-        private Port(World world, ComponentType<EntityStore, HyDragonEncounterComponent> markerType) {
+        private Port(
+                World world,
+                ComponentType<EntityStore, HyDragonEncounterComponent> markerType,
+                RemovalLedger removals) {
             this.world = world;
             this.store = world.getEntityStore().getStore();
             this.markerType = markerType;
+            this.removals = removals;
         }
 
         @Override public boolean isWorldThread() { return world.isInThread(); }
@@ -111,6 +138,7 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
                     if (pair == null || pair.first() == null || !pair.first().isValid()) continue;
                     UUIDComponent identity = store.getComponent(pair.first(), UUIDComponent.getComponentType());
                     if (identity != null && identity.getUuid() != null) {
+                        removals.observeAdded(world.getName(), request.encounterId(), identity.getUuid());
                         return SpawnResult.success(identity.getUuid());
                     }
                     store.removeEntity(pair.first(), RemoveReason.REMOVE);
@@ -130,7 +158,10 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
                 Ref<EntityStore> expected = world.getEntityRef(expectedTargetUuid);
                 HyDragonEncounterComponent marker = valid(expected)
                         ? store.getComponent(expected, markerType) : null;
-                if (marker != null && marker.matches(encounterId)) return TargetLookup.present(expectedTargetUuid);
+                if (marker != null && marker.matches(encounterId)) {
+                    removals.observeAdded(worldName, encounterId, expectedTargetUuid);
+                    return TargetLookup.present(expectedTargetUuid);
+                }
             }
 
             AtomicReference<UUID> found = new AtomicReference<>();
@@ -147,10 +178,17 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
                 }
             });
             UUID resolved = found.get();
-            if (resolved != null) return TargetLookup.present(resolved);
+            if (resolved != null) {
+                removals.observeAdded(world.getName(), encounterId, resolved);
+                return TargetLookup.present(resolved);
+            }
 
-            // The 0.5.6 runtime cannot prove that an unloaded persistent entity is gone. UNKNOWN
-            // deliberately blocks replacement instead of risking a duplicate encounter target.
+            if (removals.wasRemoved(worldName, encounterId, expectedTargetUuid)) {
+                return TargetLookup.absent();
+            }
+
+            // A missing loaded reference may still be an unloaded persistent entity. Only the
+            // removal lifecycle system's permanent REMOVE evidence can turn this into ABSENT.
             return TargetLookup.unknown();
         }
 
@@ -187,12 +225,59 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
             if (!valid(target)) return false;
             HyDragonEncounterComponent marker = store.getComponent(target, markerType);
             if (marker == null) return false;
+            UUIDComponent identity = store.getComponent(target, UUIDComponent.getComponentType());
             store.removeEntity(target, RemoveReason.REMOVE);
+            if (identity != null && identity.getUuid() != null) {
+                removals.observeRemoved(world.getName(), marker.getEncounterId(), identity.getUuid());
+            }
             return true;
         }
 
         private static boolean valid(Ref<EntityStore> ref) {
             return ref != null && ref.isValid();
         }
+    }
+
+    /** Bounded, thread-safe permanent-removal evidence keyed by world and encounter. */
+    static final class RemovalLedger {
+        private static final int MAX_ENTRIES = 4_096;
+        private final Map<Key, UUID> removed = new LinkedHashMap<>();
+
+        synchronized void observeAdded(String worldName, String encounterId, UUID targetUuid) {
+            removed.remove(new Key(worldName, encounterId));
+        }
+
+        synchronized void observeRemoved(String worldName, String encounterId, UUID targetUuid) {
+            Key key = new Key(worldName, encounterId);
+            removed.remove(key);
+            removed.put(key, Objects.requireNonNull(targetUuid, "targetUuid"));
+            while (removed.size() > MAX_ENTRIES) {
+                removed.remove(removed.keySet().iterator().next());
+            }
+        }
+
+        synchronized boolean wasRemoved(String worldName, String encounterId, UUID expectedTargetUuid) {
+            UUID removedUuid = removed.get(new Key(worldName, encounterId));
+            return removedUuid != null
+                    && (expectedTargetUuid == null || expectedTargetUuid.equals(removedUuid));
+        }
+
+        private record Key(String worldName, String encounterId) {
+            private Key {
+                worldName = requiredText(worldName, "worldName");
+                encounterId = requiredText(encounterId, "encounterId");
+            }
+
+            private static String requiredText(String value, String field) {
+                String normalized = Objects.requireNonNull(value, field).trim();
+                if (normalized.isEmpty()) throw new IllegalArgumentException(field + " is required");
+                return normalized;
+            }
+        }
+    }
+
+    @FunctionalInterface
+    interface TargetRemovalListener {
+        void onRemoved(String worldName, String encounterId, UUID targetUuid);
     }
 }

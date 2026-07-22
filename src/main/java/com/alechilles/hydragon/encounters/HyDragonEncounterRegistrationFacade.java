@@ -28,6 +28,8 @@ public final class HyDragonEncounterRegistrationFacade {
     public static HyDragonEncounterServerRuntime registerServerRuntime(JavaPlugin plugin) {
         ComponentType<EntityStore, HyDragonEncounterComponent> marker = registerComponents(plugin);
         HyDragonEncounterServerRuntime runtime = new HyDragonEncounterServerRuntime(marker);
+        plugin.getEntityStoreRegistry().registerSystem(
+                new HyDragonEncounterTargetLifecycleSystem(runtime.worlds(), marker));
         plugin.getEntityStoreRegistry().registerSystem(new HyDragonEncounterDamageSystem(runtime, marker));
         return runtime;
     }

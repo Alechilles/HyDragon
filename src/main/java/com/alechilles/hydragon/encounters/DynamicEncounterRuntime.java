@@ -55,6 +55,13 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
 
     public synchronized void start() {
         if (started) return;
+        if (worlds instanceof HytaleEncounterWorldDispatcher dispatcher) {
+            handles.add(dispatcher.subscribeToPermanentRemovals(
+                    (worldName, encounterId, targetUuid) -> dispatcher.dispatch(
+                            worldName, targetUuid,
+                            world -> coordinator.onTargetPermanentlyRemoved(
+                                    encounterId, targetUuid, world, clock.millis()))));
+        }
         handles.add(api.interactionExtensions().registerCaptureRequirement(
                 CAPTURE_REQUIREMENT_ID,
                 (context, spec) -> captureRequirement(context.targetNpcUuid(), spec)));
@@ -92,6 +99,35 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
                 encounterId, targetNpcUuid, sourceId, buildup, world, clock.millis());
     }
 
+    /** Rechecks the credited actor immediately before a damage-driven phase transition. */
+    public DynamicEncounterCoordinator.TransitionResult recheckEligibility(
+            String encounterId,
+            EncounterCandidate candidate,
+            EncounterWorldGateway world) {
+        Objects.requireNonNull(candidate, "candidate");
+        EncounterRecord record = stateStore.snapshot().encounters().get(encounterId);
+        if (record == null) {
+            return new DynamicEncounterCoordinator.TransitionResult(
+                    false, "encounter-missing", EncounterPhase.RECONCILING, 0.0D);
+        }
+        if (!record.eligiblePlayerUuids().contains(candidate.playerUuid())) {
+            return new DynamicEncounterCoordinator.TransitionResult(
+                    false, "eligibility-candidate-uncredited",
+                    EncounterCheckpoint.decode(record.phase()).phase(), 0.0D);
+        }
+        HyDragonConfigRepository.Snapshot snapshot = configs.get();
+        DragonEncounterConfig definition = snapshot.encounters().get(record.definitionId());
+        if (definition == null) {
+            return new DynamicEncounterCoordinator.TransitionResult(
+                    false, "encounter-definition-missing",
+                    EncounterCheckpoint.decode(record.phase()).phase(), 0.0D);
+        }
+        FeatureGate featureGate = gate.get();
+        return coordinator.recheckEligibility(
+                encounterId, definition, snapshot, List.of(candidate), true, world,
+                featureGate != null && featureGate.available(), clock.millis());
+    }
+
     /** Read-only lookup used by the registered Hytale damage bridge. */
     public EncounterRecord find(String encounterId) {
         if (encounterId == null || encounterId.isBlank()) return null;
@@ -103,6 +139,32 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         for (EncounterRecord record : stateStore.snapshot().encounters().values()) {
             worlds.dispatch(record.worldName(), record.targetNpcUuid().orElse(null),
                     world -> coordinator.reconcile(record.encounterId(), world, now));
+        }
+    }
+
+    /** Rechecks all bounded active encounters in one world using one immutable player scan. */
+    public void recheckEligibility(
+            String worldName,
+            List<EncounterCandidate> candidates,
+            boolean authoritativeScan) {
+        Objects.requireNonNull(worldName, "worldName");
+        candidates = List.copyOf(Objects.requireNonNull(candidates, "candidates"));
+        HyDragonConfigRepository.Snapshot snapshot = configs.get();
+        FeatureGate featureGate = gate.get();
+        boolean featureAvailable = featureGate != null && featureGate.available();
+        long now = clock.millis();
+        for (EncounterRecord record : stateStore.snapshot().encounters().values().stream()
+                .filter(candidate -> worldName.equals(candidate.worldName()))
+                .sorted(java.util.Comparator.comparing(EncounterRecord::encounterId))
+                .limit(HyDragonEncounterServerRuntime.MAX_ENCOUNTERS_PER_TICK)
+                .toList()) {
+            DragonEncounterConfig definition = snapshot.encounters().get(record.definitionId());
+            if (definition == null) continue;
+            List<EncounterCandidate> immutableCandidates = candidates;
+            worlds.dispatch(record.worldName(), record.targetNpcUuid().orElse(null),
+                    world -> coordinator.recheckEligibility(
+                            record.encounterId(), definition, snapshot, immutableCandidates,
+                            authoritativeScan, world, featureAvailable, now));
         }
     }
 

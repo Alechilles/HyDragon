@@ -848,7 +848,8 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
                         requiredText(properties, prefix + "definitionGroundedEffectId"),
                         requiredLong(properties, prefix + "definitionCaptureWindowMs"),
                         requiredLong(properties, prefix + "definitionEncounterTimeoutMs"),
-                        requiredLong(properties, prefix + "definitionRetryCooldownMs")),
+                        requiredLong(properties, prefix + "definitionRetryCooldownMs"),
+                        requiredLong(properties, prefix + "definitionEligibilityGraceMs")),
                 optionalUuid(properties, prefix + "targetNpcUuid"),
                 uuidSet(properties, prefix + "eligiblePlayerUuids"),
                 requiredLong(properties, prefix + "createdAtEpochMillis"),
@@ -977,6 +978,7 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
         properties.setProperty(prefix + "definitionCaptureWindowMs", Long.toString(definition.captureWindowMs()));
         properties.setProperty(prefix + "definitionEncounterTimeoutMs", Long.toString(definition.encounterTimeoutMs()));
         properties.setProperty(prefix + "definitionRetryCooldownMs", Long.toString(definition.retryCooldownMs()));
+        properties.setProperty(prefix + "definitionEligibilityGraceMs", Long.toString(definition.eligibilityGraceMs()));
         setOptional(properties, prefix + "targetNpcUuid", record.targetNpcUuid().map(UUID::toString));
         String eligiblePlayers = record.eligiblePlayerUuids().stream()
                 .map(UUID::toString)

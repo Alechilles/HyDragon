@@ -13,6 +13,13 @@ class EncounterCheckpointTest {
     }
 
     @Test
+    void eligibilityGraceCheckpointRoundTripsWithGroundingProgress() {
+        EncounterCheckpoint expected = new EncounterCheckpoint(
+                EncounterPhase.GROUNDING, 37.5D, 12_345L);
+        assertEquals(expected, EncounterCheckpoint.decode(expected.encode()));
+    }
+
+    @Test
     void nonGroundingPhaseCannotCarryBuildup() {
         assertThrows(IllegalArgumentException.class,
                 () -> new EncounterCheckpoint(EncounterPhase.AERIAL, 1.0D));

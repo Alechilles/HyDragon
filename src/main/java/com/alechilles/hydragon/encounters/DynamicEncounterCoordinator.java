@@ -148,7 +148,7 @@ public final class DynamicEncounterCoordinator {
             if (checkpoint.phase() == EncounterPhase.AERIAL
                     || total < definition.groundingThreshold()) {
                 EncounterRecord grounding = update(current,
-                        new EncounterCheckpoint(EncounterPhase.GROUNDING, total), current.targetNpcUuid(),
+                        checkpoint.withPhase(EncounterPhase.GROUNDING, total), current.targetNpcUuid(),
                         checkpoint.phase() == EncounterPhase.GROUNDING ? current.phaseStartedAtEpochMillis() : nowMs,
                         nowMs, 0L);
                 return put(grounding)
@@ -156,13 +156,106 @@ public final class DynamicEncounterCoordinator {
                         : TransitionResult.denied("grounding-checkpoint-failed");
             }
             EncounterRecord thresholdReached = update(current,
-                    new EncounterCheckpoint(EncounterPhase.GROUNDING, total), current.targetNpcUuid(),
+                    checkpoint.withPhase(EncounterPhase.GROUNDING, total), current.targetNpcUuid(),
                     checkpoint.phase() == EncounterPhase.GROUNDING ? current.phaseStartedAtEpochMillis() : nowMs,
                     nowMs, 0L);
             if (!put(thresholdReached)) {
                 return TransitionResult.denied("grounding-threshold-checkpoint-failed");
             }
             return advanceGrounding(thresholdReached, definition, world, nowMs);
+        }
+    }
+
+    /**
+     * Applies the definition's continuous temporary-eligibility grace policy.
+     * A bounded world scan may report positive evidence even when incomplete, but negative
+     * evidence starts or advances the durable grace timer only when the scan is authoritative.
+     */
+    public TransitionResult recheckEligibility(
+            String encounterId,
+            DragonEncounterConfig definition,
+            HyDragonConfigRepository.Snapshot configs,
+            List<EncounterCandidate> candidates,
+            boolean authoritativeScan,
+            EncounterWorldGateway world,
+            boolean featureAvailable,
+            long nowMs) {
+        Objects.requireNonNull(definition, "definition");
+        Objects.requireNonNull(configs, "configs");
+        Objects.requireNonNull(candidates, "candidates");
+        Objects.requireNonNull(world, "world");
+        if (nowMs < 0L) throw new IllegalArgumentException("nowMs must not be negative");
+        if (!world.isWorldThread()) return TransitionResult.denied("not-world-thread");
+        synchronized (lock) {
+            EncounterRecord current = stateStore.snapshot()
+                    .encounter(requiredText(encounterId, "encounterId")).orElse(null);
+            if (current == null) return TransitionResult.denied("encounter-missing");
+            EncounterCheckpoint checkpoint = decode(current);
+            if (checkpoint.phase() == EncounterPhase.COOLDOWN) {
+                return TransitionResult.denied("cooldown-active");
+            }
+            boolean eligible = candidates.stream()
+                    .filter(candidate -> current.eligiblePlayerUuids().contains(candidate.playerUuid()))
+                    .filter(candidate -> current.worldName().equals(candidate.worldName()))
+                    .filter(candidate -> current.regionKey().equals(candidate.regionKey()))
+                    .anyMatch(candidate -> eligibility.evaluate(
+                            definition, configs, candidate, featureAvailable).allowed());
+            if (eligible) {
+                if (checkpoint.eligibilityLostAtEpochMillis() == 0L) {
+                    return new TransitionResult(true, "eligibility-confirmed", checkpoint.phase(),
+                            checkpoint.groundingBuildup());
+                }
+                EncounterRecord restored = update(current, checkpoint.withEligibilityLostAt(0L),
+                        current.targetNpcUuid(), current.phaseStartedAtEpochMillis(), nowMs,
+                        current.cooldownUntilEpochMillis());
+                return put(restored)
+                        ? new TransitionResult(true, "eligibility-restored", checkpoint.phase(),
+                        checkpoint.groundingBuildup())
+                        : TransitionResult.denied("eligibility-restore-checkpoint-failed");
+            }
+            if (!authoritativeScan) {
+                return TransitionResult.denied("eligibility-scan-incomplete");
+            }
+            if (checkpoint.eligibilityLostAtEpochMillis() == 0L) {
+                EncounterRecord graceStarted = update(current, checkpoint.withEligibilityLostAt(nowMs),
+                        current.targetNpcUuid(), current.phaseStartedAtEpochMillis(), nowMs,
+                        current.cooldownUntilEpochMillis());
+                return put(graceStarted)
+                        ? new TransitionResult(true, "eligibility-grace-started", checkpoint.phase(),
+                        checkpoint.groundingBuildup())
+                        : TransitionResult.denied("eligibility-grace-checkpoint-failed");
+            }
+            long graceUntil = saturatingAdd(
+                    checkpoint.eligibilityLostAtEpochMillis(), current.definitionSnapshot().eligibilityGraceMs());
+            if (nowMs < graceUntil) {
+                return new TransitionResult(true, "eligibility-grace-active", checkpoint.phase(),
+                        checkpoint.groundingBuildup());
+            }
+            UUID target = current.targetNpcUuid().orElse(null);
+            CaptureStatus captureStatus = target == null ? CaptureStatus.NOT_CAPTURED : captureStatus(target);
+            if (captureStatus == CaptureStatus.CAPTURED) {
+                return enterCooldown(current, current.definitionSnapshot(), nowMs)
+                        ? new TransitionResult(true, "captured-at-eligibility-boundary",
+                        EncounterPhase.COOLDOWN, 0.0D)
+                        : TransitionResult.denied("captured-cooldown-checkpoint-failed");
+            }
+            if (captureStatus == CaptureStatus.UNKNOWN) {
+                return TransitionResult.denied("capture-state-ambiguous");
+            }
+            if (target != null) {
+                EncounterWorldGateway.TargetLookup lookup = world.findTarget(
+                        current.encounterId(), current.worldName(), target);
+                if (lookup.presence() == EncounterWorldGateway.TargetPresence.UNKNOWN) {
+                    return TransitionResult.denied("target-presence-ambiguous");
+                }
+                if (lookup.presence() == EncounterWorldGateway.TargetPresence.PRESENT
+                        && !world.retireTarget(target, "encounter-eligibility-expired")) {
+                    return TransitionResult.denied("target-cleanup-pending");
+                }
+            }
+            return enterCooldown(current, current.definitionSnapshot(), nowMs)
+                    ? new TransitionResult(true, "eligibility-grace-expired", EncounterPhase.COOLDOWN, 0.0D)
+                    : TransitionResult.denied("eligibility-cooldown-checkpoint-failed");
         }
     }
 
@@ -173,6 +266,38 @@ public final class DynamicEncounterCoordinator {
         synchronized (lock) {
             findByTarget(event.targetNpcUuid()).ifPresent(record -> enterCooldown(
                     record, record.definitionSnapshot(), Math.max(0L, event.resolvedAtMs())));
+        }
+    }
+
+    /** Durably closes an encounter when Hytale reports a permanent entity removal. */
+    public TransitionResult onTargetPermanentlyRemoved(
+            String encounterId,
+            UUID targetNpcUuid,
+            EncounterWorldGateway world,
+            long nowMs) {
+        Objects.requireNonNull(targetNpcUuid, "targetNpcUuid");
+        Objects.requireNonNull(world, "world");
+        if (!world.isWorldThread()) return TransitionResult.denied("not-world-thread");
+        synchronized (lock) {
+            EncounterRecord current = stateStore.snapshot()
+                    .encounter(requiredText(encounterId, "encounterId")).orElse(null);
+            if (current == null) return TransitionResult.denied("encounter-missing");
+            if (current.targetNpcUuid().filter(targetNpcUuid::equals).isEmpty()
+                    && current.targetNpcUuid().isPresent()) {
+                return TransitionResult.denied("encounter-target-mismatch");
+            }
+            if (decode(current).phase() == EncounterPhase.COOLDOWN) {
+                return new TransitionResult(true, "cooldown-preserved", EncounterPhase.COOLDOWN, 0.0D);
+            }
+            CaptureStatus status = captureStatus(targetNpcUuid);
+            if (status == CaptureStatus.UNKNOWN) {
+                return TransitionResult.denied("capture-state-ambiguous");
+            }
+            String reason = status == CaptureStatus.CAPTURED
+                    ? "captured-target-removed" : "target-permanently-removed";
+            return enterCooldown(current, current.definitionSnapshot(), nowMs)
+                    ? new TransitionResult(true, reason, EncounterPhase.COOLDOWN, 0.0D)
+                    : TransitionResult.denied("removal-cooldown-checkpoint-failed");
         }
     }
 
@@ -246,7 +371,7 @@ public final class DynamicEncounterCoordinator {
                         || checkpoint.phase() == EncounterPhase.RECONCILING
                         ? EncounterPhase.AERIAL : checkpoint.phase();
                 EncounterCheckpoint recoveredCheckpoint = recoveredPhase == checkpoint.phase()
-                        ? checkpoint : EncounterCheckpoint.of(recoveredPhase);
+                        ? checkpoint : checkpoint.withPhase(recoveredPhase, 0.0D);
                 EncounterRecord recovered = update(current, recoveredCheckpoint,
                         lookup.targetNpcUuid(), current.phaseStartedAtEpochMillis(), nowMs,
                         recoveredPhase == EncounterPhase.GROUNDED_CAPTURE_WINDOW
@@ -293,7 +418,7 @@ public final class DynamicEncounterCoordinator {
             return new TransitionResult(true, "grounding-descent-active", EncounterPhase.GROUNDING, buildup);
         }
         EncounterRecord grounded = update(current,
-                EncounterCheckpoint.of(EncounterPhase.GROUNDED_CAPTURE_WINDOW), current.targetNpcUuid(),
+                decode(current).withPhase(EncounterPhase.GROUNDED_CAPTURE_WINDOW, 0.0D), current.targetNpcUuid(),
                 nowMs, nowMs, saturatingAdd(nowMs, definition.captureWindowMs()));
         return put(grounded)
                 ? new TransitionResult(true, "capture-window-open", EncounterPhase.GROUNDED_CAPTURE_WINDOW, buildup)

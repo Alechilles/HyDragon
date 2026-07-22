@@ -371,7 +371,8 @@ class HyDragonStateStoreTest {
                 "HyDragon_Grounded",
                 45_000L,
                 120_000L,
-                60_000L);
+                60_000L,
+                30_000L);
     }
 
     private static void storeProperties(Path file, Properties properties) throws IOException {

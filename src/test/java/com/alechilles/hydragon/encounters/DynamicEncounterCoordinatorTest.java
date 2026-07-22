@@ -15,6 +15,7 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
+import com.alechilles.hydragon.persistence.EncounterDefinitionSnapshot;
 import com.alechilles.hydragon.persistence.EncounterRecord;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.persistence.ProfileExtensionRecord;
@@ -143,6 +144,129 @@ class DynamicEncounterCoordinatorTest {
     }
 
     @Test
+    void weatherAndAvatarFlightEligibilityFailClosedAndRecover() throws Exception {
+        TameworkApi api = api(new AtomicBoolean(false));
+        HyDragonStateStore store = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        DragonSpeciesConfig species = speciesConfig();
+        EncounterEligibilityService eligibility = new EncounterEligibilityService(api, store);
+
+        EncounterCandidate clearWeather = new EncounterCandidate(
+                PLAYER, "world", "region", "environment", 10.0D, 200.0D, 20.0D,
+                Set.of("clear"), Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID));
+        assertEquals("weather-gate",
+                eligibility.evaluate(definition, snapshot(definition, species), clearWeather, true).reason());
+        assertTrue(eligibility.evaluate(
+                definition, snapshot(definition, species),
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)), true).allowed());
+
+        set(species.getMount(), "mode", "GROUND");
+        assertEquals("active-avatar-flight-dragon-required", eligibility.evaluate(
+                definition, snapshot(definition, species),
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)), true).reason());
+
+        HyDragonStateStore noDragonStore = new HyDragonStateStore(
+                temporaryDirectory.resolve("no-flying-dragon.properties"));
+        assertEquals("active-avatar-flight-dragon-required", new EncounterEligibilityService(api, noDragonStore)
+                .evaluate(definition, snapshot(definition, speciesConfig()),
+                        candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)), true)
+                .reason());
+    }
+
+    @Test
+    void concurrencyAndUnsafePlacementFailWithoutDuplicatingTargets() throws Exception {
+        TameworkApi api = api(new AtomicBoolean(false));
+        HyDragonStateStore store = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, store, new EncounterEligibilityService(api, store));
+        FakeWorld world = new FakeWorld();
+        HyDragonConfigRepository.Snapshot configs = snapshot(definition, speciesConfig());
+
+        assertTrue(coordinator.admit(definition, configs,
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L).admitted());
+        assertEquals("encounter-concurrency-limit", coordinator.admit(
+                definition, configs,
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 120_000L).reason(), "per-region limit");
+
+        set(definition.getAdmission(), "globalLimit", 1);
+        EncounterCandidate otherRegion = new EncounterCandidate(
+                PLAYER, "world", "other-region", "environment", 530.0D, 200.0D, 20.0D,
+                Set.of("storm"), Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID));
+        assertEquals("encounter-concurrency-limit", coordinator.admit(
+                definition, configs, otherRegion, world, true, 120_000L).reason(), "global limit");
+
+        HyDragonStateStore unsafeStore = new HyDragonStateStore(
+                temporaryDirectory.resolve("unsafe-placement.properties"));
+        unsafeStore.putProfileExtension(ProfileExtensionRecord.fullDragon(
+                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
+        FakeWorld unsafeWorld = new FakeWorld();
+        unsafeWorld.spawnAllowed = false;
+        DynamicEncounterCoordinator unsafeCoordinator = new DynamicEncounterCoordinator(
+                api, unsafeStore, new EncounterEligibilityService(api, unsafeStore));
+        DynamicEncounterCoordinator.AdmissionResult unsafe = unsafeCoordinator.admit(
+                definition, configs,
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                unsafeWorld, true, 60_000L);
+        assertFalse(unsafe.admitted());
+        assertEquals("no-player-safe-placement", unsafe.reason());
+        assertEquals(1, unsafeWorld.spawnCalls);
+        assertEquals(EncounterPhase.COOLDOWN, EncounterCheckpoint.decode(
+                unsafeStore.snapshot().encounters().values().stream().findFirst().orElseThrow().phase()).phase());
+    }
+
+    @Test
+    void temporaryEligibilityLossUsesDurableGraceAndRestorationCancelsCleanup() throws Exception {
+        TameworkApi api = api(new AtomicBoolean(false));
+        Path statePath = temporaryDirectory.resolve("eligibility-grace.properties");
+        HyDragonStateStore store = new HyDragonStateStore(statePath);
+        store.putProfileExtension(ProfileExtensionRecord.fullDragon(
+                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
+        DragonEncounterConfig definition = encounterConfig();
+        HyDragonConfigRepository.Snapshot configs = snapshot(definition, speciesConfig());
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, store, new EncounterEligibilityService(api, store));
+        FakeWorld world = new FakeWorld();
+        DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
+                definition, configs,
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L);
+
+        assertEquals("eligibility-grace-started", coordinator.recheckEligibility(
+                admitted.encounterId(), definition, configs, java.util.List.of(), true,
+                world, true, 61_000L).reason());
+        HyDragonStateStore restarted = new HyDragonStateStore(statePath);
+        EncounterCheckpoint persisted = EncounterCheckpoint.decode(
+                restarted.snapshot().encounter(admitted.encounterId()).orElseThrow().phase());
+        assertEquals(61_000L, persisted.eligibilityLostAtEpochMillis());
+
+        DynamicEncounterCoordinator restartedCoordinator = new DynamicEncounterCoordinator(
+                api, restarted, new EncounterEligibilityService(api, restarted));
+        assertEquals("eligibility-grace-active", restartedCoordinator.recheckEligibility(
+                admitted.encounterId(), definition, configs, java.util.List.of(), true,
+                world, true, 61_999L).reason());
+        assertEquals("eligibility-restored", restartedCoordinator.recheckEligibility(
+                admitted.encounterId(), definition, configs,
+                java.util.List.of(candidate(Set.of(
+                        EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID))), true,
+                world, true, 62_000L).reason());
+        assertEquals(0, world.retireCalls);
+
+        restartedCoordinator.recheckEligibility(
+                admitted.encounterId(), definition, configs, java.util.List.of(), true,
+                world, true, 63_000L);
+        assertEquals("eligibility-grace-expired", restartedCoordinator.recheckEligibility(
+                admitted.encounterId(), definition, configs, java.util.List.of(), true,
+                world, true, 64_000L).reason());
+        assertEquals(1, world.retireCalls);
+        EncounterRecord cooldown = restarted.snapshot().encounter(admitted.encounterId()).orElseThrow();
+        assertEquals(EncounterPhase.COOLDOWN, EncounterCheckpoint.decode(cooldown.phase()).phase());
+        assertEquals(84_000L, cooldown.cooldownUntilEpochMillis());
+    }
+
+    @Test
     void committedCaptureAtTimeoutNeverRetiresTarget() throws Exception {
         AtomicBoolean captured = new AtomicBoolean(false);
         TameworkApi api = api(captured);
@@ -164,6 +288,31 @@ class DynamicEncounterCoordinatorTest {
         assertEquals("captured-at-cleanup-boundary", result.reason());
         assertEquals(0, world.retireCalls);
         assertFalse(coordinator.captureAllowed(TARGET));
+    }
+
+    @Test
+    void permanentRemovalCheckpointsCooldownBeforeRestart() throws Exception {
+        Path statePath = temporaryDirectory.resolve("permanent-removal.properties");
+        TameworkApi api = api(new AtomicBoolean(false));
+        HyDragonStateStore store = new HyDragonStateStore(statePath);
+        store.putProfileExtension(ProfileExtensionRecord.fullDragon(
+                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
+        DragonEncounterConfig definition = encounterConfig();
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, store, new EncounterEligibilityService(api, store));
+        DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
+                definition, snapshot(definition, speciesConfig()),
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                new FakeWorld(), true, 60_000L);
+
+        DynamicEncounterCoordinator.TransitionResult removed = coordinator.onTargetPermanentlyRemoved(
+                admitted.encounterId(), TARGET, new FakeWorld(), 61_000L);
+
+        assertEquals("target-permanently-removed", removed.reason());
+        HyDragonStateStore restarted = new HyDragonStateStore(statePath);
+        EncounterRecord cooldown = restarted.snapshot().encounter(admitted.encounterId()).orElseThrow();
+        assertEquals(EncounterPhase.COOLDOWN, EncounterCheckpoint.decode(cooldown.phase()).phase());
+        assertEquals(81_000L, cooldown.cooldownUntilEpochMillis());
     }
 
     @Test
@@ -220,6 +369,49 @@ class DynamicEncounterCoordinatorTest {
         assertEquals(EncounterPhase.COOLDOWN, EncounterCheckpoint.decode(cooledDown.phase()).phase());
         assertTrue(cooledDown.targetNpcUuid().isEmpty());
         assertEquals(82_000L, cooledDown.cooldownUntilEpochMillis());
+    }
+
+    @Test
+    void restartReconciliationPreservesEveryDurableActivePhase() throws Exception {
+        TameworkApi api = api(new AtomicBoolean(false));
+        DragonEncounterConfig definition = encounterConfig();
+        for (EncounterPhase phase : java.util.List.of(
+                EncounterPhase.ADMITTED,
+                EncounterPhase.AERIAL,
+                EncounterPhase.GROUNDING,
+                EncounterPhase.GROUNDED_CAPTURE_WINDOW,
+                EncounterPhase.RECONCILING)) {
+            Path path = temporaryDirectory.resolve("restart-" + phase.name() + ".properties");
+            HyDragonStateStore initial = new HyDragonStateStore(path);
+            EncounterCheckpoint checkpoint = phase == EncounterPhase.GROUNDING
+                    ? new EncounterCheckpoint(phase, 40.0D, 61_000L)
+                    : new EncounterCheckpoint(phase, 0.0D, 61_000L);
+            EncounterRecord persisted = new EncounterRecord(
+                    EncounterRecord.SCHEMA_VERSION,
+                    "encounter:restart:" + phase.name().toLowerCase(java.util.Locale.ROOT),
+                    definition.getId(), "world", "region", checkpoint.encode(),
+                    EncounterDefinitionSnapshot.capture(definition),
+                    phase == EncounterPhase.ADMITTED ? Optional.empty() : Optional.of(TARGET),
+                    Set.of(PLAYER), 60_000L, 60_500L, 61_000L,
+                    phase == EncounterPhase.GROUNDED_CAPTURE_WINDOW ? 100_000L : 0L);
+            initial.putEncounter(persisted);
+
+            HyDragonStateStore restarted = new HyDragonStateStore(path);
+            DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                    api, restarted, new EncounterEligibilityService(api, restarted));
+            DynamicEncounterCoordinator.TransitionResult result = coordinator.reconcile(
+                    persisted.encounterId(), new FakeWorld(), 62_000L);
+
+            EncounterPhase expected = phase == EncounterPhase.ADMITTED || phase == EncounterPhase.RECONCILING
+                    ? EncounterPhase.AERIAL : phase;
+            assertEquals(expected, result.phase(), "restart phase " + phase);
+            EncounterCheckpoint recovered = EncounterCheckpoint.decode(
+                    restarted.snapshot().encounter(persisted.encounterId()).orElseThrow().phase());
+            assertEquals(expected, recovered.phase(), "persisted restart phase " + phase);
+            assertEquals(61_000L, recovered.eligibilityLostAtEpochMillis(),
+                    "eligibility grace must survive restart phase " + phase);
+            if (phase == EncounterPhase.GROUNDING) assertEquals(40.0D, recovered.groundingBuildup());
+        }
     }
 
     private HyDragonStateStore stateStore() throws Exception {
@@ -360,12 +552,14 @@ class DynamicEncounterCoordinatorTest {
         int groundedCalls;
         int retireCalls;
         boolean grounded = true;
+        boolean spawnAllowed = true;
         TargetPresence targetPresence = TargetPresence.PRESENT;
 
         @Override public boolean isWorldThread() { return true; }
         @Override public SpawnResult spawn(SpawnRequest request) {
             spawnCalls++;
-            return SpawnResult.success(TARGET);
+            return spawnAllowed ? SpawnResult.success(TARGET)
+                    : SpawnResult.failure("no-player-safe-placement");
         }
         @Override public TargetLookup findTarget(String encounterId, String worldName, UUID expectedTargetUuid) {
             return switch (targetPresence) {

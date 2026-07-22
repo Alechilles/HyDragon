@@ -22,6 +22,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -137,21 +138,30 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
 
         Store<EntityStore> store = world.getEntityStore().getStore();
         int[] visited = {0};
+        boolean[] truncated = {false};
+        List<EncounterCandidate> candidates = new ArrayList<>();
         store.forEachChunk(PlayerRef.getComponentType(), (chunk, commandBuffer) -> {
-            for (int index = 0; index < chunk.size() && visited[0] < MAX_PLAYERS_PER_WORLD_SCAN; index++) {
+            if (truncated[0]) return;
+            for (int index = 0; index < chunk.size(); index++) {
                 PlayerRef player = chunk.getComponent(index, PlayerRef.getComponentType());
                 TransformComponent transform = chunk.getComponent(index, TransformComponent.getComponentType());
                 WeatherTracker tracker = chunk.getComponent(index, WeatherTracker.getComponentType());
                 if (player == null || transform == null || tracker == null || !player.isValid()) continue;
                 visited[0]++;
+                if (visited[0] > MAX_PLAYERS_PER_WORLD_SCAN) {
+                    truncated[0] = true;
+                    break;
+                }
                 EncounterCandidate candidate = candidate(world, chunk.getReferenceTo(index), player, transform, tracker, store);
                 if (candidate == null) continue;
+                candidates.add(candidate);
                 for (DragonEncounterConfig definition : definitions) {
                     worlds.dispatch(world.getName(), null,
                             gateway -> active.encounters().admit(definition.getId(), candidate, gateway));
                 }
             }
         });
+        active.encounters().recheckEligibility(world.getName(), candidates, !truncated[0]);
     }
 
     private static EncounterCandidate candidate(
@@ -207,6 +217,13 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
         }
         PlayerRef sourcePlayer = commandBuffer.getComponent(sourceRef, PlayerRef.getComponentType());
         if (sourcePlayer == null || !sourcePlayer.isValid()) return;
+        TransformComponent sourceTransform = commandBuffer.getComponent(
+                sourceRef, TransformComponent.getComponentType());
+        WeatherTracker sourceWeather = commandBuffer.getComponent(sourceRef, WeatherTracker.getComponentType());
+        World world = store.getExternalData().getWorld();
+        EncounterCandidate sourceCandidate = sourceTransform == null || sourceWeather == null
+                ? null : candidate(world, sourceRef, sourcePlayer, sourceTransform, sourceWeather, store);
+        if (sourceCandidate == null) return;
         ProjectileComponent projectile = store.getComponent(projectileRef, ProjectileComponent.getComponentType());
         if (projectile == null || projectile.getCreatorUuid() == null
                 || !projectile.getCreatorUuid().equals(sourcePlayer.getUuid())) {
@@ -231,9 +248,14 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
         if (sourceId == null) return;
         float amount = damage.getAmount();
         if (!Float.isFinite(amount) || amount <= 0.0F) return;
-        World world = store.getExternalData().getWorld();
-        worlds.dispatch(world.getName(), targetIdentity.getUuid(), gateway -> active.encounters().groundingHit(
-                encounterId, targetIdentity.getUuid(), sourceId, amount, gateway));
+        worlds.dispatch(world.getName(), targetIdentity.getUuid(), gateway -> {
+            DynamicEncounterCoordinator.TransitionResult eligibility =
+                    active.encounters().recheckEligibility(encounterId, sourceCandidate, gateway);
+            if (eligibility.phase() != EncounterPhase.COOLDOWN) {
+                active.encounters().groundingHit(
+                        encounterId, targetIdentity.getUuid(), sourceId, amount, gateway);
+            }
+        });
     }
 
     /**
