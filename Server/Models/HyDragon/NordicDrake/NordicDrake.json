@@ -1,6 +1,6 @@
 {
   "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake.blockymodel",
-  "Texture": "NPC/HyDragon/NordicDrake/Model/GreenBalls.png",
+  "Texture": "NPC/HyDragon/NordicDrake/Model/OldOrange.png",
   "EyeHeight": 3.6,
   "CrouchOffset": -0.1,
   "HitBox": {
@@ -107,7 +107,7 @@
     "Crouch": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Crouch.blockyanim",
           "BlendingDuration": 0.1
         }
       ]
@@ -115,7 +115,7 @@
     "CrouchWalk": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Crouch.blockyanim",
           "BlendingDuration": 0.1
         }
       ]
@@ -123,7 +123,7 @@
     "CrouchWalkBackward": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Crouch.blockyanim",
           "BlendingDuration": 0.1
         }
       ]
@@ -466,7 +466,9 @@
     "BasicShoot": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/BasicShoot.blockyanim"
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/BasicShoot.blockyanim",
+          "BlendingDuration": 0.5,
+          "Speed": 0.2
         }
       ]
     },

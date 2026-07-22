@@ -59,7 +59,7 @@
   "AbilityAnimation": {
     "Slot": "Movement",
     "UpwardBoostAnimation": "FlyIdle",
-    "ForwardBoostAnimation": "PulseFly",
+    "ForwardBoostAnimation": "FlyFast",
     "AirbrakeAnimation": "FlyIdle"
   },
   "RiderVisual": {

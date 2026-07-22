@@ -1,1 +1,12 @@
 .idea/
+
+# Build and packaged deployment artifacts
+target/
+*.jar
+*.zip
+
+# Local runtime and editor debris
+*.log
+*.log.lck
+**/__pycache__/
+*.py[cod]

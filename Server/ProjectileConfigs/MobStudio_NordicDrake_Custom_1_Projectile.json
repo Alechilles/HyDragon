@@ -1,0 +1,27 @@
+{
+  "Model": "Arrow_Crude",
+  "LaunchForce": 40.0,
+  "SpawnOffset": {
+    "X": 0.0,
+    "Y": 1.5,
+    "Z": 0.5
+  },
+  "Interactions": {
+    "ProjectileHit": {
+      "Cooldown": {
+        "Cooldown": 0.0
+      },
+      "Interactions": [
+        {
+          "Type": "DamageEntity",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 5.0
+            }
+          },
+          "DamageEffects": {}
+        }
+      ]
+    }
+  }
+}

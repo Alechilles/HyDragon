@@ -48,6 +48,8 @@
     "MaxHealth": 400,
     "AttractiveItemSet": [],
     "InteractionConfigId": "HyDragonIntDragon",
+    "MountMode": "TameworkAvatarFlight",
+    "AvatarFlightConfig": "HyDragonNordicDrake",
     "NeedsSeekConsumeAnimation": "",
     "CanFollow": true,
     "CanHold": true,
