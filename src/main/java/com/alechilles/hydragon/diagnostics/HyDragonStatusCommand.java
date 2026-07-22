@@ -4,20 +4,16 @@ import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkRuntimeDiagnostics;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractAsyncCommand;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 /** {@code /hydragon status} capability/config diagnostics. */
-public final class HyDragonStatusCommand extends AbstractPlayerCommand {
+public final class HyDragonStatusCommand extends AbstractAsyncCommand {
     public static final String PERMISSION = "hydragon.command.status";
     private final Supplier<HyDragonConfigRepository.Snapshot> configSupplier;
     private final Supplier<List<String>> reloadIssuesSupplier;
@@ -42,21 +38,17 @@ public final class HyDragonStatusCommand extends AbstractPlayerCommand {
     }
 
     @Override
-    protected void execute(
-            @Nonnull CommandContext context,
-            @Nonnull Store<EntityStore> store,
-            @Nonnull Ref<EntityStore> ref,
-            @Nonnull PlayerRef playerRef,
-            @Nonnull World world) {
+    @Nonnull
+    protected CompletableFuture<Void> executeAsync(@Nonnull CommandContext context) {
         String action = parseAction(context.getInputString());
         if (!action.equals("status")) {
             context.sendMessage(HyDragonMessages.statusUsage());
-            return;
+            return CompletableFuture.completedFuture(null);
         }
         TameworkBridge bridge = bridgeSupplier.get();
         if (bridge == null) {
             context.sendMessage(HyDragonMessages.statusUnavailable());
-            return;
+            return CompletableFuture.completedFuture(null);
         }
         TameworkRuntimeDiagnostics.Snapshot diagnostics = TameworkRuntimeDiagnostics.read(bridge);
         for (var message : HyDragonStatusFormatter.formatMessages(
@@ -68,6 +60,7 @@ public final class HyDragonStatusCommand extends AbstractPlayerCommand {
                 persistenceSupplier.get())) {
             context.sendMessage(message);
         }
+        return CompletableFuture.completedFuture(null);
     }
 
     private static String parseAction(String input) {
