@@ -73,6 +73,58 @@ class DraconicCaptureAssetContractTest {
     }
 
     @Test
+    void higherTierStonesExplicitlyDeclareEveryBondedLifecycleState() throws Exception {
+        Map<String, String> tiers = Map.of(
+                "Draconic_Stone_Thorium", "HyDragonDraconicStoneThorium.json",
+                "Draconic_Stone_Cobalt", "HyDragonDraconicStoneCobalt.json",
+                "Draconic_Stone_Adamantium", "HyDragonDraconicStoneAdamantium.json",
+                "Draconic_Stone_Ancient", "HyDragonDraconicStoneAncient.json");
+        Map<String, String> stateInteractions = Map.of(
+                "Filled", "TameworkSpawn",
+                "Active", "TameworkSpawn",
+                "Damaged", "HyDragonRepairBondedStone",
+                "Lost", "Simple",
+                "Unavailable", "Simple");
+
+        for (Map.Entry<String, String> tier : tiers.entrySet()) {
+            String itemId = tier.getKey();
+            String item = read("Server/Item/Items/Ingredient/" + itemId + ".json");
+            String config = read("Server/Tamework/Items/Spawners/" + tier.getValue());
+
+            for (Map.Entry<String, String> state : stateInteractions.entrySet()) {
+                String stateName = state.getKey();
+                String block = objectValueForKey(objectValueForKey(item, "State"), stateName);
+                assertTrue(block.contains("\"Variant\": true"),
+                        () -> itemId + " " + stateName + " must be a concrete item variant");
+                assertTrue(block.contains("\"Type\": \"" + state.getValue() + "\""),
+                        () -> itemId + " " + stateName + " must use " + state.getValue());
+                assertTrue(block.contains("\"Model\": \"Items/HyDragon/Draconic_Stone_Filled.blockymodel\""));
+                assertTrue(block.contains("\"Icon\": \"Icons/ItemsGenerated/" + itemId + ".png\""));
+                assertTrue(block.contains("server.items." + itemId + "_" + stateName + ".name"));
+                assertTrue(block.contains("server.items." + itemId + "_" + stateName + ".description"));
+                assertTrue(config.contains("*" + itemId + "_State_" + stateName),
+                        () -> tier.getValue() + " must address the declared " + stateName + " variant");
+            }
+        }
+    }
+
+    @Test
+    void everySupportedLocaleTranslatesHigherTierLifecycleStates() throws Exception {
+        for (String locale : new String[] {"en-US", "de-DE", "fr-FR", "es-ES", "pt-BR"}) {
+            String translations = read("Server/Languages/" + locale + "/server.lang");
+            for (String tier : new String[] {"Thorium", "Cobalt", "Adamantium", "Ancient"}) {
+                for (String state : new String[] {"Filled", "Active", "Damaged", "Lost", "Unavailable"}) {
+                    String key = "items.Draconic_Stone_" + tier + "_" + state;
+                    assertTrue(translations.contains(key + ".name="),
+                            () -> locale + " is missing " + key + ".name");
+                    assertTrue(translations.contains(key + ".description="),
+                            () -> locale + " is missing " + key + ".description");
+                }
+            }
+        }
+    }
+
+    @Test
     void wildDragonCaptureRequiresTranquilizationAndMapsEverySupportedRole() throws Exception {
         String config = read("Server/Tamework/Items/Spawners/HyDragonDraconicStone.json");
 
@@ -101,5 +153,37 @@ class DraconicCaptureAssetContractTest {
     private static String sha256(String relative) throws Exception {
         byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(ROOT.resolve(relative)));
         return HexFormat.of().formatHex(digest);
+    }
+
+    private static String objectValueForKey(String json, String key) {
+        int keyIndex = json.indexOf("\"" + key + "\"");
+        assertTrue(keyIndex >= 0, () -> "Missing JSON key " + key);
+        int objectStart = json.indexOf('{', keyIndex);
+        assertTrue(objectStart >= 0, () -> "JSON key " + key + " is not followed by an object");
+
+        int depth = 0;
+        boolean quoted = false;
+        boolean escaped = false;
+        for (int index = objectStart; index < json.length(); index++) {
+            char character = json.charAt(index);
+            if (quoted) {
+                if (escaped) {
+                    escaped = false;
+                } else if (character == '\\') {
+                    escaped = true;
+                } else if (character == '"') {
+                    quoted = false;
+                }
+                continue;
+            }
+            if (character == '"') {
+                quoted = true;
+            } else if (character == '{') {
+                depth++;
+            } else if (character == '}' && --depth == 0) {
+                return json.substring(objectStart, index + 1);
+            }
+        }
+        throw new AssertionError("Unclosed JSON object for key " + key);
     }
 }

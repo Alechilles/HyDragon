@@ -22,10 +22,83 @@
   "Light": { "Color": "#7DD3FC", "Radius": 2 },
   "State": {
     "Filled": {
+      "Variant": true,
       "TranslationProperties": {
         "Name": "server.items.Draconic_Stone_Thorium_Filled.name",
         "Description": "server.items.Draconic_Stone_Thorium_Filled.description"
       },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "TameworkSpawn" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#7DD3FC", "Radius": 2 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Thorium.png"
+    },
+    "Active": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Thorium_Active.name",
+        "Description": "server.items.Draconic_Stone_Thorium_Active.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "TameworkSpawn" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#BAF3FF", "Radius": 3 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Thorium.png"
+    },
+    "Damaged": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Thorium_Damaged.name",
+        "Description": "server.items.Draconic_Stone_Thorium_Damaged.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "HyDragonRepairBondedStone" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#CC3636", "Radius": 1 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Thorium.png"
+    },
+    "Lost": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Thorium_Lost.name",
+        "Description": "server.items.Draconic_Stone_Thorium_Lost.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "Simple" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#6B7280", "Radius": 1 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Thorium.png"
+    },
+    "Unavailable": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Thorium_Unavailable.name",
+        "Description": "server.items.Draconic_Stone_Thorium_Unavailable.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "Simple" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#4B5563", "Radius": 1 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
       "Icon": "Icons/ItemsGenerated/Draconic_Stone_Thorium.png"
     }
   }

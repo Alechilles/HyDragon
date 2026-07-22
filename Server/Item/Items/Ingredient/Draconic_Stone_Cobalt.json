@@ -22,10 +22,83 @@
   "Light": { "Color": "#2563EB", "Radius": 2 },
   "State": {
     "Filled": {
+      "Variant": true,
       "TranslationProperties": {
         "Name": "server.items.Draconic_Stone_Cobalt_Filled.name",
         "Description": "server.items.Draconic_Stone_Cobalt_Filled.description"
       },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "TameworkSpawn" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#2563EB", "Radius": 2 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Cobalt.png"
+    },
+    "Active": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Cobalt_Active.name",
+        "Description": "server.items.Draconic_Stone_Cobalt_Active.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "TameworkSpawn" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#60A5FA", "Radius": 3 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Cobalt.png"
+    },
+    "Damaged": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Cobalt_Damaged.name",
+        "Description": "server.items.Draconic_Stone_Cobalt_Damaged.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "HyDragonRepairBondedStone" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#CC3636", "Radius": 1 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Cobalt.png"
+    },
+    "Lost": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Cobalt_Lost.name",
+        "Description": "server.items.Draconic_Stone_Cobalt_Lost.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "Simple" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#6B7280", "Radius": 1 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Cobalt.png"
+    },
+    "Unavailable": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Cobalt_Unavailable.name",
+        "Description": "server.items.Draconic_Stone_Cobalt_Unavailable.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": [ { "Type": "Simple" } ]
+        }
+      },
+      "MaxStack": 1,
+      "Light": { "Color": "#4B5563", "Radius": 1 },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
       "Icon": "Icons/ItemsGenerated/Draconic_Stone_Cobalt.png"
     }
   }
