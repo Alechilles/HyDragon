@@ -109,6 +109,7 @@
     "ParticleSystemId": null
   },
   "Scale": 1.75,
+  "MaxDurability": 1,
   "MaxStack": 1,
   "ItemSoundSetId": "ISS_Items_Ingots",
   "DropOnDeath": true,
