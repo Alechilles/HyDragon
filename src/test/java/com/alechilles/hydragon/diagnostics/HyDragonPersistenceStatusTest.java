@@ -70,9 +70,6 @@ class HyDragonPersistenceStatusTest {
                 1,
                 Optional.empty(),
                 Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                OptionalLong.empty(),
                 OptionalLong.empty(),
                 1_001));
 

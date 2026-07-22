@@ -27,7 +27,7 @@ class HyDragonStatusFormatterTest {
                     feature,
                     diagnostics,
                     diagnostics ? Set.of("DIAGNOSTICS") : Set.of("COMMAND_FAMILY_ROSTERS"),
-                    diagnostics ? Set.of() : Set.of("BONDED_VESSELS"),
+                    diagnostics ? Set.of() : Set.of("COMMAND_FAMILY_ROSTERS"),
                     List.of()));
         }
         TameworkBridge.Snapshot bridge = new TameworkBridge.Snapshot("0.8.0", Set.of("DIAGNOSTICS"), gates, null);
@@ -48,7 +48,7 @@ class HyDragonStatusFormatterTest {
         assertTrue(lines.stream().anyMatch(line -> line.contains("required=>=3.0.0 <4.0.0")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("Config: INVALID")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("missing bundled assets")));
-        assertTrue(lines.stream().anyMatch(line -> line.contains("CAPTURE_AND_BOND: DISABLED")));
+        assertTrue(lines.stream().anyMatch(line -> line.contains("CAPTURE_AND_ROSTER: DISABLED")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("TAMEWORK_DIAGNOSTICS: READY")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("Tamework persistence: HEALTHY")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("HyDragon persistence: READ_WRITE")));

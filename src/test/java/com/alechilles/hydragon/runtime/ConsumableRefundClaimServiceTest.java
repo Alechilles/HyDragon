@@ -46,8 +46,8 @@ class ConsumableRefundClaimServiceTest {
                 "Wyvern_Egg", "player:" + owner, "hotbar", 2, 1L, "egg-" + operationId, 1);
         assertEquals(OperationJournal.Decision.APPLIED, journal.begin(new OperationJournal.Descriptor(
                 operationId, operationId, OperationJournal.Kind.SOUL_BOND, owner,
-                "provision-and-link", egg, 1, Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), OptionalLong.empty(), OptionalLong.empty())));
+                "provision-and-link", egg, 1, Optional.empty(), Optional.empty(),
+                OptionalLong.empty())));
         assertEquals(OperationJournal.Decision.APPLIED, journal.transition(
                 operationId, OperationJournal.Phase.PREPARED,
                 OperationJournal.Phase.MATERIAL_CONSUMED, OperationJournal.Update.EMPTY));

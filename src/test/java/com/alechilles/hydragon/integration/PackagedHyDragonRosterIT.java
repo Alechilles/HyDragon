@@ -41,14 +41,19 @@ final class PackagedHyDragonRosterIT {
                     "\"RosterStorage\": \"OwnerCommandFamily\"",
                     "\"ProjectRosterToItemMetadata\": true");
             assertNotNull(zip.getEntry("Server/Item/Items/Tool/HyDragon_Dragon_Horn.json"));
+            String baseStone = text(zip,
+                    "Server/Tamework/Items/Spawners/HyDragonDraconicStone.json");
+            assertContains(baseStone,
+                    "\"SourceConsumption\": \"ResolvedAttempt\"",
+                    "\"SuccessDisposition\": \"TameAndCommandLink\"",
+                    "\"CommandFamilyId\": \"hydragon:dragon_horn\"",
+                    "\"RequiredCommandConfigId\": \"HyDragonDragonHorn\"",
+                    "\"RequireCommandAccessItem\": true");
             for (String stone : STONES) {
                 String config = text(zip, "Server/Tamework/Items/Spawners/" + stone + ".json");
-                assertContains(config,
-                        "\"SourceConsumption\": \"ResolvedAttempt\"",
-                        "\"SuccessDisposition\": \"TameAndCommandLink\"",
-                        "\"CommandFamilyId\": \"hydragon:dragon_horn\"",
-                        "\"RequiredCommandConfigId\": \"HyDragonDragonHorn\"",
-                        "\"RequireCommandAccessItem\": true");
+                if (!stone.equals("HyDragonDraconicStone")) {
+                    assertContains(config, "\"Parent\": \"HyDragonDraconicStone\"");
+                }
                 assertFalse(config.contains("\"Vessel\""));
                 assertFalse(config.contains("\"FilledItemId\""));
             }

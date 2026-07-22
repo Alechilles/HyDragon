@@ -355,8 +355,6 @@ class HyDragonStateStoreTest {
                 1,
                 Optional.empty(),
                 Optional.empty(),
-                Optional.empty(),
-                OptionalLong.empty(),
                 OptionalLong.empty(),
                 createdAtEpochMillis);
     }

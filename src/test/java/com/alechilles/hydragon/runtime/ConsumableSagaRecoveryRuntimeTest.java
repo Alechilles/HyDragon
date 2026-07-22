@@ -48,10 +48,9 @@ class ConsumableSagaRecoveryRuntimeTest {
                 operationId, operationId, kind, owner, "intent",
                 new ConsumableReservation.SourceEvidence(
                         "item", "player:" + owner, "hotbar", 0, 1L, "fingerprint-" + operationId, 1),
-                1, Optional.empty(), Optional.empty(),
+                1, Optional.empty(),
                 kind == OperationJournal.Kind.MINIWYVERN_ATTUNEMENT
                         ? Optional.of(UUID.randomUUID().toString()) : Optional.empty(),
-                Optional.empty(), OptionalLong.empty(),
                 kind == OperationJournal.Kind.MINIWYVERN_ATTUNEMENT
                         ? OptionalLong.of(1L) : OptionalLong.empty());
         return new OperationJournal.Entry(operationId, kind, phase, descriptor, 0L);
