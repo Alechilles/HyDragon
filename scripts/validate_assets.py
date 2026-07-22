@@ -115,6 +115,12 @@ def validate_english_ids(errors: list[str]) -> None:
                     fail(errors, f"pre-release identifier remains in content: {relative}: {token}")
 
 
+def validate_no_pre_release_archives(errors: list[str]) -> None:
+    artifact_root = ROOT / "artifacts"
+    for path in sorted(artifact_root.glob("*.zip")):
+        fail(errors, f"pre-release asset archive must not remain tracked: {path.relative_to(ROOT)}")
+
+
 def read_lang(path: Path, errors: list[str]) -> dict[str, str]:
     values: dict[str, str] = {}
     for line_number, raw in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
@@ -901,6 +907,7 @@ def main() -> int:
     if base_root is not None:
         known_assets |= asset_stems(base_root)
     validate_english_ids(errors)
+    validate_no_pre_release_archives(errors)
     validate_locales(errors)
     validate_interaction_message_localization(parsed, errors)
     require_files(errors)
