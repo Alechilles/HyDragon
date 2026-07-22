@@ -6,6 +6,7 @@ import com.alechilles.alecstamework.api.CompanionProvisioningResult;
 import com.alechilles.alecstamework.api.CompanionProvisioningProjectionStatus;
 import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.alecstamework.api.PopulationCompanionLifecycle;
+import com.alechilles.alecstamework.api.ProvisionedCompanionView;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +19,8 @@ import java.util.function.LongSupplier;
 
 /** Crash-recoverable once-per-player Soul Bond provisioning saga. */
 public final class SoulBondService {
+    public static final String WYVERN_EGG_ITEM_ID = "Wyvern_Egg";
+    public static final String SOUL_BOUND_WYVERN_ITEM_ID = "Soul_Bound_Wyvern";
     private final TameworkGameplayAdapter tamework;
     private final SoulBondLedger ledger;
     private final OperationJournal journal;
@@ -79,6 +82,50 @@ public final class SoulBondService {
             inFlight.remove(inFlightKey, proposed);
         });
         return proposed.result();
+    }
+
+    /** Recalls the caller's existing lifelong Miniwyvern without consuming the bound focus. */
+    public CompletionStage<GameplayResult> recall(
+            UUID playerUuid,
+            String ownershipWorldName,
+            PopulationAdmissionLocation destination,
+            ConsumableReservation item) {
+        Objects.requireNonNull(playerUuid, "playerUuid");
+        ownershipWorldName = requiredText(ownershipWorldName, "ownershipWorldName");
+        Objects.requireNonNull(destination, "destination");
+        Objects.requireNonNull(item, "item");
+        TameworkGameplayAdapter.Readiness readiness = tamework.soulBondReadiness();
+        if (!readiness.ready()) return released(item, GameplayResult.unavailable(readiness.reason()));
+        SoulBondLedger.Claim claim = ledger.find(playerUuid).orElse(null);
+        if (claim == null || claim.state() != SoulBondLedger.Claim.State.CLAIMED
+                || claim.profileId().isEmpty()) {
+            return released(item, GameplayResult.denied(
+                    "No claimed Soul Bound Wyvern exists for this player"));
+        }
+        UUID profileId = claim.profileId().orElseThrow();
+        ProvisionedCompanionView view = tamework.findMiniwyvern(profileId.toString()).orElse(null);
+        if (view == null || !view.ownerUuid().equals(playerUuid)
+                || !view.profileId().equals(profileId.toString())) {
+            return released(item, GameplayResult.reconciliation(
+                    "Soul Bound Wyvern profile requires reconciliation"));
+        }
+        return tamework.activateDormantMiniwyvern(
+                        playerUuid,
+                        item.operationId() + ":recall",
+                        profileId.toString(),
+                        view.profileRevision(),
+                        ownershipWorldName,
+                        destination.chunkX(),
+                        destination.chunkZ())
+                .handle((result, failure) -> failure == null ? result : null)
+                .thenCompose(result -> released(item,
+                        result != null && result.accepted()
+                                && result.lifecycle() == PopulationCompanionLifecycle.ACTIVE
+                                && result.projectionStatus()
+                                == CompanionProvisioningProjectionStatus.ACTIVE
+                                ? GameplayResult.applied("Soul Bound Wyvern recalled")
+                                : GameplayResult.retryable(
+                                "Soul Bound Wyvern recall could not be queued")));
     }
 
     private CompletionStage<GameplayResult> claimOnce(UUID playerUuid,
@@ -272,7 +319,7 @@ public final class SoulBondService {
             return CompletableFuture.completedFuture(GameplayResult.reconciliation(
                     "Miniwyvern linked; Soul Bond item consumption awaits a safe retry"));
         }
-        return item.consume().thenCompose(consumed -> {
+        return item.consumeAndReplace(SOUL_BOUND_WYVERN_ITEM_ID).thenCompose(consumed -> {
             if (consumed != ConsumableReservation.Disposition.APPLIED
                     && consumed != ConsumableReservation.Disposition.ALREADY_APPLIED) {
                 ledger.reconcile(playerUuid, operationId, Optional.of(evidence.profileId()));

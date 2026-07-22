@@ -722,7 +722,7 @@ class PackagedHyDragonTameworkLoopIT {
         @Override public String operationId() { return operationId; }
         @Override public SourceEvidence sourceEvidence() {
             return new SourceEvidence(
-                    "Draconic_Soul_Bond", "player", "hotbar", 0,
+                    "Wyvern_Egg", "player", "hotbar", 0,
                     1L, "soul-bond-fingerprint", 1);
         }
         @Override public int quantity() { return 1; }

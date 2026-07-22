@@ -35,6 +35,15 @@ public final class HyDragonGameplayRuntime implements HyDragonInteractionRuntime
     }
 
     @Override
+    public CompletionStage<GameplayResult> recallMiniwyvern(
+            UUID playerUuid,
+            String worldName,
+            PopulationAdmissionLocation destination,
+            ConsumableReservation reservation) {
+        return soulBonds.recall(playerUuid, worldName, destination, reservation);
+    }
+
+    @Override
     public CompletionStage<GameplayResult> attune(
             UUID playerUuid, String archetypeId, ConsumableReservation reservation) {
         return attunements.attune(playerUuid, archetypeId, reservation);

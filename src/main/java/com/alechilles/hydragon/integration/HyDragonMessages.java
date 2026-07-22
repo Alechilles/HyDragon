@@ -14,6 +14,8 @@ public final class HyDragonMessages {
     public static Message soulBondClaimed() { return translated("soulBond.claimed"); }
     public static Message soulBondAlreadyClaimed() { return translated("soulBond.alreadyClaimed"); }
     public static Message soulBondUnavailable() { return translated("soulBond.unavailable"); }
+    public static Message soulBoundWyvernRecalled() { return translated("soulBoundWyvern.recalled"); }
+    public static Message soulBoundWyvernUnavailable() { return translated("soulBoundWyvern.unavailable"); }
     public static Message attunementSuccess() { return translated("attunement.success"); }
     public static Message attunementSame() { return translated("attunement.same"); }
     public static Message attunementUnavailable() { return translated("attunement.unavailable"); }

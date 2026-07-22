@@ -271,7 +271,8 @@ def require_files(errors: list[str]) -> None:
         "Server/Item/Items/Ingredient/Draconic_Essence_Wind.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Void.json",
         "Server/Item/Items/Ingredient/Revitalizing_Essence.json",
-        "Server/Item/Items/Ingredient/Draconic_Soul_Bond.json",
+        "Server/Item/Items/Ingredient/Wyvern_Egg.json",
+        "Server/Item/Items/Ingredient/Soul_Bound_Wyvern.json",
         "Server/Item/Items/Tool/HyDragon_Command_Whistle.json",
         "Server/Tamework/Items/Commands/HyDragonDragonCommand.json",
         "Server/Tamework/PopulationGroups/HyDragonFullDragons.json",
@@ -1044,7 +1045,7 @@ def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> Non
         "Draconic_Stone_Adamantium",
         "Draconic_Stone_Ancient",
         "Revitalizing_Essence",
-        "Draconic_Soul_Bond",
+        "Wyvern_Egg",
         "HyDragon_Command_Whistle",
     }
     seen: set[str] = set()

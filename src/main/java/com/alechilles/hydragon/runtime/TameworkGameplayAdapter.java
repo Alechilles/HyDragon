@@ -17,6 +17,7 @@ import com.alechilles.alecstamework.api.ProfileDataOperationView;
 import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.alecstamework.api.ProvisionedCompanionTransition;
 import com.alechilles.alecstamework.api.ProvisionedCompanionTransitionRequest;
+import com.alechilles.alecstamework.api.ProvisionedCompanionView;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
 import com.alechilles.hydragon.integration.HyDragonFeature;
@@ -94,6 +95,10 @@ public final class TameworkGameplayAdapter {
     public CompletionStage<Optional<CompanionProvisioningOperationView>> findMiniwyvernProvisioning(
             String operationId) {
         return api.companionProvisioning().findOperation(CALLER_NAMESPACE, operationId);
+    }
+
+    public Optional<ProvisionedCompanionView> findMiniwyvern(String profileId) {
+        return api.companionProvisioning().getByProfileId(profileId);
     }
 
     public CompletionStage<CompanionProvisioningResult> activateDormantMiniwyvern(

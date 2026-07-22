@@ -46,7 +46,7 @@ public final class HyDragonSoulBondInteraction extends HyDragonServerInteraction
     @Nonnull
     @Override
     protected String expectedItemId() {
-        return "Draconic_Soul_Bond";
+        return "Wyvern_Egg";
     }
 
     @Override

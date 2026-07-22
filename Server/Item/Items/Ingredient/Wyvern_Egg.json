@@ -1,20 +1,14 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.Draconic_Soul_Bond.name",
-    "Description": "server.items.Draconic_Soul_Bond.description"
+    "Name": "server.items.Wyvern_Egg.name",
+    "Description": "server.items.Wyvern_Egg.description"
   },
   "Icon": "Icons/ItemsGenerated/Drake_Egg.png",
   "Quality": "Epic",
-  "Categories": [
-    "Items.Tools"
-  ],
+  "Categories": [ "Items.Tools" ],
   "Interactions": {
     "Primary": {
-      "Interactions": [
-        {
-          "Type": "HyDragonSoulBond"
-        }
-      ]
+      "Interactions": [ { "Type": "HyDragonSoulBond" } ]
     }
   },
   "Recipe": {
@@ -24,9 +18,7 @@
       { "ItemId": "Draconic_Essence_Nature", "Quantity": 1 },
       { "ItemId": "Draconic_Essence_Wind", "Quantity": 1 }
     ],
-    "Output": [
-      { "ItemId": "Draconic_Soul_Bond", "Quantity": 1 }
-    ],
+    "Output": [ { "ItemId": "Wyvern_Egg", "Quantity": 1 } ],
     "BenchRequirement": [
       {
         "Type": "Crafting",
@@ -44,15 +36,10 @@
     "Rotation": [ 355, 44, 30 ],
     "Translation": [ 2, -8 ]
   },
-  "Tags": {
-    "Type": [ "Tool" ]
-  },
+  "Tags": { "Type": [ "Tool" ] },
   "Scale": 2,
   "MaxStack": 1,
-  "Light": {
-    "Color": "#A855F7",
-    "Radius": 2
-  },
+  "Light": { "Color": "#A855F7", "Radius": 2 },
   "ItemSoundSetId": "ISS_Items_Gems",
   "DropOnDeath": true
 }

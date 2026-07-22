@@ -350,7 +350,7 @@ class HyDragonStateStoreTest {
                 ownerUuid,
                 "soul_bond:ZGVmYXVsdA:0:0",
                 new SourceItemEvidence(
-                        "Draconic_Soul_Bond", ownerUuid.toString(), "hotbar", 0,
+                        "Wyvern_Egg", ownerUuid.toString(), "hotbar", 0,
                         1L, "fingerprint", 1),
                 1,
                 Optional.empty(),

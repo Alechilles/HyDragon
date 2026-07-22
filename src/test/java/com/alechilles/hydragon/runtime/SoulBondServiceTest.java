@@ -46,6 +46,7 @@ class SoulBondServiceTest {
         assertEquals(GameplayResult.Status.DENIED, denied.status());
         assertEquals(1, provisioning.calls);
         assertEquals(1, first.consumeCalls);
+        assertEquals(SoulBondService.SOUL_BOUND_WYVERN_ITEM_ID, first.replacementItemId);
         assertEquals(0, retry.consumeCalls);
         assertEquals(1, retry.releaseCalls);
         assertEquals(profile, store.snapshot().playerSoulBond(owner).orElseThrow().profileId().orElseThrow());
@@ -55,6 +56,35 @@ class SoulBondServiceTest {
         assertEquals(Optional.of(operationId), extension.lastOperationId());
         assertEquals(OperationJournal.Phase.COMMITTED,
                 new StateStoreOperationJournal(store, () -> 1234L).find(operationId).orElseThrow().phase());
+    }
+
+    @Test
+    void soulBoundWyvernFocusRecallsClaimedProfileWithoutConsumption() throws Exception {
+        UUID owner = UUID.randomUUID();
+        UUID profile = UUID.randomUUID();
+        CountingProvisioning provisioning = new CountingProvisioning(
+                owner, profile, UUID.randomUUID());
+        HyDragonStateStore store = new HyDragonStateStore(temp.resolve("recall.properties"));
+        SoulBondService service = new SoulBondService(
+                new TameworkGameplayAdapter(api(fullSoulCapabilities(), provisioning)),
+                new StateStoreSoulBondLedger(store),
+                new StateStoreOperationJournal(store, () -> 31L), () -> 31L);
+        FakeReservation egg = new FakeReservation("hydragon:soul-bond:" + UUID.randomUUID());
+        assertEquals(GameplayResult.Status.APPLIED,
+                service.claim(owner, "default", egg).toCompletableFuture().join().status());
+        FakeReservation focus = new FakeReservation(
+                "hydragon:recall:" + UUID.randomUUID(),
+                SoulBondService.SOUL_BOUND_WYVERN_ITEM_ID);
+
+        GameplayResult recalled = service.recall(
+                        owner, "default", new com.alechilles.alecstamework.api
+                                .PopulationAdmissionLocation("default", 4, -3), focus)
+                .toCompletableFuture().join();
+
+        assertEquals(GameplayResult.Status.APPLIED, recalled.status());
+        assertEquals(0, focus.consumeCalls);
+        assertEquals(1, focus.releaseCalls);
+        assertEquals(2, provisioning.transitionCalls);
     }
 
     @Test
@@ -232,6 +262,7 @@ class SoulBondServiceTest {
         private final UUID profile;
         private final UUID operation;
         private int calls;
+        private int transitionCalls;
 
         private CountingProvisioning(UUID owner, UUID profile, UUID operation) {
             this.owner = owner;
@@ -239,7 +270,17 @@ class SoulBondServiceTest {
             this.operation = operation;
         }
 
-        public Optional<ProvisionedCompanionView> getByProfileId(String profileId) { return Optional.empty(); }
+        public Optional<ProvisionedCompanionView> getByProfileId(String profileId) {
+            return this.profile.toString().equals(profileId)
+                    ? Optional.of(new ProvisionedCompanionView(
+                    operation, TameworkGameplayAdapter.CALLER_NAMESPACE, "claim",
+                    this.profile.toString(), owner,
+                    TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE,
+                    PopulationCompanionLifecycle.ACTIVE,
+                    CompanionProvisioningProjectionStatus.ACTIVE,
+                    UUID.randomUUID(), 1L, 1L))
+                    : Optional.empty();
+        }
         public Optional<ProvisionedCompanionView> getByOrigin(String callerNamespace, String idempotencyKey) {
             return Optional.empty();
         }
@@ -261,6 +302,7 @@ class SoulBondServiceTest {
                     0L));
         }
         public CompletionStage<CompanionProvisioningResult> transition(ProvisionedCompanionTransitionRequest request) {
+            transitionCalls++;
             return CompletableFuture.completedFuture(new CompanionProvisioningResult(
                     CompanionProvisioningResult.Status.TRANSITIONED,
                     "active",
@@ -386,18 +428,30 @@ class SoulBondServiceTest {
 
     private static final class FakeReservation implements ConsumableReservation {
         private final String operationId;
+        private final String itemId;
         private int consumeCalls;
         private int releaseCalls;
+        private String replacementItemId;
 
-        private FakeReservation(String operationId) { this.operationId = operationId; }
+        private FakeReservation(String operationId) {
+            this(operationId, SoulBondService.WYVERN_EGG_ITEM_ID);
+        }
+        private FakeReservation(String operationId, String itemId) {
+            this.operationId = operationId;
+            this.itemId = itemId;
+        }
         public String operationId() { return operationId; }
         public SourceEvidence sourceEvidence() {
-            return new SourceEvidence("Draconic_Soul_Bond", "player", "hotbar", 0, 1L, "fingerprint", 1);
+            return new SourceEvidence(itemId, "player", "hotbar", 0, 1L, "fingerprint", 1);
         }
         public int quantity() { return 1; }
         public CompletionStage<Disposition> consume() {
             consumeCalls++;
             return CompletableFuture.completedFuture(Disposition.APPLIED);
+        }
+        public CompletionStage<Disposition> consumeAndReplace(String replacementItemId) {
+            this.replacementItemId = replacementItemId;
+            return consume();
         }
         public CompletionStage<Disposition> release() {
             releaseCalls++;

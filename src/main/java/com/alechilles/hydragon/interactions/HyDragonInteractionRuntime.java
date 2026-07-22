@@ -95,6 +95,8 @@ public final class HyDragonInteractionRuntime {
             return switch (action) {
                 case SOUL_BOND -> installation.handler().soulBond(
                         playerUuid, worldName, destination, reservation);
+                case RECALL_MINIWYVERN -> installation.handler().recallMiniwyvern(
+                        playerUuid, worldName, destination, reservation);
                 case ATTUNE -> installation.handler().attune(playerUuid, archetypeId, reservation);
                 case REPAIR -> installation.handler().repair(
                         playerUuid, worldName, heldItemLocator, reservation);
@@ -105,7 +107,7 @@ public final class HyDragonInteractionRuntime {
         }
     }
 
-    enum Action { SOUL_BOND, ATTUNE, REPAIR }
+    enum Action { SOUL_BOND, RECALL_MINIWYVERN, ATTUNE, REPAIR }
 
     private record Installation(
             Handler handler,
@@ -119,6 +121,15 @@ public final class HyDragonInteractionRuntime {
                 String worldName,
                 PopulationAdmissionLocation destination,
                 ConsumableReservation reservation);
+
+        default CompletionStage<GameplayResult> recallMiniwyvern(
+                UUID playerUuid,
+                String worldName,
+                PopulationAdmissionLocation destination,
+                ConsumableReservation reservation) {
+            return reservation.release().handle((ignored, failure) ->
+                    GameplayResult.unavailable("Miniwyvern recall is unavailable"));
+        }
 
         CompletionStage<GameplayResult> attune(
                 UUID playerUuid, String archetypeId, ConsumableReservation reservation);

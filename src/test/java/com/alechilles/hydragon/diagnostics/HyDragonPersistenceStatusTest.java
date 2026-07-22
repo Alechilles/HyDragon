@@ -60,7 +60,7 @@ class HyDragonPersistenceStatusTest {
                 PLAYER_ONE,
                 "Wyvern_Mini",
                 new SourceItemEvidence(
-                        "Draconic_Soul_Bond",
+                        "Wyvern_Egg",
                         PLAYER_ONE.toString(),
                         "player-inventory/main",
                         4,

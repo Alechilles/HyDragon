@@ -237,7 +237,8 @@ The implemented configuration establishes the following clean first-release stat
 
 | Path | Purpose |
 | --- | --- |
-| `Server/Item/Items/Ingredient/Draconic_Soul_Bond.json` | Craftable one-time-use item and plugin interaction |
+| `Server/Item/Items/Ingredient/Wyvern_Egg.json` | Craftable one-time-use egg; successful consumption atomically replaces it with `Soul_Bound_Wyvern` |
+| `Server/Item/Items/Ingredient/Soul_Bound_Wyvern.json` | Reusable owner-bound Miniwyvern recall focus; never grants another entitlement |
 | `Server/HyDragon/MiniwyvernArchetypes/*.json` | Seven archetype behavior definitions |
 | `Server/Tamework/Companion/HyDragonMiniwyvern.json` | Recall/recovery/cross-world behavior |
 | `Server/Tamework/Interactions/HyDragonIntWyvernMini.json` | MVP Feed, mode, and attunement entry points; backpack action added only in the later update |

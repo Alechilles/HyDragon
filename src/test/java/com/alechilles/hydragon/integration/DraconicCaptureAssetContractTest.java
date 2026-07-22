@@ -140,8 +140,9 @@ class DraconicCaptureAssetContractTest {
     }
 
     @Test
-    void soulBondItemDispatchesItsRegisteredPrimaryInteraction() throws Exception {
-        String item = read("Server/Item/Items/Ingredient/Draconic_Soul_Bond.json");
+    void wyvernEggAndSoulBoundFocusDispatchTheirRegisteredInteractions() throws Exception {
+        String item = read("Server/Item/Items/Ingredient/Wyvern_Egg.json");
+        String focus = read("Server/Item/Items/Ingredient/Soul_Bound_Wyvern.json");
 
         assertTrue(item.contains("\"Primary\""));
         assertTrue(item.contains("\"Type\": \"HyDragonSoulBond\""));
@@ -149,6 +150,8 @@ class DraconicCaptureAssetContractTest {
         assertTrue(item.contains("\"Model\": \"Items/HyDragon/Drake_Egg.blockymodel\""));
         assertTrue(item.contains("\"Texture\": \"Items/HyDragon/Drake_Egg.png\""));
         assertFalse(item.contains("\"BlockType\""), "Soul Bond egg must remain a non-placeable item");
+        assertTrue(focus.contains("\"Type\": \"HyDragonMiniwyvernRecall\""));
+        assertFalse(focus.contains("\"Recipe\""), "Soul Bound Wyvern must only come from egg consumption");
     }
 
     private static String read(String relative) throws Exception {

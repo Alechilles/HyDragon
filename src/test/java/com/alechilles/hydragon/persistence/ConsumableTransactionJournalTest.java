@@ -339,7 +339,7 @@ class ConsumableTransactionJournalTest {
                 new OperationOrigin("hydragon", "soul-bond:owner:once"),
                 OWNER,
                 "Wyvern_Mini",
-                source("Draconic_Soul_Bond", "sha256:soul-source", 1),
+                source("Wyvern_Egg", "sha256:soul-source", 1),
                 1,
                 Optional.empty(),
                 Optional.empty(),

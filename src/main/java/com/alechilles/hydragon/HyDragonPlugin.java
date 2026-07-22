@@ -22,6 +22,7 @@ import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
 import com.alechilles.hydragon.interactions.HyDragonRepairBondedStoneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
+import com.alechilles.hydragon.interactions.HyDragonMiniwyvernRecallInteraction;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.runtime.BondedStoneRepairService;
 import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
@@ -260,6 +261,10 @@ public final class HyDragonPlugin extends JavaPlugin {
                 HyDragonSoulBondInteraction.TYPE_ID,
                 HyDragonSoulBondInteraction.class,
                 HyDragonSoulBondInteraction.CODEC);
+        getCodecRegistry(Interaction.CODEC).register(
+                HyDragonMiniwyvernRecallInteraction.TYPE_ID,
+                HyDragonMiniwyvernRecallInteraction.class,
+                HyDragonMiniwyvernRecallInteraction.CODEC);
         getCodecRegistry(Interaction.CODEC).register(
                 HyDragonMiniwyvernAttuneInteraction.TYPE_ID,
                 HyDragonMiniwyvernAttuneInteraction.class,

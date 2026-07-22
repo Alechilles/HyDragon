@@ -256,7 +256,7 @@ class SoulBondTransientRecoveryTest {
         private FakeReservation(String operationId) { this.operationId = operationId; }
         public String operationId() { return operationId; }
         public SourceEvidence sourceEvidence() {
-            return new SourceEvidence("Draconic_Soul_Bond", "player", "hotbar", 0, 1L,
+            return new SourceEvidence("Wyvern_Egg", "player", "hotbar", 0, 1L,
                     "fingerprint", 1);
         }
         public int quantity() { return 1; }
