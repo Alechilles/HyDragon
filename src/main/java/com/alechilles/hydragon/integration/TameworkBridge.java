@@ -23,11 +23,11 @@ public final class TameworkBridge {
     public static final String REQUIRED_TAMEWORK_RANGE = ">=3.0.0 <4.0.0";
     private static final String API_UNAVAILABLE = "Tamework public API is unavailable";
     private final TameworkApi api;
-    private final Snapshot snapshot;
+    private final Snapshot bootstrapSnapshot;
 
     private TameworkBridge(@Nullable TameworkApi api, Snapshot snapshot) {
         this.api = api;
-        this.snapshot = snapshot;
+        this.bootstrapSnapshot = snapshot;
     }
 
     /** Acquires Tamework through its sanctioned nullable plugin accessor. */
@@ -39,14 +39,37 @@ public final class TameworkBridge {
             if (api == null) {
                 return new TameworkBridge(null, evaluate(null, Set.of(), API_UNAVAILABLE));
             }
-            Set<String> capabilities = new TreeSet<>();
-            for (TameworkApiCapability capability : api.getCapabilities()) {
-                capabilities.add(capability.name());
-            }
-            return new TameworkBridge(api, evaluate(api.getApiVersion(), capabilities, null));
+            return connect(api);
         } catch (RuntimeException | LinkageError failure) {
             String reason = "Tamework API bootstrap failed: " + failure.getClass().getSimpleName();
             return new TameworkBridge(null, evaluate(null, Set.of(), reason));
+        }
+    }
+
+    /** Package-visible seam for exercising capability activation after plugin startup. */
+    static TameworkBridge connect(TameworkApi api) {
+        Snapshot initial = readSnapshot(api, "bootstrap");
+        return new TameworkBridge(api, initial);
+    }
+
+    private static Snapshot readSnapshot(TameworkApi api, String phase) {
+        try {
+            if (api == null) {
+                return evaluate(null, Set.of(), API_UNAVAILABLE);
+            }
+            Set<String> capabilities = new TreeSet<>();
+            Set<TameworkApiCapability> advertised = api.getCapabilities();
+            if (advertised == null) {
+                throw new IllegalStateException("capability set is null");
+            }
+            for (TameworkApiCapability capability : advertised) {
+                if (capability != null) capabilities.add(capability.name());
+            }
+            return evaluate(api.getApiVersion(), capabilities, null);
+        } catch (RuntimeException | LinkageError failure) {
+            String reason = "Tamework API capability " + phase + " failed: "
+                    + failure.getClass().getSimpleName();
+            return evaluate(null, Set.of(), reason);
         }
     }
 
@@ -80,7 +103,10 @@ public final class TameworkBridge {
 
     @Nonnull
     public Snapshot snapshot() {
-        return snapshot;
+        // Tamework deliberately advertises recovery-dependent capabilities only after its
+        // persistence runtimes become authoritative. Read them at request time so a normal
+        // post-startup recovery can enable HyDragon without requiring another server restart.
+        return api == null ? bootstrapSnapshot : readSnapshot(api, "refresh");
     }
 
     /** Returns the public API only for adapters that have already checked the matching feature gate. */

@@ -4,8 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.alechilles.alecstamework.api.TameworkApi;
+import com.alechilles.alecstamework.api.TameworkApiCapability;
+import java.lang.reflect.Proxy;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 class TameworkBridgeTest {
@@ -95,5 +100,62 @@ class TameworkBridgeTest {
 
         assertTrue(snapshot.capabilities().contains("DIAGNOSTICS"));
         assertThrows(UnsupportedOperationException.class, () -> snapshot.capabilities().add("OTHER"));
+    }
+
+    @Test
+    void bridgeObservesRecoveryCapabilitiesAdvertisedAfterStartup() {
+        AtomicReference<EnumSet<TameworkApiCapability>> capabilities = new AtomicReference<>(
+                EnumSet.complementOf(EnumSet.of(
+                        TameworkApiCapability.BONDED_VESSELS,
+                        TameworkApiCapability.POPULATION_GROUPS,
+                        TameworkApiCapability.COMPANION_PROVISIONING)));
+        TameworkApi api = dynamicApi(capabilities);
+        TameworkBridge bridge = TameworkBridge.connect(api);
+
+        assertFalse(bridge.snapshot().feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
+
+        capabilities.updateAndGet(current -> {
+            EnumSet<TameworkApiCapability> recovered = current.clone();
+            recovered.add(TameworkApiCapability.BONDED_VESSELS);
+            recovered.add(TameworkApiCapability.POPULATION_GROUPS);
+            recovered.add(TameworkApiCapability.COMPANION_PROVISIONING);
+            return recovered;
+        });
+
+        assertTrue(bridge.snapshot().feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
+        assertTrue(bridge.snapshot().feature(HyDragonFeature.CAPTURE_AND_BOND).available());
+    }
+
+    @Test
+    void capabilityRefreshFailureFailsClosed() {
+        AtomicReference<EnumSet<TameworkApiCapability>> capabilities = new AtomicReference<>(
+                EnumSet.allOf(TameworkApiCapability.class));
+        TameworkBridge bridge = TameworkBridge.connect(dynamicApi(capabilities));
+        capabilities.set(null);
+
+        TameworkBridge.Snapshot failed = bridge.snapshot();
+
+        assertFalse(failed.apiAvailable());
+        assertFalse(failed.feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
+        assertTrue(failed.bootstrapIssue().contains("refresh failed"));
+    }
+
+    private static TameworkApi dynamicApi(
+            AtomicReference<EnumSet<TameworkApiCapability>> capabilities) {
+        return (TameworkApi) Proxy.newProxyInstance(
+                TameworkApi.class.getClassLoader(),
+                new Class<?>[] {TameworkApi.class},
+                (proxy, method, arguments) -> switch (method.getName()) {
+                    case "getApiVersion" -> "0.9.0";
+                    case "getCapabilities" -> {
+                        EnumSet<TameworkApiCapability> current = capabilities.get();
+                        if (current == null) throw new IllegalStateException("recovery unavailable");
+                        yield current.clone();
+                    }
+                    case "toString" -> "DynamicTameworkApi";
+                    case "hashCode" -> System.identityHashCode(proxy);
+                    case "equals" -> proxy == arguments[0];
+                    default -> null;
+                });
     }
 }
