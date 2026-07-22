@@ -24,6 +24,7 @@ Related specifications:
 - The Dragon Horn is the only recurring command, recall, locate, and revive interface. `Soul_Bound_Wyvern` is removed.
 - The claim preserves one canonical profile through death, unload, restart, and revival.
 - Miniwyvern and one full dragon may be active together because they use separate population groups.
+- The Miniwyvern uses the same timed-summon lifecycle with its own role-configured duration and cooldown; its timer is independent of every full dragon.
 - The nine-slot backpack remains deferred to a later update.
 - Elemental archetypes and their effects remain HyDragon-specific behavior.
 - HyDragon is unreleased; no Egg, Soul Bound Wyvern, or profile migration is required.
@@ -53,6 +54,8 @@ Related specifications:
 - **HYD-SOUL-013:** The Miniwyvern MUST remain visibly small, non-mountable, able to Follow/Hold/Idle, and able to assist its owner with a basic bite and owner-safe targeting.
 - **HYD-SOUL-014:** The Miniwyvern MUST be controllable through the Dragon Horn's normal linked panel and command actions. It MUST NOT require a dedicated summon item.
 - **HYD-SOUL-015:** Projection and Recall MUST use safe in-front-of-player placement, matching the full-dragon behavior.
+- **HYD-SOUL-015A:** Successful Egg projection starts the Miniwyvern's first summon lease. Expiry or manual Dismiss MUST return the same profile to `ROSTER_STORED`; the Dragon Horn shows remaining time, stored status, and resummon cooldown.
+- **HYD-SOUL-015B:** Horn Summon after cooldown starts a new configured lease. Recall, attunement, unload, travel, and restart MUST NOT reset a running lease. Owner logout follows the configured auto-storage transaction and cooldown; logging back in cannot immediately convert that stored profile into a fresh active lease.
 
 ### Elemental attunement
 
@@ -92,7 +95,7 @@ Ordinary gameplay has no `CLAIMED -> UNCLAIMED` transition. A dead or unprojecte
 5. Exact-CAS consume one Egg.
 6. Call Tamework provisioning with the same idempotency key for one `Tamed_Wyvern_Mini` profile.
 7. Commit profile ID, `CLAIMED`, and Dragon Horn membership as one recoverable operation.
-8. Request safe projection in front of the player. Projection failure leaves the committed profile dormant and visible in the Horn.
+8. Request safe projection in front of the player and begin one role-configured summon lease. Projection failure leaves the committed profile dormant and visible in the Horn without starting a lease.
 9. Emit one localized success or recovery-pending message.
 
 No callback may create a new operation merely because the original callback timed out.
@@ -134,7 +137,7 @@ Attunement reserves one essence, updates profile data and appearance under one i
 | `Server/Item/Items/Ingredient/Wyvern_Egg.json` | One-time ritual consumable using the dragon egg appearance |
 | `Soul_Bound_Wyvern` | Delete item, interaction, recipe, localization, tests, and runtime references |
 | `HyDragon_Dragon_Horn` | Shared recurring interface for Miniwyvern and full dragons |
-| `Server/Tamework/Companion/HyDragonMiniwyvern.json` | Population, command, paid revival, placement, and lifecycle settings |
+| `Server/Tamework/Companion/HyDragonMiniwyvern.json` | Population, command, timed-summon, paid-revival, placement, and lifecycle settings |
 | `Server/Tamework/Items/Commands/HyDragonDragonHorn.json` | Allows all supported tamed full-dragon roles plus `Tamed_Wyvern_Mini` |
 | `Server/HyDragon/MiniwyvernArchetypes/*.json` | Neutral and seven elemental definitions |
 | `Server/Languages/{en-US,pt-BR,de-DE,fr-FR,es-ES}/server.lang` | Matching Egg, claim, Horn, lifecycle, revival, and archetype keys/placeholders |
@@ -150,6 +153,7 @@ Canonical asset IDs use English. Locale catalogs translate player-facing text on
 - Projection failure after claim leaves the one profile visible and Recall-capable through the Horn.
 - Every stone tier rejects both Miniwyvern roles without rolling or consuming.
 - Miniwyvern and one full dragon can be active together; a second Miniwyvern cannot be owned or projected.
+- Egg projection, Horn Summon, timed expiry, manual Dismiss, and resummon cooldown preserve the same Miniwyvern profile; no callback or restart resets its lease.
 - Death preserves the one profile and entitlement; paid revival restores that profile through the Horn.
 - Follow, Hold, Recall, commands, death/revival, logout, cross-world travel, and restart preserve the same profile and roster membership.
 - Each elemental essence changes the same profile once and cleans up the prior archetype's effects.

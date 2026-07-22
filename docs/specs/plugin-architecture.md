@@ -131,7 +131,8 @@ Feature gates:
 | --- | --- | --- |
 | Probabilistic/tiered capture | [Capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) | Reject capture before channel completion; keep item/NPC unchanged |
 | Tame-and-link capture and Dragon Horn roster | [Command-roster capture and revival](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md) | Disable capture before a roll; preserve existing profiles/roster rows |
-| One active full dragon / one Miniwyvern | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) | Deny admission; never bypass the cap locally |
+| Configurable concurrent full-dragon/Miniwyvern limits | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) | Deny admission; never bypass configured caps locally |
+| Timed Summon/Dismiss and roster storage | [Command-roster capture and revival](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md) | Disable new timed projections; preserve profile, slot, lease, and recovery state |
 | Soul Bond creation | Tamework `COMPANION_PROVISIONING`, population groups, and the [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) | Disable new claims; preserve existing entitlement/profile data |
 | Soul Bond metadata and archetypes | Tamework profile data and event API in the [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) | Disable mutation; preserve existing data |
 | Deferred Miniwyvern backpack | Future [companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md) | Not queried or registered in the initial release; capability-gate the later update |
@@ -243,7 +244,7 @@ Stop new operations, cancel scheduled ability/encounter tasks, flush durable sta
 | `src/main/java/com/alechilles/hydragon/` | Plugin | Services and integration adapter |
 | `src/test/java/com/alechilles/hydragon/` | Tests | Unit, contract, restart-recovery, and asset-validation tests |
 | `Server/HyDragon/DragonSpecies/*.json` | HyDragon config | Species difficulty, capture metadata, mount policy |
-| HyDragon role-scoped revival values | Tamework companion config | Revitalizing Essence costs and localized HyDragon presentation |
+| HyDragon role-scoped summon/revival values | Tamework companion config | Active duration/cooldown plus arbitrary multi-item costs and localized HyDragon presentation |
 | `Server/HyDragon/MiniwyvernArchetypes/*.json` | HyDragon config | Attunement and ability definitions |
 | `Server/HyDragon/Encounters/*.json` | HyDragon config | Plugin-controlled encounter definitions |
 | `Server/Tamework/**` | Tamework assets | Generic companion, capture, command-roster, population, and deferred inventory declarations |
