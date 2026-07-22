@@ -121,6 +121,34 @@ def load_json_assets(errors: list[str]) -> dict[Path, object]:
     return parsed
 
 
+def validate_runtime_item_contracts(parsed: dict[Path, object], errors: list[str]) -> None:
+    """Mirror runtime-only item checks that are not expressed by JSON syntax."""
+    item_root = ROOT / "Server/Item/Items"
+    allowed_icon_roots = ("Icons/ItemsGenerated/", "Icons/Items/")
+
+    def validate_item(item: object, context: str) -> None:
+        if not isinstance(item, dict):
+            return
+        icon = item.get("Icon")
+        if isinstance(icon, str) and not icon.startswith(allowed_icon_roots):
+            fail(errors, f"{context}.Icon must be within Icons/ItemsGenerated or Icons/Items: {icon}")
+        interactions = item.get("Interactions")
+        if isinstance(interactions, dict):
+            for channel, root_interaction in interactions.items():
+                if not isinstance(root_interaction, dict):
+                    continue
+                sequence = root_interaction.get("Interactions")
+                if isinstance(sequence, list) and not sequence:
+                    fail(errors, f"{context}.Interactions.{channel}.Interactions must not be empty")
+        states = item.get("State")
+        if isinstance(states, dict):
+            for state_name, state in states.items():
+                validate_item(state, f"{context}.State.{state_name}")
+
+    for path in sorted(item_root.rglob("*.json")):
+        validate_item(parsed.get(path), path.relative_to(ROOT).as_posix())
+
+
 def validate_english_ids(errors: list[str]) -> None:
     for root in ASSET_ROOTS:
         for path in root.rglob("*"):
@@ -891,8 +919,8 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
             fail(errors, f"{context} must be an authored item-state variant")
             continue
         primary = state.get("Interactions", {}).get("Primary", {}).get("Interactions")
-        if primary != []:
-            fail(errors, f"{context} must be inspection-only with an explicit empty primary interaction list")
+        if primary != [{"Type": "Simple"}]:
+            fail(errors, f"{context} must be inspection-only with an explicit no-op primary interaction")
         light = state.get("Light")
         if not isinstance(light, dict) or not isinstance(light.get("Radius"), (int, float)) \
                 or light.get("Radius") > 1:
@@ -1087,8 +1115,8 @@ def validate_repair_interaction(parsed: dict[Path, object], errors: list[str]) -
         fail(errors, "Revitalizing Essence must be reserved from inventory, not used as the held repair authority")
     secondary = essence.get("Interactions", {}).get("Secondary", {}).get("Interactions") \
         if isinstance(essence, dict) else None
-    if secondary != []:
-        fail(errors, "Revitalizing Essence must explicitly clear the Fire Essence attunement interaction it inherits")
+    if secondary != [{"Type": "Simple"}]:
+        fail(errors, "Revitalizing Essence must override inherited Fire attunement with a runtime-valid no-op")
 
 
 def main() -> int:
@@ -1100,6 +1128,7 @@ def main() -> int:
         known_assets |= asset_stems(base_root)
     validate_english_ids(errors)
     validate_no_pre_release_archives(errors)
+    validate_runtime_item_contracts(parsed, errors)
     validate_locales(errors)
     validate_interaction_message_localization(parsed, errors)
     require_files(errors)

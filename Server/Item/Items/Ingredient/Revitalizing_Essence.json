@@ -9,7 +9,9 @@
   "Quality": "Rare",
   "Interactions": {
     "Secondary": {
-      "Interactions": []
+      "Interactions": [
+        { "Type": "Simple" }
+      ]
     }
   },
   "Recipe": {

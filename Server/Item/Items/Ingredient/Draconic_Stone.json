@@ -190,7 +190,11 @@
       },
       "Interactions": {
         "Primary": {
-          "Interactions": []
+          "Interactions": [
+            {
+              "Type": "Simple"
+            }
+          ]
         }
       },
       "MaxStack": 1,
@@ -209,7 +213,11 @@
       },
       "Interactions": {
         "Primary": {
-          "Interactions": []
+          "Interactions": [
+            {
+              "Type": "Simple"
+            }
+          ]
         }
       },
       "MaxStack": 1,

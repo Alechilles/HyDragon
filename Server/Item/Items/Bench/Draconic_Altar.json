@@ -3,7 +3,7 @@
     "Name": "server.items.Draconic_Altar.name",
     "Description": "server.items.Draconic_Altar.description"
   },
-  "Icon": "Blocks/HyDragon/Draconic_Altar/Draconic_Altar.png",
+  "Icon": "Icons/ItemsGenerated/Draconic_Altar.png",
   "Categories": [ "Furniture.Benches" ],
   "Recipe": {
     "TimeSeconds": 6,
