@@ -1,0 +1,47 @@
+{
+  "Container": {
+    "Type": "Multiple",
+    "Containers": [
+      {
+        "Type": "Single",
+        "Weight": 100,
+        "Item": { "ItemId": "Draconic_Scale", "QuantityMin": 4, "QuantityMax": 7 }
+      },
+      {
+        "Type": "Single",
+        "Weight": 100,
+        "Item": { "ItemId": "Draconic_Essence", "QuantityMin": 1, "QuantityMax": 3 }
+      },
+      {
+        "Type": "Single",
+        "Weight": 65,
+        "Item": { "ItemId": "Draconic_Essence_Nature", "QuantityMin": 2, "QuantityMax": 4 }
+      },
+      {
+        "Type": "Single",
+        "Weight": 35,
+        "Item": { "ItemId": "Draconic_Essence_Fire", "QuantityMin": 1, "QuantityMax": 3 }
+      },
+      {
+        "Type": "Single",
+        "Weight": 6,
+        "Item": { "ItemId": "Draconic_Essence_Void", "QuantityMin": 1, "QuantityMax": 1 }
+      },
+      {
+        "Type": "Single",
+        "Weight": 100,
+        "Item": { "ItemId": "Ore_Gold", "QuantityMin": 2, "QuantityMax": 5 }
+      },
+      {
+        "Type": "Single",
+        "Weight": 100,
+        "Item": { "ItemId": "Rubble_Stone", "QuantityMin": 5, "QuantityMax": 10 }
+      },
+      {
+        "Type": "Single",
+        "Weight": 6,
+        "Item": { "ItemId": "Drake_Egg", "QuantityMin": 1, "QuantityMax": 1 }
+      }
+    ]
+  }
+}

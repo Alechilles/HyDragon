@@ -3,7 +3,7 @@
   "EssenceSemanticId": "lightning",
   "EssenceItemId": "Draconic_Essence_Lightning",
   "AppearanceId": "Wyvern_Mini_Lightning",
-  "ParticleAndSoundIds": [ "Void_Lightning", "SFX_Eye_Void_Attack_Blast" ],
+  "ParticleAndSoundIds": [ "Lightning", "SFX_Spark_Living_Alerted" ],
   "PassiveEffects": [],
   "PassiveModifiers": {
     "MovementSpeedMultiplier": 1.15,

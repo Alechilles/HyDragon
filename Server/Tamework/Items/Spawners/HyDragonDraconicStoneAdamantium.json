@@ -7,7 +7,9 @@
     "StateItemIds": {
       "Stored": "*Draconic_Stone_Adamantium_State_Filled",
       "Active": "*Draconic_Stone_Adamantium_State_Active",
-      "Dead": "*Draconic_Stone_Adamantium_State_Damaged"
+      "Dead": "*Draconic_Stone_Adamantium_State_Damaged",
+      "Lost": "*Draconic_Stone_Adamantium_State_Lost",
+      "Unavailable": "*Draconic_Stone_Adamantium_State_Unavailable"
     }
   }
 }

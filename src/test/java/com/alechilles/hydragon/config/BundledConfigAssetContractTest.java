@@ -11,17 +11,25 @@ import com.hypixel.hytale.codec.util.RawJsonReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class BundledConfigAssetContractTest {
     private static final Path CONFIG_ROOT = Path.of("Server", "HyDragon");
+    private static final Pattern TEXTURE_FIELD = Pattern.compile("\\\"Texture\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"");
 
     @Test
     void bundledAssetsDecodeWithoutUnknownFieldsAndCrossValidate() throws IOException {
@@ -78,6 +86,45 @@ class BundledConfigAssetContractTest {
         assertTrue(neutral.getEssenceItemId() == null || neutral.getEssenceItemId().isBlank());
         assertEquals("Wyvern_Mini", neutral.getAppearanceId());
         assertEquals("BASIC_BITE", neutral.getFallbackBehavior());
+    }
+
+    @Test
+    void miniwyvernAppearancesResolveToByteDistinctTexturesAndPresentationVocabularies()
+            throws IOException, NoSuchAlgorithmException {
+        List<MiniwyvernArchetypeConfig> archetypes = decodeDirectory(
+                "MiniwyvernArchetypes", MiniwyvernArchetypeConfig.class,
+                MiniwyvernArchetypeConfig.CODEC);
+        Map<String, String> textureHashByArchetype = new HashMap<>();
+        Map<String, List<String>> vocabularyByArchetype = new HashMap<>();
+
+        for (MiniwyvernArchetypeConfig archetype : archetypes) {
+            String appearanceId = archetype.getAppearanceId();
+            Path appearancePath = Path.of(
+                    "Server", "Models", "HyDragon", "Wyvern_Mini", appearanceId + ".json");
+            assertTrue(Files.isRegularFile(appearancePath),
+                    () -> archetype.getId() + " appearance does not resolve: " + appearancePath);
+
+            Matcher textureMatcher = TEXTURE_FIELD.matcher(Files.readString(appearancePath));
+            assertTrue(textureMatcher.find(),
+                    () -> archetype.getId() + " appearance has no concrete texture: " + appearancePath);
+            Path texturePath = Path.of("Common").resolve(textureMatcher.group(1));
+            assertTrue(Files.isRegularFile(texturePath),
+                    () -> archetype.getId() + " texture does not resolve: " + texturePath);
+
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(texturePath));
+            textureHashByArchetype.put(archetype.getId(), HexFormat.of().formatHex(digest));
+            vocabularyByArchetype.put(archetype.getId(), List.copyOf(archetype.getParticleAndSoundIds()));
+        }
+
+        assertEquals(8, textureHashByArchetype.size());
+        assertEquals(8, new HashSet<>(textureHashByArchetype.values()).size(),
+                () -> "Each resolved Miniwyvern appearance must have distinct texture bytes: "
+                        + textureHashByArchetype);
+        assertEquals(8, vocabularyByArchetype.size());
+        assertEquals(8, new HashSet<>(vocabularyByArchetype.values()).size(),
+                () -> "Each Miniwyvern archetype must have a distinct particle/audio vocabulary: "
+                        + vocabularyByArchetype);
+        assertFalse(vocabularyByArchetype.get("lightning").equals(vocabularyByArchetype.get("void")));
     }
 
     private static <T extends JsonAsset<String>> List<T> decodeDirectory(

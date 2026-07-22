@@ -12,5 +12,16 @@
   "DayTimeRange": [
     6,
     18
+  ],
+  "MoonPhaseRange": [
+    0,
+    4
+  ],
+  "MoonPhaseWeightModifiers": [
+    0.7,
+    0.85,
+    1.0,
+    1.15,
+    1.3
   ]
 }

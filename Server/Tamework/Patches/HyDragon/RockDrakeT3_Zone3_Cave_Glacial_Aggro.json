@@ -5,6 +5,15 @@
   "Enabled": true,
   "Operations": [
     {
+      "Id": "bound-rock-drake-altitude",
+      "Op": "Add",
+      "Path": "/YRange",
+      "Value": [
+        -24,
+        24
+      ]
+    },
+    {
       "Id": "append-rock-drake-t3",
       "Op": "Insert",
       "Path": "/NPCs",

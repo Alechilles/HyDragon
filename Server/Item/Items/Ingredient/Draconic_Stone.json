@@ -181,6 +181,44 @@
       },
       "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
       "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
+    },
+    "Lost": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Lost.name",
+        "Description": "server.items.Draconic_Stone_Lost.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": []
+        }
+      },
+      "MaxStack": 1,
+      "Light": {
+        "Color": "#6B7280",
+        "Radius": 1
+      },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
+    },
+    "Unavailable": {
+      "Variant": true,
+      "TranslationProperties": {
+        "Name": "server.items.Draconic_Stone_Unavailable.name",
+        "Description": "server.items.Draconic_Stone_Unavailable.description"
+      },
+      "Interactions": {
+        "Primary": {
+          "Interactions": []
+        }
+      },
+      "MaxStack": 1,
+      "Light": {
+        "Color": "#4B5563",
+        "Radius": 1
+      },
+      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
     }
   }
 }

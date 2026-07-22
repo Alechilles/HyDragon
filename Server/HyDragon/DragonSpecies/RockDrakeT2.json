@@ -4,7 +4,7 @@
   "TamedRoleIdByWildRole": { "RockDrakeT2": "Tamed_RockDrakeT2" },
   "DifficultyId": "uncommon",
   "StatsAndBehaviorAssetIds": [ "CAE_RockDrake", "Root_NPC_RockDrake_Attack" ],
-  "DropListId": "Drop_RockDrake",
+  "DropListId": "Drop_RockDrake_T2",
   "Mount": { "Mode": "GROUND", "AvatarFlightConfigId": null },
   "Capture": {
     "Resistance": 0.10,

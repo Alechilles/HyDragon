@@ -49,7 +49,9 @@
     "StateItemIds": {
       "Stored": "*Draconic_Stone_State_Filled",
       "Active": "*Draconic_Stone_State_Active",
-      "Dead": "*Draconic_Stone_State_Damaged"
+      "Dead": "*Draconic_Stone_State_Damaged",
+      "Lost": "*Draconic_Stone_State_Lost",
+      "Unavailable": "*Draconic_Stone_State_Unavailable"
     },
     "TransitionCooldownMs": 10000,
     "StoreMaxDistance": 12.0,

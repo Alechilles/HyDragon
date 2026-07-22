@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import re
 import sys
@@ -15,6 +16,7 @@ ASSET_ROOTS = (ROOT / "Common", ROOT / "Server")
 JSON_SUFFIXES = {".json", ".particlesystem", ".particlespawner", ".blockymodel", ".blockyanim"}
 LOCALES = ("en-US", "pt-BR", "de-DE", "fr-FR", "es-ES")
 REQUIRED_STATUS_MESSAGE_KEYS = {
+    "messages.status.description",
     "messages.status.usage",
     "messages.status.unavailable",
     "messages.status.title",
@@ -36,6 +38,7 @@ REQUIRED_STATUS_MESSAGE_KEYS = {
     "messages.status.state.unavailable",
     "messages.status.state.readWrite",
     "messages.status.state.readOnly",
+    "messages.refund.description",
 }
 BANNED_PRE_RELEASE_TOKENS = (
     "Draconic_Essence_Igne",
@@ -193,6 +196,17 @@ def validate_locales(errors: list[str]) -> None:
     elif "Message.raw(" in status_command.read_text(encoding="utf-8"):
         fail(errors, "HyDragon status command must not emit raw player-facing messages")
 
+    command_root = ROOT / "src/main/java/com/alechilles/hydragon/diagnostics"
+    description_pattern = re.compile(r'super\(\s*"[^"]+"\s*,\s*"([^"]+)"')
+    for command_path in sorted(command_root.glob("*Command.java")):
+        source_text = command_path.read_text(encoding="utf-8")
+        for description in description_pattern.findall(source_text):
+            if not description.startswith("server."):
+                fail(errors, f"raw HyDragon command description: {command_path.relative_to(ROOT)}: {description}")
+            elif description.removeprefix("server.") not in source:
+                fail(errors, f"missing HyDragon command description localization: "
+                     f"{command_path.relative_to(ROOT)}: {description}")
+
 
 def validate_interaction_message_localization(parsed: dict[Path, object], errors: list[str]) -> None:
     english_path = ROOT / "Server/Languages/en-US/server.lang"
@@ -234,6 +248,7 @@ def require_files(errors: list[str]) -> None:
         "Server/Tamework/Items/Commands/HyDragonDragonCommand.json",
         "Server/Tamework/PopulationGroups/HyDragonFullDragons.json",
         "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json",
+        "Server/Tamework/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json",
         "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json",
         "Server/HyDragon/StoneMaintenance/Default.json",
         "Server/Tamework/CapturePolicies/HyDragonHydra.json",
@@ -410,6 +425,8 @@ def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
             "Stored": expected_prefix + "Filled",
             "Active": expected_prefix + "Active",
             "Dead": expected_prefix + "Damaged",
+            "Lost": expected_prefix + "Lost",
+            "Unavailable": expected_prefix + "Unavailable",
         }
         if states != expected:
             fail(errors, f"tier-specific vessel state map mismatch in {path.relative_to(ROOT)}: {states}")
@@ -689,6 +706,13 @@ def validate_spawn_shape(
             fail(errors, f"{context}.LightRanges has unsupported Hytale 0.5.6 keys")
         elif any(not validate_range(value, 2, 0, 100) for value in lights.values()):
             fail(errors, f"{context}.LightRanges contains an invalid range")
+    moon_weights = data.get("MoonPhaseWeightModifiers")
+    if moon_weights is not None and (
+        not isinstance(moon_weights, list)
+        or len(moon_weights) != 5
+        or any(not isinstance(value, (int, float)) or value < 0 for value in moon_weights)
+    ):
+        fail(errors, f"{context}.MoonPhaseWeightModifiers must contain five non-negative weights")
     if "YRange" in data and data["YRange"] is not None and not validate_range(data["YRange"], 2, -4096, 4096):
         fail(errors, f"{context}.YRange must contain two ordered integer offsets")
 
@@ -760,6 +784,12 @@ def validate_static_spawn_contracts(
                 fail(errors, f"{operation_context} has a blank or duplicate operation Id")
             else:
                 operation_ids.add(operation_id)
+            if (operation.get("Op"), operation.get("Path")) == ("Add", "/YRange"):
+                if not validate_range(operation.get("Value"), 2, -4096, 4096):
+                    fail(errors, f"{operation_context}.Value violates the Hytale 0.5.6 YRange contract")
+                else:
+                    merged["YRange"] = operation.get("Value")
+                continue
             if (operation.get("Op"), operation.get("Path"), operation.get("Position")) != ("Insert", "/NPCs", "End"):
                 fail(errors, f"{operation_context} must append to the schema-defined NPCs array")
                 continue
@@ -848,6 +878,135 @@ def validate_domain_references(
             if not isinstance(reference, str) or reference not in known_assets:
                 fail(errors, f"{path.relative_to(ROOT)} unresolved {field} reference: {reference}")
 
+
+def validate_release_content_contracts(parsed: dict[Path, object], errors: list[str]) -> None:
+    """Gate the first-release vessel, flight, spawn, loot, and presentation contracts."""
+    stone_path = ROOT / "Server/Item/Items/Ingredient/Draconic_Stone.json"
+    stone = parsed.get(stone_path)
+    states = stone.get("State", {}) if isinstance(stone, dict) else {}
+    for state_name in ("Lost", "Unavailable"):
+        state = states.get(state_name) if isinstance(states, dict) else None
+        context = f"{stone_path.relative_to(ROOT)}.State.{state_name}"
+        if not isinstance(state, dict) or state.get("Variant") is not True:
+            fail(errors, f"{context} must be an authored item-state variant")
+            continue
+        primary = state.get("Interactions", {}).get("Primary", {}).get("Interactions")
+        if primary != []:
+            fail(errors, f"{context} must be inspection-only with an explicit empty primary interaction list")
+        light = state.get("Light")
+        if not isinstance(light, dict) or not isinstance(light.get("Radius"), (int, float)) \
+                or light.get("Radius") > 1:
+            fail(errors, f"{context} must use a muted light radius no greater than one")
+        serialized = json.dumps(state, sort_keys=True)
+        if "TameworkSpawn" in serialized or "HyDragonRepairBondedStone" in serialized:
+            fail(errors, f"{context} must not expose summon, store, or repair actions")
+
+    expected_drop_ids: list[str] = []
+    for tier in (1, 2, 3):
+        expected = f"Drop_RockDrake_T{tier}"
+        expected_drop_ids.append(expected)
+        species_path = ROOT / f"Server/HyDragon/DragonSpecies/RockDrakeT{tier}.json"
+        role_path = ROOT / f"Server/NPC/Roles/Creature/HyDragon/RockDrake/RockDrakeT{tier}.json"
+        drop_path = ROOT / f"Server/Drops/HyDragon/{expected}.json"
+        species = parsed.get(species_path)
+        role = parsed.get(role_path)
+        drop = parsed.get(drop_path)
+        if not isinstance(species, dict) or species.get("DropListId") != expected:
+            fail(errors, f"Rock Drake T{tier} species must select its independently tunable {expected}")
+        modify = role.get("Modify") if isinstance(role, dict) else None
+        if not isinstance(modify, dict) or modify.get("DropList") != expected:
+            fail(errors, f"Rock Drake T{tier} role must select its independently tunable {expected}")
+        if not isinstance(drop, dict):
+            fail(errors, f"missing independently tunable Rock Drake drop list: {drop_path.relative_to(ROOT)}")
+            continue
+        serialized = json.dumps(drop, sort_keys=True)
+        for required_item in ("Draconic_Scale", "Draconic_Essence"):
+            if required_item not in serialized:
+                fail(errors, f"{drop_path.relative_to(ROOT)} does not source {required_item}")
+    if len(set(expected_drop_ids)) != 3:
+        fail(errors, "Rock Drake tier drop-list IDs must be distinct")
+
+    hydra_spawn_path = ROOT / "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Glacial_HyDragon_Predator.json"
+    hydra_spawn = parsed.get(hydra_spawn_path)
+    if not isinstance(hydra_spawn, dict) or hydra_spawn.get("MoonPhaseRange") is None \
+            or hydra_spawn.get("MoonPhaseWeightModifiers") is None:
+        fail(errors, f"{hydra_spawn_path.relative_to(ROOT)} must author moon range and weight tuning")
+    altitude_patch_path = ROOT / "Server/Tamework/Patches/HyDragon/RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
+    altitude_patch = parsed.get(altitude_patch_path)
+    operations = altitude_patch.get("Operations", []) if isinstance(altitude_patch, dict) else []
+    if not any(
+        isinstance(operation, dict)
+        and operation.get("Op") == "Add"
+        and operation.get("Path") == "/YRange"
+        and validate_range(operation.get("Value"), 2, -4096, 4096)
+        for operation in operations
+    ):
+        fail(errors, f"{altitude_patch_path.relative_to(ROOT)} must author a valid BeaconNPCSpawn YRange")
+
+    flight_patch_path = ROOT / "Server/Tamework/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json"
+    flight_patch = parsed.get(flight_patch_path)
+    flight_operations = flight_patch.get("Operations", []) if isinstance(flight_patch, dict) else []
+    expected_flight_values = {
+        "MountMode": "TameworkAvatarFlight",
+        "AvatarFlightConfig": "HyDragonNordicDrake",
+    }
+    if not any(
+        isinstance(operation, dict)
+        and operation.get("Op") == "Merge"
+        and operation.get("Path") == "/Modify"
+        and operation.get("Value") == expected_flight_values
+        for operation in flight_operations
+    ):
+        fail(errors, "Nordic Drake must receive Tamework avatar-flight role wiring through its clean patch asset")
+    avatar_config = parsed.get(ROOT / "Server/Tamework/AvatarFlight/HyDragonNordicDrake.json")
+    model = avatar_config.get("Model") if isinstance(avatar_config, dict) else None
+    if not isinstance(avatar_config, dict) or avatar_config.get("Enabled") is not True \
+            or not isinstance(model, dict) or model.get("ModelId") != "NordicDrake_AvatarFlight":
+        fail(errors, "HyDragonNordicDrake must be an enabled avatar-flight config using its authored model")
+    nordic_species = parsed.get(ROOT / "Server/HyDragon/DragonSpecies/NordicDrake.json")
+    mount = nordic_species.get("Mount") if isinstance(nordic_species, dict) else None
+    if mount != {"Mode": "AVATAR_FLIGHT", "AvatarFlightConfigId": "HyDragonNordicDrake"}:
+        fail(errors, "Nordic Drake species must select the HyDragonNordicDrake avatar-flight config")
+    encounter = parsed.get(ROOT / "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json")
+    eligibility = encounter.get("PlayerEligibility") if isinstance(encounter, dict) else None
+    if not isinstance(eligibility, dict) \
+            or eligibility.get("RequiredItemId") != "Tamework_Flightmasters_Talisman":
+        fail(errors, "Nordic Drake flight eligibility must use only Tamework's Flightmaster's Talisman")
+    interaction = parsed.get(ROOT / "Server/Tamework/Interactions/HyDragonIntDragon.json")
+    interaction_entries = interaction.get("Interactions", []) if isinstance(interaction, dict) else []
+    if not any(isinstance(entry, dict) and entry.get("Type") == "Mount" and entry.get("Enabled") is True
+               for entry in interaction_entries):
+        fail(errors, "Tamed Nordic Drake interaction config must expose the Tamework mount entry")
+
+    texture_hashes: dict[str, str] = {}
+    vocabularies: dict[str, tuple[str, ...]] = {}
+    archetype_root = ROOT / "Server/HyDragon/MiniwyvernArchetypes"
+    model_root = ROOT / "Server/Models/HyDragon/Wyvern_Mini"
+    for path in sorted(archetype_root.glob("*.json")):
+        archetype = parsed.get(path)
+        if not isinstance(archetype, dict):
+            continue
+        archetype_id = archetype.get("Id")
+        appearance_id = archetype.get("AppearanceId")
+        if not isinstance(archetype_id, str) or not isinstance(appearance_id, str):
+            continue
+        appearance_path = model_root / f"{appearance_id}.json"
+        appearance = parsed.get(appearance_path)
+        texture = appearance.get("Texture") if isinstance(appearance, dict) else None
+        texture_path = ROOT / "Common" / texture if isinstance(texture, str) else None
+        if texture_path is None or not texture_path.is_file():
+            fail(errors, f"Miniwyvern {archetype_id} appearance does not resolve a texture: {appearance_id}")
+        else:
+            texture_hashes[archetype_id] = hashlib.sha256(texture_path.read_bytes()).hexdigest()
+        vocabulary = archetype.get("ParticleAndSoundIds")
+        if not isinstance(vocabulary, list):
+            fail(errors, f"Miniwyvern {archetype_id} has no resolved presentation vocabulary")
+        else:
+            vocabularies[archetype_id] = tuple(vocabulary)
+    if len(texture_hashes) == 8 and len(set(texture_hashes.values())) != 8:
+        fail(errors, f"Miniwyvern archetype textures must be byte-distinct: {texture_hashes}")
+    if len(vocabularies) == 8 and len(set(vocabularies.values())) != 8:
+        fail(errors, f"Miniwyvern particle/audio vocabularies must be distinct: {vocabularies}")
 
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
     outputs = {
@@ -952,6 +1111,7 @@ def main() -> int:
     validate_spawn_patch_role_identity(parsed, errors)
     validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
     validate_domain_references(parsed, known_assets, errors)
+    validate_release_content_contracts(parsed, errors)
     validate_altar_recipes(parsed, errors)
     validate_command_item(parsed, errors)
     validate_repair_interaction(parsed, errors)
