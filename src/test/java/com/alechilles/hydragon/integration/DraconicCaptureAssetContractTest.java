@@ -1,6 +1,7 @@
 package com.alechilles.hydragon.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
@@ -144,6 +145,10 @@ class DraconicCaptureAssetContractTest {
 
         assertTrue(item.contains("\"Primary\""));
         assertTrue(item.contains("\"Type\": \"HyDragonSoulBond\""));
+        assertTrue(item.contains("\"Icon\": \"Icons/ItemsGenerated/Drake_Egg.png\""));
+        assertTrue(item.contains("\"Model\": \"Items/HyDragon/Drake_Egg.blockymodel\""));
+        assertTrue(item.contains("\"Texture\": \"Items/HyDragon/Drake_Egg.png\""));
+        assertFalse(item.contains("\"BlockType\""), "Soul Bond egg must remain a non-placeable item");
     }
 
     private static String read(String relative) throws Exception {

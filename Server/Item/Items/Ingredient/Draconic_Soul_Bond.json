@@ -3,7 +3,7 @@
     "Name": "server.items.Draconic_Soul_Bond.name",
     "Description": "server.items.Draconic_Soul_Bond.description"
   },
-  "Icon": "Icons/ItemsGenerated/Draconic_Soul_Bond.png",
+  "Icon": "Icons/ItemsGenerated/Drake_Egg.png",
   "Quality": "Epic",
   "Categories": [
     "Items.Tools"
@@ -36,13 +36,13 @@
     ],
     "TimeSeconds": 8
   },
-  "Model": "Items/HyDragon/Draconic_Soul_Bond.blockymodel",
-  "Texture": "Items/HyDragon/Draconic_Soul_Bond.png",
+  "Model": "Items/HyDragon/Drake_Egg.blockymodel",
+  "Texture": "Items/HyDragon/Drake_Egg.png",
   "PlayerAnimationsId": "Item",
   "IconProperties": {
-    "Scale": 1.6,
-    "Rotation": [ 0, 19, 3 ],
-    "Translation": [ 1, -5 ]
+    "Scale": 1,
+    "Rotation": [ 355, 44, 30 ],
+    "Translation": [ 2, -8 ]
   },
   "Tags": {
     "Type": [ "Tool" ]

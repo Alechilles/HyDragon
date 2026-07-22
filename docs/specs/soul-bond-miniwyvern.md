@@ -32,7 +32,7 @@ Related specifications:
 
 ### Soul Bond entitlement and lifecycle
 
-- **HYD-SOUL-001:** HyDragon MUST add a Draconic Soul Bond item crafted only at the Draconic Altar and handled by a namespaced plugin interaction.
+- **HYD-SOUL-001:** HyDragon MUST add a Draconic Soul Bond item crafted only at the Draconic Altar and handled by a namespaced plugin interaction. The item MUST be presented as a soulbound dragon egg using the Drake Egg model and texture, while remaining a non-placeable consumable rather than a block item.
 - **HYD-SOUL-002:** Successful use MUST atomically reserve the player's once-per-player entitlement, provision exactly one owned Miniwyvern profile through Tamework's `COMPANION_PROVISIONING` capability, link it in the player record, admit it to its population group, and consume exactly one Soul Bond item.
 - **HYD-SOUL-003:** If the player already has a claimed or recoverable Soul Bond, use MUST be denied without consuming the item or creating another profile.
 - **HYD-SOUL-004:** `Wyvern_Mini` and `Tamed_Wyvern_Mini` MUST be excluded from every Draconic Stone capture declaration. Production world-spawn assets MUST not spawn wild Miniwyverns.
