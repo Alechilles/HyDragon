@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class HyDragonConfigRepositoryTest {
@@ -18,10 +17,9 @@ class HyDragonConfigRepositoryTest {
         DragonEncounterConfig encounter = validEncounter();
 
         HyDragonConfigRepository.Snapshot snapshot = HyDragonConfigRepository.buildSnapshot(
-                List.of(species), List.of(validMaintenance()), allArchetypes(), List.of(encounter));
+                List.of(species), allArchetypes(), List.of(encounter));
 
         assertTrue(snapshot.isValid(), () -> String.join("\n", snapshot.issues()));
-        assertTrue(snapshot.defaultMaintenance() != null);
     }
 
     @Test
@@ -31,14 +29,6 @@ class HyDragonConfigRepositoryTest {
         species.tamedRoleIdByWildRole = Map.of("Wyvern_Mini", "Tamed_Wyvern_Mini");
 
         assertTrue(species.validate().stream().anyMatch(issue -> issue.contains("Soul Bond-exclusive")));
-    }
-
-    @Test
-    void rejectsDeferredMaintenanceExtensions() {
-        StoneMaintenanceConfig maintenance = validMaintenance();
-        maintenance.futureExtensions.energyEnabled = true;
-
-        assertTrue(maintenance.validate().stream().anyMatch(issue -> issue.contains("deferred")));
     }
 
     @Test
@@ -88,7 +78,7 @@ class HyDragonConfigRepositoryTest {
         encounter.targetSpeciesId = "hydragon:some_other_dragon";
 
         HyDragonConfigRepository.Snapshot snapshot = HyDragonConfigRepository.buildSnapshot(
-                List.of(species), List.of(validMaintenance()), allArchetypes(), List.of(encounter));
+                List.of(species), allArchetypes(), List.of(encounter));
 
         assertFalse(snapshot.isValid());
         assertTrue(snapshot.issues().stream().anyMatch(issue -> issue.contains("targeting")));
@@ -98,71 +88,23 @@ class HyDragonConfigRepositoryTest {
     @Test
     void invalidReloadRetainsLastKnownGoodSnapshotAndReportsCandidateIssues() {
         HyDragonConfigRepository repository = new HyDragonConfigRepository();
-        StoneMaintenanceConfig firstMaintenance = validMaintenance();
-        firstMaintenance.repair.itemId = "Alternate_Repair_Material";
-        firstMaintenance.repair.quantity = 4;
         HyDragonConfigRepository.Snapshot valid = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), List.of(firstMaintenance), allArchetypes(), List.of(validEncounter()));
+                List.of(validSpecies()), allArchetypes(), List.of(validEncounter()));
         DragonEncounterConfig brokenEncounter = validEncounter();
         brokenEncounter.targetSpeciesId = "hydragon:missing";
         HyDragonConfigRepository.Snapshot invalid = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), List.of(validMaintenance()), allArchetypes(), List.of(brokenEncounter));
+                List.of(validSpecies()), allArchetypes(), List.of(brokenEncounter));
 
         assertTrue(repository.publishCandidate(valid));
         assertFalse(repository.publishCandidate(invalid));
 
         assertSame(valid, repository.snapshot());
         assertEquals(invalid.issues(), repository.lastReloadIssues());
-        assertEquals(
-                Optional.of(new StoneMaintenanceConfig.RepairRequirement("Alternate_Repair_Material", 4)),
-                repository.snapshot().repairRequirement());
-
-        StoneMaintenanceConfig reloadedMaintenance = validMaintenance();
-        reloadedMaintenance.repair.itemId = "Reloaded_Repair_Material";
-        reloadedMaintenance.repair.quantity = 2;
         HyDragonConfigRepository.Snapshot reloaded = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), List.of(reloadedMaintenance), allArchetypes(), List.of(validEncounter()));
+                List.of(validSpecies()), allArchetypes(), List.of(validEncounter()));
 
         assertTrue(repository.publishCandidate(reloaded));
         assertSame(reloaded, repository.snapshot());
-        assertEquals(
-                Optional.of(new StoneMaintenanceConfig.RepairRequirement("Reloaded_Repair_Material", 2)),
-                repository.snapshot().repairRequirement());
-    }
-
-    @Test
-    void repairRequirementCopiesConfiguredItemAndNonDefaultQuantity() {
-        StoneMaintenanceConfig maintenance = validMaintenance();
-        maintenance.repair.itemId = "Dragon_Heart_Shard";
-        maintenance.repair.quantity = 3;
-
-        HyDragonConfigRepository.Snapshot snapshot = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), List.of(maintenance), allArchetypes(), List.of(validEncounter()));
-
-        assertEquals(
-                Optional.of(new StoneMaintenanceConfig.RepairRequirement("Dragon_Heart_Shard", 3)),
-                snapshot.repairRequirement());
-    }
-
-    @Test
-    void missingOrInvalidMaintenanceExposesNoRepairRequirement() {
-        HyDragonConfigRepository.Snapshot missing = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), List.of(), allArchetypes(), List.of(validEncounter()));
-        StoneMaintenanceConfig incompleteMaintenance = new StoneMaintenanceConfig();
-        incompleteMaintenance.assetKey = "Default";
-        HyDragonConfigRepository.Snapshot incomplete = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), List.of(incompleteMaintenance), allArchetypes(), List.of(validEncounter()));
-        StoneMaintenanceConfig invalidMaintenance = validMaintenance();
-        invalidMaintenance.repair.quantity = 0;
-        HyDragonConfigRepository.Snapshot invalid = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), List.of(invalidMaintenance), allArchetypes(), List.of(validEncounter()));
-
-        assertFalse(missing.isValid());
-        assertTrue(missing.repairRequirement().isEmpty());
-        assertFalse(incomplete.isValid());
-        assertTrue(incomplete.repairRequirement().isEmpty());
-        assertFalse(invalid.isValid());
-        assertTrue(invalid.repairRequirement().isEmpty());
     }
 
     private static DragonSpeciesConfig validSpecies() {
@@ -183,14 +125,6 @@ class HyDragonConfigRepositoryTest {
         species.presentation.localizationPrefix = "server.npcRoles.NordicDrake";
         species.presentation.modelIds = new String[]{"NordicDrake"};
         return species;
-    }
-
-    private static StoneMaintenanceConfig validMaintenance() {
-        StoneMaintenanceConfig maintenance = new StoneMaintenanceConfig();
-        maintenance.assetKey = "Default";
-        maintenance.repair.itemId = "Revitalizing_Essence";
-        maintenance.repair.quantity = 1;
-        return maintenance;
     }
 
     private static DragonEncounterConfig validEncounter() {

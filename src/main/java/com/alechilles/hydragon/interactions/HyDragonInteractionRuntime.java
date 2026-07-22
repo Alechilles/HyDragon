@@ -4,17 +4,15 @@ import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
-import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.runtime.ConsumableReservation;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-/** Single installable dispatch seam between Hytale interaction codecs and domain sagas. */
+/** Single installable dispatch seam between Hytale interaction codecs and HyDragon domain sagas. */
 public final class HyDragonInteractionRuntime {
     private static final AtomicReference<Installation> INSTALLATION = new AtomicReference<>();
 
@@ -22,23 +20,14 @@ public final class HyDragonInteractionRuntime {
     }
 
     public static void install(Handler handler) {
-        install(handler, () -> null, Optional::empty);
+        install(handler, () -> null);
     }
 
     /** Installs gameplay plus the same immutable capability snapshot used by status diagnostics. */
     public static void install(Handler handler, Supplier<TameworkBridge.Snapshot> gates) {
-        install(handler, gates, Optional::empty);
-    }
-
-    /** Installs gameplay, capability gates, and the current immutable stone-repair policy. */
-    public static void install(
-            Handler handler,
-            Supplier<TameworkBridge.Snapshot> gates,
-            Supplier<Optional<StoneMaintenanceConfig.RepairRequirement>> repairRequirements) {
         Installation installation = new Installation(
                 Objects.requireNonNull(handler, "handler"),
-                Objects.requireNonNull(gates, "gates"),
-                Objects.requireNonNull(repairRequirements, "repairRequirements"));
+                Objects.requireNonNull(gates, "gates"));
         if (!INSTALLATION.compareAndSet(null, installation)) {
             throw new IllegalStateException("HyDragon interaction runtime is already installed");
         }
@@ -53,27 +42,14 @@ public final class HyDragonInteractionRuntime {
         return INSTALLATION.get() != null;
     }
 
-    /** Resolves one request-time copy; missing, invalid, or failing config suppliers fail closed. */
-    static Optional<StoneMaintenanceConfig.RepairRequirement> repairRequirement() {
-        Installation installation = INSTALLATION.get();
-        if (installation == null) return Optional.empty();
-        try {
-            Optional<StoneMaintenanceConfig.RepairRequirement> requirement =
-                    installation.repairRequirements().get();
-            return requirement == null ? Optional.empty() : requirement;
-        } catch (RuntimeException failure) {
-            return Optional.empty();
-        }
-    }
-
-    static CompletionStage<GameplayResult> dispatch(Action action,
-                                                     HyDragonFeature requiredFeature,
-                                                     UUID playerUuid,
-                                                     String worldName,
-                                                     PopulationAdmissionLocation destination,
-                                                     String archetypeId,
-                                                     ConsumableReservation reservation,
-                                                     HeldItemLocator heldItemLocator) {
+    static CompletionStage<GameplayResult> dispatch(
+            Action action,
+            HyDragonFeature requiredFeature,
+            UUID playerUuid,
+            String worldName,
+            PopulationAdmissionLocation destination,
+            String archetypeId,
+            ConsumableReservation reservation) {
         Installation installation = INSTALLATION.get();
         if (installation == null) {
             return reservation.release().handle((ignored, failure) ->
@@ -95,11 +71,7 @@ public final class HyDragonInteractionRuntime {
             return switch (action) {
                 case SOUL_BOND -> installation.handler().soulBond(
                         playerUuid, worldName, destination, reservation);
-                case RECALL_MINIWYVERN -> installation.handler().recallMiniwyvern(
-                        playerUuid, worldName, destination, reservation);
                 case ATTUNE -> installation.handler().attune(playerUuid, archetypeId, reservation);
-                case REPAIR -> installation.handler().repair(
-                        playerUuid, worldName, heldItemLocator, reservation);
             };
         } catch (RuntimeException failure) {
             return reservation.release().handle((ignored, releaseFailure) ->
@@ -107,12 +79,11 @@ public final class HyDragonInteractionRuntime {
         }
     }
 
-    enum Action { SOUL_BOND, RECALL_MINIWYVERN, ATTUNE, REPAIR }
+    enum Action { SOUL_BOND, ATTUNE }
 
     private record Installation(
             Handler handler,
-            Supplier<TameworkBridge.Snapshot> gates,
-            Supplier<Optional<StoneMaintenanceConfig.RepairRequirement>> repairRequirements) {
+            Supplier<TameworkBridge.Snapshot> gates) {
     }
 
     public interface Handler {
@@ -122,42 +93,7 @@ public final class HyDragonInteractionRuntime {
                 PopulationAdmissionLocation destination,
                 ConsumableReservation reservation);
 
-        default CompletionStage<GameplayResult> recallMiniwyvern(
-                UUID playerUuid,
-                String worldName,
-                PopulationAdmissionLocation destination,
-                ConsumableReservation reservation) {
-            return reservation.release().handle((ignored, failure) ->
-                    GameplayResult.unavailable("Miniwyvern recall is unavailable"));
-        }
-
         CompletionStage<GameplayResult> attune(
                 UUID playerUuid, String archetypeId, ConsumableReservation reservation);
-
-        CompletionStage<GameplayResult> repair(
-                UUID playerUuid,
-                String worldName,
-                HeldItemLocator heldItemLocator,
-                ConsumableReservation reservation);
-    }
-
-    /** Location-only evidence; Tamework resolves canonical revision/fingerprint and binding identity. */
-    public record HeldItemLocator(
-            String holderEvidenceId,
-            String containerPath,
-            int inventorySlot,
-            String expectedItemId) {
-        public HeldItemLocator {
-            holderEvidenceId = required(holderEvidenceId, "holderEvidenceId");
-            containerPath = required(containerPath, "containerPath");
-            expectedItemId = required(expectedItemId, "expectedItemId");
-            if (inventorySlot < 0) throw new IllegalArgumentException("inventorySlot cannot be negative");
-        }
-
-        private static String required(String value, String field) {
-            String normalized = Objects.requireNonNull(value, field).trim();
-            if (normalized.isEmpty()) throw new IllegalArgumentException(field + " is required");
-            return normalized;
-        }
     }
 }

@@ -175,6 +175,39 @@ def validate_no_pre_release_archives(errors: list[str]) -> None:
         fail(errors, f"pre-release asset archive must not remain tracked: {path.relative_to(ROOT)}")
 
 
+def validate_bonded_system_removed(errors: list[str]) -> None:
+    obsolete_paths = (
+        "Server/Item/Items/Ingredient/Soul_Bound_Wyvern.json",
+        "Server/Item/Items/Tool/HyDragon_Command_Whistle.json",
+        "Server/Tamework/Items/Commands/HyDragonDragonCommand.json",
+        "Server/HyDragon/StoneMaintenance",
+        "Common/Icons/ItemsGenerated/Draconic_Stone_Filled.png",
+        "Common/Items/HyDragon/Draconic_Stone_Filled.blockymodel",
+    )
+    for relative in obsolete_paths:
+        if (ROOT / relative).exists():
+            fail(errors, f"obsolete bonded-system asset remains: {relative}")
+
+    obsolete_tokens = (
+        "Soul_Bound_Wyvern",
+        "HyDragon_Command_Whistle",
+        "HyDragonRepairBondedStone",
+        '"Vessel"',
+        "Draconic_Stone_State_",
+    )
+    for root in (ROOT / "Common", ROOT / "Server", ROOT / "src/main"):
+        for path in root.rglob("*"):
+            if not path.is_file() or path.suffix.lower() in {".png", ".zip"}:
+                continue
+            try:
+                text = path.read_text(encoding="utf-8-sig")
+            except (OSError, UnicodeError):
+                continue
+            for token in obsolete_tokens:
+                if token in text:
+                    fail(errors, f"obsolete bonded-system token remains: {path.relative_to(ROOT)}: {token}")
+
+
 def read_lang(path: Path, errors: list[str]) -> dict[str, str]:
     values: dict[str, str] = {}
     for line_number, raw in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), 1):
@@ -272,14 +305,12 @@ def require_files(errors: list[str]) -> None:
         "Server/Item/Items/Ingredient/Draconic_Essence_Void.json",
         "Server/Item/Items/Ingredient/Revitalizing_Essence.json",
         "Server/Item/Items/Ingredient/Wyvern_Egg.json",
-        "Server/Item/Items/Ingredient/Soul_Bound_Wyvern.json",
-        "Server/Item/Items/Tool/HyDragon_Command_Whistle.json",
-        "Server/Tamework/Items/Commands/HyDragonDragonCommand.json",
+        "Server/Item/Items/Tool/HyDragon_Dragon_Horn.json",
+        "Server/Tamework/Items/Commands/HyDragonDragonHorn.json",
         "Server/Tamework/PopulationGroups/HyDragonFullDragons.json",
         "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json",
         "Server/Tamework/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json",
         "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json",
-        "Server/HyDragon/StoneMaintenance/Default.json",
         "Server/Tamework/CapturePolicies/HyDragonHydra.json",
         "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json",
         "Server/Tamework/CapturePolicies/HyDragonRockDrakeT1.json",
@@ -435,30 +466,26 @@ def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
     if not isinstance(ancient_capture, dict) or ancient_capture.get("MaximumChance") != 1.0:
         fail(errors, "Ancient stone must cap eligible capture probability at 1.0")
 
+    base = parsed.get(spawner_root / "HyDragonDraconicStone.json")
+    capture = base.get("Capture") if isinstance(base, dict) else None
+    required = {
+        "SourceConsumption": "ResolvedAttempt",
+        "SuccessDisposition": "TameAndCommandLink",
+        "CommandFamilyId": "hydragon:dragon_horn",
+        "RequiredCommandConfigId": "HyDragonDragonHorn",
+        "RequireCommandAccessItem": True,
+    }
+    if not isinstance(capture, dict):
+        fail(errors, "base Draconic Stone capture config is missing")
+    else:
+        for field, expected in required.items():
+            if capture.get(field) != expected:
+                fail(errors, f"base Draconic Stone Capture.{field} must be {expected!r}")
     for filename, _ in tiers:
         path = spawner_root / filename
         data = parsed.get(path)
-        if not isinstance(data, dict):
-            continue
-        item_id = data.get("EmptyItemId")
-        suffix = "" if item_id == "Draconic_Stone" else item_id.removeprefix("Draconic_Stone")
-        expected_prefix = f"*Draconic_Stone{suffix}_State_"
-        vessel = data.get("Vessel")
-        if not isinstance(vessel, dict):
-            # The base config authors the authoritative inherited map.
-            if filename != "HyDragonDraconicStone.json":
-                fail(errors, f"{path.relative_to(ROOT)} must override tier-specific vessel state items")
-            continue
-        states = vessel.get("StateItemIds")
-        expected = {
-            "Stored": expected_prefix + "Filled",
-            "Active": expected_prefix + "Active",
-            "Dead": expected_prefix + "Damaged",
-            "Lost": expected_prefix + "Lost",
-            "Unavailable": expected_prefix + "Unavailable",
-        }
-        if states != expected:
-            fail(errors, f"tier-specific vessel state map mismatch in {path.relative_to(ROOT)}: {states}")
+        if isinstance(data, dict) and ("Vessel" in data or "FilledItemId" in data):
+            fail(errors, f"obsolete filled/vessel capture config remains: {path.relative_to(ROOT)}")
 
 
 def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str]) -> None:
@@ -632,8 +659,15 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
             fail(errors, "HyDragonMiniwyvern must inherit Tamework's durable companion lifecycle defaults")
         command = companion.get("Command")
         travel = command.get("Travel") if isinstance(command, dict) else None
-        if not isinstance(command, dict) or not isinstance(command.get("DeadRespawnCooldownMins"), (int, float)):
-            fail(errors, "HyDragonMiniwyvern must declare command-link-independent death recovery")
+        summon = command.get("Summon") if isinstance(command, dict) else None
+        revive = command.get("Revive") if isinstance(command, dict) else None
+        if not isinstance(summon, dict) or summon.get("Enabled") is not True \
+                or not isinstance(summon.get("ActiveDurationMs"), int) or summon.get("ActiveDurationMs") <= 0:
+            fail(errors, "HyDragonMiniwyvern must declare a positive timed summon lease")
+        costs = revive.get("Costs") if isinstance(revive, dict) else None
+        if not isinstance(revive, dict) or revive.get("Enabled") is not True \
+                or not isinstance(costs, list) or not costs:
+            fail(errors, "HyDragonMiniwyvern must declare a non-empty paid revival cost")
         if not isinstance(travel, dict) or travel.get("CrossWorldRecallEnabled") is not True or travel.get("FollowMasterOnWorldChange") is not True:
             fail(errors, "HyDragonMiniwyvern must preserve follow/recovery across world transitions")
 
@@ -909,26 +943,11 @@ def validate_domain_references(
 
 
 def validate_release_content_contracts(parsed: dict[Path, object], errors: list[str]) -> None:
-    """Gate the first-release vessel, flight, spawn, loot, and presentation contracts."""
+    """Gate first-release capture, flight, spawn, loot, and presentation contracts."""
     stone_path = ROOT / "Server/Item/Items/Ingredient/Draconic_Stone.json"
     stone = parsed.get(stone_path)
-    states = stone.get("State", {}) if isinstance(stone, dict) else {}
-    for state_name in ("Lost", "Unavailable"):
-        state = states.get(state_name) if isinstance(states, dict) else None
-        context = f"{stone_path.relative_to(ROOT)}.State.{state_name}"
-        if not isinstance(state, dict) or state.get("Variant") is not True:
-            fail(errors, f"{context} must be an authored item-state variant")
-            continue
-        primary = state.get("Interactions", {}).get("Primary", {}).get("Interactions")
-        if primary != [{"Type": "Simple"}]:
-            fail(errors, f"{context} must be inspection-only with an explicit no-op primary interaction")
-        light = state.get("Light")
-        if not isinstance(light, dict) or not isinstance(light.get("Radius"), (int, float)) \
-                or light.get("Radius") > 1:
-            fail(errors, f"{context} must use a muted light radius no greater than one")
-        serialized = json.dumps(state, sort_keys=True)
-        if "TameworkSpawn" in serialized or "HyDragonRepairBondedStone" in serialized:
-            fail(errors, f"{context} must not expose summon, store, or repair actions")
+    if not isinstance(stone, dict) or "State" in stone or "MaxDurability" in stone:
+        fail(errors, "Draconic Stones must be stateless consumable capture attempts")
 
     expected_drop_ids: list[str] = []
     for tier in (1, 2, 3):
@@ -1046,7 +1065,7 @@ def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> Non
         "Draconic_Stone_Ancient",
         "Revitalizing_Essence",
         "Wyvern_Egg",
-        "HyDragon_Command_Whistle",
+        "HyDragon_Dragon_Horn",
     }
     seen: set[str] = set()
     item_root = ROOT / "Server" / "Item" / "Items"
@@ -1080,17 +1099,20 @@ def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> Non
 
 
 def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None:
-    item_path = ROOT / "Server/Item/Items/Tool/HyDragon_Command_Whistle.json"
-    config_path = ROOT / "Server/Tamework/Items/Commands/HyDragonDragonCommand.json"
+    item_path = ROOT / "Server/Item/Items/Tool/HyDragon_Dragon_Horn.json"
+    config_path = ROOT / "Server/Tamework/Items/Commands/HyDragonDragonHorn.json"
     item = parsed.get(item_path)
     config = parsed.get(config_path)
     if not isinstance(item, dict) or item.get("Parent") != "Tamework_Command_Whistle_Example":
-        fail(errors, "HyDragon command whistle must inherit Tamework's supported command interaction")
+        fail(errors, "HyDragon Dragon Horn must inherit Tamework's supported command interaction")
     if not isinstance(config, dict) or config.get("Parent") != "TwCommandExample":
         fail(errors, "HyDragon command config must inherit the supported Tamework command set")
         return
-    if config.get("ItemIds") != ["HyDragon_Command_Whistle"]:
-        fail(errors, "HyDragon command config must bind only the production HyDragon whistle")
+    if config.get("ItemIds") != ["HyDragon_Dragon_Horn"]:
+        fail(errors, "HyDragon command config must bind only the Dragon Horn")
+    if config.get("CommandFamilyId") != "hydragon:dragon_horn" \
+            or config.get("RosterStorage") != "OwnerCommandFamily":
+        fail(errors, "Dragon Horn must use the owner command-family roster")
     allowed = config.get("AllowedRoles")
     required_roles = {
         "Tamed_Hydra", "Tamed_NordicDrake", "Tamed_RockDrakeT1",
@@ -1101,19 +1123,36 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
         fail(errors, f"HyDragon command role allowlist mismatch: {sorted(actual_roles)}")
 
 
-def validate_repair_interaction(parsed: dict[Path, object], errors: list[str]) -> None:
-    stone_path = ROOT / "Server/Item/Items/Ingredient/Draconic_Stone.json"
+def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> None:
+    companion_paths = (
+        ROOT / "Server/Tamework/Companion/HyDragonFullDragons.json",
+        ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json",
+    )
+    for path in companion_paths:
+        data = parsed.get(path)
+        command = data.get("Command") if isinstance(data, dict) else None
+        summon = command.get("Summon") if isinstance(command, dict) else None
+        revive = command.get("Revive") if isinstance(command, dict) else None
+        if not isinstance(summon, dict) or summon.get("Enabled") is not True \
+                or not isinstance(summon.get("ActiveDurationMs"), int) or summon.get("ActiveDurationMs") <= 0:
+            fail(errors, f"{path.relative_to(ROOT)} must enable a positive summon duration")
+        thresholds = summon.get("ExpiryWarningThresholdsMs") if isinstance(summon, dict) else None
+        if not isinstance(thresholds, list) or thresholds != sorted(set(thresholds), reverse=True) \
+                or any(not isinstance(value, int) or value <= 0 or value >= summon.get("ActiveDurationMs", 0)
+                       for value in thresholds):
+            fail(errors, f"{path.relative_to(ROOT)} has invalid summon warning thresholds")
+        costs = revive.get("Costs") if isinstance(revive, dict) else None
+        if not isinstance(costs, list) or not costs:
+            fail(errors, f"{path.relative_to(ROOT)} must declare a non-empty revival cost")
+        else:
+            ids = [entry.get("ItemId") for entry in costs if isinstance(entry, dict)]
+            if len(ids) != len(costs) or len(ids) != len(set(ids)) or any(
+                    not isinstance(entry.get("Quantity"), int) or entry.get("Quantity") <= 0
+                    for entry in costs if isinstance(entry, dict)):
+                fail(errors, f"{path.relative_to(ROOT)} has invalid revival cost components")
+
     essence_path = ROOT / "Server/Item/Items/Ingredient/Revitalizing_Essence.json"
-    stone = parsed.get(stone_path)
     essence = parsed.get(essence_path)
-    damaged = stone.get("State", {}).get("Damaged", {}) if isinstance(stone, dict) else {}
-    primary = damaged.get("Interactions", {}).get("Primary", {}).get("Interactions", []) \
-        if isinstance(damaged, dict) else []
-    repair_types = [entry.get("Type") for entry in primary if isinstance(entry, dict)]
-    if repair_types != ["HyDragonRepairBondedStone"]:
-        fail(errors, "repair interaction must be attached to the held Damaged stone state")
-    if isinstance(essence, dict) and "HyDragonRepairBondedStone" in json.dumps(essence):
-        fail(errors, "Revitalizing Essence must be reserved from inventory, not used as the held repair authority")
     secondary = essence.get("Interactions", {}).get("Secondary", {}).get("Interactions") \
         if isinstance(essence, dict) else None
     if secondary != [{"Type": "Simple"}]:
@@ -1129,6 +1168,7 @@ def main() -> int:
         known_assets |= asset_stems(base_root)
     validate_english_ids(errors)
     validate_no_pre_release_archives(errors)
+    validate_bonded_system_removed(errors)
     validate_runtime_item_contracts(parsed, errors)
     validate_locales(errors)
     validate_interaction_message_localization(parsed, errors)
@@ -1144,7 +1184,7 @@ def main() -> int:
     validate_release_content_contracts(parsed, errors)
     validate_altar_recipes(parsed, errors)
     validate_command_item(parsed, errors)
-    validate_repair_interaction(parsed, errors)
+    validate_revival_configs(parsed, errors)
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)

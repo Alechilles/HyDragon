@@ -13,12 +13,6 @@ public interface ConsumableReservation {
 
     @Nonnull CompletionStage<Disposition> consume();
 
-    /** Atomically consumes the reserved source and places one canonical result in the same slot. */
-    @Nonnull
-    default CompletionStage<Disposition> consumeAndReplace(@Nonnull String replacementItemId) {
-        return consume();
-    }
-
     @Nonnull CompletionStage<Disposition> release();
 
     /** Result is deliberately proof-oriented: UNKNOWN never authorizes a second mutation or refund. */

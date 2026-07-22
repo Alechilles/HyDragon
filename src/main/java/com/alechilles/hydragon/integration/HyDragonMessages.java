@@ -14,19 +14,16 @@ public final class HyDragonMessages {
     public static Message soulBondClaimed() { return translated("soulBond.claimed"); }
     public static Message soulBondAlreadyClaimed() { return translated("soulBond.alreadyClaimed"); }
     public static Message soulBondUnavailable() { return translated("soulBond.unavailable"); }
-    public static Message soulBoundWyvernRecalled() { return translated("soulBoundWyvern.recalled"); }
-    public static Message soulBoundWyvernUnavailable() { return translated("soulBoundWyvern.unavailable"); }
+    public static Message dragonHornRequired() { return translated("capture.hornRequired"); }
     public static Message attunementSuccess() { return translated("attunement.success"); }
     public static Message attunementSame() { return translated("attunement.same"); }
     public static Message attunementUnavailable() { return translated("attunement.unavailable"); }
-    public static Message repairSuccess() { return translated("repair.success"); }
-    public static Message repairInvalid() { return translated("repair.invalid"); }
+    public static Message gameplayUnavailable() { return translated("gameplay.unavailable"); }
     public static Message refundUnavailable() { return translated("refund.unavailable"); }
     public static Message refundNone() { return translated("refund.none"); }
     public static Message refundRecovered() { return translated("refund.recovered"); }
     public static Message refundNoSpace() { return translated("refund.noSpace"); }
     public static Message refundPending() { return translated("refund.pending"); }
-    public static Message vesselUnavailable() { return translated("vessel.unavailable"); }
     public static Message statusUsage() { return translated("status.usage"); }
     public static Message statusUnavailable() { return translated("status.unavailable"); }
     public static Message statusTitle(String version) {

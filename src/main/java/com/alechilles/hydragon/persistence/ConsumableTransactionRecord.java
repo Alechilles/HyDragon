@@ -23,11 +23,8 @@ public record ConsumableTransactionRecord(
         String intentId,
         SourceItemEvidence sourceItem,
         int materialQuantity,
-        Optional<SourceItemEvidence> authoritySourceItem,
         Optional<String> authorityOperationId,
         Optional<String> profileId,
-        Optional<UUID> bindingId,
-        OptionalLong bindingGeneration,
         OptionalLong profileRevision,
         long revision,
         long createdAtEpochMillis,
@@ -47,11 +44,8 @@ public record ConsumableTransactionRecord(
         ownerUuid = Objects.requireNonNull(ownerUuid, "ownerUuid");
         intentId = requiredText(intentId, "intentId");
         sourceItem = Objects.requireNonNull(sourceItem, "sourceItem");
-        authoritySourceItem = Objects.requireNonNull(authoritySourceItem, "authoritySourceItem");
         authorityOperationId = normalized(authorityOperationId, "authorityOperationId");
         profileId = normalized(profileId, "profileId");
-        bindingId = Objects.requireNonNull(bindingId, "bindingId");
-        bindingGeneration = requireNonNegative(bindingGeneration, "bindingGeneration");
         profileRevision = requireNonNegative(profileRevision, "profileRevision");
         quarantineReason = normalized(quarantineReason, "quarantineReason");
         if (materialQuantity <= 0 || materialQuantity > sourceItem.stackQuantityAtPrepare()) {
@@ -65,15 +59,6 @@ public record ConsumableTransactionRecord(
         }
         if (status != ConsumableTransactionStatus.QUARANTINED && quarantineReason.isPresent()) {
             throw new IllegalArgumentException("quarantineReason is valid only for QUARANTINED");
-        }
-        if (kind == ConsumableTransactionKind.BONDED_STONE_REPAIR
-                && (authoritySourceItem.isEmpty() || bindingId.isEmpty() || bindingGeneration.isEmpty() || profileId.isEmpty()
-                || profileRevision.isEmpty() || authorityOperationId.isEmpty())) {
-            throw new IllegalArgumentException(
-                    "BONDED_STONE_REPAIR requires damaged-source evidence, authority operation, binding, generation, profile, and profile revision");
-        }
-        if (kind != ConsumableTransactionKind.BONDED_STONE_REPAIR && authoritySourceItem.isPresent()) {
-            throw new IllegalArgumentException("authoritySourceItem is reserved for BONDED_STONE_REPAIR");
         }
         if (kind == ConsumableTransactionKind.MINIWYVERN_ATTUNEMENT
                 && (profileId.isEmpty() || profileRevision.isEmpty())) {
@@ -90,11 +75,8 @@ public record ConsumableTransactionRecord(
             String intentId,
             SourceItemEvidence sourceItem,
             int materialQuantity,
-            Optional<SourceItemEvidence> authoritySourceItem,
             Optional<String> authorityOperationId,
             Optional<String> profileId,
-            Optional<UUID> bindingId,
-            OptionalLong bindingGeneration,
             OptionalLong profileRevision,
             long createdAtEpochMillis) {
         return new ConsumableTransactionRecord(
@@ -108,53 +90,13 @@ public record ConsumableTransactionRecord(
                 intentId,
                 sourceItem,
                 materialQuantity,
-                authoritySourceItem,
                 authorityOperationId,
                 profileId,
-                bindingId,
-                bindingGeneration,
                 profileRevision,
                 0,
                 createdAtEpochMillis,
                 createdAtEpochMillis,
                 Optional.empty());
-    }
-
-    /**
-     * Source-compatible factory for non-repair consumers. Bonded repair callers must use the overload that
-     * supplies the separately fenced damaged-stone projection.
-     */
-    public static ConsumableTransactionRecord prepared(
-            String operationId,
-            String correlationId,
-            ConsumableTransactionKind kind,
-            OperationOrigin origin,
-            UUID ownerUuid,
-            String intentId,
-            SourceItemEvidence sourceItem,
-            int materialQuantity,
-            Optional<String> authorityOperationId,
-            Optional<String> profileId,
-            Optional<UUID> bindingId,
-            OptionalLong bindingGeneration,
-            OptionalLong profileRevision,
-            long createdAtEpochMillis) {
-        return prepared(
-                operationId,
-                correlationId,
-                kind,
-                origin,
-                ownerUuid,
-                intentId,
-                sourceItem,
-                materialQuantity,
-                Optional.empty(),
-                authorityOperationId,
-                profileId,
-                bindingId,
-                bindingGeneration,
-                profileRevision,
-                createdAtEpochMillis);
     }
 
     /** Creates the next CAS generation while preserving every frozen field. */
@@ -182,11 +124,8 @@ public record ConsumableTransactionRecord(
                 intentId,
                 sourceItem,
                 materialQuantity,
-                authoritySourceItem,
                 merge(authorityOperationId, resolvedAuthorityOperationId, "authorityOperationId"),
                 merge(profileId, resolvedProfileId, "profileId"),
-                bindingId,
-                bindingGeneration,
                 merge(profileRevision, resolvedProfileRevision, "profileRevision"),
                 Math.addExact(revision, 1),
                 createdAtEpochMillis,
@@ -210,9 +149,6 @@ public record ConsumableTransactionRecord(
                 && intentId.equals(candidate.intentId)
                 && sourceItem.equals(candidate.sourceItem)
                 && materialQuantity == candidate.materialQuantity
-                && authoritySourceItem.equals(candidate.authoritySourceItem)
-                && bindingId.equals(candidate.bindingId)
-                && bindingGeneration.equals(candidate.bindingGeneration)
                 && optionalMatches(authorityOperationId, candidate.authorityOperationId)
                 && optionalMatches(profileId, candidate.profileId)
                 && optionalMatches(profileRevision, candidate.profileRevision);

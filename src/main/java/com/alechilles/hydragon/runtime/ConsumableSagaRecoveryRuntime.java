@@ -19,24 +19,20 @@ import java.util.concurrent.CompletionStage;
 public final class ConsumableSagaRecoveryRuntime {
     private final OperationJournal journal;
     private final Recovery soulBondRecovery;
-    private final Recovery repairRecovery;
     private final Set<String> inFlight = new HashSet<>();
     private String cursor;
 
     public ConsumableSagaRecoveryRuntime(
             OperationJournal journal,
-            SoulBondService soulBonds,
-            BondedStoneRepairService repairs) {
-        this(journal, soulBonds::recover, repairs::recover);
+            SoulBondService soulBonds) {
+        this(journal, soulBonds::recover);
     }
 
     ConsumableSagaRecoveryRuntime(
             OperationJournal journal,
-            Recovery soulBondRecovery,
-            Recovery repairRecovery) {
+            Recovery soulBondRecovery) {
         this.journal = Objects.requireNonNull(journal, "journal");
         this.soulBondRecovery = Objects.requireNonNull(soulBondRecovery, "soulBondRecovery");
-        this.repairRecovery = Objects.requireNonNull(repairRecovery, "repairRecovery");
     }
 
     /** Starts at most {@code maximumOperations} recoveries and never overlaps the same operation. */
@@ -77,7 +73,6 @@ public final class ConsumableSagaRecoveryRuntime {
         try {
             return switch (entry.kind()) {
                 case SOUL_BOND -> nonNull(soulBondRecovery.recover(entry));
-                case BONDED_STONE_REPAIR -> nonNull(repairRecovery.recover(entry));
                 case MINIWYVERN_ATTUNEMENT -> CompletableFuture.completedFuture(
                         closeCommittedAttunement(entry));
             };

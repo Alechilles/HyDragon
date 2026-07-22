@@ -8,9 +8,9 @@ class HyDragonMessagesTest {
     @Test
     void gameplayMessagesUseServerLanguageKeys() {
         assertEquals("server.messages.soulBond.claimed", HyDragonMessages.soulBondClaimed().getMessageId());
+        assertEquals("server.messages.capture.hornRequired", HyDragonMessages.dragonHornRequired().getMessageId());
         assertEquals("server.messages.attunement.success", HyDragonMessages.attunementSuccess().getMessageId());
-        assertEquals("server.messages.repair.success", HyDragonMessages.repairSuccess().getMessageId());
-        assertEquals("server.messages.vessel.unavailable", HyDragonMessages.vesselUnavailable().getMessageId());
+        assertEquals("server.messages.gameplay.unavailable", HyDragonMessages.gameplayUnavailable().getMessageId());
         assertEquals("server.messages.status.usage", HyDragonMessages.statusUsage().getMessageId());
         assertEquals("server.messages.status.unavailable", HyDragonMessages.statusUnavailable().getMessageId());
         assertEquals("server.messages.status.title", HyDragonMessages.statusTitle("1.0.0").getMessageId());

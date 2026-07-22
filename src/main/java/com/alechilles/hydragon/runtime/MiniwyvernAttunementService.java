@@ -119,10 +119,7 @@ public final class MiniwyvernAttunementService {
                 essence.sourceEvidence(),
                 essence.quantity(),
                 Optional.empty(),
-                Optional.empty(),
                 Optional.of(profileId),
-                Optional.empty(),
-                OptionalLong.empty(),
                 OptionalLong.of(expectedRevision)));
         if (begun != OperationJournal.Decision.APPLIED
                 && begun != OperationJournal.Decision.ALREADY_APPLIED) {

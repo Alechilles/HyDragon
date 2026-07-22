@@ -158,7 +158,7 @@ class MiniwyvernLifecycleContinuityTest {
                 api,
                 store,
                 () -> new HyDragonConfigRepository.Snapshot(
-                        Map.of(), Map.of(), Map.of(), Map.of(), java.util.List.of()),
+                        Map.of(), Map.of(), Map.of(), java.util.List.of()),
                 () -> new FeatureGate(
                         HyDragonFeature.MINIWYVERN_ABILITIES,
                         true,

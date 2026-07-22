@@ -4,7 +4,6 @@ import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.HyDragonPlugin;
-import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -14,11 +13,10 @@ import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.protocol.WaitForDataFrom;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
-import com.hypixel.hytale.server.core.inventory.InventoryComponent;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -68,13 +66,20 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
             return;
         }
 
-        Optional<StoneMaintenanceConfig.RepairRequirement> requirement = consumableRequirement();
+        Optional<ConsumableRequirement> requirement = consumableRequirement();
         if (requirement.isEmpty()) {
             commandBuffer.run(store -> player.sendMessage(unavailableMessage()));
             fail(context, firstRun, time, type, cooldownHandler);
             return;
         }
-        StoneMaintenanceConfig.RepairRequirement consumable = requirement.orElseThrow();
+        ConsumableRequirement consumable = requirement.orElseThrow();
+        Optional<String> accessItemId = requiredAccessItemId();
+        if (accessItemId.isPresent()
+                && !hasInventoryItem(commandBuffer, playerEntity, accessItemId.orElseThrow())) {
+            commandBuffer.run(store -> player.sendMessage(accessItemMissingMessage()));
+            fail(context, firstRun, time, type, cooldownHandler);
+            return;
+        }
 
         UUID worldUuid = player.getWorldUuid();
         Universe universe = Universe.get();
@@ -84,33 +89,10 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
             fail(context, firstRun, time, type, cooldownHandler);
             return;
         }
-        HyDragonInteractionRuntime.HeldItemLocator heldItemLocator = null;
-        Optional<HytaleHeldItemReservation> reserved;
-        String operationId;
-        if (action() == HyDragonInteractionRuntime.Action.REPAIR) {
-            ItemStack heldStone = context.getHeldItem();
-            short heldSlot = context.getHeldItemSlot();
-            InventoryComponent.Hotbar hotbar = commandBuffer.getComponent(
-                    playerEntity, InventoryComponent.Hotbar.getComponentType());
-            if (ItemStack.isEmpty(heldStone) || heldStone.getItemId() == null
-                    || heldStone.getItemId().isBlank() || heldSlot < 0 || hotbar == null) {
-                commandBuffer.run(store -> player.sendMessage(invalidMessage()));
-                fail(context, firstRun, time, type, cooldownHandler);
-                return;
-            }
-            operationId = HytaleHeldItemReservation.existingHotbarMaterialOperationId(
-                            hotbar, consumable.itemId(), heldSlot)
-                    .orElseGet(() -> newOperationId(player.getUuid()));
-            reserved = HytaleHeldItemReservation.reserveHotbarMaterial(
-                    context, player, hotbar, consumable.itemId(), operationId, consumable.quantity(), heldSlot);
-            heldItemLocator = new HyDragonInteractionRuntime.HeldItemLocator(
-                    "player:" + player.getUuid(), "hotbar", heldSlot, heldStone.getItemId());
-        } else {
-            operationId = HytaleHeldItemReservation.existingOperationId(context)
-                    .orElseGet(() -> newOperationId(player.getUuid()));
-            reserved = HytaleHeldItemReservation.reserve(
-                    context, player, consumable.itemId(), operationId, consumable.quantity());
-        }
+        String operationId = HytaleHeldItemReservation.existingOperationId(context)
+                .orElseGet(() -> newOperationId(player.getUuid()));
+        Optional<HytaleHeldItemReservation> reserved = HytaleHeldItemReservation.reserve(
+                context, player, consumable.itemId(), operationId, consumable.quantity());
         if (reserved.isEmpty()) {
             commandBuffer.run(store -> player.sendMessage(invalidMessage()));
             fail(context, firstRun, time, type, cooldownHandler);
@@ -129,9 +111,9 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
                 ChunkUtil.chunkCoordinate(transform.getPosition().x()),
                 ChunkUtil.chunkCoordinate(transform.getPosition().z()));
 
-        HyDragonInteractionRuntime.dispatch(
+                HyDragonInteractionRuntime.dispatch(
                         action(), requiredFeature(), player.getUuid(), world.getName(), destination, archetypeId(),
-                        reserved.orElseThrow(), heldItemLocator)
+                        reserved.orElseThrow())
                 .whenComplete((result, failure) -> completeInteraction(
                         worldUuid, player.getUuid(), operationId, destination, result, failure));
         super.tick0(true, time, type, context, cooldownHandler);
@@ -176,13 +158,31 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
         return 1;
     }
 
+    /** Optional non-consumed inventory access item required before the consumable can be reserved. */
+    protected Optional<String> requiredAccessItemId() {
+        return Optional.empty();
+    }
+
+    protected Message accessItemMissingMessage() {
+        return unavailableMessage();
+    }
+
     /** Captures one immutable material policy for the entire request. */
-    protected Optional<StoneMaintenanceConfig.RepairRequirement> consumableRequirement() {
+    protected Optional<ConsumableRequirement> consumableRequirement() {
         try {
-            return Optional.of(new StoneMaintenanceConfig.RepairRequirement(
+            return Optional.of(new ConsumableRequirement(
                     expectedItemId(), consumedQuantity()));
         } catch (IllegalArgumentException | NullPointerException invalid) {
             return Optional.empty();
+        }
+    }
+
+    protected record ConsumableRequirement(String itemId, int quantity) {
+        protected ConsumableRequirement {
+            itemId = java.util.Objects.requireNonNull(itemId, "itemId").trim();
+            if (itemId.isEmpty() || quantity <= 0) {
+                throw new IllegalArgumentException("consumable requirement is invalid");
+            }
         }
     }
 
@@ -191,7 +191,7 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
     }
 
     protected Message successMessage() {
-        return HyDragonMessages.vesselUnavailable();
+        return HyDragonMessages.gameplayUnavailable();
     }
 
     protected Message invalidMessage() {
@@ -199,11 +199,25 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
     }
 
     protected Message unavailableMessage() {
-        return HyDragonMessages.vesselUnavailable();
+        return HyDragonMessages.gameplayUnavailable();
     }
 
     protected Message deniedMessage(GameplayResult result) {
         return invalidMessage();
+    }
+
+    private static boolean hasInventoryItem(
+            CommandBuffer<EntityStore> commandBuffer,
+            Ref<EntityStore> playerEntity,
+            String itemId) {
+        try {
+            var inventory = InventoryComponent.getCombined(
+                    commandBuffer, playerEntity, InventoryComponent.HOTBAR_STORAGE_BACKPACK);
+            return inventory != null && inventory.countItemStacks(
+                    stack -> stack != null && !stack.isEmpty() && itemId.equals(stack.getItemId())) > 0;
+        } catch (RuntimeException | LinkageError failure) {
+            return false;
+        }
     }
 
     private void completeInteraction(

@@ -5,9 +5,7 @@
   },
   "Icon": "Icons/ItemsGenerated/Draconic_Stone.png",
   "Quality": "Common",
-  "Categories": [
-    "Items.Tools"
-  ],
+  "Categories": [ "Items.Tools" ],
   "Interactions": {
     "Primary": {
       "Interactions": [
@@ -33,10 +31,7 @@
             "AllowIndefiniteHold": false,
             "DisplayProgress": true,
             "Next": {
-              "0.0": {
-                "Type": "TameworkCaptureChannel",
-                "Phase": "Cancel"
-              },
+              "0.0": { "Type": "TameworkCaptureChannel", "Phase": "Cancel" },
               "3.0": {
                 "Type": "TameworkCaptureChannel",
                 "Phase": "Complete",
@@ -50,37 +45,14 @@
   },
   "Recipe": {
     "Input": [
-      {
-        "ItemId": "Ingredient_Bar_Iron",
-        "Quantity": 4
-      },
-      {
-        "ItemId": "Draconic_Scale",
-        "Quantity": 2
-      },
-      {
-        "ItemId": "Draconic_Essence_Ice",
-        "Quantity": 1
-      },
-      {
-        "ItemId": "Draconic_Essence_Nature",
-        "Quantity": 1
-      }
+      { "ItemId": "Ingredient_Bar_Iron", "Quantity": 4 },
+      { "ItemId": "Draconic_Scale", "Quantity": 2 },
+      { "ItemId": "Draconic_Essence_Ice", "Quantity": 1 },
+      { "ItemId": "Draconic_Essence_Nature", "Quantity": 1 }
     ],
-    "Output": [
-      {
-        "ItemId": "Draconic_Stone",
-        "Quantity": 1
-      }
-    ],
+    "Output": [ { "ItemId": "Draconic_Stone", "Quantity": 1 } ],
     "BenchRequirement": [
-      {
-        "Type": "Crafting",
-        "Id": "Draconic_Altar",
-        "Categories": [
-          "Draconic_Altar_Stones"
-        ]
-      }
+      { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Stones" ] }
     ],
     "OutputQuantity": 1,
     "TimeSeconds": 3
@@ -90,144 +62,13 @@
   "PlayerAnimationsId": "Item",
   "IconProperties": {
     "Scale": 1.2,
-    "Rotation": [
-      342,
-      20,
-      24
-    ],
-    "Translation": [
-      6,
-      -14
-    ]
+    "Rotation": [ 342, 20, 24 ],
+    "Translation": [ 6, -14 ]
   },
-  "Tags": {
-    "Type": [
-      "Tool"
-    ]
-  },
-  "ItemEntity": {
-    "ParticleSystemId": null
-  },
+  "Tags": { "Type": [ "Tool" ] },
+  "ItemEntity": { "ParticleSystemId": null },
   "Scale": 1.75,
-  "MaxDurability": 1,
   "MaxStack": 1,
   "ItemSoundSetId": "ISS_Items_Ingots",
-  "DropOnDeath": true,
-  "State": {
-    "Filled": {
-      "Variant": true,
-      "TranslationProperties": {
-        "Name": "server.items.Draconic_Stone_Filled.name",
-        "Description": "server.items.Draconic_Stone_Filled.description"
-      },
-      "Interactions": {
-        "Primary": {
-          "Interactions": [
-            {
-              "Type": "TameworkSpawn"
-            }
-          ]
-        }
-      },
-      "MaxStack": 1,
-      "Light": {
-        "Color": "#369DCC",
-        "Radius": 2
-      },
-      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
-      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
-    },
-    "Active": {
-      "Variant": true,
-      "TranslationProperties": {
-        "Name": "server.items.Draconic_Stone_Active.name",
-        "Description": "server.items.Draconic_Stone_Active.description"
-      },
-      "Interactions": {
-        "Primary": {
-          "Interactions": [
-            {
-              "Type": "TameworkSpawn"
-            }
-          ]
-        }
-      },
-      "MaxStack": 1,
-      "Light": {
-        "Color": "#5AD9FF",
-        "Radius": 3
-      },
-      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
-      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
-    },
-    "Damaged": {
-      "Variant": true,
-      "TranslationProperties": {
-        "Name": "server.items.Draconic_Stone_Damaged.name",
-        "Description": "server.items.Draconic_Stone_Damaged.description"
-      },
-      "Interactions": {
-        "Primary": {
-          "Interactions": [
-            {
-              "Type": "HyDragonRepairBondedStone"
-            }
-          ]
-        }
-      },
-      "MaxStack": 1,
-      "Light": {
-        "Color": "#CC3636",
-        "Radius": 1
-      },
-      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
-      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
-    },
-    "Lost": {
-      "Variant": true,
-      "TranslationProperties": {
-        "Name": "server.items.Draconic_Stone_Lost.name",
-        "Description": "server.items.Draconic_Stone_Lost.description"
-      },
-      "Interactions": {
-        "Primary": {
-          "Interactions": [
-            {
-              "Type": "Simple"
-            }
-          ]
-        }
-      },
-      "MaxStack": 1,
-      "Light": {
-        "Color": "#6B7280",
-        "Radius": 1
-      },
-      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
-      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
-    },
-    "Unavailable": {
-      "Variant": true,
-      "TranslationProperties": {
-        "Name": "server.items.Draconic_Stone_Unavailable.name",
-        "Description": "server.items.Draconic_Stone_Unavailable.description"
-      },
-      "Interactions": {
-        "Primary": {
-          "Interactions": [
-            {
-              "Type": "Simple"
-            }
-          ]
-        }
-      },
-      "MaxStack": 1,
-      "Light": {
-        "Color": "#4B5563",
-        "Radius": 1
-      },
-      "Model": "Items/HyDragon/Draconic_Stone_Filled.blockymodel",
-      "Icon": "Icons/ItemsGenerated/Draconic_Stone_Filled.png"
-    }
-  }
+  "DropOnDeath": true
 }

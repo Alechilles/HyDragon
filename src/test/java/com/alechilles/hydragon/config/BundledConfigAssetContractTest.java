@@ -35,15 +35,13 @@ class BundledConfigAssetContractTest {
     void bundledAssetsDecodeWithoutUnknownFieldsAndCrossValidate() throws IOException {
         List<DragonSpeciesConfig> species = decodeDirectory(
                 "DragonSpecies", DragonSpeciesConfig.class, DragonSpeciesConfig.CODEC);
-        List<StoneMaintenanceConfig> maintenance = decodeDirectory(
-                "StoneMaintenance", StoneMaintenanceConfig.class, StoneMaintenanceConfig.CODEC);
         List<MiniwyvernArchetypeConfig> archetypes = decodeDirectory(
                 "MiniwyvernArchetypes", MiniwyvernArchetypeConfig.class, MiniwyvernArchetypeConfig.CODEC);
         List<DragonEncounterConfig> encounters = decodeDirectory(
                 "Encounters", DragonEncounterConfig.class, DragonEncounterConfig.CODEC);
 
         HyDragonConfigRepository.Snapshot snapshot = HyDragonConfigRepository.buildSnapshot(
-                species, maintenance, archetypes, encounters);
+                species, archetypes, encounters);
         assertTrue(snapshot.isValid(), () -> String.join("\n", snapshot.issues()));
     }
 

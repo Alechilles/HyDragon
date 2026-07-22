@@ -4,158 +4,67 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.alechilles.alecstamework.api.TameworkApi;
-import com.alechilles.alecstamework.api.TameworkApiCapability;
-import java.lang.reflect.Proxy;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 class TameworkBridgeTest {
-    private static final Set<String> BASELINE_08 = Set.of(
-            "PROFILES", "COMMAND_LINKS", "PROGRESSION", "PROGRESSION_MUTATIONS", "POLICY",
-            "INTERACTION_EXTENSIONS", "TRAIT_EFFECTS", "PROFILE_DATA", "EVENTS",
-            "COMPANION_XP_EVENTS", "CONFIG_READ", "DIAGNOSTICS", "PERSISTENCE_RESILIENCE");
+    private static final Set<String> BASELINE = Set.of(
+            "PROFILES", "POLICY", "INTERACTION_EXTENSIONS", "PROFILE_DATA", "EVENTS",
+            "DIAGNOSTICS", "PERSISTENCE_RESILIENCE", "POPULATION_GROUPS",
+            "COMPANION_PROVISIONING", "PROFILE_DATA_TRANSACTIONS");
 
     @Test
-    void tameworkThreePublicApiBaselineFailsNewSystemsClosed() {
-        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("0.8.0", BASELINE_08, null);
+    void oldBondedVesselCapabilityCannotEnableNewRosterFeatures() {
+        Set<String> capabilities = new HashSet<>(BASELINE);
+        capabilities.add("BONDED_VESSELS");
+        capabilities.add("CAPTURE_POLICY");
 
-        assertTrue(snapshot.apiAvailable());
-        assertTrue(snapshot.feature(HyDragonFeature.TAMEWORK_DIAGNOSTICS).available());
-        assertFalse(snapshot.feature(HyDragonFeature.CAPTURE_AND_BOND).available());
-        assertTrue(snapshot.feature(HyDragonFeature.CAPTURE_AND_BOND).missingCapabilities()
-                .containsAll(Set.of("CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS")));
+        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("3.0.0", capabilities, null);
+
+        assertFalse(snapshot.feature(HyDragonFeature.CAPTURE_AND_ROSTER).available());
+        assertTrue(snapshot.feature(HyDragonFeature.CAPTURE_AND_ROSTER).missingCapabilities()
+                .containsAll(Set.of("COMMAND_FAMILY_ROSTERS", "CAPTURE_TAME_AND_LINK",
+                        "CAPTURE_RESOLVED_ATTEMPT_CONSUMPTION", "COMMAND_TIMED_SUMMONING")));
         assertFalse(snapshot.feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
-        assertFalse(snapshot.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT).available());
-        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT).missingCapabilities()
-                .contains("PROFILE_DATA_TRANSACTIONS"));
     }
 
     @Test
-    void newCapabilitiesEnableOnlyFullySpecifiedContracts() {
-        Set<String> capabilities = new HashSet<>(BASELINE_08);
-        capabilities.addAll(Set.of(
-                "CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS", "COMPANION_PROVISIONING",
-                "PROFILE_DATA_TRANSACTIONS"));
+    void granularCapabilitiesEnableOnlyTheirCompleteContracts() {
+        Set<String> capabilities = new HashSet<>(BASELINE);
+        capabilities.addAll(Set.of("CAPTURE_POLICY", "COMMAND_FAMILY_ROSTERS",
+                "CAPTURE_TAME_AND_LINK", "CAPTURE_RESOLVED_ATTEMPT_CONSUMPTION",
+                "COMMAND_TIMED_SUMMONING", "PAID_COMMAND_REVIVAL"));
 
-        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("0.9.0", capabilities, null);
+        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("3.0.0", capabilities, null);
 
-        assertTrue(snapshot.feature(HyDragonFeature.CAPTURE_AND_BOND).available());
-        assertTrue(snapshot.feature(HyDragonFeature.BONDED_STONE_REPAIR).available());
-        assertTrue(snapshot.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS).available());
-        assertTrue(snapshot.feature(HyDragonFeature.BONDED_STONE_TRANSITIONS).available());
+        assertTrue(snapshot.feature(HyDragonFeature.CAPTURE_AND_ROSTER).available());
+        assertTrue(snapshot.feature(HyDragonFeature.DRAGON_HORN).available());
+        assertTrue(snapshot.feature(HyDragonFeature.TIMED_SUMMONING).available());
+        assertTrue(snapshot.feature(HyDragonFeature.PAID_REVIVAL).available());
         assertTrue(snapshot.feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
-        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT).available());
-        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
     }
 
     @Test
-    void liveRuntimeDependenciesArePartOfTheirReportedGates() {
-        Set<String> capabilities = new HashSet<>(BASELINE_08);
-        capabilities.addAll(Set.of(
-                "CAPTURE_POLICY", "BONDED_VESSELS", "POPULATION_GROUPS", "COMPANION_PROVISIONING",
-                "PROFILE_DATA_TRANSACTIONS"));
-        capabilities.remove("PROFILES");
-
-        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("0.9.0", capabilities, null);
-
-        assertFalse(snapshot.feature(HyDragonFeature.BONDED_STONE_REPAIR).available());
-        assertFalse(snapshot.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS).available());
-        assertFalse(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
-        assertTrue(snapshot.feature(HyDragonFeature.BONDED_STONE_REPAIR).reason().contains("PROFILES"));
-        assertTrue(snapshot.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS).reason().contains("PROFILES"));
-        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).reason().contains("PROFILES"));
+    void missingPaidRevivalDoesNotDisableOrdinaryHornCommands() {
+        Set<String> capabilities = new HashSet<>(BASELINE);
+        capabilities.addAll(Set.of("COMMAND_FAMILY_ROSTERS", "COMMAND_TIMED_SUMMONING"));
+        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("3.0.0", capabilities, null);
+        assertTrue(snapshot.feature(HyDragonFeature.DRAGON_HORN).available());
+        assertTrue(snapshot.feature(HyDragonFeature.TIMED_SUMMONING).available());
+        assertFalse(snapshot.feature(HyDragonFeature.PAID_REVIVAL).available());
     }
 
     @Test
-    void localAbilityEffectsDoNotRequireTameworkTraitEffects() {
-        Set<String> capabilities = new HashSet<>(BASELINE_08);
-        capabilities.add("PROFILE_DATA_TRANSACTIONS");
-        capabilities.remove("TRAIT_EFFECTS");
-
-        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("0.9.0", capabilities, null);
-
-        assertTrue(snapshot.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
-    }
-
-    @Test
-    void bootstrapFailureDisablesEverythingWithOneStableReason() {
-        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate(null, Set.of(), "not loaded");
-
-        assertFalse(snapshot.apiAvailable());
-        for (FeatureGate gate : snapshot.features().values()) {
-            assertFalse(gate.available());
-            assertTrue(gate.reason().contains("not loaded") || !gate.missingCapabilities().isEmpty());
-        }
-    }
-
-    @Test
-    void snapshotsDoNotRetainMutableCapabilityInput() {
-        Set<String> capabilities = new HashSet<>(BASELINE_08);
-        TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("0.8.0", capabilities, null);
-        capabilities.clear();
-
-        assertTrue(snapshot.capabilities().contains("DIAGNOSTICS"));
-        assertThrows(UnsupportedOperationException.class, () -> snapshot.capabilities().add("OTHER"));
-    }
-
-    @Test
-    void bridgeObservesRecoveryCapabilitiesAdvertisedAfterStartup() {
-        AtomicReference<EnumSet<TameworkApiCapability>> capabilities = new AtomicReference<>(
-                EnumSet.complementOf(EnumSet.of(
-                        TameworkApiCapability.BONDED_VESSELS,
-                        TameworkApiCapability.POPULATION_GROUPS,
-                        TameworkApiCapability.COMPANION_PROVISIONING)));
-        TameworkApi api = dynamicApi(capabilities);
-        TameworkBridge bridge = TameworkBridge.connect(api);
-
-        assertFalse(bridge.snapshot().feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
-
-        capabilities.updateAndGet(current -> {
-            EnumSet<TameworkApiCapability> recovered = current.clone();
-            recovered.add(TameworkApiCapability.BONDED_VESSELS);
-            recovered.add(TameworkApiCapability.POPULATION_GROUPS);
-            recovered.add(TameworkApiCapability.COMPANION_PROVISIONING);
-            return recovered;
-        });
-
-        assertTrue(bridge.snapshot().feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
-        assertTrue(bridge.snapshot().feature(HyDragonFeature.CAPTURE_AND_BOND).available());
-    }
-
-    @Test
-    void capabilityRefreshFailureFailsClosed() {
-        AtomicReference<EnumSet<TameworkApiCapability>> capabilities = new AtomicReference<>(
-                EnumSet.allOf(TameworkApiCapability.class));
-        TameworkBridge bridge = TameworkBridge.connect(dynamicApi(capabilities));
-        capabilities.set(null);
-
-        TameworkBridge.Snapshot failed = bridge.snapshot();
-
+    void bootstrapFailureDisablesEverythingAndSnapshotIsImmutable() {
+        Set<String> input = new HashSet<>(BASELINE);
+        TameworkBridge.Snapshot failed = TameworkBridge.evaluate(null, Set.of(), "not loaded");
         assertFalse(failed.apiAvailable());
-        assertFalse(failed.feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
-        assertTrue(failed.bootstrapIssue().contains("refresh failed"));
-    }
+        for (FeatureGate gate : failed.features().values()) assertFalse(gate.available());
 
-    private static TameworkApi dynamicApi(
-            AtomicReference<EnumSet<TameworkApiCapability>> capabilities) {
-        return (TameworkApi) Proxy.newProxyInstance(
-                TameworkApi.class.getClassLoader(),
-                new Class<?>[] {TameworkApi.class},
-                (proxy, method, arguments) -> switch (method.getName()) {
-                    case "getApiVersion" -> "0.9.0";
-                    case "getCapabilities" -> {
-                        EnumSet<TameworkApiCapability> current = capabilities.get();
-                        if (current == null) throw new IllegalStateException("recovery unavailable");
-                        yield current.clone();
-                    }
-                    case "toString" -> "DynamicTameworkApi";
-                    case "hashCode" -> System.identityHashCode(proxy);
-                    case "equals" -> proxy == arguments[0];
-                    default -> null;
-                });
+        TameworkBridge.Snapshot copied = TameworkBridge.evaluate("3.0.0", input, null);
+        input.clear();
+        assertTrue(copied.capabilities().contains("DIAGNOSTICS"));
+        assertThrows(UnsupportedOperationException.class, () -> copied.capabilities().add("OTHER"));
     }
 }

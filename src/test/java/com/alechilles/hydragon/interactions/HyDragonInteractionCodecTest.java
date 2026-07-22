@@ -14,7 +14,8 @@ class HyDragonInteractionCodecTest {
     void exposesExactAssetTypeIds() {
         assertEquals("HyDragonSoulBond", HyDragonSoulBondInteraction.TYPE_ID);
         assertEquals("HyDragonMiniwyvernAttune", HyDragonMiniwyvernAttuneInteraction.TYPE_ID);
-        assertEquals("HyDragonRepairBondedStone", HyDragonRepairBondedStoneInteraction.TYPE_ID);
+        assertEquals(java.util.Optional.of("HyDragon_Dragon_Horn"),
+                new HyDragonSoulBondInteraction("test").requiredAccessItemId());
     }
 
     @Test

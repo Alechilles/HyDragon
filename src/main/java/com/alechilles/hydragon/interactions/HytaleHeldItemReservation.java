@@ -224,27 +224,21 @@ final class HytaleHeldItemReservation implements ConsumableReservation {
 
     @Override
     public CompletionStage<Disposition> consume() {
-        return mutate(true, null);
-    }
-
-    @Override
-    public CompletionStage<Disposition> consumeAndReplace(String replacementItemId) {
-        return mutate(true, required(replacementItemId, "replacementItemId"));
+        return mutate(true);
     }
 
     @Override
     public CompletionStage<Disposition> release() {
-        return mutate(false, null);
+        return mutate(false);
     }
 
-    private CompletionStage<Disposition> mutate(boolean consume, String replacementItemId) {
+    private CompletionStage<Disposition> mutate(boolean consume) {
         CompletableFuture<Disposition> completion = new CompletableFuture<>();
         Universe universe = Universe.get();
         World world = universe == null ? null : universe.getWorld(worldUuid);
         if (world == null) return CompletableFuture.completedFuture(Disposition.UNAVAILABLE);
         try {
-            world.execute(() -> mutateOnWorldThread(
-                    world, consume, replacementItemId, completion));
+            world.execute(() -> mutateOnWorldThread(world, consume, completion));
         } catch (RuntimeException failure) {
             completion.complete(Disposition.UNAVAILABLE);
         }
@@ -254,7 +248,6 @@ final class HytaleHeldItemReservation implements ConsumableReservation {
     private void mutateOnWorldThread(
             World world,
             boolean consume,
-            String replacementItemId,
             CompletableFuture<Disposition> completion) {
         try {
             Store<EntityStore> store = world.getEntityStore() == null ? null : world.getEntityStore().getStore();
@@ -269,9 +262,7 @@ final class HytaleHeldItemReservation implements ConsumableReservation {
             ItemContainer container = hotbar == null ? null : hotbar.getInventory();
             ItemStack current = container == null ? null : container.getItemStack(hotbarSlot);
             if (current == null || !sourceEvidence.itemId().equals(current.getItemId())) {
-                completion.complete(replacementItemId != null && current != null
-                        && replacementItemId.equals(current.getItemId())
-                        ? Disposition.ALREADY_APPLIED : Disposition.UNKNOWN);
+                completion.complete(Disposition.UNKNOWN);
                 return;
             }
             String currentReceipt = current.getFromMetadataOrNull(RECEIPT_METADATA_KEY, Codec.STRING);
@@ -287,17 +278,6 @@ final class HytaleHeldItemReservation implements ConsumableReservation {
             int remaining = consume ? current.getQuantity() - quantity : current.getQuantity();
             if (remaining < 0) {
                 completion.complete(Disposition.CONFLICT);
-                return;
-            }
-            if (replacementItemId != null) {
-                if (remaining != 0) {
-                    completion.complete(Disposition.CONFLICT);
-                    return;
-                }
-                ItemStack replacement = new ItemStack(replacementItemId, 1);
-                completion.complete(container.replaceItemStackInSlot(
-                                hotbarSlot, current, replacement).succeeded()
-                        ? Disposition.APPLIED : Disposition.CONFLICT);
                 return;
             }
             if (remaining == 0) {

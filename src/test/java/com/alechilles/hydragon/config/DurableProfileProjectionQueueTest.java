@@ -23,7 +23,7 @@ final class DurableProfileProjectionQueueTest {
         Path file = temporaryDirectory.resolve("restart.properties");
         HyDragonStateStore firstStore = new HyDragonStateStore(file);
         HyDragonConfigRepository.Snapshot unavailable = new HyDragonConfigRepository.Snapshot(
-                Map.of(), Map.of(), Map.of(), Map.of(), List.of("assets-not-ready"));
+                Map.of(), Map.of(), Map.of(), List.of("assets-not-ready"));
         DurableProfileProjectionQueue first = queue(firstStore, unavailable);
         UUID firstProfile = UUID.randomUUID();
         UUID secondProfile = UUID.randomUUID();
@@ -69,7 +69,7 @@ final class DurableProfileProjectionQueueTest {
         species.capture.minimumStoneTier = 1;
         species.presentation.localizationPrefix = "server.test";
         return new HyDragonConfigRepository.Snapshot(
-                Map.of(species.getId(), species), Map.of(), Map.of(), Map.of(), List.of());
+                Map.of(species.getId(), species), Map.of(), Map.of(), List.of());
     }
 
     private static CaptureAttemptResolvedEvent event(UUID profileId, String roleId) {

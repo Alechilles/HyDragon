@@ -19,14 +19,14 @@ class HyDragonStatusFormatterTest {
     @Test
     void reportsEachFeatureAndItsStableDisableReason() {
         HyDragonConfigRepository.Snapshot config = new HyDragonConfigRepository.Snapshot(
-                Map.of(), Map.of(), Map.of(), Map.of(), List.of("missing bundled assets"));
+                Map.of(), Map.of(), Map.of(), List.of("missing bundled assets"));
         Map<HyDragonFeature, FeatureGate> gates = new EnumMap<>(HyDragonFeature.class);
         for (HyDragonFeature feature : HyDragonFeature.values()) {
             boolean diagnostics = feature == HyDragonFeature.TAMEWORK_DIAGNOSTICS;
             gates.put(feature, new FeatureGate(
                     feature,
                     diagnostics,
-                    diagnostics ? Set.of("DIAGNOSTICS") : Set.of("BONDED_VESSELS"),
+                    diagnostics ? Set.of("DIAGNOSTICS") : Set.of("COMMAND_FAMILY_ROSTERS"),
                     diagnostics ? Set.of() : Set.of("BONDED_VESSELS"),
                     List.of()));
         }
@@ -60,7 +60,7 @@ class HyDragonStatusFormatterTest {
     @Test
     void reportsRejectedReloadIssuesWhileRetainingValidSnapshot() {
         HyDragonConfigRepository.Snapshot config = new HyDragonConfigRepository.Snapshot(
-                Map.of(), Map.of(), Map.of(), Map.of(), List.of());
+                Map.of(), Map.of(), Map.of(), List.of());
         Map<HyDragonFeature, FeatureGate> gates = new EnumMap<>(HyDragonFeature.class);
         for (HyDragonFeature feature : HyDragonFeature.values()) {
             gates.put(feature, new FeatureGate(

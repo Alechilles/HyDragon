@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import javax.annotation.Nonnull;
 import com.hypixel.hytale.server.core.Message;
+import java.util.Optional;
 
 /** Soul Bond item interaction. Runtime provisioning remains capability/contract gated. */
 public final class HyDragonSoulBondInteraction extends HyDragonServerInteraction {
@@ -47,6 +48,16 @@ public final class HyDragonSoulBondInteraction extends HyDragonServerInteraction
     @Override
     protected String expectedItemId() {
         return "Wyvern_Egg";
+    }
+
+    @Override
+    protected Optional<String> requiredAccessItemId() {
+        return Optional.of("HyDragon_Dragon_Horn");
+    }
+
+    @Override
+    protected Message accessItemMissingMessage() {
+        return HyDragonMessages.dragonHornRequired();
     }
 
     @Override

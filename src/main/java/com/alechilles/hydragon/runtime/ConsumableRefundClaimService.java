@@ -36,16 +36,15 @@ public final class ConsumableRefundClaimService {
         Optional<OperationJournal.Entry> found = journal.find(normalizedOperationId);
         if (found.isEmpty()) return completed(GameplayResult.denied("refund claim was not found"));
         OperationJournal.Entry entry = found.orElseThrow();
-        if (entry.kind() != OperationJournal.Kind.BONDED_STONE_REPAIR
-                || !entry.descriptor().ownerUuid().equals(ownerUuid)) {
+        if (!entry.descriptor().ownerUuid().equals(ownerUuid)) {
             return completed(GameplayResult.denied("refund claim does not belong to this player"));
         }
         if (entry.phase() == OperationJournal.Phase.REFUNDED) {
             return completed(new GameplayResult(
-                    GameplayResult.Status.ALREADY_APPLIED, "Revitalizing Essence already recovered"));
+                    GameplayResult.Status.ALREADY_APPLIED, "HyDragon materials already recovered"));
         }
         if (entry.phase() != OperationJournal.Phase.REFUND_DUE) {
-            return completed(GameplayResult.denied("repair is not eligible for a refund claim"));
+            return completed(GameplayResult.denied("operation is not eligible for a refund claim"));
         }
 
         Claim claim = claim(entry);
@@ -71,7 +70,7 @@ public final class ConsumableRefundClaimService {
                             OperationJournal.Phase.REFUNDED, OperationJournal.Update.EMPTY);
                     return closed == OperationJournal.Decision.APPLIED
                             || closed == OperationJournal.Decision.ALREADY_APPLIED
-                            ? GameplayResult.applied("Revitalizing Essence recovered")
+                            ? GameplayResult.applied("HyDragon materials recovered")
                             : GameplayResult.reconciliation(
                             "refund was delivered; durable claim closure remains pending");
                 });

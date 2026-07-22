@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 public final class HyDragonConfigRepository {
     private final Object reloadLock = new Object();
     private Map<String, DragonSpeciesConfig> speciesAssets = Map.of();
-    private Map<String, StoneMaintenanceConfig> maintenanceAssets = Map.of();
     private Map<String, MiniwyvernArchetypeConfig> archetypeAssets = Map.of();
     private Map<String, DragonEncounterConfig> encounterAssets = Map.of();
     private volatile Snapshot snapshot = Snapshot.empty();
@@ -35,7 +34,6 @@ public final class HyDragonConfigRepository {
     public void refreshFromAssetRegistry() {
         synchronized (reloadLock) {
             speciesAssets = copyRegisteredAssets(DragonSpeciesConfig.class);
-            maintenanceAssets = copyRegisteredAssets(StoneMaintenanceConfig.class);
             archetypeAssets = copyRegisteredAssets(MiniwyvernArchetypeConfig.class);
             encounterAssets = copyRegisteredAssets(DragonEncounterConfig.class);
             rebuild();
@@ -50,16 +48,6 @@ public final class HyDragonConfigRepository {
     public void onSpeciesRemoved(
             RemovedAssetsEvent<String, DragonSpeciesConfig, DefaultAssetMap<String, DragonSpeciesConfig>> event) {
         replaceSpecies(event.getAssetMap());
-    }
-
-    public void onMaintenanceLoaded(
-            LoadedAssetsEvent<String, StoneMaintenanceConfig, DefaultAssetMap<String, StoneMaintenanceConfig>> event) {
-        replaceMaintenance(event.getAssetMap());
-    }
-
-    public void onMaintenanceRemoved(
-            RemovedAssetsEvent<String, StoneMaintenanceConfig, DefaultAssetMap<String, StoneMaintenanceConfig>> event) {
-        replaceMaintenance(event.getAssetMap());
     }
 
     public void onArchetypeLoaded(
@@ -100,13 +88,6 @@ public final class HyDragonConfigRepository {
         }
     }
 
-    private void replaceMaintenance(@Nullable DefaultAssetMap<String, StoneMaintenanceConfig> map) {
-        synchronized (reloadLock) {
-            maintenanceAssets = copy(map);
-            rebuild();
-        }
-    }
-
     private void replaceArchetypes(@Nullable DefaultAssetMap<String, MiniwyvernArchetypeConfig> map) {
         synchronized (reloadLock) {
             archetypeAssets = copy(map);
@@ -124,7 +105,6 @@ public final class HyDragonConfigRepository {
     private void rebuild() {
         publishCandidate(buildSnapshot(
                 speciesAssets.values(),
-                maintenanceAssets.values(),
                 archetypeAssets.values(),
                 encounterAssets.values()
         ));
@@ -146,25 +126,17 @@ public final class HyDragonConfigRepository {
     /** Pure snapshot builder exposed for deterministic validation tests. */
     static Snapshot buildSnapshot(
             Collection<DragonSpeciesConfig> species,
-            Collection<StoneMaintenanceConfig> maintenance,
             Collection<MiniwyvernArchetypeConfig> archetypes,
             Collection<DragonEncounterConfig> encounters) {
         List<String> issues = new ArrayList<>();
         Map<String, DragonSpeciesConfig> speciesById = index(
                 "DragonSpecies", species, DragonSpeciesConfig::getId, DragonSpeciesConfig::validate, issues);
-        Map<String, StoneMaintenanceConfig> maintenanceById = index(
-                "StoneMaintenance", maintenance, StoneMaintenanceConfig::getId,
-                StoneMaintenanceConfig::validate, issues);
         Map<String, MiniwyvernArchetypeConfig> archetypesById = index(
                 "MiniwyvernArchetypes", archetypes, MiniwyvernArchetypeConfig::getId,
                 MiniwyvernArchetypeConfig::validate, issues);
         Map<String, DragonEncounterConfig> encountersById = index(
                 "Encounters", encounters, DragonEncounterConfig::getId,
                 DragonEncounterConfig::validate, issues);
-
-        if (!maintenanceById.containsKey("Default")) {
-            issues.add("StoneMaintenance requires an asset with key Default");
-        }
 
         for (DragonSpeciesConfig speciesConfig : speciesById.values()) {
             for (String encounterId : speciesConfig.getSpawn().getPluginEncounterIds()) {
@@ -195,7 +167,6 @@ public final class HyDragonConfigRepository {
 
         return new Snapshot(
                 Map.copyOf(speciesById),
-                Map.copyOf(maintenanceById),
                 Map.copyOf(archetypesById),
                 Map.copyOf(encountersById),
                 List.copyOf(issues)
@@ -246,38 +217,15 @@ public final class HyDragonConfigRepository {
     /** One atomic configuration generation. */
     public record Snapshot(
             Map<String, DragonSpeciesConfig> species,
-            Map<String, StoneMaintenanceConfig> maintenance,
             Map<String, MiniwyvernArchetypeConfig> archetypes,
             Map<String, DragonEncounterConfig> encounters,
             List<String> issues) {
         private static Snapshot empty() {
-            return new Snapshot(Map.of(), Map.of(), Map.of(), Map.of(), List.of("Assets not loaded"));
+            return new Snapshot(Map.of(), Map.of(), Map.of(), List.of("Assets not loaded"));
         }
 
         public boolean isValid() {
             return issues.isEmpty();
-        }
-
-        @Nullable
-        public StoneMaintenanceConfig defaultMaintenance() {
-            return maintenance.get("Default");
-        }
-
-        /**
-         * Copies the repair policy from this exact generation. Invalid or incomplete generations
-         * expose no policy so callers fail closed instead of falling back to hardcoded gameplay.
-         */
-        public Optional<StoneMaintenanceConfig.RepairRequirement> repairRequirement() {
-            if (!isValid()) return Optional.empty();
-            StoneMaintenanceConfig config = defaultMaintenance();
-            if (config == null || !config.validate().isEmpty()) return Optional.empty();
-            StoneMaintenanceConfig.RepairSettings repair = config.getRepair();
-            try {
-                return Optional.of(new StoneMaintenanceConfig.RepairRequirement(
-                        repair.getItemId(), repair.getQuantity()));
-            } catch (IllegalArgumentException | NullPointerException invalid) {
-                return Optional.empty();
-            }
         }
     }
 }

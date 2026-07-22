@@ -1,7 +1,10 @@
 {
   "Parent": "TwCommandExample",
   "Enabled": true,
-  "ItemIds": [ "HyDragon_Command_Whistle" ],
+  "ItemIds": [ "HyDragon_Dragon_Horn" ],
+  "CommandFamilyId": "hydragon:dragon_horn",
+  "RosterStorage": "OwnerCommandFamily",
+  "ProjectRosterToItemMetadata": true,
   "MembershipMode": "LinkedOnly",
   "LinkEnabled": true,
   "LinkUseTogglesMembership": true,

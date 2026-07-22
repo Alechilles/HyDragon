@@ -84,17 +84,8 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
             "sourceItemFingerprint",
             "sourceStackQuantityAtPrepare",
             "materialQuantity",
-            "authoritySourceItemId",
-            "authoritySourceHolderEvidenceId",
-            "authoritySourceContainerPath",
-            "authoritySourceInventorySlot",
-            "authoritySourceInventoryRevision",
-            "authoritySourceItemFingerprint",
-            "authoritySourceStackQuantityAtPrepare",
             "authorityOperationId",
             "profileId",
-            "bindingId",
-            "bindingGeneration",
             "profileRevision",
             "revision",
             "createdAtEpochMillis",
@@ -248,8 +239,8 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
     }
 
     /**
-     * Atomically closes a denied, pre-profile Soul Bond operation and releases its player entitlement.
-     * Exact replay is a no-op; any profile evidence or mismatched operation fails closed.
+     * Atomically releases a denied, pre-profile Soul Bond entitlement. An unspent operation is canceled;
+     * an operation whose Egg was already consumed becomes one durable refund claim.
      */
     public MutationOutcome compensateDeniedSoulBond(
             UUID playerUuid,
@@ -291,7 +282,8 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
                 return MutationOutcome.CONFLICT;
             }
 
-            if (transaction.status() == ConsumableTransactionStatus.CANCELED) {
+            if (transaction.status() == ConsumableTransactionStatus.CANCELED
+                    || transaction.status() == ConsumableTransactionStatus.REFUND_DUE) {
                 if (!compatible(transaction.authorityOperationId(), authorityOperationId)) {
                     return MutationOutcome.CONFLICT;
                 }
@@ -301,12 +293,17 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
                 commit(next);
                 return MutationOutcome.APPLIED;
             }
-            if (transaction.status() != ConsumableTransactionStatus.PREPARED) {
+            if (transaction.status() != ConsumableTransactionStatus.PREPARED
+                    && transaction.status() != ConsumableTransactionStatus.MATERIAL_CONSUMED) {
                 return MutationOutcome.CONFLICT;
             }
 
-            ConsumableTransactionRecord canceled = transaction.transitionTo(
-                    ConsumableTransactionStatus.CANCELED,
+            ConsumableTransactionStatus compensatedStatus =
+                    transaction.status() == ConsumableTransactionStatus.MATERIAL_CONSUMED
+                            ? ConsumableTransactionStatus.REFUND_DUE
+                            : ConsumableTransactionStatus.CANCELED;
+            ConsumableTransactionRecord compensated = transaction.transitionTo(
+                    compensatedStatus,
                     Math.max(transaction.updatedAtEpochMillis(), compensatedAtEpochMillis),
                     authorityOperationId,
                     Optional.empty(),
@@ -314,7 +311,7 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
                     Optional.empty());
             Properties next = copyProperties(committedProperties);
             writePlayer(next, PlayerSoulBondRecord.unclaimed(playerUuid));
-            writeTransaction(next, canceled);
+            writeTransaction(next, compensated);
             commit(next);
             return MutationOutcome.APPLIED;
         }
@@ -907,36 +904,13 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
                         requiredText(properties, prefix + "sourceItemFingerprint"),
                         requiredInt(properties, prefix + "sourceStackQuantityAtPrepare")),
                 requiredInt(properties, prefix + "materialQuantity"),
-                optionalSourceItem(properties, prefix, "authoritySource"),
                 optionalText(properties, prefix + "authorityOperationId"),
                 optionalText(properties, prefix + "profileId"),
-                optionalUuid(properties, prefix + "bindingId"),
-                optionalLong(properties, prefix + "bindingGeneration"),
                 optionalLong(properties, prefix + "profileRevision"),
                 requiredLong(properties, prefix + "revision"),
                 requiredLong(properties, prefix + "createdAtEpochMillis"),
                 requiredLong(properties, prefix + "updatedAtEpochMillis"),
                 optionalText(properties, prefix + "quarantineReason"));
-    }
-
-    private static Optional<SourceItemEvidence> optionalSourceItem(
-            Properties properties,
-            String prefix,
-            String fieldPrefix) {
-        String itemIdKey = prefix + fieldPrefix + "ItemId";
-        boolean present = properties.stringPropertyNames().stream()
-                .anyMatch(key -> key.startsWith(prefix + fieldPrefix));
-        if (!present) {
-            return Optional.empty();
-        }
-        return Optional.of(new SourceItemEvidence(
-                requiredText(properties, itemIdKey),
-                requiredText(properties, prefix + fieldPrefix + "HolderEvidenceId"),
-                requiredText(properties, prefix + fieldPrefix + "ContainerPath"),
-                requiredInt(properties, prefix + fieldPrefix + "InventorySlot"),
-                requiredLong(properties, prefix + fieldPrefix + "InventoryRevision"),
-                requiredText(properties, prefix + fieldPrefix + "ItemFingerprint"),
-                requiredInt(properties, prefix + fieldPrefix + "StackQuantityAtPrepare")));
     }
 
     private static void writePlayer(Properties properties, PlayerSoulBondRecord record) {
@@ -1028,36 +1002,13 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
                 prefix + "sourceStackQuantityAtPrepare",
                 Integer.toString(record.sourceItem().stackQuantityAtPrepare()));
         properties.setProperty(prefix + "materialQuantity", Integer.toString(record.materialQuantity()));
-        writeOptionalSourceItem(properties, prefix, "authoritySource", record.authoritySourceItem());
         setOptional(properties, prefix + "authorityOperationId", record.authorityOperationId());
         setOptional(properties, prefix + "profileId", record.profileId());
-        setOptional(properties, prefix + "bindingId", record.bindingId().map(UUID::toString));
-        setOptionalLong(properties, prefix + "bindingGeneration", record.bindingGeneration());
         setOptionalLong(properties, prefix + "profileRevision", record.profileRevision());
         properties.setProperty(prefix + "revision", Long.toString(record.revision()));
         properties.setProperty(prefix + "createdAtEpochMillis", Long.toString(record.createdAtEpochMillis()));
         properties.setProperty(prefix + "updatedAtEpochMillis", Long.toString(record.updatedAtEpochMillis()));
         setOptional(properties, prefix + "quarantineReason", record.quarantineReason());
-    }
-
-    private static void writeOptionalSourceItem(
-            Properties properties,
-            String prefix,
-            String fieldPrefix,
-            Optional<SourceItemEvidence> evidence) {
-        if (evidence.isEmpty()) {
-            return;
-        }
-        SourceItemEvidence value = evidence.orElseThrow();
-        properties.setProperty(prefix + fieldPrefix + "ItemId", value.itemId());
-        properties.setProperty(prefix + fieldPrefix + "HolderEvidenceId", value.holderEvidenceId());
-        properties.setProperty(prefix + fieldPrefix + "ContainerPath", value.containerPath());
-        properties.setProperty(prefix + fieldPrefix + "InventorySlot", Integer.toString(value.inventorySlot()));
-        properties.setProperty(prefix + fieldPrefix + "InventoryRevision", Long.toString(value.inventoryRevision()));
-        properties.setProperty(prefix + fieldPrefix + "ItemFingerprint", value.itemFingerprint());
-        properties.setProperty(
-                prefix + fieldPrefix + "StackQuantityAtPrepare",
-                Integer.toString(value.stackQuantityAtPrepare()));
     }
 
     private static void clearKnownFields(Properties properties, String prefix, Set<String> fields) {

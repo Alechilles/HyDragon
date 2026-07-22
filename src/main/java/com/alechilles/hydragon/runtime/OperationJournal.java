@@ -24,7 +24,7 @@ public interface OperationJournal {
 
     boolean available();
 
-    enum Kind { SOUL_BOND, MINIWYVERN_ATTUNEMENT, BONDED_STONE_REPAIR }
+    enum Kind { SOUL_BOND, MINIWYVERN_ATTUNEMENT }
 
     enum Phase {
         PREPARED,
@@ -63,11 +63,8 @@ public interface OperationJournal {
                       String intentId,
                       ConsumableReservation.SourceEvidence source,
                       int materialQuantity,
-                      Optional<ConsumableReservation.SourceEvidence> authoritySource,
                       Optional<String> authorityOperationId,
                       Optional<String> profileId,
-                      Optional<UUID> bindingId,
-                      OptionalLong bindingGeneration,
                       OptionalLong profileRevision) {
         public Descriptor {
             operationId = required(operationId, "operationId");
@@ -76,11 +73,8 @@ public interface OperationJournal {
             ownerUuid = Objects.requireNonNull(ownerUuid, "ownerUuid");
             intentId = required(intentId, "intentId");
             source = Objects.requireNonNull(source, "source");
-            authoritySource = Objects.requireNonNull(authoritySource, "authoritySource");
             authorityOperationId = Objects.requireNonNull(authorityOperationId, "authorityOperationId");
             profileId = Objects.requireNonNull(profileId, "profileId");
-            bindingId = Objects.requireNonNull(bindingId, "bindingId");
-            bindingGeneration = Objects.requireNonNull(bindingGeneration, "bindingGeneration");
             profileRevision = Objects.requireNonNull(profileRevision, "profileRevision");
             if (materialQuantity <= 0 || materialQuantity > source.stackQuantityAtPrepare()) {
                 throw new IllegalArgumentException("materialQuantity exceeds source stack");

@@ -8,7 +8,6 @@ import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
-import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.diagnostics.HyDragonStatusCommand;
 import com.alechilles.hydragon.diagnostics.HyDragonPersistenceStatus;
 import com.alechilles.hydragon.diagnostics.HyDragonRefundClaimCommand;
@@ -20,11 +19,8 @@ import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkCapabilityDiagnostics;
 import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
-import com.alechilles.hydragon.interactions.HyDragonRepairBondedStoneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
-import com.alechilles.hydragon.interactions.HyDragonMiniwyvernRecallInteraction;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
-import com.alechilles.hydragon.runtime.BondedStoneRepairService;
 import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
 import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
 import com.alechilles.hydragon.runtime.HyDragonGameplayRuntime;
@@ -34,7 +30,6 @@ import com.alechilles.hydragon.runtime.SoulBondService;
 import com.alechilles.hydragon.runtime.StateStoreMiniwyvernProfileProjection;
 import com.alechilles.hydragon.runtime.StateStoreOperationJournal;
 import com.alechilles.hydragon.runtime.StateStoreSoulBondLedger;
-import com.alechilles.hydragon.runtime.TameworkBondedRepairRequestResolver;
 import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
 import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.assetstore.event.RemovedAssetsEvent;
@@ -195,20 +190,15 @@ public final class HyDragonPlugin extends JavaPlugin {
                     soulBonds,
                     journal,
                     new StateStoreMiniwyvernProfileProjection(store));
-            BondedStoneRepairService repairService = new BondedStoneRepairService(adapter, journal);
-            sagaRecoveryRuntime = new ConsumableSagaRecoveryRuntime(
-                    journal, soulBondService, repairService);
+            sagaRecoveryRuntime = new ConsumableSagaRecoveryRuntime(journal, soulBondService);
             refundClaims = new ConsumableRefundClaimService(journal);
 
             gameplayRuntime = new HyDragonGameplayRuntime(
                     soulBondService,
-                    attunementService,
-                    repairService,
-                    new TameworkBondedRepairRequestResolver(api));
+                    attunementService);
             HyDragonInteractionRuntime.install(
                     gameplayRuntime,
-                    () -> bridge.snapshot(),
-                    () -> configRepository.snapshot().repairRequirement());
+                    () -> bridge.snapshot());
 
             encounterRuntime = HyDragonEncounterRegistrationFacade.install(
                     api,
@@ -262,17 +252,9 @@ public final class HyDragonPlugin extends JavaPlugin {
                 HyDragonSoulBondInteraction.class,
                 HyDragonSoulBondInteraction.CODEC);
         getCodecRegistry(Interaction.CODEC).register(
-                HyDragonMiniwyvernRecallInteraction.TYPE_ID,
-                HyDragonMiniwyvernRecallInteraction.class,
-                HyDragonMiniwyvernRecallInteraction.CODEC);
-        getCodecRegistry(Interaction.CODEC).register(
                 HyDragonMiniwyvernAttuneInteraction.TYPE_ID,
                 HyDragonMiniwyvernAttuneInteraction.class,
                 HyDragonMiniwyvernAttuneInteraction.CODEC);
-        getCodecRegistry(Interaction.CODEC).register(
-                HyDragonRepairBondedStoneInteraction.TYPE_ID,
-                HyDragonRepairBondedStoneInteraction.class,
-                HyDragonRepairBondedStoneInteraction.CODEC);
     }
 
     private void registerConfigAssets() {
@@ -281,12 +263,6 @@ public final class HyDragonPlugin extends JavaPlugin {
                         .setPath("HyDragon/DragonSpecies")
                         .setCodec(DragonSpeciesConfig.CODEC)
                         .setKeyFunction(DragonSpeciesConfig::getId)
-                        .build());
-        getAssetRegistry().register(
-                HytaleAssetStore.builder(StoneMaintenanceConfig.class, new DefaultAssetMap<>())
-                        .setPath("HyDragon/StoneMaintenance")
-                        .setCodec(StoneMaintenanceConfig.CODEC)
-                        .setKeyFunction(StoneMaintenanceConfig::getId)
                         .build());
         getAssetRegistry().register(
                 HytaleAssetStore.builder(MiniwyvernArchetypeConfig.class, new DefaultAssetMap<>())
@@ -305,10 +281,6 @@ public final class HyDragonPlugin extends JavaPlugin {
                 configRepository::onSpeciesLoaded);
         getEventRegistry().register(RemovedAssetsEvent.class, DragonSpeciesConfig.class,
                 configRepository::onSpeciesRemoved);
-        getEventRegistry().register(LoadedAssetsEvent.class, StoneMaintenanceConfig.class,
-                configRepository::onMaintenanceLoaded);
-        getEventRegistry().register(RemovedAssetsEvent.class, StoneMaintenanceConfig.class,
-                configRepository::onMaintenanceRemoved);
         getEventRegistry().register(LoadedAssetsEvent.class, MiniwyvernArchetypeConfig.class,
                 configRepository::onArchetypeLoaded);
         getEventRegistry().register(RemovedAssetsEvent.class, MiniwyvernArchetypeConfig.class,

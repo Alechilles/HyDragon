@@ -1,6 +1,5 @@
 {
   "EmptyItemId": "Draconic_Stone",
-  "FilledItemId": "*Draconic_Stone_State_Filled",
   "AllowedRoles": {
     "Mode": "Allowlist",
     "Allowlist": [
@@ -27,6 +26,11 @@
       "RockDrakeT2": "Tamed_RockDrakeT2",
       "RockDrakeT3": "Tamed_RockDrakeT3"
     },
+    "SourceConsumption": "ResolvedAttempt",
+    "SuccessDisposition": "TameAndCommandLink",
+    "CommandFamilyId": "hydragon:dragon_horn",
+    "RequiredCommandConfigId": "HyDragonDragonHorn",
+    "RequireCommandAccessItem": true,
     "ChanceMode": "Probability",
     "Power": 1,
     "BaseChance": 0.42,
@@ -36,26 +40,5 @@
     "FailureCooldownMs": 2500,
     "CooldownMs": 500,
     "MaxDistance": 12.0
-  },
-  "Spawn": {
-    "AssignsOwner": true,
-    "OwnerRestricted": true,
-    "RequireOwner": true,
-    "CooldownMs": 500,
-    "MaxDistance": 12.0
-  },
-  "Vessel": {
-    "Mode": "Bonded",
-    "StateItemIds": {
-      "Stored": "*Draconic_Stone_State_Filled",
-      "Active": "*Draconic_Stone_State_Active",
-      "Dead": "*Draconic_Stone_State_Damaged",
-      "Lost": "*Draconic_Stone_State_Lost",
-      "Unavailable": "*Draconic_Stone_State_Unavailable"
-    },
-    "TransitionCooldownMs": 1000,
-    "StoreMaxDistance": 12.0,
-    "RequireOwner": true,
-    "AllowStoreInCombat": false
   }
 }

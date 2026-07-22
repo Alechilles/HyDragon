@@ -380,7 +380,7 @@ class DynamicEncounterCoordinatorTest {
         DynamicEncounterCoordinator restartedCoordinator = new DynamicEncounterCoordinator(
                 api, restartedStore, new EncounterEligibilityService(api, restartedStore));
         HyDragonConfigRepository.Snapshot definitionRemoved = new HyDragonConfigRepository.Snapshot(
-                Map.of(), Map.of(), Map.of(), Map.of(), java.util.List.of());
+                Map.of(), Map.of(), Map.of(), java.util.List.of());
         DynamicEncounterRuntime runtime = new DynamicEncounterRuntime(
                 api,
                 restartedStore,
@@ -549,7 +549,7 @@ class DynamicEncounterCoordinatorTest {
     private static HyDragonConfigRepository.Snapshot snapshot(
             DragonEncounterConfig encounter, DragonSpeciesConfig species) {
         return new HyDragonConfigRepository.Snapshot(
-                Map.of(species.getId(), species), Map.of(), Map.of(), Map.of(encounter.getId(), encounter), java.util.List.of());
+                Map.of(species.getId(), species), Map.of(), Map.of(encounter.getId(), encounter), java.util.List.of());
     }
 
     private static <T> T construct(Class<T> type) throws Exception {

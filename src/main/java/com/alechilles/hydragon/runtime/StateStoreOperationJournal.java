@@ -54,11 +54,8 @@ public final class StateStoreOperationJournal implements OperationJournal {
                         source.inventorySlot(), source.inventoryRevision(), source.itemFingerprint(),
                         source.stackQuantityAtPrepare()),
                 descriptor.materialQuantity(),
-                descriptor.authoritySource().map(StateStoreOperationJournal::toPersistentSource),
                 descriptor.authorityOperationId(),
                 descriptor.profileId(),
-                descriptor.bindingId(),
-                descriptor.bindingGeneration(),
                 descriptor.profileRevision(),
                 now);
         try {
@@ -102,26 +99,12 @@ public final class StateStoreOperationJournal implements OperationJournal {
                 source.itemId(), source.holderEvidenceId(), source.containerPath(), source.inventorySlot(),
                 source.inventoryRevision(), source.itemFingerprint(), source.stackQuantityAtPrepare()),
                 record.materialQuantity(),
-                record.authoritySourceItem().map(StateStoreOperationJournal::toRuntimeSource),
-                record.authorityOperationId(), record.profileId(), record.bindingId(),
-                record.bindingGeneration(), record.profileRevision());
+                record.authorityOperationId(), record.profileId(), record.profileRevision());
         return new Entry(record.operationId(), descriptor.kind(), phase(record.status()), descriptor, record.revision());
     }
 
     private static ConsumableTransactionKind kind(Kind kind) {
         return ConsumableTransactionKind.valueOf(kind.name());
-    }
-
-    private static SourceItemEvidence toPersistentSource(ConsumableReservation.SourceEvidence source) {
-        return new SourceItemEvidence(
-                source.itemId(), source.holderEvidenceId(), source.containerPath(), source.inventorySlot(),
-                source.inventoryRevision(), source.itemFingerprint(), source.stackQuantityAtPrepare());
-    }
-
-    private static ConsumableReservation.SourceEvidence toRuntimeSource(SourceItemEvidence source) {
-        return new ConsumableReservation.SourceEvidence(
-                source.itemId(), source.holderEvidenceId(), source.containerPath(), source.inventorySlot(),
-                source.inventoryRevision(), source.itemFingerprint(), source.stackQuantityAtPrepare());
     }
 
     private static Kind kind(ConsumableTransactionKind kind) {

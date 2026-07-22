@@ -16,7 +16,22 @@
       "FollowMasterOnWorldChange": true,
       "FollowMasterOnWorldChangeStateFilter": [ "Follow", "Defend", "Aggressive" ]
     },
-    "DeadRespawnCooldownMins": 0,
+    "Summon": {
+      "Enabled": true,
+      "ActiveDurationMs": 900000,
+      "ResummonCooldownMs": 180000,
+      "AutoStoreOnOwnerLogout": true,
+      "ExpiryWarningThresholdsMs": [ 60000, 30000, 10000 ]
+    },
+    "Revive": {
+      "Enabled": true,
+      "GameplayCooldownMs": 0,
+      "Costs": [
+        { "ItemId": "Revitalizing_Essence", "Quantity": 1 },
+        { "ItemId": "Draconic_Essence", "Quantity": 2 }
+      ],
+      "InsufficientCostMessage": "server.messages.revive.insufficientCost"
+    },
     "PlacementMinRelativeY": -2.0,
     "PlacementMaxRelativeY": 6.0
   }

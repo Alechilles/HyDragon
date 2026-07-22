@@ -1,27 +1,19 @@
 package com.alechilles.hydragon.runtime;
 
-import com.alechilles.alecstamework.api.BondedVesselDurableOperationStatus;
-import com.alechilles.alecstamework.api.BondedVesselOperationResult;
-import com.alechilles.alecstamework.api.BondedVesselOperationView;
-import com.alechilles.alecstamework.api.BondedVesselTransitionRequest;
-import com.alechilles.alecstamework.api.BondedVesselTransitionToken;
-import com.alechilles.alecstamework.api.BondedVesselView;
 import com.alechilles.alecstamework.api.CompanionProvisioningDisposition;
-import com.alechilles.alecstamework.api.CompanionProvisioningOperationView;
+import com.alechilles.alecstamework.api.CompanionProvisioningLinkRequest;
+import com.alechilles.alecstamework.api.CompanionProvisioningLinkResult;
 import com.alechilles.alecstamework.api.CompanionProvisioningRequest;
-import com.alechilles.alecstamework.api.CompanionProvisioningResult;
 import com.alechilles.alecstamework.api.ProfileDataCompareAndSetRequest;
 import com.alechilles.alecstamework.api.ProfileDataCompareAndSetResult;
 import com.alechilles.alecstamework.api.ProfileDataEntryView;
 import com.alechilles.alecstamework.api.ProfileDataOperationView;
-import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
-import com.alechilles.alecstamework.api.ProvisionedCompanionTransition;
-import com.alechilles.alecstamework.api.ProvisionedCompanionTransitionRequest;
 import com.alechilles.alecstamework.api.ProvisionedCompanionView;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
 import com.alechilles.hydragon.integration.HyDragonFeature;
-import java.util.EnumSet;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +24,10 @@ import javax.annotation.Nonnull;
 public final class TameworkGameplayAdapter {
     public static final String CALLER_NAMESPACE = "Alechilles:HyDragon";
     public static final String SOULBOUND_MINIWYVERN_ROLE = "Tamed_Wyvern_Mini";
+    public static final String DRAGON_HORN_COMMAND_FAMILY = "hydragon:dragon_horn";
+    public static final String DRAGON_HORN_COMMAND_CONFIG = "HyDragonDragonHorn";
+    public static final String DRAGON_HORN_ITEM_ID = "HyDragon_Dragon_Horn";
+    public static final String MINIWYVERN_POPULATION_GROUP = "hydragon:soulbound_mini";
 
     private final TameworkApi api;
 
@@ -41,10 +37,6 @@ public final class TameworkGameplayAdapter {
 
     public Readiness soulBondReadiness() {
         return readiness(HyDragonFeature.SOUL_BOND_CLAIM);
-    }
-
-    public Readiness repairReadiness() {
-        return readiness(HyDragonFeature.BONDED_STONE_REPAIR);
     }
 
     public Readiness attunementReadiness() {
@@ -73,95 +65,45 @@ public final class TameworkGameplayAdapter {
         return api.profileData().findOperation(namespace, operationId);
     }
 
-    public CompletionStage<CompanionProvisioningResult> provisionDormantMiniwyvern(
+    public CompletionStage<CompanionProvisioningLinkResult> provisionAndLinkMiniwyvern(
             UUID playerUuid,
             String operationId,
             String ownershipWorldName) {
-        return api.companionProvisioning().provision(new CompanionProvisioningRequest(
-                CALLER_NAMESPACE,
-                operationId,
-                null,
-                playerUuid,
-                SOULBOUND_MINIWYVERN_ROLE,
-                CompanionProvisioningDisposition.PROVISIONED_DORMANT,
-                ownershipWorldName,
-                null,
-                null,
-                null,
-                CompanionProvisioningRequest.CURRENT_POLICY_REVISION
-        ));
-    }
-
-    public CompletionStage<Optional<CompanionProvisioningOperationView>> findMiniwyvernProvisioning(
-            String operationId) {
-        return api.companionProvisioning().findOperation(CALLER_NAMESPACE, operationId);
+        return api.companionProvisioning().provisionAndLink(new CompanionProvisioningLinkRequest(
+                new CompanionProvisioningRequest(
+                        CALLER_NAMESPACE,
+                        operationId,
+                        null,
+                        playerUuid,
+                        SOULBOUND_MINIWYVERN_ROLE,
+                        CompanionProvisioningDisposition.PROVISIONED_DORMANT,
+                        ownershipWorldName,
+                        null,
+                        null,
+                        null,
+                        CompanionProvisioningRequest.CURRENT_POLICY_REVISION),
+                DRAGON_HORN_COMMAND_FAMILY,
+                DRAGON_HORN_COMMAND_CONFIG,
+                DRAGON_HORN_ITEM_ID,
+                MINIWYVERN_POPULATION_GROUP,
+                true,
+                true));
     }
 
     public Optional<ProvisionedCompanionView> findMiniwyvern(String profileId) {
         return api.companionProvisioning().getByProfileId(profileId);
     }
 
-    public CompletionStage<CompanionProvisioningResult> activateDormantMiniwyvern(
-            UUID playerUuid,
-            String operationId,
-            String profileId,
-            long expectedProfileRevision,
-            String ownershipWorldName,
-            int chunkX,
-            int chunkZ) {
-        return api.companionProvisioning().transition(new ProvisionedCompanionTransitionRequest(
-                CALLER_NAMESPACE,
-                operationId,
-                playerUuid,
-                profileId,
-                expectedProfileRevision,
-                ProvisionedCompanionTransition.ACTIVATE,
-                ownershipWorldName,
-                new PopulationAdmissionLocation(ownershipWorldName, chunkX, chunkZ)
-        ));
-    }
-
-    public CompletionStage<BondedVesselOperationResult> prepareRepair(BondedVesselTransitionRequest request) {
-        return api.bondedVessels().prepareTransition(request);
-    }
-
-    public Optional<BondedVesselView> findVessel(UUID bindingId) {
-        return api.bondedVessels().getByBindingId(bindingId);
-    }
-
-    public CompletionStage<BondedVesselOperationResult> resumeRepair(BondedVesselTransitionRequest request) {
-        return api.bondedVessels().resumeTransition(request);
-    }
-
-    public BondedVesselOperationResult claimRepair(BondedVesselTransitionToken token) {
-        return api.bondedVessels().claimForApply(token);
-    }
-
-    public CompletionStage<BondedVesselOperationResult> commitRepair(BondedVesselTransitionToken token) {
-        return api.bondedVessels().commit(token);
-    }
-
-    public CompletionStage<Optional<BondedVesselOperationView>> findRepair(String operationId) {
-        return api.bondedVessels().findOperation(CALLER_NAMESPACE, operationId);
-    }
-
-    public static boolean provesTerminalPreApplyDenial(Optional<BondedVesselOperationView> operation) {
-        return operation.isPresent()
-                && operation.orElseThrow().status() == BondedVesselDurableOperationStatus.TERMINAL_DENIED;
-    }
-
     private Readiness readiness(HyDragonFeature feature) {
-        EnumSet<TameworkApiCapability> capabilities;
+        Set<String> capabilities = new TreeSet<>();
         try {
-            capabilities = api.getCapabilities().clone();
+            for (TameworkApiCapability capability : api.getCapabilities()) {
+                if (capability != null) capabilities.add(capability.name());
+            }
         } catch (RuntimeException failure) {
             return new Readiness(false, "Tamework capability refresh failed");
         }
-        EnumSet<TameworkApiCapability> required = EnumSet.noneOf(TameworkApiCapability.class);
-        for (String capability : feature.requiredCapabilities()) {
-            required.add(TameworkApiCapability.valueOf(capability));
-        }
-        EnumSet<TameworkApiCapability> missing = required.clone();
+        Set<String> missing = new TreeSet<>(feature.requiredCapabilities());
         missing.removeAll(capabilities);
         if (!missing.isEmpty()) return new Readiness(false, "missing Tamework capabilities " + missing);
         return new Readiness(true, "ready");

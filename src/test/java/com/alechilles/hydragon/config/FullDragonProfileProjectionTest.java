@@ -54,7 +54,7 @@ final class FullDragonProfileProjectionTest {
         return new HyDragonConfigRepository.Snapshot(
                 java.util.Arrays.stream(species).collect(java.util.stream.Collectors.toMap(
                         DragonSpeciesConfig::getId, value -> value)),
-                Map.of(), Map.of(), Map.of(), List.of());
+                Map.of(), Map.of(), List.of());
     }
 
     private static DragonSpeciesConfig species(String id, String roleId) {
