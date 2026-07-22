@@ -83,6 +83,19 @@ class TameworkGameplayAdapterTest {
     }
 
     @Test
+    void adapterReadinessTracksTameworkRecoveryAfterConstruction() {
+        EnumSet<TameworkApiCapability> capabilities = EnumSet.noneOf(TameworkApiCapability.class);
+        TameworkGameplayAdapter adapter = new TameworkGameplayAdapter(api(capabilities));
+
+        assertFalse(adapter.soulBondReadiness().ready());
+        HyDragonFeature.SOUL_BOND_CLAIM.requiredCapabilities().stream()
+                .map(TameworkApiCapability::valueOf)
+                .forEach(capabilities::add);
+
+        assertTrue(adapter.soulBondReadiness().ready());
+    }
+
+    @Test
     void onlyTerminalDeniedProvesRepairRefundIsSafe() {
         BondedVesselOperationView terminal = operation(BondedVesselDurableOperationStatus.TERMINAL_DENIED);
         BondedVesselOperationView applied = operation(BondedVesselDurableOperationStatus.APPLIED);

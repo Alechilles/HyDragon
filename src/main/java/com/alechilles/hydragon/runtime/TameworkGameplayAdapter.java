@@ -33,11 +33,9 @@ public final class TameworkGameplayAdapter {
     public static final String SOULBOUND_MINIWYVERN_ROLE = "Tamed_Wyvern_Mini";
 
     private final TameworkApi api;
-    private final EnumSet<TameworkApiCapability> capabilities;
 
     public TameworkGameplayAdapter(@Nonnull TameworkApi api) {
         this.api = Objects.requireNonNull(api, "api");
-        this.capabilities = api.getCapabilities().clone();
     }
 
     public Readiness soulBondReadiness() {
@@ -148,6 +146,12 @@ public final class TameworkGameplayAdapter {
     }
 
     private Readiness readiness(HyDragonFeature feature) {
+        EnumSet<TameworkApiCapability> capabilities;
+        try {
+            capabilities = api.getCapabilities().clone();
+        } catch (RuntimeException failure) {
+            return new Readiness(false, "Tamework capability refresh failed");
+        }
         EnumSet<TameworkApiCapability> required = EnumSet.noneOf(TameworkApiCapability.class);
         for (String capability : feature.requiredCapabilities()) {
             required.add(TameworkApiCapability.valueOf(capability));
