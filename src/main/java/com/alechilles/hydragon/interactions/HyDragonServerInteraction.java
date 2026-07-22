@@ -3,6 +3,7 @@ package com.alechilles.hydragon.interactions;
 import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.integration.HyDragonFeature;
+import com.alechilles.hydragon.HyDragonPlugin;
 import com.alechilles.hydragon.config.StoneMaintenanceConfig;
 import com.alechilles.hydragon.runtime.GameplayResult;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -25,6 +26,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /** Common server-authoritative fail-closed dispatch for HyDragon item interactions. */
 abstract class HyDragonServerInteraction extends SimpleInteraction {
@@ -130,10 +132,8 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
         HyDragonInteractionRuntime.dispatch(
                         action(), requiredFeature(), player.getUuid(), world.getName(), destination, archetypeId(),
                         reserved.orElseThrow(), heldItemLocator)
-                .whenComplete((result, failure) -> sendResult(
-                        worldUuid,
-                        player.getUuid(),
-                        failure == null ? result : GameplayResult.retryable("interaction callback failed")));
+                .whenComplete((result, failure) -> completeInteraction(
+                        worldUuid, player.getUuid(), operationId, destination, result, failure));
         super.tick0(true, time, type, context, cooldownHandler);
     }
 
@@ -204,6 +204,33 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
 
     protected Message deniedMessage(GameplayResult result) {
         return invalidMessage();
+    }
+
+    private void completeInteraction(
+            UUID worldUuid,
+            UUID playerUuid,
+            String operationId,
+            PopulationAdmissionLocation destination,
+            GameplayResult result,
+            Throwable failure) {
+        GameplayResult effective = failure == null && result != null
+                ? result : GameplayResult.retryable("interaction callback failed");
+        HyDragonPlugin plugin = HyDragonPlugin.getInstance();
+        if (plugin != null) {
+            String message = "HyDragon interaction outcome: action=" + action()
+                    + ", operation=" + operationId
+                    + ", player=" + playerUuid
+                    + ", world=" + destination.worldName()
+                    + ", chunk=" + destination.chunkX() + ',' + destination.chunkZ()
+                    + ", status=" + effective.status()
+                    + ", reason=" + effective.reason();
+            if (failure == null) {
+                plugin.getLogger().at(effective.succeeded() ? Level.INFO : Level.WARNING).log(message);
+            } else {
+                plugin.getLogger().at(Level.WARNING).withCause(failure).log(message);
+            }
+        }
+        sendResult(worldUuid, playerUuid, effective);
     }
 
     private void sendResult(UUID worldUuid, UUID playerUuid, GameplayResult result) {
