@@ -121,6 +121,27 @@ messages.refund.none=You have no pending HyDragon refund claims.
 messages.refund.recovered=Your Revitalizing Essence has been restored.
 messages.refund.noSpace=Make room in your inventory before claiming the refund.
 messages.refund.pending=Your refund remains safely pending; try again shortly.
+messages.status.usage=Usage: /hydragon status
+messages.status.unavailable=HyDragon status is unavailable because the runtime is not initialized.
+messages.status.title=HyDragon {version} status
+messages.status.config=Config: {state}; species={species}, archetypes={archetypes}, encounters={encounters}, issues={issues}
+messages.status.configIssue=  config: {issue}
+messages.status.configMore=  config: ... and {count} more
+messages.status.rejectedReload=Last config reload: rejected with {issues} issue(s); the valid configuration remains active.
+messages.status.tamework=Tamework: required={range}; Public API={apiVersion}; capabilities={capabilities}
+messages.status.feature=  {feature}: {state}; {reason}
+messages.status.tameworkPersistence=Tamework persistence: {status}; queue={queue}; population={population}; resilience={resilience}
+messages.status.diagnosticsIssue=  diagnostics: {reason}
+messages.status.localPersistence=HyDragon persistence: {state}; players={players}, profiles={profiles}, encounters={encounters}, pendingProfileProjections={pendingProfileProjections}, quarantined={quarantined}, reconcile={reconcile}, orphanedLinks={orphanedLinks}
+messages.status.orphan=  orphan[{kind}]: {identity}; action={action}
+messages.status.orphanMore=  orphan: ... and {count} more
+messages.status.localPersistenceIssue=  local persistence: {reason}
+messages.status.state.ready=READY
+messages.status.state.invalid=INVALID
+messages.status.state.disabled=DISABLED
+messages.status.state.unavailable=UNAVAILABLE
+messages.status.state.readWrite=READ_WRITE
+messages.status.state.readOnly=READ_ONLY
 messages.encounter.admitted=A powerful wingbeat echoes through the storm above.
 messages.encounter.grounding=The dragon is losing altitude. Keep up the pressure.
 messages.encounter.captureWindow=The grounded dragon can now be captured.

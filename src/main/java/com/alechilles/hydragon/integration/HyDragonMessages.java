@@ -25,6 +25,89 @@ public final class HyDragonMessages {
     public static Message refundNoSpace() { return translated("refund.noSpace"); }
     public static Message refundPending() { return translated("refund.pending"); }
     public static Message vesselUnavailable() { return translated("vessel.unavailable"); }
+    public static Message statusUsage() { return translated("status.usage"); }
+    public static Message statusUnavailable() { return translated("status.unavailable"); }
+    public static Message statusTitle(String version) {
+        return translated("status.title").param("version", version);
+    }
+    public static Message statusConfig(
+            Message state, int species, int archetypes, int encounters, int issues) {
+        return translated("status.config")
+                .param("state", state)
+                .param("species", species)
+                .param("archetypes", archetypes)
+                .param("encounters", encounters)
+                .param("issues", issues);
+    }
+    public static Message statusConfigIssue(String issue) {
+        return translated("status.configIssue").param("issue", issue);
+    }
+    public static Message statusConfigMore(int count) {
+        return translated("status.configMore").param("count", count);
+    }
+    public static Message statusRejectedReload(int issues) {
+        return translated("status.rejectedReload").param("issues", issues);
+    }
+    public static Message statusTamework(String range, String apiVersion, int capabilities) {
+        return translated("status.tamework")
+                .param("range", range)
+                .param("apiVersion", apiVersion)
+                .param("capabilities", capabilities);
+    }
+    public static Message statusFeature(String feature, Message state, String reason) {
+        return translated("status.feature")
+                .param("feature", feature)
+                .param("state", state)
+                .param("reason", reason);
+    }
+    public static Message statusTameworkPersistence(
+            String status, long queue, String population, String resilience) {
+        return translated("status.tameworkPersistence")
+                .param("status", status)
+                .param("queue", queue)
+                .param("population", population)
+                .param("resilience", resilience);
+    }
+    public static Message statusDiagnosticsIssue(String reason) {
+        return translated("status.diagnosticsIssue").param("reason", reason);
+    }
+    public static Message statusLocalPersistence(
+            Message state,
+            int players,
+            int profiles,
+            int encounters,
+            int pendingProfileProjections,
+            int quarantined,
+            int reconcile,
+            int orphanedLinks) {
+        return translated("status.localPersistence")
+                .param("state", state)
+                .param("players", players)
+                .param("profiles", profiles)
+                .param("encounters", encounters)
+                .param("pendingProfileProjections", pendingProfileProjections)
+                .param("quarantined", quarantined)
+                .param("reconcile", reconcile)
+                .param("orphanedLinks", orphanedLinks);
+    }
+    public static Message statusOrphan(String kind, String identity, String action) {
+        return translated("status.orphan")
+                .param("kind", kind)
+                .param("identity", identity)
+                .param("action", action);
+    }
+    public static Message statusOrphanMore(int count) {
+        return translated("status.orphanMore").param("count", count);
+    }
+    public static Message statusLocalPersistenceIssue(String reason) {
+        return translated("status.localPersistenceIssue").param("reason", reason);
+    }
+    public static Message statusStateReady() { return translated("status.state.ready"); }
+    public static Message statusStateInvalid() { return translated("status.state.invalid"); }
+    public static Message statusStateDisabled() { return translated("status.state.disabled"); }
+    public static Message statusStateUnavailable() { return translated("status.state.unavailable"); }
+    public static Message statusStateReadWrite() { return translated("status.state.readWrite"); }
+    public static Message statusStateReadOnly() { return translated("status.state.readOnly"); }
 
     /** Server-side resolution for non-client sinks and locale contract tests. */
     public static String resolve(String language, String key) {

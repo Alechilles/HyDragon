@@ -14,6 +14,29 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSET_ROOTS = (ROOT / "Common", ROOT / "Server")
 JSON_SUFFIXES = {".json", ".particlesystem", ".particlespawner", ".blockymodel", ".blockyanim"}
 LOCALES = ("en-US", "pt-BR", "de-DE", "fr-FR", "es-ES")
+REQUIRED_STATUS_MESSAGE_KEYS = {
+    "messages.status.usage",
+    "messages.status.unavailable",
+    "messages.status.title",
+    "messages.status.config",
+    "messages.status.configIssue",
+    "messages.status.configMore",
+    "messages.status.rejectedReload",
+    "messages.status.tamework",
+    "messages.status.feature",
+    "messages.status.tameworkPersistence",
+    "messages.status.diagnosticsIssue",
+    "messages.status.localPersistence",
+    "messages.status.orphan",
+    "messages.status.orphanMore",
+    "messages.status.localPersistenceIssue",
+    "messages.status.state.ready",
+    "messages.status.state.invalid",
+    "messages.status.state.disabled",
+    "messages.status.state.unavailable",
+    "messages.status.state.readWrite",
+    "messages.status.state.readOnly",
+}
 BANNED_PRE_RELEASE_TOKENS = (
     "Draconic_Essence_Igne",
     "Draconic_Essence_Cryo",
@@ -148,6 +171,10 @@ def validate_locales(errors: list[str]) -> None:
             continue
         catalogs[locale] = read_lang(path, errors)
     source = catalogs.get("en-US", {})
+    for locale, catalog in catalogs.items():
+        missing_status = sorted(REQUIRED_STATUS_MESSAGE_KEYS - set(catalog))
+        if missing_status:
+            fail(errors, f"{locale} missing status command keys: {', '.join(missing_status)}")
     for locale in LOCALES[1:]:
         translated = catalogs.get(locale, {})
         missing = sorted(set(source) - set(translated))
@@ -159,6 +186,12 @@ def validate_locales(errors: list[str]) -> None:
         for key in sorted(set(source) & set(translated)):
             if PLACEHOLDER.findall(source[key]) != PLACEHOLDER.findall(translated[key]):
                 fail(errors, f"placeholder mismatch: {locale}:{key}")
+
+    status_command = ROOT / "src/main/java/com/alechilles/hydragon/diagnostics/HyDragonStatusCommand.java"
+    if not status_command.is_file():
+        fail(errors, "missing HyDragon status command source")
+    elif "Message.raw(" in status_command.read_text(encoding="utf-8"):
+        fail(errors, "HyDragon status command must not emit raw player-facing messages")
 
 
 def validate_interaction_message_localization(parsed: dict[Path, object], errors: list[str]) -> None:

@@ -17,6 +17,7 @@ import com.alechilles.hydragon.encounters.HyDragonEncounterRegistrationFacade;
 import com.alechilles.hydragon.encounters.HyDragonEncounterServerRuntime;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
+import com.alechilles.hydragon.integration.TameworkCapabilityDiagnostics;
 import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
 import com.alechilles.hydragon.interactions.HyDragonRepairBondedStoneInteraction;
@@ -75,6 +76,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         getCommandRegistry().registerCommand(new HyDragonStatusCommand(
                 getManifest().getVersion().toString(),
                 configRepository::snapshot,
+                configRepository::lastReloadIssues,
                 () -> tameworkBridge,
                 this::getPersistenceStatus));
         getCommandRegistry().registerCommand(new HyDragonRefundClaimCommand(() -> refundClaims));
@@ -88,6 +90,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         openStateStore();
         startRuntimes();
         HyDragonConfigRepository.Snapshot config = configRepository.snapshot();
+        emitCapabilityDiagnostics();
         Level level = config.isValid() ? Level.INFO : Level.WARNING;
         getLogger().at(level).log("HyDragon enabled with %d species, %d Miniwyvern archetypes, "
                         + "%d encounters, %d config issue(s), and Tamework Public API %s.",
@@ -101,6 +104,20 @@ public final class HyDragonPlugin extends JavaPlugin {
                 persistence.players(), persistence.profiles(), persistence.encounters(),
                 persistence.pendingProfileProjections(), persistence.quarantined(),
                 persistence.pendingReconciliation());
+    }
+
+    private void emitCapabilityDiagnostics() {
+        TameworkBridge bridge = tameworkBridge;
+        if (bridge == null) {
+            getLogger().at(Level.SEVERE).log(
+                    "Tamework capability diagnostics unavailable; install Tamework %s and restart the server.",
+                    TameworkBridge.REQUIRED_TAMEWORK_RANGE);
+            return;
+        }
+        for (TameworkCapabilityDiagnostics.Entry entry
+                : TameworkCapabilityDiagnostics.evaluate(bridge.snapshot())) {
+            getLogger().at(entry.present() ? Level.INFO : Level.WARNING).log(entry.format());
+        }
     }
 
     @Override

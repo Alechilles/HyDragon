@@ -121,6 +121,27 @@ messages.refund.none=Du hast keine ausstehenden HyDragon-Rückerstattungen.
 messages.refund.recovered=Deine Revitalisierende Essenz wurde wiederhergestellt.
 messages.refund.noSpace=Schaffe Platz in deinem Inventar, bevor du die Rückerstattung abholst.
 messages.refund.pending=Deine Rückerstattung bleibt sicher ausstehend; versuche es gleich erneut.
+messages.status.usage=Verwendung: /hydragon status
+messages.status.unavailable=Der HyDragon-Status ist nicht verfügbar, weil die Laufzeit nicht initialisiert ist.
+messages.status.title=HyDragon {version} Status
+messages.status.config=Konfiguration: {state}; Arten={species}, Archetypen={archetypes}, Begegnungen={encounters}, Probleme={issues}
+messages.status.configIssue=  Konfiguration: {issue}
+messages.status.configMore=  Konfiguration: ... und {count} weitere
+messages.status.rejectedReload=Die letzte Konfigurationsaktualisierung wurde mit {issues} Problem(en) abgelehnt; die gültige Konfiguration bleibt aktiv.
+messages.status.tamework=Tamework: benötigt={range}; öffentliche API={apiVersion}; Fähigkeiten={capabilities}
+messages.status.feature=  {feature}: {state}; {reason}
+messages.status.tameworkPersistence=Tamework-Persistenz: {status}; Warteschlange={queue}; Population={population}; Ausfallsicherheit={resilience}
+messages.status.diagnosticsIssue=  Diagnose: {reason}
+messages.status.localPersistence=HyDragon-Persistenz: {state}; Spieler={players}, Profile={profiles}, Begegnungen={encounters}, ausstehendeProfilprojektionen={pendingProfileProjections}, Quarantäne={quarantined}, Abgleich={reconcile}, verwaisteVerknüpfungen={orphanedLinks}
+messages.status.orphan=  verwaist[{kind}]: {identity}; Maßnahme={action}
+messages.status.orphanMore=  verwaist: ... und {count} weitere
+messages.status.localPersistenceIssue=  lokale Persistenz: {reason}
+messages.status.state.ready=BEREIT
+messages.status.state.invalid=UNGÜLTIG
+messages.status.state.disabled=DEAKTIVIERT
+messages.status.state.unavailable=NICHT_VERFÜGBAR
+messages.status.state.readWrite=LESEN_UND_SCHREIBEN
+messages.status.state.readOnly=NUR_LESEN
 messages.encounter.admitted=Ein mächtiger Flügelschlag hallt durch den Sturm über dir.
 messages.encounter.grounding=Der Drache verliert an Höhe. Halte den Druck aufrecht.
 messages.encounter.captureWindow=Der gelandete Drache kann jetzt gefangen werden.

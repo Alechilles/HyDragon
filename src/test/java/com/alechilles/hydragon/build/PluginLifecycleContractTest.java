@@ -48,6 +48,15 @@ final class PluginLifecycleContractTest {
                 "HyDragonInteractionRuntime.uninstall(gameplayRuntime);");
     }
 
+    @Test
+    void startupEmitsPerCapabilityDiagnostics() throws IOException {
+        String source = pluginSource();
+
+        assertTrue(source.contains("emitCapabilityDiagnostics();"));
+        assertTrue(source.contains("TameworkCapabilityDiagnostics.evaluate(bridge.snapshot())"));
+        assertTrue(source.contains("entry.present() ? Level.INFO : Level.WARNING"));
+    }
+
     private String pluginSource() throws IOException {
         return Files.readString(projectRoot.resolve(
                 "src/main/java/com/alechilles/hydragon/HyDragonPlugin.java"));

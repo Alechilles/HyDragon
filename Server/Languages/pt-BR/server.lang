@@ -121,6 +121,27 @@ messages.refund.none=Você não possui reembolsos pendentes do HyDragon.
 messages.refund.recovered=Sua Essência Revitalizante foi restaurada.
 messages.refund.noSpace=Libere espaço no inventário antes de resgatar o reembolso.
 messages.refund.pending=Seu reembolso continua pendente em segurança; tente novamente em instantes.
+messages.status.usage=Uso: /hydragon status
+messages.status.unavailable=O status do HyDragon está indisponível porque o sistema ainda não foi inicializado.
+messages.status.title=Status do HyDragon {version}
+messages.status.config=Configuração: {state}; espécies={species}, arquétipos={archetypes}, encontros={encounters}, problemas={issues}
+messages.status.configIssue=  configuração: {issue}
+messages.status.configMore=  configuração: ... e mais {count}
+messages.status.rejectedReload=A última recarga da configuração foi rejeitada com {issues} problema(s); a configuração válida continua ativa.
+messages.status.tamework=Tamework: versão necessária={range}; API pública={apiVersion}; capacidades={capabilities}
+messages.status.feature=  {feature}: {state}; {reason}
+messages.status.tameworkPersistence=Persistência do Tamework: {status}; fila={queue}; população={population}; resiliência={resilience}
+messages.status.diagnosticsIssue=  diagnóstico: {reason}
+messages.status.localPersistence=Persistência do HyDragon: {state}; jogadores={players}, perfis={profiles}, encontros={encounters}, projeçõesPendentes={pendingProfileProjections}, emQuarentena={quarantined}, conciliação={reconcile}, vínculosÓrfãos={orphanedLinks}
+messages.status.orphan=  órfão[{kind}]: {identity}; ação={action}
+messages.status.orphanMore=  órfão: ... e mais {count}
+messages.status.localPersistenceIssue=  persistência local: {reason}
+messages.status.state.ready=PRONTO
+messages.status.state.invalid=INVÁLIDO
+messages.status.state.disabled=DESATIVADO
+messages.status.state.unavailable=INDISPONÍVEL
+messages.status.state.readWrite=LEITURA_E_GRAVAÇÃO
+messages.status.state.readOnly=SOMENTE_LEITURA
 messages.encounter.admitted=Um poderoso bater de asas ecoa na tempestade acima.
 messages.encounter.grounding=O dragão está perdendo altitude. Mantenha a pressão.
 messages.encounter.captureWindow=O dragão em terra agora pode ser capturado.

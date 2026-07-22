@@ -121,6 +121,27 @@ messages.refund.none=Vous n'avez aucun remboursement HyDragon en attente.
 messages.refund.recovered=Votre Essence revitalisante a été restaurée.
 messages.refund.noSpace=Libérez de la place dans votre inventaire avant de récupérer le remboursement.
 messages.refund.pending=Votre remboursement reste en attente en toute sécurité ; réessayez bientôt.
+messages.status.usage=Utilisation : /hydragon status
+messages.status.unavailable=L'état de HyDragon est indisponible car le système n'est pas initialisé.
+messages.status.title=État de HyDragon {version}
+messages.status.config=Configuration : {state} ; espèces={species}, archétypes={archetypes}, rencontres={encounters}, problèmes={issues}
+messages.status.configIssue=  configuration : {issue}
+messages.status.configMore=  configuration : ... et {count} de plus
+messages.status.rejectedReload=Le dernier rechargement de configuration a été rejeté avec {issues} problème(s) ; la configuration valide reste active.
+messages.status.tamework=Tamework : version requise={range} ; API publique={apiVersion} ; capacités={capabilities}
+messages.status.feature=  {feature} : {state} ; {reason}
+messages.status.tameworkPersistence=Persistance Tamework : {status} ; file={queue} ; population={population} ; résilience={resilience}
+messages.status.diagnosticsIssue=  diagnostic : {reason}
+messages.status.localPersistence=Persistance HyDragon : {state} ; joueurs={players}, profils={profiles}, rencontres={encounters}, projectionsEnAttente={pendingProfileProjections}, quarantaine={quarantined}, rapprochement={reconcile}, liensOrphelins={orphanedLinks}
+messages.status.orphan=  orphelin[{kind}] : {identity} ; action={action}
+messages.status.orphanMore=  orphelin : ... et {count} de plus
+messages.status.localPersistenceIssue=  persistance locale : {reason}
+messages.status.state.ready=PRÊT
+messages.status.state.invalid=INVALIDE
+messages.status.state.disabled=DÉSACTIVÉ
+messages.status.state.unavailable=INDISPONIBLE
+messages.status.state.readWrite=LECTURE_ÉCRITURE
+messages.status.state.readOnly=LECTURE_SEULE
 messages.encounter.admitted=Un puissant battement d'ailes résonne dans la tempête au-dessus de vous.
 messages.encounter.grounding=Le dragon perd de l'altitude. Maintenez la pression.
 messages.encounter.captureWindow=Le dragon au sol peut maintenant être capturé.

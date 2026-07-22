@@ -3,8 +3,10 @@ package com.alechilles.hydragon.diagnostics;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
+import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkRuntimeDiagnostics;
+import com.hypixel.hytale.server.core.Message;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,7 @@ public final class HyDragonStatusFormatter {
     public static List<String> format(
             String pluginVersion,
             HyDragonConfigRepository.Snapshot config,
+            List<String> lastReloadIssues,
             TameworkBridge.Snapshot tamework,
             TameworkRuntimeDiagnostics.Snapshot diagnostics,
             HyDragonPersistenceStatus localPersistence) {
@@ -31,6 +34,15 @@ public final class HyDragonStatusFormatter {
         }
         if (config.issues().size() > 5) {
             lines.add("  config: ... and " + (config.issues().size() - 5) + " more");
+        }
+        if (config.isValid() && !lastReloadIssues.isEmpty()) {
+            lines.add("Last config reload: REJECTED; retained=READY; issues=" + lastReloadIssues.size());
+            for (String issue : lastReloadIssues.stream().limit(5).toList()) {
+                lines.add("  rejected reload: " + issue);
+            }
+            if (lastReloadIssues.size() > 5) {
+                lines.add("  rejected reload: ... and " + (lastReloadIssues.size() - 5) + " more");
+            }
         }
 
         lines.add("Tamework: required=" + TameworkBridge.REQUIRED_TAMEWORK_RANGE
@@ -68,5 +80,77 @@ public final class HyDragonStatusFormatter {
             lines.add("  local persistence: " + localPersistence.reason());
         }
         return List.copyOf(lines);
+    }
+
+    /** Localized player-facing equivalent of the structured operator report. */
+    public static List<Message> formatMessages(
+            String pluginVersion,
+            HyDragonConfigRepository.Snapshot config,
+            List<String> lastReloadIssues,
+            TameworkBridge.Snapshot tamework,
+            TameworkRuntimeDiagnostics.Snapshot diagnostics,
+            HyDragonPersistenceStatus localPersistence) {
+        List<Message> messages = new ArrayList<>();
+        messages.add(HyDragonMessages.statusTitle(pluginVersion));
+        messages.add(HyDragonMessages.statusConfig(
+                config.isValid() ? HyDragonMessages.statusStateReady() : HyDragonMessages.statusStateInvalid(),
+                config.species().size(), config.archetypes().size(), config.encounters().size(), config.issues().size()));
+        appendIssues(messages, config.issues());
+        if (config.isValid() && !lastReloadIssues.isEmpty()) {
+            messages.add(HyDragonMessages.statusRejectedReload(lastReloadIssues.size()));
+            appendIssues(messages, lastReloadIssues);
+        }
+
+        messages.add(HyDragonMessages.statusTamework(
+                TameworkBridge.REQUIRED_TAMEWORK_RANGE, tamework.apiVersion(), tamework.capabilities().size()));
+        for (HyDragonFeature feature : HyDragonFeature.values()) {
+            FeatureGate gate = tamework.feature(feature);
+            messages.add(HyDragonMessages.statusFeature(
+                    feature.name(),
+                    gate.available() ? HyDragonMessages.statusStateReady() : HyDragonMessages.statusStateDisabled(),
+                    gate.reason()));
+        }
+        messages.add(HyDragonMessages.statusTameworkPersistence(
+                diagnostics.persistenceStatus(), diagnostics.queueDepth(),
+                diagnostics.populationReadiness(), diagnostics.resilienceState()));
+        if (!diagnostics.available() && diagnostics.persistenceReason() != null) {
+            messages.add(HyDragonMessages.statusDiagnosticsIssue(diagnostics.persistenceReason()));
+        }
+
+        Message localState = !localPersistence.available()
+                ? HyDragonMessages.statusStateUnavailable()
+                : localPersistence.writable()
+                        ? HyDragonMessages.statusStateReadWrite()
+                        : HyDragonMessages.statusStateReadOnly();
+        messages.add(HyDragonMessages.statusLocalPersistence(
+                localState,
+                localPersistence.players(),
+                localPersistence.profiles(),
+                localPersistence.encounters(),
+                localPersistence.pendingProfileProjections(),
+                localPersistence.quarantined(),
+                localPersistence.pendingReconciliation(),
+                localPersistence.orphanedLinks().size()));
+        for (HyDragonPersistenceStatus.OrphanedLink orphan
+                : localPersistence.orphanedLinks().stream().limit(5).toList()) {
+            messages.add(HyDragonMessages.statusOrphan(
+                    orphan.kind(), orphan.identity(), orphan.operatorAction()));
+        }
+        if (localPersistence.orphanedLinks().size() > 5) {
+            messages.add(HyDragonMessages.statusOrphanMore(localPersistence.orphanedLinks().size() - 5));
+        }
+        if (localPersistence.reason() != null) {
+            messages.add(HyDragonMessages.statusLocalPersistenceIssue(localPersistence.reason()));
+        }
+        return List.copyOf(messages);
+    }
+
+    private static void appendIssues(List<Message> messages, List<String> issues) {
+        for (String issue : issues.stream().limit(5).toList()) {
+            messages.add(HyDragonMessages.statusConfigIssue(issue));
+        }
+        if (issues.size() > 5) {
+            messages.add(HyDragonMessages.statusConfigMore(issues.size() - 5));
+        }
     }
 }

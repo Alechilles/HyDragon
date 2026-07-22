@@ -121,6 +121,27 @@ messages.refund.none=No tienes reembolsos pendientes de HyDragon.
 messages.refund.recovered=Tu Esencia Revitalizante ha sido restaurada.
 messages.refund.noSpace=Haz espacio en tu inventario antes de reclamar el reembolso.
 messages.refund.pending=Tu reembolso sigue pendiente de forma segura; inténtalo de nuevo en breve.
+messages.status.usage=Uso: /hydragon status
+messages.status.unavailable=El estado de HyDragon no está disponible porque el sistema no se ha inicializado.
+messages.status.title=Estado de HyDragon {version}
+messages.status.config=Configuración: {state}; especies={species}, arquetipos={archetypes}, encuentros={encounters}, problemas={issues}
+messages.status.configIssue=  configuración: {issue}
+messages.status.configMore=  configuración: ... y {count} más
+messages.status.rejectedReload=La última recarga de configuración se rechazó con {issues} problema(s); la configuración válida sigue activa.
+messages.status.tamework=Tamework: versión requerida={range}; API pública={apiVersion}; capacidades={capabilities}
+messages.status.feature=  {feature}: {state}; {reason}
+messages.status.tameworkPersistence=Persistencia de Tamework: {status}; cola={queue}; población={population}; resiliencia={resilience}
+messages.status.diagnosticsIssue=  diagnóstico: {reason}
+messages.status.localPersistence=Persistencia de HyDragon: {state}; jugadores={players}, perfiles={profiles}, encuentros={encounters}, proyeccionesPendientes={pendingProfileProjections}, enCuarentena={quarantined}, conciliación={reconcile}, vínculosHuérfanos={orphanedLinks}
+messages.status.orphan=  huérfano[{kind}]: {identity}; acción={action}
+messages.status.orphanMore=  huérfano: ... y {count} más
+messages.status.localPersistenceIssue=  persistencia local: {reason}
+messages.status.state.ready=LISTO
+messages.status.state.invalid=NO_VÁLIDO
+messages.status.state.disabled=DESACTIVADO
+messages.status.state.unavailable=NO_DISPONIBLE
+messages.status.state.readWrite=LECTURA_Y_ESCRITURA
+messages.status.state.readOnly=SOLO_LECTURA
 messages.encounter.admitted=Un poderoso aleteo resuena en la tormenta sobre ti.
 messages.encounter.grounding=El dragón está perdiendo altura. Mantén la presión.
 messages.encounter.captureWindow=El dragón en tierra ya puede ser capturado.
