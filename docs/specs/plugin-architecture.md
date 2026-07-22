@@ -1,6 +1,6 @@
 # HyDragon Plugin Architecture Specification
 
-Status: Implementation complete; release verification pending
+Status: Implementation and automated release verification complete
 Target HyDragon release: first plugin release compatible with Tamework `3.x`
 Required Tamework range: `>=3.0.0 <4.0.0`
 

@@ -1,6 +1,6 @@
 # Dragon Content, Crafting, Spawning, and Encounter Specification
 
-Status: Implementation complete; release verification pending
+Status: Implementation and automated release verification complete
 Base-game evidence target: Hytale Workshop corpus `0.5.6`
 
 ## 1. Purpose and boundaries

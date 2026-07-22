@@ -1,6 +1,6 @@
 # HyDragon Implementation Specification Suite
 
-Status: Implementation complete; release verification pending
+Status: Implementation and automated release verification complete
 Source: collaborator-provided `HydragonBaseMod.docx`, reconciled with the current HyDragon asset pack and Tamework 3.0.0 source
 Required Tamework range: `>=3.0.0 <4.0.0`
 
@@ -8,7 +8,7 @@ Required Tamework range: `>=3.0.0 <4.0.0`
 
 HyDragon is implemented as a combined Java plugin and asset pack. Existing content stays in the root `Common/` and `Server/` layout, and Maven packages it beside the Java entry point. HyDragon owns dragon-specific content, economy, Soul Bond, elemental abilities, stone maintenance, and special encounters. Tamework owns reusable capture, profile, bonded-vessel, population, and command mechanics; generic companion inventory remains reserved for a later update.
 
-The implementation is present in source, assets, configuration, and focused tests. Final clean-build, packaged-JAR, cross-repository integration, and live-server release gates are still pending; this status does not claim that those gates have passed.
+The implementation is present in source, assets, configuration, and tests. The final clean build, packaged-JAR contract, asset/localization validation, and cross-repository integration suite pass against Tamework 3.0.0. A live-server playtest remains a release operation rather than an implementation prerequisite.
 
 Locked product decisions:
 

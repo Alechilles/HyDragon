@@ -1,6 +1,6 @@
 # Draconic Capture, Summoning, and Maintenance Specification
 
-Status: Implementation complete; release verification pending
+Status: Implementation and automated release verification complete
 Scope: Full-sized dragons only; Miniwyvern is specified separately
 
 ## 1. Purpose and boundaries

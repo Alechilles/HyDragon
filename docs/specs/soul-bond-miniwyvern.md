@@ -1,6 +1,6 @@
 # Draconic Soul Bond and Miniwyvern Specification
 
-Status: Implementation complete; release verification pending
+Status: Implementation and automated release verification complete
 Deferred: Miniwyvern backpack and Tamework companion inventory remain post-MVP
 Scope: The unique, Soul Bond-exclusive Miniwyvern companion
 
