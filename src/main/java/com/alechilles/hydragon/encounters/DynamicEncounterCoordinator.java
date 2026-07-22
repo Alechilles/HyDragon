@@ -402,6 +402,11 @@ public final class DynamicEncounterCoordinator {
                 .isPresent();
     }
 
+    /** Ordinary dragons are not subject to the special encounter's grounded-phase gate. */
+    public boolean isEncounterTarget(UUID targetNpcUuid) {
+        return findByTarget(Objects.requireNonNull(targetNpcUuid, "targetNpcUuid")).isPresent();
+    }
+
     private TransitionResult advanceGrounding(
             EncounterRecord current,
             EncounterDefinitionSnapshot definition,

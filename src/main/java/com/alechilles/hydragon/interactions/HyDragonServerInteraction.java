@@ -202,6 +202,10 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
         return HyDragonMessages.vesselUnavailable();
     }
 
+    protected Message deniedMessage(GameplayResult result) {
+        return invalidMessage();
+    }
+
     private void sendResult(UUID worldUuid, UUID playerUuid, GameplayResult result) {
         Universe universe = Universe.get();
         World world = universe == null ? null : universe.getWorld(worldUuid);
@@ -214,7 +218,7 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
                 if (player != null) {
                     player.sendMessage(result != null && result.succeeded() ? successMessage()
                             : result != null && result.status() == GameplayResult.Status.DENIED
-                            ? invalidMessage() : unavailableMessage());
+                            ? deniedMessage(result) : unavailableMessage());
                 }
             });
         } catch (RuntimeException ignored) {

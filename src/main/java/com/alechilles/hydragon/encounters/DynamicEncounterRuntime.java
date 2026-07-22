@@ -195,13 +195,16 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         return count;
     }
 
-    private CaptureRequirementDecision captureRequirement(UUID targetNpcUuid, CaptureRequirementSpec spec) {
+    CaptureRequirementDecision captureRequirement(UUID targetNpcUuid, CaptureRequirementSpec spec) {
         FeatureGate featureGate = gate.get();
         if (featureGate == null || !featureGate.available()) {
             return CaptureRequirementDecision.deny("hydragon-dynamic-encounters-unavailable");
         }
         if (spec == null || !CAPTURE_REQUIREMENT_ID.equals(spec.id())) {
             return CaptureRequirementDecision.deny("hydragon-capture-requirement-mismatch");
+        }
+        if (!coordinator.isEncounterTarget(targetNpcUuid)) {
+            return CaptureRequirementDecision.allow();
         }
         return coordinator.captureAllowed(targetNpcUuid)
                 ? CaptureRequirementDecision.allow()

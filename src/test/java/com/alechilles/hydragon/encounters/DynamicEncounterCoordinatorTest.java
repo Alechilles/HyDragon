@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.alecstamework.api.NpcProfileView;
 import com.alechilles.alecstamework.api.NpcProfilesApi;
+import com.alechilles.alecstamework.api.CaptureRequirementDecision;
+import com.alechilles.alecstamework.api.CaptureRequirementSpec;
 import com.alechilles.alecstamework.api.PolicyApi;
 import com.alechilles.alecstamework.api.PopulationGroupApi;
 import com.alechilles.alecstamework.api.PopulationGroupCountsView;
@@ -15,6 +17,8 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
+import com.alechilles.hydragon.integration.FeatureGate;
+import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.persistence.EncounterDefinitionSnapshot;
 import com.alechilles.hydragon.persistence.EncounterRecord;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
@@ -27,6 +31,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -43,6 +48,36 @@ class DynamicEncounterCoordinatorTest {
 
     @TempDir Path temporaryDirectory;
 
+    /** Regression: the Nordic policy also applies to ordinary spawned drakes. */
+    @Test
+    void ordinaryNordicDrakeDoesNotRequireARegisteredEncounterGroundingPhase() throws Exception {
+        TameworkApi api = api(new AtomicBoolean(false));
+        HyDragonStateStore stateStore = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        HyDragonConfigRepository.Snapshot configs = snapshot(definition, speciesConfig());
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, stateStore, new EncounterEligibilityService(api, stateStore));
+        DynamicEncounterRuntime runtime = new DynamicEncounterRuntime(
+                api, stateStore, () -> configs,
+                () -> new FeatureGate(HyDragonFeature.DYNAMIC_ENCOUNTERS, true,
+                        Set.of(), Set.of(), List.of()),
+                (worldName, targetNpcUuid, callback) -> { }, coordinator, Clock.systemUTC());
+        CaptureRequirementSpec requirement = new CaptureRequirementSpec(
+                DynamicEncounterRuntime.CAPTURE_REQUIREMENT_ID, "grounded_phase", List.of(), null);
+
+        CaptureRequirementDecision ordinary = runtime.captureRequirement(TARGET, requirement);
+
+        assertTrue(ordinary.allowed());
+        FakeWorld world = new FakeWorld();
+        assertTrue(coordinator.admit(
+                definition, configs,
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L).admitted());
+        CaptureRequirementDecision aerialEncounter = runtime.captureRequirement(TARGET, requirement);
+        assertFalse(aerialEncounter.allowed());
+        assertEquals("hydragon-target-not-grounded", aerialEncounter.reason());
+    }
+
     @Test
     void admissionIsIdempotentAndGroundingSurvivesReconciliation() throws Exception {
         AtomicBoolean captured = new AtomicBoolean(false);
@@ -55,9 +90,12 @@ class DynamicEncounterCoordinatorTest {
         FakeWorld world = new FakeWorld();
         EncounterCandidate candidate = candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID));
 
+        assertFalse(coordinator.isEncounterTarget(TARGET));
+
         DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
                 definition, configs, candidate, world, true, 60_000L);
         assertTrue(admitted.admitted());
+        assertTrue(coordinator.isEncounterTarget(TARGET));
         assertEquals(TARGET, admitted.targetNpcUuid());
         assertEquals(1, world.spawnCalls);
 

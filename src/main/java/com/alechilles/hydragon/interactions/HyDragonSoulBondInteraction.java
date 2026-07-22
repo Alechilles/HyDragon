@@ -2,6 +2,7 @@ package com.alechilles.hydragon.interactions;
 
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.HyDragonMessages;
+import com.alechilles.hydragon.runtime.GameplayResult;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
 import javax.annotation.Nonnull;
@@ -61,5 +62,13 @@ public final class HyDragonSoulBondInteraction extends HyDragonServerInteraction
     @Override
     protected Message unavailableMessage() {
         return HyDragonMessages.soulBondUnavailable();
+    }
+
+    @Override
+    protected Message deniedMessage(GameplayResult result) {
+        String reason = result == null ? "" : result.reason().toLowerCase(java.util.Locale.ROOT);
+        return reason.contains("already claimed") || reason.contains("already consumed")
+                ? HyDragonMessages.soulBondAlreadyClaimed()
+                : HyDragonMessages.soulBondUnavailable();
     }
 }
