@@ -30,5 +30,6 @@ final class PackagedJarContractIT {
         assertTrue(entries.stream().anyMatch(name -> name.startsWith("Server/")));
         assertFalse(entries.stream().anyMatch(name -> name.equals("HyDragon.zip") || name.startsWith("docs/")));
         assertFalse(entries.stream().anyMatch(name -> name.startsWith("target/") || name.startsWith(".idea/")));
+        assertFalse(entries.stream().anyMatch(name -> name.contains("/Source/") || name.endsWith(".bbmodel")));
     }
 }

@@ -201,6 +201,66 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
+    void waterBurstHealsBelowThresholdWithinConfiguredCap() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.ownerHealth = new MiniwyvernAbilityWorld.Health(40.0D, 100.0D);
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context("water"), Map.of("water", waterConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertEquals(1, result.abilitiesExecuted());
+        assertEquals(1, world.healApplications);
+        assertEquals(1, world.effects);
+        assertEquals(1, world.presentations);
+        assertEquals(21_000L, states.current.cooldownUntilByAbility().get("restorative_surge"));
+    }
+
+    @Test
+    void natureRegenerationHealsAndPresentsOnItsCappedSchedule() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.ownerHealth = new MiniwyvernAbilityWorld.Health(50.0D, 100.0D);
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+
+        MiniwyvernAbilityService.TickResult first = service.tick(
+                context("nature"), Map.of("nature", natureConfig()), world, 1_000L);
+        MiniwyvernAbilityService.TickResult early = service.tick(
+                context("nature"), Map.of("nature", natureConfig()), world, 2_000L);
+
+        assertTrue(first.ready());
+        assertTrue(early.ready());
+        assertEquals(1, world.healApplications);
+        assertEquals(1, world.presentations);
+        assertEquals(3_000L, states.current.cooldownUntilByAbility().get("nature_regeneration"));
+    }
+
+    @Test
+    void iceFourthHitStunsThenImmunitySuppressesTheNextCast() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.areaTargets = List.of(
+                new MiniwyvernAbilityWorld.Target(ENEMY, null, "world", 3.0D, true));
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+        MiniwyvernArchetypeConfig config = iceConfig(1);
+
+        for (long now : List.of(1_000L, 7_000L, 13_000L, 19_000L)) {
+            assertEquals(1, service.tick(
+                    context("ice"), Map.of("ice", config), world, now).abilitiesExecuted());
+        }
+
+        assertEquals(4, world.projectiles);
+        assertEquals(5, world.effects, "four slows plus the threshold stun");
+        assertFalse(states.current.iceBuildupByTarget().containsKey(ENEMY));
+        assertEquals(31_000L, states.current.controlImmunityUntilByTarget().get(ENEMY));
+
+        assertEquals(0, service.tick(
+                context("ice"), Map.of("ice", config), world, 25_000L).abilitiesExecuted());
+        assertEquals(4, world.projectiles, "control immunity must suppress the next eligible cast");
+    }
+
+    @Test
     void unsupportedEffectStackingFailsOnlyTheEffectChannel() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
@@ -371,6 +431,23 @@ class MiniwyvernAbilityServiceTest {
         set(ability, "durationSeconds", 1.0D);
         set(ability, "stackingPolicy", "NON_STACKING");
         set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[] { ability });
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig natureConfig() throws Exception {
+        MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
+        set(config, "id", "nature");
+        set(config, "essenceSemanticId", "nature");
+        set(config, "essenceItemId", "Draconic_Essence_Nature");
+        set(config, "appearanceId", "Wyvern_Mini_Nature");
+        set(config, "particleAndSoundIds", new String[] { "test-nature-presentation" });
+        set(config, "passiveEffects", new String[] { "test-nature-regeneration" });
+        set(config, "passiveModifiers", Map.of(
+                "RegenerationTickSeconds", 2.0D,
+                "MaximumHealFractionPerTick", 0.01D));
+        set(config, "fallbackBehavior", "BASIC_BITE");
+        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[0]);
         assertTrue(config.validate().isEmpty(), config.validate().toString());
         return config;
     }

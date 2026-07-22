@@ -2,6 +2,7 @@ package com.alechilles.hydragon.config;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.assetstore.JsonAsset;
@@ -13,6 +14,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class BundledConfigAssetContractTest {
@@ -45,6 +50,34 @@ class BundledConfigAssetContractTest {
             assertFalse(json.contains("\"StatModifiers\""), path + " must not apply health outside the capped service");
             assertTrue(json.contains("\"ApplicationEffects\""), path + " should retain visible feedback");
         }
+    }
+
+    @Test
+    void elementalArchetypeMatrixHasEssenceAppearancePresentationAndBehavior() throws IOException {
+        Map<String, MiniwyvernArchetypeConfig> archetypes = decodeDirectory(
+                "MiniwyvernArchetypes", MiniwyvernArchetypeConfig.class,
+                MiniwyvernArchetypeConfig.CODEC).stream().collect(Collectors.toMap(
+                        MiniwyvernArchetypeConfig::getId, Function.identity()));
+        assertEquals(Set.of("neutral", "lightning", "wind", "ice", "fire", "water", "nature", "void"),
+                archetypes.keySet());
+
+        for (String id : Set.of("lightning", "wind", "ice", "fire", "water", "nature", "void")) {
+            MiniwyvernArchetypeConfig archetype = archetypes.get(id);
+            String title = Character.toUpperCase(id.charAt(0)) + id.substring(1);
+            assertEquals(id, archetype.getEssenceSemanticId(), id);
+            assertEquals("Draconic_Essence_" + title, archetype.getEssenceItemId(), id);
+            assertEquals("Wyvern_Mini_" + title, archetype.getAppearanceId(), id);
+            assertFalse(archetype.getParticleAndSoundIds().isEmpty(), id + " lacks presentation");
+            assertTrue(!archetype.getActiveAbilities().isEmpty()
+                            || !archetype.getPassiveEffects().isEmpty(),
+                    id + " lacks an active or passive behavior");
+        }
+
+        MiniwyvernArchetypeConfig neutral = archetypes.get("neutral");
+        assertTrue(neutral.getEssenceSemanticId() == null || neutral.getEssenceSemanticId().isBlank());
+        assertTrue(neutral.getEssenceItemId() == null || neutral.getEssenceItemId().isBlank());
+        assertEquals("Wyvern_Mini", neutral.getAppearanceId());
+        assertEquals("BASIC_BITE", neutral.getFallbackBehavior());
     }
 
     private static <T extends JsonAsset<String>> List<T> decodeDirectory(

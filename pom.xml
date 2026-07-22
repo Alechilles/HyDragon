@@ -69,6 +69,10 @@
                 <directory>${project.basedir}/Common</directory>
                 <targetPath>Common</targetPath>
                 <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/Source/**</exclude>
+                    <exclude>**/*.bbmodel</exclude>
+                </excludes>
             </resource>
             <resource>
                 <directory>${project.basedir}/Server</directory>
