@@ -5,6 +5,7 @@
     "Description": "server.items.Draconic_Stone_Ancient.description"
   },
   "Icon": "Icons/ItemsGenerated/Draconic_Stone_Ancient.png",
+  "Quality": "Legendary",
   "Texture": "Items/HyDragon/Draconic_Stone_Ancient.png",
   "Recipe": {
     "Input": [

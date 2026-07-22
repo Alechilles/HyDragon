@@ -37,6 +37,7 @@ Related specifications:
 - **HYD-CAP-003:** HyDragon MUST ship Iron, Thorium, Cobalt, Adamantium, and Ancient/Mithril stone tiers with strictly increasing capture power. The English `Draconic_Stone` asset is the canonical Iron-tier item.
 - **HYD-CAP-004:** Each full-dragon species/difficulty MUST declare capture resistance, minimum eligible stone tier, base chance or modifier inputs, and whether special encounter conditions are required.
 - **HYD-CAP-005:** The Ancient/Mithril tier MUST succeed with 100% probability once every non-probability eligibility condition is satisfied. It MUST NOT bypass health, tranquilizer, ownership, encounter, capacity, or role requirements.
+- **HYD-CAP-005A:** Stone item quality MUST increase with the tier as Common, Uncommon, Rare, Epic, and Legendary. Every tier MUST use a distinct runtime texture and inventory icon whose material palette matches Iron, Thorium, Cobalt, Adamantium, or Mithril respectively, while retaining a common physical and icon scale because every stone stores exactly one dragon.
 - **HYD-CAP-006:** Capture validation and the random roll MUST execute within the Tamework capture-policy transaction. HyDragon MUST provide policy inputs and presentation but MUST NOT perform an independent pre-roll.
 - **HYD-CAP-007:** Failed validation MUST consume nothing. An eligible failed roll MUST leave the target alive and uncaptured, retain the unchanged empty stone, clear the channel presentation, and apply the configured retry cooldown.
 
@@ -63,13 +64,13 @@ Related specifications:
 
 ### 4.1 Stable item IDs
 
-| Tier | Capture power | Item ID | Material identity | Rule |
-| --- | ---: | --- | --- | --- |
-| Iron | 1 | `Draconic_Stone` | Iron | Canonical base asset |
-| Thorium | 2 | `Draconic_Stone_Thorium` | Thorium | New asset |
-| Cobalt | 3 | `Draconic_Stone_Cobalt` | Cobalt | New asset |
-| Adamantium | 4 | `Draconic_Stone_Adamantium` | Adamantium | New asset |
-| Ancient | 5 | `Draconic_Stone_Ancient` | Mithril/ancient material | Guaranteed after eligibility |
+| Tier | Capture power | Quality | Item ID | Material identity | Rule |
+| --- | ---: | --- | --- | --- | --- |
+| Iron | 1 | Common | `Draconic_Stone` | Iron | Canonical base asset |
+| Thorium | 2 | Uncommon | `Draconic_Stone_Thorium` | Thorium | New asset |
+| Cobalt | 3 | Rare | `Draconic_Stone_Cobalt` | Cobalt | New asset |
+| Adamantium | 4 | Epic | `Draconic_Stone_Adamantium` | Adamantium | New asset |
+| Ancient | 5 | Legendary | `Draconic_Stone_Ancient` | Mithril/ancient material | Guaranteed after eligibility |
 
 Recipes and material tags are defined in [Dragon content and encounters](dragon-content-encounters.md). Exact chance curves remain balance data, not Java constants.
 

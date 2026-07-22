@@ -4,7 +4,7 @@
     "Description": "server.items.Draconic_Stone.description"
   },
   "Icon": "Icons/ItemsGenerated/Draconic_Stone.png",
-  "Quality": "Epic",
+  "Quality": "Common",
   "Categories": [
     "Items.Tools"
   ],

@@ -5,6 +5,7 @@
     "Description": "server.items.Draconic_Stone_Cobalt.description"
   },
   "Icon": "Icons/ItemsGenerated/Draconic_Stone_Cobalt.png",
+  "Quality": "Rare",
   "Texture": "Items/HyDragon/Draconic_Stone_Cobalt.png",
   "Recipe": {
     "Input": [

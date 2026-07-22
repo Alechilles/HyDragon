@@ -1,10 +1,15 @@
 package com.alechilles.hydragon.integration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class DraconicCaptureAssetContractTest {
@@ -45,6 +50,29 @@ class DraconicCaptureAssetContractTest {
     }
 
     @Test
+    void metalStonesScaleQualityAndUseDistinctMaterialArt() throws Exception {
+        Map<String, String> qualities = Map.of(
+                "Draconic_Stone", "Common",
+                "Draconic_Stone_Thorium", "Uncommon",
+                "Draconic_Stone_Cobalt", "Rare",
+                "Draconic_Stone_Adamantium", "Epic",
+                "Draconic_Stone_Ancient", "Legendary");
+        Set<String> textureDigests = new HashSet<>();
+        Set<String> iconDigests = new HashSet<>();
+
+        for (Map.Entry<String, String> stone : qualities.entrySet()) {
+            String item = read("Server/Item/Items/Ingredient/" + stone.getKey() + ".json");
+            assertTrue(item.contains("\"Quality\": \"" + stone.getValue() + "\""),
+                    () -> stone.getKey() + " must use " + stone.getValue() + " quality");
+            textureDigests.add(sha256("Common/Items/HyDragon/" + stone.getKey() + ".png"));
+            iconDigests.add(sha256("Common/Icons/ItemsGenerated/" + stone.getKey() + ".png"));
+        }
+
+        assertEquals(qualities.size(), textureDigests.size(), "Each metal tier needs distinct texture bytes");
+        assertEquals(qualities.size(), iconDigests.size(), "Each metal tier needs distinct icon bytes");
+    }
+
+    @Test
     void wildDragonCaptureRequiresTranquilizationAndMapsEverySupportedRole() throws Exception {
         String config = read("Server/Tamework/Items/Spawners/HyDragonDraconicStone.json");
 
@@ -68,5 +96,10 @@ class DraconicCaptureAssetContractTest {
 
     private static String read(String relative) throws Exception {
         return Files.readString(ROOT.resolve(relative)).replace("\r\n", "\n");
+    }
+
+    private static String sha256(String relative) throws Exception {
+        byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(ROOT.resolve(relative)));
+        return HexFormat.of().formatHex(digest);
     }
 }

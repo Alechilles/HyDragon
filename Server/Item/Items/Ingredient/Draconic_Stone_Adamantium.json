@@ -5,6 +5,7 @@
     "Description": "server.items.Draconic_Stone_Adamantium.description"
   },
   "Icon": "Icons/ItemsGenerated/Draconic_Stone_Adamantium.png",
+  "Quality": "Epic",
   "Texture": "Items/HyDragon/Draconic_Stone_Adamantium.png",
   "Recipe": {
     "Input": [
