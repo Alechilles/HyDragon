@@ -54,6 +54,7 @@ public final class BondedStoneRepairService {
             case COMMITTED -> release(essence,
                     new GameplayResult(GameplayResult.Status.ALREADY_APPLIED, "bonded stone already repaired"));
             case REFUNDED -> release(essence, GameplayResult.denied("repair was terminally denied and refunded"));
+            case CANCELED -> release(essence, GameplayResult.denied("repair was canceled before consumption"));
             case QUARANTINED -> release(essence,
                     new GameplayResult(GameplayResult.Status.QUARANTINED, "repair operation is quarantined"));
             case PREPARED -> tamework.resumeRepair(request)

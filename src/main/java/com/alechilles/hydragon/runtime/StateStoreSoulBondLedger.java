@@ -36,6 +36,19 @@ public final class StateStoreSoulBondLedger implements SoulBondLedger {
     }
 
     @Override
+    public Reservation compensateDenied(UUID playerUuid,
+                                         String operationId,
+                                         Optional<String> authorityOperationId,
+                                         long compensatedAtEpochMillis) {
+        try {
+            return map(store.compensateDeniedSoulBond(
+                    playerUuid, operationId, authorityOperationId, compensatedAtEpochMillis));
+        } catch (IOException exception) {
+            return Reservation.UNAVAILABLE;
+        }
+    }
+
+    @Override
     public Reservation reconcile(UUID playerUuid, String operationId, Optional<UUID> profileId) {
         try {
             return map(store.markSoulBondNeedsReconciliation(

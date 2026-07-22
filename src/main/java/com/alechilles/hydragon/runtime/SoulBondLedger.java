@@ -9,6 +9,17 @@ public interface SoulBondLedger {
 
     Reservation complete(UUID playerUuid, String operationId, UUID profileId, long claimedAtEpochMillis);
 
+    /**
+     * Atomically closes a pre-profile terminal denial and returns the entitlement to its unclaimed state.
+     * Implementations must not use this path once a canonical profile identity has been observed.
+     */
+    default Reservation compensateDenied(UUID playerUuid,
+                                          String operationId,
+                                          Optional<String> authorityOperationId,
+                                          long compensatedAtEpochMillis) {
+        return Reservation.UNAVAILABLE;
+    }
+
     Reservation reconcile(UUID playerUuid, String operationId, Optional<UUID> profileId);
 
     Optional<Claim> find(UUID playerUuid);

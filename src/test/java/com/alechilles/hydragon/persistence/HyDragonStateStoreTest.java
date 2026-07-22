@@ -52,6 +52,65 @@ class HyDragonStateStoreTest {
     }
 
     @Test
+    void deniedSoulBondCompensationIsAtomicIdempotentAndRestartSafe() throws Exception {
+        Path file = temporaryDirectory.resolve("soul-bond-denial.properties");
+        String operationId = "hydragon:soul-bond:" + UUID.randomUUID();
+        String authorityOperationId = UUID.randomUUID().toString();
+        HyDragonStateStore store = new HyDragonStateStore(file);
+        assertEquals(MutationOutcome.APPLIED, store.beginSoulBond(PLAYER_ONE, operationId));
+        assertEquals(MutationOutcome.APPLIED,
+                store.beginConsumableTransaction(soulBondTransaction(operationId, PLAYER_ONE, 10L)));
+
+        assertEquals(MutationOutcome.APPLIED, store.compensateDeniedSoulBond(
+                PLAYER_ONE, operationId, Optional.of(authorityOperationId), 20L));
+        assertEquals(MutationOutcome.ALREADY_APPLIED, store.compensateDeniedSoulBond(
+                PLAYER_ONE, operationId, Optional.of(authorityOperationId), 30L));
+        assertEquals(SoulBondState.UNCLAIMED,
+                store.snapshot().playerSoulBond(PLAYER_ONE).orElseThrow().state());
+        ConsumableTransactionRecord canceled = store.snapshot()
+                .consumableTransaction(operationId).orElseThrow();
+        assertEquals(ConsumableTransactionStatus.CANCELED, canceled.status());
+        assertEquals(Optional.of(authorityOperationId), canceled.authorityOperationId());
+        assertEquals(1L, canceled.revision());
+
+        HyDragonStateStore restarted = new HyDragonStateStore(file);
+        assertEquals(SoulBondState.UNCLAIMED,
+                restarted.snapshot().playerSoulBond(PLAYER_ONE).orElseThrow().state());
+        assertEquals(ConsumableTransactionStatus.CANCELED,
+                restarted.snapshot().consumableTransaction(operationId).orElseThrow().status());
+        assertEquals(MutationOutcome.ALREADY_APPLIED, restarted.compensateDeniedSoulBond(
+                PLAYER_ONE, operationId, Optional.of(authorityOperationId), 40L));
+    }
+
+    @Test
+    void failedDeniedSoulBondCompensationPublishesNeitherHalf() throws Exception {
+        Path file = temporaryDirectory.resolve("soul-bond-denial-failure.properties");
+        String operationId = "hydragon:soul-bond:" + UUID.randomUUID();
+        HyDragonStateStore initial = new HyDragonStateStore(file);
+        assertEquals(MutationOutcome.APPLIED, initial.beginSoulBond(PLAYER_ONE, operationId));
+        assertEquals(MutationOutcome.APPLIED,
+                initial.beginConsumableTransaction(soulBondTransaction(operationId, PLAYER_ONE, 10L)));
+        byte[] before = Files.readAllBytes(file);
+
+        HyDragonStateStore failing = new HyDragonStateStore(file, (destination, content) -> {
+            throw new IOException("simulated compensation replacement failure");
+        });
+        assertThrows(IOException.class, () -> failing.compensateDeniedSoulBond(
+                PLAYER_ONE, operationId, Optional.empty(), 20L));
+
+        assertArrayEquals(before, Files.readAllBytes(file));
+        assertEquals(SoulBondState.PENDING,
+                failing.snapshot().playerSoulBond(PLAYER_ONE).orElseThrow().state());
+        assertEquals(ConsumableTransactionStatus.PREPARED,
+                failing.snapshot().consumableTransaction(operationId).orElseThrow().status());
+        HyDragonStateStore restarted = new HyDragonStateStore(file);
+        assertEquals(SoulBondState.PENDING,
+                restarted.snapshot().playerSoulBond(PLAYER_ONE).orElseThrow().state());
+        assertEquals(ConsumableTransactionStatus.PREPARED,
+                restarted.snapshot().consumableTransaction(operationId).orElseThrow().status());
+    }
+
+    @Test
     void restartRoundTripBuildsReconciliationInventory() throws Exception {
         Path file = temporaryDirectory.resolve("hydragon-state.properties");
         HyDragonStateStore first = new HyDragonStateStore(file);
@@ -279,6 +338,27 @@ class HyDragonStateStoreTest {
                 200,
                 250,
                 1_000);
+    }
+
+    private static ConsumableTransactionRecord soulBondTransaction(
+            String operationId, UUID ownerUuid, long createdAtEpochMillis) {
+        return ConsumableTransactionRecord.prepared(
+                operationId,
+                operationId,
+                ConsumableTransactionKind.SOUL_BOND,
+                new OperationOrigin("Alechilles:HyDragon", operationId),
+                ownerUuid,
+                "soul_bond:ZGVmYXVsdA:0:0",
+                new SourceItemEvidence(
+                        "Draconic_Soul_Bond", ownerUuid.toString(), "hotbar", 0,
+                        1L, "fingerprint", 1),
+                1,
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                OptionalLong.empty(),
+                OptionalLong.empty(),
+                createdAtEpochMillis);
     }
 
     private static EncounterDefinitionSnapshot encounterDefinitionSnapshot() {

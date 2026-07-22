@@ -3,6 +3,7 @@ package com.alechilles.hydragon.persistence;
 /** Durable phases of a HyDragon-owned consumable saga. */
 public enum ConsumableTransactionStatus {
     PREPARED,
+    CANCELED,
     MATERIAL_CONSUMED,
     COMMITTED,
     REFUND_DUE,
@@ -10,7 +11,7 @@ public enum ConsumableTransactionStatus {
     QUARANTINED;
 
     public boolean terminal() {
-        return this == COMMITTED || this == REFUNDED || this == QUARANTINED;
+        return this == CANCELED || this == COMMITTED || this == REFUNDED || this == QUARANTINED;
     }
 
     /** Only transitions that preserve the one-success-or-one-refund invariant are legal. */
@@ -19,10 +20,10 @@ public enum ConsumableTransactionStatus {
             return false;
         }
         return switch (this) {
-            case PREPARED -> next == MATERIAL_CONSUMED || next == QUARANTINED;
+            case PREPARED -> next == CANCELED || next == MATERIAL_CONSUMED || next == QUARANTINED;
             case MATERIAL_CONSUMED -> next == COMMITTED || next == REFUND_DUE || next == QUARANTINED;
             case REFUND_DUE -> next == REFUNDED || next == QUARANTINED;
-            case COMMITTED, REFUNDED, QUARANTINED -> false;
+            case CANCELED, COMMITTED, REFUNDED, QUARANTINED -> false;
         };
     }
 }

@@ -248,6 +248,79 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
     }
 
     /**
+     * Atomically closes a denied, pre-profile Soul Bond operation and releases its player entitlement.
+     * Exact replay is a no-op; any profile evidence or mismatched operation fails closed.
+     */
+    public MutationOutcome compensateDeniedSoulBond(
+            UUID playerUuid,
+            String operationId,
+            Optional<String> authorityOperationId,
+            long compensatedAtEpochMillis) throws IOException {
+        Objects.requireNonNull(playerUuid, "playerUuid");
+        operationId = requiredText(operationId, "operationId");
+        authorityOperationId = Objects.requireNonNull(authorityOperationId, "authorityOperationId")
+                .map(value -> requiredText(value, "authorityOperationId"));
+        if (compensatedAtEpochMillis < 0) {
+            throw new IllegalArgumentException("compensatedAtEpochMillis must not be negative");
+        }
+        synchronized (mutationLock) {
+            MutationOutcome playerBlock = mutationBlock(
+                    PersistentRecordType.PLAYER_SOUL_BOND, playerUuid.toString());
+            if (playerBlock != null) return playerBlock;
+            MutationOutcome transactionBlock = mutationBlock(
+                    PersistentRecordType.CONSUMABLE_TRANSACTION, operationId);
+            if (transactionBlock != null) return transactionBlock;
+
+            PlayerSoulBondRecord player = snapshot.playerSoulBonds().get(playerUuid);
+            ConsumableTransactionRecord transaction = snapshot.consumableTransactions().get(operationId);
+            if (transaction == null
+                    || transaction.kind() != ConsumableTransactionKind.SOUL_BOND
+                    || !transaction.ownerUuid().equals(playerUuid)
+                    || transaction.profileId().isPresent()
+                    || transaction.profileRevision().isPresent()
+                    || !canResolve(transaction.authorityOperationId(), authorityOperationId)) {
+                return MutationOutcome.CONFLICT;
+            }
+
+            boolean playerAlreadyReleased = player != null && player.state() == SoulBondState.UNCLAIMED;
+            boolean matchingPending = player != null
+                    && player.state() == SoulBondState.PENDING
+                    && player.operationId().equals(Optional.of(operationId))
+                    && player.profileId().isEmpty();
+            if (!playerAlreadyReleased && !matchingPending) {
+                return MutationOutcome.CONFLICT;
+            }
+
+            if (transaction.status() == ConsumableTransactionStatus.CANCELED) {
+                if (!compatible(transaction.authorityOperationId(), authorityOperationId)) {
+                    return MutationOutcome.CONFLICT;
+                }
+                if (playerAlreadyReleased) return MutationOutcome.ALREADY_APPLIED;
+                Properties next = copyProperties(committedProperties);
+                writePlayer(next, PlayerSoulBondRecord.unclaimed(playerUuid));
+                commit(next);
+                return MutationOutcome.APPLIED;
+            }
+            if (transaction.status() != ConsumableTransactionStatus.PREPARED) {
+                return MutationOutcome.CONFLICT;
+            }
+
+            ConsumableTransactionRecord canceled = transaction.transitionTo(
+                    ConsumableTransactionStatus.CANCELED,
+                    Math.max(transaction.updatedAtEpochMillis(), compensatedAtEpochMillis),
+                    authorityOperationId,
+                    Optional.empty(),
+                    OptionalLong.empty(),
+                    Optional.empty());
+            Properties next = copyProperties(committedProperties);
+            writePlayer(next, PlayerSoulBondRecord.unclaimed(playerUuid));
+            writeTransaction(next, canceled);
+            commit(next);
+            return MutationOutcome.APPLIED;
+        }
+    }
+
+    /**
      * Records an ambiguous external result for startup repair. This may create a record when an external
      * operation succeeded before the local pending write was observed.
      */

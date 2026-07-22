@@ -154,6 +154,7 @@ public final class MiniwyvernAttunementService {
             }
             case REFUND_DUE -> releaseDenied(essence, "attunement was denied by Tamework");
             case REFUNDED -> released(essence, GameplayResult.denied("attunement was denied by Tamework"));
+            case CANCELED -> released(essence, GameplayResult.denied("attunement was canceled before consumption"));
             case QUARANTINED -> released(essence,
                     new GameplayResult(GameplayResult.Status.QUARANTINED,
                             "attunement operation is quarantined"));

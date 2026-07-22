@@ -28,6 +28,7 @@ public interface OperationJournal {
 
     enum Phase {
         PREPARED,
+        CANCELED,
         MATERIAL_CONSUMED,
         COMMITTED,
         REFUND_DUE,

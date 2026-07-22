@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.LongSupplier;
 
 /** Crash-recoverable once-per-player Soul Bond provisioning saga. */
@@ -19,6 +20,7 @@ public final class SoulBondService {
     private final SoulBondLedger ledger;
     private final OperationJournal journal;
     private final LongSupplier clock;
+    private final ConcurrentHashMap<String, InFlightClaim> inFlight = new ConcurrentHashMap<>();
 
     public SoulBondService(TameworkGameplayAdapter tamework,
                            SoulBondLedger ledger,
@@ -48,6 +50,38 @@ public final class SoulBondService {
             throw new IllegalArgumentException("destination must be in the ownership world");
         }
         Objects.requireNonNull(item, "item");
+        String operationId = item.operationId();
+        ClaimIdentity identity = new ClaimIdentity(
+                playerUuid, ownershipWorldName, destination, item.sourceEvidence(), item.quantity());
+        InFlightClaim proposed = new InFlightClaim(identity, new CompletableFuture<>());
+        InFlightClaim existing = inFlight.putIfAbsent(operationId, proposed);
+        if (existing != null) {
+            return existing.identity().equals(identity)
+                    ? existing.result()
+                    : released(item, GameplayResult.reconciliation(
+                    "Soul Bond operation identity conflicts with an active claim"));
+        }
+
+        CompletionStage<GameplayResult> attempt;
+        try {
+            attempt = claimOnce(playerUuid, ownershipWorldName, destination, item);
+        } catch (RuntimeException failure) {
+            inFlight.remove(operationId, proposed);
+            proposed.result().completeExceptionally(failure);
+            return proposed.result();
+        }
+        attempt.whenComplete((result, failure) -> {
+            if (failure == null) proposed.result().complete(result);
+            else proposed.result().completeExceptionally(failure);
+            inFlight.remove(operationId, proposed);
+        });
+        return proposed.result();
+    }
+
+    private CompletionStage<GameplayResult> claimOnce(UUID playerUuid,
+                                                       String ownershipWorldName,
+                                                       PopulationAdmissionLocation destination,
+                                                       ConsumableReservation item) {
         TameworkGameplayAdapter.Readiness readiness = tamework.soulBondReadiness();
         if (!readiness.ready()) return released(item, GameplayResult.unavailable(readiness.reason()));
         if (!journal.available()) {
@@ -67,6 +101,9 @@ public final class SoulBondService {
             }
             if (entry.phase() == OperationJournal.Phase.COMMITTED) {
                 return released(item, GameplayResult.denied("Soul Bond entitlement already consumed"));
+            }
+            if (entry.phase() == OperationJournal.Phase.CANCELED) {
+                return released(item, GameplayResult.denied("Soul Bond provisioning was already denied"));
             }
             if (entry.phase() == OperationJournal.Phase.MATERIAL_CONSUMED) {
                 return recover(entry).thenCompose(result -> released(item, result));
@@ -131,9 +168,24 @@ public final class SoulBondService {
                                                             ConsumableReservation item,
                                                             CompanionProvisioningResult result) {
         if (!result.accepted() || result.profileId() == null) {
-            return released(item, result.status() == CompanionProvisioningResult.Status.DENIED
-                    ? GameplayResult.denied(result.reason())
-                    : GameplayResult.retryable(result.reason()));
+            if (result.status() == CompanionProvisioningResult.Status.DENIED) {
+                if (!matchesDeniedOrigin(result, playerUuid, operationId)) {
+                    return keepPending(playerUuid, operationId, Optional.empty(), item,
+                            "Tamework denial identity does not match the Soul Bond operation");
+                }
+                SoulBondLedger.Reservation compensated = ledger.compensateDenied(
+                        playerUuid,
+                        operationId,
+                        Optional.ofNullable(result.operationId()).map(UUID::toString),
+                        Math.max(0L, clock.getAsLong()));
+                if (compensated == SoulBondLedger.Reservation.APPLIED
+                        || compensated == SoulBondLedger.Reservation.ALREADY_APPLIED) {
+                    return released(item, GameplayResult.denied(result.reason()));
+                }
+                return keepPending(playerUuid, operationId, Optional.empty(), item,
+                        "Tamework denied provisioning, but Soul Bond compensation is pending");
+            }
+            return released(item, GameplayResult.retryable(result.reason()));
         }
         UUID profileId;
         try {
@@ -293,6 +345,16 @@ public final class SoulBondService {
         return normalized;
     }
 
+    private static boolean matchesDeniedOrigin(
+            CompanionProvisioningResult result, UUID playerUuid, String operationId) {
+        return (result.callerNamespace() == null
+                || TameworkGameplayAdapter.CALLER_NAMESPACE.equals(result.callerNamespace()))
+                && (result.idempotencyKey() == null || operationId.equals(result.idempotencyKey()))
+                && (result.ownerUuid() == null || playerUuid.equals(result.ownerUuid()))
+                && (result.roleId() == null
+                || TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE.equals(result.roleId()));
+    }
+
     private record Activation(boolean active, GameplayResult result) {
         private Activation {
             Objects.requireNonNull(result, "result");
@@ -300,6 +362,27 @@ public final class SoulBondService {
     }
 
     private record SoulBondIntent(String worldName, int chunkX, int chunkZ) {
+    }
+
+    private record ClaimIdentity(UUID playerUuid,
+                                 String ownershipWorldName,
+                                 PopulationAdmissionLocation destination,
+                                 ConsumableReservation.SourceEvidence source,
+                                 int quantity) {
+        private ClaimIdentity {
+            Objects.requireNonNull(playerUuid, "playerUuid");
+            ownershipWorldName = requiredText(ownershipWorldName, "ownershipWorldName");
+            Objects.requireNonNull(destination, "destination");
+            Objects.requireNonNull(source, "source");
+            if (quantity <= 0) throw new IllegalArgumentException("quantity must be positive");
+        }
+    }
+
+    private record InFlightClaim(ClaimIdentity identity, CompletableFuture<GameplayResult> result) {
+        private InFlightClaim {
+            Objects.requireNonNull(identity, "identity");
+            Objects.requireNonNull(result, "result");
+        }
     }
 
 }
