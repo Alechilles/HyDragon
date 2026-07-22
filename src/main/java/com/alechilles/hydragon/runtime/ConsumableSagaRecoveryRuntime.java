@@ -10,10 +10,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 /**
- * Bounded, restart-safe reconciliation loop for consumable sagas whose material was already consumed.
+ * Bounded, restart-safe reconciliation loop for consumable sagas with durable authority work to resume.
  *
- * <p>The journal remains authoritative. Prepared operations still require their exact live item receipt,
- * and refund-due repairs remain durable owner recovery claims; neither is guessed by this poller.</p>
+ * <p>The journal remains authoritative. Soul Bond preparation is safe to query/resume by its stable
+ * Tamework idempotency key even without a live item receipt; it remains PREPARED until a later item
+ * reservation can commit consumption. Other prepared operations still require their exact receipt.</p>
  */
 public final class ConsumableSagaRecoveryRuntime {
     private final OperationJournal journal;
@@ -108,7 +109,9 @@ public final class ConsumableSagaRecoveryRuntime {
     }
 
     private static boolean automaticallyRecoverable(OperationJournal.Entry entry) {
-        return entry.phase() == OperationJournal.Phase.MATERIAL_CONSUMED;
+        return entry.phase() == OperationJournal.Phase.MATERIAL_CONSUMED
+                || (entry.kind() == OperationJournal.Kind.SOUL_BOND
+                && entry.phase() == OperationJournal.Phase.PREPARED);
     }
 
     private static List<OperationJournal.Entry> rotateAfter(

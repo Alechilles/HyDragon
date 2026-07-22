@@ -7,6 +7,7 @@ import com.alechilles.alecstamework.api.BondedVesselTransitionRequest;
 import com.alechilles.alecstamework.api.BondedVesselTransitionToken;
 import com.alechilles.alecstamework.api.BondedVesselView;
 import com.alechilles.alecstamework.api.CompanionProvisioningDisposition;
+import com.alechilles.alecstamework.api.CompanionProvisioningOperationView;
 import com.alechilles.alecstamework.api.CompanionProvisioningRequest;
 import com.alechilles.alecstamework.api.CompanionProvisioningResult;
 import com.alechilles.alecstamework.api.ProfileDataCompareAndSetRequest;
@@ -90,6 +91,11 @@ public final class TameworkGameplayAdapter {
                 null,
                 CompanionProvisioningRequest.CURRENT_POLICY_REVISION
         ));
+    }
+
+    public CompletionStage<Optional<CompanionProvisioningOperationView>> findMiniwyvernProvisioning(
+            String operationId) {
+        return api.companionProvisioning().findOperation(CALLER_NAMESPACE, operationId);
     }
 
     public CompletionStage<CompanionProvisioningResult> activateDormantMiniwyvern(

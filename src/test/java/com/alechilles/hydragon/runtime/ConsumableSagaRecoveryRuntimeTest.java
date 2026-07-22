@@ -67,13 +67,17 @@ class ConsumableSagaRecoveryRuntimeTest {
         MemoryJournal journal = new MemoryJournal();
         journal.add(entry("prepared", OperationJournal.Kind.MINIWYVERN_ATTUNEMENT,
                 OperationJournal.Phase.PREPARED));
+        journal.add(entry("soul-prepared", OperationJournal.Kind.SOUL_BOND,
+                OperationJournal.Phase.PREPARED));
         journal.add(entry("refund", OperationJournal.Kind.BONDED_STONE_REPAIR,
                 OperationJournal.Phase.REFUND_DUE));
+        AtomicInteger soulRecoveries = new AtomicInteger();
         ConsumableSagaRecoveryRuntime runtime = new ConsumableSagaRecoveryRuntime(
-                journal, ignored -> completed(new AtomicInteger()), ignored -> completed(new AtomicInteger()));
+                journal, ignored -> completed(soulRecoveries), ignored -> completed(new AtomicInteger()));
 
-        assertEquals(0, runtime.tickSome(4));
-        assertEquals(0, runtime.snapshot().recoverableOperations());
+        assertEquals(1, runtime.tickSome(4));
+        assertEquals(1, soulRecoveries.get());
+        assertEquals(1, runtime.snapshot().recoverableOperations());
         assertEquals(1, runtime.snapshot().refundClaims());
     }
 
