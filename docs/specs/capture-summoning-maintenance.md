@@ -248,8 +248,8 @@ HyDragon has never been released. There are zero HyDragon migration or legacy-co
 | `Server/Item/Items/Ingredient/Draconic_Stone.json` | Use as canonical Iron; add bonded/active/damaged presentation and new interaction mapping |
 | `Server/Item/Items/Ingredient/Draconic_Stone_{Thorium,Cobalt,Adamantium,Ancient}.json` | New tier items and recipes |
 | `Server/Tamework/Items/Spawners/HyDragonDraconicStone*.json` | Tiered stone power, probability mode, and bonded-vessel declarations; no Miniwyvern roles |
-| `Server/Tamework/CapturePolicies/HyDragonDragons.json` | Per-role capture resistance, minimum power, chance multiplier, missing-health bonus, and Ancient-tier guarantee |
-| `Server/Tamework/Companion/HyDragonDragons.json` | Role-scoped revive/placement/recall behavior |
+| `Server/Tamework/CapturePolicies/HyDragon{Hydra,NordicDrake,RockDrakeT1,RockDrakeT2,RockDrakeT3}.json` | Per-role capture resistance, minimum power, chance multiplier, missing-health bonus, and Ancient-tier guarantee |
+| `Server/Tamework/Companion/HyDragonFullDragons.json` | Role-scoped revive/placement/recall behavior |
 | `Server/Tamework/Items/Commands/HyDragonDragonCommand.json` | Commands if not exposed through vessel actions |
 | `Server/Tamework/PopulationGroups/HyDragonFullDragons.json` | `hydragon:full_dragons` membership and active cap |
 | `Server/HyDragon/DragonSpecies/*.json` | Resistance, minimum tier, encounter eligibility |

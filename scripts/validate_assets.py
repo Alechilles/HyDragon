@@ -162,7 +162,7 @@ def validate_interaction_message_localization(parsed: dict[Path, object], errors
     def visit(value: object, path: Path) -> None:
         if isinstance(value, dict):
             for key, child in value.items():
-                if key == "Message" and isinstance(child, str):
+                if key in {"Message", "PromptHint"} and isinstance(child, str):
                     if not child.startswith("server."):
                         fail(errors, f"raw player-facing interaction message: {path.relative_to(ROOT)}: {child}")
                     elif child.removeprefix("server.") not in english:

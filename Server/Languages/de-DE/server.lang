@@ -132,3 +132,4 @@ messages.mode.aggressive=Aggressiv
 messages.mode.wandering=Streift umher
 items.HyDragon_Command_Whistle.name=Drakonische Kommandopfeife
 items.HyDragon_Command_Whistle.description=Verknüpft deine gebundenen Gefährten und erteilt Befehle zum Folgen, Warten, Zurückrufen, Heimkehren, Bewegen, Ruhen und Angreifen.
+interactionHints.pet=Streicheln

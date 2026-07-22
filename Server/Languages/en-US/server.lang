@@ -132,3 +132,4 @@ messages.mode.aggressive=Aggressive
 messages.mode.wandering=Wandering
 items.HyDragon_Command_Whistle.name=Draconic Command Whistle
 items.HyDragon_Command_Whistle.description=Links your bonded companions and issues follow, hold, recall, home, movement, idle, and attack commands.
+interactionHints.pet=Pet

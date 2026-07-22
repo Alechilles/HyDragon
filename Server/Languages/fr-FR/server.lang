@@ -132,3 +132,4 @@ messages.mode.aggressive=Agressif
 messages.mode.wandering=Vagabonde
 items.HyDragon_Command_Whistle.name=Sifflet de commandement draconique
 items.HyDragon_Command_Whistle.description=Lie vos compagnons liés et donne des ordres de suivi, attente, rappel, foyer, déplacement, repos et attaque.
+interactionHints.pet=Caresser

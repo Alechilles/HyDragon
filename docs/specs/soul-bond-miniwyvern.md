@@ -246,7 +246,7 @@ The implemented configuration establishes the following clean first-release stat
 | `Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/` | Tamed role; wild role retained only if required internally for provisioning |
 | `Server/Models/HyDragon/Wyvern_Mini/` | Neutral and archetype appearances |
 | `Common/NPC/HyDragon/Wyvern_Mini/` | Model, textures, animations |
-| `Server/Projectiles/HyDragon/Wyvern_Mini/` | Fire/Ice/Void/etc. projectile assets |
+| Existing Nordic Drake/Hydra projectiles plus Miniwyvern status effects | Archetype attacks reuse validated projectile assets; buffs, healing, and presentation use dedicated status/particle/sound assets |
 | Status, particle, sound, and localization assets | Archetype presentation and mechanics |
 
 Implemented Tamework asset paths are authoritative; the linked Tamework specifications define their reusable semantics.
