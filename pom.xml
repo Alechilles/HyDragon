@@ -165,9 +165,14 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <argLine>@{argLine} -Djava.util.logging.manager=com.hypixel.hytale.logger.backend.HytaleLogManager</argLine>
                     <useModulePath>false</useModulePath>
                     <systemPropertyVariables>
                         <hydragon.packaged.jar>${project.build.directory}/${project.build.finalName}.jar</hydragon.packaged.jar>
+                        <hydragon.tamework.jar>${tamework.jar.path}</hydragon.tamework.jar>
+                        <hydragon.plugin.version>${project.version}</hydragon.plugin.version>
+                        <hydragon.tamework.version>${tamework.version}</hydragon.tamework.version>
+                        <hydragon.project.basedir>${project.basedir}</hydragon.project.basedir>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
