@@ -77,37 +77,51 @@ class MiniwyvernLifecycleContinuityTest {
                 .archetypeId().orElseThrow());
 
         AtomicInteger firstRuntimeDispatches = new AtomicInteger();
+        AtomicInteger cleanupCalls = new AtomicInteger();
+        MemoryAbilityStates firstRuntimeStates = new MemoryAbilityStates();
+        firstRuntimeStates.save(PROFILE.toString(), trackedAbilityState());
         MiniwyvernAbilityRuntime firstRuntime = runtime(
-                api, restartedStore, firstRuntimeDispatches,
+                api, restartedStore, firstRuntimeStates, firstRuntimeDispatches, cleanupCalls,
                 Clock.fixed(Instant.ofEpochMilli(3_000L), ZoneOffset.UTC));
         firstRuntime.start();
+        assertEquals(TameworkGameplayAdapter.CALLER_NAMESPACE, MiniwyvernAbilityRuntime.CALLER_NAMESPACE);
 
         NpcProfileView loaded = authority.profileView();
         authority.currentNpcUuid = null;
         events.emit(new NpcProfileChangedEvent(
                 PROFILE.toString(), EnumSet.of(ProfileChangeType.CURRENT_NPC_UUID),
                 loaded, authority.profileView(), 3_100L));
-        assertEquals(0, firstRuntimeDispatches.get(), "unload must not fabricate another projection");
+        assertEquals(1, firstRuntimeDispatches.get(), "unload must reconcile the previous projection");
+        assertEquals(1, cleanupCalls.get(), "unload must remove tracked source-keyed effects");
+        assertTrue(firstRuntimeStates.states.get(PROFILE.toString()).appliedSourceKeys().isEmpty());
+
+        events.emit(new ProvisionedCompanionDeathRecordedEvent(
+                UUID.fromString("81000000-0000-0000-0000-000000000007"),
+                "hydragon",
+                "soul-bond:owner",
+                PROFILE.toString(), OWNER, TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE,
+                FIRST_NPC, 7L, 8L, false, 3_150L, 3_150L));
+        assertEquals(1, firstRuntimeDispatches.get(), "a foreign caller namespace must be ignored");
 
         events.emit(new ProvisionedCompanionDeathRecordedEvent(
                 UUID.fromString("81000000-0000-0000-0000-000000000005"),
-                MiniwyvernAbilityRuntime.CALLER_NAMESPACE,
+                TameworkGameplayAdapter.CALLER_NAMESPACE,
                 "soul-bond:owner",
                 PROFILE.toString(), OWNER, TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE,
                 FIRST_NPC, 8L, 9L, false, 3_200L, 3_200L));
-        assertEquals(1, firstRuntimeDispatches.get(), "death must clean the same profile's effects");
+        assertEquals(2, firstRuntimeDispatches.get(), "death must clean the same profile's effects");
         firstRuntime.close();
 
         HyDragonStateStore secondRestart = new HyDragonStateStore(statePath);
         authority.currentNpcUuid = REVIVED_NPC;
         AtomicInteger restartedDispatches = new AtomicInteger();
         MiniwyvernAbilityRuntime restartedRuntime = runtime(
-                api, secondRestart, restartedDispatches,
+                api, secondRestart, new MemoryAbilityStates(), restartedDispatches, new AtomicInteger(),
                 Clock.fixed(Instant.ofEpochMilli(4_000L), ZoneOffset.UTC));
         restartedRuntime.start();
         events.emit(new ProvisionedCompanionRevivedEvent(
                 UUID.fromString("81000000-0000-0000-0000-000000000006"),
-                MiniwyvernAbilityRuntime.CALLER_NAMESPACE,
+                TameworkGameplayAdapter.CALLER_NAMESPACE,
                 "soul-bond:owner",
                 PROFILE.toString(), OWNER, TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE,
                 REVIVED_NPC, PopulationCompanionLifecycle.ACTIVE,
@@ -136,9 +150,10 @@ class MiniwyvernLifecycleContinuityTest {
     private static MiniwyvernAbilityRuntime runtime(
             TameworkApi api,
             HyDragonStateStore store,
+            MemoryAbilityStates states,
             AtomicInteger dispatches,
+            AtomicInteger cleanupCalls,
             Clock clock) {
-        MemoryAbilityStates states = new MemoryAbilityStates();
         return new MiniwyvernAbilityRuntime(
                 api,
                 store,
@@ -150,13 +165,13 @@ class MiniwyvernLifecycleContinuityTest {
                         Set.of(), Set.of(), java.util.List.of()),
                 (owner, npc, callback) -> {
                     dispatches.incrementAndGet();
-                    callback.accept(world(owner, npc));
+                    callback.accept(world(owner, npc, cleanupCalls));
                 },
                 new MiniwyvernAbilityService(states),
                 clock);
     }
 
-    private static MiniwyvernAbilityWorld world(UUID owner, UUID npc) {
+    private static MiniwyvernAbilityWorld world(UUID owner, UUID npc, AtomicInteger cleanupCalls) {
         return (MiniwyvernAbilityWorld) Proxy.newProxyInstance(
                 MiniwyvernAbilityWorld.class.getClassLoader(),
                 new Class<?>[] {MiniwyvernAbilityWorld.class},
@@ -169,8 +184,27 @@ class MiniwyvernLifecycleContinuityTest {
                             npc, owner, "world", 0.0D, true));
                     case "nearbyTargets" -> java.util.List.of();
                     case "health" -> new MiniwyvernAbilityWorld.Health(42.0D, 100.0D);
+                    case "removeOwnerModifiers" -> {
+                        cleanupCalls.incrementAndGet();
+                        yield true;
+                    }
                     default -> method.getReturnType() == boolean.class;
                 });
+    }
+
+    private static MiniwyvernAbilityState trackedAbilityState() {
+        String source = "hydragon:mini:" + PROFILE + ":fire:passive";
+        return new MiniwyvernAbilityState(
+                MiniwyvernAbilityState.SCHEMA_VERSION,
+                "fire",
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Set.of(source),
+                Map.of(source, OWNER),
+                Map.of(source, 10_000L),
+                3_000L);
     }
 
     private static TameworkApi api(CanonicalTameworkAuthority authority, MemoryEvents events) {

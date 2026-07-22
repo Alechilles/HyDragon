@@ -154,8 +154,10 @@ public final class TameworkMiniwyvernAbilityStateRepository implements Miniwyver
                     decoded.cooldownUntilByAbility(),
                     decoded.iceBuildupByTarget(),
                     decoded.controlImmunityUntilByTarget(),
+                    decoded.iceTargetUpdatedAtByTarget(),
                     decoded.appliedSourceKeys(),
                     decoded.targetBySourceKey(),
+                    decoded.sourceExpiresAtBySourceKey(),
                     decoded.updatedAtEpochMillis());
         } catch (JsonParseException | IllegalArgumentException | NullPointerException failure) {
             return null;

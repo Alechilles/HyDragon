@@ -20,6 +20,7 @@ import java.util.UUID;
  */
 public final class MiniwyvernAbilityService {
     private static final String SOURCE_PREFIX = "hydragon:mini:";
+    private static final long ICE_TARGET_RETENTION_MS = 60_000L;
     private final MiniwyvernAbilityStateRepository states;
 
     public MiniwyvernAbilityService(MiniwyvernAbilityStateRepository states) {
@@ -70,6 +71,7 @@ public final class MiniwyvernAbilityService {
             state = MiniwyvernAbilityState.empty(archetypeId, nowMs);
         }
         MutableState mutable = new MutableState(state);
+        mutable.prune(nowMs);
         PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs);
         Set<String> diagnostics = new LinkedHashSet<>(passive.diagnostics());
         // Establish source ownership and every non-idempotent cooldown before mutating the world.
@@ -88,8 +90,10 @@ public final class MiniwyvernAbilityService {
             mutable.cooldowns.put(ability.getId(), cooldownUntil);
             for (AbilityExecution execution : executions) {
                 String source = executionSourceKey(context, config, ability, execution.targetUuid());
-                mutable.sources.add(source);
-                mutable.targetsBySource.put(source, execution.targetUuid());
+                mutable.trackSource(
+                        source,
+                        execution.targetUuid(),
+                        saturatingAdd(nowMs, secondsToMs(ability.getDurationSeconds())));
             }
             mutable.updatedAt = nowMs;
             MiniwyvernAbilityState beforeMutation = mutable.freeze(archetypeId);
@@ -193,13 +197,19 @@ public final class MiniwyvernAbilityService {
         if (passiveDisabled) {
             cleanupDisabledPassive = state.sources.remove(passiveSource);
             cleanupDisabledPassive |= state.targetsBySource.remove(passiveSource) != null;
+            state.sourceExpiresAt.remove(passiveSource);
             if (cleanupDisabledPassive) state.updatedAt = nowMs;
             supportedEffectModifiers.clear();
             supportedRawModifiers.clear();
         }
-        if (hasPassive) {
-            state.sources.add(passiveSource);
-            state.targetsBySource.put(passiveSource, context.ownerUuid());
+        if (hasPassive && !state.trackSource(
+                passiveSource,
+                context.ownerUuid(),
+                saturatingAdd(nowMs, secondsToMs(passiveRefreshSeconds(config))))) {
+            hasPassive = false;
+            diagnostics = List.of("passive-ability-disabled:source-tracking-capacity");
+            supportedEffectModifiers.clear();
+            supportedRawModifiers.clear();
         }
 
         double natureHeal = 0.0D;
@@ -287,6 +297,9 @@ public final class MiniwyvernAbilityService {
                         .toList()
                 : world.hostileTarget(ability.getRange()).stream().toList();
         Map<UUID, AbilityExecution> valid = new LinkedHashMap<>();
+        Set<UUID> trackedIceTargets = state.trackedIceTargets();
+        int availableSourceSlots = MiniwyvernAbilityState.MAX_TRACKED_SOURCE_KEYS - state.sources.size();
+        Set<String> prospectiveSources = new LinkedHashSet<>();
         for (MiniwyvernAbilityWorld.Target target : candidates) {
             if (!target.alive() || target.distance() > ability.getRange()
                     || !world.worldName().equals(target.worldName())
@@ -300,7 +313,17 @@ public final class MiniwyvernAbilityService {
                     && nowMs < state.immunityUntil.getOrDefault(target.entityUuid(), 0L)) {
                 continue;
             }
+            if (config.getId().equals("ice") && !trackedIceTargets.contains(target.entityUuid())
+                    && trackedIceTargets.size() >= MiniwyvernAbilityState.MAX_TRACKED_ICE_TARGETS) {
+                continue;
+            }
+            String source = executionSourceKey(context, config, ability, target.entityUuid());
+            if (!state.sources.contains(source) && prospectiveSources.add(source)
+                    && prospectiveSources.size() > availableSourceSlots) {
+                continue;
+            }
             valid.putIfAbsent(target.entityUuid(), new AbilityExecution(target.entityUuid(), world.health(target.entityUuid())));
+            if (config.getId().equals("ice")) trackedIceTargets.add(target.entityUuid());
         }
         return List.copyOf(valid.values());
     }
@@ -378,6 +401,7 @@ public final class MiniwyvernAbilityService {
         double threshold = Objects.requireNonNullElse(ability.getBuildupThreshold(), Double.POSITIVE_INFINITY);
         double cap = Objects.requireNonNullElse(ability.getBuildupCap(), threshold);
         double buildup = Math.min(cap, state.iceBuildup.getOrDefault(target, 0.0D) + perHit);
+        state.iceTargetUpdatedAt.put(target, nowMs);
         if (buildup < threshold) {
             state.iceBuildup.put(target, buildup);
             return false;
@@ -529,16 +553,20 @@ public final class MiniwyvernAbilityService {
         final Map<String, Long> cooldowns;
         final Map<UUID, Double> iceBuildup;
         final Map<UUID, Long> immunityUntil;
+        final Map<UUID, Long> iceTargetUpdatedAt;
         final Set<String> sources;
         final Map<String, UUID> targetsBySource;
+        final Map<String, Long> sourceExpiresAt;
         long updatedAt;
 
         MutableState(MiniwyvernAbilityState state) {
             cooldowns = new LinkedHashMap<>(state.cooldownUntilByAbility());
             iceBuildup = new LinkedHashMap<>(state.iceBuildupByTarget());
             immunityUntil = new LinkedHashMap<>(state.controlImmunityUntilByTarget());
+            iceTargetUpdatedAt = new LinkedHashMap<>(state.iceTargetUpdatedAtByTarget());
             sources = new LinkedHashSet<>(state.appliedSourceKeys());
             targetsBySource = new LinkedHashMap<>(state.targetBySourceKey());
+            sourceExpiresAt = new LinkedHashMap<>(state.sourceExpiresAtBySourceKey());
             updatedAt = state.updatedAtEpochMillis();
         }
 
@@ -546,6 +574,39 @@ public final class MiniwyvernAbilityService {
             cooldowns.entrySet().removeIf(entry -> entry.getValue() < nowMs - 86_400_000L);
             immunityUntil.entrySet().removeIf(entry -> entry.getValue() <= nowMs);
             iceBuildup.entrySet().removeIf(entry -> entry.getValue() <= 0.0D);
+            iceTargetUpdatedAt.entrySet().removeIf(entry -> {
+                UUID target = entry.getKey();
+                boolean untracked = !iceBuildup.containsKey(target) && !immunityUntil.containsKey(target);
+                boolean stale = entry.getValue() < nowMs - ICE_TARGET_RETENTION_MS
+                        && !immunityUntil.containsKey(target);
+                if (stale) iceBuildup.remove(target);
+                return untracked || stale;
+            });
+            sourceExpiresAt.entrySet().removeIf(entry -> {
+                if (entry.getValue() > nowMs) return false;
+                sources.remove(entry.getKey());
+                targetsBySource.remove(entry.getKey());
+                return true;
+            });
+            sources.retainAll(sourceExpiresAt.keySet());
+            targetsBySource.keySet().retainAll(sources);
+        }
+
+        Set<UUID> trackedIceTargets() {
+            Set<UUID> tracked = new LinkedHashSet<>(iceBuildup.keySet());
+            tracked.addAll(immunityUntil.keySet());
+            return tracked;
+        }
+
+        boolean trackSource(String source, UUID target, long expiresAtMs) {
+            if (!sources.contains(source)
+                    && sources.size() >= MiniwyvernAbilityState.MAX_TRACKED_SOURCE_KEYS) {
+                return false;
+            }
+            sources.add(source);
+            targetsBySource.put(source, target);
+            sourceExpiresAt.put(source, expiresAtMs);
+            return true;
         }
 
         MiniwyvernAbilityState freeze(String archetypeId) {
@@ -555,8 +616,10 @@ public final class MiniwyvernAbilityService {
                     cooldowns,
                     iceBuildup,
                     immunityUntil,
+                    iceTargetUpdatedAt,
                     sources,
                     targetsBySource,
+                    sourceExpiresAt,
                     updatedAt);
         }
     }

@@ -10,6 +10,7 @@ import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.persistence.ProfileExtensionRecord;
 import com.alechilles.hydragon.persistence.ProfileKind;
+import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 
 /** Tamework-event-aware runtime facade around {@link MiniwyvernAbilityService}. */
 public final class MiniwyvernAbilityRuntime implements AutoCloseable {
-    public static final String CALLER_NAMESPACE = "hydragon";
+    public static final String CALLER_NAMESPACE = TameworkGameplayAdapter.CALLER_NAMESPACE;
     private static final Logger LOGGER = Logger.getLogger(MiniwyvernAbilityRuntime.class.getName());
 
     private final TameworkApi api;
@@ -138,7 +139,17 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
 
     private void onProfileChanged(NpcProfileChangedEvent event) {
         if (event == null) return;
-        tickProfile(event.profileId(), Math.max(0L, event.emittedAtMs()));
+        long emittedAtMs = Math.max(0L, event.emittedAtMs());
+        NpcProfileView before = event.before();
+        NpcProfileView after = event.after();
+        if (hasProjection(before) && projectionChanged(before, after)) {
+            deactivate(
+                    event.profileId(),
+                    before.ownerUuid(),
+                    before.currentNpcUuid(),
+                    emittedAtMs);
+        }
+        if (hasProjection(after)) tickProfile(event.profileId(), emittedAtMs);
     }
 
     private void onProvisionedDeath(ProvisionedCompanionDeathRecordedEvent event) {
@@ -167,6 +178,16 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         } catch (RuntimeException failure) {
             return Optional.empty();
         }
+    }
+
+    private static boolean hasProjection(NpcProfileView profile) {
+        return profile != null && profile.ownerUuid() != null && profile.currentNpcUuid() != null;
+    }
+
+    private static boolean projectionChanged(NpcProfileView before, NpcProfileView after) {
+        return !hasProjection(after)
+                || !before.ownerUuid().equals(after.ownerUuid())
+                || !before.currentNpcUuid().equals(after.currentNpcUuid());
     }
 
     @Override

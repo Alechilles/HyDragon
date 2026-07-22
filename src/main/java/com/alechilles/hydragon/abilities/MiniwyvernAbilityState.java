@@ -12,10 +12,14 @@ public record MiniwyvernAbilityState(
         Map<String, Long> cooldownUntilByAbility,
         Map<UUID, Double> iceBuildupByTarget,
         Map<UUID, Long> controlImmunityUntilByTarget,
+        Map<UUID, Long> iceTargetUpdatedAtByTarget,
         Set<String> appliedSourceKeys,
         Map<String, UUID> targetBySourceKey,
+        Map<String, Long> sourceExpiresAtBySourceKey,
         long updatedAtEpochMillis) {
-    public static final int SCHEMA_VERSION = 1;
+    public static final int SCHEMA_VERSION = 2;
+    public static final int MAX_TRACKED_ICE_TARGETS = 128;
+    public static final int MAX_TRACKED_SOURCE_KEYS = 256;
 
     public MiniwyvernAbilityState {
         if (schemaVersion != SCHEMA_VERSION) {
@@ -25,10 +29,20 @@ public record MiniwyvernAbilityState(
         cooldownUntilByAbility = copyLongMap(cooldownUntilByAbility, "cooldownUntilByAbility");
         iceBuildupByTarget = copyDoubleMap(iceBuildupByTarget, "iceBuildupByTarget");
         controlImmunityUntilByTarget = copyLongMap(controlImmunityUntilByTarget, "controlImmunityUntilByTarget");
+        iceTargetUpdatedAtByTarget = copyLongMap(iceTargetUpdatedAtByTarget, "iceTargetUpdatedAtByTarget");
+        Set<UUID> trackedIceTargets = new java.util.LinkedHashSet<>(iceBuildupByTarget.keySet());
+        trackedIceTargets.addAll(controlImmunityUntilByTarget.keySet());
+        if (trackedIceTargets.size() > MAX_TRACKED_ICE_TARGETS
+                || !iceTargetUpdatedAtByTarget.keySet().equals(trackedIceTargets)) {
+            throw new IllegalArgumentException("Ice target tracking is incomplete or exceeds its bound");
+        }
         Set<String> normalizedAppliedSourceKeys = Set.copyOf(
                 Objects.requireNonNull(appliedSourceKeys, "appliedSourceKeys"));
         if (normalizedAppliedSourceKeys.stream().anyMatch(value -> value == null || value.isBlank())) {
             throw new IllegalArgumentException("appliedSourceKeys cannot contain blank values");
+        }
+        if (normalizedAppliedSourceKeys.size() > MAX_TRACKED_SOURCE_KEYS) {
+            throw new IllegalArgumentException("appliedSourceKeys exceeds its bound");
         }
         appliedSourceKeys = normalizedAppliedSourceKeys;
         targetBySourceKey = Map.copyOf(Objects.requireNonNull(targetBySourceKey, "targetBySourceKey"));
@@ -37,6 +51,10 @@ public record MiniwyvernAbilityState(
                 || !normalizedAppliedSourceKeys.contains(entry.getKey()))) {
             throw new IllegalArgumentException("targetBySourceKey contains an invalid or untracked source");
         }
+        sourceExpiresAtBySourceKey = copyLongMap(sourceExpiresAtBySourceKey, "sourceExpiresAtBySourceKey");
+        if (!sourceExpiresAtBySourceKey.keySet().equals(normalizedAppliedSourceKeys)) {
+            throw new IllegalArgumentException("sourceExpiresAtBySourceKey must cover every tracked source");
+        }
         if (updatedAtEpochMillis < 0L) {
             throw new IllegalArgumentException("updatedAtEpochMillis must not be negative");
         }
@@ -44,7 +62,8 @@ public record MiniwyvernAbilityState(
 
     public static MiniwyvernAbilityState empty(String archetypeId, long nowMs) {
         return new MiniwyvernAbilityState(
-                SCHEMA_VERSION, archetypeId, Map.of(), Map.of(), Map.of(), Set.of(), Map.of(), nowMs);
+                SCHEMA_VERSION, archetypeId, Map.of(), Map.of(), Map.of(), Map.of(),
+                Set.of(), Map.of(), Map.of(), nowMs);
     }
 
     private static <K> Map<K, Long> copyLongMap(Map<K, Long> values, String field) {

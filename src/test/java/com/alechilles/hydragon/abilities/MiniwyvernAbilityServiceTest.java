@@ -261,6 +261,37 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
+    void iceAreaTrackingPrunesExpiredSourcesAndStaleTargets() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+        MiniwyvernArchetypeConfig config = iceConfig(1);
+
+        for (int index = 0; index < 140; index++) {
+            UUID target = UUID.nameUUIDFromBytes(("ice-target-" + index)
+                    .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            world.areaTargets = List.of(
+                    new MiniwyvernAbilityWorld.Target(target, null, "world", 3.0D, true));
+            assertEquals(1, service.tick(
+                    context("ice"), Map.of("ice", config), world, 1_000L + index * 6_001L)
+                    .abilitiesExecuted());
+            assertTrue(states.current.iceBuildupByTarget().size()
+                    <= MiniwyvernAbilityState.MAX_TRACKED_ICE_TARGETS);
+            assertTrue(states.current.appliedSourceKeys().size()
+                    <= MiniwyvernAbilityState.MAX_TRACKED_SOURCE_KEYS);
+        }
+
+        assertTrue(states.current.iceBuildupByTarget().size() <= 11,
+                "one-hit buildup older than the retention window must be pruned");
+        assertEquals(1, states.current.appliedSourceKeys().size(),
+                "expired per-target source keys must not accumulate across area casts");
+        assertEquals(states.current.appliedSourceKeys(),
+                states.current.sourceExpiresAtBySourceKey().keySet());
+        assertEquals(states.current.iceBuildupByTarget().keySet(),
+                states.current.iceTargetUpdatedAtByTarget().keySet());
+    }
+
+    @Test
     void unsupportedEffectStackingFailsOnlyTheEffectChannel() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
