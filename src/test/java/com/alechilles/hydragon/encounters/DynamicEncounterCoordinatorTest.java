@@ -485,13 +485,13 @@ class DynamicEncounterCoordinatorTest {
             default -> null;
         });
         PolicyApi policies = proxy(PolicyApi.class, (method, arguments) -> switch (method) {
-            case "populationGroups" -> groups;
             case "isOwner" -> true;
             default -> null;
         });
         return proxy(TameworkApi.class, (method, arguments) -> switch (method) {
             case "profiles" -> profiles;
             case "policies" -> policies;
+            case "populationGroups" -> groups;
             case "getApiVersion" -> "0.9";
             default -> null;
         });

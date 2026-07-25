@@ -49,7 +49,7 @@ public final class EncounterEligibilityService {
 
         String groupId = definition.getPlayerEligibility().getActiveCompanionGroup();
         try {
-            PopulationGroupCountsView counts = api.policies().populationGroups()
+            PopulationGroupCountsView counts = api.populationGroups()
                     .getCounts(candidate.playerUuid(), groupId, candidate.worldName()).orElse(null);
             if (counts == null || counts.committedActive() < 1L || counts.pendingActive() > 0L) {
                 return Decision.deny("active-companion-group-unavailable");
