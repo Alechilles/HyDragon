@@ -2,6 +2,8 @@ package com.alechilles.hydragon.encounters;
 
 import com.alechilles.alecstamework.api.CaptureAttemptOutcome;
 import com.alechilles.alecstamework.api.CaptureAttemptResolvedEvent;
+import com.alechilles.alecstamework.api.CaptureSourceConsumption;
+import com.alechilles.alecstamework.api.CaptureSuccessDisposition;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
@@ -13,11 +15,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
 /** Projects a committed Tamework full-dragon capture into HyDragon's namespaced metadata. */
 public final class FullDragonProfileProjection {
+    private static final Set<String> DRACONIC_STONE_CONFIG_IDS = Set.of(
+            "HyDragonDraconicStone",
+            "HyDragonDraconicStoneThorium",
+            "HyDragonDraconicStoneCobalt",
+            "HyDragonDraconicStoneAdamantium",
+            "HyDragonDraconicStoneAncient");
+
     private final HyDragonStateStore stateStore;
     private final Supplier<HyDragonConfigRepository.Snapshot> configs;
 
@@ -31,7 +41,24 @@ public final class FullDragonProfileProjection {
     /** Safe for at-least-once event delivery; ambiguous or malformed capture evidence fails closed. */
     public Result project(CaptureAttemptResolvedEvent event) {
         if (event == null || event.outcome() != CaptureAttemptOutcome.CAPTURED) return Result.IGNORED;
+        if (!isSupportedCaptureEvidence(event)) return Result.INVALID;
         return project(event.operationId(), event.profileId(), event.roleId());
+    }
+
+    /**
+     * Verifies the immutable capture contract before HyDragon persists retry evidence.
+     * Package-visible so the durable queue cannot admit a record that bypasses this check.
+     */
+    static boolean isSupportedCaptureEvidence(CaptureAttemptResolvedEvent event) {
+        if (event == null || event.outcome() != CaptureAttemptOutcome.CAPTURED
+                || !DRACONIC_STONE_CONFIG_IDS.contains(event.spawnerConfigId())
+                || event.replayEvidence() == null) {
+            return false;
+        }
+        return event.replayEvidence().formula().sourceConsumption()
+                == CaptureSourceConsumption.RESOLVED_ATTEMPT
+                && event.replayEvidence().formula().successDisposition()
+                == CaptureSuccessDisposition.TAME_AND_COMMAND_LINK;
     }
 
     /** Replays the minimal durable capture evidence retained by HyDragon. */

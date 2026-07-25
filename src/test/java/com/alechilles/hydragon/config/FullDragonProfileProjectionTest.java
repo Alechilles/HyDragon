@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.alechilles.alecstamework.api.CaptureAttemptOutcome;
 import com.alechilles.alecstamework.api.CaptureAttemptResolvedEvent;
+import com.alechilles.alecstamework.api.CaptureSourceConsumption;
+import com.alechilles.alecstamework.api.CaptureSuccessDisposition;
 import com.alechilles.hydragon.encounters.FullDragonProfileProjection;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.persistence.ProfileKind;
@@ -50,6 +52,41 @@ final class FullDragonProfileProjectionTest {
         assertEquals(0, store.snapshot().profileExtensions().size());
     }
 
+    @Test
+    void capturedProfileRequiresExactHyDragonTameAndLinkEvidence() throws Exception {
+        HyDragonStateStore store = new HyDragonStateStore(
+                temporaryDirectory.resolve("capture-evidence.properties"));
+        FullDragonProfileProjection projection = new FullDragonProfileProjection(
+                store, () -> snapshot(species("hydragon:nordic_drake", "NordicDrake")));
+        String profileId = UUID.randomUUID().toString();
+
+        assertEquals(FullDragonProfileProjection.Result.INVALID, projection.project(
+                CaptureEventFixtures.capture(
+                        profileId,
+                        "NordicDrake",
+                        CaptureAttemptOutcome.CAPTURED,
+                        "AnotherModsCaptureConfig",
+                        CaptureSourceConsumption.RESOLVED_ATTEMPT,
+                        CaptureSuccessDisposition.TAME_AND_COMMAND_LINK)));
+        assertEquals(FullDragonProfileProjection.Result.INVALID, projection.project(
+                CaptureEventFixtures.capture(
+                        profileId,
+                        "NordicDrake",
+                        CaptureAttemptOutcome.CAPTURED,
+                        "HyDragonDraconicStone",
+                        CaptureSourceConsumption.SUCCESS_ONLY,
+                        CaptureSuccessDisposition.TAME_AND_COMMAND_LINK)));
+        assertEquals(FullDragonProfileProjection.Result.INVALID, projection.project(
+                CaptureEventFixtures.capture(
+                        profileId,
+                        "NordicDrake",
+                        CaptureAttemptOutcome.CAPTURED,
+                        "HyDragonDraconicStone",
+                        CaptureSourceConsumption.RESOLVED_ATTEMPT,
+                        CaptureSuccessDisposition.CAPTURED_ITEM)));
+        assertEquals(0, store.snapshot().profileExtensions().size());
+    }
+
     private static HyDragonConfigRepository.Snapshot snapshot(DragonSpeciesConfig... species) {
         return new HyDragonConfigRepository.Snapshot(
                 java.util.Arrays.stream(species).collect(java.util.stream.Collectors.toMap(
@@ -72,13 +109,6 @@ final class FullDragonProfileProjectionTest {
 
     private static CaptureAttemptResolvedEvent event(
             String profileId, String roleId, CaptureAttemptOutcome outcome) {
-        long now = System.currentTimeMillis();
-        return new CaptureAttemptResolvedEvent(
-                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), profileId,
-                roleId, "Draconic_Stone", "HyDragonDraconicStone", 1L,
-                "HyDragonPolicy", 1L, 5, 1, 10.0, 100.0, 0.9,
-                0.0, outcome == CaptureAttemptOutcome.CAPTURED ? 1.0 : 0.5,
-                outcome == CaptureAttemptOutcome.CAPTURED, outcome,
-                outcome == CaptureAttemptOutcome.CAPTURED ? "captured" : "failed-roll", now, now);
+        return CaptureEventFixtures.capture(profileId, roleId, outcome);
     }
 }

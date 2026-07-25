@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.alechilles.alecstamework.api.CaptureAttemptOutcome;
 import com.alechilles.alecstamework.api.CaptureAttemptResolvedEvent;
+import com.alechilles.alecstamework.api.CaptureSourceConsumption;
+import com.alechilles.alecstamework.api.CaptureSuccessDisposition;
 import com.alechilles.hydragon.encounters.DurableProfileProjectionQueue;
 import com.alechilles.hydragon.encounters.FullDragonProfileProjection;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
@@ -49,6 +51,25 @@ final class DurableProfileProjectionQueueTest {
         assertEquals(2, restartedAgainStore.snapshot().profileExtensions().size());
     }
 
+    @Test
+    void unsupportedCaptureEvidenceNeverEntersTheDurableRetryQueue() throws Exception {
+        HyDragonStateStore store = new HyDragonStateStore(
+                temporaryDirectory.resolve("unsupported.properties"));
+        HyDragonConfigRepository.Snapshot unavailable = new HyDragonConfigRepository.Snapshot(
+                Map.of(), Map.of(), Map.of(), List.of("assets-not-ready"));
+        DurableProfileProjectionQueue queue = queue(store, unavailable);
+        CaptureAttemptResolvedEvent unsupported = CaptureEventFixtures.capture(
+                UUID.randomUUID().toString(),
+                "NordicDrake",
+                CaptureAttemptOutcome.CAPTURED,
+                "AnotherModsCaptureConfig",
+                CaptureSourceConsumption.RESOLVED_ATTEMPT,
+                CaptureSuccessDisposition.TAME_AND_COMMAND_LINK);
+
+        assertEquals(FullDragonProfileProjection.Result.INVALID, queue.accept(unsupported));
+        assertEquals(0, queue.pendingCount());
+    }
+
     private static DurableProfileProjectionQueue queue(
             HyDragonStateStore store,
             HyDragonConfigRepository.Snapshot snapshot) {
@@ -73,11 +94,7 @@ final class DurableProfileProjectionQueueTest {
     }
 
     private static CaptureAttemptResolvedEvent event(UUID profileId, String roleId) {
-        long now = System.currentTimeMillis();
-        return new CaptureAttemptResolvedEvent(
-                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), profileId.toString(),
-                roleId, "Draconic_Stone", "HyDragonDraconicStone", 1L,
-                "HyDragonPolicy", 1L, 5, 1, 10.0, 100.0, 0.9,
-                0.0, 1.0, true, CaptureAttemptOutcome.CAPTURED, "captured", now, now);
+        return CaptureEventFixtures.capture(
+                profileId.toString(), roleId, CaptureAttemptOutcome.CAPTURED);
     }
 }

@@ -33,6 +33,9 @@ public final class DurableProfileProjectionQueue {
         if (event == null || event.outcome() != CaptureAttemptOutcome.CAPTURED) {
             return projection.project(event);
         }
+        if (!FullDragonProfileProjection.isSupportedCaptureEvidence(event)) {
+            return FullDragonProfileProjection.Result.INVALID;
+        }
 
         PendingProfileProjectionRecord record;
         try {
