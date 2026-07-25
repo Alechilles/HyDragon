@@ -149,6 +149,29 @@ class SoulBondServiceTest {
                 journal(store, 50L).find(egg.operationId()).orElseThrow().phase());
     }
 
+    @Test
+    void mismatchedRosterAuthorityEvidenceQuarantinesTheConsumedClaim() throws Exception {
+        for (EvidenceMismatch mismatch : EvidenceMismatch.values()) {
+            if (mismatch == EvidenceMismatch.NONE) continue;
+            UUID owner = UUID.randomUUID();
+            List<String> order = new ArrayList<>();
+            LinkAuthority authority = new LinkAuthority(owner, UUID.randomUUID(), order);
+            authority.evidenceMismatch = mismatch;
+            HyDragonStateStore store = new HyDragonStateStore(
+                    temp.resolve("mismatch-" + mismatch.name().toLowerCase() + ".properties"));
+            FakeReservation egg = new FakeReservation(
+                    "hydragon:soul-bond:" + UUID.randomUUID(), order);
+
+            GameplayResult result = service(store, authority, 60L)
+                    .claim(owner, "default", egg).toCompletableFuture().join();
+
+            assertEquals(GameplayResult.Status.QUARANTINED, result.status(), mismatch.name());
+            assertEquals(OperationJournal.Phase.QUARANTINED,
+                    journal(store, 60L).find(egg.operationId()).orElseThrow().phase(),
+                    mismatch.name());
+        }
+    }
+
     private static SoulBondService service(
             HyDragonStateStore store,
             CompanionProvisioningApi provisioning,
@@ -202,6 +225,7 @@ class SoulBondServiceTest {
         private int unavailableCalls;
         private boolean deny;
         private boolean initialProjectionSuccessful = true;
+        private EvidenceMismatch evidenceMismatch = EvidenceMismatch.NONE;
         private CompanionProvisioningLinkRequest lastRequest;
 
         private LinkAuthority(UUID owner, UUID profile, List<String> order) {
@@ -267,15 +291,35 @@ class SoulBondServiceTest {
                         null,
                         null));
             }
+            UUID memberOwner = evidenceMismatch == EvidenceMismatch.MEMBERSHIP_OWNER
+                    ? UUID.randomUUID() : owner;
+            String memberFamily = evidenceMismatch == EvidenceMismatch.MEMBERSHIP_FAMILY
+                    ? "other:family" : request.commandFamilyId();
+            String memberProfile = evidenceMismatch == EvidenceMismatch.MEMBERSHIP_PROFILE
+                    ? UUID.randomUUID().toString() : profile.toString();
+            String memberRole = evidenceMismatch == EvidenceMismatch.MEMBERSHIP_ROLE
+                    ? "Tamed_Other" : request.provisioning().roleId();
+            String memberGroup = evidenceMismatch == EvidenceMismatch.MEMBERSHIP_GROUP
+                    ? "other:group" : request.groupId();
+            CommandFamilyRosterMemberState expectedState = initialProjectionSuccessful
+                    ? CommandFamilyRosterMemberState.ACTIVE
+                    : CommandFamilyRosterMemberState.ROSTER_STORED;
+            CommandFamilyRosterMemberState memberState =
+                    evidenceMismatch == EvidenceMismatch.MEMBERSHIP_STATE
+                            ? (expectedState == CommandFamilyRosterMemberState.ACTIVE
+                            ? CommandFamilyRosterMemberState.ROSTER_STORED
+                            : CommandFamilyRosterMemberState.ACTIVE)
+                            : expectedState;
             CommandFamilyRosterMembershipView membership = new CommandFamilyRosterMembershipView(
-                    owner,
-                    request.commandFamilyId(),
-                    profile.toString(),
-                    request.provisioning().roleId(),
+                    memberOwner,
+                    memberFamily,
+                    memberProfile,
+                    memberRole,
                     0L,
-                    CommandFamilyRosterMemberState.ROSTER_STORED,
-                    request.groupId(),
-                    request.activeForBulkCommands(),
+                    memberState,
+                    memberGroup,
+                    evidenceMismatch != EvidenceMismatch.MEMBERSHIP_BULK
+                            && request.activeForBulkCommands(),
                     null,
                     1L);
             if (request.requestInitialProjection()) order.add("timed-summon");
@@ -283,16 +327,49 @@ class SoulBondServiceTest {
                     initialProjectionSuccessful ? CommandTimedSummoningResult.Status.SUCCESS
                             : CommandTimedSummoningResult.Status.UNAVAILABLE,
                     initialProjectionSuccessful ? "summoned" : "unavailable",
-                    null);
+                    initialProjectionSuccessful
+                            ? new CommandTimedSummoningView(
+                            owner,
+                            request.commandFamilyId(),
+                            profile.toString(),
+                            1L,
+                            CommandTimedSummoningState.ACTIVE,
+                            "initial-session",
+                            60_000L,
+                            false,
+                            0L,
+                            1L)
+                            : null);
             return CompletableFuture.completedFuture(new CompanionProvisioningLinkResult(
                     CompanionProvisioningLinkResult.Status.COMMITTED,
                     "committed",
                     provisioning,
                     new CommandFamilyRosterView(
-                            owner, request.commandFamilyId(), 1L, List.of(membership), 1L),
+                            evidenceMismatch == EvidenceMismatch.ROSTER_OWNER
+                                    ? UUID.randomUUID() : owner,
+                            evidenceMismatch == EvidenceMismatch.ROSTER_FAMILY
+                                    ? "other:family" : request.commandFamilyId(),
+                            1L,
+                            evidenceMismatch == EvidenceMismatch.MEMBERSHIP_NOT_IN_ROSTER
+                                    ? List.of() : List.of(membership),
+                            1L),
                     membership,
                     initialProjection));
         }
+    }
+
+    private enum EvidenceMismatch {
+        NONE,
+        ROSTER_OWNER,
+        ROSTER_FAMILY,
+        MEMBERSHIP_OWNER,
+        MEMBERSHIP_FAMILY,
+        MEMBERSHIP_PROFILE,
+        MEMBERSHIP_ROLE,
+        MEMBERSHIP_GROUP,
+        MEMBERSHIP_STATE,
+        MEMBERSHIP_BULK,
+        MEMBERSHIP_NOT_IN_ROSTER
     }
 
     private static final class FakeReservation implements ConsumableReservation {

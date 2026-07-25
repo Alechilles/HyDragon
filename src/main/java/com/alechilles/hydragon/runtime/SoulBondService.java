@@ -1,7 +1,10 @@
 package com.alechilles.hydragon.runtime;
 
-import com.alechilles.alecstamework.api.CompanionProvisioningLinkResult;
+import com.alechilles.alecstamework.api.CommandFamilyRosterMemberState;
+import com.alechilles.alecstamework.api.CommandFamilyRosterMembershipView;
+import com.alechilles.alecstamework.api.CommandFamilyRosterView;
 import com.alechilles.alecstamework.api.CommandTimedSummoningResult;
+import com.alechilles.alecstamework.api.CompanionProvisioningLinkResult;
 import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -325,20 +328,54 @@ public final class SoulBondService {
                 || !entry.operationId().equals(result.provisioning().idempotencyKey())
                 || !entry.descriptor().ownerUuid().equals(result.provisioning().ownerUuid())
                 || !TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE.equals(
-                result.provisioning().roleId())
-                || result.roster() == null
-                || result.membership() == null) {
+                result.provisioning().roleId())) {
             return null;
         }
         UUID profileId = parseUuid(result.provisioning().profileId());
         if (profileId == null
                 || result.provisioning().operationId() == null
-                || result.provisioning().profileRevision() < 0) {
+                || result.provisioning().profileRevision() < 0
+                || !matchesRosterEvidence(result, entry.descriptor().ownerUuid(), profileId)) {
             return null;
         }
         return new AuthorityEvidence(
                 result.provisioning().operationId(), profileId,
                 result.provisioning().profileRevision());
+    }
+
+    private static boolean matchesRosterEvidence(
+            CompanionProvisioningLinkResult result,
+            UUID ownerUuid,
+            UUID profileId) {
+        CommandFamilyRosterView roster = result.roster();
+        CommandFamilyRosterMembershipView member = result.membership();
+        if (roster == null || member == null
+                || !ownerUuid.equals(roster.ownerUuid())
+                || !TameworkGameplayAdapter.DRAGON_HORN_COMMAND_FAMILY.equals(roster.commandFamilyId())
+                || !ownerUuid.equals(member.ownerUuid())
+                || !TameworkGameplayAdapter.DRAGON_HORN_COMMAND_FAMILY.equals(member.commandFamilyId())
+                || !profileId.toString().equals(member.profileId())
+                || !TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE.equals(member.roleId())
+                || !TameworkGameplayAdapter.MINIWYVERN_POPULATION_GROUP.equals(member.groupId())
+                || !member.activeForBulkCommands()
+                || member.state() != expectedMemberState(result.initialProjection())) {
+            return false;
+        }
+        return roster.memberships().contains(member);
+    }
+
+    private static CommandFamilyRosterMemberState expectedMemberState(
+            CommandTimedSummoningResult initialProjection) {
+        if (initialProjection == null || !initialProjection.successful()
+                || initialProjection.session() == null) {
+            return CommandFamilyRosterMemberState.ROSTER_STORED;
+        }
+        try {
+            return CommandFamilyRosterMemberState.valueOf(
+                    initialProjection.session().state().name());
+        } catch (IllegalArgumentException unsupportedState) {
+            return null;
+        }
     }
 
     private static String intent(PopulationAdmissionLocation destination) {
