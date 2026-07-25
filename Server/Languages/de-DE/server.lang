@@ -82,7 +82,6 @@ effects.miniwyvernNatureRegeneration.name=Grüne Erneuerung
 effects.miniwyvernVoidExposure.name=Leerenentblößung
 
 messages.capture.miniwyvernDenied=Miniwyvern können nur durch eine Drakonische Seelenbindung erschaffen werden.
-messages.capture.healthTooHigh=Der Drache muss weiter geschwächt werden.
 messages.capture.tranquilizerRequired=Der Drache muss zuerst betäubt werden.
 messages.capture.stoneTierTooLow=Dieser Drachenstein ist nicht mächtig genug.
 messages.capture.failed=Der Drache hat sich dem Fang widersetzt. Der Drachenstein wurde verbraucht.

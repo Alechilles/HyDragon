@@ -9,7 +9,6 @@
   "Capture": {
     "Resistance": 0.10,
     "MinimumStoneTier": 2,
-    "MaxHealthPercentOverride": 20.0,
     "SpecialRequirementIds": []
   },
   "Spawn": {

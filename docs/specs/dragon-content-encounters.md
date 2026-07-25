@@ -166,7 +166,6 @@ Mount:
 Capture:
   resistance
   minimumStoneTier
-  maxHealthPercentOverride nullable
   specialRequirementIds[]
 Spawn:
   ordinarySpawnAssetIds[]
@@ -242,7 +241,10 @@ stateDiagram-v2
     COOLDOWN --> DORMANT: cooldown expires
 ```
 
-Capture attempts during `AERIAL` or `GROUNDING` fail the named special eligibility requirement before a random roll. On `GROUNDED_CAPTURE_WINDOW`, ordinary health/tranquilizer/tier requirements still apply; grounding does not guarantee capture.
+Capture attempts during `AERIAL` or `GROUNDING` fail the named special
+eligibility requirement before a random roll. On `GROUNDED_CAPTURE_WINDOW`,
+ordinary tranquilizer and tier requirements still apply; grounding does not
+guarantee capture.
 
 ### High-altitude encounter eligibility
 
@@ -287,7 +289,8 @@ Hydra's ground-mount declaration and tamed-role interaction are aligned in the i
 - Ground mounts do not require the Flightmaster's Talisman; every avatar-flight mount does, and no external flight-mod item is queried.
 - `WorldNPCSpawn`/`BeaconNPCSpawn` tests cover environment/weight/time/moon/light/altitude/proximity fields without plugin duplication.
 - Dynamic tests cover weather false/true, no flying dragon, wrong mount type, missing talisman, concurrency limit, unsafe placement, restart in every phase, and config reload mid-encounter.
-- The aerial target cannot be captured before the grounded phase; grounding retains health/tranquilizer/minimum-tier requirements.
+- The aerial target cannot be captured before the grounded phase; grounding
+  retains tranquilizer and minimum-tier requirements.
 - Capture at the cleanup boundary produces one captured profile and no subsequent encounter despawn or replacement.
 
 ## 13. Implemented sequence

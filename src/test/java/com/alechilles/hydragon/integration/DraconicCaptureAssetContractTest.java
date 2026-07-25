@@ -80,7 +80,7 @@ class DraconicCaptureAssetContractTest {
     void captureExcludesMiniwyvernsAndRequiresTranquilization() throws Exception {
         String config = read("Server/Tamework/Items/Spawners/HyDragonDraconicStone.json");
         assertTrue(config.contains("\"RequiredEffectId\": \"Tw_Status_Tranquilized\""));
-        assertTrue(config.contains("\"MaxHealthPercent\": 20.0"));
+        assertFalse(config.contains("\"MaxHealthPercent\""));
         assertFalse(config.contains("Wyvern_Mini"));
         assertFalse(config.contains("Tamed_Wyvern_Mini"));
     }

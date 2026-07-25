@@ -46,10 +46,6 @@ public final class DragonSpeciesConfig
                     (settings, value) -> settings.minimumStoneTier = value == null ? 1 : value,
                     settings -> settings.minimumStoneTier)
             .add()
-            .<Double>append(new KeyedCodec<>("MaxHealthPercentOverride", Codec.DOUBLE),
-                    (settings, value) -> settings.maxHealthPercentOverride = value,
-                    settings -> settings.maxHealthPercentOverride)
-            .add()
             .<String[]>append(new KeyedCodec<>("SpecialRequirementIds", Codec.STRING_ARRAY),
                     (settings, value) -> settings.specialRequirementIds = value == null ? EMPTY : value,
                     settings -> settings.specialRequirementIds)
@@ -221,7 +217,6 @@ public final class DragonSpeciesConfig
     public static final class CaptureSettings {
         double resistance;
         int minimumStoneTier = 1;
-        Double maxHealthPercentOverride;
         String[] specialRequirementIds = EMPTY;
 
         private List<String> validate() {
@@ -232,16 +227,11 @@ public final class DragonSpeciesConfig
             if (minimumStoneTier < 1 || minimumStoneTier > 5) {
                 errors.add("Capture.MinimumStoneTier must be between 1 and 5");
             }
-            if (maxHealthPercentOverride != null && (!Double.isFinite(maxHealthPercentOverride)
-                    || maxHealthPercentOverride <= 0.0 || maxHealthPercentOverride > 100.0)) {
-                errors.add("Capture.MaxHealthPercentOverride must be in (0, 100]");
-            }
             return errors;
         }
 
         public double getResistance() { return resistance; }
         public int getMinimumStoneTier() { return minimumStoneTier; }
-        @Nullable public Double getMaxHealthPercentOverride() { return maxHealthPercentOverride; }
         public List<String> getSpecialRequirementIds() { return List.of(specialRequirementIds.clone()); }
     }
 

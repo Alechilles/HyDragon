@@ -82,7 +82,6 @@ effects.miniwyvernNatureRegeneration.name=Renouveau Verdoyant
 effects.miniwyvernVoidExposure.name=Exposition au Néant
 
 messages.capture.miniwyvernDenied=Les Miniwyvernes ne peuvent être créés qu'avec un Lien d'Âme Draconique.
-messages.capture.healthTooHigh=Le dragon doit être davantage affaibli.
 messages.capture.tranquilizerRequired=Le dragon doit d'abord être tranquillisé.
 messages.capture.stoneTierTooLow=Cette Pierre Draconique n'est pas assez puissante.
 messages.capture.failed=Le dragon a résisté à la capture. La Pierre Draconique a été consommée.

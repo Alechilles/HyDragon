@@ -82,7 +82,6 @@ effects.miniwyvernNatureRegeneration.name=Renovación Frondosa
 effects.miniwyvernVoidExposure.name=Exposición al Vacío
 
 messages.capture.miniwyvernDenied=Los Miniwyvern solo pueden crearse mediante un Vínculo de Alma Dracónico.
-messages.capture.healthTooHigh=El dragón debe debilitarse aún más.
 messages.capture.tranquilizerRequired=Primero hay que tranquilizar al dragón.
 messages.capture.stoneTierTooLow=Esta Piedra Dracónica no es lo bastante poderosa.
 messages.capture.failed=El dragón se resistió a la captura. La Piedra Dracónica fue consumida.

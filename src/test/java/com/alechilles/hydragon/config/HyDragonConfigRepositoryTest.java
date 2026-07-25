@@ -119,7 +119,6 @@ class HyDragonConfigRepositoryTest {
         species.mount.avatarFlightConfigId = "HyDragonNordicDrake";
         species.capture.resistance = 0.25;
         species.capture.minimumStoneTier = 4;
-        species.capture.maxHealthPercentOverride = 20.0;
         species.capture.specialRequirementIds = new String[]{"hydragon:special_encounter_capture_ready"};
         species.spawn.pluginEncounterIds = new String[]{"hydragon:nordic_drake_high_altitude"};
         species.presentation.localizationPrefix = "server.npcRoles.NordicDrake";

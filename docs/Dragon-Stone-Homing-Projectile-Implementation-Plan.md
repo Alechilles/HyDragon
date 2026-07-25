@@ -13,7 +13,7 @@ Replace the Dragon Stone's current world-space particle stream with a rapid stre
 The capture rules remain unchanged:
 
 - The player holds primary/left click for three seconds.
-- The target must remain the locked, tranquilized NPC and satisfy the configured taming-health threshold.
+- The target must remain the locked, tranquilized NPC.
 - The existing blue channeling skin effect remains active on the NPC.
 - A successful capture still produces the configured burst and filled Dragon Stone.
 - Releasing early or invalidating the channel cleans up every mote and the NPC effect.
@@ -247,7 +247,7 @@ This work does not change which input starts capture or what the UI promises.
 
 | Interaction path | Gate | Action | Reset/cleanup |
 | --- | --- | --- | --- |
-| Primary Begin | Existing begin gates: valid empty stone, eligible tranquilized target, range, health threshold, no conflicting session | Lock target; start three-second session, blue skin effect, and homing cadence | Cancel, Complete, timeout, disconnect, invalid target, world/item change |
+| Primary Begin | Existing begin gates: valid empty stone, eligible tranquilized target, range, no conflicting session | Lock target; start three-second session, blue skin effect, and homing cadence | Cancel, Complete, timeout, disconnect, invalid target, world/item change |
 | Charging Cancel | Primary released before three seconds | Stop session without capture | Remove generation motes and blue effect immediately |
 | Charging Complete | Three seconds elapsed and existing terminal capture gates still pass | Stop visuals, execute transactional capture, then successful burst | Capture success/failure cleanup |
 
@@ -396,7 +396,8 @@ Exit criterion: the stream reads as energy being pulled from the dragon into the
 
 ## In-game validation matrix
 
-Test every scenario with a freshly spawned NPC that is damaged below its configured taming-health threshold and then tranquilized:
+Test every scenario with a freshly spawned NPC while
+`Tw_Status_Tranquilized` is active:
 
 | Scenario | Expected result |
 | --- | --- |

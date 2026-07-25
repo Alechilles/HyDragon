@@ -9,7 +9,6 @@
   "Capture": {
     "Resistance": 0.25,
     "MinimumStoneTier": 4,
-    "MaxHealthPercentOverride": 20.0,
     "SpecialRequirementIds": [ "hydragon:special_encounter_capture_ready" ]
   },
   "Spawn": {

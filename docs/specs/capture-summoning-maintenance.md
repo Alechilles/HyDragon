@@ -50,10 +50,15 @@ HyDragon must use Tamework's public, capability-gated contracts. It must not rep
 ### Capture eligibility and tiers
 
 - **HYD-CAP-001:** Draconic Stones MUST target only configured wild full-dragon roles. `Wyvern_Mini` and `Tamed_Wyvern_Mini` MUST be denied by every stone tier.
-- **HYD-CAP-002:** A capture attempt MUST require a living target, an allowed wild role, valid range and line of interaction, health at or below the configured threshold, and `Tw_Status_Tranquilized`. The initial health threshold is 20 percent.
+- **HYD-CAP-002:** A capture attempt MUST require a living target, an allowed
+  wild role, valid range and line of interaction, and
+  `Tw_Status_Tranquilized`. Draconic Stones do not impose a separate health
+  threshold.
 - **HYD-CAP-003:** HyDragon MUST ship Iron, Thorium, Cobalt, Adamantium, and Ancient/Mithril tiers with increasing capture power and Common, Uncommon, Rare, Epic, and Legendary item qualities respectively.
 - **HYD-CAP-004:** Each target role MUST configure capture resistance, minimum eligible power, chance modifiers, and any special encounter requirements.
-- **HYD-CAP-005:** Ancient/Mithril MUST guarantee capture after every non-probability requirement passes. It MUST NOT bypass health, tranquilizer, role, ownership, capacity, range, or encounter requirements.
+- **HYD-CAP-005:** Ancient/Mithril MUST guarantee capture after every
+  non-probability requirement passes. It MUST NOT bypass tranquilizer, role,
+  ownership, capacity, range, or encounter requirements.
 - **HYD-CAP-006:** Tamework MUST perform one authoritative terminal roll. HyDragon MUST NOT pre-roll or retry entropy in callbacks.
 
 ### Stone consumption boundary
@@ -241,7 +246,7 @@ The example demonstrates a two-component AND cost, not final HyDragon balance. E
 
 Every player-facing key ships in `en-US`, `pt-BR`, `de-DE`, `fr-FR`, and `es-ES` with identical key and placeholder sets. Required outcomes include:
 
-- invalid role, health, tranquilizer, range, ownership, capacity, or special condition;
+- invalid role, tranquilizer, range, ownership, capacity, or special condition;
 - Dragon Horn required;
 - channel interrupted without cost;
 - failed roll and consumed stone;

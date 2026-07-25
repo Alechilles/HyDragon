@@ -16,7 +16,6 @@
     "TamesTarget": true,
     "OwnerRestricted": false,
     "RequireOwner": false,
-    "MaxHealthPercent": 20.0,
     "RequiredEffectId": "Tw_Status_Tranquilized",
     "ChannelAuraEffectId": "HyDragon_DragonStone_CaptureAura",
     "TamedRoleOverrides": {

@@ -82,7 +82,6 @@ effects.miniwyvernNatureRegeneration.name=Verdant Renewal
 effects.miniwyvernVoidExposure.name=Void Exposure
 
 messages.capture.miniwyvernDenied=Miniwyverns can only be created through a Draconic Soul Bond.
-messages.capture.healthTooHigh=The dragon must be weakened further.
 messages.capture.tranquilizerRequired=The dragon must be tranquilized first.
 messages.capture.stoneTierTooLow=This Draconic Stone is not powerful enough.
 messages.capture.failed=The dragon resisted capture. The Draconic Stone was consumed.
