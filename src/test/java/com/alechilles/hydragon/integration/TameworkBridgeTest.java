@@ -56,6 +56,29 @@ class TameworkBridgeTest {
     }
 
     @Test
+    void semanticEventConsumersRequireTheirAuthoritativeFeatureCapabilities() {
+        Set<String> encounterCapabilities = new HashSet<>(
+                HyDragonFeature.DYNAMIC_ENCOUNTERS.requiredCapabilities());
+        encounterCapabilities.remove("CAPTURE_RESOLVED_ATTEMPT_CONSUMPTION");
+        TameworkBridge.Snapshot encounters = TameworkBridge.evaluate(
+                "0.9.0", encounterCapabilities, null);
+
+        assertFalse(encounters.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS).available());
+        assertTrue(encounters.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS)
+                .missingCapabilities().contains("CAPTURE_RESOLVED_ATTEMPT_CONSUMPTION"));
+
+        Set<String> abilityCapabilities = new HashSet<>(
+                HyDragonFeature.MINIWYVERN_ABILITIES.requiredCapabilities());
+        abilityCapabilities.remove("COMPANION_PROVISIONING");
+        TameworkBridge.Snapshot abilities = TameworkBridge.evaluate(
+                "0.9.0", abilityCapabilities, null);
+
+        assertFalse(abilities.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
+        assertTrue(abilities.feature(HyDragonFeature.MINIWYVERN_ABILITIES)
+                .missingCapabilities().contains("COMPANION_PROVISIONING"));
+    }
+
+    @Test
     void bootstrapFailureDisablesEverythingAndSnapshotIsImmutable() {
         Set<String> input = new HashSet<>(BASELINE);
         TameworkBridge.Snapshot failed = TameworkBridge.evaluate(null, Set.of(), "not loaded");
