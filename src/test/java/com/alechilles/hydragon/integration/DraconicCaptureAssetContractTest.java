@@ -33,6 +33,8 @@ class DraconicCaptureAssetContractTest {
         assertTrue(config.contains("\"BondedRosterId\": \"hydragon:dragon_horn\""));
         assertTrue(config.contains("\"RequiredCommandConfigId\": \"HyDragonDragonHorn\""));
         assertTrue(config.contains("\"RequireCommandAccessItem\": true"));
+        assertTrue(config.contains("\"ChannelSoundEvent\": "
+                + "\"SFX_Tamework_Capture_Channel_Dark_Magic\""));
         assertFalse(config.contains("\"CommandFamilyId\""));
         assertFalse(config.contains("FilledItemId"));
         assertFalse(config.contains("\"Vessel\""));

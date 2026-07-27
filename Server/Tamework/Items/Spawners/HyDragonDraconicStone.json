@@ -18,6 +18,7 @@
     "RequireOwner": false,
     "RequiredEffectId": "Tw_Status_Tranquilized",
     "ChannelAuraEffectId": "HyDragon_DragonStone_CaptureAura",
+    "ChannelSoundEvent": "SFX_Tamework_Capture_Channel_Dark_Magic",
     "TamedRoleOverrides": {
       "NordicDrake": "Tamed_NordicDrake",
       "Hydra": "Tamed_Hydra",
