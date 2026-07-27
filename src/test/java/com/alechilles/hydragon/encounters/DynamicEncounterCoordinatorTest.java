@@ -710,7 +710,6 @@ class DynamicEncounterCoordinatorTest {
         set(config.getRegionsAndAltitude(), "maxY", 300.0D);
         set(config.getWeatherPredicate(), "mode", "AnyOf");
         set(config.getWeatherPredicate(), "weatherIds", new String[] { "storm" });
-        set(config.getPlayerEligibility(), "activeCompanionGroup", "hydragon:full_dragons");
         set(config.getPlayerEligibility(), "requiredMountMode", "AVATAR_FLIGHT");
         set(config.getPlayerEligibility(), "requiredItemId",
                 EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID);

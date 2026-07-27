@@ -135,7 +135,6 @@ class HyDragonConfigRepositoryTest {
         encounter.regionsAndAltitude.maxY = 320;
         encounter.weatherPredicate.mode = "AnyOf";
         encounter.weatherPredicate.weatherIds = new String[]{"Zone3_Snow_Storm"};
-        encounter.playerEligibility.activeCompanionGroup = "hydragon:full_dragons";
         encounter.playerEligibility.requiredMountMode = "AVATAR_FLIGHT";
         encounter.playerEligibility.requiredItemId = "Tamework_Flightmasters_Talisman";
         encounter.admission.chance = 0.08;

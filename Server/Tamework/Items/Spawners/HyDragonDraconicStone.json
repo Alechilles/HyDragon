@@ -26,8 +26,8 @@
       "RockDrakeT3": "Tamed_RockDrakeT3"
     },
     "SourceConsumption": "ResolvedAttempt",
-    "SuccessDisposition": "TameAndCommandLink",
-    "CommandFamilyId": "hydragon:dragon_horn",
+    "SuccessDisposition": "StoreBondedCompanion",
+    "BondedRosterId": "hydragon:dragon_horn",
     "RequiredCommandConfigId": "HyDragonDragonHorn",
     "RequireCommandAccessItem": true,
     "ChanceMode": "Probability",

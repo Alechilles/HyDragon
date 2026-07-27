@@ -17,7 +17,8 @@ class DraconicCaptureAssetContractTest {
     private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
 
     @Test
-    void baseStoneChannelsThenConsumesEveryResolvedRollIntoTheDragonHorn() throws Exception {
+    void baseStoneChannelsThenStoresSuccessfulDragonsInTheSharedHornRoster()
+            throws Exception {
         String item = read("Server/Item/Items/Ingredient/Draconic_Stone.json");
         String config = read("Server/Tamework/Items/Spawners/HyDragonDraconicStone.json");
 
@@ -28,12 +29,14 @@ class DraconicCaptureAssetContractTest {
         assertFalse(item.contains("\"State\""));
         assertFalse(item.contains("MaxDurability"));
         assertTrue(config.contains("\"SourceConsumption\": \"ResolvedAttempt\""));
-        assertTrue(config.contains("\"SuccessDisposition\": \"TameAndCommandLink\""));
-        assertTrue(config.contains("\"CommandFamilyId\": \"hydragon:dragon_horn\""));
+        assertTrue(config.contains("\"SuccessDisposition\": \"StoreBondedCompanion\""));
+        assertTrue(config.contains("\"BondedRosterId\": \"hydragon:dragon_horn\""));
         assertTrue(config.contains("\"RequiredCommandConfigId\": \"HyDragonDragonHorn\""));
         assertTrue(config.contains("\"RequireCommandAccessItem\": true"));
+        assertFalse(config.contains("\"CommandFamilyId\""));
         assertFalse(config.contains("FilledItemId"));
         assertFalse(config.contains("\"Vessel\""));
+        assertEquals(1, occurrences(item, "\"CaptureBurstParticleSystem\""));
     }
 
     @Test
@@ -94,8 +97,12 @@ class DraconicCaptureAssetContractTest {
         assertTrue(egg.contains("\"Type\": \"HyDragonSoulBond\""));
         assertFalse(egg.contains("\"BlockType\""));
         assertTrue(horn.contains("\"ItemId\": \"HyDragon_Dragon_Horn\""));
-        assertTrue(command.contains("\"CommandFamilyId\": \"hydragon:dragon_horn\""));
-        assertTrue(command.contains("\"RosterStorage\": \"OwnerCommandFamily\""));
+        assertTrue(command.contains("\"RosterStorage\": \"BondedCompanions\""));
+        assertTrue(command.contains("\"BondedRosterId\": \"hydragon:dragon_horn\""));
+        assertTrue(command.contains("\"LinkEnabled\": false"));
+        assertTrue(command.contains("\"LinkUseTogglesMembership\": false"));
+        assertFalse(command.contains("\"CommandFamilyId\""));
+        assertFalse(command.contains("ProjectRosterToItemMetadata"));
         assertTrue(command.contains("Tamed_Wyvern_Mini"));
         assertFalse(Files.exists(ROOT.resolve("Server/Item/Items/Ingredient/Soul_Bound_Wyvern.json")));
     }
@@ -107,5 +114,14 @@ class DraconicCaptureAssetContractTest {
     private static String sha256(String relative) throws Exception {
         byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(ROOT.resolve(relative)));
         return HexFormat.of().formatHex(digest);
+    }
+
+    private static int occurrences(String text, String fragment) {
+        int count = 0;
+        for (int cursor = 0; (cursor = text.indexOf(fragment, cursor)) >= 0;
+             cursor += fragment.length()) {
+            count++;
+        }
+        return count;
     }
 }
