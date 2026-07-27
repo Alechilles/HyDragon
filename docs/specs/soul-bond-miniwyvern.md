@@ -1,169 +1,186 @@
 # Wyvern Egg, Soul Bond, and Miniwyvern Specification
 
-Status: Proposed redesign; replaces the unreleased Soul Bound Wyvern item flow
+Status: Bonded-companion implementation is present in source; packaged and live acceptance remain pending
 Target dependency: Tamework `>=3.0.0 <4.0.0`
 
 ## 1. Purpose
 
-The Wyvern Egg is a once-per-player ritual item that creates the player's lifelong Soul Bond Miniwyvern. Successful use consumes the egg, creates exactly one canonical Miniwyvern profile, and adds that profile to the same Dragon Horn roster used by full dragons. The Egg is not a recurring summon item, and no separate Soul Bound Wyvern item is created.
+The Wyvern Egg is a once-per-player ritual item that creates the player's lifelong Soul Bond Miniwyvern. Successful use consumes the Egg, provisions exactly one canonical bonded profile in `STORED` state, initializes HyDragon's namespaced Miniwyvern data, and places the profile in the same Dragon Horn roster as full dragons.
 
-Related specifications:
+The Egg is an acquisition item, not a recurring controller. The Dragon Horn is the one summon, dismiss, command, and revive interface for both companion families. No `Soul_Bound_Wyvern` item exists.
+
+Related documents:
 
 - [Draconic capture, Dragon Horn, and revival](capture-summoning-maintenance.md)
-- [Dragon content and encounters](dragon-content-encounters.md)
 - [Plugin architecture](plugin-architecture.md)
-- Tamework [command-roster capture and revival](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md)
-- Tamework [population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md)
-- Deferred Tamework [companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md)
+- [Dragon content and encounters](dragon-content-encounters.md)
+- [HyDragon - Tamework bonded integration contract](../integration/tamework-bonded-companions-contract.md)
 
 ## 2. Locked decisions
 
-- Miniwyverns are Soul Bond-exclusive and cannot be captured with Draconic Stones.
-- Each player can claim exactly one Miniwyvern for life.
-- Successful Wyvern Egg use consumes the egg and adds the companion to command family `hydragon:dragon_horn`.
-- The Dragon Horn is the only recurring command, recall, locate, and revive interface. `Soul_Bound_Wyvern` is removed.
-- The claim preserves one canonical profile through death, unload, restart, and revival.
-- Miniwyvern and one full dragon may be active together because they use separate population groups.
-- The Miniwyvern uses the same timed-summon lifecycle with its own role-configured duration and cooldown; its timer is independent of every full dragon.
-- The nine-slot backpack remains deferred to a later update.
-- Elemental archetypes and their effects remain HyDragon-specific behavior.
-- HyDragon is unreleased; no Egg, Soul Bound Wyvern, or profile migration is required.
+- Miniwyverns are Soul Bond-exclusive and cannot be captured with a Draconic Stone.
+- Each player can claim one Miniwyvern for life.
+- A successful claim creates a `Tamed_Wyvern_Mini` profile in roster `hydragon:dragon_horn` and family `hydragon:soulbound_mini`.
+- Provisioning returns the new profile as `STORED`; the player uses the Dragon Horn to summon it.
+- Full dragons and Miniwyverns share one Horn panel but have independent family limits, session durations, cooldowns, acquisition permissions, and revival recipes.
+- Any Miniwyvern non-death disappearance becomes `STORED`. Only confirmed death becomes `DEAD`.
+- Paid revive returns the same profile to `STORED` and never auto-summons.
+- Tamework owns the complete NPC snapshot and bonded lifecycle. HyDragon owns the one-lifetime entitlement and Miniwyvern domain data.
+- Miniwyvern domain data uses Tamework's profile-keyed, namespaced bonded extension store rather than HyDragon's old generic/local profile projection.
+- The nine-slot backpack remains deferred. Preserving unknown extension fields keeps a future addition possible without changing lifecycle ownership.
+- HyDragon has not shipped this feature, so no Egg, controller-item, generic-profile, or command-roster migration is required.
 
-## 3. Requirements
+## 3. Ownership boundary
 
-### Claim and roster integration
+| Concern | Authority |
+| --- | --- |
+| Lifelong claim eligibility | HyDragon player Soul Bond ledger |
+| Egg spend/recovery | HyDragon idempotent consumable operation journal |
+| Profile ID, owner, roster/family, state, revision, complete NPC snapshot, lease, cooldown, and revive | Tamework bonded-companion runtime |
+| Archetype, attunement evidence, ability scheduler state, progression, and future HyDragon fields | Tamework bonded extension namespace `Alechilles:HyDragon`, with HyDragon defining the payload |
+| Appearance, role behavior, commands, combat, and archetype content | HyDragon assets and runtime |
 
-- **HYD-SOUL-001:** HyDragon MUST provide a craftable, non-placeable `Wyvern_Egg` using the dragon egg model and texture.
-- **HYD-SOUL-002:** Claim preflight MUST require a compatible `HyDragon_Dragon_Horn`, an unclaimed entitlement, available Tamework provisioning/roster/population authority, and a valid player/world context.
-- **HYD-SOUL-003:** Successful use MUST atomically reserve the lifelong entitlement, provision exactly one owned `Tamed_Wyvern_Mini` profile, add it to command family `hydragon:dragon_horn`, consume one Egg, and request safe projection in front of the player.
-- **HYD-SOUL-004:** A player with a claimed, pending, dead, lost, unloaded, or recoverable Miniwyvern MUST be denied another claim without Egg consumption.
-- **HYD-SOUL-005:** If initial projection is temporarily unavailable after the durable claim commits, the one profile remains in the Dragon Horn as dormant/recoverable. The player uses Horn Recall later; a new Egg cannot be used.
-- **HYD-SOUL-006:** Duplicate use callbacks and restart recovery MUST reuse the same operation ID and return the same profile. They MUST NOT consume two Eggs, create two profiles, or add duplicate roster rows.
-- **HYD-SOUL-007:** If the Egg was consumed but provisioning cannot terminally complete, recovery MUST produce one Egg refund/recovery claim and release the entitlement. It MUST never retain both a refundable Egg and a provisioned profile.
+The bonded profile ID is the shared key across these records. A live Miniwyvern NPC UUID is temporary projection evidence only and is never the entitlement or roster identity.
 
-### Identity, population, and death
+## 4. Claim requirements
 
-- **HYD-SOUL-008:** `Wyvern_Mini` and `Tamed_Wyvern_Mini` MUST be absent from all Draconic Stone allowlists and production wild-spawn assets.
-- **HYD-SOUL-009:** Miniwyverns MUST join `hydragon:soulbound_mini`, configured as one owned and one active per owner. They MUST NOT count against `hydragon:full_dragons`.
-- **HYD-SOUL-010:** Profile ID, name, health/lifecycle, archetype, appearance, progression, and future backpack identity MUST survive ordinary lifecycle changes.
-- **HYD-SOUL-011:** Death MUST preserve the claimed entitlement and Dragon Horn row in `DEAD_REVIVABLE`. Revival restores the same profile and uses the paid Horn revival contract in [the capture specification](capture-summoning-maintenance.md#death-and-paid-revival).
-- **HYD-SOUL-012:** Death, profile loss, item loss, or unlinking MUST NOT allow a replacement claim. Administrative repair relinks the existing profile or explicitly resolves a quarantined claim.
+- **HYD-SOUL-001:** `Wyvern_Egg` remains a craftable, non-placeable ritual item using `HyDragonSoulBond` as its primary interaction.
+- **HYD-SOUL-002:** Claim preflight requires a valid player/world context, a writable HyDragon entitlement/journal, `BONDED_COMPANIONS` readiness, and no existing or reconcilable claim.
+- **HYD-SOUL-003:** A successful claim consumes exactly one Egg, provisions exactly one `STORED` bonded profile in the shared Horn, initializes one neutral extension document, and closes the entitlement against that profile ID.
+- **HYD-SOUL-004:** `PENDING`, `CLAIMED`, or `NEEDS_RECONCILIATION` denies another independent claim. `STORED`, `ACTIVE`, and `DEAD` are all still the same claimed companion.
+- **HYD-SOUL-005:** Duplicate callbacks and restart recovery reuse the same operation and authority evidence. They cannot consume two Eggs, provision two profiles, or initialize two divergent extension documents.
+- **HYD-SOUL-006:** If the Egg is consumed and bonded provisioning is terminally denied, HyDragon records one Egg recovery claim and releases the entitlement only through that compensation path.
+- **HYD-SOUL-007:** A missing projection, logout, transfer, restart, or dismissal cannot release the entitlement or create a replacement claim.
+- **HYD-SOUL-008:** `Wyvern_Mini` and `Tamed_Wyvern_Mini` remain absent from all Draconic Stone allowlists and production wild-spawn assets.
 
-### Companion behavior
-
-- **HYD-SOUL-013:** The Miniwyvern MUST remain visibly small, non-mountable, able to Follow/Hold/Idle, and able to assist its owner with a basic bite and owner-safe targeting.
-- **HYD-SOUL-014:** The Miniwyvern MUST be controllable through the Dragon Horn's normal linked panel and command actions. It MUST NOT require a dedicated summon item.
-- **HYD-SOUL-015:** Projection and Recall MUST use safe in-front-of-player placement, matching the full-dragon behavior.
-- **HYD-SOUL-015A:** Successful Egg projection starts the Miniwyvern's first summon lease. Expiry or manual Dismiss MUST return the same profile to `ROSTER_STORED`; the Dragon Horn shows remaining time, stored status, and resummon cooldown.
-- **HYD-SOUL-015B:** Horn Summon after cooldown starts a new configured lease. Recall, attunement, unload, travel, and restart MUST NOT reset a running lease. Owner logout follows the configured auto-storage transaction and cooldown; logging back in cannot immediately convert that stored profile into a fresh active lease.
-
-### Elemental attunement
-
-- **HYD-SOUL-016:** HyDragon MUST support `neutral`, `lightning`, `wind`, `ice`, `fire`, `water`, `nature`, and `void` archetype IDs.
-- **HYD-SOUL-017:** Consuming one configured elemental essence re-attunes the same profile and preserves name, health ratio, progression, roster membership, and future backpack contents.
-- **HYD-SOUL-018:** Every archetype MUST provide distinct presentation, a localized description, and a data-driven ability definition. Appearance assets alone do not count as working behavior.
-- **HYD-SOUL-019:** Lightning increases movement/action speed; Wind increases movement, jump, and mobility; Ice applies bounded slow/freeze buildup and control.
-- **HYD-SOUL-020:** Fire uses frequent fireball attacks with bounded damage-over-time; Water provides burst combat healing; Nature provides lower-intensity periodic regeneration.
-- **HYD-SOUL-021:** Void applies bounded defense reduction. No archetype may stack an unbounded modifier.
-- **HYD-SOUL-022:** Ability targeting, cooldowns, effects, stacking, and cleanup MUST be source-keyed, owner-safe, data-driven, and world-thread-safe.
-
-### Deferred backpack
-
-- **HYD-SOUL-023 (DEFERRED):** A later update MAY add a nine-slot owner-only backpack backed by Tamework's generic companion inventory.
-- **HYD-SOUL-024 (DEFERRED):** The initial release MUST NOT register backpack interactions, config, persistence, or UI. The future feature cannot alter Egg, Horn, capture, or revival semantics.
-
-## 4. Entitlement state machine
-
-```mermaid
-stateDiagram-v2
-    [*] --> UNCLAIMED
-    UNCLAIMED --> PENDING: Egg use admitted
-    PENDING --> CLAIMED: profile + Horn membership commit
-    PENDING --> UNCLAIMED: terminal compensation + Egg recovery
-    CLAIMED --> NEEDS_RECONCILIATION: profile temporarily unresolved
-    NEEDS_RECONCILIATION --> CLAIMED: same profile relinked
-```
-
-Ordinary gameplay has no `CLAIMED -> UNCLAIMED` transition. A dead or unprojected Miniwyvern is still claimed.
-
-## 5. Claim transaction
-
-1. Resolve the acting player, exact Egg stack, registered Dragon Horn access, and current Tamework capabilities.
-2. Read and fence the player's entitlement. Reject any existing `PENDING`, `CLAIMED`, or reconcilable profile.
-3. Prepare `hydragon:soulbound_mini` owner/population admission and `hydragon:dragon_horn` command-family membership.
-4. Persist a namespaced operation ID and `PENDING` entitlement before consuming the Egg.
-5. Exact-CAS consume one Egg.
-6. Call Tamework provisioning with the same idempotency key for one `Tamed_Wyvern_Mini` profile.
-7. Commit profile ID, `CLAIMED`, and Dragon Horn membership as one recoverable operation.
-8. Request safe projection in front of the player and begin one role-configured summon lease. Projection failure leaves the committed profile dormant and visible in the Horn without starting a lease.
-9. Emit one localized success or recovery-pending message.
-
-No callback may create a new operation merely because the original callback timed out.
-
-## 6. Profile data
-
-HyDragon's namespaced profile extension contains only domain behavior:
+## 5. Entitlement state machine
 
 ```text
+UNCLAIMED
+  -> PENDING                 one operation reserves the entitlement
+  -> CLAIMED                 stored bonded profile + extension are proven
+  -> NEEDS_RECONCILIATION    durable evidence is temporarily incomplete
+
+PENDING
+  -> UNCLAIMED               terminal provisioning denial creates Egg recovery
+```
+
+Ordinary gameplay has no `CLAIMED -> UNCLAIMED` transition. The bonded profile's `STORED`, `ACTIVE`, or `DEAD` state does not change entitlement ownership.
+
+## 6. Claim transaction
+
+The implemented claim saga is intentionally separate from ordinary projection lifecycle:
+
+1. Resolve the acting player, exact Egg stack, world context, bonded capability, and writable HyDragon journal.
+2. Fence the player's entitlement and reuse any existing matching operation.
+3. Persist `PENDING` plus the exact source-item evidence.
+4. Consume the Egg through its exact reservation and record `MATERIAL_CONSUMED`.
+5. Call bonded `provision` with the same stable operation identity for roster `hydragon:dragon_horn`, family `hydragon:soulbound_mini`, and role `Tamed_Wyvern_Mini`.
+6. Require canonical authority evidence: matching owner, roster, family, role, `STORED` state, nonnegative revision, and no active lease.
+7. Create or verify the neutral `Alechilles:HyDragon` extension with compare-and-set semantics.
+8. Link the HyDragon entitlement to the stable profile ID and close the operation.
+9. Report that the Miniwyvern is stored in the Dragon Horn. Summoning is a separate Horn action.
+
+If a response is lost, recovery reads the operation, bonded profile, and extension evidence. It does not invent a new operation. Invalid or conflicting authority evidence is quarantined for operator review instead of being overwritten.
+
+## 7. Bonded family policy
+
+`Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json` defines the current policy:
+
+| Field | Current value |
+| --- | --- |
+| Roster ID | `hydragon:dragon_horn` |
+| Family ID | `hydragon:soulbound_mini` |
+| Allowed role | `Tamed_Wyvern_Mini` |
+| Maximum owned | `1` |
+| Maximum active | `1` |
+| Session duration | `900` seconds |
+| Summon cooldown | `180` seconds |
+| Revive cost | `Revitalizing_Essence x1` and `Draconic_Essence x2` |
+| Features | Provision, summon, dismiss, revive enabled; capture disabled |
+
+The limits are bonded family policy, not population-group membership. The full-dragon family has its own active slot, so one Miniwyvern and one full dragon may be active together. `SessionDurationSeconds: 0` disables expiration and `SummonCooldownSeconds: 0` disables the cooldown without adding another lifecycle state.
+
+## 8. Bonded lifecycle
+
+```text
+STORED --Summon--> ACTIVE
+ACTIVE --Dismiss / expiry / logout / transfer / missing or duplicate cleanup--> STORED
+ACTIVE --confirmed death--> DEAD
+DEAD --paid revive--> STORED
+```
+
+The Dragon Horn card remains profile-keyed and fully detailed in every state. Summon creates one exact live projection. Store snapshots the projection before removal. Ability runtime attaches only to a confirmed active Miniwyvern lease and detaches on store or death; detaching never deletes extension data.
+
+There are no Miniwyvern `LOST`, `UNLOADED`, dormant-profile, generic timed-summon, or generic command-roster states. Any non-death absence is recoverable storage. A second live copy is stale projection data and is cleaned up without creating a second companion.
+
+## 9. Extension-data contract
+
+HyDragon stores one versioned, unknown-field-preserving document under namespace `Alechilles:HyDragon`:
+
+```text
+schemaVersion: 1
 companionKind: SOULBOUND_MINIWYVERN
+speciesId: miniwyvern
 archetypeId: neutral | lightning | wind | ice | fire | water | nature | void
 archetypeRevision
 lastAttunementOperationId
 abilityState:
-  cooldownsByAbilityId
-  lastAppliedSourceKeys
+  archetypeId
+  scheduler/cooldown state
+  source-keyed effect evidence
+progression: object
+unknown future fields: preserved
 ```
 
-Entitlement state belongs to the HyDragon player record. Profile identity/lifecycle, Horn membership, and population state belong to Tamework. Inventory contents remain deferred and, when added, belong to Tamework's profile-scoped inventory store.
+Reads and writes are owner/profile/namespace scoped. Attunement and ability writers use compare-and-set revisions plus bounded retry/reload behavior so one writer cannot silently overwrite another. An attunement change preserves progression and unknown fields; ability updates preserve attunement and progression.
 
-## 7. Attunement contract
+Tamework's full NPC snapshot separately preserves gameplay state such as name, appearance, health, needs, happiness, breeding, attachments, progression exposed by the NPC snapshot, traits, talents, life stage, and command settings. The extension supplements that snapshot with HyDragon-specific data; it is not a second companion profile.
 
-| Archetype | Essence semantic ID | Required behavior |
-| --- | --- | --- |
-| Lightning | `lightning` | Movement/action speed and fast lightning attacks |
-| Wind | `wind` | Movement/jump/mobility and gust utility |
-| Ice | `ice` | Slow/freeze buildup with bounded control |
-| Fire | `fire` | Frequent fireballs and bounded damage-over-time |
-| Water | `water` | Burst combat healing |
-| Nature | `nature` | Sustained periodic regeneration |
-| Void | `void` | Projectile/pulse defense reduction with a floor |
+## 10. Elemental attunement
 
-Attunement reserves one essence, updates profile data and appearance under one idempotency key, consumes once, and reconciles presentation after restart. Re-attuning to the current archetype is denied without consumption by default.
-
-## 8. Assets and configuration
-
-| Path or ID | Required result |
+| Archetype | Intended behavior |
 | --- | --- |
-| `Server/Item/Items/Ingredient/Wyvern_Egg.json` | One-time ritual consumable using the dragon egg appearance |
-| `Soul_Bound_Wyvern` | Delete item, interaction, recipe, localization, tests, and runtime references |
-| `HyDragon_Dragon_Horn` | Shared recurring interface for Miniwyvern and full dragons |
-| `Server/Tamework/Companion/HyDragonMiniwyvern.json` | Population, command, timed-summon, paid-revival, placement, and lifecycle settings |
-| `Server/Tamework/Items/Commands/HyDragonDragonHorn.json` | Allows all supported tamed full-dragon roles plus `Tamed_Wyvern_Mini` |
-| `Server/HyDragon/MiniwyvernArchetypes/*.json` | Neutral and seven elemental definitions |
-| `Server/Languages/{en-US,pt-BR,de-DE,fr-FR,es-ES}/server.lang` | Matching Egg, claim, Horn, lifecycle, revival, and archetype keys/placeholders |
+| Neutral | Baseline Miniwyvern behavior |
+| Lightning | Movement/action speed and fast lightning attacks |
+| Wind | Movement, jump, mobility, and gust utility |
+| Ice | Bounded slow/freeze buildup and control |
+| Fire | Fireball pressure and bounded damage-over-time |
+| Water | Burst combat healing |
+| Nature | Lower-intensity periodic regeneration |
+| Void | Bounded defense reduction |
 
-Canonical asset IDs use English. Locale catalogs translate player-facing text only.
+Attunement consumes the configured essence only after the active claim/profile and extension revision are valid. Re-attuning to the current archetype is denied without consumption. Source-keyed effects from the prior archetype are cleaned before the new ability state is published.
 
-## 9. Acceptance criteria
+## 11. Death and revival
 
-- First valid Egg use consumes one Egg, commits one entitlement, creates one profile, adds one Horn row, and attempts one in-front projection.
-- A simultaneous, duplicate, restarted, or repeated claim cannot consume twice or create a second profile.
-- Existing claimed/dead/lost/dormant states deny a new Egg without consumption.
-- Missing Dragon Horn, capability, population authority, or valid inventory source denies before Egg consumption.
-- Projection failure after claim leaves the one profile visible and Recall-capable through the Horn.
-- Every stone tier rejects both Miniwyvern roles without rolling or consuming.
-- Miniwyvern and one full dragon can be active together; a second Miniwyvern cannot be owned or projected.
-- Egg projection, Horn Summon, timed expiry, manual Dismiss, and resummon cooldown preserve the same Miniwyvern profile; no callback or restart resets its lease.
-- Death preserves the one profile and entitlement; paid revival restores that profile through the Horn.
-- Follow, Hold, Recall, commands, death/revival, logout, cross-world travel, and restart preserve the same profile and roster membership.
-- Each elemental essence changes the same profile once and cleans up the prior archetype's effects.
-- The packaged initial release contains no `Soul_Bound_Wyvern` asset or runtime path and no backpack feature.
+Confirmed death keeps the entitlement and the same Horn card, records `DEAD`, and removes the active lease. The Miniwyvern recipe requires one Revitalizing Essence and two Draconic Essences.
 
-## 10. Delivery order
+Successful revival consumes the complete recipe once and changes the same profile to `STORED`. It does not create a replacement Miniwyvern, clear the one-lifetime claim, start a session, or summon a projection. The player explicitly selects Summon afterward.
 
-1. Tamework owner-command-family roster and atomic provisioning/link support.
-2. HyDragon Egg claim transaction conversion.
-3. Dragon Horn asset/config and Miniwyvern role inclusion.
-4. Removal of the Soul Bound Wyvern item and interaction.
-5. Paid revival and in-front placement integration.
-6. Ability and lifecycle regression tests plus multilingual asset validation.
+## 12. Deferred backpack and historical designs
+
+The Miniwyvern backpack remains a later feature. The initial bonded release does not register backpack interactions, inventory UI, or a separate inventory persistence system. Future data should extend the existing profile/extension boundary rather than introduce another roster identity.
+
+The following pre-release designs are superseded and must not be described as current behavior:
+
+- a recurring `Soul_Bound_Wyvern` item;
+- owner-command-family membership for the Miniwyvern;
+- `hydragon:soulbound_mini` as a generic population group;
+- generic `COMPANION_PROVISIONING`, `ProfileDataApi`, timed-command-summon, or paid-command-revival calls;
+- `DEAD_REVIVABLE`, `ROSTER_STORED`, `LOST`, or `UNLOADED` as player-visible Miniwyvern states;
+- initial automatic projection as part of Egg provisioning.
+
+## 13. Acceptance criteria
+
+- First valid Egg use consumes one Egg and creates one neutral `STORED` profile in the shared Horn.
+- Duplicate, simultaneous, or recovered callbacks cannot consume twice or create a second profile/extension.
+- Every existing or reconcilable lifelong claim denies a new Egg without independent provisioning.
+- Miniwyverns cannot be captured or spawned through production wild-spawn assets.
+- The Horn shows full Miniwyvern details immediately after claim, summon, store, revive, and relog.
+- Summon, dismissal, session expiry, logout, world transfer, and duplicate cleanup preserve the same profile and extension data.
+- Only confirmed death produces `DEAD`; paid revive consumes both configured components and returns to `STORED` without summoning.
+- Attunement, ability state, progression, and unknown extension fields survive summon/store/relog cycles.
+- One active Miniwyvern does not consume the full-dragon family's active slot.
+- Missing `BONDED_COMPANIONS` or unavailable bonded authority disables claim/attunement/ability operations with a specific reason and never invokes a generic fallback.
+- The packaged initial release contains no `Soul_Bound_Wyvern` asset and no backpack implementation.
