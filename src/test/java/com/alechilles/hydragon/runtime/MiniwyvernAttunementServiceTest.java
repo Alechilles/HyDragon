@@ -3,8 +3,21 @@ package com.alechilles.hydragon.runtime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.alechilles.alecstamework.api.*;
+import com.alechilles.alecstamework.api.BondedCompanionApi;
+import com.alechilles.alecstamework.api.BondedCompanionAvailability;
+import com.alechilles.alecstamework.api.BondedCompanionExtensionData;
+import com.alechilles.alecstamework.api.BondedCompanionExtensionDataKey;
+import com.alechilles.alecstamework.api.BondedCompanionResult;
+import com.alechilles.alecstamework.api.BondedCompanionResultCode;
+import com.alechilles.alecstamework.api.TameworkApi;
+import com.alechilles.alecstamework.api.TameworkApiCapability;
+import com.alechilles.hydragon.bonded.BondedExtensionJsonValue;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionDocument;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionGateway;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
+import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -16,208 +29,240 @@ import java.util.concurrent.CompletionStage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class MiniwyvernAttunementServiceTest {
-    @TempDir Path temp;
+/** Crash and concurrency coverage for bonded Miniwyvern attunement. */
+final class MiniwyvernAttunementServiceTest {
+    private static final BondedMiniwyvernExtensionCodec CODEC =
+            new BondedMiniwyvernExtensionCodec();
+
+    @TempDir
+    Path temp;
 
     @Test
     void committedRetryNeverMutatesOrConsumesTwice() throws Exception {
-        UUID owner = UUID.randomUUID();
-        UUID profile = UUID.randomUUID();
-        MemoryProfileData data = new MemoryProfileData();
-        CountingProjection projection = new CountingProjection();
-        StateStoreOperationJournal journal = journal("once.properties");
-        MiniwyvernAttunementService service = service(owner, profile, data, journal, projection,
-                fullCapabilities());
-        String operationId = "hydragon:attune:" + owner + ":fire";
+        Fixture fixture = fixture("once.properties");
+        String operationId = "hydragon:attune:" + fixture.owner + ":fire";
 
-        FakeReservation first = new FakeReservation(operationId, "Draconic_Essence_Fire");
-        GameplayResult applied = service.attune(owner, "fire", first).toCompletableFuture().join();
-        FakeReservation retry = new FakeReservation(operationId, "Draconic_Essence_Fire");
-        GameplayResult replay = service.attune(owner, "fire", retry).toCompletableFuture().join();
+        FakeReservation first = new FakeReservation(
+                operationId, "Draconic_Essence_Fire");
+        GameplayResult applied = fixture.service.attune(
+                fixture.owner, "fire", first).toCompletableFuture().join();
+        FakeReservation retry = new FakeReservation(
+                operationId, "Draconic_Essence_Fire");
+        GameplayResult replay = fixture.service.attune(
+                fixture.owner, "fire", retry).toCompletableFuture().join();
 
         assertEquals(GameplayResult.Status.APPLIED, applied.status());
         assertEquals(GameplayResult.Status.ALREADY_APPLIED, replay.status());
-        assertEquals(1, data.commits);
+        assertEquals(1, fixture.gateway.commits);
         assertEquals(1, first.consumeCalls);
         assertEquals(0, retry.consumeCalls);
         assertEquals(1, retry.releaseCalls);
-        assertEquals(1, projection.calls);
         assertEquals(OperationJournal.Phase.COMMITTED,
-                journal.find(operationId).orElseThrow().phase());
+                fixture.journal.find(operationId).orElseThrow().phase());
     }
 
     @Test
-    void committedAuthorityIsRecoveredBeforeFirstConsumption() throws Exception {
-        UUID owner = UUID.randomUUID();
-        UUID profile = UUID.randomUUID();
-        MemoryProfileData data = new MemoryProfileData();
-        CountingProjection unavailable = new CountingProjection();
-        unavailable.decision = MiniwyvernAttunementService.ProfileProjection.Decision.UNAVAILABLE;
-        StateStoreOperationJournal journal = journal("recovery.properties");
-        String operationId = "hydragon:attune:" + owner + ":ice";
-        FakeReservation first = new FakeReservation(operationId, "Draconic_Essence_Ice");
-
-        GameplayResult pending = service(owner, profile, data, journal, unavailable, fullCapabilities())
-                .attune(owner, "ice", first).toCompletableFuture().join();
-
-        assertEquals(GameplayResult.Status.RECONCILIATION_REQUIRED, pending.status());
-        assertEquals(1, data.commits);
-        assertEquals(0, first.consumeCalls);
-        assertEquals(OperationJournal.Phase.PREPARED,
-                journal.find(operationId).orElseThrow().phase());
-
-        CountingProjection recovered = new CountingProjection();
-        FakeReservation retry = new FakeReservation(operationId, "Draconic_Essence_Ice");
-        GameplayResult result = service(owner, profile, data, journal, recovered, fullCapabilities())
-                .attune(owner, "ice", retry).toCompletableFuture().join();
-
-        assertEquals(GameplayResult.Status.APPLIED, result.status());
-        assertEquals(1, data.commits);
-        assertEquals(1, retry.consumeCalls);
-        assertEquals(OperationJournal.Phase.COMMITTED,
-                journal.find(operationId).orElseThrow().phase());
-    }
-
-    @Test
-    void lostCasResponseUsesDurableOperationProofWithoutSecondMutation() throws Exception {
-        UUID owner = UUID.randomUUID();
-        UUID profile = UUID.randomUUID();
-        MemoryProfileData data = new MemoryProfileData();
-        data.failNextResponseAfterCommit = true;
+    void lostCasResponseIsRecoveredFromAttunementEvidenceBeforeConsumption()
+            throws Exception {
+        Fixture fixture = fixture("lost.properties");
+        fixture.gateway.failNextResponseAfterCommit = true;
         FakeReservation essence = new FakeReservation(
-                "hydragon:attune:" + owner + ":wind", "Draconic_Essence_Wind");
+                "hydragon:attune:" + fixture.owner + ":wind",
+                "Draconic_Essence_Wind");
 
-        GameplayResult result = service(owner, profile, data, journal("lost.properties"),
-                new CountingProjection(), fullCapabilities())
-                .attune(owner, "wind", essence).toCompletableFuture().join();
+        GameplayResult result = fixture.service.attune(
+                fixture.owner, "wind", essence).toCompletableFuture().join();
 
         assertEquals(GameplayResult.Status.APPLIED, result.status());
-        assertEquals(1, data.commits);
+        assertEquals(1, fixture.gateway.commits);
         assertEquals(1, essence.consumeCalls);
+        assertTrue(fixture.gateway.document().hasAttunementEvidence(
+                essence.operationId(), "wind"));
     }
 
     @Test
-    void staleRevisionIsTerminallyDeniedAndEssenceIsReleased() throws Exception {
-        UUID owner = UUID.randomUUID();
-        UUID profile = UUID.randomUUID();
-        MemoryProfileData data = new MemoryProfileData();
-        data.writeExisting(profile.toString(), payload("fire", "older"));
-        data.mutateBeforeNextCompare = payload("water", "concurrent");
-        StateStoreOperationJournal journal = journal("stale.properties");
+    void concurrentAbilityWriteRebasesAttunementWithoutLosingOtherData()
+            throws Exception {
+        Fixture fixture = fixture("rebase.properties");
+        BondedMiniwyvernExtensionDocument concurrent = fixture.gateway.document()
+                .withProgression(BondedExtensionJsonValue.parse("{\"level\":4}"));
+        fixture.gateway.mutateBeforeNextCompare = concurrent;
         FakeReservation essence = new FakeReservation(
-                "hydragon:attune:" + owner + ":nature", "Draconic_Essence_Nature");
+                "hydragon:attune:" + fixture.owner + ":nature",
+                "Draconic_Essence_Nature");
 
-        GameplayResult result = service(owner, profile, data, journal,
-                new CountingProjection(), fullCapabilities())
-                .attune(owner, "nature", essence).toCompletableFuture().join();
+        GameplayResult result = fixture.service.attune(
+                fixture.owner, "nature", essence).toCompletableFuture().join();
+
+        assertEquals(GameplayResult.Status.APPLIED, result.status());
+        assertEquals(1, essence.consumeCalls);
+        assertEquals("nature", fixture.gateway.document().archetypeId());
+        assertEquals(BondedExtensionJsonValue.parse("{\"level\":4}"),
+                fixture.gateway.document().progression());
+        assertTrue(fixture.gateway.compareCalls >= 2);
+    }
+
+    @Test
+    void alreadyAttunedByDifferentOperationDeniesWithoutConsumption()
+            throws Exception {
+        Fixture fixture = fixture("already.properties");
+        fixture.gateway.externalWrite(
+                fixture.gateway.document().attune("ice", "attune-older"));
+        FakeReservation essence = new FakeReservation(
+                "hydragon:attune:" + fixture.owner + ":ice",
+                "Draconic_Essence_Ice");
+
+        GameplayResult result = fixture.service.attune(
+                fixture.owner, "ice", essence).toCompletableFuture().join();
 
         assertEquals(GameplayResult.Status.DENIED, result.status());
         assertEquals(0, essence.consumeCalls);
         assertEquals(1, essence.releaseCalls);
-        // PREPARED is retained because the journal's refund phases are reserved for material that
-        // was actually consumed. The durable Tamework denial closes every retry without another CAS.
-        assertEquals(OperationJournal.Phase.PREPARED,
-                journal.find(essence.operationId()).orElseThrow().phase());
-        FakeReservation replay = new FakeReservation(
-                essence.operationId(), "Draconic_Essence_Nature");
-        GameplayResult replayResult = service(owner, profile, data, journal,
-                new CountingProjection(), fullCapabilities())
-                .attune(owner, "nature", replay).toCompletableFuture().join();
-        assertEquals(GameplayResult.Status.DENIED, replayResult.status());
-        assertEquals(1, data.compareCalls);
-        assertEquals(0, replay.consumeCalls);
+        assertTrue(fixture.journal.find(essence.operationId()).isEmpty());
     }
 
     @Test
-    void missingTransactionCapabilityFailsClosedBeforeJournalOrCas() throws Exception {
-        UUID owner = UUID.randomUUID();
-        UUID profile = UUID.randomUUID();
-        MemoryProfileData data = new MemoryProfileData();
-        StateStoreOperationJournal journal = journal("capability.properties");
-        FakeReservation essence = new FakeReservation(
-                "hydragon:attune:" + owner + ":void", "Draconic_Essence_Void");
-        EnumSet<TameworkApiCapability> capabilities = fullCapabilities();
-        capabilities.remove(TameworkApiCapability.PROFILE_DATA_TRANSACTIONS);
+    void missingOrMalformedExtensionFailsClosedBeforeJournalOrConsumption()
+            throws Exception {
+        Fixture missing = fixture("missing.properties");
+        missing.gateway.rawPayload = null;
+        missing.gateway.revision = -1L;
+        FakeReservation first = new FakeReservation(
+                "hydragon:attune:" + missing.owner + ":water",
+                "Draconic_Essence_Water");
+        GameplayResult missingResult = missing.service.attune(
+                missing.owner, "water", first).toCompletableFuture().join();
 
-        GameplayResult result = service(owner, profile, data, journal,
-                new CountingProjection(), capabilities)
-                .attune(owner, "void", essence).toCompletableFuture().join();
+        assertEquals(GameplayResult.Status.RECONCILIATION_REQUIRED,
+                missingResult.status());
+        assertEquals(0, first.consumeCalls);
+        assertEquals(1, first.releaseCalls);
+        assertTrue(missing.journal.find(first.operationId()).isEmpty());
+
+        Fixture malformed = fixture("malformed.properties");
+        malformed.gateway.rawPayload = "{}";
+        FakeReservation second = new FakeReservation(
+                "hydragon:attune:" + malformed.owner + ":void",
+                "Draconic_Essence_Void");
+        GameplayResult malformedResult = malformed.service.attune(
+                malformed.owner, "void", second).toCompletableFuture().join();
+        assertEquals(GameplayResult.Status.RECONCILIATION_REQUIRED,
+                malformedResult.status());
+        assertEquals(0, second.consumeCalls);
+        assertEquals(1, second.releaseCalls);
+    }
+
+    @Test
+    void missingBondedCapabilityFailsClosedBeforeJournalOrCas() throws Exception {
+        Fixture fixture = fixture(
+                "capability.properties", EnumSet.noneOf(TameworkApiCapability.class));
+        FakeReservation essence = new FakeReservation(
+                "hydragon:attune:" + fixture.owner + ":void",
+                "Draconic_Essence_Void");
+
+        GameplayResult result = fixture.service.attune(
+                fixture.owner, "void", essence).toCompletableFuture().join();
 
         assertEquals(GameplayResult.Status.UNAVAILABLE, result.status());
-        assertEquals(0, data.compareCalls);
+        assertEquals(0, fixture.gateway.compareCalls);
         assertEquals(0, essence.consumeCalls);
         assertEquals(1, essence.releaseCalls);
-        assertTrue(journal.find(essence.operationId()).isEmpty());
+        assertTrue(fixture.journal.find(essence.operationId()).isEmpty());
     }
 
-    private StateStoreOperationJournal journal(String name) throws Exception {
-        return new StateStoreOperationJournal(new HyDragonStateStore(temp.resolve(name)), () -> 10L);
+    private Fixture fixture(String journalName) throws Exception {
+        return fixture(journalName,
+                EnumSet.of(TameworkApiCapability.BONDED_COMPANIONS));
     }
 
-    private static MiniwyvernAttunementService service(
-            UUID owner,
-            UUID profile,
-            ProfileDataApi data,
-            OperationJournal journal,
-            MiniwyvernAttunementService.ProfileProjection projection,
-            EnumSet<TameworkApiCapability> capabilities) {
-        SoulBondLedger ledger = new SoulBondLedger() {
-            public Reservation reserve(UUID playerUuid, String operationId) { return Reservation.CONFLICT; }
-            public Reservation complete(UUID playerUuid, String operationId, UUID profileId, long claimedAt) {
+    private Fixture fixture(
+            String journalName,
+            EnumSet<TameworkApiCapability> capabilities) throws Exception {
+        UUID owner = UUID.randomUUID();
+        UUID profile = UUID.randomUUID();
+        MemoryGateway gateway = new MemoryGateway(owner, profile.toString());
+        gateway.install(BondedMiniwyvernExtensionDocument.neutral(
+                "hydragon:miniwyvern", 10L), 0L);
+        StateStoreOperationJournal journal = new StateStoreOperationJournal(
+                new HyDragonStateStore(temp.resolve(journalName)), () -> 10L);
+        TameworkGameplayAdapter adapter = new TameworkGameplayAdapter(
+                api(capabilities));
+        SoulBondLedger ledger = claimedLedger(owner, profile);
+        MiniwyvernAttunementService service = new MiniwyvernAttunementService(
+                adapter,
+                new BondedMiniwyvernExtensionStore(gateway, CODEC),
+                ledger,
+                journal);
+        return new Fixture(owner, gateway, journal, service);
+    }
+
+    private static SoulBondLedger claimedLedger(UUID owner, UUID profile) {
+        return new SoulBondLedger() {
+            public Reservation reserve(UUID playerUuid, String operationId) {
                 return Reservation.CONFLICT;
             }
-            public Reservation reconcile(UUID playerUuid, String operationId, Optional<UUID> profileId) {
+
+            public Reservation complete(
+                    UUID playerUuid, String operationId, UUID profileId, long claimedAt) {
                 return Reservation.CONFLICT;
             }
+
+            public Reservation reconcile(
+                    UUID playerUuid, String operationId, Optional<UUID> profileId) {
+                return Reservation.CONFLICT;
+            }
+
             public Optional<Claim> find(UUID playerUuid) {
                 return playerUuid.equals(owner)
-                        ? Optional.of(new Claim("soul-bond", Optional.of(profile), Claim.State.CLAIMED))
+                        ? Optional.of(new Claim(
+                        "soul-bond", Optional.of(profile), Claim.State.CLAIMED))
                         : Optional.empty();
             }
         };
-        return new MiniwyvernAttunementService(
-                new TameworkGameplayAdapter(api(capabilities, data)), ledger, journal, projection);
     }
 
-    private static EnumSet<TameworkApiCapability> fullCapabilities() {
-        return EnumSet.of(
-                TameworkApiCapability.PROFILE_DATA,
-                TameworkApiCapability.PROFILE_DATA_TRANSACTIONS);
+    private static TameworkApi api(EnumSet<TameworkApiCapability> capabilities) {
+        BondedCompanionApi bonded = proxy(BondedCompanionApi.class,
+                (method, arguments) -> {
+                    if (method.equals("availability")) {
+                        return BondedCompanionAvailability.availableNow();
+                    }
+                    throw new AssertionError("unexpected bonded call " + method);
+                });
+        return proxy(TameworkApi.class, (method, arguments) -> switch (method) {
+            case "getApiVersion" -> "3.0.0";
+            case "getCapabilities" -> capabilities.clone();
+            case "bondedCompanions" -> bonded;
+            default -> throw new AssertionError("legacy API accessed: " + method);
+        });
     }
 
-    private static TameworkApi api(
-            EnumSet<TameworkApiCapability> capabilities,
-            ProfileDataApi data) {
-        return new TameworkApi() {
-            public String getApiVersion() { return "0.9.0"; }
-            public EnumSet<TameworkApiCapability> getCapabilities() { return capabilities.clone(); }
-            public NpcProfilesApi profiles() { return null; }
-            public CommandLinksApi commandLinks() { return null; }
-            public ProgressionApi progression() { return null; }
-            public PolicyApi policies() { return null; }
-            public InteractionExtensionApi interactionExtensions() { return null; }
-            public TraitEffectApi traitEffects() { return null; }
-            public ProfileDataApi profileData() { return data; }
-            public TameworkEventsApi events() { return null; }
-            public TameworkConfigReadApi configs() { return null; }
-            public DiagnosticsApi diagnostics() { return null; }
-        };
+    @SuppressWarnings("unchecked")
+    private static <T> T proxy(Class<T> type, Invocation invocation) {
+        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type },
+                (instance, method, arguments) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        return switch (method.getName()) {
+                            case "toString" -> "Fake" + type.getSimpleName();
+                            case "hashCode" -> System.identityHashCode(instance);
+                            case "equals" -> instance == arguments[0];
+                            default -> null;
+                        };
+                    }
+                    return invocation.invoke(method.getName(), arguments);
+                });
     }
 
-    private static String payload(String archetype, String operationId) {
-        return "{\"schemaVersion\":1,\"archetypeId\":\"" + archetype
-                + "\",\"attunementOperationId\":\"" + operationId + "\"}";
+    @FunctionalInterface
+    private interface Invocation {
+        Object invoke(String method, Object[] arguments) throws Throwable;
     }
 
-    private static final class CountingProjection
-            implements MiniwyvernAttunementService.ProfileProjection {
-        private int calls;
-        private Decision decision = Decision.APPLIED;
-
-        public Decision synchronize(UUID profileId, String archetypeId, String operationId) {
-            calls++;
-            return decision;
-        }
+    private record Fixture(
+            UUID owner,
+            MemoryGateway gateway,
+            StateStoreOperationJournal journal,
+            MiniwyvernAttunementService service) {
     }
 
     private static final class FakeReservation implements ConsumableReservation {
@@ -231,110 +276,125 @@ class MiniwyvernAttunementServiceTest {
             this.itemId = itemId;
         }
 
-        public String operationId() { return operationId; }
+        public String operationId() {
+            return operationId;
+        }
+
         public SourceEvidence sourceEvidence() {
             return new SourceEvidence(itemId, "player", "hotbar", 0, 1L,
                     "fingerprint:" + operationId, 1);
         }
-        public int quantity() { return 1; }
+
+        public int quantity() {
+            return 1;
+        }
+
         public CompletionStage<Disposition> consume() {
             consumeCalls++;
             return CompletableFuture.completedFuture(Disposition.APPLIED);
         }
+
         public CompletionStage<Disposition> release() {
             releaseCalls++;
             return CompletableFuture.completedFuture(Disposition.APPLIED);
         }
     }
 
-    private static final class MemoryProfileData implements ProfileDataApi {
-        private final Map<String, ProfileDataEntryView> values = new LinkedHashMap<>();
-        private final Map<String, ProfileDataOperationView> operations = new LinkedHashMap<>();
+    private static final class MemoryGateway implements BondedMiniwyvernExtensionGateway {
+        private final UUID owner;
+        private final String profile;
+        private final Map<String, Operation> operations = new LinkedHashMap<>();
+        private String rawPayload;
+        private long revision = -1L;
         private boolean failNextResponseAfterCommit;
-        private String mutateBeforeNextCompare;
+        private BondedMiniwyvernExtensionDocument mutateBeforeNextCompare;
         private int compareCalls;
         private int commits;
 
-        void writeExisting(String profileId, String payload) {
-            long revision = Optional.ofNullable(values.get(profileId))
-                    .map(ProfileDataEntryView::revision).orElse(0L) + 1L;
-            values.put(profileId, new ProfileDataEntryView(profileId,
-                    MiniwyvernAttunementService.NAMESPACE, MiniwyvernAttunementService.KEY,
-                    revision, payload, revision));
+        private MemoryGateway(UUID owner, String profile) {
+            this.owner = owner;
+            this.profile = profile;
         }
 
-        public Optional<String> get(String profileId, String namespace, String key) {
-            return getVersioned(profileId, namespace, key).map(ProfileDataEntryView::jsonPayload);
+        private void install(BondedMiniwyvernExtensionDocument document, long revision) {
+            rawPayload = CODEC.encode(document);
+            this.revision = revision;
         }
-        public Map<String, String> list(String profileId, String namespace) { return Map.of(); }
-        public boolean put(String profileId, String namespace, String key, String jsonPayload) {
-            throw new AssertionError("unfenced put must not be used");
+
+        private BondedMiniwyvernExtensionDocument document() {
+            return CODEC.decode(rawPayload);
         }
-        public boolean delete(String profileId, String namespace, String key) { return false; }
-        public Optional<ProfileDataEntryView> getVersioned(String profileId, String namespace, String key) {
-            return Optional.ofNullable(values.get(profileId));
+
+        private void externalWrite(BondedMiniwyvernExtensionDocument document) {
+            install(document, revision + 1L);
         }
-        public CompletionStage<Optional<ProfileDataOperationView>> findOperation(
-                String namespace, String idempotencyKey) {
-            return CompletableFuture.completedFuture(Optional.ofNullable(operations.get(idempotencyKey)));
+
+        @Override
+        public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
+                getMiniwyvernExtension(UUID ownerUuid, String profileId) {
+            if (rawPayload == null) {
+                return CompletableFuture.completedFuture(new BondedCompanionResult<>(
+                        BondedCompanionResultCode.NOT_FOUND, null, "missing"));
+            }
+            return CompletableFuture.completedFuture(success(rawPayload, revision));
         }
-        public CompletionStage<ProfileDataCompareAndSetResult> compareAndSet(
-                ProfileDataCompareAndSetRequest request) {
+
+        @Override
+        public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
+                compareAndSetMiniwyvernExtension(
+                        UUID ownerUuid, String profileId, String idempotencyKey,
+                        String jsonPayload, long expectedRevision) {
             compareCalls++;
-            ProfileDataOperationView prior = operations.get(request.idempotencyKey());
-            if (prior != null) return CompletableFuture.completedFuture(result(prior));
+            Operation prior = operations.get(idempotencyKey);
+            if (prior != null) {
+                boolean exact = prior.payload.equals(jsonPayload)
+                        && prior.expectedRevision == expectedRevision;
+                return CompletableFuture.completedFuture(exact && prior.resultingRevision >= 0L
+                        ? success(prior.payload, prior.resultingRevision)
+                        : conflict());
+            }
             if (mutateBeforeNextCompare != null) {
-                String payload = mutateBeforeNextCompare;
+                BondedMiniwyvernExtensionDocument concurrent = mutateBeforeNextCompare;
                 mutateBeforeNextCompare = null;
-                writeExisting(request.profileId(), payload);
+                externalWrite(concurrent);
             }
-            long current = Optional.ofNullable(values.get(request.profileId()))
-                    .map(ProfileDataEntryView::revision).orElse(0L);
-            if (current != request.expectedRevision()) {
-                ProfileDataOperationView denied = operation(
-                        request, ProfileDataOperationStatus.TERMINAL_DENIED, -1L);
-                operations.put(request.idempotencyKey(), denied);
-                return CompletableFuture.completedFuture(new ProfileDataCompareAndSetResult(
-                        ProfileDataCompareAndSetResult.Status.TERMINAL_DENIED,
-                        "revision-conflict", denied, null));
+            if (revision != expectedRevision) {
+                operations.put(idempotencyKey,
+                        new Operation(jsonPayload, expectedRevision, -1L));
+                return CompletableFuture.completedFuture(conflict());
             }
-            long resulting = current + 1L;
-            ProfileDataEntryView entry = new ProfileDataEntryView(
-                    request.profileId(), request.namespace(), request.key(), resulting,
-                    request.jsonPayload(), resulting);
-            values.put(request.profileId(), entry);
-            ProfileDataOperationView committed = operation(
-                    request, ProfileDataOperationStatus.COMMITTED, resulting);
-            operations.put(request.idempotencyKey(), committed);
+            revision++;
+            rawPayload = jsonPayload;
             commits++;
+            operations.put(idempotencyKey,
+                    new Operation(jsonPayload, expectedRevision, revision));
             if (failNextResponseAfterCommit) {
                 failNextResponseAfterCommit = false;
-                return CompletableFuture.failedFuture(new IllegalStateException("lost response"));
+                return CompletableFuture.failedFuture(
+                        new IllegalStateException("lost response"));
             }
-            return CompletableFuture.completedFuture(new ProfileDataCompareAndSetResult(
-                    ProfileDataCompareAndSetResult.Status.COMMITTED,
-                    "committed", committed, entry));
+            return CompletableFuture.completedFuture(success(rawPayload, revision));
         }
 
-        private ProfileDataCompareAndSetResult result(ProfileDataOperationView operation) {
-            if (operation.status() == ProfileDataOperationStatus.COMMITTED) {
-                return new ProfileDataCompareAndSetResult(
-                        ProfileDataCompareAndSetResult.Status.COMMITTED,
-                        "replayed", operation, values.get(operation.profileId()));
-            }
-            return new ProfileDataCompareAndSetResult(
-                    ProfileDataCompareAndSetResult.Status.TERMINAL_DENIED,
-                    operation.reason(), operation, null);
+        private BondedCompanionResult<BondedCompanionExtensionData> success(
+                String payload,
+                long revision) {
+            return new BondedCompanionResult<>(
+                    BondedCompanionResultCode.SUCCESS,
+                    new BondedCompanionExtensionData(
+                            new BondedCompanionExtensionDataKey(
+                                    owner, profile,
+                                    BondedMiniwyvernExtensionDocument.NAMESPACE),
+                            payload, revision, 10L),
+                    null);
         }
 
-        private static ProfileDataOperationView operation(
-                ProfileDataCompareAndSetRequest request,
-                ProfileDataOperationStatus status,
-                long resultingRevision) {
-            return new ProfileDataOperationView(
-                    UUID.randomUUID(), request.namespace(), request.idempotencyKey(),
-                    request.profileId(), request.key(), request.expectedRevision(), resultingRevision,
-                    "fingerprint", status, status.name().toLowerCase(), 1L);
+        private static BondedCompanionResult<BondedCompanionExtensionData> conflict() {
+            return new BondedCompanionResult<>(
+                    BondedCompanionResultCode.REVISION_CONFLICT, null, "conflict");
+        }
+
+        private record Operation(String payload, long expectedRevision, long resultingRevision) {
         }
     }
 }
