@@ -14,6 +14,7 @@ import com.alechilles.hydragon.diagnostics.HyDragonRefundClaimCommand;
 import com.alechilles.hydragon.encounters.DynamicEncounterRuntime;
 import com.alechilles.hydragon.encounters.HyDragonEncounterRegistrationFacade;
 import com.alechilles.hydragon.encounters.HyDragonEncounterServerRuntime;
+import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkCapabilityDiagnostics;
@@ -24,6 +25,7 @@ import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
 import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
 import com.alechilles.hydragon.runtime.HyDragonGameplayRuntime;
+import com.alechilles.hydragon.runtime.HyDragonRuntimeComposition;
 import com.alechilles.hydragon.runtime.MiniwyvernAttunementService;
 import com.alechilles.hydragon.runtime.SoulBondLedger;
 import com.alechilles.hydragon.runtime.SoulBondService;
@@ -56,6 +58,7 @@ public final class HyDragonPlugin extends JavaPlugin {
     private MiniwyvernAbilityRuntime abilityRuntime;
     private ConsumableSagaRecoveryRuntime sagaRecoveryRuntime;
     private ConsumableRefundClaimService refundClaims;
+    private HyDragonRuntimeComposition runtimeComposition;
 
     public HyDragonPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -179,61 +182,122 @@ public final class HyDragonPlugin extends JavaPlugin {
             return;
         }
 
-        try {
-            TameworkGameplayAdapter adapter = new TameworkGameplayAdapter(api);
-            SoulBondLedger soulBonds = new StateStoreSoulBondLedger(store);
-            StateStoreOperationJournal journal = new StateStoreOperationJournal(store, System::currentTimeMillis);
-            SoulBondService soulBondService = new SoulBondService(
-                    adapter, soulBonds, journal, System::currentTimeMillis);
-            MiniwyvernAttunementService attunementService = new MiniwyvernAttunementService(
-                    adapter,
-                    soulBonds,
-                    journal,
-                    new StateStoreMiniwyvernProfileProjection(store));
-            sagaRecoveryRuntime = new ConsumableSagaRecoveryRuntime(journal, soulBondService);
-            refundClaims = new ConsumableRefundClaimService(journal);
-
-            gameplayRuntime = new HyDragonGameplayRuntime(
-                    soulBondService,
-                    attunementService);
-            HyDragonInteractionRuntime.install(
-                    gameplayRuntime,
-                    () -> bridge.snapshot());
-
-            encounterRuntime = HyDragonEncounterRegistrationFacade.install(
-                    api,
-                    store,
-                    configRepository::snapshot,
-                    () -> bridge.snapshot().feature(HyDragonFeature.DYNAMIC_ENCOUNTERS),
-                    serverRuntime.worlds());
-            abilityRuntime = HyDragonAbilityRegistrationFacade.install(
-                    api,
-                    store,
-                    configRepository::snapshot,
-                    () -> bridge.snapshot().feature(HyDragonFeature.MINIWYVERN_ABILITIES),
-                    new HytaleMiniwyvernAbilityWorldDispatcher(api));
-            serverRuntime.start(
-                    encounterRuntime, abilityRuntime, sagaRecoveryRuntime, configRepository::snapshot);
-            getLogger().at(Level.INFO).log("HyDragon gameplay, encounter, and Miniwyvern runtimes are active.");
-        } catch (RuntimeException | LinkageError failure) {
-            stopRuntimes();
-            getLogger().at(Level.SEVERE).withCause(failure).log(
-                    "HyDragon runtime startup failed; gameplay interactions are disabled.");
-        }
+        TameworkBridge.Snapshot gates = bridge.snapshot();
+        runtimeComposition = new HyDragonRuntimeComposition(this::logRuntimeFailure);
+        installGameplay(api, store, bridge, gates);
+        installAbilities(api, store, bridge, gates);
+        installEncounters(api, store, bridge, gates);
+        startSharedRuntime();
     }
 
     private void stopRuntimes() {
         closeRuntime("live server", serverRuntime);
-        closeRuntime("Miniwyvern ability", abilityRuntime);
-        closeRuntime("dynamic encounter", encounterRuntime);
-        if (gameplayRuntime != null) {
-            HyDragonInteractionRuntime.uninstall(gameplayRuntime);
-        }
+        closeRuntime("feature composition", runtimeComposition);
+        runtimeComposition = null;
         gameplayRuntime = null;
         encounterRuntime = null;
         abilityRuntime = null;
         sagaRecoveryRuntime = null;
         refundClaims = null;
+    }
+
+    private void installGameplay(
+            TameworkApi api,
+            HyDragonStateStore store,
+            TameworkBridge bridge,
+            TameworkBridge.Snapshot gates) {
+        GameplayInstallation installed = runtimeComposition.install(
+                HyDragonRuntimeComposition.Slot.BONDED_GAMEPLAY,
+                gameplayGate(gates),
+                () -> createGameplay(api, store, bridge));
+        if (installed == null) return;
+        gameplayRuntime = installed.gameplay();
+        sagaRecoveryRuntime = installed.sagaRecovery();
+        refundClaims = installed.refundClaims();
+    }
+
+    private GameplayInstallation createGameplay(
+            TameworkApi api,
+            HyDragonStateStore store,
+            TameworkBridge bridge) {
+        TameworkGameplayAdapter adapter = new TameworkGameplayAdapter(api);
+        SoulBondLedger soulBonds = new StateStoreSoulBondLedger(store);
+        StateStoreOperationJournal journal = new StateStoreOperationJournal(
+                store, System::currentTimeMillis);
+        SoulBondService soulBondService = new SoulBondService(
+                adapter, soulBonds, journal, System::currentTimeMillis);
+        MiniwyvernAttunementService attunementService =
+                new MiniwyvernAttunementService(adapter, soulBonds, journal,
+                        new StateStoreMiniwyvernProfileProjection(store));
+        HyDragonGameplayRuntime gameplay = new HyDragonGameplayRuntime(
+                soulBondService, attunementService);
+        HyDragonInteractionRuntime.install(gameplay, bridge::snapshot);
+        return new GameplayInstallation(
+                gameplay,
+                new ConsumableSagaRecoveryRuntime(journal, soulBondService),
+                new ConsumableRefundClaimService(journal));
+    }
+
+    private void installAbilities(
+            TameworkApi api,
+            HyDragonStateStore store,
+            TameworkBridge bridge,
+            TameworkBridge.Snapshot gates) {
+        abilityRuntime = runtimeComposition.install(
+                HyDragonRuntimeComposition.Slot.MINIWYVERN_ABILITIES,
+                gates.feature(HyDragonFeature.MINIWYVERN_ABILITIES),
+                () -> HyDragonAbilityRegistrationFacade.install(
+                        api, store, configRepository::snapshot,
+                        () -> bridge.snapshot().feature(
+                                HyDragonFeature.MINIWYVERN_ABILITIES),
+                        new HytaleMiniwyvernAbilityWorldDispatcher(api)));
+    }
+
+    private void installEncounters(
+            TameworkApi api,
+            HyDragonStateStore store,
+            TameworkBridge bridge,
+            TameworkBridge.Snapshot gates) {
+        encounterRuntime = runtimeComposition.install(
+                HyDragonRuntimeComposition.Slot.DYNAMIC_ENCOUNTERS,
+                gates.feature(HyDragonFeature.DYNAMIC_ENCOUNTERS),
+                () -> HyDragonEncounterRegistrationFacade.install(
+                        api, store, configRepository::snapshot,
+                        () -> bridge.snapshot().feature(
+                                HyDragonFeature.DYNAMIC_ENCOUNTERS),
+                        serverRuntime.worlds()));
+    }
+
+    private void startSharedRuntime() {
+        if (runtimeComposition.startedSlots().isEmpty()) {
+            getLogger().at(Level.WARNING).log(
+                    "No HyDragon gameplay feature runtime is currently available.");
+            return;
+        }
+        try {
+            serverRuntime.start(encounterRuntime, abilityRuntime,
+                    sagaRecoveryRuntime, configRepository::snapshot);
+            getLogger().at(Level.INFO).log(
+                    "HyDragon feature runtimes active: %s.",
+                    runtimeComposition.startedSlots());
+        } catch (RuntimeException | LinkageError failure) {
+            getLogger().at(Level.SEVERE).withCause(failure).log(
+                    "HyDragon shared poller startup failed; installed interactions remain active.");
+        }
+    }
+
+    private FeatureGate gameplayGate(TameworkBridge.Snapshot gates) {
+        FeatureGate soulBond = gates.feature(HyDragonFeature.SOUL_BOND_CLAIM);
+        FeatureGate attunement = gates.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT);
+        return soulBond.available() ? soulBond : attunement;
+    }
+
+    private void logRuntimeFailure(HyDragonRuntimeComposition.Failure failure) {
+        getLogger().at(failure.phase() == HyDragonRuntimeComposition.Phase.INSTALL
+                        ? Level.SEVERE : Level.WARNING)
+                .withCause(failure.cause())
+                .log("HyDragon %s runtime %s failed; other feature runtimes remain active.",
+                        failure.slot(), failure.phase().name().toLowerCase());
     }
 
     private void closeRuntime(String label, AutoCloseable runtime) {
@@ -289,5 +353,22 @@ public final class HyDragonPlugin extends JavaPlugin {
                 configRepository::onEncounterLoaded);
         getEventRegistry().register(RemovedAssetsEvent.class, DragonEncounterConfig.class,
                 configRepository::onEncounterRemoved);
+    }
+
+    /** Owns the shared interaction installation and its gameplay polling collaborators. */
+    private record GameplayInstallation(
+            HyDragonGameplayRuntime gameplay,
+            ConsumableSagaRecoveryRuntime sagaRecovery,
+            ConsumableRefundClaimService refundClaims) implements AutoCloseable {
+        private GameplayInstallation {
+            java.util.Objects.requireNonNull(gameplay, "gameplay");
+            java.util.Objects.requireNonNull(sagaRecovery, "sagaRecovery");
+            java.util.Objects.requireNonNull(refundClaims, "refundClaims");
+        }
+
+        @Override
+        public void close() {
+            HyDragonInteractionRuntime.uninstall(gameplay);
+        }
     }
 }
