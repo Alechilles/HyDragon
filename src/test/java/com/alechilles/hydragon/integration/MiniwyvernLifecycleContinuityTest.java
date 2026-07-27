@@ -79,7 +79,7 @@ class MiniwyvernLifecycleContinuityTest {
         AtomicInteger firstRuntimeDispatches = new AtomicInteger();
         AtomicInteger cleanupCalls = new AtomicInteger();
         MemoryAbilityStates firstRuntimeStates = new MemoryAbilityStates();
-        firstRuntimeStates.save(PROFILE.toString(), trackedAbilityState());
+        firstRuntimeStates.save(OWNER, PROFILE.toString(), trackedAbilityState());
         MiniwyvernAbilityRuntime firstRuntime = runtime(
                 api, restartedStore, firstRuntimeStates, firstRuntimeDispatches, cleanupCalls,
                 Clock.fixed(Instant.ofEpochMilli(3_000L), ZoneOffset.UTC));
@@ -335,11 +335,14 @@ class MiniwyvernLifecycleContinuityTest {
 
     private static final class MemoryAbilityStates implements MiniwyvernAbilityStateRepository {
         private final Map<String, MiniwyvernAbilityState> states = new LinkedHashMap<>();
-        @Override public LoadResult load(String profileId) {
+        @Override public LoadResult load(UUID ownerUuid, String profileId) {
             MiniwyvernAbilityState state = states.get(profileId);
             return state == null ? LoadResult.missing() : LoadResult.loaded(state);
         }
-        @Override public boolean save(String profileId, MiniwyvernAbilityState state) {
+        @Override public boolean save(
+                UUID ownerUuid,
+                String profileId,
+                MiniwyvernAbilityState state) {
             states.put(profileId, state);
             return true;
         }

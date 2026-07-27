@@ -1,9 +1,12 @@
 package com.alechilles.hydragon.abilities;
 
 import com.alechilles.alecstamework.api.TameworkApi;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
+import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
 import java.time.Clock;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -21,7 +24,10 @@ public final class HyDragonAbilityRegistrationFacade {
             MiniwyvernAbilityWorldDispatcher worlds) {
         Objects.requireNonNull(api, "api");
         MiniwyvernAbilityService service = new MiniwyvernAbilityService(
-                new TameworkMiniwyvernAbilityStateRepository(api.profileData()));
+                new TameworkMiniwyvernAbilityStateRepository(
+                        new BondedMiniwyvernExtensionStore(
+                                new TameworkGameplayAdapter(api),
+                                new BondedMiniwyvernExtensionCodec())));
         MiniwyvernAbilityRuntime runtime = new MiniwyvernAbilityRuntime(
                 api, stateStore, configs, featureGate, worlds, service, Clock.systemUTC());
         try {

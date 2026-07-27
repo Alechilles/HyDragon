@@ -562,12 +562,15 @@ class MiniwyvernAbilityServiceTest {
         MiniwyvernAbilityState current;
         boolean unavailable;
 
-        @Override public LoadResult load(String profileId) {
+        @Override public LoadResult load(UUID ownerUuid, String profileId) {
             if (unavailable) return LoadResult.unavailable();
             return current == null ? LoadResult.missing() : LoadResult.loaded(current);
         }
 
-        @Override public boolean save(String profileId, MiniwyvernAbilityState state) {
+        @Override public boolean save(
+                UUID ownerUuid,
+                String profileId,
+                MiniwyvernAbilityState state) {
             if (unavailable) return false;
             current = state;
             return true;
