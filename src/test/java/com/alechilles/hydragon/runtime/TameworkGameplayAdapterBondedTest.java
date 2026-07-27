@@ -18,6 +18,7 @@ import com.alechilles.alecstamework.api.BondedCompanionResultCode;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -73,6 +74,17 @@ final class TameworkGameplayAdapterBondedTest {
         assertEquals(TameworkGameplayAdapter.DRAGON_HORN_ROSTER, bonded.captureRoster);
         assertEquals(SOURCE, bonded.captureSource);
         assertSame(bonded.subscription, subscription);
+    }
+
+    @Test
+    void adapterDoesNotExposeLegacyGenericPersistenceEntrypoints() {
+        assertFalse(Arrays.stream(TameworkGameplayAdapter.class.getDeclaredMethods())
+                .map(method -> method.getName())
+                .anyMatch(name -> name.equals("findVersionedProfileData")
+                        || name.equals("compareAndSetProfileData")
+                        || name.equals("findProfileDataOperation")
+                        || name.equals("provisionAndLinkMiniwyvern")
+                        || name.equals("findMiniwyvern")));
     }
 
     private static BondedCompanionApi bondedAvailable() {

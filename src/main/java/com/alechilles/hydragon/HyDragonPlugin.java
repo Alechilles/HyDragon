@@ -4,6 +4,8 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.abilities.HyDragonAbilityRegistrationFacade;
 import com.alechilles.hydragon.abilities.HytaleMiniwyvernAbilityWorldDispatcher;
 import com.alechilles.hydragon.abilities.MiniwyvernAbilityRuntime;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
@@ -29,7 +31,6 @@ import com.alechilles.hydragon.runtime.HyDragonRuntimeComposition;
 import com.alechilles.hydragon.runtime.MiniwyvernAttunementService;
 import com.alechilles.hydragon.runtime.SoulBondLedger;
 import com.alechilles.hydragon.runtime.SoulBondService;
-import com.alechilles.hydragon.runtime.StateStoreMiniwyvernProfileProjection;
 import com.alechilles.hydragon.runtime.StateStoreOperationJournal;
 import com.alechilles.hydragon.runtime.StateStoreSoulBondLedger;
 import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
@@ -224,11 +225,14 @@ public final class HyDragonPlugin extends JavaPlugin {
         SoulBondLedger soulBonds = new StateStoreSoulBondLedger(store);
         StateStoreOperationJournal journal = new StateStoreOperationJournal(
                 store, System::currentTimeMillis);
+        BondedMiniwyvernExtensionStore extensions =
+                new BondedMiniwyvernExtensionStore(
+                        adapter, new BondedMiniwyvernExtensionCodec());
         SoulBondService soulBondService = new SoulBondService(
-                adapter, soulBonds, journal, System::currentTimeMillis);
+                adapter, extensions, soulBonds, journal, System::currentTimeMillis);
         MiniwyvernAttunementService attunementService =
-                new MiniwyvernAttunementService(adapter, soulBonds, journal,
-                        new StateStoreMiniwyvernProfileProjection(store));
+                new MiniwyvernAttunementService(
+                        adapter, extensions, soulBonds, journal);
         HyDragonGameplayRuntime gameplay = new HyDragonGameplayRuntime(
                 soulBondService, attunementService);
         HyDragonInteractionRuntime.install(gameplay, bridge::snapshot);

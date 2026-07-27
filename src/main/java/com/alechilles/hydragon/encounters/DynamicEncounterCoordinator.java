@@ -1,7 +1,9 @@
 package com.alechilles.hydragon.encounters;
 
-import com.alechilles.alecstamework.api.CaptureAttemptOutcome;
-import com.alechilles.alecstamework.api.CaptureAttemptResolvedEvent;
+import com.alechilles.alecstamework.api.BondedCompanionCaptureEvidenceView;
+import com.alechilles.alecstamework.api.BondedCompanionCaptureResolvedEvent;
+import com.alechilles.alecstamework.api.BondedCompanionResult;
+import com.alechilles.alecstamework.api.BondedCompanionResultCode;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
@@ -10,6 +12,7 @@ import com.alechilles.hydragon.persistence.EncounterDefinitionSnapshot;
 import com.alechilles.hydragon.persistence.EncounterRecord;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.persistence.MutationOutcome;
+import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -21,11 +24,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /** Crash-safe dynamic encounter admission and phase coordinator. */
 public final class DynamicEncounterCoordinator {
     private final Object lock = new Object();
-    private final TameworkApi api;
+    private final TameworkGameplayAdapter tamework;
     private final HyDragonStateStore stateStore;
     private final EncounterEligibilityService eligibility;
 
@@ -33,7 +37,7 @@ public final class DynamicEncounterCoordinator {
             TameworkApi api,
             HyDragonStateStore stateStore,
             EncounterEligibilityService eligibility) {
-        this.api = Objects.requireNonNull(api, "api");
+        this.tamework = new TameworkGameplayAdapter(Objects.requireNonNull(api, "api"));
         this.stateStore = Objects.requireNonNull(stateStore, "stateStore");
         this.eligibility = Objects.requireNonNull(eligibility, "eligibility");
     }
@@ -232,7 +236,7 @@ public final class DynamicEncounterCoordinator {
                         checkpoint.groundingBuildup());
             }
             UUID target = current.targetNpcUuid().orElse(null);
-            CaptureStatus captureStatus = target == null ? CaptureStatus.NOT_CAPTURED : captureStatus(target);
+            CaptureStatus captureStatus = target == null ? CaptureStatus.NOT_CAPTURED : captureStatus(current);
             if (captureStatus == CaptureStatus.CAPTURED) {
                 return enterCooldown(current, current.definitionSnapshot(), nowMs)
                         ? new TransitionResult(true, "captured-at-eligibility-boundary",
@@ -260,12 +264,12 @@ public final class DynamicEncounterCoordinator {
     }
 
     public void onCaptureResolved(
-            CaptureAttemptResolvedEvent event,
+            BondedCompanionCaptureResolvedEvent event,
             EncounterWorldGateway world) {
-        if (event == null || event.outcome() != CaptureAttemptOutcome.CAPTURED || !world.isWorldThread()) return;
+        if (event == null || !world.isWorldThread() || !isFullDragonCapture(event.capture())) return;
         synchronized (lock) {
-            findByTarget(event.targetNpcUuid()).ifPresent(record -> enterCooldown(
-                    record, record.definitionSnapshot(), Math.max(0L, event.resolvedAtMs())));
+            findByTarget(event.capture().sourceNpcUuid()).ifPresent(record -> enterCooldown(
+                    record, record.definitionSnapshot(), Math.max(0L, event.capture().committedAtMs())));
         }
     }
 
@@ -289,7 +293,7 @@ public final class DynamicEncounterCoordinator {
             if (decode(current).phase() == EncounterPhase.COOLDOWN) {
                 return new TransitionResult(true, "cooldown-preserved", EncounterPhase.COOLDOWN, 0.0D);
             }
-            CaptureStatus status = captureStatus(targetNpcUuid);
+            CaptureStatus status = captureStatus(current);
             if (status == CaptureStatus.UNKNOWN) {
                 return TransitionResult.denied("capture-state-ambiguous");
             }
@@ -331,7 +335,7 @@ public final class DynamicEncounterCoordinator {
             }
             if (!expired) return new TransitionResult(true, "active", checkpoint.phase(), checkpoint.groundingBuildup());
             UUID target = current.targetNpcUuid().orElse(null);
-            CaptureStatus captureStatus = target == null ? CaptureStatus.NOT_CAPTURED : captureStatus(target);
+            CaptureStatus captureStatus = target == null ? CaptureStatus.NOT_CAPTURED : captureStatus(current);
             if (captureStatus == CaptureStatus.CAPTURED) {
                 return enterCooldown(current, definition, nowMs)
                         ? new TransitionResult(true, "captured-at-cleanup-boundary", EncounterPhase.COOLDOWN, 0.0D)
@@ -430,13 +434,54 @@ public final class DynamicEncounterCoordinator {
                 : TransitionResult.denied("grounded-checkpoint-failed");
     }
 
-    private CaptureStatus captureStatus(UUID targetNpcUuid) {
+    private CaptureStatus captureStatus(EncounterRecord encounter) {
+        UUID sourceNpcUuid = encounter.targetNpcUuid().orElse(null);
+        if (sourceNpcUuid == null || encounter.eligiblePlayerUuids().isEmpty()) {
+            return CaptureStatus.UNKNOWN;
+        }
+        boolean unknown = false;
+        for (UUID ownerUuid : encounter.eligiblePlayerUuids().stream().sorted().toList()) {
+            CaptureStatus status = captureStatus(ownerUuid, sourceNpcUuid);
+            if (status == CaptureStatus.CAPTURED) return status;
+            unknown |= status == CaptureStatus.UNKNOWN;
+        }
+        return unknown ? CaptureStatus.UNKNOWN : CaptureStatus.NOT_CAPTURED;
+    }
+
+    /** Never waits on the world thread; incomplete or failed evidence remains ambiguous for a later retry. */
+    private CaptureStatus captureStatus(UUID ownerUuid, UUID sourceNpcUuid) {
+        BondedCompanionResult<BondedCompanionCaptureEvidenceView> result;
         try {
-            return api.profiles().resolveProfileId(targetNpcUuid).isPresent()
-                    ? CaptureStatus.CAPTURED : CaptureStatus.NOT_CAPTURED;
+            CompletableFuture<BondedCompanionResult<BondedCompanionCaptureEvidenceView>> lookup =
+                    tamework.findDragonCapture(ownerUuid, sourceNpcUuid).toCompletableFuture();
+            if (!lookup.isDone()) return CaptureStatus.UNKNOWN;
+            result = lookup.getNow(null);
         } catch (RuntimeException failure) {
             return CaptureStatus.UNKNOWN;
         }
+        if (result == null) return CaptureStatus.UNKNOWN;
+        if (result.code() == BondedCompanionResultCode.NOT_FOUND) {
+            return CaptureStatus.NOT_CAPTURED;
+        }
+        if (!result.successful() || !isExactCapture(result.value(), ownerUuid, sourceNpcUuid)) {
+            return CaptureStatus.UNKNOWN;
+        }
+        return CaptureStatus.CAPTURED;
+    }
+
+    private static boolean isFullDragonCapture(BondedCompanionCaptureEvidenceView evidence) {
+        return evidence != null
+                && TameworkGameplayAdapter.DRAGON_HORN_ROSTER.equals(evidence.rosterId())
+                && TameworkGameplayAdapter.FULL_DRAGON_FAMILY.equals(evidence.familyId());
+    }
+
+    private static boolean isExactCapture(
+            BondedCompanionCaptureEvidenceView evidence,
+            UUID ownerUuid,
+            UUID sourceNpcUuid) {
+        return isFullDragonCapture(evidence)
+                && ownerUuid.equals(evidence.ownerUuid())
+                && sourceNpcUuid.equals(evidence.sourceNpcUuid());
     }
 
     private Optional<EncounterRecord> findByTarget(UUID targetNpcUuid) {

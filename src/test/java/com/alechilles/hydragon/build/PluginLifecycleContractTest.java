@@ -31,7 +31,8 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("new StateStoreSoulBondLedger(store)"));
         assertTrue(source.contains("new StateStoreOperationJournal("));
         assertTrue(source.contains("store, System::currentTimeMillis"));
-        assertTrue(source.contains("new StateStoreMiniwyvernProfileProjection(store)"));
+        assertTrue(source.contains("new BondedMiniwyvernExtensionStore("));
+        assertTrue(source.contains("new BondedMiniwyvernExtensionCodec()"));
         assertTrue(source.contains("new SoulBondService("));
         assertTrue(source.contains("new MiniwyvernAttunementService("));
         assertTrue(source.contains("new ConsumableSagaRecoveryRuntime("));

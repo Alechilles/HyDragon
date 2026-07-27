@@ -8,21 +8,14 @@ import com.alechilles.alecstamework.api.BondedCompanionExtensionData;
 import com.alechilles.alecstamework.api.BondedCompanionExtensionDataKey;
 import com.alechilles.alecstamework.api.BondedCompanionExtensionDataUpdate;
 import com.alechilles.alecstamework.api.BondedCompanionProfileView;
+import com.alechilles.alecstamework.api.BondedCompanionProvisionRequest;
 import com.alechilles.alecstamework.api.BondedCompanionResult;
-import com.alechilles.alecstamework.api.CompanionProvisioningDisposition;
-import com.alechilles.alecstamework.api.CompanionProvisioningLinkRequest;
-import com.alechilles.alecstamework.api.CompanionProvisioningLinkResult;
-import com.alechilles.alecstamework.api.CompanionProvisioningRequest;
-import com.alechilles.alecstamework.api.ProfileDataCompareAndSetRequest;
-import com.alechilles.alecstamework.api.ProfileDataCompareAndSetResult;
-import com.alechilles.alecstamework.api.ProfileDataEntryView;
-import com.alechilles.alecstamework.api.ProfileDataOperationView;
-import com.alechilles.alecstamework.api.ProvisionedCompanionView;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionGateway;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Objects;
@@ -40,10 +33,6 @@ public final class TameworkGameplayAdapter implements BondedMiniwyvernExtensionG
     public static final String DRAGON_HORN_ROSTER = "hydragon:dragon_horn";
     public static final String FULL_DRAGON_FAMILY = "hydragon:full_dragons";
     public static final String MINIWYVERN_FAMILY = "hydragon:soulbound_mini";
-    public static final String DRAGON_HORN_COMMAND_FAMILY = "hydragon:dragon_horn";
-    public static final String DRAGON_HORN_COMMAND_CONFIG = "HyDragonDragonHorn";
-    public static final String DRAGON_HORN_ITEM_ID = "HyDragon_Dragon_Horn";
-    public static final String MINIWYVERN_POPULATION_GROUP = "hydragon:soulbound_mini";
 
     private final TameworkApi api;
 
@@ -68,6 +57,22 @@ public final class TameworkGameplayAdapter implements BondedMiniwyvernExtensionG
         return bonded().list(
                 Objects.requireNonNull(ownerUuid, "ownerUuid"),
                 DRAGON_HORN_ROSTER);
+    }
+
+    /** Provisions the one-lifetime Miniwyvern directly into the shared Horn roster. */
+    public CompletionStage<BondedCompanionResult<BondedCompanionProfileView>>
+            provisionMiniwyvern(UUID ownerUuid, String operationId) {
+        return bonded().provision(new BondedCompanionProvisionRequest(
+                CALLER_NAMESPACE,
+                Objects.requireNonNull(operationId, "operationId"),
+                Objects.requireNonNull(ownerUuid, "ownerUuid"),
+                DRAGON_HORN_ROSTER,
+                SOULBOUND_MINIWYVERN_ROLE,
+                "Bonded Miniwyvern",
+                "Miniwyvern",
+                null,
+                Map.of("source", "soul-bond"),
+                MINIWYVERN_FAMILY));
     }
 
     @Override
@@ -104,53 +109,6 @@ public final class TameworkGameplayAdapter implements BondedMiniwyvernExtensionG
     public AutoCloseable subscribeBondedChanges(
             Consumer<BondedCompanionChangedEvent> listener) {
         return bonded().subscribe(Objects.requireNonNull(listener, "listener"));
-    }
-
-    public Optional<ProfileDataEntryView> findVersionedProfileData(
-            String profileId,
-            String namespace,
-            String key) {
-        return api.profileData().getVersioned(profileId, namespace, key);
-    }
-
-    public CompletionStage<ProfileDataCompareAndSetResult> compareAndSetProfileData(
-            ProfileDataCompareAndSetRequest request) {
-        return api.profileData().compareAndSet(request);
-    }
-
-    public CompletionStage<Optional<ProfileDataOperationView>> findProfileDataOperation(
-            String namespace,
-            String operationId) {
-        return api.profileData().findOperation(namespace, operationId);
-    }
-
-    public CompletionStage<CompanionProvisioningLinkResult> provisionAndLinkMiniwyvern(
-            UUID playerUuid,
-            String operationId,
-            String ownershipWorldName) {
-        return api.companionProvisioning().provisionAndLink(new CompanionProvisioningLinkRequest(
-                new CompanionProvisioningRequest(
-                        CALLER_NAMESPACE,
-                        operationId,
-                        null,
-                        playerUuid,
-                        SOULBOUND_MINIWYVERN_ROLE,
-                        CompanionProvisioningDisposition.PROVISIONED_DORMANT,
-                        ownershipWorldName,
-                        null,
-                        null,
-                        null,
-                        CompanionProvisioningRequest.CURRENT_POLICY_REVISION),
-                DRAGON_HORN_COMMAND_FAMILY,
-                DRAGON_HORN_COMMAND_CONFIG,
-                DRAGON_HORN_ITEM_ID,
-                MINIWYVERN_POPULATION_GROUP,
-                true,
-                true));
-    }
-
-    public Optional<ProvisionedCompanionView> findMiniwyvern(String profileId) {
-        return api.companionProvisioning().getByProfileId(profileId);
     }
 
     private Readiness readiness(HyDragonFeature feature) {

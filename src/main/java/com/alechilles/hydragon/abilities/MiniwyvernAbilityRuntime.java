@@ -1,42 +1,53 @@
 package com.alechilles.hydragon.abilities;
 
-import com.alechilles.alecstamework.api.NpcProfileChangedEvent;
-import com.alechilles.alecstamework.api.NpcProfileView;
-import com.alechilles.alecstamework.api.ProvisionedCompanionDeathRecordedEvent;
-import com.alechilles.alecstamework.api.ProvisionedCompanionRevivedEvent;
+import com.alechilles.alecstamework.api.BondedCompanionChangedEvent;
+import com.alechilles.alecstamework.api.BondedCompanionLeaseView;
+import com.alechilles.alecstamework.api.BondedCompanionProfileView;
+import com.alechilles.alecstamework.api.BondedCompanionResult;
+import com.alechilles.alecstamework.api.BondedCompanionStateView;
 import com.alechilles.alecstamework.api.TameworkApi;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionDocument;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
-import com.alechilles.hydragon.persistence.ProfileExtensionRecord;
-import com.alechilles.hydragon.persistence.ProfileKind;
+import com.alechilles.hydragon.persistence.PlayerSoulBondRecord;
+import com.alechilles.hydragon.persistence.SoulBondState;
 import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-/** Tamework-event-aware runtime facade around {@link MiniwyvernAbilityService}. */
+/** Runs Miniwyvern abilities only for exact active bonded projection leases. */
 public final class MiniwyvernAbilityRuntime implements AutoCloseable {
     public static final String CALLER_NAMESPACE = TameworkGameplayAdapter.CALLER_NAMESPACE;
-    private static final Logger LOGGER = Logger.getLogger(MiniwyvernAbilityRuntime.class.getName());
+    private static final String SPECIES_ID = "miniwyvern";
+    private static final Logger LOGGER = Logger.getLogger(
+            MiniwyvernAbilityRuntime.class.getName());
 
-    private final TameworkApi api;
+    private final TameworkGameplayAdapter tamework;
+    private final BondedMiniwyvernExtensionStore extensions;
     private final HyDragonStateStore stateStore;
     private final Supplier<HyDragonConfigRepository.Snapshot> configs;
     private final Supplier<FeatureGate> featureGate;
     private final MiniwyvernAbilityWorldDispatcher worlds;
     private final MiniwyvernAbilityService service;
     private final Clock clock;
-    private final List<AutoCloseable> subscriptions = new ArrayList<>();
-    private final Set<String> reportedDegradations = ConcurrentHashMap.newKeySet();
-    private boolean started;
+    private final Map<String, ActiveBinding> active = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> generations = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> refreshing = new ConcurrentHashMap<>();
+    private final java.util.Set<String> reportedDegradations =
+            ConcurrentHashMap.newKeySet();
+    private AutoCloseable subscription;
+    private volatile boolean started;
     private String tickCursor;
 
     public MiniwyvernAbilityRuntime(
@@ -47,7 +58,9 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
             MiniwyvernAbilityWorldDispatcher worlds,
             MiniwyvernAbilityService service,
             Clock clock) {
-        this.api = Objects.requireNonNull(api, "api");
+        tamework = new TameworkGameplayAdapter(Objects.requireNonNull(api, "api"));
+        extensions = new BondedMiniwyvernExtensionStore(
+                tamework, new BondedMiniwyvernExtensionCodec());
         this.stateStore = Objects.requireNonNull(stateStore, "stateStore");
         this.configs = Objects.requireNonNull(configs, "configs");
         this.featureGate = Objects.requireNonNull(featureGate, "featureGate");
@@ -56,151 +69,268 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
-    /** Registers public lifecycle events. Safe to replay; no duplicate subscriptions are created. */
+    /** Subscribes to the dedicated bonded lifecycle and bootstraps claimed owners. */
     public synchronized void start() {
         if (started) return;
-        subscriptions.add(api.events().subscribe(NpcProfileChangedEvent.class, this::onProfileChanged));
-        subscriptions.add(api.events().subscribe(
-                ProvisionedCompanionDeathRecordedEvent.class, this::onProvisionedDeath));
-        subscriptions.add(api.events().subscribe(
-                ProvisionedCompanionRevivedEvent.class, this::onProvisionedRevived));
+        subscription = tamework.subscribeBondedChanges(this::onBondedChanged);
         started = true;
+        refreshClaims();
     }
 
-    /** Reconciles every persisted Soul Bond Miniwyvern; intended for a bounded periodic scheduler. */
+    /** Reconciles every currently active bonded Miniwyvern. */
     public void tickAll() {
         tickSome(Integer.MAX_VALUE);
     }
 
     /** Round-robin bounded polling entry point for the live server bridge. */
     public synchronized int tickSome(int maximumProfiles) {
-        if (maximumProfiles <= 0) throw new IllegalArgumentException("maximumProfiles must be positive");
-        List<String> profileIds = stateStore.snapshot().profileExtensions().values().stream()
-                .filter(extension -> extension.kind() == ProfileKind.SOULBOUND_MINIWYVERN)
-                .map(extension -> extension.profileId().toString())
-                .sorted()
+        if (maximumProfiles <= 0) {
+            throw new IllegalArgumentException("maximumProfiles must be positive");
+        }
+        refreshClaims();
+        List<ActiveBinding> bindings = active.values().stream()
+                .sorted(java.util.Comparator.comparing(ActiveBinding::profileId))
                 .toList();
-        if (profileIds.isEmpty()) {
+        if (bindings.isEmpty()) {
             tickCursor = null;
             return 0;
         }
-        int start = tickCursor == null ? 0 : insertionPointAfter(profileIds, tickCursor);
-        int count = Math.min(maximumProfiles, profileIds.size());
-        long nowMs = clock.millis();
+        List<String> ids = bindings.stream().map(ActiveBinding::profileId).toList();
+        int startIndex = tickCursor == null ? 0 : insertionPointAfter(ids, tickCursor);
+        int count = Math.min(maximumProfiles, bindings.size());
+        long nowMs = Math.max(0L, clock.millis());
         for (int offset = 0; offset < count; offset++) {
-            String profileId = profileIds.get((start + offset) % profileIds.size());
-            tickProfile(profileId, nowMs);
-            tickCursor = profileId;
+            ActiveBinding binding = bindings.get((startIndex + offset) % bindings.size());
+            tick(binding, nowMs);
+            tickCursor = binding.profileId();
         }
         return count;
     }
 
+    /** Ticks a cached active profile and requests a refresh when it is not cached. */
     public void tickProfile(String profileId, long nowMs) {
-        ProfileExtensionRecord extension = extension(profileId).orElse(null);
-        if (extension == null || extension.kind() != ProfileKind.SOULBOUND_MINIWYVERN
-                || extension.archetypeId().isEmpty()) {
+        String profile = requiredText(profileId, "profileId");
+        ActiveBinding binding = active.get(profile);
+        if (binding != null) {
+            tick(binding, Math.max(0L, nowMs));
             return;
         }
-        NpcProfileView profile;
-        try {
-            profile = api.profiles().getByProfileId(profileId).orElse(null);
-        } catch (RuntimeException failure) {
-            return;
-        }
-        if (profile == null || profile.ownerUuid() == null || profile.currentNpcUuid() == null) return;
-        boolean owned;
-        try {
-            owned = api.policies().isOwner(profileId, profile.ownerUuid());
-        } catch (RuntimeException failure) {
-            owned = false;
-        }
+        claimedOwner(profile).ifPresent(this::scheduleRefresh);
+    }
+
+    private void tick(ActiveBinding binding, long nowMs) {
         FeatureGate gate = featureGate.get();
-        MiniwyvernAbilityService.ProfileContext context = new MiniwyvernAbilityService.ProfileContext(
-                profileId,
-                profile.ownerUuid(),
-                profile.currentNpcUuid(),
-                extension.archetypeId().orElseThrow(),
-                owned,
-                true,
-                true,
-                gate != null && gate.available());
-        worlds.dispatch(profile.ownerUuid(), profile.currentNpcUuid(), world -> {
+        MiniwyvernAbilityService.ProfileContext context = context(
+                binding, true, gate != null && gate.available());
+        worlds.dispatch(binding.ownerUuid(), binding.npcUuid(), world -> {
             MiniwyvernAbilityService.TickResult result = service.tick(
                     context, configs.get().archetypes(), world, nowMs);
-            if (result.ready() && result.reason().startsWith("ready-with-degraded-semantics:")) {
-                String diagnosticKey = extension.archetypeId().orElseThrow() + ':' + result.reason();
-                if (reportedDegradations.add(diagnosticKey)) {
-                    LOGGER.warning("Miniwyvern archetype '" + extension.archetypeId().orElseThrow()
-                            + "' remains active with unavailable optional semantics: " + result.reason());
-                }
-            }
+            reportDegradation(binding, result);
         });
     }
 
-    private void onProfileChanged(NpcProfileChangedEvent event) {
-        if (event == null) return;
-        long emittedAtMs = Math.max(0L, event.emittedAtMs());
-        NpcProfileView before = event.before();
-        NpcProfileView after = event.after();
-        if (hasProjection(before) && projectionChanged(before, after)) {
-            deactivate(
-                    event.profileId(),
-                    before.ownerUuid(),
-                    before.currentNpcUuid(),
-                    emittedAtMs);
+    private void reportDegradation(
+            ActiveBinding binding,
+            MiniwyvernAbilityService.TickResult result) {
+        if (!result.ready()
+                || !result.reason().startsWith("ready-with-degraded-semantics:")) {
+            return;
         }
-        if (hasProjection(after)) tickProfile(event.profileId(), emittedAtMs);
+        String diagnosticKey = binding.archetypeId() + ':' + result.reason();
+        if (reportedDegradations.add(diagnosticKey)) {
+            LOGGER.warning("Miniwyvern archetype '" + binding.archetypeId()
+                    + "' remains active with unavailable optional semantics: "
+                    + result.reason());
+        }
     }
 
-    private void onProvisionedDeath(ProvisionedCompanionDeathRecordedEvent event) {
-        if (event == null || !CALLER_NAMESPACE.equals(event.callerNamespace()) || event.lastNpcUuid() == null) return;
-        deactivate(event.profileId(), event.ownerUuid(), event.lastNpcUuid(), event.emittedAtMs());
+    private void refreshClaims() {
+        if (!started) return;
+        stateStore.snapshot().playerSoulBonds().values().stream()
+                .filter(record -> record.state() == SoulBondState.CLAIMED)
+                .map(PlayerSoulBondRecord::playerUuid)
+                .forEach(this::scheduleRefresh);
     }
 
-    private void onProvisionedRevived(ProvisionedCompanionRevivedEvent event) {
-        if (event == null || !CALLER_NAMESPACE.equals(event.callerNamespace()) || event.newNpcUuid() == null) return;
-        tickProfile(event.profileId(), Math.max(0L, event.emittedAtMs()));
-    }
-
-    private void deactivate(String profileId, UUID ownerUuid, UUID npcUuid, long nowMs) {
-        ProfileExtensionRecord extension = extension(profileId).orElse(null);
-        if (extension == null || extension.archetypeId().isEmpty()) return;
-        MiniwyvernAbilityService.ProfileContext context = new MiniwyvernAbilityService.ProfileContext(
-                profileId, ownerUuid, npcUuid, extension.archetypeId().orElseThrow(),
-                true, false, false, false);
-        worlds.dispatch(ownerUuid, npcUuid, world -> service.deactivate(
-                context, configs.get().archetypes(), world, Math.max(0L, nowMs)));
-    }
-
-    private Optional<ProfileExtensionRecord> extension(String profileId) {
+    private void scheduleRefresh(UUID ownerUuid) {
+        if (!started) return;
+        long generation = generations.getOrDefault(ownerUuid, 0L);
+        if (refreshing.putIfAbsent(ownerUuid, generation) != null) return;
         try {
-            return stateStore.snapshot().profileExtension(UUID.fromString(profileId));
-        } catch (RuntimeException failure) {
-            return Optional.empty();
+            tamework.listDragonHorn(ownerUuid).whenComplete((result, failure) -> {
+                refreshing.remove(ownerUuid, generation);
+                if (!started || failure != null
+                        || generation != currentGeneration(ownerUuid)
+                        || result == null || !result.successful()
+                        || result.value() == null) {
+                    return;
+                }
+                reconcile(ownerUuid, generation, result);
+            });
+        } catch (RuntimeException | LinkageError failure) {
+            refreshing.remove(ownerUuid, generation);
         }
     }
 
-    private static boolean hasProjection(NpcProfileView profile) {
-        return profile != null && profile.ownerUuid() != null && profile.currentNpcUuid() != null;
+    private void reconcile(
+            UUID ownerUuid,
+            long generation,
+            BondedCompanionResult<List<BondedCompanionProfileView>> result) {
+        String claimedProfile = claimedProfile(ownerUuid);
+        Map<String, BondedCompanionProfileView> desired = new LinkedHashMap<>();
+        if (claimedProfile != null) {
+            for (BondedCompanionProfileView profile : result.value()) {
+                if (activeMiniwyvern(ownerUuid, claimedProfile, profile)) {
+                    desired.put(profile.profileId(), profile);
+                }
+            }
+        }
+        removeStale(ownerUuid, desired);
+        desired.values().forEach(profile -> loadBinding(ownerUuid, generation, profile));
     }
 
-    private static boolean projectionChanged(NpcProfileView before, NpcProfileView after) {
-        return !hasProjection(after)
-                || !before.ownerUuid().equals(after.ownerUuid())
-                || !before.currentNpcUuid().equals(after.currentNpcUuid());
+    private void removeStale(
+            UUID ownerUuid,
+            Map<String, BondedCompanionProfileView> desired) {
+        for (ActiveBinding binding : new ArrayList<>(active.values())) {
+            if (!ownerUuid.equals(binding.ownerUuid())) continue;
+            BondedCompanionProfileView profile = desired.get(binding.profileId());
+            if (profile != null && sameProjection(binding, profile.activeLease())) continue;
+            if (active.remove(binding.profileId(), binding)) {
+                deactivate(binding, clock.millis());
+            }
+        }
+    }
+
+    private void loadBinding(
+            UUID ownerUuid,
+            long generation,
+            BondedCompanionProfileView profile) {
+        try {
+            extensions.load(ownerUuid, profile.profileId()).whenComplete((read, failure) -> {
+                if (!started || failure != null
+                        || generation != currentGeneration(ownerUuid)
+                        || !loadedMiniwyvern(read)) {
+                    return;
+                }
+                BondedCompanionLeaseView lease = profile.activeLease();
+                ActiveBinding candidate = new ActiveBinding(
+                        profile.profileId(), ownerUuid, lease.liveNpcUuid(),
+                        lease.leaseToken(), lease.worldKey(),
+                        read.document().archetypeId());
+                ActiveBinding previous = active.put(profile.profileId(), candidate);
+                if (previous != null && !sameProjection(previous, lease)) {
+                    deactivate(previous, clock.millis());
+                }
+            });
+        } catch (RuntimeException failure) {
+            // A later bounded refresh retries without using generic profile state.
+        }
+    }
+
+    private void onBondedChanged(BondedCompanionChangedEvent event) {
+        String claimed = event == null ? null : claimedProfile(event.ownerUuid());
+        if (event == null
+                || !TameworkGameplayAdapter.DRAGON_HORN_ROSTER.equals(event.rosterId())
+                || !event.profileId().equals(claimed)) {
+            return;
+        }
+        invalidate(event.ownerUuid());
+        if (event.newState() != BondedCompanionStateView.ACTIVE) {
+            ActiveBinding removed = active.remove(event.profileId());
+            if (removed != null) deactivate(removed, clock.millis());
+        }
+        scheduleRefresh(event.ownerUuid());
+    }
+
+    private void deactivate(ActiveBinding binding, long nowMs) {
+        worlds.dispatch(binding.ownerUuid(), binding.npcUuid(), world -> service.deactivate(
+                context(binding, false, false), configs.get().archetypes(),
+                world, Math.max(0L, nowMs)));
+    }
+
+    private MiniwyvernAbilityService.ProfileContext context(
+            ActiveBinding binding,
+            boolean activeState,
+            boolean available) {
+        return new MiniwyvernAbilityService.ProfileContext(
+                binding.profileId(), binding.ownerUuid(), binding.npcUuid(),
+                binding.archetypeId(), true, activeState, activeState, available);
+    }
+
+    private String claimedProfile(UUID ownerUuid) {
+        PlayerSoulBondRecord record = stateStore.snapshot()
+                .playerSoulBond(ownerUuid).orElse(null);
+        return record != null && record.state() == SoulBondState.CLAIMED
+                && record.profileId().isPresent()
+                ? record.profileId().orElseThrow().toString() : null;
+    }
+
+    private java.util.Optional<UUID> claimedOwner(String profileId) {
+        return stateStore.snapshot().playerSoulBonds().values().stream()
+                .filter(record -> record.state() == SoulBondState.CLAIMED)
+                .filter(record -> record.profileId().map(UUID::toString)
+                        .filter(profileId::equals).isPresent())
+                .map(PlayerSoulBondRecord::playerUuid)
+                .findFirst();
+    }
+
+    private void invalidate(UUID ownerUuid) {
+        generations.compute(ownerUuid, (ignored, value) ->
+                value == null || value == Long.MAX_VALUE ? 1L : value + 1L);
+        refreshing.remove(ownerUuid);
+    }
+
+    private long currentGeneration(UUID ownerUuid) {
+        return generations.getOrDefault(ownerUuid, 0L);
+    }
+
+    private static boolean activeMiniwyvern(
+            UUID ownerUuid,
+            String claimedProfile,
+            BondedCompanionProfileView profile) {
+        BondedCompanionLeaseView lease = profile == null ? null : profile.activeLease();
+        return profile != null
+                && ownerUuid.equals(profile.ownerUuid())
+                && claimedProfile.equals(profile.profileId())
+                && TameworkGameplayAdapter.DRAGON_HORN_ROSTER.equals(profile.rosterId())
+                && TameworkGameplayAdapter.MINIWYVERN_FAMILY.equals(profile.familyId())
+                && TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE.equals(profile.roleId())
+                && profile.state() == BondedCompanionStateView.ACTIVE
+                && lease != null && lease.liveNpcUuid() != null;
+    }
+
+    private static boolean loadedMiniwyvern(
+            BondedMiniwyvernExtensionStore.ReadResult read) {
+        BondedMiniwyvernExtensionDocument document = read == null ? null : read.document();
+        return read != null
+                && read.status() == BondedMiniwyvernExtensionStore.ReadStatus.LOADED
+                && document != null && SPECIES_ID.equals(document.speciesId());
+    }
+
+    private static boolean sameProjection(
+            ActiveBinding binding,
+            BondedCompanionLeaseView lease) {
+        return lease != null
+                && binding.npcUuid().equals(lease.liveNpcUuid())
+                && binding.leaseToken().equals(lease.leaseToken())
+                && binding.worldKey().equals(lease.worldKey());
     }
 
     @Override
     public synchronized void close() {
-        for (int index = subscriptions.size() - 1; index >= 0; index--) {
+        if (subscription != null) {
             try {
-                subscriptions.get(index).close();
+                subscription.close();
             } catch (Exception ignored) {
-                // Every handle is attempted so shutdown cannot strand later subscriptions.
+                // The runtime still clears all local handles after a close failure.
             }
         }
-        subscriptions.clear();
+        subscription = null;
         started = false;
+        active.clear();
+        refreshing.clear();
+        generations.clear();
         tickCursor = null;
         reportedDegradations.clear();
     }
@@ -214,5 +344,28 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
             else high = middle - 1;
         }
         return low >= values.size() ? 0 : low;
+    }
+
+    private static String requiredText(String value, String field) {
+        String normalized = Objects.requireNonNull(value, field).trim();
+        if (normalized.isEmpty()) throw new IllegalArgumentException(field + " is required");
+        return normalized;
+    }
+
+    private record ActiveBinding(
+            String profileId,
+            UUID ownerUuid,
+            UUID npcUuid,
+            String leaseToken,
+            String worldKey,
+            String archetypeId) {
+        private ActiveBinding {
+            profileId = requiredText(profileId, "profileId");
+            Objects.requireNonNull(ownerUuid, "ownerUuid");
+            Objects.requireNonNull(npcUuid, "npcUuid");
+            leaseToken = requiredText(leaseToken, "leaseToken");
+            worldKey = requiredText(worldKey, "worldKey");
+            archetypeId = requiredText(archetypeId, "archetypeId");
+        }
     }
 }
