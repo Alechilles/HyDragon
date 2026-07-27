@@ -3,6 +3,7 @@ package com.alechilles.hydragon.bonded;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,6 +24,15 @@ public final class BondedExtensionJsonValue {
         return EMPTY_OBJECT;
     }
 
+    /** Parses arbitrary JSON into an immutable, canonical fragment. */
+    public static BondedExtensionJsonValue parse(String json) {
+        try {
+            return from(JsonParser.parseString(Objects.requireNonNull(json, "json")));
+        } catch (JsonParseException | NullPointerException failure) {
+            throw new IllegalArgumentException("Invalid extension JSON", failure);
+        }
+    }
+
     public String json() {
         return json;
     }
@@ -33,6 +43,10 @@ public final class BondedExtensionJsonValue {
 
     JsonElement toJsonElement() {
         return JsonParser.parseString(json);
+    }
+
+    boolean isObject() {
+        return toJsonElement().isJsonObject();
     }
 
     @Override

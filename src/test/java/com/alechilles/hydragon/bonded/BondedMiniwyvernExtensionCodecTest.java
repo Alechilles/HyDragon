@@ -89,6 +89,7 @@ class BondedMiniwyvernExtensionCodecTest {
         assertEquals(5L, attuned.archetypeRevision());
         assertEquals("attune-22", attuned.lastAttunementOperationId().orElseThrow());
         assertEquals("fire", attuned.abilityState().archetypeId());
+        assertTrue(attuned.abilityStateCleanupPending());
         assertTrue(encoded.has("futureTop"));
         assertTrue(encoded.getAsJsonObject("progression").has("future"));
         assertTrue(encoded.getAsJsonObject("abilityState").has("futureAbility"));
@@ -118,6 +119,7 @@ class BondedMiniwyvernExtensionCodecTest {
         assertEquals(5L, replaced.archetypeRevision());
         assertEquals("attune-22", replaced.lastAttunementOperationId().orElseThrow());
         assertEquals(200L, replaced.abilityState().updatedAtEpochMillis());
+        assertFalse(replaced.abilityStateCleanupPending());
         assertTrue(encoded.has("futureTop"));
         assertTrue(encoded.getAsJsonObject("progression").has("future"));
         assertTrue(encoded.getAsJsonObject("abilityState").has("futureAbility"));
@@ -137,6 +139,30 @@ class BondedMiniwyvernExtensionCodecTest {
         assertEquals(
                 CODEC.encode(CODEC.decode(existingPayload())),
                 CODEC.encode(CODEC.decode(reordered)));
+    }
+
+    @Test
+    void progressionReplacementIsPublicImmutableAndPreservesOtherDomains() {
+        BondedMiniwyvernExtensionDocument original = CODEC.decode(existingPayload());
+        BondedExtensionJsonValue progression = BondedExtensionJsonValue.parse(
+                "{\"talents\":{\"z\":2,\"a\":1},\"xp\":90}");
+
+        BondedMiniwyvernExtensionDocument replaced = original.withProgression(progression);
+        JsonObject encoded = JsonParser.parseString(CODEC.encode(replaced)).getAsJsonObject();
+
+        assertEquals("{\"talents\":{\"a\":1,\"z\":2},\"xp\":90}", replaced.progression().json());
+        assertEquals("fire", replaced.archetypeId());
+        assertEquals(4L, replaced.archetypeRevision());
+        assertEquals("attune-17", replaced.lastAttunementOperationId().orElseThrow());
+        assertEquals(125L, replaced.abilityState().updatedAtEpochMillis());
+        assertTrue(encoded.has("futureTop"));
+        assertTrue(encoded.getAsJsonObject("abilityState").has("futureAbility"));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> original.withProgression(BondedExtensionJsonValue.parse("[1,2,3]")));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> BondedExtensionJsonValue.parse("{not-json"));
     }
 
     private static String existingPayload() {

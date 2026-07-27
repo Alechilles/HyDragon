@@ -92,7 +92,11 @@ public final class BondedMiniwyvernExtensionDocument {
         return unknownAbilityStateFields;
     }
 
-    /** Returns a new document with attunement metadata changed and old ability effects retained. */
+    /**
+     * Changes attunement while retaining the old scheduler state as explicit cleanup evidence.
+     * The resulting archetype mismatch is intentional: the ability runtime must remove every
+     * source tracked by the old state before replacing it with target-archetype state.
+     */
     public BondedMiniwyvernExtensionDocument attune(String targetArchetypeId, String operationId) {
         String target = requiredText(targetArchetypeId, "targetArchetypeId").toLowerCase(Locale.ROOT);
         String operation = requiredText(operationId, "operationId");
@@ -114,6 +118,11 @@ public final class BondedMiniwyvernExtensionDocument {
                 progression,
                 unknownTopLevelFields,
                 unknownAbilityStateFields);
+    }
+
+    /** Whether old source-keyed effects must be cleaned before the next ability-state write. */
+    public boolean abilityStateCleanupPending() {
+        return !archetypeId.equals(abilityState.archetypeId());
     }
 
     public boolean hasAttunementEvidence(String operationId, String targetArchetypeId) {
@@ -141,6 +150,23 @@ public final class BondedMiniwyvernExtensionDocument {
                 lastAttunementOperationId,
                 state,
                 progression,
+                unknownTopLevelFields,
+                unknownAbilityStateFields);
+    }
+
+    /** Replaces domain-specific progression without disturbing lifecycle or scheduler evidence. */
+    public BondedMiniwyvernExtensionDocument withProgression(BondedExtensionJsonValue replacement) {
+        BondedExtensionJsonValue value = Objects.requireNonNull(replacement, "replacement");
+        if (!value.isObject()) {
+            throw new IllegalArgumentException("progression must be a JSON object");
+        }
+        return new BondedMiniwyvernExtensionDocument(
+                speciesId,
+                archetypeId,
+                archetypeRevision,
+                lastAttunementOperationId,
+                abilityState,
+                value,
                 unknownTopLevelFields,
                 unknownAbilityStateFields);
     }
