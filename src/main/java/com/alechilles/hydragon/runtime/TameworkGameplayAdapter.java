@@ -21,6 +21,7 @@ import com.alechilles.alecstamework.api.ProvisionedCompanionView;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
 import com.alechilles.hydragon.integration.HyDragonFeature;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionGateway;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -32,7 +33,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
 /** Public-API-only adapter for HyDragon's mutation-authoritative Tamework operations. */
-public final class TameworkGameplayAdapter {
+public final class TameworkGameplayAdapter implements BondedMiniwyvernExtensionGateway {
     public static final String CALLER_NAMESPACE = "Alechilles:HyDragon";
     public static final String EXTENSION_NAMESPACE = CALLER_NAMESPACE;
     public static final String SOULBOUND_MINIWYVERN_ROLE = "Tamed_Wyvern_Mini";
@@ -69,11 +70,13 @@ public final class TameworkGameplayAdapter {
                 DRAGON_HORN_ROSTER);
     }
 
+    @Override
     public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
             getMiniwyvernExtension(UUID ownerUuid, String profileId) {
         return bonded().getExtensionData(extensionKey(ownerUuid, profileId));
     }
 
+    @Override
     public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
             compareAndSetMiniwyvernExtension(
                     UUID ownerUuid,
