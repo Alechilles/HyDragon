@@ -220,7 +220,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
                 ActiveBinding candidate = new ActiveBinding(
                         profile.profileId(), ownerUuid, lease.liveNpcUuid(),
                         lease.leaseToken(), lease.worldKey(),
-                        read.document().archetypeId());
+                        read.document().archetypeId(), new BindingAuthority());
                 ActiveBinding previous = active.put(profile.profileId(), candidate);
                 if (previous != null && !sameProjection(previous, lease)) {
                     deactivate(previous, clock.millis());
@@ -372,7 +372,8 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
             UUID npcUuid,
             String leaseToken,
             String worldKey,
-            String archetypeId) {
+            String archetypeId,
+            BindingAuthority authority) {
         private ActiveBinding {
             profileId = requiredText(profileId, "profileId");
             Objects.requireNonNull(ownerUuid, "ownerUuid");
@@ -380,6 +381,11 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
             leaseToken = requiredText(leaseToken, "leaseToken");
             worldKey = requiredText(worldKey, "worldKey");
             archetypeId = requiredText(archetypeId, "archetypeId");
+            Objects.requireNonNull(authority, "authority");
         }
+    }
+
+    /** Identity token preventing a superseded refresh from removing a newer value-equal binding. */
+    private static final class BindingAuthority {
     }
 }

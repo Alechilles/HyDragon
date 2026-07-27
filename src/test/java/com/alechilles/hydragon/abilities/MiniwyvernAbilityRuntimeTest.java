@@ -127,6 +127,39 @@ final class MiniwyvernAbilityRuntimeTest {
                 "an unavailable extension must not leave a binding to tick again");
     }
 
+    /** Regression: an older malformed response cannot revoke a newer value-equal binding. */
+    @Test
+    void olderInvalidRefreshCannotDetachNewerValueEqualBinding() throws Exception {
+        assertOlderFailureCannotDetachNewerBinding(
+                "superseded-invalid-extension.properties", ExtensionMode.INVALID);
+    }
+
+    /** Regression: an older unavailable response cannot revoke a newer value-equal binding. */
+    @Test
+    void olderUnavailableRefreshCannotDetachNewerValueEqualBinding() throws Exception {
+        assertOlderFailureCannotDetachNewerBinding(
+                "superseded-unavailable-extension.properties", ExtensionMode.UNAVAILABLE);
+    }
+
+    private void assertOlderFailureCannotDetachNewerBinding(
+            String fileName,
+            ExtensionMode failureMode) throws Exception {
+        Fixture fixture = fixture(fileName, TameworkGameplayAdapter.MINIWYVERN_FAMILY);
+        fixture.runtime.start();
+        CompletableFuture<BondedCompanionResult<BondedCompanionExtensionData>> older =
+                fixture.authority.deferNextExtension();
+
+        assertEquals(1, fixture.runtime.tickSome(8),
+                "the existing binding remains active while the older refresh is pending");
+        assertEquals(1, fixture.runtime.tickSome(8),
+                "a newer valid refresh must install and tick its binding");
+        assertTrue(older.complete(fixture.authority.extensionResult(failureMode)));
+        fixture.authority.deferNextExtension();
+
+        assertEquals(1, fixture.runtime.tickSome(8),
+                "the superseded failure must not detach the newer binding");
+    }
+
     private Fixture fixture(String fileName, String familyId) throws Exception {
         UUID owner = UUID.randomUUID();
         UUID profile = UUID.randomUUID();
@@ -205,6 +238,9 @@ final class MiniwyvernAbilityRuntimeTest {
         private final String extensionPayload;
         private BondedCompanionProfileView profile;
         private ExtensionMode extensionMode = ExtensionMode.VALID;
+        private final java.util.ArrayDeque<CompletableFuture<
+                BondedCompanionResult<BondedCompanionExtensionData>>> extensionResponses =
+                new java.util.ArrayDeque<>();
         private Consumer<BondedCompanionChangedEvent> listener;
         private int listCalls;
         private int extensionCalls;
@@ -243,14 +279,30 @@ final class MiniwyvernAbilityRuntimeTest {
         private CompletableFuture<BondedCompanionResult<BondedCompanionExtensionData>>
                 extension() {
             extensionCalls++;
-            BondedCompanionResult<BondedCompanionExtensionData> result = switch (extensionMode) {
+            CompletableFuture<BondedCompanionResult<BondedCompanionExtensionData>> queued =
+                    extensionResponses.pollFirst();
+            return queued != null
+                    ? queued
+                    : CompletableFuture.completedFuture(extensionResult(extensionMode));
+        }
+
+        private CompletableFuture<BondedCompanionResult<BondedCompanionExtensionData>>
+                deferNextExtension() {
+            CompletableFuture<BondedCompanionResult<BondedCompanionExtensionData>> response =
+                    new CompletableFuture<>();
+            extensionResponses.addLast(response);
+            return response;
+        }
+
+        private BondedCompanionResult<BondedCompanionExtensionData> extensionResult(
+                ExtensionMode mode) {
+            return switch (mode) {
                 case VALID -> success(extensionData(extensionPayload));
                 case INVALID -> success(extensionData("{}"));
                 case UNAVAILABLE -> new BondedCompanionResult<>(
                         BondedCompanionResultCode.UNAVAILABLE, null,
                         "bonded extension authority unavailable");
             };
-            return CompletableFuture.completedFuture(result);
         }
 
         private BondedCompanionExtensionData extensionData(String payload) {
