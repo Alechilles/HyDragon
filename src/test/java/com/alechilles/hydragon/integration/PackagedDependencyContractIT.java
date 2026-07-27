@@ -40,6 +40,33 @@ final class PackagedDependencyContractIT {
     }
 
     @Test
+    void missingRequiredDependencyEntryFailsBeforeGameplay() throws Exception {
+        Path hydragon = pluginJar("hydragon.jar", "0.2.1", null);
+        Path tamework = pluginJar("tamework.jar", "3.0.0", null);
+
+        PackagedDependencyContract.Verification verification =
+                PackagedDependencyContract.verify(
+                        hydragon, tamework, pom("3.0.0"), SUPPORTED_RANGE);
+
+        assertEquals(List.of(IssueCode.TAMEWORK_DEPENDENCY_MISSING),
+                verification.issueCodes());
+    }
+
+    @Test
+    void optionalDependencyCannotImpersonateRequiredTamework() throws Exception {
+        Path hydragon = pluginJar(
+                "hydragon.jar", "0.2.1", null, SUPPORTED_RANGE);
+        Path tamework = pluginJar("tamework.jar", "3.0.0", null);
+
+        PackagedDependencyContract.Verification verification =
+                PackagedDependencyContract.verify(
+                        hydragon, tamework, pom("3.0.0"), SUPPORTED_RANGE);
+
+        assertEquals(List.of(IssueCode.TAMEWORK_DEPENDENCY_MISSING),
+                verification.issueCodes());
+    }
+
+    @Test
     void lowerThanSupportedTameworkFailsBeforeGameplay() throws Exception {
         assertOutOfRange("2.9.9");
     }
@@ -112,10 +139,19 @@ final class PackagedDependencyContractIT {
             String filename,
             String version,
             String tameworkRange) throws IOException {
+        return pluginJar(filename, version, tameworkRange, null);
+    }
+
+    private Path pluginJar(
+            String filename,
+            String version,
+            String tameworkRange,
+            String optionalTameworkRange) throws IOException {
         Path jar = temporaryDirectory.resolve(filename);
         try (ZipOutputStream output = new ZipOutputStream(
                 java.nio.file.Files.newOutputStream(jar))) {
-            write(output, "manifest.json", pluginManifest(version, tameworkRange));
+            write(output, "manifest.json", pluginManifest(
+                    version, tameworkRange, optionalTameworkRange));
             Manifest javaManifest = new Manifest();
             Attributes attributes = javaManifest.getMainAttributes();
             attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
@@ -143,12 +179,18 @@ final class PackagedDependencyContractIT {
 
     private static String pluginManifest(
             String version,
-            String tameworkRange) {
+            String tameworkRange,
+            String optionalTameworkRange) {
         String dependencies = tameworkRange == null
                 ? "{}"
                 : "{\"Alechilles:Alec's Tamework!\":\"" + tameworkRange + "\"}";
+        String optionalDependencies = optionalTameworkRange == null
+                ? "{}"
+                : "{\"Alechilles:Alec's Tamework!\":\""
+                        + optionalTameworkRange + "\"}";
         return "{\"Version\":\"" + version
-                + "\",\"Dependencies\":" + dependencies + "}";
+                + "\",\"Dependencies\":" + dependencies
+                + ",\"OptionalDependencies\":" + optionalDependencies + "}";
     }
 
     private static void write(

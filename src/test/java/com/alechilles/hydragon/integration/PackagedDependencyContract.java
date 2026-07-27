@@ -1,5 +1,8 @@
 package com.alechilles.hydragon.integration;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -120,22 +123,23 @@ final class PackagedDependencyContract {
             return null;
         }
         try (ZipFile zip = new ZipFile(normalized.toFile())) {
-            String json = readText(zip, "manifest.json");
-            String version = jsonString(json, "Version");
+            JsonObject manifest = JsonParser.parseString(
+                    readText(zip, "manifest.json")).getAsJsonObject();
+            String version = jsonString(manifest, "Version");
             if (version == null) {
                 issues.add(new Issue(
                         IssueCode.PACKAGED_VERSION_MISSING,
                         normalized + " manifest.json"));
             }
             verifyJavaManifestVersion(zip, normalized, version, issues);
-            String range = jsonString(json, TAMEWORK_DEPENDENCY);
+            String range = requiredDependencyRange(manifest);
             if (requireTameworkDependency && range == null) {
                 issues.add(new Issue(
                         IssueCode.TAMEWORK_DEPENDENCY_MISSING,
                         normalized.toString()));
             }
             return new Artifact(version, range);
-        } catch (IOException failure) {
+        } catch (IOException | RuntimeException failure) {
             issues.add(new Issue(
                     IssueCode.PACKAGED_MANIFEST_UNREADABLE,
                     normalized + ": " + failure.getMessage()));
@@ -315,11 +319,16 @@ final class PackagedDependencyContract {
         }
     }
 
-    private static String jsonString(String json, String key) {
-        Pattern field = Pattern.compile(
-                "\\\"" + Pattern.quote(key)
-                        + "\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"");
-        Matcher matcher = field.matcher(json);
-        return matcher.find() ? matcher.group(1) : null;
+    private static String requiredDependencyRange(JsonObject manifest) {
+        JsonElement dependencies = manifest.get("Dependencies");
+        if (dependencies == null || !dependencies.isJsonObject()) return null;
+        return jsonString(dependencies.getAsJsonObject(), TAMEWORK_DEPENDENCY);
+    }
+
+    private static String jsonString(JsonObject object, String key) {
+        JsonElement value = object.get(key);
+        return value != null && value.isJsonPrimitive()
+                && value.getAsJsonPrimitive().isString()
+                ? value.getAsString() : null;
     }
 }
