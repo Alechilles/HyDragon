@@ -206,11 +206,14 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
             UUID ownerUuid,
             long generation,
             BondedCompanionProfileView profile) {
+        ActiveBinding expected = active.get(profile.profileId());
         try {
             extensions.load(ownerUuid, profile.profileId()).whenComplete((read, failure) -> {
-                if (!started || failure != null
-                        || generation != currentGeneration(ownerUuid)
-                        || !loadedMiniwyvern(read)) {
+                if (!started || generation != currentGeneration(ownerUuid)) {
+                    return;
+                }
+                if (failure != null || !loadedMiniwyvern(read)) {
+                    detachExpectedBinding(profile, expected);
                     return;
                 }
                 BondedCompanionLeaseView lease = profile.activeLease();
@@ -224,7 +227,18 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
                 }
             });
         } catch (RuntimeException failure) {
-            // A later bounded refresh retries without using generic profile state.
+            if (started && generation == currentGeneration(ownerUuid)) {
+                detachExpectedBinding(profile, expected);
+            }
+        }
+    }
+
+    private void detachExpectedBinding(
+            BondedCompanionProfileView profile,
+            ActiveBinding expected) {
+        if (expected == null || !sameProjection(expected, profile.activeLease())) return;
+        if (active.remove(profile.profileId(), expected)) {
+            deactivate(expected, clock.millis());
         }
     }
 

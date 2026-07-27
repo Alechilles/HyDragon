@@ -91,6 +91,42 @@ final class MiniwyvernAbilityRuntimeTest {
         assertEquals(0, fixture.worlds.dispatches);
     }
 
+    /** Regression: malformed bonded extension evidence must revoke a cached same-lease binding. */
+    @Test
+    void invalidExtensionRefreshDetachesUnchangedActiveLease() throws Exception {
+        Fixture fixture = fixture("invalid-extension.properties",
+                TameworkGameplayAdapter.MINIWYVERN_FAMILY);
+        fixture.runtime.start();
+        fixture.authority.extensionMode = ExtensionMode.INVALID;
+
+        int ticked = fixture.runtime.tickSome(8);
+
+        assertEquals(0, ticked);
+        assertEquals(1, fixture.worlds.dispatches,
+                "the cached binding must be deactivated instead of ticked");
+        assertEquals(0, fixture.runtime.tickSome(8));
+        assertEquals(1, fixture.worlds.dispatches,
+                "an invalid extension must not leave a binding to tick again");
+    }
+
+    /** Regression: unavailable bonded extension evidence must fail closed for a cached binding. */
+    @Test
+    void unavailableExtensionRefreshDetachesUnchangedActiveLease() throws Exception {
+        Fixture fixture = fixture("unavailable-extension.properties",
+                TameworkGameplayAdapter.MINIWYVERN_FAMILY);
+        fixture.runtime.start();
+        fixture.authority.extensionMode = ExtensionMode.UNAVAILABLE;
+
+        int ticked = fixture.runtime.tickSome(8);
+
+        assertEquals(0, ticked);
+        assertEquals(1, fixture.worlds.dispatches,
+                "the cached binding must be deactivated instead of ticked");
+        assertEquals(0, fixture.runtime.tickSome(8));
+        assertEquals(1, fixture.worlds.dispatches,
+                "an unavailable extension must not leave a binding to tick again");
+    }
+
     private Fixture fixture(String fileName, String familyId) throws Exception {
         UUID owner = UUID.randomUUID();
         UUID profile = UUID.randomUUID();
@@ -168,6 +204,7 @@ final class MiniwyvernAbilityRuntimeTest {
         private final String familyId;
         private final String extensionPayload;
         private BondedCompanionProfileView profile;
+        private ExtensionMode extensionMode = ExtensionMode.VALID;
         private Consumer<BondedCompanionChangedEvent> listener;
         private int listCalls;
         private int extensionCalls;
@@ -206,12 +243,22 @@ final class MiniwyvernAbilityRuntimeTest {
         private CompletableFuture<BondedCompanionResult<BondedCompanionExtensionData>>
                 extension() {
             extensionCalls++;
-            return CompletableFuture.completedFuture(success(
-                    new BondedCompanionExtensionData(
-                            new BondedCompanionExtensionDataKey(
-                                    owner, profileId.toString(),
-                                    BondedMiniwyvernExtensionDocument.NAMESPACE),
-                            extensionPayload, 0L, 10L)));
+            BondedCompanionResult<BondedCompanionExtensionData> result = switch (extensionMode) {
+                case VALID -> success(extensionData(extensionPayload));
+                case INVALID -> success(extensionData("{}"));
+                case UNAVAILABLE -> new BondedCompanionResult<>(
+                        BondedCompanionResultCode.UNAVAILABLE, null,
+                        "bonded extension authority unavailable");
+            };
+            return CompletableFuture.completedFuture(result);
+        }
+
+        private BondedCompanionExtensionData extensionData(String payload) {
+            return new BondedCompanionExtensionData(
+                    new BondedCompanionExtensionDataKey(
+                            owner, profileId.toString(),
+                            BondedMiniwyvernExtensionDocument.NAMESPACE),
+                    payload, 0L, 10L);
         }
 
         @SuppressWarnings("unchecked")
@@ -260,6 +307,8 @@ final class MiniwyvernAbilityRuntimeTest {
                     BondedCompanionResultCode.SUCCESS, value, null);
         }
     }
+
+    private enum ExtensionMode { VALID, INVALID, UNAVAILABLE }
 
     private static final class MemoryAbilityStates
             implements MiniwyvernAbilityStateRepository {
