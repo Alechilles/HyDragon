@@ -81,15 +81,17 @@ final class NordicDrakeProgressionAssetTest {
         for (Map.Entry<String, TalentExpectation> entry : expectedTalents().entrySet()) {
             JsonObject talent = talents.get(entry.getKey());
             TalentExpectation expected = entry.getValue();
+            TalentTextExpectation text = expectedTalentText().get(entry.getKey());
             assertNotNull(talent, entry.getKey());
             assertEquals(expected.branch(), talent.get("Branch").getAsString(), entry.getKey());
+            assertNotNull(text, entry.getKey() + " text expectation");
+            assertEquals(text.displayName(), talent.get("DisplayName").getAsString(), entry.getKey());
+            assertEquals(text.description(), talent.get("Description").getAsString(), entry.getKey());
             assertEquals(expected.cost(), talent.get("PointCost").getAsInt(), entry.getKey());
             assertEquals(expected.level(), talent.get("MinLevel").getAsInt(), entry.getKey());
             assertEquals(expected.requires(), talent.has("RequiresTalentIds")
                     ? strings(talent.getAsJsonArray("RequiresTalentIds")) : List.of(), entry.getKey());
             assertEffects(talent.getAsJsonArray("Effects"), expected.effects());
-            assertTrue(talent.get("DisplayName").getAsString().startsWith(LOCALE_PREFIX), entry.getKey());
-            assertTrue(talent.get("Description").getAsString().startsWith(LOCALE_PREFIX), entry.getKey());
         }
 
         Set<String> effectKeys = new java.util.HashSet<>();
@@ -111,11 +113,15 @@ final class NordicDrakeProgressionAssetTest {
     @Test
     void allNordicDrakeLocaleKeysAndPlaceholdersMatchEnglish() throws IOException {
         Map<String, String> english = localeEntries("en-US");
-        Map<String, String> required = english.entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith(LOCALE_PREFIX))
-                .collect(java.util.stream.Collectors.toMap(
-                        Map.Entry::getKey, Map.Entry::getValue, (left, right) -> left, LinkedHashMap::new));
-        assertEquals(39, required.size());
+        JsonObject talentConfig = loadJson(TALENTS_PATH);
+        Set<String> requiredKeys = referencedLocaleKeys(talentConfig.getAsJsonArray("Talents"));
+        assertEquals(expectedLocaleKeys(), requiredKeys);
+        Map<String, String> required = new LinkedHashMap<>();
+        for (String key : requiredKeys) {
+            String englishValue = english.get(key);
+            assertNotNull(englishValue, "en-US missing " + key);
+            required.put(key, englishValue);
+        }
 
         for (String locale : LOCALES) {
             Map<String, String> entries = localeEntries(locale);
@@ -178,9 +184,50 @@ final class NordicDrakeProgressionAssetTest {
         return expected;
     }
 
+    private static Map<String, TalentTextExpectation> expectedTalentText() {
+        Map<String, TalentTextExpectation> expected = new LinkedHashMap<>();
+        expected.put("NordicDrake_NorthwindResolve", text("northwind_resolve"));
+        expected.put("NordicDrake_SustainedCurrent", text("sustained_current"));
+        expected.put("NordicDrake_Flamewake", text("flamewake"));
+        expected.put("NordicDrake_ThermalGuard", text("thermal_guard"));
+        expected.put("NordicDrake_Skyrend", text("skyrend"));
+        expected.put("NordicDrake_StormSovereign", text("storm_sovereign"));
+        expected.put("NordicDrake_EmberDiscipline", text("ember_discipline"));
+        expected.put("NordicDrake_FurnaceHeart", text("furnace_heart"));
+        expected.put("NordicDrake_ScorchingMomentum", text("scorching_momentum"));
+        expected.put("NordicDrake_RuinousBreath", text("ruinous_breath"));
+        expected.put("NordicDrake_IronTalons", text("iron_talons"));
+        expected.put("NordicDrake_JarlsBane", text("jarls_bane"));
+        expected.put("NordicDrake_RunestoneHide", text("runestone_hide"));
+        expected.put("NordicDrake_GlacierScales", text("glacier_scales"));
+        expected.put("NordicDrake_LongVigil", text("long_vigil"));
+        expected.put("NordicDrake_Unyielding", text("unyielding"));
+        expected.put("NordicDrake_Sagascar", text("sagascar"));
+        expected.put("NordicDrake_NorthernBulwark", text("northern_bulwark"));
+        return expected;
+    }
+
+    private static Set<String> expectedLocaleKeys() {
+        Set<String> expected = new java.util.LinkedHashSet<>(Set.of(
+                "hydragon.talents.nordic_drake.branch.aerial_mastery",
+                "hydragon.talents.nordic_drake.branch.war_drake",
+                "hydragon.talents.nordic_drake.branch.wyrmguard"));
+        for (TalentTextExpectation text : expectedTalentText().values()) {
+            expected.add(text.displayName());
+            expected.add(text.description());
+        }
+        return Set.copyOf(expected);
+    }
+
     private static TalentExpectation talent(String branch, int cost, int level, List<String> requires,
                                              Map<String, Double> effects) {
         return new TalentExpectation(branch, cost, level, requires, effects);
+    }
+
+    private static TalentTextExpectation text(String node) {
+        return new TalentTextExpectation(
+                LOCALE_PREFIX + node + ".name",
+                LOCALE_PREFIX + node + ".description");
     }
 
     private static JsonObject loadJson(Path path) throws IOException {
@@ -194,6 +241,18 @@ final class NordicDrakeProgressionAssetTest {
             assertTrue(byId.put(talent.get("Id").getAsString(), talent) == null, "duplicate talent ID");
         }
         return byId;
+    }
+
+    private static Set<String> referencedLocaleKeys(JsonArray talents) {
+        Set<String> keys = new java.util.LinkedHashSet<>();
+        for (JsonElement element : talents) {
+            JsonObject talent = element.getAsJsonObject();
+            keys.add(talent.get("Branch").getAsString());
+            keys.add(talent.get("DisplayName").getAsString());
+            keys.add(talent.get("Description").getAsString());
+        }
+        assertTrue(keys.stream().allMatch(key -> key.startsWith(LOCALE_PREFIX)));
+        return Set.copyOf(keys);
     }
 
     private static void assertEffects(JsonArray effects, Map<String, Double> expected) {
@@ -252,5 +311,8 @@ final class NordicDrakeProgressionAssetTest {
 
     private record TalentExpectation(String branch, int cost, int level, List<String> requires,
                                      Map<String, Double> effects) {
+    }
+
+    private record TalentTextExpectation(String displayName, String description) {
     }
 }
