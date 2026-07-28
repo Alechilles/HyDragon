@@ -5,6 +5,7 @@ target/
 *.jar
 *.zip
 *.json.bak
+*.bak
 
 # Local runtime and editor debris
 *.log
