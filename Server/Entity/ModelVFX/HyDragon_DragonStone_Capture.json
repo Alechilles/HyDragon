@@ -1,7 +1,7 @@
 {
-  "SwitchTo": "PostColor",
-  "EffectDirection": "BottomUp",
-  "AnimationDuration": 5.0,
+  "SwitchTo": "Disappear",
+  "EffectDirection": "ToCenter",
+  "AnimationDuration": 3.0,
   "AnimationRange": {
     "Y": 1.0
   },
@@ -10,9 +10,8 @@
     "X": 29.0,
     "Y": 25.0
   },
-  "PostColor": "#071827",
-  "PostColorOpacity": 0.7,
   "UseProgessiveHighlight": false,
   "HighlightColor": "#55D9FF",
-  "HighlightThickness": 0.3
+  "HighlightThickness": 1,
+  "CurveType": "Linear"
 }

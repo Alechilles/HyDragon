@@ -17,8 +17,7 @@ class DraconicCaptureAssetContractTest {
     private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
 
     @Test
-    void baseStoneChannelsThenStoresSuccessfulDragonsInTheSharedHornRoster()
-            throws Exception {
+    void baseStoneChannelsThenStoresEveryResolvedRollInTheDragonHornBondedRoster() throws Exception {
         String item = read("Server/Item/Items/Ingredient/Draconic_Stone.json");
         String config = read("Server/Tamework/Items/Spawners/HyDragonDraconicStone.json");
 
@@ -31,6 +30,8 @@ class DraconicCaptureAssetContractTest {
         assertTrue(config.contains("\"SourceConsumption\": \"ResolvedAttempt\""));
         assertTrue(config.contains("\"SuccessDisposition\": \"StoreBondedCompanion\""));
         assertTrue(config.contains("\"BondedRosterId\": \"hydragon:dragon_horn\""));
+        assertFalse(config.contains("\"SuccessDisposition\": \"TameAndCommandLink\""));
+        assertFalse(config.contains("\"CommandFamilyId\""));
         assertTrue(config.contains("\"RequiredCommandConfigId\": \"HyDragonDragonHorn\""));
         assertTrue(config.contains("\"RequireCommandAccessItem\": true"));
         assertTrue(config.contains("\"ChannelSoundEvent\": "

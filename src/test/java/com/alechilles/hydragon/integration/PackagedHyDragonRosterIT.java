@@ -72,6 +72,8 @@ final class PackagedHyDragonRosterIT {
                     "\"BondedRosterId\": \"hydragon:dragon_horn\"",
                     "\"RequiredCommandConfigId\": \"HyDragonDragonHorn\"",
                     "\"RequireCommandAccessItem\": true");
+            assertFalse(baseStone.contains("\"SuccessDisposition\": \"TameAndCommandLink\""));
+            assertFalse(baseStone.contains("\"CommandFamilyId\""));
             for (String stone : STONES) {
                 String config = text(zip, "Server/Tamework/Items/Spawners/" + stone + ".json");
                 if (!stone.equals("HyDragonDraconicStone")) {

@@ -4,6 +4,9 @@
     "Name": "server.items.HyDragon_Dragon_Horn.name",
     "Description": "server.items.HyDragon_Dragon_Horn.description"
   },
+  "PlayerAnimationsId": "Item",
+  "Model": "Items/HyDragon/Dragon_Command_Flute.blockymodel",
+  "Texture": "Items/HyDragon/Dragon_Command_Flute.png",
   "Quality": "Epic",
   "Recipe": {
     "Input": [

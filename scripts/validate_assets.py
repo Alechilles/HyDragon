@@ -481,6 +481,10 @@ def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
         for field, expected in required.items():
             if capture.get(field) != expected:
                 fail(errors, f"base Draconic Stone Capture.{field} must be {expected!r}")
+        if capture.get("SuccessDisposition") == "TameAndCommandLink":
+            fail(errors, "base Draconic Stone Capture must not use retired TameAndCommandLink")
+        if "CommandFamilyId" in capture:
+            fail(errors, "base Draconic Stone Capture must not declare retired CommandFamilyId")
     for filename, _ in tiers:
         path = spawner_root / filename
         data = parsed.get(path)
