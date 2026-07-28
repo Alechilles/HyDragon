@@ -110,6 +110,22 @@ class DraconicCaptureAssetContractTest {
         assertFalse(Files.exists(ROOT.resolve("Server/Item/Items/Ingredient/Soul_Bound_Wyvern.json")));
     }
 
+    @Test
+    void bondedSummonsMaterializeWithTheReverseDragonStoneEffect() throws Exception {
+        String model = read("Server/Entity/ModelVFX/HyDragon_DragonStone_Summon.json");
+        String aura = read("Server/Entity/Effects/Status/HyDragon_DragonStone_SummonAura.json");
+        String fullDragons = read("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json");
+        String miniwyvern = read("Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json");
+
+        assertTrue(model.contains("\"SwitchTo\": \"Disappear\""));
+        assertTrue(model.contains("\"EffectDirection\": \"FromCenter\""));
+        assertTrue(model.contains("\"AnimationDuration\": 3.0"));
+        assertTrue(aura.contains("\"ModelVFXId\": \"HyDragon_DragonStone_Summon\""));
+        assertTrue(aura.contains("\"Duration\": 3.25"));
+        assertTrue(fullDragons.contains("\"SummonAuraEffectId\": \"HyDragon_DragonStone_SummonAura\""));
+        assertTrue(miniwyvern.contains("\"SummonAuraEffectId\": \"HyDragon_DragonStone_SummonAura\""));
+    }
+
     private static String read(String relative) throws Exception {
         return Files.readString(ROOT.resolve(relative)).replace("\r\n", "\n");
     }

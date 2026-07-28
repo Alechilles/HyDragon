@@ -1,0 +1,12 @@
+{
+  "ApplicationEffects": {
+    "EntityBottomTint": "#071827",
+    "EntityTopTint": "#72D7FF",
+    "ModelVFXId": "HyDragon_DragonStone_Summon"
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 3.25
+}

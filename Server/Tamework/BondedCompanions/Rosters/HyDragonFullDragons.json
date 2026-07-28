@@ -13,6 +13,7 @@
   "MaximumActive": 1,
   "SessionDurationSeconds": 600,
   "SummonCooldownSeconds": 300,
+  "SummonAuraEffectId": "HyDragon_DragonStone_SummonAura",
   "RevivePrice": {
     "Costs": [
       { "ItemId": "Revitalizing_Essence", "Quantity": 2 },

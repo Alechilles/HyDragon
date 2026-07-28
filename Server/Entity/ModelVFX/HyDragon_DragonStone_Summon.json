@@ -1,0 +1,17 @@
+{
+  "SwitchTo": "Disappear",
+  "EffectDirection": "FromCenter",
+  "AnimationDuration": 3.0,
+  "AnimationRange": {
+    "Y": 1.0
+  },
+  "UseBloomOnHighlight": true,
+  "NoiseScale": {
+    "X": 29.0,
+    "Y": 25.0
+  },
+  "UseProgessiveHighlight": false,
+  "HighlightColor": "#55D9FF",
+  "HighlightThickness": 1,
+  "CurveType": "Linear"
+}
