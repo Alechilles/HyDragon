@@ -1,0 +1,20 @@
+{
+  "Priority": 100,
+  "RoleIds": [
+    "Tamed_NordicDrake",
+    "Tamed_Hydra",
+    "Tamed_RockDrakeT1",
+    "Tamed_RockDrakeT2",
+    "Tamed_RockDrakeT3",
+    "Tamed_Wyvern_Mini"
+  ],
+  "PassiveBreeding": {
+    "Enabled": false
+  },
+  "Gender": {
+    "Enabled": true,
+    "RequireDifferentGender": false,
+    "MaleWeight": 1.0,
+    "FemaleWeight": 1.0
+  }
+}
