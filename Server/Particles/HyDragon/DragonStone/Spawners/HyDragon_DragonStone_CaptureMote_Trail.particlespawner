@@ -98,22 +98,28 @@
             "Max": 0
           }
         },
-        "Opacity": 0.0
+        "Opacity": 0.0,
+        "Color": "#63E2FF"
       },
       "15": {
-        "Opacity": 0.55
+        "Opacity": 0.55,
+        "Color": "#85F5FF"
       },
       "40": {
-        "Opacity": 0.2
+        "Opacity": 0.2,
+        "Color": "#5DE0FF"
       },
       "60": {
-        "Opacity": 0.4
+        "Opacity": 0.4,
+        "Color": "#55D9FF"
       },
       "80": {
-        "Opacity": 0.6
+        "Opacity": 0.6,
+        "Color": "#50D2FF"
       },
       "100": {
-        "Opacity": 0.0
+        "Opacity": 0.0,
+        "Color": "#3B8CFF"
       }
     },
     "InitialAnimationFrame": {
@@ -142,6 +148,7 @@
         }
       },
       "Opacity": 1,
+      "Color": "#63E2FF",
       "FrameIndex": {
         "Min": 0,
         "Max": 0
