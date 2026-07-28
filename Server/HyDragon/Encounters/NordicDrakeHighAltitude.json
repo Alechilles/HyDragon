@@ -12,7 +12,6 @@
     "WeatherIds": [ "Zone3_Snow_Heavy", "Zone3_Snow_Storm" ]
   },
   "PlayerEligibility": {
-    "ActiveCompanionGroup": "hydragon:full_dragons",
     "RequiredMountMode": "AVATAR_FLIGHT",
     "RequiredItemId": "Tamework_Flightmasters_Talisman"
   },

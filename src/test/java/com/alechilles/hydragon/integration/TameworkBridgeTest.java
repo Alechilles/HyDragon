@@ -10,9 +10,8 @@ import org.junit.jupiter.api.Test;
 
 class TameworkBridgeTest {
     private static final Set<String> BASELINE = Set.of(
-            "PROFILES", "POLICY", "INTERACTION_EXTENSIONS", "PROFILE_DATA", "EVENTS",
-            "DIAGNOSTICS", "PERSISTENCE_RESILIENCE", "POPULATION_GROUPS",
-            "COMPANION_PROVISIONING", "PROFILE_DATA_TRANSACTIONS");
+            "INTERACTION_EXTENSIONS", "EVENTS", "DIAGNOSTICS",
+            "CAPTURE_RESOLVED_ATTEMPT_CONSUMPTION");
 
     @Test
     void oldBondedVesselCapabilityCannotEnableNewRosterFeatures() {
@@ -24,17 +23,14 @@ class TameworkBridgeTest {
 
         assertFalse(snapshot.feature(HyDragonFeature.CAPTURE_AND_ROSTER).available());
         assertTrue(snapshot.feature(HyDragonFeature.CAPTURE_AND_ROSTER).missingCapabilities()
-                .containsAll(Set.of("COMMAND_FAMILY_ROSTERS", "CAPTURE_TAME_AND_LINK",
-                        "CAPTURE_RESOLVED_ATTEMPT_CONSUMPTION", "COMMAND_TIMED_SUMMONING")));
+                .contains("BONDED_COMPANIONS"));
         assertFalse(snapshot.feature(HyDragonFeature.SOUL_BOND_CLAIM).available());
     }
 
     @Test
     void granularCapabilitiesEnableOnlyTheirCompleteContracts() {
         Set<String> capabilities = new HashSet<>(BASELINE);
-        capabilities.addAll(Set.of("CAPTURE_POLICY", "COMMAND_FAMILY_ROSTERS",
-                "CAPTURE_TAME_AND_LINK", "CAPTURE_RESOLVED_ATTEMPT_CONSUMPTION",
-                "COMMAND_TIMED_SUMMONING", "PAID_COMMAND_REVIVAL"));
+        capabilities.addAll(Set.of("CAPTURE_POLICY", "BONDED_COMPANIONS"));
 
         TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("3.0.0", capabilities, null);
 
@@ -46,12 +42,11 @@ class TameworkBridgeTest {
     }
 
     @Test
-    void missingPaidRevivalDoesNotDisableOrdinaryHornCommands() {
+    void missingBondedAuthorityDisablesAllBondedHornActionsTogether() {
         Set<String> capabilities = new HashSet<>(BASELINE);
-        capabilities.addAll(Set.of("COMMAND_FAMILY_ROSTERS", "COMMAND_TIMED_SUMMONING"));
         TameworkBridge.Snapshot snapshot = TameworkBridge.evaluate("3.0.0", capabilities, null);
-        assertTrue(snapshot.feature(HyDragonFeature.DRAGON_HORN).available());
-        assertTrue(snapshot.feature(HyDragonFeature.TIMED_SUMMONING).available());
+        assertFalse(snapshot.feature(HyDragonFeature.DRAGON_HORN).available());
+        assertFalse(snapshot.feature(HyDragonFeature.TIMED_SUMMONING).available());
         assertFalse(snapshot.feature(HyDragonFeature.PAID_REVIVAL).available());
     }
 
@@ -69,13 +64,13 @@ class TameworkBridgeTest {
 
         Set<String> abilityCapabilities = new HashSet<>(
                 HyDragonFeature.MINIWYVERN_ABILITIES.requiredCapabilities());
-        abilityCapabilities.remove("COMPANION_PROVISIONING");
+        abilityCapabilities.remove("BONDED_COMPANIONS");
         TameworkBridge.Snapshot abilities = TameworkBridge.evaluate(
                 "0.9.0", abilityCapabilities, null);
 
         assertFalse(abilities.feature(HyDragonFeature.MINIWYVERN_ABILITIES).available());
         assertTrue(abilities.feature(HyDragonFeature.MINIWYVERN_ABILITIES)
-                .missingCapabilities().contains("COMPANION_PROVISIONING"));
+                .missingCapabilities().contains("BONDED_COMPANIONS"));
     }
 
     @Test

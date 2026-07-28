@@ -32,13 +32,13 @@ class TameworkCapabilityDiagnosticsTest {
                 entries.stream().map(TameworkCapabilityDiagnostics.Entry::capability).toList());
 
         TameworkCapabilityDiagnostics.Entry missing = entries.stream()
-                .filter(entry -> entry.capability().equals("COMMAND_FAMILY_ROSTERS"))
+                .filter(entry -> entry.capability().equals("BONDED_COMPANIONS"))
                 .findFirst()
                 .orElseThrow();
         assertFalse(missing.present());
         assertTrue(missing.affectedFeatures().contains(HyDragonFeature.CAPTURE_AND_ROSTER));
         assertTrue(missing.operatorAction().contains(">=3.0.0 <4.0.0"));
-        assertTrue(missing.operatorAction().contains("COMMAND_FAMILY_ROSTERS"));
+        assertTrue(missing.operatorAction().contains("BONDED_COMPANIONS"));
         assertTrue(missing.format().contains("MISSING"));
 
         TameworkCapabilityDiagnostics.Entry present = entries.stream()

@@ -85,19 +85,34 @@ class HyDragonPersistenceStatusTest {
     }
 
     @Test
-    void identifiesOrphanedSoulBondLinksWithAnOperatorAction() throws Exception {
+    /** Regression: bonded storage, not the removed local projection, owns Miniwyvern extension data. */
+    void claimedBondWithoutLegacyProfileExtensionIsNotAnOrphan() throws Exception {
         HyDragonStateStore store = new HyDragonStateStore(temporaryDirectory.resolve("orphaned-state.properties"));
         store.beginSoulBond(PLAYER_ONE, "soul:orphaned");
         store.completeSoulBond(PLAYER_ONE, "soul:orphaned", PROFILE_ONE, 1_000);
 
         HyDragonPersistenceStatus status = HyDragonPersistenceStatus.from(store, null);
 
+        assertTrue(status.orphanedLinks().isEmpty());
+    }
+
+    @Test
+    void identifiesUnclaimedLegacyMiniwyvernExtensionWithAnOperatorAction() throws Exception {
+        HyDragonStateStore store = new HyDragonStateStore(
+                temporaryDirectory.resolve("legacy-extension-state.properties"));
+        store.putProfileExtension(ProfileExtensionRecord.soulboundMiniwyvern(
+                PROFILE_ONE,
+                "hydragon:miniwyvern",
+                "neutral",
+                Optional.of("soul:legacy")));
+
+        HyDragonPersistenceStatus status = HyDragonPersistenceStatus.from(store, null);
+
         assertEquals(1, status.orphanedLinks().size());
         HyDragonPersistenceStatus.OrphanedLink orphan = status.orphanedLinks().getFirst();
-        assertEquals("SOUL_BOND_PROFILE_MISSING", orphan.kind());
-        assertTrue(orphan.identity().contains(PLAYER_ONE.toString()));
+        assertEquals("MINIWYVERN_BOND_MISSING", orphan.kind());
         assertTrue(orphan.identity().contains(PROFILE_ONE.toString()));
-        assertTrue(orphan.operatorAction().contains("restore"));
+        assertTrue(orphan.operatorAction().contains("reconcile"));
         assertTrue(orphan.operatorAction().contains("quarantine"));
     }
 

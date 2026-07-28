@@ -1,0 +1,23 @@
+{
+  "Priority": 100,
+  "RosterId": "hydragon:dragon_horn",
+  "FamilyId": "hydragon:soulbound_mini",
+  "AllowedRoles": [ "Tamed_Wyvern_Mini" ],
+  "MaximumOwned": 1,
+  "MaximumActive": 1,
+  "SessionDurationSeconds": 900,
+  "SummonCooldownSeconds": 180,
+  "RevivePrice": {
+    "Costs": [
+      { "ItemId": "Revitalizing_Essence", "Quantity": 1 },
+      { "ItemId": "Draconic_Essence", "Quantity": 2 }
+    ]
+  },
+  "Features": {
+    "Capture": false,
+    "Provision": true,
+    "Summon": true,
+    "Dismiss": true,
+    "Revive": true
+  }
+}

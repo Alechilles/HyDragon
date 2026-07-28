@@ -5,15 +5,25 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.alechilles.alecstamework.api.NpcProfileView;
-import com.alechilles.alecstamework.api.NpcProfilesApi;
+import com.alechilles.alecstamework.api.BondedCompanionApi;
+import com.alechilles.alecstamework.api.BondedCompanionAvailability;
+import com.alechilles.alecstamework.api.BondedCompanionCaptureEvidenceView;
+import com.alechilles.alecstamework.api.BondedCompanionCaptureResolvedEvent;
+import com.alechilles.alecstamework.api.BondedCompanionLeaseView;
+import com.alechilles.alecstamework.api.BondedCompanionProfileView;
+import com.alechilles.alecstamework.api.BondedCompanionResult;
+import com.alechilles.alecstamework.api.BondedCompanionResultCode;
+import com.alechilles.alecstamework.api.BondedCompanionStateView;
+import com.alechilles.alecstamework.api.CaptureAttemptOutcome;
 import com.alechilles.alecstamework.api.CaptureRequirementDecision;
 import com.alechilles.alecstamework.api.CaptureRequirementSpec;
-import com.alechilles.alecstamework.api.PolicyApi;
-import com.alechilles.alecstamework.api.PopulationGroupApi;
-import com.alechilles.alecstamework.api.PopulationGroupCountsView;
-import com.alechilles.alecstamework.api.PopulationGroupScope;
+import com.alechilles.alecstamework.api.CaptureSourceConsumption;
+import com.alechilles.alecstamework.api.CaptureSuccessDisposition;
+import com.alechilles.alecstamework.api.InteractionExtensionApi;
 import com.alechilles.alecstamework.api.TameworkApi;
+import com.alechilles.alecstamework.api.TameworkApiCapability;
+import com.alechilles.alecstamework.api.TameworkEvent;
+import com.alechilles.alecstamework.api.TameworkEventsApi;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
@@ -22,7 +32,7 @@ import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.persistence.EncounterDefinitionSnapshot;
 import com.alechilles.hydragon.persistence.EncounterRecord;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
-import com.alechilles.hydragon.persistence.ProfileExtensionRecord;
+import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
@@ -32,11 +42,14 @@ import java.time.ZoneOffset;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.List;
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -45,6 +58,8 @@ class DynamicEncounterCoordinatorTest {
     private static final UUID ACCESS_PROFILE = UUID.fromString("10000000-0000-0000-0000-000000000002");
     private static final UUID ACCESS_NPC = UUID.fromString("10000000-0000-0000-0000-000000000003");
     private static final UUID TARGET = UUID.fromString("10000000-0000-0000-0000-000000000004");
+    private static final UUID CAPTURE_OPERATION = UUID.fromString("10000000-0000-0000-0000-000000000005");
+    private static final UUID CAPTURE_ATTEMPT = UUID.fromString("10000000-0000-0000-0000-000000000006");
 
     @TempDir Path temporaryDirectory;
 
@@ -205,10 +220,10 @@ class DynamicEncounterCoordinatorTest {
 
         HyDragonStateStore noDragonStore = new HyDragonStateStore(
                 temporaryDirectory.resolve("no-flying-dragon.properties"));
-        assertEquals("active-avatar-flight-dragon-required", new EncounterEligibilityService(api, noDragonStore)
+        assertTrue(new EncounterEligibilityService(api, noDragonStore)
                 .evaluate(definition, snapshot(definition, speciesConfig()),
                         candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)), true)
-                .reason());
+                .allowed(), "bonded authority must not depend on local profile extensions");
     }
 
     @Test
@@ -238,8 +253,6 @@ class DynamicEncounterCoordinatorTest {
 
         HyDragonStateStore unsafeStore = new HyDragonStateStore(
                 temporaryDirectory.resolve("unsafe-placement.properties"));
-        unsafeStore.putProfileExtension(ProfileExtensionRecord.fullDragon(
-                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
         FakeWorld unsafeWorld = new FakeWorld();
         unsafeWorld.spawnAllowed = false;
         DynamicEncounterCoordinator unsafeCoordinator = new DynamicEncounterCoordinator(
@@ -260,8 +273,6 @@ class DynamicEncounterCoordinatorTest {
         TameworkApi api = api(new AtomicBoolean(false));
         Path statePath = temporaryDirectory.resolve("eligibility-grace.properties");
         HyDragonStateStore store = new HyDragonStateStore(statePath);
-        store.putProfileExtension(ProfileExtensionRecord.fullDragon(
-                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
         DragonEncounterConfig definition = encounterConfig();
         HyDragonConfigRepository.Snapshot configs = snapshot(definition, speciesConfig());
         DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
@@ -328,13 +339,146 @@ class DynamicEncounterCoordinatorTest {
         assertFalse(coordinator.captureAllowed(TARGET));
     }
 
+    /** Regression: an unavailable bounded lookup cannot be treated as proof that capture did not happen. */
+    @Test
+    void unavailableBondedCaptureEvidenceFailsClosedAtTimeout() throws Exception {
+        TameworkApi api = api((ownerUuid, sourceNpcUuid) ->
+                CompletableFuture.completedFuture(BondedCompanionResult.unavailable(
+                        "bonded-capture-evidence-unavailable")), new EventSink());
+        HyDragonStateStore stateStore = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, stateStore, new EncounterEligibilityService(api, stateStore));
+        FakeWorld world = new FakeWorld();
+        DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
+                definition, snapshot(definition, speciesConfig()),
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L);
+
+        DynamicEncounterCoordinator.TransitionResult result = coordinator.tick(
+                admitted.encounterId(), world, 71_000L);
+
+        assertFalse(result.transitioned());
+        assertEquals("capture-state-ambiguous", result.reason());
+        assertEquals(0, world.retireCalls);
+        assertTrue(coordinator.isEncounterTarget(TARGET));
+    }
+
+    @Test
+    void incompleteBondedCaptureEvidenceNeverBlocksOrRetiresTarget() throws Exception {
+        CompletableFuture<BondedCompanionResult<BondedCompanionCaptureEvidenceView>> pending =
+                new CompletableFuture<>();
+        TameworkApi api = api((ownerUuid, sourceNpcUuid) -> pending, new EventSink());
+        HyDragonStateStore stateStore = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, stateStore, new EncounterEligibilityService(api, stateStore));
+        FakeWorld world = new FakeWorld();
+        DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
+                definition, snapshot(definition, speciesConfig()),
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L);
+
+        DynamicEncounterCoordinator.TransitionResult result = coordinator.tick(
+                admitted.encounterId(), world, 71_000L);
+
+        assertFalse(result.transitioned());
+        assertEquals("capture-state-ambiguous", result.reason());
+        assertEquals(0, world.retireCalls);
+        assertFalse(pending.isDone());
+    }
+
+    /** Regression: shared-roster Miniwyvern evidence must never close a full-dragon encounter. */
+    @Test
+    void otherBondedFamilyCaptureEvidenceFailsClosedAtTimeout() throws Exception {
+        TameworkApi api = api((ownerUuid, sourceNpcUuid) ->
+                CompletableFuture.completedFuture(capturedResult(
+                        TameworkGameplayAdapter.MINIWYVERN_FAMILY)), new EventSink());
+        HyDragonStateStore stateStore = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, stateStore, new EncounterEligibilityService(api, stateStore));
+        FakeWorld world = new FakeWorld();
+        DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
+                definition, snapshot(definition, speciesConfig()),
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L);
+
+        DynamicEncounterCoordinator.TransitionResult result = coordinator.tick(
+                admitted.encounterId(), world, 71_000L);
+
+        assertFalse(result.transitioned());
+        assertEquals("capture-state-ambiguous", result.reason());
+        assertEquals(0, world.retireCalls);
+    }
+
+    @Test
+    void runtimeConsumesBondedCaptureEventAndKeepsCaptureCommitCooldownOrigin() throws Exception {
+        EventSink events = new EventSink();
+        TameworkApi api = api(new AtomicBoolean(false), events);
+        HyDragonStateStore stateStore = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        HyDragonConfigRepository.Snapshot configs = snapshot(definition, speciesConfig());
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, stateStore, new EncounterEligibilityService(api, stateStore));
+        FakeWorld world = new FakeWorld();
+        DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
+                definition, configs,
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L);
+        DynamicEncounterRuntime runtime = new DynamicEncounterRuntime(
+                api, stateStore, () -> configs,
+                () -> new FeatureGate(HyDragonFeature.DYNAMIC_ENCOUNTERS, true,
+                        Set.of(), Set.of(), List.of()),
+                (worldName, targetNpcUuid, callback) -> callback.accept(world),
+                coordinator, Clock.systemUTC());
+
+        runtime.start();
+        events.emit(new BondedCompanionCaptureResolvedEvent(
+                captureEvidence(TameworkGameplayAdapter.FULL_DRAGON_FAMILY), 65_000L));
+
+        EncounterRecord cooldown = stateStore.snapshot().encounter(admitted.encounterId()).orElseThrow();
+        assertEquals(BondedCompanionCaptureResolvedEvent.class, events.subscribedType);
+        assertEquals(EncounterPhase.COOLDOWN, EncounterCheckpoint.decode(cooldown.phase()).phase());
+        assertEquals(81_000L, cooldown.cooldownUntilEpochMillis());
+        runtime.close();
+    }
+
+    @Test
+    void runtimeIgnoresBondedCaptureEventFromOtherFamily() throws Exception {
+        EventSink events = new EventSink();
+        TameworkApi api = api(new AtomicBoolean(false), events);
+        HyDragonStateStore stateStore = stateStore();
+        DragonEncounterConfig definition = encounterConfig();
+        HyDragonConfigRepository.Snapshot configs = snapshot(definition, speciesConfig());
+        DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
+                api, stateStore, new EncounterEligibilityService(api, stateStore));
+        FakeWorld world = new FakeWorld();
+        DynamicEncounterCoordinator.AdmissionResult admitted = coordinator.admit(
+                definition, configs,
+                candidate(Set.of(EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID)),
+                world, true, 60_000L);
+        DynamicEncounterRuntime runtime = new DynamicEncounterRuntime(
+                api, stateStore, () -> configs,
+                () -> new FeatureGate(HyDragonFeature.DYNAMIC_ENCOUNTERS, true,
+                        Set.of(), Set.of(), List.of()),
+                (worldName, targetNpcUuid, callback) -> callback.accept(world),
+                coordinator, Clock.systemUTC());
+
+        runtime.start();
+        events.emit(new BondedCompanionCaptureResolvedEvent(
+                captureEvidence(TameworkGameplayAdapter.MINIWYVERN_FAMILY), 61_000L));
+
+        EncounterRecord active = stateStore.snapshot().encounter(admitted.encounterId()).orElseThrow();
+        assertEquals(EncounterPhase.AERIAL, EncounterCheckpoint.decode(active.phase()).phase());
+        runtime.close();
+    }
+
     @Test
     void permanentRemovalCheckpointsCooldownBeforeRestart() throws Exception {
         Path statePath = temporaryDirectory.resolve("permanent-removal.properties");
         TameworkApi api = api(new AtomicBoolean(false));
         HyDragonStateStore store = new HyDragonStateStore(statePath);
-        store.putProfileExtension(ProfileExtensionRecord.fullDragon(
-                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
         DragonEncounterConfig definition = encounterConfig();
         DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(
                 api, store, new EncounterEligibilityService(api, store));
@@ -358,8 +502,6 @@ class DynamicEncounterCoordinatorTest {
         Path statePath = temporaryDirectory.resolve("removed-definition.properties");
         TameworkApi api = api(new AtomicBoolean(false));
         HyDragonStateStore initialStore = new HyDragonStateStore(statePath);
-        initialStore.putProfileExtension(ProfileExtensionRecord.fullDragon(
-                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
         DragonEncounterConfig definition = encounterConfig();
         DynamicEncounterCoordinator initialCoordinator = new DynamicEncounterCoordinator(
                 api, initialStore, new EncounterEligibilityService(api, initialStore));
@@ -453,10 +595,7 @@ class DynamicEncounterCoordinatorTest {
     }
 
     private HyDragonStateStore stateStore() throws Exception {
-        HyDragonStateStore store = new HyDragonStateStore(temporaryDirectory.resolve("state.properties"));
-        store.putProfileExtension(ProfileExtensionRecord.fullDragon(
-                ACCESS_PROFILE, "hydragon:nordic", Optional.empty()));
-        return store;
+        return new HyDragonStateStore(temporaryDirectory.resolve("state.properties"));
     }
 
     private static EncounterCandidate candidate(Set<String> items) {
@@ -466,35 +605,99 @@ class DynamicEncounterCoordinatorTest {
     }
 
     private static TameworkApi api(AtomicBoolean captured) {
-        NpcProfileView accessProfile = new NpcProfileView(
-                ACCESS_PROFILE.toString(), ACCESS_NPC, PLAYER, "owner", "Tamed_Nordic", "Nordic", null,
-                true, null, null, Set.of(), Set.of(), 1L);
-        NpcProfilesApi profiles = proxy(NpcProfilesApi.class, (method, arguments) -> switch (method) {
-            case "getByProfileId" -> Optional.of(accessProfile);
-            case "resolveProfileId" -> captured.get() ? Optional.of("captured-profile") : Optional.empty();
-            case "getByNpcUuid", "getActiveSnapshot" -> Optional.empty();
-            case "listActiveSnapshotTypes" -> Set.of();
-            default -> null;
-        });
-        PopulationGroupApi groups = proxy(PopulationGroupApi.class, (method, arguments) -> switch (method) {
-            case "getCounts" -> Optional.of(new PopulationGroupCountsView(
-                    PLAYER, "hydragon:full_dragons", PopulationGroupScope.PER_WORLD, "world",
-                    1L, 0L, 1L, 0L, 1L, 1L, false, false, 1L));
-            case "getDefinition" -> Optional.empty();
-            case "resolveForRole" -> java.util.List.of();
-            default -> null;
-        });
-        PolicyApi policies = proxy(PolicyApi.class, (method, arguments) -> switch (method) {
-            case "isOwner" -> true;
-            default -> null;
+        return api(captured, new EventSink());
+    }
+
+    private static TameworkApi api(AtomicBoolean captured, EventSink events) {
+        return api((ownerUuid, sourceNpcUuid) -> CompletableFuture.completedFuture(
+                captured.get()
+                        ? capturedResult(TameworkGameplayAdapter.FULL_DRAGON_FAMILY)
+                        : new BondedCompanionResult<>(
+                                BondedCompanionResultCode.NOT_FOUND,
+                                null,
+                                "bonded-capture-not-found")), events);
+    }
+
+    private static TameworkApi api(CaptureLookup captures, EventSink events) {
+        BondedCompanionProfileView accessProfile = new BondedCompanionProfileView(
+                ACCESS_PROFILE.toString(), PLAYER,
+                ActiveBondedDragonResolver.DRAGON_HORN_ROSTER,
+                ActiveBondedDragonResolver.FULL_DRAGON_FAMILY,
+                "Nordic_Tamed", "Nordic", "Nordic", null,
+                1L, BondedCompanionStateView.ACTIVE,
+                false, true, false, Map.of(),
+                new BondedCompanionLeaseView(
+                        "lease-access", ACCESS_NPC, "world", 1L, 0L),
+                0L, null);
+        BondedCompanionApi bonded = proxy(BondedCompanionApi.class,
+                (method, arguments) -> switch (method) {
+                    case "availability" -> BondedCompanionAvailability.availableNow();
+                    case "list" -> CompletableFuture.completedFuture(
+                            new BondedCompanionResult<>(
+                                    BondedCompanionResultCode.SUCCESS,
+                                    List.of(accessProfile), null));
+                    case "findCapture" -> {
+                        assertEquals(PLAYER, arguments[0]);
+                        assertEquals(TameworkGameplayAdapter.DRAGON_HORN_ROSTER, arguments[1]);
+                        assertEquals(TARGET, arguments[2]);
+                        yield captures.find((UUID) arguments[0], (UUID) arguments[2]);
+                    }
+                    case "subscribe" -> (AutoCloseable) () -> { };
+                    default -> throw new AssertionError(
+                            "unexpected bonded call " + method);
+                });
+        InteractionExtensionApi interactions = proxy(InteractionExtensionApi.class,
+                (method, arguments) -> switch (method) {
+                    case "registerCaptureRequirement" -> (AutoCloseable) () -> { };
+                    default -> throw new AssertionError(
+                            "unexpected interaction-extension call " + method);
+                });
+        TameworkEventsApi eventApi = proxy(TameworkEventsApi.class, (method, arguments) -> switch (method) {
+            case "subscribe" -> events.subscribe((Class<?>) arguments[0], (Consumer<?>) arguments[1]);
+            default -> throw new AssertionError("unexpected events call " + method);
         });
         return proxy(TameworkApi.class, (method, arguments) -> switch (method) {
-            case "profiles" -> profiles;
-            case "policies" -> policies;
-            case "populationGroups" -> groups;
-            case "getApiVersion" -> "0.9";
+            case "bondedCompanions" -> bonded;
+            case "interactionExtensions" -> interactions;
+            case "events" -> eventApi;
+            case "getCapabilities" -> EnumSet.of(
+                    TameworkApiCapability.BONDED_COMPANIONS);
+            case "getApiVersion" -> "3.0.0";
             default -> null;
         });
+    }
+
+    private static BondedCompanionResult<BondedCompanionCaptureEvidenceView> capturedResult(
+            String familyId) {
+        return new BondedCompanionResult<>(
+                BondedCompanionResultCode.SUCCESS,
+                captureEvidence(familyId),
+                null);
+    }
+
+    private static BondedCompanionCaptureEvidenceView captureEvidence(String familyId) {
+        return new BondedCompanionCaptureEvidenceView(
+                CAPTURE_OPERATION,
+                CAPTURE_ATTEMPT,
+                PLAYER,
+                TameworkGameplayAdapter.DRAGON_HORN_ROSTER,
+                familyId,
+                TARGET,
+                "captured-profile",
+                "Nordic_Tamed",
+                TameworkGameplayAdapter.CALLER_NAMESPACE,
+                "capture-idempotency-key",
+                "HyDragon_Ancient_Draconic_Stone",
+                "HyDragonDraconicStone",
+                1L,
+                null,
+                -1L,
+                CaptureSourceConsumption.SUCCESS_ONLY,
+                CaptureSuccessDisposition.STORE_BONDED_COMPANION,
+                CaptureAttemptOutcome.CAPTURED,
+                "captured",
+                "world",
+                61_000L);
     }
 
     private static DragonEncounterConfig encounterConfig() throws Exception {
@@ -507,7 +710,6 @@ class DynamicEncounterCoordinatorTest {
         set(config.getRegionsAndAltitude(), "maxY", 300.0D);
         set(config.getWeatherPredicate(), "mode", "AnyOf");
         set(config.getWeatherPredicate(), "weatherIds", new String[] { "storm" });
-        set(config.getPlayerEligibility(), "activeCompanionGroup", "hydragon:full_dragons");
         set(config.getPlayerEligibility(), "requiredMountMode", "AVATAR_FLIGHT");
         set(config.getPlayerEligibility(), "requiredItemId",
                 EncounterEligibilityService.FLIGHTMASTERS_TALISMAN_ITEM_ID);
@@ -583,6 +785,35 @@ class DynamicEncounterCoordinatorTest {
     @FunctionalInterface
     private interface Invocation {
         Object invoke(String method, Object[] arguments) throws Throwable;
+    }
+
+    @FunctionalInterface
+    private interface CaptureLookup {
+        CompletableFuture<BondedCompanionResult<BondedCompanionCaptureEvidenceView>> find(
+                UUID ownerUuid,
+                UUID sourceNpcUuid);
+    }
+
+    private static final class EventSink {
+        private Class<?> subscribedType;
+        private Consumer<Object> listener;
+
+        @SuppressWarnings("unchecked")
+        private AutoCloseable subscribe(Class<?> type, Consumer<?> consumer) {
+            subscribedType = type;
+            listener = (Consumer<Object>) consumer;
+            return () -> {
+                subscribedType = null;
+                listener = null;
+            };
+        }
+
+        private void emit(TameworkEvent event) {
+            assertNotNull(listener, "runtime must subscribe before an event can be emitted");
+            assertTrue(subscribedType.isInstance(event),
+                    () -> "subscriber type " + subscribedType + " rejected " + event.getClass());
+            listener.accept(event);
+        }
     }
 
     private static final class FakeWorld implements EncounterWorldGateway {

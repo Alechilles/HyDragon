@@ -1,0 +1,29 @@
+{
+  "Priority": 100,
+  "RosterId": "hydragon:dragon_horn",
+  "FamilyId": "hydragon:full_dragons",
+  "AllowedRoles": [
+    "Tamed_NordicDrake",
+    "Tamed_Hydra",
+    "Tamed_RockDrakeT1",
+    "Tamed_RockDrakeT2",
+    "Tamed_RockDrakeT3"
+  ],
+  "MaximumOwned": 0,
+  "MaximumActive": 1,
+  "SessionDurationSeconds": 600,
+  "SummonCooldownSeconds": 300,
+  "RevivePrice": {
+    "Costs": [
+      { "ItemId": "Revitalizing_Essence", "Quantity": 2 },
+      { "ItemId": "Draconic_Essence", "Quantity": 4 }
+    ]
+  },
+  "Features": {
+    "Capture": true,
+    "Provision": false,
+    "Summon": true,
+    "Dismiss": true,
+    "Revive": true
+  }
+}

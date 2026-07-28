@@ -5,6 +5,7 @@ import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.persistence.EncounterRecord;
 import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
+import com.alechilles.hydragon.runtime.HyDragonRuntimePollCycle;
 import com.hypixel.hytale.builtin.weather.components.WeatherTracker;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -37,6 +38,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 /**
  * Live server bridge for bounded encounter admission/lifecycle polling and Miniwyvern ability ticks.
@@ -70,17 +72,17 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
 
     /** Binds installed feature runtimes and starts one daemon, non-overlapping bounded poller. */
     public void start(
-            DynamicEncounterRuntime encounters,
-            MiniwyvernAbilityRuntime abilities,
-            ConsumableSagaRecoveryRuntime sagaRecovery,
+            @Nullable DynamicEncounterRuntime encounters,
+            @Nullable MiniwyvernAbilityRuntime abilities,
+            @Nullable ConsumableSagaRecoveryRuntime sagaRecovery,
             Supplier<HyDragonConfigRepository.Snapshot> configs) {
-        Objects.requireNonNull(encounters, "encounters");
-        Objects.requireNonNull(abilities, "abilities");
-        Objects.requireNonNull(sagaRecovery, "sagaRecovery");
         Objects.requireNonNull(configs, "configs");
+        HyDragonRuntimePollCycle pollCycle = pollCycle(
+                encounters, abilities, sagaRecovery);
+        if (!pollCycle.hasWork()) return;
         synchronized (lifecycleLock) {
             if (scheduled != null) return;
-            bindings = new Bindings(encounters, abilities, sagaRecovery, configs);
+            bindings = new Bindings(encounters, pollCycle, configs);
             executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
                 Thread thread = new Thread(runnable, "HyDragon-live-runtime");
                 thread.setDaemon(true);
@@ -92,17 +94,36 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
     }
 
     private void safeCycle() {
-        try {
-            Bindings active = bindings;
-            if (active == null) return;
-            active.encounters().tickSome(MAX_ENCOUNTERS_PER_TICK);
-            active.abilities().tickSome(MAX_MINIWYVERNS_PER_TICK);
-            active.sagaRecovery().tickSome(MAX_SAGAS_PER_TICK);
-            cycle++;
-            if (cycle % ADMISSION_SCAN_INTERVAL_TICKS == 0) queueAdmissionScans(active);
-        } catch (RuntimeException ignored) {
-            // One failed poll must not terminate all future lifecycle reconciliation.
+        Bindings active = bindings;
+        if (active == null) return;
+        active.pollCycle().run();
+        cycle++;
+        if (active.pollCycle().encountersEnabled()
+                && cycle % ADMISSION_SCAN_INTERVAL_TICKS == 0) {
+            safeAdmissionScan(active);
         }
+    }
+
+    private void safeAdmissionScan(Bindings active) {
+        try {
+            queueAdmissionScans(active);
+        } catch (RuntimeException | LinkageError ignored) {
+            // One failed admission scan must not terminate the shared poller.
+        }
+    }
+
+    private HyDragonRuntimePollCycle pollCycle(
+            DynamicEncounterRuntime encounters,
+            MiniwyvernAbilityRuntime abilities,
+            ConsumableSagaRecoveryRuntime sagaRecovery) {
+        Runnable encounterPoll = encounters == null ? null
+                : () -> encounters.tickSome(MAX_ENCOUNTERS_PER_TICK);
+        Runnable abilityPoll = abilities == null ? null
+                : () -> abilities.tickSome(MAX_MINIWYVERNS_PER_TICK);
+        Runnable sagaPoll = sagaRecovery == null ? null
+                : () -> sagaRecovery.tickSome(MAX_SAGAS_PER_TICK);
+        return new HyDragonRuntimePollCycle(
+                encounterPoll, abilityPoll, sagaPoll, ignored -> { });
     }
 
     private void queueAdmissionScans(Bindings active) {
@@ -209,7 +230,7 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
             CommandBuffer<EntityStore> commandBuffer) {
         Bindings active = bindings;
         ProjectileDamageRefs damageRefs = projectileDamageRefs(damage);
-        if (active == null || damageRefs == null) return;
+        if (active == null || active.encounters() == null || damageRefs == null) return;
         Ref<EntityStore> sourceRef = damageRefs.shooterRef();
         Ref<EntityStore> projectileRef = damageRefs.projectileRef();
         if (!validInStore(sourceRef, store) || !validInStore(projectileRef, store)) {
@@ -344,9 +365,8 @@ public final class HyDragonEncounterServerRuntime implements AutoCloseable {
     }
 
     private record Bindings(
-            DynamicEncounterRuntime encounters,
-            MiniwyvernAbilityRuntime abilities,
-            ConsumableSagaRecoveryRuntime sagaRecovery,
+            @Nullable DynamicEncounterRuntime encounters,
+            HyDragonRuntimePollCycle pollCycle,
             Supplier<HyDragonConfigRepository.Snapshot> configs) {
     }
 }

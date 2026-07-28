@@ -28,7 +28,7 @@ public final class StateStoreSoulBondLedger implements SoulBondLedger {
     @Override
     public Reservation complete(UUID playerUuid, String operationId, UUID profileId, long claimedAtEpochMillis) {
         try {
-            return map(store.completeSoulBondWithMiniwyvernProfile(
+            return map(store.completeSoulBond(
                     playerUuid, operationId, profileId, claimedAtEpochMillis));
         } catch (IOException exception) {
             return Reservation.UNAVAILABLE;

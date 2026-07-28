@@ -24,9 +24,15 @@ final class PluginLifecycleContractTest {
     void writableStartupComposesEveryProductionRuntime() throws IOException {
         String source = pluginSource();
 
+        assertTrue(source.contains("new HyDragonRuntimeComposition("));
+        assertTrue(source.contains("HyDragonRuntimeComposition.Slot.BONDED_GAMEPLAY"));
+        assertTrue(source.contains("HyDragonRuntimeComposition.Slot.MINIWYVERN_ABILITIES"));
+        assertTrue(source.contains("HyDragonRuntimeComposition.Slot.DYNAMIC_ENCOUNTERS"));
         assertTrue(source.contains("new StateStoreSoulBondLedger(store)"));
-        assertTrue(source.contains("new StateStoreOperationJournal(store, System::currentTimeMillis)"));
-        assertTrue(source.contains("new StateStoreMiniwyvernProfileProjection(store)"));
+        assertTrue(source.contains("new StateStoreOperationJournal("));
+        assertTrue(source.contains("store, System::currentTimeMillis"));
+        assertTrue(source.contains("new BondedMiniwyvernExtensionStore("));
+        assertTrue(source.contains("new BondedMiniwyvernExtensionCodec()"));
         assertTrue(source.contains("new SoulBondService("));
         assertTrue(source.contains("new MiniwyvernAttunementService("));
         assertTrue(source.contains("new ConsumableSagaRecoveryRuntime("));
@@ -34,7 +40,8 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("HyDragonEncounterRegistrationFacade.install("));
         assertTrue(source.contains("HyDragonAbilityRegistrationFacade.install("));
         assertTrue(source.contains("serverRuntime.start("));
-        assertTrue(source.contains("encounterRuntime, abilityRuntime, sagaRecoveryRuntime"));
+        assertTrue(source.contains("encounterRuntime, abilityRuntime,"));
+        assertTrue(source.contains("sagaRecoveryRuntime, configRepository::snapshot"));
     }
 
     @Test
@@ -45,7 +52,9 @@ final class PluginLifecycleContractTest {
         assertOrdered(source,
                 "private void stopRuntimes()",
                 "closeRuntime(\"live server\", serverRuntime);",
-                "HyDragonInteractionRuntime.uninstall(gameplayRuntime);");
+                "closeRuntime(\"feature composition\", runtimeComposition);",
+                "runtimeComposition = null;");
+        assertTrue(source.contains("HyDragonInteractionRuntime.uninstall(gameplay);"));
     }
 
     @Test

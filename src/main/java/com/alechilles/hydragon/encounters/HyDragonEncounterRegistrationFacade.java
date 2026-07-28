@@ -41,7 +41,7 @@ public final class HyDragonEncounterRegistrationFacade {
             Supplier<FeatureGate> featureGate,
             EncounterWorldDispatcher worlds) {
         Objects.requireNonNull(api, "api");
-        EncounterEligibilityService eligibility = new EncounterEligibilityService(api, stateStore);
+        EncounterEligibilityService eligibility = new EncounterEligibilityService(api);
         DynamicEncounterCoordinator coordinator = new DynamicEncounterCoordinator(api, stateStore, eligibility);
         DynamicEncounterRuntime runtime = new DynamicEncounterRuntime(
                 api, stateStore, configs, featureGate, worlds, coordinator, Clock.systemUTC());

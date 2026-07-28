@@ -1,107 +1,106 @@
 # HyDragon Implementation Specification Suite
 
-Status: Redesign specified; implementation pending
-Source: collaborator feature outline plus in-game iteration
+Status: Bonded-companion source integration implemented; packaged and fresh-world acceptance pending
 Required Tamework range: `>=3.0.0 <4.0.0`
+Required Tamework public API: `0.9.0` with `BONDED_COMPANIONS`
 
 ## 1. Product direction
 
-HyDragon is a Java plugin and asset pack built on Tamework 3.x. It owns dragon content, capture balance, the Draconic Altar and economy, the Wyvern Egg entitlement, elemental abilities, encounters, effects, and localization. Tamework owns reusable companion identity, capture resolution, command-family rosters, configurable active limits, timed summoning/storage, placement, commands, and paid revival.
+HyDragon is a Java plugin and root-layout asset pack built on Tamework 3.x. HyDragon owns dragon content, capture balance, the Draconic Altar and economy, the once-per-player Wyvern Egg entitlement, Miniwyvern archetypes/abilities, encounters, effects, and localization.
 
-The original unreleased bonded-stone design is withdrawn. Draconic Stones are consumed capture attempts. Success tames the existing dragon and adds it to the Dragon Horn; failure consumes the attempted stone and leaves the wild dragon available for another attempt after cooldown. The Dragon Horn is the recurring interface for full dragons and the Soul Bond Miniwyvern.
+Tamework's dedicated bonded-companion runtime owns the durable roster profile, complete NPC snapshot, three-state lifecycle, ephemeral projection lease, capacity/timer policy, profile-first Dragon Horn card, atomic revival, and namespaced extension storage. It is deliberately separate from permanent-world animal persistence and Tamework's generic command-roster systems.
+
+Draconic Stones are consumed capture attempts. Success stores a full dragon in the Dragon Horn after durable snapshot commit and removes the source NPC; failure spends the resolved attempt and leaves the wild target unchanged. The Wyvern Egg provisions one stored Soul Bond Miniwyvern. Both families use the same Horn from then on.
 
 ## 2. Locked decisions
 
-- HyDragon targets Tamework `>=3.0.0 <4.0.0` and checks required capabilities.
-- Every eligible resolved capture roll consumes one stone, on success or failure.
-- Invalid preflight and interrupted channels consume nothing and do not roll.
-- Success tames in place and adds one canonical profile to `hydragon:dragon_horn`; no filled stone is created.
-- Full dragons and the one Soul Bond Miniwyvern share the Dragon Horn UI but retain separate data-driven population limits and per-profile summon timers.
-- `Wyvern_Egg` is consumed on the one lifelong Miniwyvern claim. No `Soul_Bound_Wyvern` item exists.
-- Summoned dragons have role-configured active durations. Expiry durably despawns the projection into roster-stored state; Horn Summon after cooldown starts a new lease.
-- Dead companions remain in the Horn and require a data-driven, clearly displayed multi-item cost to revive. Item IDs and quantities are content configuration, not Tamework constants.
-- Recall, initial Egg projection, and revival place companions safely in front of the player.
+- The shared roster ID is `hydragon:dragon_horn`.
+- Full dragons use family `hydragon:full_dragons`; Miniwyverns use `hydragon:soulbound_mini`.
+- The only bonded states are `STORED`, `ACTIVE`, and `DEAD`.
+- Any non-death disappearance, including logout, transfer, expiration, missing projection, or duplicate cleanup, becomes `STORED`.
+- Only confirmed death becomes `DEAD`; paid revive returns to `STORED` and never auto-summons.
+- Cards and actions use stable bonded profile IDs, never live NPC UUIDs or item metadata.
+- Complete snapshot details render from durable profile data immediately after capture, summon, store, revive, and relog.
+- Session durations and summon cooldowns are family policy; `0` disables a timer.
+- Full dragons and Miniwyverns share a panel but retain independent acquisition, ownership/active limits, timers, and revive recipes.
+- `Wyvern_Egg` is consumed for the one lifelong Miniwyvern claim. No recurring `Soul_Bound_Wyvern` item exists.
+- Miniwyvern attunement, ability, progression, and future fields use the owner/profile-scoped `Alechilles:HyDragon` bonded extension namespace.
 - Flying dragons use Tamework's Flightmaster's Talisman only.
-- The backpack is deferred to a later update.
-- Canonical asset IDs use English. Player-facing text ships in English, Brazilian Portuguese, German, French, and Spanish.
-- HyDragon has never been released. There are no HyDragon migration or compatibility requirements.
+- HyDragon has not shipped, so pre-release generic-roster and bonded-vessel data are not migrated.
 
 ## 3. Documents
 
 | Document | Authority |
 | --- | --- |
-| [Plugin architecture](plugin-architecture.md) | Packaging, dependency/capability handling, persistence, recovery, and safety |
-| [Draconic capture, Dragon Horn, and revival](capture-summoning-maintenance.md) | Stone tiers and spending, tame-and-link capture, Horn roster, active caps, timed summoning/storage, revival, and bonded-system removal |
-| [Wyvern Egg, Soul Bond, and Miniwyvern](soul-bond-miniwyvern.md) | Lifelong claim, Egg consumption, Horn membership, Miniwyvern behavior, archetypes, and deferred backpack |
+| [Plugin architecture](plugin-architecture.md) | Packaging, public API boundary, capabilities, persistence ownership, recovery, and diagnostics |
+| [Draconic capture, Dragon Horn, and revival](capture-summoning-maintenance.md) | Stone tiers/spending, stored capture, shared Horn, full-dragon family policy, leases, and revival |
+| [Wyvern Egg, Soul Bond, and Miniwyvern](soul-bond-miniwyvern.md) | Lifelong entitlement, stored provisioning, extension data, abilities, and Miniwyvern family policy |
 | [Dragon content and encounters](dragon-content-encounters.md) | Materials, Altar/recipes, species, drops, mounts, spawning, and special encounters |
-
-Normative Tamework companion specifications:
-
-- [Tamework HyDragon integration suite](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/README.md)
-- [Capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md)
-- [Command-roster capture and revival](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md)
-- [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md)
-- [Integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md)
-- Deferred: [Companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md)
+| [Tamework bonded integration contract](../integration/tamework-bonded-companions-contract.md) | Cross-mod ownership and prohibited generic fallbacks |
+| [Compatibility matrix](../integration/tamework-bonded-compatibility-matrix.md) | Version/capability behavior and remaining live-test gap |
+| [Fresh-world integration checklist](../testing/bonded-companion-integration-checklist.md) | Packaged/manual sequence and failure evidence |
 
 ## 4. System boundary
 
 | Layer | Owns | Does not own |
 | --- | --- | --- |
-| HyDragon assets/config | Items, models, textures, Altar/recipes, roles, spawns, drops, VFX/audio, balance, multilingual catalogs | Atomic profile/roster transitions |
-| HyDragon plugin | Egg entitlement, archetype abilities, special encounters, capability checks, domain diagnostics | Generic profiles, command roster, population admission, revival inventory transaction |
-| Tamework | Capture transaction, profile lifecycle, command-family roster, commands/UI, population groups, summon leases/storage, provisioning, generic paid revival, recovery | Dragon lore, item-cost balance, elemental combat, Altar, encounter policy |
-| Hytale runtime | Asset and ECS execution | Cross-mod domain transaction policy |
+| HyDragon assets/config | Items, recipes, roles, spawns, capture tier data, family policy values, effects, and localization | Durable bonded transitions or live-projection identity |
+| HyDragon plugin | Entitlement saga, extension payload semantics, archetype abilities, special encounters, capability diagnostics, and bounded compensation | A second companion profile, roster state, lease, or revive transaction |
+| Tamework bonded runtime | Stable profile/roster identity, full snapshot, `STORED`/`ACTIVE`/`DEAD`, projection lease, duplicate cleanup, panel actions, extension CAS, and atomic revive | Dragon lore, elemental combat, Altar economy, or encounter policy |
+| Hytale runtime | Asset and ECS execution on the owning world thread | Cross-mod transaction authority |
 
-## 5. Delivery map
+## 5. Current declarative policies
 
-1. **Tamework redesign:** replace bonded vessels with command-family roster capture, timed summoning/storage, and generic paid revival.
-2. **HyDragon capture:** convert five stone tiers to consume-on-roll tame-and-link behavior.
-3. **Dragon Horn:** rename and configure the command item as the durable roster access point.
-4. **Soul Bond:** consume the Wyvern Egg, provision one profile, and add it to the Horn.
-5. **Removal:** delete bonded stone states, summon/store/repair code, Soul Bound Wyvern, and all unreleased compatibility artifacts.
-6. **Content:** retain species, mounts, Altar, essence, elemental abilities, and encounters under the new lifecycle.
-7. **Verification:** cross-repository, packaged-asset, recovery, localization, and in-game tests.
+| Family | Acquisition | Owned | Active | Session | Cooldown | Revive recipe |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| `hydragon:full_dragons` | Draconic Stone capture | Unlimited (`0`) | 1 | 600 s | 300 s | `Revitalizing_Essence x2` + `Draconic_Essence x4` |
+| `hydragon:soulbound_mini` | Wyvern Egg provisioning | 1 | 1 | 900 s | 180 s | `Revitalizing_Essence x1` + `Draconic_Essence x2` |
 
-The Miniwyvern backpack is a later release and does not block these phases.
+These are current content values, not hard-coded Java limits. Both families may be active at once because capacity is resolved per bonded family.
 
-## 6. Core requirement traceability
+## 6. Cross-cutting invariants
 
-| Area | HyDragon authority | Tamework authority |
-| --- | --- | --- |
-| Capture eligibility and chance | [Capture §§4-5](capture-summoning-maintenance.md#4-functional-requirements) | [Capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) |
-| Spend on every resolved attempt | [Capture §§4, 7](capture-summoning-maintenance.md#stone-consumption-boundary) | [Command-roster capture §5](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md#5-capture-transaction) |
-| Tame in place and add to Horn | [Capture §§4, 8](capture-summoning-maintenance.md#successful-capture-and-dragon-horn-membership) | [Command-roster capture §§4-6](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md) |
-| Paid death recovery | [Capture §4](capture-summoning-maintenance.md#death-and-paid-revival) | [Command-roster capture §8](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md#8-paid-revival-transaction) |
-| Miniwyvern lifelong claim | [Miniwyvern §§3-5](soul-bond-miniwyvern.md#3-requirements) | Tamework provisioning, roster, and population contracts |
-| One active full dragon / one Miniwyvern | Capture and Miniwyvern specs | [Population groups](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/population-groups.md) |
-| Timed summon and roster storage | [Capture timed summoning](capture-summoning-maintenance.md#timed-summoning-and-roster-storage) | [Command-roster timed summoning](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/command-roster-capture-revival.md#7-command-placement-active-limits-and-timed-summoning) |
-| English IDs and five locales | [Content localization](dragon-content-encounters.md#53-localization-catalogs) | None |
-| Deferred backpack | [Miniwyvern §3](soul-bond-miniwyvern.md#deferred-backpack) | [Companion inventory](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/companion-inventory.md) |
+1. One stable bonded profile represents one companion across all projections and lifecycle states.
+2. A live NPC is an ephemeral projection identified by a lease token, not the durable roster identity.
+3. Every positive operation is revision-aware and idempotent; retry replays evidence instead of re-spending, re-rolling, re-provisioning, or re-spawning.
+4. Capture is durable before source removal. Store snapshots before projection removal.
+5. Item metadata can grant access but cannot establish ownership or fork a roster.
+6. Positive mutations fail closed when their bonded, HyDragon journal, inventory, or world authority is unavailable.
+7. World/entity work stays on the owning world thread; deferred work carries stable IDs.
+8. HyDragon does not fall back to generic command-family, timed-summon, generic profile-data, population, paid-command-revival, or replacement-persistence APIs.
 
-## 7. Cross-cutting invariants
+## 7. Implementation map
 
-1. One stable Tamework profile represents one companion across all projections and lifecycle states.
-2. One namespaced operation ID spans each cross-plugin capture, claim, or revival transaction.
-3. Exactly-once means retries return the recorded result; they do not re-roll, re-consume, re-provision, or re-spawn.
-4. Item metadata is a cache/projection. It cannot establish ownership, Horn membership, or entitlement.
-5. Inventory, profile, roster, population, and world mutations either converge together or produce one durable recovery claim.
-6. Positive mutations fail closed when persistence or capability authority is unavailable.
-7. World/ECS work runs on the owning world thread; durable I/O never blocks it.
-8. Missing presentation assets may degrade visuals, not transaction correctness.
-9. No implementation may retain the bonded-vessel design as a hidden alternate path.
+1. Tamework supplies the independent bonded database, public API, snapshot codec, lifecycle, projection manager, panel integration, diagnostics, and policy assets.
+2. HyDragon routes full-dragon capture to `StoreBondedCompanion` and the shared Horn.
+3. HyDragon provisions the one-lifetime Miniwyvern directly into the same roster and initializes its bonded extension document.
+4. Miniwyvern attunement and abilities read/write the extension through compare-and-set and react to bonded state-change events.
+5. Dynamic encounter eligibility queries a confirmed active full-dragon lease in the candidate world instead of population evidence.
+6. HyDragon's old population assets and generic roster/timer/revive declarations are absent from the active asset path.
+7. Contract, asset, and packaged-layout tests cover the source integration. Fresh-world gameplay remains the final acceptance gate.
 
-## 8. Definition of completion
+## 8. Superseded historical designs
 
-The redesign is complete only when:
+The following were unreleased development directions and are not supported behavior:
 
-- all five stones consume exactly once for every resolved roll and never for pre-roll denial;
-- capture success preserves the same dragon/profile in the world and adds one Horn row;
-- Horn replacement reconstructs the same owner roster and never transfers it;
-- the Wyvern Egg creates one lifelong profile and no separate summon item;
-- every active profile holds a population slot and an independent durable lease; expiry returns it to roster-stored state;
-- death and paid revival preserve identity and consume every configured cost component exactly once;
-- configurable population caps and in-front placement apply to every projection path;
-- all bonded-vessel and Soul Bound Wyvern code/assets/config/docs are removed;
-- there are no HyDragon migration readers or aliases;
-- Maven tests, packaged-asset validation, localization parity, restart recovery, and live-server acceptance all pass against Tamework 3.0.0.
+- filled or damageable bonded Draconic Stone vessels;
+- `Soul_Bound_Wyvern` as a separate controller;
+- `OwnerCommandFamily` / `TameAndCommandLink` for HyDragon companions;
+- generic population groups for active dragon/Miniwyvern limits;
+- generic timed-command-summon, dormant-profile, profile-data, and paid-command-revival paths;
+- `LOST`, `UNLOADED`, `ROSTER_STORED`, or `DEAD_REVIVABLE` as bonded states.
+
+No player migration or compatibility layer is required for those pre-release paths.
+
+## 9. Definition of completion
+
+The bonded redesign is complete only when:
+
+- both families use one fully detailed, profile-keyed Horn panel;
+- capture is durable-before-removal and never silently or partially succeeds;
+- all non-death exits converge to `STORED`, death alone produces `DEAD`, and revive returns to `STORED`;
+- finite and zero-duration policies behave as configured without negative-time bugs;
+- Miniwyvern extension data survives every summon/store/relog cycle;
+- active-dragon encounter eligibility uses one confirmed active full-dragon lease in the candidate world;
+- ordinary Tamework animal/companion persistence remains unchanged under its full regression suite;
+- clean Tamework and HyDragon suites, packaged asset/dependency checks, and the fresh-world checklist all pass.
