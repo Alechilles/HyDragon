@@ -14,11 +14,18 @@
       { "ItemId": "Draconic_Essence", "Quantity": 6 },
       { "ItemId": "Draconic_Essence_Void", "Quantity": 2 }
     ],
-    "Output": [ { "ItemId": "Draconic_Stone_Ancient", "Quantity": 1 } ],
+    "Output": [
+      { "ItemId": "Draconic_Stone_Ancient", "Quantity": 1 }
+    ],
     "BenchRequirement": [
       { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Stones" ] }
     ],
     "TimeSeconds": 8
   },
-  "Light": { "Color": "#A855F7", "Radius": 3 }
+  "Light": { "Color": "#A855F7", "Radius": 3 },
+  "IconProperties": {
+    "Scale": 1.2,
+    "Translation": [ 3, -2 ],
+    "Rotation": [ 12, -160, -21 ]
+  }
 }

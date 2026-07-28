@@ -50,7 +50,9 @@
       { "ItemId": "Draconic_Essence_Ice", "Quantity": 1 },
       { "ItemId": "Draconic_Essence_Nature", "Quantity": 1 }
     ],
-    "Output": [ { "ItemId": "Draconic_Stone", "Quantity": 1 } ],
+    "Output": [
+      { "ItemId": "Draconic_Stone", "Quantity": 1 }
+    ],
     "BenchRequirement": [
       { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Stones" ] }
     ],
@@ -62,8 +64,8 @@
   "PlayerAnimationsId": "Item",
   "IconProperties": {
     "Scale": 1.2,
-    "Rotation": [ 342, 20, 24 ],
-    "Translation": [ 6, -14 ]
+    "Translation": [ 3, -2 ],
+    "Rotation": [ 12, -160, -21 ]
   },
   "Tags": { "Type": [ "Tool" ] },
   "ItemEntity": { "ParticleSystemId": null },

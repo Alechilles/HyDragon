@@ -13,11 +13,18 @@
       { "ItemId": "Draconic_Scale", "Quantity": 4 },
       { "ItemId": "Draconic_Essence", "Quantity": 2 }
     ],
-    "Output": [ { "ItemId": "Draconic_Stone_Thorium", "Quantity": 1 } ],
+    "Output": [
+      { "ItemId": "Draconic_Stone_Thorium", "Quantity": 1 }
+    ],
     "BenchRequirement": [
       { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Stones" ] }
     ],
     "TimeSeconds": 4
   },
-  "Light": { "Color": "#7DD3FC", "Radius": 2 }
+  "Light": { "Color": "#7DD3FC", "Radius": 2 },
+  "IconProperties": {
+    "Scale": 1.2,
+    "Translation": [ 3, -2 ],
+    "Rotation": [ 12, -160, -21 ]
+  }
 }

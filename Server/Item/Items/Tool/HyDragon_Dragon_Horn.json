@@ -31,5 +31,5 @@
     "Translation": [ 0, 0 ],
     "Rotation": [ -4.8, 29, 37 ]
   },
-  "Icon": "icons/items/generated/HyDragon_Dragon_Horn"
+  "Icon": "Icons/ItemsGenerated/HyDragon_Dragon_Horn.png"
 }
