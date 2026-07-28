@@ -1,14 +1,14 @@
 {
   "RenderMode": "BlendAdd",
   "ParticleRotationInfluence": "Billboard",
-  "MaxConcurrentParticles": 5,
+  "MaxConcurrentParticles": 2,
   "ParticleLifeSpan": {
-    "Min": 0.08,
-    "Max": 0.14
+    "Min": 0.14,
+    "Max": 0.22
   },
   "SpawnRate": {
-    "Min": 20.0,
-    "Max": 20.0
+    "Min": 3.0,
+    "Max": 3.0
   },
   "EmitOffset": {
     "X": {

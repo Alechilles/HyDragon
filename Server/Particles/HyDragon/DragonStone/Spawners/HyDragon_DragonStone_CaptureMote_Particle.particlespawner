@@ -3,27 +3,31 @@
   "ParticleRotationInfluence": "Billboard",
   "MaxConcurrentParticles": 6,
   "ParticleLifeSpan": {
-    "Min": 0.08,
-    "Max": 0.12
+    "Min": 0.30,
+    "Max": 0.42
   },
   "SpawnRate": {
-    "Min": 45.0,
-    "Max": 45.0
+    "Min": 12.0,
+    "Max": 12.0
   },
   "Particle": {
-    "Texture": "Particles/Textures/Circles/Circle_Glow.png",
+    "Texture": "Particles/Textures/Basic/Glow_Direction2.png",
     "FrameSize": {
       "Height": 0
     },
-    "ScaleRatioConstraint": "OneToOne",
+    "ScaleRatioConstraint": "None",
     "Animation": {
       "0": {
         "Opacity": 0.92,
         "Color": "#F4FDFF",
         "Scale": {
           "X": {
-            "Min": 0.22,
-            "Max": 0.28
+            "Min": 0.07,
+            "Max": 0.11
+          },
+          "Y": {
+            "Min": 0.55,
+            "Max": 0.85
           }
         }
       },
@@ -32,8 +36,12 @@
         "Color": "#8CEBFF",
         "Scale": {
           "X": {
-            "Min": 0.28,
-            "Max": 0.34
+            "Min": 0.07,
+            "Max": 0.11
+          },
+          "Y": {
+            "Min": 0.55,
+            "Max": 0.85
           }
         }
       },
@@ -42,8 +50,12 @@
         "Color": "#326DFF",
         "Scale": {
           "X": {
-            "Min": 0.12,
-            "Max": 0.18
+            "Min": 0.07,
+            "Max": 0.11
+          },
+          "Y": {
+            "Min": 0.55,
+            "Max": 0.85
           }
         }
       }
@@ -51,8 +63,12 @@
     "InitialAnimationFrame": {
       "Scale": {
         "X": {
-          "Min": 0.22,
-          "Max": 0.28
+          "Min": 0.07,
+          "Max": 0.11
+        },
+        "Y": {
+          "Min": 0.55,
+          "Max": 0.85
         }
       },
       "Opacity": 1.0,

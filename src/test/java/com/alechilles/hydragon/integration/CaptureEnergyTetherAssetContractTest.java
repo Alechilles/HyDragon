@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 class CaptureEnergyTetherAssetContractTest {
@@ -23,10 +24,19 @@ class CaptureEnergyTetherAssetContractTest {
         assertTrue(mote.contains("Particles/Textures/Basic/Glow_Direction2.png"));
         assertTrue(trail.contains("Particles/Textures/Basic/Glow_Direction2.png"));
         assertFalse(mote.contains("Particles/Textures/Circles/Circle_Glow.png"));
-        assertTrue(sparks.contains("\"Min\": 3.0"));
+        assertTrue(sparks.contains("Particles/Textures/Basic/Spark_Direction.png"));
+        assertTrue(hasNumericProperty(sparks, "SpawnRate", "Min", 3.0));
     }
 
     private static String read(String relative) throws Exception {
         return Files.readString(ROOT.resolve(relative)).replace("\r\n", "\n");
+    }
+
+    private static boolean hasNumericProperty(String json, String objectName, String propertyName, double value) {
+        String expectedValue = Pattern.quote(Double.toString(value));
+        Pattern property = Pattern.compile("\\\"" + Pattern.quote(objectName)
+                + "\\\"\\s*:\\s*\\{[^}]*\\\"" + Pattern.quote(propertyName)
+                + "\\\"\\s*:\\s*" + expectedValue + "(?:\\s*[,}])");
+        return property.matcher(json).find();
     }
 }
