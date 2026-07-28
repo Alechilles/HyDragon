@@ -19,9 +19,9 @@
   ],
   "Website": "https://modstats.io/stats",
   "Main": "com.alechilles.hydragon.HyDragonPlugin",
-  "ServerVersion": "=^0.5.X",
+  "ServerVersion": "0.5.x",
   "Dependencies": {
-    "Alechilles:Alec's Tamework!": "^3.X"
+    "Alechilles:Alec's Tamework!": "3.x"
   },
   "OptionalDependencies": {
     "Alechilles:Alec's Nametags!": "*"
