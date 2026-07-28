@@ -37,14 +37,24 @@ final class BuildToolingContractTest {
     }
 
     @Test
+    void mavenDefaultsUseTheInstalledTameworkArtifactForEachChannel() throws IOException {
+        String pom = Files.readString(projectRoot.resolve("pom.xml"));
+
+        assertTrue(pom.contains(
+                "<tamework.jar.path>C:/Users/22ale/AppData/Roaming/Hytale/UserData/Mods/"
+                        + "Alec's Tamework! v${tamework.version}.jar</tamework.jar.path>"));
+        assertTrue(pom.contains(
+                "<tamework.jar.path>C:/Users/22ale/AppData/Roaming/Hytale/data/pre-release/Mods/"
+                        + "Alec's Tamework! v${tamework.version}.jar</tamework.jar.path>"));
+    }
+
+    @Test
     void buildDocumentationPreservesTameworkFirstOrdering() throws IOException {
         String documentation = Files.readString(projectRoot.resolve("BUILDING.md"));
         int tamework = documentation.indexOf(
                 "..\\alecstamework\\mvnw.cmd package \"-Dmaven.test.skip=true\" -Pinstall-plugin");
         int hydragon = documentation.indexOf(
-                ".\\mvnw.cmd package \"-Dmaven.test.skip=true\" -Pinstall-plugin "
-                        + "\"-Dtamework.jar.path=C:/Users/22ale/AppData/Roaming/Hytale/UserData/Mods/"
-                        + "Alec's Tamework! v3.0.0.jar\"");
+                ".\\mvnw.cmd package \"-Dmaven.test.skip=true\" -Pinstall-plugin");
 
         assertTrue(tamework >= 0);
         assertTrue(hydragon > tamework);

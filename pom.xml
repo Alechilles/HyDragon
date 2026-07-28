@@ -20,7 +20,7 @@
         <hytale.install.path>${hytale.install.path.release}</hytale.install.path>
         <hytale.userdata.path>C:/Users/22ale/AppData/Roaming/Hytale/UserData</hytale.userdata.path>
         <tamework.version>3.0.0</tamework.version>
-        <tamework.jar.path>${project.basedir}/../alecstamework/target/Alec's Tamework! v${tamework.version}.jar</tamework.jar.path>
+        <tamework.jar.path>C:/Users/22ale/AppData/Roaming/Hytale/UserData/Mods/Alec's Tamework! v${tamework.version}.jar</tamework.jar.path>
         <junit.version>5.10.2</junit.version>
         <hydragon.python.executable>python</hydragon.python.executable>
         <argLine></argLine>
@@ -196,6 +196,7 @@
             <properties>
                 <hytale.install.path>${hytale.install.path.prerelease}</hytale.install.path>
                 <hytale.userdata.path>C:/Users/22ale/AppData/Roaming/Hytale/data/pre-release</hytale.userdata.path>
+                <tamework.jar.path>C:/Users/22ale/AppData/Roaming/Hytale/data/pre-release/Mods/Alec's Tamework! v${tamework.version}.jar</tamework.jar.path>
             </properties>
         </profile>
 
