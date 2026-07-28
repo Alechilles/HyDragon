@@ -10,3 +10,5 @@ target/
 *.log.lck
 **/__pycache__/
 *.py[cod]
+.vscode/
+.superpowers/
