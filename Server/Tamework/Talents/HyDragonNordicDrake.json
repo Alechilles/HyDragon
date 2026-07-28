@@ -1,0 +1,231 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": [
+    "Tamed_NordicDrake"
+  ],
+  "Talents": [
+    {
+      "Id": "NordicDrake_NorthwindResolve",
+      "DisplayName": "hydragon.talents.nordic_drake.northwind_resolve.name",
+      "Description": "hydragon.talents.nordic_drake.northwind_resolve.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 1,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "AvatarFlightVigourCapacityMultiplier", "Multiplier": 1.15}]
+    },
+    {
+      "Id": "NordicDrake_SustainedCurrent",
+      "DisplayName": "hydragon.talents.nordic_drake.sustained_current.name",
+      "Description": "hydragon.talents.nordic_drake.sustained_current.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 2,
+      "MinLevel": 6,
+      "RequiresTalentIds": ["NordicDrake_NorthwindResolve"],
+      "Effects": [{"EffectKey": "AvatarFlightVigourRechargeRateMultiplier", "Multiplier": 1.15}]
+    },
+    {
+      "Id": "NordicDrake_Flamewake",
+      "DisplayName": "hydragon.talents.nordic_drake.flamewake.name",
+      "Description": "hydragon.talents.nordic_drake.flamewake.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 2,
+      "MinLevel": 6,
+      "RequiresTalentIds": ["NordicDrake_NorthwindResolve"],
+      "Effects": [{"EffectKey": "AvatarFlightForwardBoostCostMultiplier", "Multiplier": 0.88}]
+    },
+    {
+      "Id": "NordicDrake_ThermalGuard",
+      "DisplayName": "hydragon.talents.nordic_drake.thermal_guard.name",
+      "Description": "hydragon.talents.nordic_drake.thermal_guard.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 3,
+      "MinLevel": 14,
+      "RequiresTalentIds": ["NordicDrake_SustainedCurrent"],
+      "Effects": [{"EffectKey": "AvatarFlightGlideSinkMultiplier", "Multiplier": 0.86}]
+    },
+    {
+      "Id": "NordicDrake_Skyrend",
+      "DisplayName": "hydragon.talents.nordic_drake.skyrend.name",
+      "Description": "hydragon.talents.nordic_drake.skyrend.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 3,
+      "MinLevel": 14,
+      "RequiresTalentIds": ["NordicDrake_Flamewake"],
+      "Effects": [{"EffectKey": "AvatarFlightForwardBoostImpulseMultiplier", "Multiplier": 1.15}]
+    },
+    {
+      "Id": "NordicDrake_StormSovereign",
+      "DisplayName": "hydragon.talents.nordic_drake.storm_sovereign.name",
+      "Description": "hydragon.talents.nordic_drake.storm_sovereign.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["NordicDrake_ThermalGuard", "NordicDrake_Skyrend"],
+      "Effects": [
+        {"EffectKey": "AvatarFlightVigourCapacityMultiplier", "Multiplier": 1.10},
+        {"EffectKey": "AvatarFlightClimbLiftMultiplier", "Multiplier": 1.12}
+      ]
+    },
+    {
+      "Id": "NordicDrake_EmberDiscipline",
+      "DisplayName": "hydragon.talents.nordic_drake.ember_discipline.name",
+      "Description": "hydragon.talents.nordic_drake.ember_discipline.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 2,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.02}]
+    },
+    {
+      "Id": "NordicDrake_FurnaceHeart",
+      "DisplayName": "hydragon.talents.nordic_drake.furnace_heart.name",
+      "Description": "hydragon.talents.nordic_drake.furnace_heart.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 2,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["NordicDrake_EmberDiscipline"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.97}]
+    },
+    {
+      "Id": "NordicDrake_ScorchingMomentum",
+      "DisplayName": "hydragon.talents.nordic_drake.scorching_momentum.name",
+      "Description": "hydragon.talents.nordic_drake.scorching_momentum.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 3,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["NordicDrake_EmberDiscipline"],
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.035}]
+    },
+    {
+      "Id": "NordicDrake_RuinousBreath",
+      "DisplayName": "hydragon.talents.nordic_drake.ruinous_breath.name",
+      "Description": "hydragon.talents.nordic_drake.ruinous_breath.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 4,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["NordicDrake_ScorchingMomentum"],
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.045}]
+    },
+    {
+      "Id": "NordicDrake_IronTalons",
+      "DisplayName": "hydragon.talents.nordic_drake.iron_talons.name",
+      "Description": "hydragon.talents.nordic_drake.iron_talons.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 3,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["NordicDrake_FurnaceHeart"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05}]
+    },
+    {
+      "Id": "NordicDrake_JarlsBane",
+      "DisplayName": "hydragon.talents.nordic_drake.jarls_bane.name",
+      "Description": "hydragon.talents.nordic_drake.jarls_bane.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["NordicDrake_RuinousBreath", "NordicDrake_IronTalons"],
+      "Effects": [
+        {"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04},
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.97}
+      ]
+    },
+    {
+      "Id": "NordicDrake_RunestoneHide",
+      "DisplayName": "hydragon.talents.nordic_drake.runestone_hide.name",
+      "Description": "hydragon.talents.nordic_drake.runestone_hide.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 1,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
+    },
+    {
+      "Id": "NordicDrake_GlacierScales",
+      "DisplayName": "hydragon.talents.nordic_drake.glacier_scales.name",
+      "Description": "hydragon.talents.nordic_drake.glacier_scales.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 2,
+      "MinLevel": 7,
+      "RequiresTalentIds": ["NordicDrake_RunestoneHide"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.96}]
+    },
+    {
+      "Id": "NordicDrake_LongVigil",
+      "DisplayName": "hydragon.talents.nordic_drake.long_vigil.name",
+      "Description": "hydragon.talents.nordic_drake.long_vigil.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 2,
+      "MinLevel": 7,
+      "RequiresTalentIds": ["NordicDrake_RunestoneHide"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
+    },
+    {
+      "Id": "NordicDrake_Unyielding",
+      "DisplayName": "hydragon.talents.nordic_drake.unyielding.name",
+      "Description": "hydragon.talents.nordic_drake.unyielding.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 3,
+      "MinLevel": 15,
+      "RequiresTalentIds": ["NordicDrake_LongVigil"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.06}]
+    },
+    {
+      "Id": "NordicDrake_Sagascar",
+      "DisplayName": "hydragon.talents.nordic_drake.sagascar.name",
+      "Description": "hydragon.talents.nordic_drake.sagascar.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 3,
+      "MinLevel": 15,
+      "RequiresTalentIds": ["NordicDrake_GlacierScales"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.94}]
+    },
+    {
+      "Id": "NordicDrake_NorthernBulwark",
+      "DisplayName": "hydragon.talents.nordic_drake.northern_bulwark.name",
+      "Description": "hydragon.talents.nordic_drake.northern_bulwark.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["NordicDrake_Unyielding", "NordicDrake_Sagascar"],
+      "Effects": [
+        {"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05},
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.96}
+      ]
+    }
+  ]
+}
