@@ -13,3 +13,4 @@ target/
 .vscode/
 .superpowers/
 artifacts/
+.vscode/settings.json

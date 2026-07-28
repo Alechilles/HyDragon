@@ -9,15 +9,23 @@
       "Email": "",
       "Url": "https://www.curseforge.com/members/alechilles/projects",
       "Discord": "alechilles"
+    },
+    {
+      "Name": "Ye",
+      "Email": "",
+      "Url": "https://www.curseforge.com/members/onlyye/projects",
+      "Discord": "ye1111"
     }
   ],
-  "Website": "",
+  "Website": "https://modstats.io/stats",
   "Main": "com.alechilles.hydragon.HyDragonPlugin",
-  "ServerVersion": ">=0.5.6 <0.6.0",
+  "ServerVersion": "0.5.X",
   "Dependencies": {
-    "Alechilles:Alec's Tamework!": ">=3.0.0 <4.0.0"
+    "Alechilles:Alec's Tamework!": "3.X"
   },
-  "OptionalDependencies": {},
+  "OptionalDependencies": {
+    "Alechilles:Alec's Nametags!": "*"
+  },
   "LoadBefore": {},
   "DisabledByDefault": false,
   "IncludesAssetPack": true,
