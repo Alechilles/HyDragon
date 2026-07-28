@@ -16,14 +16,18 @@ class CaptureEnergyTetherAssetContractTest {
 
     @Test
     void captureMoteUsesTheSoulLanternTwoSpawnerContract() throws Exception {
+        String item = read("Server/Item/Items/Ingredient/Draconic_Stone.json");
         String system = read("Server/Particles/HyDragon/DragonStone/HyDragon_DragonStone_CaptureMote.particlesystem");
         String mote = read("Server/Particles/HyDragon/DragonStone/Spawners/HyDragon_DragonStone_CaptureMote_Particle.particlespawner");
         String trail = read("Server/Particles/HyDragon/DragonStone/Spawners/HyDragon_DragonStone_CaptureMote_Trail.particlespawner");
 
+        assertTrue(item.contains("\"BeamFromTarget\": true"));
+        assertTrue(item.contains("\"HomingProjectileSpawnIntervalSeconds\": 0.2"));
+        assertTrue(item.contains("\"HomingProjectileMaxConcurrent\": 6"));
         assertEquals(List.of(
                 "HyDragon_DragonStone_CaptureMote_Particle",
                 "HyDragon_DragonStone_CaptureMote_Trail"), spawnerIds(system));
-        assertTrue(system.contains("\"PositionOffset\": {\n        \"Y\": 0\n      }"));
+        assertTrue(trailSpawnerHasStartOffset(system));
         assertSoulLanternTexturesAndAttractors(mote);
         assertSoulLanternTexturesAndAttractors(trail);
         assertFalse(Files.exists(ROOT.resolve(
@@ -37,6 +41,12 @@ class CaptureEnergyTetherAssetContractTest {
     private static List<String> spawnerIds(String system) {
         Matcher matcher = Pattern.compile("\\\"SpawnerId\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"").matcher(system);
         return matcher.results().map(result -> result.group(1)).toList();
+    }
+
+    private static boolean trailSpawnerHasStartOffset(String system) {
+        Pattern trailSpawner = Pattern.compile("\\{\\s*\\\"SpawnerId\\\"\\s*:\\s*\\\"HyDragon_DragonStone_CaptureMote_Trail\\\""
+                + "\\s*,\\s*\\\"PositionOffset\\\"\\s*:\\s*\\{\\s*\\\"Y\\\"\\s*:\\s*0\\s*}\\s*}");
+        return trailSpawner.matcher(system).find();
     }
 
     private static void assertSoulLanternTexturesAndAttractors(String spawner) {
