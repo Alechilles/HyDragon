@@ -10,7 +10,7 @@ From the HyDragon repository in PowerShell:
 
 ```powershell
 ..\alecstamework\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin
-.\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin
+.\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin "-Dtamework.jar.path=C:/Users/22ale/AppData/Roaming/Hytale/UserData/Mods/Alec's Tamework! v3.0.0.jar"
 ```
 
 The HyDragon command packages the current `Common/`, `Server/`, Java, and
@@ -39,7 +39,7 @@ Pass `-Dprerelease=true` to both projects:
 
 ```powershell
 ..\alecstamework\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin -Dprerelease=true
-.\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin -Dprerelease=true
+.\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin -Dprerelease=true "-Dtamework.jar.path=C:/Users/22ale/AppData/Roaming/Hytale/data/pre-release/Mods/Alec's Tamework! v3.0.0.jar"
 ```
 
 This selects the prerelease Hytale server and userdata paths while preserving
