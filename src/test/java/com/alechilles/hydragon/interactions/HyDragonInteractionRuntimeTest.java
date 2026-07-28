@@ -27,7 +27,7 @@ class HyDragonInteractionRuntimeTest {
                 HyDragonInteractionRuntime.Action.SOUL_BOND,
                 HyDragonFeature.SOUL_BOND_CLAIM,
                 UUID.randomUUID(), "world", new PopulationAdmissionLocation("world", 0, 0),
-                "", item).toCompletableFuture().join();
+                item).toCompletableFuture().join();
         assertEquals(GameplayResult.Status.UNAVAILABLE, result.status());
         assertEquals(1, item.releases.get());
     }
@@ -42,7 +42,7 @@ class HyDragonInteractionRuntimeTest {
                     HyDragonInteractionRuntime.Action.SOUL_BOND,
                     HyDragonFeature.SOUL_BOND_CLAIM,
                     UUID.randomUUID(), "world", new PopulationAdmissionLocation("world", 0, 0),
-                    "", item).toCompletableFuture().join();
+                    item).toCompletableFuture().join();
             assertEquals(GameplayResult.Status.UNAVAILABLE, result.status());
             assertEquals(1, item.releases.get());
             assertEquals(0, handler.claims.get());
@@ -63,7 +63,7 @@ class HyDragonInteractionRuntimeTest {
                     HyDragonInteractionRuntime.Action.SOUL_BOND,
                     HyDragonFeature.SOUL_BOND_CLAIM,
                     UUID.randomUUID(), "world", new PopulationAdmissionLocation("world", 0, 0),
-                    "", item).toCompletableFuture().join();
+                    item).toCompletableFuture().join();
             assertEquals(GameplayResult.Status.APPLIED, result.status());
             assertEquals(1, handler.claims.get());
             assertEquals(0, item.releases.get());
@@ -90,12 +90,6 @@ class HyDragonInteractionRuntimeTest {
                 ConsumableReservation reservation) {
             claims.incrementAndGet();
             return CompletableFuture.completedFuture(GameplayResult.applied("claimed"));
-        }
-
-        @Override
-        public CompletionStage<GameplayResult> attune(
-                UUID playerUuid, String archetypeId, ConsumableReservation reservation) {
-            return CompletableFuture.completedFuture(GameplayResult.applied("attuned"));
         }
     }
 
