@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,39 +22,53 @@ class DragonRosterAssetContractTest {
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{[^{}]+}");
 
     @Test
-    void populationGroupsEnforceIndependentFullDragonAndMiniwyvernLimits() throws Exception {
-        String full = read("Server/Tamework/PopulationGroups/HyDragonFullDragons.json");
-        String mini = read("Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json");
-        assertTrue(full.contains("\"GroupId\": \"hydragon:full_dragons\""));
-        assertTrue(full.contains("\"MaxOwnedPerOwner\": 0"));
-        assertTrue(full.contains("\"MaxActivePerOwner\": 1"));
-        assertTrue(mini.contains("\"GroupId\": \"hydragon:soulbound_mini\""));
-        assertTrue(mini.contains("\"MaxOwnedPerOwner\": 1"));
-        assertTrue(mini.contains("\"MaxActivePerOwner\": 1"));
+    void bondedPoliciesShareTheHornButKeepIndependentFamilyLimitsAndEconomics()
+            throws Exception {
+        String full = read("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json");
+        String mini = read("Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json");
+
+        assertPolicy(full, "hydragon:full_dragons", 0, 1, 600, 300,
+                List.of("Revitalizing_Essence:2", "Draconic_Essence:4"));
+        assertPolicy(mini, "hydragon:soulbound_mini", 1, 1, 900, 180,
+                List.of("Revitalizing_Essence:1", "Draconic_Essence:2"));
+        assertTrue(full.contains("\"Tamed_NordicDrake\""));
+        assertTrue(full.contains("\"Tamed_Hydra\""));
+        assertTrue(full.contains("\"Tamed_RockDrakeT3\""));
+        assertTrue(mini.contains("\"Tamed_Wyvern_Mini\""));
+        assertTrue(full.contains("\"Capture\": true"));
+        assertTrue(full.contains("\"Provision\": false"));
+        assertTrue(mini.contains("\"Capture\": false"));
+        assertTrue(mini.contains("\"Provision\": true"));
     }
 
     @Test
-    void everyCompanionFamilyHasPositiveLeaseCooldownWarningsAndMultiItemReviveCost() throws Exception {
+    void companionAssetsRetainMovementWithoutOwningBondedLifecycle() throws Exception {
         for (String file : List.of("HyDragonFullDragons.json", "HyDragonMiniwyvern.json")) {
             String config = read("Server/Tamework/Companion/" + file);
-            assertTrue(config.contains("\"Summon\""), file);
             assertTrue(config.contains("\"Enabled\": true"), file);
-            assertPositive(config, "ActiveDurationMs", file);
-            assertPositive(config, "ResummonCooldownMs", file);
-            assertTrue(config.contains("\"AutoStoreOnOwnerLogout\": true"), file);
-            assertTrue(config.contains("\"ExpiryWarningThresholdsMs\": [ 60000, 30000, 10000 ]"), file);
-            assertTrue(config.contains("\"Revive\""), file);
-            Matcher costs = COST.matcher(config);
-            Set<String> ids = new HashSet<>();
-            int count = 0;
-            while (costs.find()) {
-                count++;
-                ids.add(costs.group(1));
-                assertTrue(Integer.parseInt(costs.group(2)) > 0, file);
-            }
-            assertTrue(count >= 2, file + " should exercise generic multi-component costs");
-            assertEquals(count, ids.size(), file + " has duplicate cost item IDs");
+            assertTrue(config.contains("\"ReturnHomeTeleportDistance\""), file);
+            assertTrue(config.contains("\"RecallSafeSpawnDistance\""), file);
+            assertTrue(config.contains("\"PlacementMinRelativeY\""), file);
+            assertFalse(config.contains("\"Travel\""), file);
+            assertFalse(config.contains("\"Summon\""), file);
+            assertFalse(config.contains("\"Revive\""), file);
+            assertFalse(config.contains("ActiveDurationMs"), file);
+            assertFalse(config.contains("ResummonCooldownMs"), file);
+            assertFalse(config.contains("AutoStoreOnOwnerLogout"), file);
+            assertFalse(config.contains("ExpiryWarningThresholdsMs"), file);
+            assertFalse(config.contains("GameplayCooldownMs"), file);
+            assertFalse(config.contains("InsufficientCostMessage"), file);
         }
+    }
+
+    @Test
+    void obsoleteGenericPopulationGroupsAndEncounterFieldAreAbsent() throws Exception {
+        assertFalse(Files.exists(ROOT.resolve(
+                "Server/Tamework/PopulationGroups/HyDragonFullDragons.json")));
+        assertFalse(Files.exists(ROOT.resolve(
+                "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json")));
+        assertFalse(read("Server/HyDragon/Encounters/NordicDrakeHighAltitude.json")
+                .contains("ActiveCompanionGroup"));
     }
 
     @Test
@@ -105,10 +118,26 @@ class DragonRosterAssetContractTest {
         }
     }
 
-    private static void assertPositive(String json, String key, String context) {
-        Matcher matcher = Pattern.compile("\\\"" + key + "\\\"\\s*:\\s*(\\d+)").matcher(json);
-        assertTrue(matcher.find(), context + " missing " + key);
-        assertTrue(Long.parseLong(matcher.group(1)) > 0, context + " requires positive " + key);
+    private static void assertPolicy(
+            String json,
+            String familyId,
+            int maximumOwned,
+            int maximumActive,
+            int sessionSeconds,
+            int cooldownSeconds,
+            List<String> expectedCosts
+    ) {
+        assertTrue(json.contains("\"RosterId\": \"hydragon:dragon_horn\""));
+        assertTrue(json.contains("\"FamilyId\": \"" + familyId + "\""));
+        assertTrue(json.contains("\"MaximumOwned\": " + maximumOwned));
+        assertTrue(json.contains("\"MaximumActive\": " + maximumActive));
+        assertTrue(json.contains("\"SessionDurationSeconds\": " + sessionSeconds));
+        assertTrue(json.contains("\"SummonCooldownSeconds\": " + cooldownSeconds));
+        assertTrue(json.contains("\"RevivePrice\""));
+        Matcher costs = COST.matcher(json);
+        List<String> actual = new java.util.ArrayList<>();
+        while (costs.find()) actual.add(costs.group(1) + ":" + costs.group(2));
+        assertEquals(expectedCosts, actual);
     }
 
     private static String read(String relative) throws Exception {

@@ -1,6 +1,8 @@
 package com.alechilles.hydragon.integration;
 
 import com.alechilles.alecstamework.Tamework;
+import com.alechilles.alecstamework.api.BondedCompanionApi;
+import com.alechilles.alecstamework.api.BondedCompanionAvailability;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.api.TameworkApiCapability;
 import java.util.EnumMap;
@@ -65,12 +67,56 @@ public final class TameworkBridge {
             for (TameworkApiCapability capability : advertised) {
                 if (capability != null) capabilities.add(capability.name());
             }
-            return evaluate(api.getApiVersion(), capabilities, null);
+            Snapshot snapshot = evaluate(api.getApiVersion(), capabilities, null);
+            return capabilities.contains("BONDED_COMPANIONS")
+                    ? withBondedAvailability(snapshot, bondedAvailability(api))
+                    : snapshot;
         } catch (RuntimeException | LinkageError failure) {
             String reason = "Tamework API capability " + phase + " failed: "
                     + failure.getClass().getSimpleName();
             return evaluate(null, Set.of(), reason);
         }
+    }
+
+    private static BondedCompanionAvailability bondedAvailability(TameworkApi api) {
+        try {
+            BondedCompanionApi bonded = api.bondedCompanions();
+            if (bonded == null) {
+                return BondedCompanionAvailability.unavailable(
+                        "Tamework bonded-companion API is null");
+            }
+            BondedCompanionAvailability availability = bonded.availability();
+            return availability == null
+                    ? BondedCompanionAvailability.unavailable(
+                    "Tamework bonded-companion availability is null")
+                    : availability;
+        } catch (RuntimeException | LinkageError failure) {
+            return BondedCompanionAvailability.unavailable(
+                    "Tamework bonded-companion availability refresh failed: "
+                            + failure.getClass().getSimpleName());
+        }
+    }
+
+    private static Snapshot withBondedAvailability(
+            Snapshot snapshot,
+            BondedCompanionAvailability availability) {
+        if (availability.available()) return snapshot;
+        String reason = availability.reason();
+        Map<HyDragonFeature, FeatureGate> gates = new EnumMap<>(HyDragonFeature.class);
+        snapshot.features().forEach((feature, gate) -> {
+            if (!gate.requiredCapabilities().contains("BONDED_COMPANIONS")) {
+                gates.put(feature, gate);
+                return;
+            }
+            java.util.List<String> blockers = new java.util.ArrayList<>(
+                    gate.contractBlockers());
+            blockers.add(reason);
+            gates.put(feature, new FeatureGate(
+                    feature, false, gate.requiredCapabilities(),
+                    gate.missingCapabilities(), blockers));
+        });
+        return new Snapshot(snapshot.apiVersion(), snapshot.capabilities(),
+                Map.copyOf(gates), snapshot.bootstrapIssue());
     }
 
     /** Pure gate evaluator used by unit tests and readiness tooling. */

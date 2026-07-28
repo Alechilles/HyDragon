@@ -54,10 +54,6 @@ public final class DragonEncounterConfig
             PlayerEligibilitySettings.class,
             PlayerEligibilitySettings::new
     )
-            .<String>append(new KeyedCodec<>("ActiveCompanionGroup", Codec.STRING),
-                    (settings, value) -> settings.activeCompanionGroup = value,
-                    settings -> settings.activeCompanionGroup)
-            .add()
             .<String>append(new KeyedCodec<>("RequiredMountMode", Codec.STRING),
                     (settings, value) -> settings.requiredMountMode = value,
                     settings -> settings.requiredMountMode)
@@ -273,13 +269,11 @@ public final class DragonEncounterConfig
     }
 
     public static final class PlayerEligibilitySettings {
-        String activeCompanionGroup;
         String requiredMountMode;
         String requiredItemId;
 
         private List<String> validate() {
             List<String> errors = new ArrayList<>();
-            requireNamespaced(errors, "PlayerEligibility.ActiveCompanionGroup", activeCompanionGroup);
             if (!trim(requiredMountMode).equals("AVATAR_FLIGHT")) {
                 errors.add("PlayerEligibility.RequiredMountMode must be AVATAR_FLIGHT for high-altitude encounters");
             }
@@ -287,7 +281,6 @@ public final class DragonEncounterConfig
             return errors;
         }
 
-        public String getActiveCompanionGroup() { return trim(activeCompanionGroup); }
         public String getRequiredMountMode() { return trim(requiredMountMode); }
         public String getRequiredItemId() { return trim(requiredItemId); }
     }

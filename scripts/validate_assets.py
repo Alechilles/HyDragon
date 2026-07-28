@@ -307,8 +307,8 @@ def require_files(errors: list[str]) -> None:
         "Server/Item/Items/Ingredient/Wyvern_Egg.json",
         "Server/Item/Items/Tool/HyDragon_Dragon_Horn.json",
         "Server/Tamework/Items/Commands/HyDragonDragonHorn.json",
-        "Server/Tamework/PopulationGroups/HyDragonFullDragons.json",
-        "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json",
+        "Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json",
+        "Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json",
         "Server/Tamework/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json",
         "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json",
         "Server/Tamework/CapturePolicies/HyDragonHydra.json",
@@ -470,8 +470,8 @@ def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
     capture = base.get("Capture") if isinstance(base, dict) else None
     required = {
         "SourceConsumption": "ResolvedAttempt",
-        "SuccessDisposition": "TameAndCommandLink",
-        "CommandFamilyId": "hydragon:dragon_horn",
+        "SuccessDisposition": "StoreBondedCompanion",
+        "BondedRosterId": "hydragon:dragon_horn",
         "RequiredCommandConfigId": "HyDragonDragonHorn",
         "RequireCommandAccessItem": True,
     }
@@ -529,7 +529,6 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
     follow_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Components/Component_Tamework_Instruction_Follow_Flying.json"
     interaction_path = ROOT / "Server/Tamework/Interactions/HyDragonIntWyvernMini.json"
     companion_path = ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json"
-    population_path = ROOT / "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json"
     root_bite_path = ROOT / "Server/Item/RootInteractions/NPCs/Creature/HyDragon/Root_NPC_Wyvern_Mini_Bite.json"
     bite_path = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite.json"
     bite_damage_path = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite_Damage.json"
@@ -540,7 +539,6 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
     follow = parsed.get(follow_path)
     interaction = parsed.get(interaction_path)
     companion = parsed.get(companion_path)
-    population = parsed.get(population_path)
     root_bite = parsed.get(root_bite_path)
     bite = parsed.get(bite_path)
     bite_damage = parsed.get(bite_damage_path)
@@ -658,25 +656,8 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
         if companion.get("Parent") != "TwCompanionDefault":
             fail(errors, "HyDragonMiniwyvern must inherit Tamework's durable companion lifecycle defaults")
         command = companion.get("Command")
-        travel = command.get("Travel") if isinstance(command, dict) else None
-        summon = command.get("Summon") if isinstance(command, dict) else None
-        revive = command.get("Revive") if isinstance(command, dict) else None
-        if not isinstance(summon, dict) or summon.get("Enabled") is not True \
-                or not isinstance(summon.get("ActiveDurationMs"), int) or summon.get("ActiveDurationMs") <= 0:
-            fail(errors, "HyDragonMiniwyvern must declare a positive timed summon lease")
-        costs = revive.get("Costs") if isinstance(revive, dict) else None
-        if not isinstance(revive, dict) or revive.get("Enabled") is not True \
-                or not isinstance(costs, list) or not costs:
-            fail(errors, "HyDragonMiniwyvern must declare a non-empty paid revival cost")
-        if not isinstance(travel, dict) or travel.get("CrossWorldRecallEnabled") is not True or travel.get("FollowMasterOnWorldChange") is not True:
-            fail(errors, "HyDragonMiniwyvern must preserve follow/recovery across world transitions")
-
-    if not isinstance(population, dict) or population.get("RoleIds") != ["Tamed_Wyvern_Mini"]:
-        fail(errors, "Soulbound Miniwyvern population group must target Tamed_Wyvern_Mini")
-    else:
-        limits = population.get("Limits")
-        if not isinstance(limits, dict) or limits.get("MaxOwnedPerOwner") != 1 or limits.get("MaxActivePerOwner") != 1:
-            fail(errors, "Soulbound Miniwyvern population group must enforce one owned and one active")
+        if any(field in command for field in ("Travel", "Summon", "Revive")):
+            fail(errors, "HyDragonMiniwyvern must leave bonded travel/summon/revive lifecycle to its roster policy")
 
 
 def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[str]) -> None:
@@ -1110,9 +1091,14 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
         return
     if config.get("ItemIds") != ["HyDragon_Dragon_Horn"]:
         fail(errors, "HyDragon command config must bind only the Dragon Horn")
-    if config.get("CommandFamilyId") != "hydragon:dragon_horn" \
-            or config.get("RosterStorage") != "OwnerCommandFamily":
-        fail(errors, "Dragon Horn must use the owner command-family roster")
+    if config.get("BondedRosterId") != "hydragon:dragon_horn" \
+            or config.get("RosterStorage") != "BondedCompanions":
+        fail(errors, "Dragon Horn must use the shared bonded-companion roster")
+    if config.get("LinkEnabled") is not False \
+            or config.get("LinkUseTogglesMembership") is not False:
+        fail(errors, "Dragon Horn must disable inherited generic link/toggle behavior")
+    if "CommandFamilyId" in config or "ProjectRosterToItemMetadata" in config:
+        fail(errors, "Dragon Horn must not retain generic owner-family projection settings")
     allowed = config.get("AllowedRoles")
     required_roles = {
         "Tamed_Hydra", "Tamed_NordicDrake", "Tamed_RockDrakeT1",
@@ -1124,32 +1110,68 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
 
 
 def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> None:
-    companion_paths = (
+    companion_paths = [
         ROOT / "Server/Tamework/Companion/HyDragonFullDragons.json",
         ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json",
-    )
+    ]
     for path in companion_paths:
         data = parsed.get(path)
         command = data.get("Command") if isinstance(data, dict) else None
-        summon = command.get("Summon") if isinstance(command, dict) else None
-        revive = command.get("Revive") if isinstance(command, dict) else None
-        if not isinstance(summon, dict) or summon.get("Enabled") is not True \
-                or not isinstance(summon.get("ActiveDurationMs"), int) or summon.get("ActiveDurationMs") <= 0:
-            fail(errors, f"{path.relative_to(ROOT)} must enable a positive summon duration")
-        thresholds = summon.get("ExpiryWarningThresholdsMs") if isinstance(summon, dict) else None
-        if not isinstance(thresholds, list) or thresholds != sorted(set(thresholds), reverse=True) \
-                or any(not isinstance(value, int) or value <= 0 or value >= summon.get("ActiveDurationMs", 0)
-                       for value in thresholds):
-            fail(errors, f"{path.relative_to(ROOT)} has invalid summon warning thresholds")
-        costs = revive.get("Costs") if isinstance(revive, dict) else None
-        if not isinstance(costs, list) or not costs:
-            fail(errors, f"{path.relative_to(ROOT)} must declare a non-empty revival cost")
-        else:
-            ids = [entry.get("ItemId") for entry in costs if isinstance(entry, dict)]
-            if len(ids) != len(costs) or len(ids) != len(set(ids)) or any(
-                    not isinstance(entry.get("Quantity"), int) or entry.get("Quantity") <= 0
-                    for entry in costs if isinstance(entry, dict)):
-                fail(errors, f"{path.relative_to(ROOT)} has invalid revival cost components")
+        if not isinstance(command, dict) or any(
+                field in command for field in ("Travel", "Summon", "Revive")):
+            fail(errors, f"{path.relative_to(ROOT)} must not own bonded travel/summon/revive lifecycle")
+
+    policies = {
+        "HyDragonFullDragons.json": {
+            "FamilyId": "hydragon:full_dragons", "MaximumOwned": 0,
+            "MaximumActive": 1, "SessionDurationSeconds": 600,
+            "SummonCooldownSeconds": 300,
+            "AllowedRoles": {"Tamed_NordicDrake", "Tamed_Hydra", "Tamed_RockDrakeT1",
+                             "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"},
+            "Costs": [("Revitalizing_Essence", 2), ("Draconic_Essence", 4)],
+            "Features": {"Capture": True, "Provision": False, "Summon": True,
+                         "Dismiss": True, "Revive": True},
+        },
+        "HyDragonMiniwyvern.json": {
+            "FamilyId": "hydragon:soulbound_mini", "MaximumOwned": 1,
+            "MaximumActive": 1, "SessionDurationSeconds": 900,
+            "SummonCooldownSeconds": 180, "AllowedRoles": {"Tamed_Wyvern_Mini"},
+            "Costs": [("Revitalizing_Essence", 1), ("Draconic_Essence", 2)],
+            "Features": {"Capture": False, "Provision": True, "Summon": True,
+                         "Dismiss": True, "Revive": True},
+        },
+    }
+    policy_root = ROOT / "Server/Tamework/BondedCompanions/Rosters"
+    for filename, expected in policies.items():
+        path = policy_root / filename
+        data = parsed.get(path)
+        if not isinstance(data, dict):
+            fail(errors, f"missing bonded roster policy: {path.relative_to(ROOT)}")
+            continue
+        for field in ("FamilyId", "MaximumOwned", "MaximumActive",
+                      "SessionDurationSeconds", "SummonCooldownSeconds"):
+            if data.get(field) != expected[field]:
+                fail(errors, f"{path.relative_to(ROOT)} has invalid {field}")
+        if data.get("RosterId") != "hydragon:dragon_horn" \
+                or set(data.get("AllowedRoles", [])) != expected["AllowedRoles"]:
+            fail(errors, f"{path.relative_to(ROOT)} has invalid roster/role authority")
+        costs = data.get("RevivePrice", {}).get("Costs")
+        actual_costs = [(entry.get("ItemId"), entry.get("Quantity"))
+                        for entry in costs] if isinstance(costs, list) \
+            and all(isinstance(entry, dict) for entry in costs) else None
+        if actual_costs != expected["Costs"]:
+            fail(errors, f"{path.relative_to(ROOT)} has invalid ordered revive recipe")
+        if data.get("Features") != expected["Features"]:
+            fail(errors, f"{path.relative_to(ROOT)} has invalid bonded feature policy")
+
+    population_root = ROOT / "Server/Tamework/PopulationGroups"
+    for obsolete in ("HyDragonFullDragons.json", "HyDragonSoulboundMiniwyvern.json"):
+        if (population_root / obsolete).exists():
+            fail(errors, f"obsolete generic population policy remains: {obsolete}")
+    encounter = parsed.get(ROOT / "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json")
+    eligibility = encounter.get("PlayerEligibility") if isinstance(encounter, dict) else None
+    if isinstance(eligibility, dict) and "ActiveCompanionGroup" in eligibility:
+        fail(errors, "Nordic encounter must not retain obsolete ActiveCompanionGroup evidence")
 
     essence_path = ROOT / "Server/Item/Items/Ingredient/Revitalizing_Essence.json"
     essence = parsed.get(essence_path)

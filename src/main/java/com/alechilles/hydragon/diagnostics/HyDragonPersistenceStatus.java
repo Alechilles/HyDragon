@@ -60,15 +60,7 @@ public record HyDragonPersistenceStatus(
         List<OrphanedLink> links = new ArrayList<>();
         Set<UUID> claimedProfiles = new HashSet<>();
         for (PlayerSoulBondRecord bond : snapshot.playerSoulBonds().values()) {
-            bond.profileId().ifPresent(profileId -> {
-                claimedProfiles.add(profileId);
-                if (!snapshot.profileExtensions().containsKey(profileId)) {
-                    links.add(new OrphanedLink(
-                            "SOUL_BOND_PROFILE_MISSING",
-                            "player=" + bond.playerUuid() + ", profile=" + profileId,
-                            "restore the matching profile extension or quarantine the Soul Bond record"));
-                }
-            });
+            bond.profileId().ifPresent(claimedProfiles::add);
         }
         for (ProfileExtensionRecord extension : snapshot.profileExtensions().values()) {
             if (extension.kind() == ProfileKind.SOULBOUND_MINIWYVERN

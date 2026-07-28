@@ -1,11 +1,13 @@
 package com.alechilles.hydragon.abilities;
 
+import java.util.UUID;
+
 /** Idempotent persistence boundary for Miniwyvern ability scheduler state. */
 public interface MiniwyvernAbilityStateRepository {
-    LoadResult load(String profileId);
+    LoadResult load(UUID ownerUuid, String profileId);
 
     /** Returns false when durable persistence is unavailable; callers must fail closed. */
-    boolean save(String profileId, MiniwyvernAbilityState state);
+    boolean save(UUID ownerUuid, String profileId, MiniwyvernAbilityState state);
 
     record LoadResult(Status status, MiniwyvernAbilityState state) {
         public LoadResult {

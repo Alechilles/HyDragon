@@ -1,11 +1,8 @@
 package com.alechilles.hydragon.runtime;
 
-import com.alechilles.alecstamework.api.CommandFamilyRosterMemberState;
-import com.alechilles.alecstamework.api.CommandFamilyRosterMembershipView;
-import com.alechilles.alecstamework.api.CommandFamilyRosterView;
-import com.alechilles.alecstamework.api.CommandTimedSummoningResult;
-import com.alechilles.alecstamework.api.CompanionProvisioningLinkResult;
 import com.alechilles.alecstamework.api.PopulationAdmissionLocation;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
@@ -22,6 +19,7 @@ public final class SoulBondService {
     public static final String WYVERN_EGG_ITEM_ID = "Wyvern_Egg";
 
     private final TameworkGameplayAdapter tamework;
+    private final BondedMiniwyvernProvisioningService provisioning;
     private final SoulBondLedger ledger;
     private final OperationJournal journal;
     private final LongSupplier clock;
@@ -29,13 +27,29 @@ public final class SoulBondService {
 
     public SoulBondService(
             TameworkGameplayAdapter tamework,
+            BondedMiniwyvernExtensionStore extensions,
             SoulBondLedger ledger,
             OperationJournal journal,
-            LongSupplier clock) {
+        LongSupplier clock) {
         this.tamework = Objects.requireNonNull(tamework, "tamework");
+        this.provisioning = new BondedMiniwyvernProvisioningService(
+                tamework, Objects.requireNonNull(extensions, "extensions"));
         this.ledger = Objects.requireNonNull(ledger, "ledger");
         this.journal = Objects.requireNonNull(journal, "journal");
         this.clock = Objects.requireNonNull(clock, "clock");
+    }
+
+    /** Source-compatible bridge while plugin composition is moved to the bonded store. */
+    @Deprecated
+    public SoulBondService(
+            TameworkGameplayAdapter tamework,
+            SoulBondLedger ledger,
+            OperationJournal journal,
+            LongSupplier clock) {
+        this(tamework,
+                new BondedMiniwyvernExtensionStore(
+                        tamework, new BondedMiniwyvernExtensionCodec()),
+                ledger, journal, clock);
     }
 
     public CompletionStage<GameplayResult> claim(
@@ -224,36 +238,28 @@ public final class SoulBondService {
                     "Soul Bond operation is not recoverable from this phase"));
         }
 
-        SoulBondIntent destination = decodeIntent(entry.descriptor().intentId());
-        if (destination == null) {
-            return completed(quarantine(entry, "Soul Bond projection destination is invalid"));
+        if (decodeIntent(entry.descriptor().intentId()) == null) {
+            return completed(quarantine(entry, "Soul Bond intent is invalid"));
         }
-        return tamework.provisionAndLinkMiniwyvern(
-                        entry.descriptor().ownerUuid(), entry.operationId(), destination.worldName())
-                .handle((result, failure) -> failure == null ? result : null)
-                .thenCompose(result -> resolveProvisioning(entry, destination, result));
+        return provisioning.provision(
+                        entry.descriptor().ownerUuid(), entry.operationId())
+                .thenCompose(result -> resolveProvisioning(entry, result));
     }
 
     private CompletionStage<GameplayResult> resolveProvisioning(
             OperationJournal.Entry entry,
-            SoulBondIntent destination,
-            CompanionProvisioningLinkResult result) {
-        if (result == null || result.status() == CompanionProvisioningLinkResult.Status.UNAVAILABLE) {
-            return completed(GameplayResult.retryable(
-                    result == null ? "Tamework provision-and-link result is unknown" : result.reason()));
-        }
-        if (result.status() == CompanionProvisioningLinkResult.Status.DENIED) {
-            return completed(compensateConsumedDenial(entry, result));
-        }
-        if (result.status() == CompanionProvisioningLinkResult.Status.QUARANTINED) {
-            return completed(quarantine(entry, result.reason()));
-        }
-        AuthorityEvidence evidence = evidence(result, entry);
-        if (evidence == null) {
-            return completed(quarantine(entry,
-                    "Tamework provision-and-link returned noncanonical authority evidence"));
-        }
+            BondedMiniwyvernProvisioningService.Outcome result) {
+        return switch (result.status()) {
+            case RETRYABLE -> completed(GameplayResult.retryable(result.reason()));
+            case DENIED -> completed(compensateConsumedDenial(entry));
+            case QUARANTINED -> completed(quarantine(entry, result.reason()));
+            case APPLIED -> finishAuthority(entry, result);
+        };
+    }
 
+    private CompletionStage<GameplayResult> finishAuthority(
+            OperationJournal.Entry entry,
+            BondedMiniwyvernProvisioningService.Outcome evidence) {
         SoulBondLedger.Reservation linked = ledger.complete(
                 entry.descriptor().ownerUuid(), entry.operationId(), evidence.profileId(),
                 Math.max(0L, clock.getAsLong()));
@@ -264,19 +270,17 @@ public final class SoulBondService {
             return completed(GameplayResult.reconciliation(
                     "Miniwyvern is in the Dragon Horn, but entitlement linkage needs recovery"));
         }
-
-        return completed(finishCommittedClaim(entry, evidence, result.initialProjection()));
+        return completed(finishCommittedClaim(entry, evidence));
     }
 
     private GameplayResult finishCommittedClaim(
             OperationJournal.Entry entry,
-            AuthorityEvidence evidence,
-            CommandTimedSummoningResult summon) {
+            BondedMiniwyvernProvisioningService.Outcome evidence) {
         OperationJournal.Decision committed = journal.transition(
                 entry.operationId(), OperationJournal.Phase.MATERIAL_CONSUMED,
                 OperationJournal.Phase.COMMITTED,
                 new OperationJournal.Update(
-                        Optional.of(evidence.authorityOperationId().toString()),
+                        Optional.of(evidence.authorityOperationId()),
                         Optional.of(evidence.profileId().toString()),
                         OptionalLong.of(evidence.profileRevision()),
                         Optional.empty()));
@@ -285,19 +289,15 @@ public final class SoulBondService {
             return GameplayResult.reconciliation(
                     "Miniwyvern is in the Dragon Horn; claim closure remains pending");
         }
-        return summon != null && summon.successful()
-                ? GameplayResult.applied(
-                "Soul Bond claimed and Miniwyvern summoned from the Dragon Horn")
-                : GameplayResult.applied(
+        return GameplayResult.applied(
                 "Soul Bond claimed; Miniwyvern is stored in the Dragon Horn");
     }
 
     private GameplayResult compensateConsumedDenial(
-            OperationJournal.Entry entry,
-            CompanionProvisioningLinkResult result) {
+            OperationJournal.Entry entry) {
         SoulBondLedger.Reservation compensated = ledger.compensateDenied(
                 entry.descriptor().ownerUuid(), entry.operationId(),
-                Optional.ofNullable(result.provisioning().operationId()).map(UUID::toString),
+                Optional.empty(),
                 Math.max(0L, clock.getAsLong()));
         return compensated == SoulBondLedger.Reservation.APPLIED
                 || compensated == SoulBondLedger.Reservation.ALREADY_APPLIED
@@ -317,65 +317,6 @@ public final class SoulBondService {
                 || decision == OperationJournal.Decision.ALREADY_APPLIED
                 ? new GameplayResult(GameplayResult.Status.QUARANTINED, reason)
                 : GameplayResult.reconciliation(reason);
-    }
-
-    private static AuthorityEvidence evidence(
-            CompanionProvisioningLinkResult result,
-            OperationJournal.Entry entry) {
-        if (!result.accepted()
-                || !TameworkGameplayAdapter.CALLER_NAMESPACE.equals(
-                result.provisioning().callerNamespace())
-                || !entry.operationId().equals(result.provisioning().idempotencyKey())
-                || !entry.descriptor().ownerUuid().equals(result.provisioning().ownerUuid())
-                || !TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE.equals(
-                result.provisioning().roleId())) {
-            return null;
-        }
-        UUID profileId = parseUuid(result.provisioning().profileId());
-        if (profileId == null
-                || result.provisioning().operationId() == null
-                || result.provisioning().profileRevision() < 0
-                || !matchesRosterEvidence(result, entry.descriptor().ownerUuid(), profileId)) {
-            return null;
-        }
-        return new AuthorityEvidence(
-                result.provisioning().operationId(), profileId,
-                result.provisioning().profileRevision());
-    }
-
-    private static boolean matchesRosterEvidence(
-            CompanionProvisioningLinkResult result,
-            UUID ownerUuid,
-            UUID profileId) {
-        CommandFamilyRosterView roster = result.roster();
-        CommandFamilyRosterMembershipView member = result.membership();
-        if (roster == null || member == null
-                || !ownerUuid.equals(roster.ownerUuid())
-                || !TameworkGameplayAdapter.DRAGON_HORN_COMMAND_FAMILY.equals(roster.commandFamilyId())
-                || !ownerUuid.equals(member.ownerUuid())
-                || !TameworkGameplayAdapter.DRAGON_HORN_COMMAND_FAMILY.equals(member.commandFamilyId())
-                || !profileId.toString().equals(member.profileId())
-                || !TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE.equals(member.roleId())
-                || !TameworkGameplayAdapter.MINIWYVERN_POPULATION_GROUP.equals(member.groupId())
-                || !member.activeForBulkCommands()
-                || member.state() != expectedMemberState(result.initialProjection())) {
-            return false;
-        }
-        return roster.memberships().contains(member);
-    }
-
-    private static CommandFamilyRosterMemberState expectedMemberState(
-            CommandTimedSummoningResult initialProjection) {
-        if (initialProjection == null || !initialProjection.successful()
-                || initialProjection.session() == null) {
-            return CommandFamilyRosterMemberState.ROSTER_STORED;
-        }
-        try {
-            return CommandFamilyRosterMemberState.valueOf(
-                    initialProjection.session().state().name());
-        } catch (IllegalArgumentException unsupportedState) {
-            return null;
-        }
     }
 
     private static String intent(PopulationAdmissionLocation destination) {
@@ -398,14 +339,6 @@ public final class SoulBondService {
         }
     }
 
-    private static UUID parseUuid(String value) {
-        try {
-            return value == null ? null : UUID.fromString(value);
-        } catch (IllegalArgumentException failure) {
-            return null;
-        }
-    }
-
     private static CompletionStage<GameplayResult> released(
             ConsumableReservation item,
             GameplayResult result) {
@@ -420,17 +353,6 @@ public final class SoulBondService {
         String normalized = Objects.requireNonNull(value, field).trim();
         if (normalized.isEmpty()) throw new IllegalArgumentException(field + " is required");
         return normalized;
-    }
-
-    private record AuthorityEvidence(
-            UUID authorityOperationId,
-            UUID profileId,
-            long profileRevision) {
-        private AuthorityEvidence {
-            Objects.requireNonNull(authorityOperationId, "authorityOperationId");
-            Objects.requireNonNull(profileId, "profileId");
-            if (profileRevision < 0) throw new IllegalArgumentException("profileRevision is negative");
-        }
     }
 
     private record SoulBondIntent(String worldName, int chunkX, int chunkZ) {

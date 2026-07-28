@@ -16,28 +16,6 @@
     "ReturnHomePathDistanceBeforeTeleport": 32.0,
     "RecallSafeSpawnDistance": 24.0,
     "RecallForceRelocateDistance": 96.0,
-    "Travel": {
-      "CrossWorldRecallEnabled": true,
-      "OnTransferFailure": "QueueForRecall",
-      "FollowMasterOnWorldChange": false,
-      "FollowMasterOnWorldChangeStateFilter": [ "Follow", "Defend", "Aggressive" ]
-    },
-    "Summon": {
-      "Enabled": true,
-      "ActiveDurationMs": 600000,
-      "ResummonCooldownMs": 300000,
-      "AutoStoreOnOwnerLogout": true,
-      "ExpiryWarningThresholdsMs": [ 60000, 30000, 10000 ]
-    },
-    "Revive": {
-      "Enabled": true,
-      "GameplayCooldownMs": 0,
-      "Costs": [
-        { "ItemId": "Revitalizing_Essence", "Quantity": 2 },
-        { "ItemId": "Draconic_Essence", "Quantity": 4 }
-      ],
-      "InsufficientCostMessage": "server.messages.revive.insufficientCost"
-    },
     "PlacementMinRelativeY": -4.0,
     "PlacementMaxRelativeY": 8.0
   }

@@ -1,24 +1,24 @@
 # Dragon Content, Crafting, Spawning, and Encounter Specification
 
-Status: Implementation and automated release verification complete
-Base-game evidence target: Hytale Workshop corpus `0.5.6`
+Status: Source implementation and repository validation complete; packaged/live verification pending
+Base-game target: Hytale `>=0.5.6 <0.6.0`; exact public `0.5.6` Workshop-profile validation remains pending
 
 ## 1. Purpose and boundaries
 
 This specification completes HyDragon's content layer and separates ordinary asset-driven content from encounters that require Java orchestration. It covers materials, the Draconic Altar, recipes, the current dragon roster, difficulty metadata, static spawning, mounts, and special multi-stage encounters.
 
-Capture spending, Dragon Horn membership, and paid revival are defined in [Draconic capture, Dragon Horn, and revival](capture-summoning-maintenance.md). Miniwyvern content is defined in [Wyvern Egg, Soul Bond, and Miniwyvern](soul-bond-miniwyvern.md). Runtime boundaries follow [Plugin architecture](plugin-architecture.md) and the Tamework [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md).
+Capture spending, the shared bonded Dragon Horn, and paid revival are defined in [Draconic capture, Dragon Horn, and revival](capture-summoning-maintenance.md). Miniwyvern content is defined in [Wyvern Egg, Soul Bond, and Miniwyvern](soul-bond-miniwyvern.md). Runtime boundaries follow [Plugin architecture](plugin-architecture.md) and the local [HyDragon - Tamework bonded integration contract](../integration/tamework-bonded-companions-contract.md).
 
 ## 2. Base-game asset boundary
 
-The Hytale Workshop `0.5.6` schema is the evidence for this split:
+The current source/asset split uses these base-game asset contracts:
 
 - `CraftingRecipe` supports `Input`, `Output`, `BenchRequirement`, and `TimeSeconds`. The Draconic Altar and its recipes are therefore asset/config work.
 - `WorldNPCSpawn` supports weighted NPC entries, `Environments`, `DayTimeRange`, `MoonPhaseRange`, `LightRanges`, and `MoonPhaseWeightModifiers`. Ordinary biome/region/time/light/moon/rarity spawning is asset/config work.
-- `BeaconNPCSpawn` adds player-distance, `YRange`, spawn cooldown/radius, and state controls. It can support localized height- or proximity-based spawning, but its `0.5.6` schema does not express weather or an owned-companion prerequisite.
-- Weather gates, checking whether a player owns/uses another flying dragon, and a multi-phase aerial-to-ground capture sequence therefore require the HyDragon plugin.
+- `BeaconNPCSpawn` in the currently referenced runtime/source contract adds player-distance, `YRange`, spawn cooldown/radius, and state controls. It can support localized height- or proximity-based spawning, but the inspected contract does not express weather or an owned-companion prerequisite; exact `0.5.6` profile confirmation remains pending.
+- Weather gates, checking whether a player has a confirmed active bonded avatar-flight dragon, and a multi-phase aerial-to-ground capture sequence therefore require the HyDragon plugin.
 
-The plugin must not replace static spawning or crafting that these schemas already express.
+The plugin must not replace static spawning or crafting that these asset systems already express. The local schema catalog available during the bonded-companion pass did not expose an exact public `0.5.6` profile, so exact-profile validation remains an explicit packaging gate rather than a completed claim in this document.
 
 ## 3. Requirements
 
@@ -58,8 +58,8 @@ The plugin must not replace static spawning or crafting that these schemas alrea
 | Hydra | Wild/tamed roles, species data, combat, drops, capture mapping, ordinary spawn, and ground-mount policy | Mount behavior, drop balance, and spawn conditions in game |
 | Nordic Drake | Wild/tamed roles, species data, combat, capture mapping, encounter coverage, and `TameworkAvatarFlight` config | Avatar flight using only Tamework's Flightmaster's Talisman |
 | Rock Drake T1/T2/T3 | Wild/tamed roles, capture declarations, commands, cave spawning, mount policy, and tier metadata | Tier balance, commands, spawning, and mounting in game |
-| Miniwyvern | Soul Bond provisioning, seven archetypes, production wild spawning disabled, and ordinary capture denied | Once-only entitlement, population limits, and ability safety |
-| Draconic Stones | Iron, Thorium, Cobalt, Adamantium, and Ancient tiers with altar-only recipes | Tier eligibility, probability, consume-on-roll behavior, tame/link, and cooldown |
+| Miniwyvern | Stored bonded Soul Bond provisioning, seven archetypes, production wild spawning disabled, and ordinary capture denied | Once-only entitlement, bonded family limits, extension continuity, and ability safety |
+| Draconic Stones | Iron, Thorium, Cobalt, Adamantium, and Ancient tiers with altar-only recipes | Tier eligibility, probability, consume-on-roll behavior, durable stored capture, and cooldown |
 | Essences | Generic, Fire, Ice, Water, Nature, Lightning, Wind, Void, and Revitalizing canonical items and configured sources | Drop balance, crafting, references, and localization parity |
 | Draconic Scale | Canonical item and configured dragon drops | Per-species sourcing and balance |
 | Draconic Altar | Bench block, model, icon, categories, recipes, and five locale catalogs | Placement, recipe availability, and packaged references |
@@ -175,7 +175,7 @@ Presentation:
   model/appearance IDs
 ```
 
-This is HyDragon domain data. Generic capture math and population enforcement are delegated to the linked Tamework specifications.
+This is HyDragon domain data. Generic capture math and bonded roster/family enforcement are delegated to Tamework; HyDragon does not use generic population evidence for bonded companions.
 
 Unknown roles, missing tamed mappings, invalid mount configs, unknown item/effect/projectile IDs, and duplicate species ownership of one wild role are load errors for that species. The plugin disables only invalid species runtime features and reports the exact reference.
 
@@ -196,7 +196,7 @@ Spawn assets may vary weight by difficulty/rarity and supported moon/light condi
 
 ## 9. Plugin-controlled encounter model
 
-`Server/HyDragon/Encounters/*.json` describes only requirements outside the `0.5.6` spawn schemas:
+`Server/HyDragon/Encounters/*.json` describes only requirements outside the currently referenced spawn contracts:
 
 ```text
 Id
@@ -206,7 +206,6 @@ RegionsAndAltitude
 WeatherPredicate
 TimePredicate                 optional; prefer spawn assets for ordinary cases
 PlayerEligibility:
-  activeCompanionGroup
   requiredMountMode
   requiredItemId
 Admission:
@@ -250,8 +249,9 @@ guarantee capture.
 
 At admission time, at least one credited player must:
 
-- own the active companion profile used for access;
-- have an active companion in `hydragon:full_dragons` whose species declares `AVATAR_FLIGHT`;
+- own a profile in roster `hydragon:dragon_horn` and family `hydragon:full_dragons`;
+- have that profile in `ACTIVE` with an exact live bonded lease in the candidate world;
+- have a tamed role whose species declares `AVATAR_FLIGHT`;
 - possess/access Tamework's Flightmaster's Talisman under the current avatar-flight contract;
 - be in the configured world/region/altitude envelope and satisfy encounter cooldown.
 
@@ -272,8 +272,8 @@ Hydra's ground-mount declaration and tamed-role interaction are aligned in the i
 - Encounter admission is serialized per region key and rechecks limits immediately before spawning.
 - A spawned special target receives one encounter ID. Restart recovery reattaches to that target when possible; it does not spawn a replacement until absence is authoritative.
 - If state is ambiguous, the encounter enters cleanup/reconciliation and blocks another admission in that region.
-- Despawn/cleanup must not remove a dragon after Tamework has committed its capture.
-- Capture and encounter completion events are idempotent by encounter ID and Tamework operation/profile ID.
+- Despawn/cleanup must not remove a dragon after Tamework has committed its stored bonded capture.
+- Capture and encounter completion are idempotent by encounter ID and exact bonded capture evidence. A missed event is recovered by owner, shared roster, and source NPC UUID rather than generic profile/population evidence.
 - Invalid weather/player-service data fails closed for dynamic encounters without affecting ordinary spawn assets.
 - Config reload never mutates an active encounter definition in place. Existing instances finish using an immutable snapshot or enter a documented safe cleanup state.
 
@@ -313,8 +313,8 @@ No release artifact may retain a reference to a replaced pre-release identifier.
 | Phase | Asset/config work | Plugin/runtime work | Dependency |
 | --- | --- | --- | --- |
 | D0 | Direct English canonical-ID cleanup, complete canonical item set, and five complete locale catalogs | Identifier/localization/config validation | [Plugin architecture](plugin-architecture.md) A0-A2 |
-| D1 | Draconic Altar and recipes | None beyond validation | Hytale `CraftingRecipe` 0.5.6 contract |
-| D2 | Complete tamed roles, commands, drops, ordinary spawns | Species repository | Tamework 3.0.0 and [capture policy](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/capture-policy.md) |
+| D1 | Draconic Altar and recipes | None beyond validation | Current Hytale `CraftingRecipe` contract; exact `0.5.6` profile validation pending |
+| D2 | Complete tamed roles, commands, drops, ordinary spawns | Species repository | Tamework 3.0.0 capture policy and bonded companion capability |
 | D3 | Ground/avatar-flight content and verification | Talisman capability/status messaging | Tamework avatar flight |
-| D4 | Special encounter assets/effects | Encounter admission/state machine/recovery | Tamework [integration contract](https://github.com/Alechilles/AlecsTamework/blob/main/docs/specs/hydragon/integration-contract.md) |
+| D4 | Special encounter assets/effects | Encounter admission/state machine/recovery | [HyDragon - Tamework bonded integration contract](../integration/tamework-bonded-companions-contract.md) |
 | D5 | Balance and polish | Telemetry/diagnostics-driven tuning | D0-D4 |

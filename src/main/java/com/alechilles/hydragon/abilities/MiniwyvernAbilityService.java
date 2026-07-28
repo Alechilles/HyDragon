@@ -60,7 +60,8 @@ public final class MiniwyvernAbilityService {
             return cleanupAndDeny(context, archetypes, world, "appearance-sync-unavailable", nowMs);
         }
 
-        MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(context.profileId());
+        MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
+                context.ownerUuid(), context.profileId());
         if (loaded.status() == MiniwyvernAbilityStateRepository.Status.UNAVAILABLE) {
             return TickResult.denied("ability-state-unavailable");
         }
@@ -75,7 +76,8 @@ public final class MiniwyvernAbilityService {
         PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs);
         Set<String> diagnostics = new LinkedHashSet<>(passive.diagnostics());
         // Establish source ownership and every non-idempotent cooldown before mutating the world.
-        if (!states.save(context.profileId(), mutable.freeze(archetypeId))) {
+        if (!states.save(context.ownerUuid(), context.profileId(),
+                mutable.freeze(archetypeId))) {
             return TickResult.denied("ability-state-unavailable");
         }
 
@@ -97,7 +99,7 @@ public final class MiniwyvernAbilityService {
             }
             mutable.updatedAt = nowMs;
             MiniwyvernAbilityState beforeMutation = mutable.freeze(archetypeId);
-            if (!states.save(context.profileId(), beforeMutation)) {
+            if (!states.save(context.ownerUuid(), context.profileId(), beforeMutation)) {
                 return new TickResult(false, "ability-state-commit-failed", effectsApplied, abilitiesExecuted);
             }
             boolean executed = false;
@@ -110,7 +112,8 @@ public final class MiniwyvernAbilityService {
 
         mutable.prune(nowMs);
         MiniwyvernAbilityState finalState = mutable.freeze(archetypeId);
-        if (!finalState.equals(state) && !states.save(context.profileId(), finalState)) {
+        if (!finalState.equals(state) && !states.save(
+                context.ownerUuid(), context.profileId(), finalState)) {
             return new TickResult(false, "ability-state-finalize-failed", effectsApplied, abilitiesExecuted);
         }
         String reason = diagnostics.isEmpty()
@@ -129,7 +132,8 @@ public final class MiniwyvernAbilityService {
         Objects.requireNonNull(archetypes, "archetypes");
         Objects.requireNonNull(world, "world");
         if (!world.isWorldThread()) return TickResult.denied("not-world-thread");
-        MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(context.profileId());
+        MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
+                context.ownerUuid(), context.profileId());
         if (loaded.status() == MiniwyvernAbilityStateRepository.Status.UNAVAILABLE) {
             return TickResult.denied("ability-state-cleanup-pending");
         }
@@ -138,7 +142,7 @@ public final class MiniwyvernAbilityService {
                 : MiniwyvernAbilityState.empty(normalize(context.archetypeId()), nowMs);
         cleanupSources(context, state, archetypes, world);
         MiniwyvernAbilityState cleared = MiniwyvernAbilityState.empty(normalize(context.archetypeId()), nowMs);
-        return states.save(context.profileId(), cleared)
+        return states.save(context.ownerUuid(), context.profileId(), cleared)
                 ? TickResult.denied("inactive")
                 : TickResult.denied("ability-state-cleanup-pending");
     }

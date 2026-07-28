@@ -4,170 +4,239 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.alechilles.alecstamework.api.ProfileDataApi;
-import com.alechilles.alecstamework.api.ProfileDataCompareAndSetRequest;
-import com.alechilles.alecstamework.api.ProfileDataCompareAndSetResult;
-import com.alechilles.alecstamework.api.ProfileDataEntryView;
-import com.alechilles.alecstamework.api.ProfileDataOperationStatus;
-import com.alechilles.alecstamework.api.ProfileDataOperationView;
+import com.alechilles.alecstamework.api.BondedCompanionExtensionData;
+import com.alechilles.alecstamework.api.BondedCompanionExtensionDataKey;
+import com.alechilles.alecstamework.api.BondedCompanionResult;
+import com.alechilles.alecstamework.api.BondedCompanionResultCode;
+import com.alechilles.hydragon.bonded.BondedExtensionJsonValue;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionDocument;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionGateway;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import org.junit.jupiter.api.Test;
 
-class TameworkMiniwyvernAbilityStateRepositoryTest {
+/** Regression coverage for ability-state merges into the shared bonded extension document. */
+final class TameworkMiniwyvernAbilityStateRepositoryTest {
+    private static final UUID OWNER = UUID.fromString("00000000-0000-0000-0000-000000000501");
+    private static final String PROFILE = "profile-mini";
+    private static final BondedMiniwyvernExtensionCodec CODEC =
+            new BondedMiniwyvernExtensionCodec();
+
     @Test
-    void missingStateIsCreatedWithRevisionFencedCas() {
-        MemoryProfileData data = new MemoryProfileData();
-        TameworkMiniwyvernAbilityStateRepository repository =
-                new TameworkMiniwyvernAbilityStateRepository(data);
-        MiniwyvernAbilityState expected = MiniwyvernAbilityState.empty("fire", 100L);
+    void saveMergesAbilityStateWithoutDiscardingAttunementOrProgression() {
+        MemoryGateway gateway = new MemoryGateway();
+        BondedMiniwyvernExtensionDocument original = CODEC.decode("""
+                {
+                  "schemaVersion":1,
+                  "companionKind":"SOULBOUND_MINIWYVERN",
+                  "speciesId":"hydragon:miniwyvern",
+                  "archetypeId":"ice",
+                  "archetypeRevision":2,
+                  "lastAttunementOperationId":"attune-2",
+                  "progression":{"level":7},
+                  "futureTop":{"kept":true},
+                  "abilityState":{
+                    "schemaVersion":2,
+                    "archetypeId":"ice",
+                    "cooldownUntilByAbility":{},
+                    "iceBuildupByTarget":{},
+                    "controlImmunityUntilByTarget":{},
+                    "iceTargetUpdatedAtByTarget":{},
+                    "appliedSourceKeys":[],
+                    "targetBySourceKey":{},
+                    "sourceExpiresAtBySourceKey":{},
+                    "updatedAtEpochMillis":10
+                  }
+                }
+                """);
+        gateway.install(original, 3L);
+        TameworkMiniwyvernAbilityStateRepository repository = repository(gateway);
+        MiniwyvernAbilityState replacement = MiniwyvernAbilityState.empty("ice", 25L);
 
-        assertEquals(MiniwyvernAbilityStateRepository.Status.MISSING,
-                repository.load("profile-1").status());
-        assertTrue(repository.save("profile-1", expected));
+        assertEquals(MiniwyvernAbilityStateRepository.Status.LOADED,
+                repository.load(OWNER, PROFILE).status());
+        assertTrue(repository.save(OWNER, PROFILE, replacement));
 
-        MiniwyvernAbilityStateRepository.LoadResult loaded = repository.load("profile-1");
-        assertEquals(MiniwyvernAbilityStateRepository.Status.LOADED, loaded.status());
-        assertEquals(expected, loaded.state());
-        assertEquals(1L, data.entry("profile-1").orElseThrow().revision());
+        BondedMiniwyvernExtensionDocument saved = gateway.document();
+        assertEquals(replacement, saved.abilityState());
+        assertEquals("ice", saved.archetypeId());
+        assertEquals(2L, saved.archetypeRevision());
+        assertEquals("attune-2", saved.lastAttunementOperationId().orElseThrow());
+        assertEquals(BondedExtensionJsonValue.parse("{\"level\":7}"), saved.progression());
+        assertTrue(saved.unknownTopLevelFields().containsKey("futureTop"));
+        assertEquals(4L, gateway.revision);
     }
 
     @Test
-    void corruptStateAndSaveWithoutObservedRevisionFailClosed() {
-        MemoryProfileData data = new MemoryProfileData();
-        data.externalWrite("profile-1", "{}");
-        TameworkMiniwyvernAbilityStateRepository repository =
-                new TameworkMiniwyvernAbilityStateRepository(data);
+    void missingOrInvalidDocumentFailsClosedInsteadOfCreatingParallelState() {
+        MemoryGateway missing = new MemoryGateway();
+        TameworkMiniwyvernAbilityStateRepository missingRepository = repository(missing);
+
+        assertEquals(MiniwyvernAbilityStateRepository.Status.MISSING,
+                missingRepository.load(OWNER, PROFILE).status());
+        assertFalse(missingRepository.save(
+                OWNER, PROFILE, MiniwyvernAbilityState.empty("fire", 10L)));
+
+        MemoryGateway malformed = new MemoryGateway();
+        malformed.rawPayload = "{}";
+        malformed.revision = 0L;
+        TameworkMiniwyvernAbilityStateRepository malformedRepository = repository(malformed);
+        assertEquals(MiniwyvernAbilityStateRepository.Status.UNAVAILABLE,
+                malformedRepository.load(OWNER, PROFILE).status());
+        assertFalse(malformedRepository.save(
+                OWNER, PROFILE, MiniwyvernAbilityState.empty("fire", 10L)));
+    }
+
+    @Test
+    void concurrentAttunementCannotBeOverwrittenByAStaleAbilityTick() {
+        MemoryGateway gateway = new MemoryGateway();
+        gateway.install(BondedMiniwyvernExtensionDocument.neutral(
+                "hydragon:miniwyvern", 10L), 0L);
+        TameworkMiniwyvernAbilityStateRepository repository = repository(gateway);
+        assertEquals(MiniwyvernAbilityStateRepository.Status.LOADED,
+                repository.load(OWNER, PROFILE).status());
+        gateway.externalWrite(gateway.document().attune("ice", "attune-concurrent"));
+
+        assertFalse(repository.save(
+                OWNER, PROFILE, MiniwyvernAbilityState.empty("neutral", 20L)));
+        assertEquals("ice", gateway.document().archetypeId());
+        assertEquals("attune-concurrent",
+                gateway.document().lastAttunementOperationId().orElseThrow());
+    }
+
+    @Test
+    void exactDeterministicRetryRecoversALostCasResponse() {
+        MemoryGateway gateway = new MemoryGateway();
+        gateway.install(BondedMiniwyvernExtensionDocument.neutral(
+                "hydragon:miniwyvern", 10L), 0L);
+        gateway.failNextResponseAfterCommit = true;
+        TameworkMiniwyvernAbilityStateRepository repository = repository(gateway);
+        MiniwyvernAbilityState desired = MiniwyvernAbilityState.empty("neutral", 20L);
+        repository.load(OWNER, PROFILE);
+
+        assertFalse(repository.save(OWNER, PROFILE, desired));
+        assertTrue(repository.save(OWNER, PROFILE, desired));
+        assertEquals(1, gateway.commits);
+        assertEquals(desired, gateway.document().abilityState());
+    }
+
+    @Test
+    void incompleteAsyncResponseFailsClosedWithoutBlockingTheWorldThread() {
+        BondedMiniwyvernExtensionGateway pending = new BondedMiniwyvernExtensionGateway() {
+            @Override
+            public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
+                    getMiniwyvernExtension(UUID ownerUuid, String profileId) {
+                return new CompletableFuture<>();
+            }
+
+            @Override
+            public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
+                    compareAndSetMiniwyvernExtension(
+                            UUID ownerUuid, String profileId, String idempotencyKey,
+                            String jsonPayload, long expectedRevision) {
+                return new CompletableFuture<>();
+            }
+        };
+        TameworkMiniwyvernAbilityStateRepository repository = new
+                TameworkMiniwyvernAbilityStateRepository(
+                new BondedMiniwyvernExtensionStore(pending, CODEC));
 
         assertEquals(MiniwyvernAbilityStateRepository.Status.UNAVAILABLE,
-                repository.load("profile-1").status());
-        assertFalse(repository.save("profile-1", MiniwyvernAbilityState.empty("fire", 100L)));
-        assertEquals("{}", data.entry("profile-1").orElseThrow().jsonPayload());
+                repository.load(OWNER, PROFILE).status());
+        assertFalse(repository.save(
+                OWNER, PROFILE, MiniwyvernAbilityState.empty("neutral", 20L)));
     }
 
-    @Test
-    void concurrentWriterCannotBeOverwrittenByAStaleAbilityTick() {
-        MemoryProfileData data = new MemoryProfileData();
-        data.externalWrite("profile-1", json(MiniwyvernAbilityState.empty("fire", 100L)));
-        TameworkMiniwyvernAbilityStateRepository repository =
-                new TameworkMiniwyvernAbilityStateRepository(data);
-        assertEquals(MiniwyvernAbilityStateRepository.Status.LOADED,
-                repository.load("profile-1").status());
-        MiniwyvernAbilityState concurrent = MiniwyvernAbilityState.empty("ice", 200L);
-        data.externalWrite("profile-1", json(concurrent));
-
-        assertFalse(repository.save("profile-1", MiniwyvernAbilityState.empty("wind", 300L)));
-        assertEquals(json(concurrent), data.entry("profile-1").orElseThrow().jsonPayload());
+    private static TameworkMiniwyvernAbilityStateRepository repository(
+            MemoryGateway gateway) {
+        return new TameworkMiniwyvernAbilityStateRepository(
+                new BondedMiniwyvernExtensionStore(gateway, CODEC));
     }
 
-    @Test
-    void retryFindsCommittedOperationAfterLostCasResponse() {
-        MemoryProfileData data = new MemoryProfileData();
-        data.failNextResponseAfterCommit = true;
-        TameworkMiniwyvernAbilityStateRepository repository =
-                new TameworkMiniwyvernAbilityStateRepository(data);
-        MiniwyvernAbilityState expected = MiniwyvernAbilityState.empty("nature", 100L);
-        assertEquals(MiniwyvernAbilityStateRepository.Status.MISSING,
-                repository.load("profile-1").status());
-
-        assertFalse(repository.save("profile-1", expected));
-        assertTrue(repository.save("profile-1", expected));
-        assertEquals(1, data.commits);
-        assertEquals(json(expected), data.entry("profile-1").orElseThrow().jsonPayload());
-    }
-
-    private static String json(MiniwyvernAbilityState state) {
-        return new com.google.gson.Gson().toJson(state);
-    }
-
-    private static final class MemoryProfileData implements ProfileDataApi {
-        private final Map<String, ProfileDataEntryView> values = new LinkedHashMap<>();
-        private final Map<String, ProfileDataOperationView> operations = new LinkedHashMap<>();
+    private static final class MemoryGateway implements BondedMiniwyvernExtensionGateway {
+        private final Map<String, Operation> operations = new LinkedHashMap<>();
+        private String rawPayload;
+        private long revision = -1L;
         private boolean failNextResponseAfterCommit;
         private int commits;
 
-        Optional<ProfileDataEntryView> entry(String profileId) {
-            return Optional.ofNullable(values.get(profileId));
+        private void install(BondedMiniwyvernExtensionDocument document, long revision) {
+            rawPayload = CODEC.encode(document);
+            this.revision = revision;
         }
 
-        void externalWrite(String profileId, String payload) {
-            long revision = entry(profileId).map(ProfileDataEntryView::revision).orElse(0L) + 1L;
-            values.put(profileId, new ProfileDataEntryView(profileId, "hydragon",
-                    "miniwyvern_ability_state", revision, payload, revision));
+        private BondedMiniwyvernExtensionDocument document() {
+            return CODEC.decode(rawPayload);
         }
 
-        @Override public Optional<String> get(String profileId, String namespace, String key) {
-            return entry(profileId).map(ProfileDataEntryView::jsonPayload);
+        private void externalWrite(BondedMiniwyvernExtensionDocument document) {
+            install(document, revision + 1L);
         }
 
-        @Override public Map<String, String> list(String profileId, String namespace) { return Map.of(); }
-
-        @Override public boolean put(String profileId, String namespace, String key, String value) {
-            throw new AssertionError("unfenced put must not be used");
-        }
-
-        @Override public boolean delete(String profileId, String namespace, String key) { return false; }
-
-        @Override public Optional<ProfileDataEntryView> getVersioned(
-                String profileId, String namespace, String key) {
-            return entry(profileId);
-        }
-
-        @Override public CompletionStage<Optional<ProfileDataOperationView>> findOperation(
-                String namespace, String idempotencyKey) {
-            return CompletableFuture.completedFuture(Optional.ofNullable(operations.get(idempotencyKey)));
-        }
-
-        @Override public CompletionStage<ProfileDataCompareAndSetResult> compareAndSet(
-                ProfileDataCompareAndSetRequest request) {
-            ProfileDataOperationView prior = operations.get(request.idempotencyKey());
-            if (prior != null) return CompletableFuture.completedFuture(committed(prior));
-            long currentRevision = entry(request.profileId())
-                    .map(ProfileDataEntryView::revision).orElse(0L);
-            if (currentRevision != request.expectedRevision()) {
-                ProfileDataOperationView denied = operation(
-                        request, ProfileDataOperationStatus.TERMINAL_DENIED, -1L);
-                operations.put(request.idempotencyKey(), denied);
-                return CompletableFuture.completedFuture(new ProfileDataCompareAndSetResult(
-                        ProfileDataCompareAndSetResult.Status.TERMINAL_DENIED,
-                        "revision-conflict", denied, null));
+        @Override
+        public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
+                getMiniwyvernExtension(UUID ownerUuid, String profileId) {
+            if (rawPayload == null) {
+                return CompletableFuture.completedFuture(new BondedCompanionResult<>(
+                        BondedCompanionResultCode.NOT_FOUND, null, "missing"));
             }
-            long resulting = currentRevision + 1L;
-            ProfileDataEntryView entry = new ProfileDataEntryView(
-                    request.profileId(), request.namespace(), request.key(), resulting,
-                    request.jsonPayload(), resulting);
-            values.put(request.profileId(), entry);
-            ProfileDataOperationView operation = operation(
-                    request, ProfileDataOperationStatus.COMMITTED, resulting);
-            operations.put(request.idempotencyKey(), operation);
+            return CompletableFuture.completedFuture(success(data(rawPayload, revision)));
+        }
+
+        @Override
+        public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
+                compareAndSetMiniwyvernExtension(
+                        UUID ownerUuid, String profileId, String idempotencyKey,
+                        String jsonPayload, long expectedRevision) {
+            Operation prior = operations.get(idempotencyKey);
+            if (prior != null) {
+                boolean exact = prior.payload.equals(jsonPayload)
+                        && prior.expectedRevision == expectedRevision;
+                return CompletableFuture.completedFuture(exact
+                        ? success(data(prior.payload, prior.resultingRevision))
+                        : conflict());
+            }
+            if (revision != expectedRevision) {
+                operations.put(idempotencyKey,
+                        new Operation(jsonPayload, expectedRevision, -1L));
+                return CompletableFuture.completedFuture(conflict());
+            }
+            revision++;
+            rawPayload = jsonPayload;
             commits++;
+            operations.put(idempotencyKey,
+                    new Operation(jsonPayload, expectedRevision, revision));
             if (failNextResponseAfterCommit) {
                 failNextResponseAfterCommit = false;
-                return CompletableFuture.failedFuture(new IllegalStateException("lost response"));
+                return CompletableFuture.failedFuture(
+                        new IllegalStateException("lost response"));
             }
-            return CompletableFuture.completedFuture(new ProfileDataCompareAndSetResult(
-                    ProfileDataCompareAndSetResult.Status.COMMITTED,
-                    "committed", operation, entry));
+            return CompletableFuture.completedFuture(success(data(rawPayload, revision)));
         }
 
-        private ProfileDataCompareAndSetResult committed(ProfileDataOperationView operation) {
-            return new ProfileDataCompareAndSetResult(
-                    ProfileDataCompareAndSetResult.Status.COMMITTED, "replayed", operation,
-                    values.get(operation.profileId()));
+        private static BondedCompanionResult<BondedCompanionExtensionData> conflict() {
+            return new BondedCompanionResult<>(
+                    BondedCompanionResultCode.REVISION_CONFLICT, null, "conflict");
         }
 
-        private static ProfileDataOperationView operation(
-                ProfileDataCompareAndSetRequest request,
-                ProfileDataOperationStatus status,
-                long resultingRevision) {
-            return new ProfileDataOperationView(
-                    UUID.randomUUID(), request.namespace(), request.idempotencyKey(),
-                    request.profileId(), request.key(), request.expectedRevision(), resultingRevision,
-                    "fingerprint", status, status.name().toLowerCase(), 1L);
+        private static BondedCompanionResult<BondedCompanionExtensionData> success(
+                BondedCompanionExtensionData data) {
+            return new BondedCompanionResult<>(BondedCompanionResultCode.SUCCESS, data, null);
+        }
+
+        private static BondedCompanionExtensionData data(String payload, long revision) {
+            return new BondedCompanionExtensionData(
+                    new BondedCompanionExtensionDataKey(
+                            OWNER, PROFILE, BondedMiniwyvernExtensionDocument.NAMESPACE),
+                    payload, revision, 10L);
+        }
+
+        private record Operation(String payload, long expectedRevision, long resultingRevision) {
         }
     }
 }

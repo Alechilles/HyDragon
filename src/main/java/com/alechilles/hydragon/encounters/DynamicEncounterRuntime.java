@@ -1,6 +1,6 @@
 package com.alechilles.hydragon.encounters;
 
-import com.alechilles.alecstamework.api.CaptureAttemptResolvedEvent;
+import com.alechilles.alecstamework.api.BondedCompanionCaptureResolvedEvent;
 import com.alechilles.alecstamework.api.CaptureRequirementDecision;
 import com.alechilles.alecstamework.api.CaptureRequirementSpec;
 import com.alechilles.alecstamework.api.TameworkApi;
@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 /** Capture-policy registration, event dispatch, restart reconciliation, and timeout ticking facade. */
 public final class DynamicEncounterRuntime implements AutoCloseable {
     public static final String CAPTURE_REQUIREMENT_ID = "hydragon:special_encounter_capture_ready";
-    private static final System.Logger LOGGER = System.getLogger(DynamicEncounterRuntime.class.getName());
 
     private final TameworkApi api;
     private final HyDragonStateStore stateStore;
@@ -27,8 +26,6 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
     private final Supplier<FeatureGate> gate;
     private final EncounterWorldDispatcher worlds;
     private final DynamicEncounterCoordinator coordinator;
-    private final FullDragonProfileProjection fullDragonProfiles;
-    private final DurableProfileProjectionQueue profileProjections;
     private final Clock clock;
     private final List<AutoCloseable> handles = new ArrayList<>();
     private boolean started;
@@ -48,9 +45,7 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         this.gate = Objects.requireNonNull(gate, "gate");
         this.worlds = Objects.requireNonNull(worlds, "worlds");
         this.coordinator = Objects.requireNonNull(coordinator, "coordinator");
-        this.fullDragonProfiles = new FullDragonProfileProjection(stateStore, configs);
         this.clock = Objects.requireNonNull(clock, "clock");
-        this.profileProjections = new DurableProfileProjectionQueue(stateStore, fullDragonProfiles, clock);
     }
 
     public synchronized void start() {
@@ -65,7 +60,7 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
         handles.add(api.interactionExtensions().registerCaptureRequirement(
                 CAPTURE_REQUIREMENT_ID,
                 (context, spec) -> captureRequirement(context.targetNpcUuid(), spec)));
-        handles.add(api.events().subscribe(CaptureAttemptResolvedEvent.class, this::onCaptureResolved));
+        handles.add(api.events().subscribe(BondedCompanionCaptureResolvedEvent.class, this::onCaptureResolved));
         started = true;
     }
 
@@ -175,7 +170,6 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
     /** Round-robin bounded polling entry point for the live server bridge. */
     public synchronized int tickSome(int maximumRecords) {
         if (maximumRecords <= 0) throw new IllegalArgumentException("maximumRecords must be positive");
-        retryProfileProjections(Math.min(16, maximumRecords));
         long now = clock.millis();
         List<EncounterRecord> records = stateStore.snapshot().encounters().values().stream()
                 .sorted(java.util.Comparator.comparing(EncounterRecord::encounterId))
@@ -211,30 +205,15 @@ public final class DynamicEncounterRuntime implements AutoCloseable {
                 : CaptureRequirementDecision.deny("hydragon-target-not-grounded");
     }
 
-    private void onCaptureResolved(CaptureAttemptResolvedEvent event) {
+    private void onCaptureResolved(BondedCompanionCaptureResolvedEvent event) {
         if (event == null) return;
-        FullDragonProfileProjection.Result projection = profileProjections.accept(event);
-        if (projection == FullDragonProfileProjection.Result.INVALID
-                || projection == FullDragonProfileProjection.Result.AMBIGUOUS
-                || projection == FullDragonProfileProjection.Result.CONFLICT) {
-            LOGGER.log(System.Logger.Level.WARNING,
-                    "HyDragon could not project captured full-dragon profile for operation {0}: {1}",
-                    event.operationId(), projection);
-        }
         EncounterRecord record = stateStore.snapshot().encounters().values().stream()
-                .filter(candidate -> candidate.targetNpcUuid().filter(event.targetNpcUuid()::equals).isPresent())
+                .filter(candidate -> candidate.targetNpcUuid()
+                        .filter(event.capture().sourceNpcUuid()::equals).isPresent())
                 .findFirst().orElse(null);
         if (record == null) return;
-        worlds.dispatch(record.worldName(), event.targetNpcUuid(),
+        worlds.dispatch(record.worldName(), event.capture().sourceNpcUuid(),
                 world -> coordinator.onCaptureResolved(event, world));
-    }
-
-    private void retryProfileProjections(int maximum) {
-        profileProjections.retrySome(maximum);
-    }
-
-    public int pendingProfileProjectionCount() {
-        return profileProjections.pendingCount();
     }
 
     @Override

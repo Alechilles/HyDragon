@@ -1,12 +1,8 @@
 package com.alechilles.hydragon.runtime;
 
-import com.alechilles.alecstamework.api.ProfileDataCompareAndSetRequest;
-import com.alechilles.alecstamework.api.ProfileDataCompareAndSetResult;
-import com.alechilles.alecstamework.api.ProfileDataEntryView;
-import com.alechilles.alecstamework.api.ProfileDataOperationStatus;
-import com.alechilles.alecstamework.api.ProfileDataOperationView;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionDocument;
+import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -16,12 +12,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-/** Crash-recoverable elemental attunement of a player's canonical Soul Bond profile. */
+/** Crash-recoverable elemental attunement of a player's bonded Miniwyvern profile. */
 public final class MiniwyvernAttunementService {
-    public static final String NAMESPACE = "hydragon";
-    public static final String KEY = "miniwyvern_attunement";
-    private static final int PAYLOAD_SCHEMA = 1;
-    private static final Gson GSON = new Gson();
+    private static final int MAX_REBASE_ATTEMPTS = 4;
     private static final Map<String, String> ESSENCE_ITEMS = Map.of(
             "lightning", "Draconic_Essence_Lightning",
             "wind", "Draconic_Essence_Wind",
@@ -32,19 +25,38 @@ public final class MiniwyvernAttunementService {
             "void", "Draconic_Essence_Void");
 
     private final TameworkGameplayAdapter tamework;
+    private final BondedMiniwyvernExtensionStore extensions;
     private final SoulBondLedger soulBonds;
     private final OperationJournal journal;
-    private final ProfileProjection projection;
 
+    public MiniwyvernAttunementService(
+            TameworkGameplayAdapter tamework,
+            BondedMiniwyvernExtensionStore extensions,
+            SoulBondLedger soulBonds,
+            OperationJournal journal) {
+        this.tamework = Objects.requireNonNull(tamework, "tamework");
+        this.extensions = Objects.requireNonNull(extensions, "extensions");
+        this.soulBonds = Objects.requireNonNull(soulBonds, "soulBonds");
+        this.journal = Objects.requireNonNull(journal, "journal");
+    }
+
+    /**
+     * Source-compatible bridge for pre-lease composition. The local profile
+     * projection is intentionally ignored; bonded extension data is now the
+     * sole Miniwyvern archetype authority.
+     */
+    @Deprecated
     public MiniwyvernAttunementService(
             TameworkGameplayAdapter tamework,
             SoulBondLedger soulBonds,
             OperationJournal journal,
-            ProfileProjection projection) {
-        this.tamework = Objects.requireNonNull(tamework, "tamework");
-        this.soulBonds = Objects.requireNonNull(soulBonds, "soulBonds");
-        this.journal = Objects.requireNonNull(journal, "journal");
-        this.projection = Objects.requireNonNull(projection, "projection");
+            ProfileProjection ignoredProjection) {
+        this(tamework,
+                new BondedMiniwyvernExtensionStore(
+                        tamework, new BondedMiniwyvernExtensionCodec()),
+                soulBonds,
+                journal);
+        Objects.requireNonNull(ignoredProjection, "ignoredProjection");
     }
 
     public CompletionStage<GameplayResult> attune(
@@ -54,284 +66,256 @@ public final class MiniwyvernAttunementService {
         Objects.requireNonNull(playerUuid, "playerUuid");
         String archetype = normalize(archetypeId);
         Objects.requireNonNull(essence, "essence");
-        String expectedItem = ESSENCE_ITEMS.get(archetype);
-        if (expectedItem == null) {
-            return released(essence, GameplayResult.denied("unsupported archetype"));
-        }
-        if (!expectedItem.equals(essence.sourceEvidence().itemId()) || essence.quantity() != 1) {
-            return released(essence, GameplayResult.denied("essence does not match target archetype"));
-        }
+        GameplayResult inputFailure = validateInput(archetype, essence);
+        if (inputFailure != null) return released(essence, inputFailure);
         TameworkGameplayAdapter.Readiness readiness = tamework.attunementReadiness();
         if (!readiness.ready()) return released(essence, GameplayResult.unavailable(readiness.reason()));
         if (!journal.available()) {
-            return released(essence, GameplayResult.unavailable("HyDragon attunement journal is unavailable"));
+            return released(essence, GameplayResult.unavailable(
+                    "HyDragon attunement journal is unavailable"));
         }
 
-        Optional<SoulBondLedger.Claim> foundClaim = soulBonds.find(playerUuid);
-        if (foundClaim.isEmpty()) {
-            return released(essence, GameplayResult.denied("Soul Bond Miniwyvern is not claimed"));
-        }
-        SoulBondLedger.Claim claim = foundClaim.orElseThrow();
-        if (claim.state() != SoulBondLedger.Claim.State.CLAIMED || claim.profileId().isEmpty()) {
-            return released(essence, GameplayResult.reconciliation(
-                    "Soul Bond profile identity requires reconciliation"));
-        }
-        UUID profileUuid = claim.profileId().orElseThrow();
-        String profileId = profileUuid.toString();
-
+        UUID profileId = claimedProfile(playerUuid);
+        if (profileId == null) return claimFailure(playerUuid, essence);
         Optional<OperationJournal.Entry> existing = journal.find(essence.operationId());
         if (existing.isPresent()) {
             OperationJournal.Entry entry = existing.orElseThrow();
-            if (!matches(entry, playerUuid, profileId, archetype, essence)) {
+            if (!matches(entry, playerUuid, profileId.toString(), archetype, essence)) {
                 return released(essence, GameplayResult.reconciliation(
                         "attunement operation identity conflicts with durable evidence"));
             }
-            return resume(entry, profileUuid, archetype, essence);
+            return resume(entry, playerUuid, profileId, archetype, essence);
         }
+        return load(playerUuid, profileId).thenCompose(read -> begin(
+                playerUuid, profileId, archetype, essence, read));
+    }
 
-        final Optional<ProfileDataEntryView> current;
-        try {
-            current = tamework.findVersionedProfileData(profileId, NAMESPACE, KEY);
-        } catch (RuntimeException unavailable) {
-            return released(essence, GameplayResult.unavailable(
-                    "Tamework attunement profile data is unavailable"));
+    private GameplayResult validateInput(
+            String archetype,
+            ConsumableReservation essence) {
+        String expectedItem = ESSENCE_ITEMS.get(archetype);
+        if (expectedItem == null) return GameplayResult.denied("unsupported archetype");
+        if (!expectedItem.equals(essence.sourceEvidence().itemId())
+                || essence.quantity() != 1) {
+            return GameplayResult.denied("essence does not match target archetype");
         }
-        long expectedRevision = ProfileDataCompareAndSetRequest.MISSING_REVISION;
-        if (current.isPresent()) {
-            ProfileDataEntryView entry = current.orElseThrow();
-            AttunementPayload payload = decode(entry.jsonPayload());
-            if (!matches(entry, profileId) || payload == null) {
-                return released(essence, GameplayResult.reconciliation(
-                        "Miniwyvern attunement profile data is invalid"));
-            }
-            if (payload.archetypeId().equals(archetype)) {
-                return released(essence, GameplayResult.denied("Miniwyvern already has this archetype"));
-            }
-            expectedRevision = entry.revision();
-        }
+        return null;
+    }
 
-        OperationJournal.Decision begun = journal.begin(new OperationJournal.Descriptor(
-                essence.operationId(),
-                essence.operationId(),
-                OperationJournal.Kind.MINIWYVERN_ATTUNEMENT,
-                playerUuid,
-                intent(archetype),
-                essence.sourceEvidence(),
-                essence.quantity(),
-                Optional.empty(),
-                Optional.of(profileId),
-                OptionalLong.of(expectedRevision)));
+    private UUID claimedProfile(UUID playerUuid) {
+        Optional<SoulBondLedger.Claim> found = soulBonds.find(playerUuid);
+        if (found.isEmpty()) return null;
+        SoulBondLedger.Claim claim = found.orElseThrow();
+        if (claim.state() != SoulBondLedger.Claim.State.CLAIMED
+                || claim.profileId().isEmpty()) {
+            return null;
+        }
+        return claim.profileId().orElseThrow();
+    }
+
+    private CompletionStage<GameplayResult> claimFailure(
+            UUID playerUuid,
+            ConsumableReservation essence) {
+        Optional<SoulBondLedger.Claim> claim = soulBonds.find(playerUuid);
+        return released(essence, claim.isEmpty()
+                ? GameplayResult.denied("Soul Bond Miniwyvern is not claimed")
+                : GameplayResult.reconciliation(
+                "Soul Bond profile identity requires reconciliation"));
+    }
+
+    private CompletionStage<GameplayResult> begin(
+            UUID ownerUuid,
+            UUID profileId,
+            String archetype,
+            ConsumableReservation essence,
+            BondedMiniwyvernExtensionStore.ReadResult read) {
+        if (!loaded(read)) return released(essence, invalidRead(read));
+        BondedMiniwyvernExtensionDocument document = read.document();
+        if (document.archetypeId().equals(archetype)) {
+            return released(essence, GameplayResult.denied(
+                    "Miniwyvern already has this archetype"));
+        }
+        OperationJournal.Decision begun = journal.begin(descriptor(
+                ownerUuid, profileId, archetype, essence, read.revision()));
         if (begun != OperationJournal.Decision.APPLIED
                 && begun != OperationJournal.Decision.ALREADY_APPLIED) {
             return released(essence, begun == OperationJournal.Decision.QUARANTINED
-                    ? new GameplayResult(GameplayResult.Status.QUARANTINED,
-                    "attunement operation is quarantined")
-                    : GameplayResult.reconciliation("attunement journal reservation failed"));
+                    ? quarantined("attunement operation is quarantined")
+                    : GameplayResult.reconciliation(
+                    "attunement journal reservation failed"));
         }
-        return executeCas(profileUuid, archetype, essence, expectedRevision, true);
+        return apply(ownerUuid, profileId, archetype, essence,
+                read, MAX_REBASE_ATTEMPTS);
+    }
+
+    private OperationJournal.Descriptor descriptor(
+            UUID ownerUuid,
+            UUID profileId,
+            String archetype,
+            ConsumableReservation essence,
+            long revision) {
+        return new OperationJournal.Descriptor(
+                essence.operationId(), essence.operationId(),
+                OperationJournal.Kind.MINIWYVERN_ATTUNEMENT,
+                ownerUuid, intent(archetype), essence.sourceEvidence(), essence.quantity(),
+                Optional.empty(), Optional.of(profileId.toString()),
+                OptionalLong.of(revision));
     }
 
     private CompletionStage<GameplayResult> resume(
             OperationJournal.Entry entry,
+            UUID ownerUuid,
             UUID profileId,
             String archetype,
             ConsumableReservation essence) {
         return switch (entry.phase()) {
             case COMMITTED -> released(essence,
-                    new GameplayResult(GameplayResult.Status.ALREADY_APPLIED, "Miniwyvern attuned"));
-            case MATERIAL_CONSUMED -> {
-                OperationJournal.Decision closed = journal.transition(
-                        essence.operationId(), OperationJournal.Phase.MATERIAL_CONSUMED,
-                        OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
-                yield released(essence,
-                        closed == OperationJournal.Decision.APPLIED
-                                || closed == OperationJournal.Decision.ALREADY_APPLIED
-                                ? new GameplayResult(GameplayResult.Status.ALREADY_APPLIED, "Miniwyvern attuned")
-                                : GameplayResult.reconciliation("attunement journal closure is pending"));
-            }
-            case REFUND_DUE -> releaseDenied(essence, "attunement was denied by Tamework");
-            case REFUNDED -> released(essence, GameplayResult.denied("attunement was denied by Tamework"));
-            case CANCELED -> released(essence, GameplayResult.denied("attunement was canceled before consumption"));
+                    new GameplayResult(GameplayResult.Status.ALREADY_APPLIED,
+                            "Miniwyvern attuned"));
+            case MATERIAL_CONSUMED -> closeConsumed(essence);
+            case PREPARED -> recoverPrepared(
+                    ownerUuid, profileId, archetype, essence);
+            case REFUND_DUE -> releaseDenied(essence, "attunement was denied");
+            case REFUNDED, CANCELED -> released(essence,
+                    GameplayResult.denied("attunement was canceled"));
             case QUARANTINED -> released(essence,
-                    new GameplayResult(GameplayResult.Status.QUARANTINED,
-                            "attunement operation is quarantined"));
-            case PREPARED -> recoverAuthority(entry, profileId, archetype, essence);
+                    quarantined("attunement operation is quarantined"));
         };
     }
 
-    private CompletionStage<GameplayResult> recoverAuthority(
-            OperationJournal.Entry entry,
+    private CompletionStage<GameplayResult> recoverPrepared(
+            UUID ownerUuid,
             UUID profileId,
             String archetype,
             ConsumableReservation essence) {
-        final CompletionStage<Optional<ProfileDataOperationView>> lookup;
-        try {
-            lookup = tamework.findProfileDataOperation(NAMESPACE, essence.operationId());
-        } catch (RuntimeException unavailable) {
-            return completed(GameplayResult.reconciliation(
-                    "attunement authority is unavailable; consumption remains pending"));
-        }
-        return lookup
-                .handle((operation, failure) -> failure == null ? operation : null)
-                .thenCompose(found -> {
-                    if (found == null) {
-                        return completed(GameplayResult.reconciliation(
-                                "attunement authority is unavailable; consumption remains pending"));
-                    }
-                    if (found.isEmpty()) {
-                        return executeCas(profileId, archetype, essence,
-                                entry.descriptor().profileRevision().orElseThrow(), false);
-                    }
-                    ProfileDataOperationView operation = found.orElseThrow();
-                    if (!matches(operation, profileId.toString(), essence.operationId(),
-                            entry.descriptor().profileRevision().orElseThrow())) {
-                        quarantine(essence.operationId(), "Tamework attunement operation identity conflict");
-                        return completed(new GameplayResult(GameplayResult.Status.QUARANTINED,
-                                "attunement authority identity is quarantined"));
-                    }
-                    return switch (operation.status()) {
-                        case COMMITTED -> afterCommittedOperation(profileId, archetype, essence, operation);
-                        case TERMINAL_DENIED -> releaseDenied(essence, operation.reason());
-                        case QUARANTINED -> {
-                            quarantine(essence.operationId(), operation.reason());
-                            yield completed(new GameplayResult(GameplayResult.Status.QUARANTINED,
-                                    "Tamework quarantined the attunement operation"));
-                        }
-                        case PREPARED, APPLYING -> executeCas(profileId, archetype, essence,
-                                entry.descriptor().profileRevision().orElseThrow(), false);
-                    };
-                });
+        return load(ownerUuid, profileId).thenCompose(read -> {
+            if (!loaded(read)) {
+                return completed(GameplayResult.reconciliation(
+                        "attunement authority is unavailable; consumption remains pending"));
+            }
+            if (read.document().hasAttunementEvidence(
+                    essence.operationId(), archetype)) {
+                return consumeAndCommit(profileId, essence,
+                        evidenceOperationId(essence.operationId()));
+            }
+            if (read.document().archetypeId().equals(archetype)) {
+                return releaseDenied(essence,
+                        "Miniwyvern was attuned by a different operation");
+            }
+            return apply(ownerUuid, profileId, archetype, essence,
+                    read, MAX_REBASE_ATTEMPTS);
+        });
     }
 
-    private CompletionStage<GameplayResult> executeCas(
-            UUID profileUuid,
-            String archetype,
-            ConsumableReservation essence,
-            long expectedRevision,
-            boolean recoverFailure) {
-        String payload = encode(archetype, essence.operationId());
-        ProfileDataCompareAndSetRequest request = new ProfileDataCompareAndSetRequest(
-                profileUuid.toString(), NAMESPACE, KEY, expectedRevision, essence.operationId(), payload);
-        final CompletionStage<ProfileDataCompareAndSetResult> comparison;
-        try {
-            comparison = tamework.compareAndSetProfileData(request);
-        } catch (RuntimeException unavailable) {
-            return recoverFailure
-                    ? recoverAuthority(journal.find(essence.operationId()).orElseThrow(),
-                    profileUuid, archetype, essence)
-                    : completed(GameplayResult.reconciliation(
-                    "attunement outcome is indeterminate; consumption remains pending"));
-        }
-        return comparison
-                .handle((result, failure) -> failure == null ? result : null)
-                .thenCompose(result -> {
-                    if (result == null) {
-                        if (!recoverFailure) return completed(GameplayResult.reconciliation(
-                                "attunement outcome is indeterminate; consumption remains pending"));
-                        OperationJournal.Entry entry = journal.find(essence.operationId()).orElseThrow();
-                        return recoverAuthority(entry, profileUuid, archetype, essence);
-                    }
-                    return switch (result.status()) {
-                        case COMMITTED -> afterCommittedResult(
-                                profileUuid, archetype, essence, expectedRevision, result);
-                        case TERMINAL_DENIED -> releaseDenied(essence, result.reason());
-                        case QUARANTINED -> {
-                            quarantine(essence.operationId(), result.reason());
-                            yield completed(new GameplayResult(GameplayResult.Status.QUARANTINED,
-                                    "Tamework quarantined the attunement operation"));
-                        }
-                        case UNAVAILABLE -> recoverFailure
-                                ? recoverAuthority(journal.find(essence.operationId()).orElseThrow(),
-                                profileUuid, archetype, essence)
-                                : completed(GameplayResult.reconciliation(
-                                "attunement authority is unavailable; consumption remains pending"));
-                    };
-                });
-    }
-
-    private CompletionStage<GameplayResult> afterCommittedResult(
+    private CompletionStage<GameplayResult> apply(
+            UUID ownerUuid,
             UUID profileId,
             String archetype,
             ConsumableReservation essence,
-            long expectedRevision,
-            ProfileDataCompareAndSetResult result) {
-        ProfileDataOperationView operation = result.durableOperation().orElseThrow();
-        ProfileDataEntryView entry = result.committedEntry().orElseThrow();
-        if (!matches(operation, profileId.toString(), essence.operationId(), expectedRevision)
-                || !matches(entry, profileId.toString())
-                || entry.revision() != operation.resultingRevision()
-                || !payloadMatches(entry.jsonPayload(), archetype, essence.operationId())) {
-            quarantine(essence.operationId(), "Tamework returned inconsistent attunement proof");
-            return completed(new GameplayResult(GameplayResult.Status.QUARANTINED,
-                    "Tamework attunement proof is inconsistent"));
+            BondedMiniwyvernExtensionStore.ReadResult read,
+            int attemptsRemaining) {
+        BondedMiniwyvernExtensionDocument desired;
+        try {
+            desired = read.document().attune(archetype, essence.operationId());
+        } catch (RuntimeException conflict) {
+            return releaseDenied(essence, conflict.getMessage());
         }
-        return applyProjectionAndConsume(profileId, archetype, essence, operation);
+        String authorityOperationId = extensionOperationId(
+                essence.operationId(), read.revision());
+        return extensions.compareAndSet(
+                        ownerUuid, profileId.toString(), authorityOperationId,
+                        read.revision(), desired)
+                .thenCompose(write -> resolveWrite(
+                        ownerUuid, profileId, archetype, essence,
+                        authorityOperationId, attemptsRemaining, write));
     }
 
-    private CompletionStage<GameplayResult> afterCommittedOperation(
+    private CompletionStage<GameplayResult> resolveWrite(
+            UUID ownerUuid,
             UUID profileId,
             String archetype,
             ConsumableReservation essence,
-            ProfileDataOperationView operation) {
-        final Optional<ProfileDataEntryView> found;
-        try {
-            found = tamework.findVersionedProfileData(profileId.toString(), NAMESPACE, KEY);
-        } catch (RuntimeException unavailable) {
-            return completed(GameplayResult.reconciliation(
-                    "committed attunement value cannot yet be verified"));
+            String authorityOperationId,
+            int attemptsRemaining,
+            BondedMiniwyvernExtensionStore.WriteResult write) {
+        if (write.status() == BondedMiniwyvernExtensionStore.WriteStatus.APPLIED) {
+            if (!write.document().hasAttunementEvidence(
+                    essence.operationId(), archetype)) {
+                return completed(quarantine(
+                        essence.operationId(), "inconsistent attunement proof"));
+            }
+            return consumeAndCommit(profileId, essence, authorityOperationId);
         }
-        if (found.isEmpty()) {
-            return completed(GameplayResult.reconciliation(
-                    "committed attunement value cannot yet be verified"));
+        if (write.status() == BondedMiniwyvernExtensionStore.WriteStatus.CONFLICT
+                && attemptsRemaining > 0) {
+            return rebase(ownerUuid, profileId, archetype, essence,
+                    attemptsRemaining - 1);
         }
-        ProfileDataEntryView entry = found.orElseThrow();
-        if (!matches(entry, profileId.toString())
-                || entry.revision() != operation.resultingRevision()
-                || !payloadMatches(entry.jsonPayload(), archetype, essence.operationId())) {
-            quarantine(essence.operationId(), "Committed attunement value conflicts with journal");
-            return completed(new GameplayResult(GameplayResult.Status.QUARANTINED,
-                    "committed attunement value conflicts with durable evidence"));
+        if (write.status() == BondedMiniwyvernExtensionStore.WriteStatus.UNAVAILABLE) {
+            return verifyIndeterminate(ownerUuid, profileId, archetype, essence);
         }
-        return applyProjectionAndConsume(profileId, archetype, essence, operation);
+        if (write.status() == BondedMiniwyvernExtensionStore.WriteStatus.INVALID) {
+            return completed(quarantine(
+                    essence.operationId(), "invalid attunement authority response"));
+        }
+        return write.status() == BondedMiniwyvernExtensionStore.WriteStatus.REJECTED
+                ? releaseDenied(essence, write.reason())
+                : completed(GameplayResult.reconciliation(
+                "attunement changed concurrently; retry remains pending"));
     }
 
-    private CompletionStage<GameplayResult> applyProjectionAndConsume(
+    private CompletionStage<GameplayResult> rebase(
+            UUID ownerUuid,
             UUID profileId,
             String archetype,
             ConsumableReservation essence,
-            ProfileDataOperationView authority) {
-        final ProfileProjection.Decision synchronizedProjection;
-        try {
-            synchronizedProjection = projection.synchronize(
-                    profileId, archetype, essence.operationId());
-        } catch (RuntimeException unavailable) {
-            return completed(GameplayResult.reconciliation(
-                    "attunement committed; HyDragon profile projection remains pending"));
-        }
-        if (synchronizedProjection == ProfileProjection.Decision.QUARANTINED) {
-            quarantine(essence.operationId(), "HyDragon profile projection is quarantined");
-            return completed(new GameplayResult(GameplayResult.Status.QUARANTINED,
-                    "HyDragon profile projection is quarantined"));
-        }
-        if (synchronizedProjection != ProfileProjection.Decision.APPLIED
-                && synchronizedProjection != ProfileProjection.Decision.ALREADY_APPLIED) {
-            return completed(GameplayResult.reconciliation(
-                    "attunement committed; HyDragon profile projection remains pending"));
-        }
-        final CompletionStage<ConsumableReservation.Disposition> consumption;
+            int attemptsRemaining) {
+        return load(ownerUuid, profileId).thenCompose(read -> {
+            if (!loaded(read)) {
+                return completed(GameplayResult.reconciliation(
+                        "attunement rebase evidence is unavailable"));
+            }
+            if (read.document().hasAttunementEvidence(
+                    essence.operationId(), archetype)) {
+                return consumeAndCommit(profileId, essence,
+                        evidenceOperationId(essence.operationId()));
+            }
+            if (read.document().archetypeId().equals(archetype)) {
+                return releaseDenied(essence,
+                        "Miniwyvern was attuned by a different operation");
+            }
+            return apply(ownerUuid, profileId, archetype, essence,
+                    read, attemptsRemaining);
+        });
+    }
+
+    private CompletionStage<GameplayResult> verifyIndeterminate(
+            UUID ownerUuid,
+            UUID profileId,
+            String archetype,
+            ConsumableReservation essence) {
+        return load(ownerUuid, profileId).thenCompose(read -> loaded(read)
+                && read.document().hasAttunementEvidence(
+                essence.operationId(), archetype)
+                ? consumeAndCommit(profileId, essence,
+                evidenceOperationId(essence.operationId()))
+                : completed(GameplayResult.reconciliation(
+                "attunement outcome is indeterminate; consumption remains pending")));
+    }
+
+    private CompletionStage<GameplayResult> consumeAndCommit(
+            UUID profileId,
+            ConsumableReservation essence,
+            String authorityOperationId) {
+        CompletionStage<ConsumableReservation.Disposition> consumption;
         try {
             consumption = essence.consume();
-        } catch (RuntimeException unavailable) {
+        } catch (RuntimeException failure) {
             return completed(GameplayResult.reconciliation(
                     "attunement committed; essence consumption requires reconciliation"));
         }
         return consumption.handle((consumed, failure) -> {
-            if (failure != null) {
-                return GameplayResult.reconciliation(
-                        "attunement committed; essence consumption requires reconciliation");
-            }
-            if (consumed != ConsumableReservation.Disposition.APPLIED
-                    && consumed != ConsumableReservation.Disposition.ALREADY_APPLIED) {
+            if (failure != null || !applied(consumed)) {
                 return GameplayResult.reconciliation(
                         "attunement committed; essence consumption requires reconciliation");
             }
@@ -339,51 +323,69 @@ public final class MiniwyvernAttunementService {
                     essence.operationId(), OperationJournal.Phase.PREPARED,
                     OperationJournal.Phase.MATERIAL_CONSUMED,
                     new OperationJournal.Update(
-                            Optional.of(authority.operationId().toString()),
+                            Optional.of(authorityOperationId),
                             Optional.of(profileId.toString()),
-                            OptionalLong.empty(),
-                            Optional.empty()));
-            if (material != OperationJournal.Decision.APPLIED
-                    && material != OperationJournal.Decision.ALREADY_APPLIED) {
+                            OptionalLong.empty(), Optional.empty()));
+            if (!applied(material)) {
                 return GameplayResult.reconciliation(
                         "essence consumed; attunement journal requires reconciliation");
             }
             OperationJournal.Decision closed = journal.transition(
                     essence.operationId(), OperationJournal.Phase.MATERIAL_CONSUMED,
                     OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
-            return closed == OperationJournal.Decision.APPLIED
-                    || closed == OperationJournal.Decision.ALREADY_APPLIED
+            return applied(closed)
                     ? GameplayResult.applied("Miniwyvern attuned")
-                    : GameplayResult.reconciliation("attunement succeeded; journal closure is pending");
+                    : GameplayResult.reconciliation(
+                    "attunement succeeded; journal closure is pending");
         });
+    }
+
+    private CompletionStage<GameplayResult> closeConsumed(
+            ConsumableReservation essence) {
+        OperationJournal.Decision closed = journal.transition(
+                essence.operationId(), OperationJournal.Phase.MATERIAL_CONSUMED,
+                OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
+        return released(essence, applied(closed)
+                ? new GameplayResult(GameplayResult.Status.ALREADY_APPLIED,
+                "Miniwyvern attuned")
+                : GameplayResult.reconciliation(
+                "attunement journal closure is pending"));
+    }
+
+    private CompletionStage<BondedMiniwyvernExtensionStore.ReadResult> load(
+            UUID ownerUuid,
+            UUID profileId) {
+        try {
+            return extensions.load(ownerUuid, profileId.toString());
+        } catch (RuntimeException failure) {
+            return CompletableFuture.completedFuture(null);
+        }
     }
 
     private CompletionStage<GameplayResult> releaseDenied(
             ConsumableReservation essence,
             String reason) {
-        return essence.release().handle((released, failure) -> {
-            if (failure == null && (released == ConsumableReservation.Disposition.APPLIED
-                    || released == ConsumableReservation.Disposition.ALREADY_APPLIED)) {
-                // A profile-data CAS denial occurs before material consumption. Keep PREPARED so
-                // retries can re-read the durable Tamework denial; refund phases are reserved for
-                // sagas whose material was actually consumed.
-                if (journal.find(essence.operationId())
-                        .map(OperationJournal.Entry::phase)
-                        .orElse(OperationJournal.Phase.PREPARED) == OperationJournal.Phase.REFUND_DUE) {
-                    journal.transition(essence.operationId(), OperationJournal.Phase.REFUND_DUE,
-                            OperationJournal.Phase.REFUNDED, OperationJournal.Update.EMPTY);
-                }
-                return GameplayResult.denied(reason);
-            }
-            return GameplayResult.reconciliation("attunement denied; essence release remains pending");
-        });
+        return essence.release().handle((released, failure) ->
+                failure == null && applied(released)
+                        ? GameplayResult.denied(reason)
+                        : GameplayResult.reconciliation(
+                        "attunement denied; essence release remains pending"));
     }
 
-    private void quarantine(String operationId, String reason) {
+    private GameplayResult invalidRead(
+            BondedMiniwyvernExtensionStore.ReadResult read) {
+        String detail = read == null ? "empty response" : read.reason();
+        return GameplayResult.reconciliation(
+                "Miniwyvern bonded extension is unavailable: " + detail);
+    }
+
+    private GameplayResult quarantine(String operationId, String reason) {
         journal.transition(operationId, OperationJournal.Phase.PREPARED,
                 OperationJournal.Phase.QUARANTINED,
-                new OperationJournal.Update(Optional.empty(), Optional.empty(),
-                        OptionalLong.empty(), Optional.of(reason)));
+                new OperationJournal.Update(
+                        Optional.empty(), Optional.empty(), OptionalLong.empty(),
+                        Optional.of(reason)));
+        return quarantined(reason);
     }
 
     private static boolean matches(
@@ -400,48 +402,32 @@ public final class MiniwyvernAttunementService {
                 && descriptor.profileRevision().isPresent()
                 && descriptor.source().itemFingerprint().equals(
                 essence.sourceEvidence().itemFingerprint())
-                && descriptor.source().itemId().equals(essence.sourceEvidence().itemId())
+                && descriptor.source().itemId().equals(
+                essence.sourceEvidence().itemId())
                 && descriptor.materialQuantity() == essence.quantity();
     }
 
-    private static boolean matches(ProfileDataEntryView entry, String profileId) {
-        return entry.profileId().equals(profileId)
-                && entry.namespace().equals(NAMESPACE)
-                && entry.key().equals(KEY);
+    private static boolean loaded(BondedMiniwyvernExtensionStore.ReadResult read) {
+        return read != null
+                && read.status() == BondedMiniwyvernExtensionStore.ReadStatus.LOADED;
     }
 
-    private static boolean matches(
-            ProfileDataOperationView operation,
-            String profileId,
-            String operationId,
-            long expectedRevision) {
-        return operation.namespace().equals(NAMESPACE)
-                && operation.idempotencyKey().equals(operationId)
-                && operation.profileId().equals(profileId)
-                && operation.key().equals(KEY)
-                && operation.expectedRevision() == expectedRevision;
+    private static boolean applied(ConsumableReservation.Disposition disposition) {
+        return disposition == ConsumableReservation.Disposition.APPLIED
+                || disposition == ConsumableReservation.Disposition.ALREADY_APPLIED;
     }
 
-    private static String encode(String archetype, String operationId) {
-        return GSON.toJson(new AttunementPayload(PAYLOAD_SCHEMA, archetype, operationId));
+    private static boolean applied(OperationJournal.Decision decision) {
+        return decision == OperationJournal.Decision.APPLIED
+                || decision == OperationJournal.Decision.ALREADY_APPLIED;
     }
 
-    private static AttunementPayload decode(String json) {
-        try {
-            AttunementPayload decoded = GSON.fromJson(json, AttunementPayload.class);
-            if (decoded == null) return null;
-            return new AttunementPayload(
-                    decoded.schemaVersion(), decoded.archetypeId(), decoded.attunementOperationId());
-        } catch (JsonParseException | IllegalArgumentException | NullPointerException invalid) {
-            return null;
-        }
+    private static String extensionOperationId(String operationId, long revision) {
+        return operationId + ":extension:" + revision;
     }
 
-    private static boolean payloadMatches(String json, String archetype, String operationId) {
-        AttunementPayload payload = decode(json);
-        return payload != null
-                && payload.archetypeId().equals(archetype)
-                && payload.attunementOperationId().equals(operationId);
+    private static String evidenceOperationId(String operationId) {
+        return operationId + ":extension:evidence";
     }
 
     private static String intent(String archetype) {
@@ -455,6 +441,10 @@ public final class MiniwyvernAttunementService {
         return normalized;
     }
 
+    private static GameplayResult quarantined(String reason) {
+        return new GameplayResult(GameplayResult.Status.QUARANTINED, reason);
+    }
+
     private static CompletionStage<GameplayResult> released(
             ConsumableReservation essence,
             GameplayResult result) {
@@ -465,27 +455,8 @@ public final class MiniwyvernAttunementService {
         return CompletableFuture.completedFuture(result);
     }
 
-    private record AttunementPayload(
-            int schemaVersion,
-            String archetypeId,
-            String attunementOperationId) {
-        private AttunementPayload {
-            if (schemaVersion != PAYLOAD_SCHEMA) {
-                throw new IllegalArgumentException("unsupported attunement payload schema");
-            }
-            archetypeId = normalize(archetypeId);
-            if (!ESSENCE_ITEMS.containsKey(archetypeId)) {
-                throw new IllegalArgumentException("unsupported attunement archetype");
-            }
-            attunementOperationId = Objects.requireNonNull(
-                    attunementOperationId, "attunementOperationId").trim();
-            if (attunementOperationId.isEmpty()) {
-                throw new IllegalArgumentException("attunementOperationId is required");
-            }
-        }
-    }
-
-    /** Local projection commit which makes the persisted archetype visible to HyDragon runtimes. */
+    /** Legacy local projection contract retained only until old local state is retired. */
+    @Deprecated
     @FunctionalInterface
     public interface ProfileProjection {
         Decision synchronize(UUID profileId, String archetypeId, String operationId);
