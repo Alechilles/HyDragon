@@ -21,7 +21,6 @@ final class BondedCompanionBridgeContractTest {
             HyDragonFeature.TIMED_SUMMONING,
             HyDragonFeature.PAID_REVIVAL,
             HyDragonFeature.SOUL_BOND_CLAIM,
-            HyDragonFeature.MINIWYVERN_ATTUNEMENT,
             HyDragonFeature.MINIWYVERN_ABILITIES);
 
     private static final Set<String> LEGACY_GENERIC_CAPABILITIES = Set.of(

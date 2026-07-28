@@ -20,7 +20,6 @@ import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkCapabilityDiagnostics;
-import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
@@ -28,7 +27,6 @@ import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
 import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
 import com.alechilles.hydragon.runtime.HyDragonGameplayRuntime;
 import com.alechilles.hydragon.runtime.HyDragonRuntimeComposition;
-import com.alechilles.hydragon.runtime.MiniwyvernAttunementService;
 import com.alechilles.hydragon.runtime.SoulBondLedger;
 import com.alechilles.hydragon.runtime.SoulBondService;
 import com.alechilles.hydragon.runtime.StateStoreOperationJournal;
@@ -230,11 +228,7 @@ public final class HyDragonPlugin extends JavaPlugin {
                         adapter, new BondedMiniwyvernExtensionCodec());
         SoulBondService soulBondService = new SoulBondService(
                 adapter, extensions, soulBonds, journal, System::currentTimeMillis);
-        MiniwyvernAttunementService attunementService =
-                new MiniwyvernAttunementService(
-                        adapter, extensions, soulBonds, journal);
-        HyDragonGameplayRuntime gameplay = new HyDragonGameplayRuntime(
-                soulBondService, attunementService);
+        HyDragonGameplayRuntime gameplay = new HyDragonGameplayRuntime(soulBondService);
         HyDragonInteractionRuntime.install(gameplay, bridge::snapshot);
         return new GameplayInstallation(
                 gameplay,
@@ -291,9 +285,7 @@ public final class HyDragonPlugin extends JavaPlugin {
     }
 
     private FeatureGate gameplayGate(TameworkBridge.Snapshot gates) {
-        FeatureGate soulBond = gates.feature(HyDragonFeature.SOUL_BOND_CLAIM);
-        FeatureGate attunement = gates.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT);
-        return soulBond.available() ? soulBond : attunement;
+        return gates.feature(HyDragonFeature.SOUL_BOND_CLAIM);
     }
 
     private void logRuntimeFailure(HyDragonRuntimeComposition.Failure failure) {
@@ -319,10 +311,6 @@ public final class HyDragonPlugin extends JavaPlugin {
                 HyDragonSoulBondInteraction.TYPE_ID,
                 HyDragonSoulBondInteraction.class,
                 HyDragonSoulBondInteraction.CODEC);
-        getCodecRegistry(Interaction.CODEC).register(
-                HyDragonMiniwyvernAttuneInteraction.TYPE_ID,
-                HyDragonMiniwyvernAttuneInteraction.class,
-                HyDragonMiniwyvernAttuneInteraction.CODEC);
     }
 
     private void registerConfigAssets() {

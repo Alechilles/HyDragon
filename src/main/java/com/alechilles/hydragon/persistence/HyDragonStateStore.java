@@ -41,7 +41,7 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
     private static final Set<String> PLAYER_FIELDS = Set.of(
             "schema", "state", "operationId", "profileId", "claimedAtEpochMillis");
     private static final Set<String> PROFILE_FIELDS = Set.of(
-            "schema", "kind", "speciesId", "archetypeId", "lastOperationId");
+            "schema", "kind", "speciesId", "lastOperationId");
     private static final Set<String> ENCOUNTER_FIELDS = Set.of(
             "schema",
             "id",
@@ -218,7 +218,7 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
             }
 
             ProfileExtensionRecord desiredProfile = ProfileExtensionRecord.soulboundMiniwyvern(
-                    profileId, "miniwyvern", "neutral", Optional.of(operationId));
+                    profileId, "miniwyvern", Optional.of(operationId));
             ProfileExtensionRecord currentProfile = snapshot.profileExtensions().get(profileId);
             if (currentProfile != null && !currentProfile.equals(desiredProfile)) {
                 return MutationOutcome.CONFLICT;
@@ -818,7 +818,6 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
                 profileId,
                 kind,
                 requiredText(properties, prefix + "speciesId"),
-                optionalText(properties, prefix + "archetypeId"),
                 optionalText(properties, prefix + "lastOperationId"));
     }
 
@@ -929,7 +928,6 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
         properties.setProperty(prefix + "schema", Integer.toString(record.schemaVersion()));
         properties.setProperty(prefix + "kind", record.kind().name());
         properties.setProperty(prefix + "speciesId", record.speciesId());
-        setOptional(properties, prefix + "archetypeId", record.archetypeId());
         setOptional(properties, prefix + "lastOperationId", record.lastOperationId());
     }
 

@@ -29,7 +29,16 @@ import javax.annotation.Nonnull;
 public final class TameworkGameplayAdapter implements BondedMiniwyvernExtensionGateway {
     public static final String CALLER_NAMESPACE = "Alechilles:HyDragon";
     public static final String EXTENSION_NAMESPACE = CALLER_NAMESPACE;
-    public static final String SOULBOUND_MINIWYVERN_ROLE = "Tamed_Wyvern_Mini";
+    public static final String WILD_MINIWYVERN_ROLE = "Tamed_Wyvern_Mini_Wild";
+    /** The role family is authoritative; extension data must never select a live form. */
+    public static final Set<String> MINIWYVERN_ROLE_IDS = Set.of(
+            WILD_MINIWYVERN_ROLE,
+            "Tamed_Wyvern_Mini_Nature",
+            "Tamed_Wyvern_Mini_Toxic",
+            "Tamed_Wyvern_Mini_Fire",
+            "Tamed_Wyvern_Mini_Void",
+            "Tamed_Wyvern_Mini_Lightning",
+            "Tamed_Wyvern_Mini_Ice");
     public static final String DRAGON_HORN_ROSTER = "hydragon:dragon_horn";
     public static final String FULL_DRAGON_FAMILY = "hydragon:full_dragons";
     public static final String MINIWYVERN_FAMILY = "hydragon:soulbound_mini";
@@ -42,10 +51,6 @@ public final class TameworkGameplayAdapter implements BondedMiniwyvernExtensionG
 
     public Readiness soulBondReadiness() {
         return readiness(HyDragonFeature.SOUL_BOND_CLAIM);
-    }
-
-    public Readiness attunementReadiness() {
-        return readiness(HyDragonFeature.MINIWYVERN_ATTUNEMENT);
     }
 
     public Readiness abilityStateReadiness() {
@@ -67,7 +72,7 @@ public final class TameworkGameplayAdapter implements BondedMiniwyvernExtensionG
                 Objects.requireNonNull(operationId, "operationId"),
                 Objects.requireNonNull(ownerUuid, "ownerUuid"),
                 DRAGON_HORN_ROSTER,
-                SOULBOUND_MINIWYVERN_ROLE,
+                WILD_MINIWYVERN_ROLE,
                 "Bonded Miniwyvern",
                 "Miniwyvern",
                 null,

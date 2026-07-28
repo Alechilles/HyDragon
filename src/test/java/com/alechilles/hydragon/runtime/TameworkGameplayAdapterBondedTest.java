@@ -21,6 +21,7 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -45,7 +46,6 @@ final class TameworkGameplayAdapterBondedTest {
         assertFalse(unavailableAuthority.soulBondReadiness().ready());
         assertEquals("database-offline", unavailableAuthority.soulBondReadiness().reason());
         assertTrue(ready.soulBondReadiness().ready());
-        assertTrue(ready.attunementReadiness().ready());
         assertTrue(ready.abilityStateReadiness().ready());
     }
 
@@ -85,6 +85,17 @@ final class TameworkGameplayAdapterBondedTest {
                         || name.equals("findProfileDataOperation")
                         || name.equals("provisionAndLinkMiniwyvern")
                         || name.equals("findMiniwyvern")));
+    }
+
+    @Test
+    void miniwyvernRolesAreRestrictedToTheSevenRoleFamily() {
+        assertEquals(Set.of(
+                        "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature",
+                        "Tamed_Wyvern_Mini_Toxic", "Tamed_Wyvern_Mini_Fire",
+                        "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+                        "Tamed_Wyvern_Mini_Ice"),
+                TameworkGameplayAdapter.MINIWYVERN_ROLE_IDS);
+        assertEquals("Tamed_Wyvern_Mini_Wild", TameworkGameplayAdapter.WILD_MINIWYVERN_ROLE);
     }
 
     private static BondedCompanionApi bondedAvailable() {

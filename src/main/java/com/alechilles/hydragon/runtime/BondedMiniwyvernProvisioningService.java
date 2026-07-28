@@ -86,7 +86,7 @@ public final class BondedMiniwyvernProvisioningService {
             String operation,
             ProfileEvidence evidence) {
         BondedMiniwyvernExtensionDocument desired =
-                BondedMiniwyvernExtensionDocument.neutral(SPECIES_ID, 0L);
+                BondedMiniwyvernExtensionDocument.wild(SPECIES_ID, 0L);
         try {
             return extensions.compareAndSet(
                             owner, evidence.profileId().toString(),
@@ -152,7 +152,7 @@ public final class BondedMiniwyvernProvisioningService {
         if (!owner.equals(profile.ownerUuid())
                 || !TameworkGameplayAdapter.DRAGON_HORN_ROSTER.equals(profile.rosterId())
                 || !TameworkGameplayAdapter.MINIWYVERN_FAMILY.equals(profile.familyId())
-                || !TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE.equals(profile.roleId())
+                || !TameworkGameplayAdapter.WILD_MINIWYVERN_ROLE.equals(profile.roleId())
                 || profile.state() != BondedCompanionStateView.STORED
                 || profile.activeLease() != null) {
             return null;

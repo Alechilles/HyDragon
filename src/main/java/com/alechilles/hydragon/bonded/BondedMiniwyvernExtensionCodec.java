@@ -24,14 +24,11 @@ public final class BondedMiniwyvernExtensionCodec {
             "schemaVersion",
             "companionKind",
             "speciesId",
-            "archetypeId",
-            "archetypeRevision",
-            "lastAttunementOperationId",
             "abilityState",
             "progression");
     private static final Set<String> ABILITY_FIELDS = Set.of(
             "schemaVersion",
-            "archetypeId",
+            "formId",
             "cooldownUntilByAbility",
             "iceBuildupByTarget",
             "controlImmunityUntilByTarget",
@@ -47,11 +44,6 @@ public final class BondedMiniwyvernExtensionCodec {
         root.addProperty("schemaVersion", BondedMiniwyvernExtensionDocument.SCHEMA_VERSION);
         root.addProperty("companionKind", BondedMiniwyvernExtensionDocument.COMPANION_KIND);
         root.addProperty("speciesId", document.speciesId());
-        root.addProperty("archetypeId", document.archetypeId());
-        root.addProperty("archetypeRevision", document.archetypeRevision());
-        document.lastAttunementOperationId().ifPresentOrElse(
-                value -> root.addProperty("lastAttunementOperationId", value),
-                () -> root.add("lastAttunementOperationId", null));
         JsonObject abilityState = encodeAbilityState(document.abilityState());
         addUnknownFields(abilityState, document.unknownAbilityStateFields(), ABILITY_FIELDS);
         root.add("abilityState", abilityState);
@@ -76,18 +68,11 @@ public final class BondedMiniwyvernExtensionCodec {
                 throw new IllegalArgumentException("Unexpected bonded companion kind " + companionKind);
             }
             String speciesId = requiredString(root, "speciesId");
-            String archetypeId = requiredString(root, "archetypeId");
-            long archetypeRevision = requiredNonNegativeLong(root, "archetypeRevision");
-            Optional<String> operationId = optionalNullableString(root, "lastAttunementOperationId");
             JsonObject abilityJson = requiredObject(root, "abilityState");
             MiniwyvernAbilityState abilityState = decodeAbilityState(abilityJson);
             JsonObject progression = requiredObject(root, "progression");
             return new BondedMiniwyvernExtensionDocument(
-                    speciesId,
-                    archetypeId,
-                    archetypeRevision,
-                    operationId,
-                    abilityState,
+                    speciesId, abilityState,
                     BondedExtensionJsonValue.from(progression),
                     unknownFields(root, DOCUMENT_FIELDS),
                     unknownFields(abilityJson, ABILITY_FIELDS));
@@ -105,7 +90,7 @@ public final class BondedMiniwyvernExtensionCodec {
         }
         return new MiniwyvernAbilityState(
                 decoded.schemaVersion(),
-                decoded.archetypeId(),
+                decoded.formId(),
                 decoded.cooldownUntilByAbility(),
                 decoded.iceBuildupByTarget(),
                 decoded.controlImmunityUntilByTarget(),
@@ -119,7 +104,7 @@ public final class BondedMiniwyvernExtensionCodec {
     private static JsonObject encodeAbilityState(MiniwyvernAbilityState state) {
         JsonObject json = new JsonObject();
         json.addProperty("schemaVersion", state.schemaVersion());
-        json.addProperty("archetypeId", state.archetypeId());
+        json.addProperty("formId", state.formId());
         json.add("cooldownUntilByAbility", stringLongMap(state.cooldownUntilByAbility()));
         json.add("iceBuildupByTarget", uuidDoubleMap(state.iceBuildupByTarget()));
         json.add("controlImmunityUntilByTarget", uuidLongMap(state.controlImmunityUntilByTarget()));

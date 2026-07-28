@@ -10,7 +10,6 @@ public record ProfileExtensionRecord(
         UUID profileId,
         ProfileKind kind,
         String speciesId,
-        Optional<String> archetypeId,
         Optional<String> lastOperationId) {
     public static final int SCHEMA_VERSION = 1;
 
@@ -21,15 +20,7 @@ public record ProfileExtensionRecord(
         Objects.requireNonNull(profileId, "profileId");
         Objects.requireNonNull(kind, "kind");
         speciesId = requiredText(speciesId, "speciesId");
-        archetypeId = normalizedText(archetypeId, "archetypeId");
         lastOperationId = normalizedText(lastOperationId, "lastOperationId");
-
-        if (kind == ProfileKind.FULL_DRAGON && archetypeId.isPresent()) {
-            throw new IllegalArgumentException("FULL_DRAGON profiles cannot carry a miniwyvern archetype");
-        }
-        if (kind == ProfileKind.SOULBOUND_MINIWYVERN && archetypeId.isEmpty()) {
-            throw new IllegalArgumentException("SOULBOUND_MINIWYVERN profiles require an archetypeId");
-        }
     }
 
     public static ProfileExtensionRecord fullDragon(
@@ -40,23 +31,18 @@ public record ProfileExtensionRecord(
                 SCHEMA_VERSION,
                 profileId,
                 ProfileKind.FULL_DRAGON,
-                speciesId,
-                Optional.empty(),
-                lastOperationId);
+                speciesId, lastOperationId);
     }
 
     public static ProfileExtensionRecord soulboundMiniwyvern(
             UUID profileId,
             String speciesId,
-            String archetypeId,
             Optional<String> lastOperationId) {
         return new ProfileExtensionRecord(
                 SCHEMA_VERSION,
                 profileId,
                 ProfileKind.SOULBOUND_MINIWYVERN,
-                speciesId,
-                Optional.of(archetypeId),
-                lastOperationId);
+                speciesId, lastOperationId);
     }
 
     private static String requiredText(String value, String field) {

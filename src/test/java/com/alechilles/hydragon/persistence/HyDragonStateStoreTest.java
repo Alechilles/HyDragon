@@ -31,7 +31,7 @@ class HyDragonStateStoreTest {
     Path temporaryDirectory;
 
     @Test
-    void completesSoulBondAndNeutralMiniwyvernExtensionInOneGeneration() throws Exception {
+    void completesSoulBondWithFormFreeMiniwyvernMetadataInOneGeneration() throws Exception {
         UUID owner = UUID.randomUUID();
         UUID profile = UUID.randomUUID();
         String operationId = "hydragon:soul-bond:" + owner;
@@ -47,7 +47,6 @@ class HyDragonStateStoreTest {
         assertEquals(profile, store.snapshot().playerSoulBond(owner).orElseThrow().profileId().orElseThrow());
         ProfileExtensionRecord extension = store.snapshot().profileExtension(profile).orElseThrow();
         assertEquals(ProfileKind.SOULBOUND_MINIWYVERN, extension.kind());
-        assertEquals(Optional.of("neutral"), extension.archetypeId());
         assertEquals(Optional.of(operationId), extension.lastOperationId());
     }
 

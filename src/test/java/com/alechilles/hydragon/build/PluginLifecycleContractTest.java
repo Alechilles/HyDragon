@@ -34,7 +34,7 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("new BondedMiniwyvernExtensionStore("));
         assertTrue(source.contains("new BondedMiniwyvernExtensionCodec()"));
         assertTrue(source.contains("new SoulBondService("));
-        assertTrue(source.contains("new MiniwyvernAttunementService("));
+        assertTrue(source.contains("new HyDragonGameplayRuntime(soulBondService)"));
         assertTrue(source.contains("new ConsumableSagaRecoveryRuntime("));
         assertTrue(source.contains("new ConsumableRefundClaimService(journal)"));
         assertTrue(source.contains("HyDragonEncounterRegistrationFacade.install("));
