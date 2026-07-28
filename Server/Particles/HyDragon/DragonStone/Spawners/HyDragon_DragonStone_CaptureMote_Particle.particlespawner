@@ -8,8 +8,8 @@
   "TrailSpawnerRotationMultiplier": 0.0,
   "MaxConcurrentParticles": 3,
   "ParticleLifeSpan": {
-    "Min": 1.2,
-    "Max": 2.0
+    "Min": 0.55,
+    "Max": 0.85
   },
   "SpawnRate": {
     "Min": 1.0,
