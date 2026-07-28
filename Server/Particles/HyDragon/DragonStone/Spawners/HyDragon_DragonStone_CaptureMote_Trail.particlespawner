@@ -3,12 +3,12 @@
   "ParticleRotationInfluence": "Billboard",
   "MaxConcurrentParticles": 10,
   "ParticleLifeSpan": {
-    "Min": 0.1,
-    "Max": 0.18
+    "Min": 0.38,
+    "Max": 0.52
   },
   "SpawnRate": {
-    "Min": 50.0,
-    "Max": 50.0
+    "Min": 18.0,
+    "Max": 18.0
   },
   "EmitOffset": {
     "X": {
@@ -31,7 +31,7 @@
     "Animation": {
       "0": {
         "Opacity": 0.82,
-        "Color": "#D9FAFF",
+        "Color": "#CFF8FF",
         "Rotation": {
           "Z": {
             "Min": -180.0,
@@ -40,30 +40,30 @@
         },
         "Scale": {
           "X": {
-            "Min": 0.08,
-            "Max": 0.12
+            "Min": 0.09,
+            "Max": 0.13
           },
           "Y": {
-            "Min": 0.28,
-            "Max": 0.42
+            "Min": 0.65,
+            "Max": 0.95
           }
         }
       },
       "55": {
         "Opacity": 0.62,
-        "Color": "#57D7FF"
+        "Color": "#2F69FF"
       },
       "100": {
         "Opacity": 0.0,
-        "Color": "#355BFF",
+        "Color": "#2F69FF",
         "Scale": {
           "X": {
-            "Min": 0.035,
-            "Max": 0.06
+            "Min": 0.09,
+            "Max": 0.13
           },
           "Y": {
-            "Min": 0.12,
-            "Max": 0.2
+            "Min": 0.65,
+            "Max": 0.95
           }
         }
       }
@@ -79,12 +79,12 @@
       },
       "Scale": {
         "X": {
-          "Min": 0.08,
-          "Max": 0.12
+          "Min": 0.09,
+          "Max": 0.13
         },
         "Y": {
-          "Min": 0.28,
-          "Max": 0.42
+          "Min": 0.65,
+          "Max": 0.95
         }
       }
     }
