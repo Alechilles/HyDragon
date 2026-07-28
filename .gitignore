@@ -14,5 +14,6 @@ target/
 *.py[cod]
 .vscode/
 .superpowers/
+.worktrees/
 artifacts/
 .vscode/settings.json
