@@ -35,12 +35,12 @@ class MiniwyvernOwnerAuraDamageSystemTest {
     }
 
     @Test
-    void routesOwnerHitEffectsThroughTheCommandBufferForClientReplication() throws IOException {
+    void routesOwnerHitEffectsThroughTheLiveStoreForEffectControllerReplication() throws IOException {
         String system = source();
 
         assertTrue(system.contains(
-                "commandBuffer.getComponent(target, EffectControllerComponent.getComponentType())"));
-        assertTrue(system.contains("OverlapBehavior.OVERWRITE, commandBuffer)"));
+                "store.getComponent(target, EffectControllerComponent.getComponentType())"));
+        assertTrue(system.contains("OverlapBehavior.OVERWRITE, store)"));
     }
 
     @Test
