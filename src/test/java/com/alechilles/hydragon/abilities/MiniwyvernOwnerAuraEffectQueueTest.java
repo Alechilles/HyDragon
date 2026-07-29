@@ -120,6 +120,20 @@ class MiniwyvernOwnerAuraEffectQueueTest {
     }
 
     @Test
+    void reapplicationQueuedAfterRemovalIsReleasedInTheFollowingCycle() {
+        MiniwyvernOwnerAuraEffectQueue queue = immediateQueue();
+        MiniwyvernOwnerAuraRegistry.Aura aura = aura(
+                "void", "HyDragon_Miniwyvern_Void_Exposure", 6.0D);
+
+        MiniwyvernOwnerAuraEffectQueue.Cycle currentCycle = queue.drainCycle(WORLD, TARGET);
+        queue.submitAfterRemoval(WORLD, TARGET, aura);
+
+        assertTrue(currentCycle.reapplications().isEmpty());
+        assertEquals(List.of(aura), queue.drainCycle(WORLD, TARGET).reapplications());
+        assertTrue(queue.drainCycle(WORLD, TARGET).reapplications().isEmpty());
+    }
+
+    @Test
     void appliesQueuedEffectsAfterDamageCaptureAndBeforeEntityEffectReplication() {
         MiniwyvernOwnerAuraEffectSystem system = new MiniwyvernOwnerAuraEffectSystem(
                 new MiniwyvernOwnerAuraEffectQueue(),

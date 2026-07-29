@@ -15,6 +15,8 @@ public final class MiniwyvernOwnerAuraEffectQueue {
 
     private final ConcurrentHashMap<RequestKey, PendingAura> pending =
             new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<RequestKey, PendingAura> reapplications =
+            new ConcurrentHashMap<>();
     private final LongSupplier nanoTime;
     private final long delayNanos;
 
@@ -40,6 +42,19 @@ public final class MiniwyvernOwnerAuraEffectQueue {
             }
             return new PendingAura(aura, current.readyAtNanos(), false);
         });
+    }
+
+    /** Queues a fresh Add for the cycle after a COMPLETE removal was replicated. */
+    void submitAfterRemoval(String worldName, UUID targetUuid, MiniwyvernOwnerAuraRegistry.Aura aura) {
+        Objects.requireNonNull(aura, "aura");
+        RequestKey key = new RequestKey(worldName, targetUuid, aura.effectId());
+        reapplications.put(key, new PendingAura(aura, nanoTime.getAsLong(), true));
+    }
+
+    Cycle drainCycle(String worldName, UUID targetUuid) {
+        return new Cycle(
+                drainReapplications(worldName, targetUuid),
+                drain(worldName, targetUuid));
     }
 
     List<MiniwyvernOwnerAuraRegistry.Aura> drain(String worldName, UUID targetUuid) {
@@ -69,6 +84,28 @@ public final class MiniwyvernOwnerAuraEffectQueue {
         return drained.stream().map(QueuedAura::aura).toList();
     }
 
+    private List<MiniwyvernOwnerAuraRegistry.Aura> drainReapplications(
+            String worldName, UUID targetUuid) {
+        String requiredWorld = requireText(worldName, "worldName");
+        Objects.requireNonNull(targetUuid, "targetUuid");
+        long nowNanos = nanoTime.getAsLong();
+        List<QueuedAura> drained = new ArrayList<>();
+        for (var entry : reapplications.entrySet()) {
+            RequestKey key = entry.getKey();
+            PendingAura queued = entry.getValue();
+            if (hasReached(nowNanos, queued.readyAtNanos() + STALE_REQUEST_NANOS)) {
+                reapplications.remove(key, queued);
+                continue;
+            }
+            if (key.worldName().equals(requiredWorld) && key.targetUuid().equals(targetUuid)
+                    && reapplications.remove(key, queued)) {
+                drained.add(new QueuedAura(key.effectId(), queued.aura()));
+            }
+        }
+        drained.sort(Comparator.comparing(QueuedAura::effectId));
+        return drained.stream().map(QueuedAura::aura).toList();
+    }
+
     private static boolean hasReached(long nowNanos, long deadlineNanos) {
         return nowNanos - deadlineNanos >= 0L;
     }
@@ -88,6 +125,15 @@ public final class MiniwyvernOwnerAuraEffectQueue {
     }
 
     private record QueuedAura(String effectId, MiniwyvernOwnerAuraRegistry.Aura aura) {
+    }
+
+    record Cycle(
+            List<MiniwyvernOwnerAuraRegistry.Aura> reapplications,
+            List<MiniwyvernOwnerAuraRegistry.Aura> applications) {
+        Cycle {
+            reapplications = List.copyOf(reapplications);
+            applications = List.copyOf(applications);
+        }
     }
 
     private record PendingAura(

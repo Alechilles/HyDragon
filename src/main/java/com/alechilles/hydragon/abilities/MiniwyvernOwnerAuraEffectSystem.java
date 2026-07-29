@@ -11,6 +11,7 @@ import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
+import com.hypixel.hytale.server.core.asset.type.entityeffect.config.RemovalBehavior;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
@@ -77,12 +78,46 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
         UUID targetUuid = identity.getUuid();
         String worldName = store.getExternalData().getWorld().getName();
         Ref<EntityStore> target = chunk.getReferenceTo(index);
-        for (MiniwyvernOwnerAuraRegistry.Aura aura : queue.drain(worldName, targetUuid)) {
-            apply(target, targetUuid, aura, controller, commandBuffer);
+        MiniwyvernOwnerAuraEffectQueue.Cycle cycle = queue.drainCycle(worldName, targetUuid);
+        for (MiniwyvernOwnerAuraRegistry.Aura aura : cycle.reapplications()) {
+            add(target, targetUuid, aura, controller, commandBuffer);
+        }
+        for (MiniwyvernOwnerAuraRegistry.Aura aura : cycle.applications()) {
+            applyOrRestart(worldName, target, targetUuid, aura, controller, commandBuffer);
         }
     }
 
-    private void apply(
+    private void applyOrRestart(
+            String worldName,
+            Ref<EntityStore> target,
+            UUID targetUuid,
+            MiniwyvernOwnerAuraRegistry.Aura aura,
+            EffectControllerComponent controller,
+            CommandBuffer<EntityStore> commandBuffer) {
+        EntityEffect effect = EntityEffect.getAssetMap().getAsset(aura.effectId());
+        if (effect == null) {
+            logVoidApplication(aura, targetUuid, false, false, false, "missing-effect", 0.0F);
+            return;
+        }
+
+        boolean activeBefore = controller.hasEffect(effect);
+        com.hypixel.hytale.protocol.EntityEffect packet = effect.toPacket();
+        String modelVfxId = packet.applicationEffects == null
+                ? null : packet.applicationEffects.modelVFXId;
+        if (requiresModelVfxRestart(activeBefore, modelVfxId)) {
+            int effectIndex = EntityEffect.getAssetMap().getIndex(aura.effectId());
+            controller.removeEffect(
+                    target, effectIndex, RemovalBehavior.COMPLETE, commandBuffer);
+            queue.submitAfterRemoval(worldName, targetUuid, aura);
+            logVoidApplication(aura, targetUuid, true, false,
+                    controller.hasEffect(effect), "restart-removed", effect.getDuration());
+            return;
+        }
+
+        add(target, targetUuid, aura, controller, commandBuffer);
+    }
+
+    private void add(
             Ref<EntityStore> target,
             UUID targetUuid,
             MiniwyvernOwnerAuraRegistry.Aura aura,
@@ -113,6 +148,10 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
             registry.recordToxicWeakness(targetUuid, aura.effectId(), aura.damageReductionFraction(),
                     effect.getDuration(), System.currentTimeMillis());
         }
+    }
+
+    static boolean requiresModelVfxRestart(boolean activeBefore, @Nullable String modelVfxId) {
+        return activeBefore && modelVfxId != null && !modelVfxId.isBlank();
     }
 
     private void logVoidApplication(
