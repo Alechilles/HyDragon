@@ -85,22 +85,28 @@ class BundledConfigAssetContractTest {
 
     @Test
     void elementalMiniwyvernsApplyAVisibleOwnerAuraEffect() throws IOException {
-        Map<String, String> expectedEffectByForm = Map.of(
-                "Nature", "HyDragon_Miniwyvern_Nature_Regeneration",
-                "Toxic", "HyDragon_Miniwyvern_Toxic_Aura",
-                "Fire", "HyDragon_Miniwyvern_Fire_Aura",
-                "Void", "HyDragon_Miniwyvern_Void_Aura",
-                "Lightning", "HyDragon_Miniwyvern_Lightning_Boon",
-                "Ice", "HyDragon_Miniwyvern_Ice_Aura");
-        for (Map.Entry<String, String> expected : expectedEffectByForm.entrySet()) {
+        Map<String, AuraVisual> expectedAuraByForm = Map.of(
+                "Nature", new AuraVisual("HyDragon_Miniwyvern_Nature_Regeneration", "Icons/StatusEffects/HyDragon/Miniwyvern_Nature_Aura.png"),
+                "Toxic", new AuraVisual("HyDragon_Miniwyvern_Toxic_Aura", "Icons/StatusEffects/HyDragon/Miniwyvern_Toxic_Aura.png"),
+                "Fire", new AuraVisual("HyDragon_Miniwyvern_Fire_Aura", "Icons/StatusEffects/HyDragon/Miniwyvern_Fire_Aura.png"),
+                "Void", new AuraVisual("HyDragon_Miniwyvern_Void_Aura", "Icons/StatusEffects/HyDragon/Miniwyvern_Void_Aura.png"),
+                "Lightning", new AuraVisual("HyDragon_Miniwyvern_Lightning_Boon", "Icons/StatusEffects/HyDragon/Miniwyvern_Lightning_Aura.png"),
+                "Ice", new AuraVisual("HyDragon_Miniwyvern_Ice_Aura", "Icons/StatusEffects/HyDragon/Miniwyvern_Ice_Aura.png"));
+        for (Map.Entry<String, AuraVisual> expected : expectedAuraByForm.entrySet()) {
             Path archetype = Path.of("Server", "HyDragon", "MiniwyvernArchetypes", expected.getKey() + ".json");
             String json = Files.readString(archetype);
-            assertTrue(json.contains("\"PassiveEffects\": [ \"" + expected.getValue() + "\" ]"),
+            assertTrue(json.contains("\"PassiveEffects\": [ \"" + expected.getValue().effectId() + "\" ]"),
                     archetype + " must maintain its owner aura EntityEffect while summoned");
-            assertTrue(Files.exists(Path.of("Server", "Entity", "Effects", "Status", expected.getValue() + ".json")),
-                    expected.getValue() + " must be a bundled EntityEffect");
+            Path effect = Path.of("Server", "Entity", "Effects", "Status", expected.getValue().effectId() + ".json");
+            assertTrue(Files.exists(effect), expected.getValue().effectId() + " must be a bundled EntityEffect");
+            assertTrue(Files.readString(effect).contains("\"StatusEffectIcon\": \"" + expected.getValue().iconPath() + "\""),
+                    expected.getValue().effectId() + " must declare its generated HUD icon");
+            assertTrue(Files.exists(Path.of("Common", expected.getValue().iconPath())),
+                    expected.getValue().iconPath() + " must be bundled with the HUD effect");
         }
     }
+
+    private record AuraVisual(String effectId, String iconPath) { }
 
     private static int occurrences(String value, String needle) {
         int count = 0;

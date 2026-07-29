@@ -1,5 +1,6 @@
 {
   "Name": "server.effects.miniwyvernLightningBoon.name",
+  "StatusEffectIcon": "Icons/StatusEffects/HyDragon/Miniwyvern_Lightning_Aura.png",
   "ApplicationEffects": {
     "HorizontalSpeedMultiplier": 1.15,
     "EntityBottomTint": "#EAB308",

@@ -1,5 +1,6 @@
 {
   "Name": "server.effects.miniwyvernIceAura.name",
+  "StatusEffectIcon": "Icons/StatusEffects/HyDragon/Miniwyvern_Ice_Aura.png",
   "OverlapBehavior": "Overwrite",
   "RemovalBehavior": "Duration",
   "Infinite": false,

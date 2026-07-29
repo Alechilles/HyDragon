@@ -1,5 +1,6 @@
 {
   "Name": "server.effects.miniwyvernNatureRegeneration.name",
+  "StatusEffectIcon": "Icons/StatusEffects/HyDragon/Miniwyvern_Nature_Aura.png",
   "ApplicationEffects": {
     "EntityBottomTint": "#22C55E",
     "EntityTopTint": "#BBF7D0"
