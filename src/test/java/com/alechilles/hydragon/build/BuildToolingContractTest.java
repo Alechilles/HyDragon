@@ -1,5 +1,6 @@
 package com.alechilles.hydragon.build;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -59,5 +60,14 @@ final class BuildToolingContractTest {
         assertTrue(tamework >= 0);
         assertTrue(hydragon > tamework);
         assertTrue(documentation.contains(".\\mvnw.cmd clean verify"));
+    }
+
+    @Test
+    void configRegistryAvoidsTheRuntimeCompilersUnsupportedRecursiveAssetMapBound() throws IOException {
+        String repository = Files.readString(projectRoot.resolve(
+                "src/main/java/com/alechilles/hydragon/config/HyDragonConfigRepository.java"));
+
+        assertFalse(repository.contains(
+                "JsonAssetWithMap<String, DefaultAssetMap<String, T>>"));
     }
 }

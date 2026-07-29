@@ -34,9 +34,9 @@ public final class HyDragonConfigRepository {
     /** Reads all registered asset maps. Safe to call at start and during reconciliation. */
     public void refreshFromAssetRegistry() {
         synchronized (reloadLock) {
-            speciesAssets = copyRegisteredAssets(DragonSpeciesConfig.class);
-            archetypeAssets = copyRegisteredAssets(MiniwyvernArchetypeConfig.class);
-            encounterAssets = copyRegisteredAssets(DragonEncounterConfig.class);
+            speciesAssets = copyRegisteredAssets(AssetRegistry.getAssetStore(DragonSpeciesConfig.class));
+            archetypeAssets = copyRegisteredAssets(AssetRegistry.getAssetStore(MiniwyvernArchetypeConfig.class));
+            encounterAssets = copyRegisteredAssets(AssetRegistry.getAssetStore(DragonEncounterConfig.class));
             rebuild();
         }
     }
@@ -210,9 +210,8 @@ public final class HyDragonConfigRepository {
         return indexed;
     }
 
-    private static <T extends com.hypixel.hytale.assetstore.map.JsonAssetWithMap<String, DefaultAssetMap<String, T>>>
-            Map<String, T> copyRegisteredAssets(Class<T> type) {
-        AssetStore<String, T, DefaultAssetMap<String, T>> store = AssetRegistry.getAssetStore(type);
+    private static <T extends JsonAsset<String>> Map<String, T> copyRegisteredAssets(
+            @Nullable AssetStore<String, T, DefaultAssetMap<String, T>> store) {
         return store == null ? Map.of() : copy(store.getAssetMap());
     }
 
