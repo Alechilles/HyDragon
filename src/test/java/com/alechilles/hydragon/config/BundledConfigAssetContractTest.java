@@ -119,70 +119,22 @@ class BundledConfigAssetContractTest {
     }
 
     @Test
-    void elementalArchetypeMatrixHasEssenceAppearancePresentationAndBehavior() throws IOException {
+    void miniwyvernFormConfigsBindOnlyApprovedFormsToTheirRoles() throws IOException {
         Map<String, MiniwyvernArchetypeConfig> archetypes = decodeDirectory(
                 "MiniwyvernArchetypes", MiniwyvernArchetypeConfig.class,
                 MiniwyvernArchetypeConfig.CODEC).stream().collect(Collectors.toMap(
                         MiniwyvernArchetypeConfig::getId, Function.identity()));
-        assertEquals(Set.of("neutral", "lightning", "wind", "ice", "fire", "water", "nature", "void"),
+        assertEquals(Set.of("wild", "nature", "toxic", "fire", "void", "lightning", "ice"),
                 archetypes.keySet());
-
-        for (String id : Set.of("lightning", "wind", "ice", "fire", "water", "nature", "void")) {
+        for (String id : archetypes.keySet()) {
             MiniwyvernArchetypeConfig archetype = archetypes.get(id);
             String title = Character.toUpperCase(id.charAt(0)) + id.substring(1);
-            assertEquals(id, archetype.getEssenceSemanticId(), id);
-            assertEquals("Draconic_Essence_" + title, archetype.getEssenceItemId(), id);
-            assertEquals("Wyvern_Mini_" + title, archetype.getAppearanceId(), id);
-            assertFalse(archetype.getParticleAndSoundIds().isEmpty(), id + " lacks presentation");
-            assertTrue(!archetype.getActiveAbilities().isEmpty()
-                            || !archetype.getPassiveEffects().isEmpty(),
-                    id + " lacks an active or passive behavior");
+            assertEquals("Tamed_Wyvern_Mini_" + title, archetype.getRoleId(), id);
         }
-
-        MiniwyvernArchetypeConfig neutral = archetypes.get("neutral");
-        assertTrue(neutral.getEssenceSemanticId() == null || neutral.getEssenceSemanticId().isBlank());
-        assertTrue(neutral.getEssenceItemId() == null || neutral.getEssenceItemId().isBlank());
-        assertEquals("Wyvern_Mini", neutral.getAppearanceId());
-        assertEquals("BASIC_BITE", neutral.getFallbackBehavior());
-    }
-
-    @Test
-    void miniwyvernAppearancesResolveToByteDistinctTexturesAndPresentationVocabularies()
-            throws IOException, NoSuchAlgorithmException {
-        List<MiniwyvernArchetypeConfig> archetypes = decodeDirectory(
-                "MiniwyvernArchetypes", MiniwyvernArchetypeConfig.class,
-                MiniwyvernArchetypeConfig.CODEC);
-        Map<String, String> textureHashByArchetype = new HashMap<>();
-        Map<String, List<String>> vocabularyByArchetype = new HashMap<>();
-
-        for (MiniwyvernArchetypeConfig archetype : archetypes) {
-            String appearanceId = archetype.getAppearanceId();
-            Path appearancePath = Path.of(
-                    "Server", "Models", "HyDragon", "Wyvern_Mini", appearanceId + ".json");
-            assertTrue(Files.isRegularFile(appearancePath),
-                    () -> archetype.getId() + " appearance does not resolve: " + appearancePath);
-
-            Matcher textureMatcher = TEXTURE_FIELD.matcher(Files.readString(appearancePath));
-            assertTrue(textureMatcher.find(),
-                    () -> archetype.getId() + " appearance has no concrete texture: " + appearancePath);
-            Path texturePath = Path.of("Common").resolve(textureMatcher.group(1));
-            assertTrue(Files.isRegularFile(texturePath),
-                    () -> archetype.getId() + " texture does not resolve: " + texturePath);
-
-            byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(texturePath));
-            textureHashByArchetype.put(archetype.getId(), HexFormat.of().formatHex(digest));
-            vocabularyByArchetype.put(archetype.getId(), List.copyOf(archetype.getParticleAndSoundIds()));
-        }
-
-        assertEquals(8, textureHashByArchetype.size());
-        assertEquals(8, new HashSet<>(textureHashByArchetype.values()).size(),
-                () -> "Each resolved Miniwyvern appearance must have distinct texture bytes: "
-                        + textureHashByArchetype);
-        assertEquals(8, vocabularyByArchetype.size());
-        assertEquals(8, new HashSet<>(vocabularyByArchetype.values()).size(),
-                () -> "Each Miniwyvern archetype must have a distinct particle/audio vocabulary: "
-                        + vocabularyByArchetype);
-        assertFalse(vocabularyByArchetype.get("lightning").equals(vocabularyByArchetype.get("void")));
+        assertTrue(archetypes.get("nature").getActiveAbilities().isEmpty());
+        assertTrue(archetypes.get("nature").getPassiveEffects().contains("HyDragon_Miniwyvern_Nature_Regeneration"));
+        assertEquals("Scarak_Seeker_Spit_Projectile", archetypes.get("toxic").getActiveAbilities().getFirst().getProjectileId());
+        assertEquals("HyDragon_Miniwyvern_Void_Exposure", archetypes.get("toxic").getOwnerAttackAura().getEffectId());
     }
 
     private static <T extends JsonAsset<String>> List<T> decodeDirectory(

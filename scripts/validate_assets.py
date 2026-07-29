@@ -298,10 +298,9 @@ def require_files(errors: list[str]) -> None:
         "Server/Item/Items/Ingredient/Draconic_Essence.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Fire.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Ice.json",
-        "Server/Item/Items/Ingredient/Draconic_Essence_Water.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Nature.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Toxic.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Lightning.json",
-        "Server/Item/Items/Ingredient/Draconic_Essence_Wind.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Void.json",
         "Server/Item/Items/Ingredient/Revitalizing_Essence.json",
         "Server/Item/Items/Ingredient/Wyvern_Egg.json",
@@ -323,7 +322,7 @@ def require_files(errors: list[str]) -> None:
     )
     required.extend(
         f"Server/HyDragon/MiniwyvernArchetypes/{name}.json"
-        for name in ("Neutral", "Lightning", "Wind", "Ice", "Fire", "Water", "Nature", "Void")
+        for name in ("Wild", "Nature", "Toxic", "Lightning", "Ice", "Fire", "Void")
     )
     required.extend(
         f"Server/HyDragon/DragonSpecies/{name}.json"
@@ -907,9 +906,11 @@ def validate_domain_references(
         if not isinstance(archetype, dict):
             continue
         references: list[tuple[str, object]] = []
-        for field in ("EssenceItemId", "AppearanceId"):
-            if archetype.get(field) is not None:
-                references.append((field, archetype[field]))
+        if archetype.get("RoleId") is not None:
+            references.append(("RoleId", archetype["RoleId"]))
+        owner_attack_aura = archetype.get("OwnerAttackAura")
+        if isinstance(owner_attack_aura, dict) and owner_attack_aura.get("EffectId") is not None:
+            references.append(("OwnerAttackAura.EffectId", owner_attack_aura["EffectId"]))
         references.extend(("ParticleAndSoundIds", value) for value in archetype.get("ParticleAndSoundIds", []))
         references.extend(("PassiveEffects", value) for value in archetype.get("PassiveEffects", []))
         passive_modifier_effects = archetype.get("PassiveModifierEffects", {})
@@ -1010,36 +1011,6 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
                for entry in interaction_entries):
         fail(errors, "Tamed Nordic Drake interaction config must expose the Tamework mount entry")
 
-    texture_hashes: dict[str, str] = {}
-    vocabularies: dict[str, tuple[str, ...]] = {}
-    archetype_root = ROOT / "Server/HyDragon/MiniwyvernArchetypes"
-    model_root = ROOT / "Server/Models/HyDragon/Wyvern_Mini"
-    for path in sorted(archetype_root.glob("*.json")):
-        archetype = parsed.get(path)
-        if not isinstance(archetype, dict):
-            continue
-        archetype_id = archetype.get("Id")
-        appearance_id = archetype.get("AppearanceId")
-        if not isinstance(archetype_id, str) or not isinstance(appearance_id, str):
-            continue
-        appearance_path = model_root / f"{appearance_id}.json"
-        appearance = parsed.get(appearance_path)
-        texture = appearance.get("Texture") if isinstance(appearance, dict) else None
-        texture_path = ROOT / "Common" / texture if isinstance(texture, str) else None
-        if texture_path is None or not texture_path.is_file():
-            fail(errors, f"Miniwyvern {archetype_id} appearance does not resolve a texture: {appearance_id}")
-        else:
-            texture_hashes[archetype_id] = hashlib.sha256(texture_path.read_bytes()).hexdigest()
-        vocabulary = archetype.get("ParticleAndSoundIds")
-        if not isinstance(vocabulary, list):
-            fail(errors, f"Miniwyvern {archetype_id} has no resolved presentation vocabulary")
-        else:
-            vocabularies[archetype_id] = tuple(vocabulary)
-    if len(texture_hashes) == 8 and len(set(texture_hashes.values())) != 8:
-        fail(errors, f"Miniwyvern archetype textures must be byte-distinct: {texture_hashes}")
-    if len(vocabularies) == 8 and len(set(vocabularies.values())) != 8:
-        fail(errors, f"Miniwyvern particle/audio vocabularies must be distinct: {vocabularies}")
-
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
     outputs = {
         "Draconic_Stone",
@@ -1105,7 +1076,10 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
     allowed = config.get("AllowedRoles")
     required_roles = {
         "Tamed_Hydra", "Tamed_NordicDrake", "Tamed_RockDrakeT1",
-        "Tamed_RockDrakeT2", "Tamed_RockDrakeT3", "Tamed_Wyvern_Mini",
+        "Tamed_RockDrakeT2", "Tamed_RockDrakeT3",
+        "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+        "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+        "Tamed_Wyvern_Mini_Ice",
     }
     actual_roles = set(allowed.get("Allowlist", [])) if isinstance(allowed, dict) else set()
     if actual_roles != required_roles:

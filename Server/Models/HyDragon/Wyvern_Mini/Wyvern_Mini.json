@@ -1,6 +1,6 @@
 {
   "Model": "NPC/HyDragon/Wyvern_Mini/Model/Wyvern_Mini.blockymodel",
-  "Texture": "NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Neutral.png",
+  "Texture": "NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Wild.png",
   "EyeHeight": 1.6,
   "HitBox": {
     "Max": {

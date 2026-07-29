@@ -158,7 +158,7 @@ public final class HyDragonConfigRepository {
         }
 
         Set<String> expectedArchetypes = Set.of(
-                "neutral", "lightning", "wind", "ice", "fire", "water", "nature", "void");
+                "wild", "nature", "toxic", "fire", "void", "lightning", "ice");
         Set<String> missingArchetypes = new TreeSet<>(expectedArchetypes);
         missingArchetypes.removeAll(archetypesById.keySet());
         if (!archetypesById.isEmpty() && !missingArchetypes.isEmpty()) {

@@ -1,8 +1,6 @@
 {
   "Id": "ice",
-  "EssenceSemanticId": "ice",
-  "EssenceItemId": "Draconic_Essence_Ice",
-  "AppearanceId": "Wyvern_Mini_Ice",
+  "RoleId": "Tamed_Wyvern_Mini_Ice",
   "ParticleAndSoundIds": [ "Hydra_Rain_Impact_Ice", "SFX_Staff_Ice_Shoot" ],
   "PassiveEffects": [],
   "ActiveAbilities": [

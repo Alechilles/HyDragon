@@ -1,8 +1,6 @@
 {
   "Id": "void",
-  "EssenceSemanticId": "void",
-  "EssenceItemId": "Draconic_Essence_Void",
-  "AppearanceId": "Wyvern_Mini_Void",
+  "RoleId": "Tamed_Wyvern_Mini_Void",
   "ParticleAndSoundIds": [ "Void_Lightning", "SFX_Eye_Void_Attack_Blast" ],
   "PassiveEffects": [],
   "ActiveAbilities": [
