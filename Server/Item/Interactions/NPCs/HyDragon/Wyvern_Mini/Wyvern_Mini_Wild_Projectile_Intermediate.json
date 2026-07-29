@@ -1,0 +1,6 @@
+{
+  "$Comment": "Raw Wild intermediate projectile: damage/range/cadence only.",
+  "Type": "LaunchProjectile",
+  "RunTime": 0.2,
+  "ProjectileId": "HyDragon_Miniwyvern_Wild_Projectile_Intermediate"
+}

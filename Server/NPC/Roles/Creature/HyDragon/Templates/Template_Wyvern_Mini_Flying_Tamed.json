@@ -75,6 +75,18 @@
       "Value": 2.75,
       "Description": "Distance at which the Miniwyvern can execute its bite."
     },
+    "TalentProjectileBase": {
+      "Value": "",
+      "Description": "Combat talent base root interaction; selected by TameworkHasTalent."
+    },
+    "TalentProjectileIntermediate": {
+      "Value": "",
+      "Description": "Combat talent upgraded root interaction; selected by TameworkHasTalent."
+    },
+    "TalentProjectileApex": {
+      "Value": "",
+      "Description": "Combat talent capstone root interaction; selected by TameworkHasTalent."
+    },
     "AttackPauseRange": {
       "Value": [
         1.25,
@@ -720,6 +732,40 @@
           ]
         }
       ]
+    },
+    {
+      "$Comment": "Profile-backed native And/Not/Target plus source-backed self TameworkHasTalent select one combat projectile tier.",
+      "Continue": true,
+      "Sensor": { "Type": "And", "Sensors": [
+        { "Type": "State", "State": "Defend" },
+        { "Type": "Target", "TargetSlot": "LockedTarget" },
+        { "Type": "TameworkHasTalent", "TalentId": "DraconicProjectile" },
+        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } },
+        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } }
+      ] },
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileBase" }, "AttackPauseRange": [ 2.5, 2.5 ] } ]
+    },
+    {
+      "Continue": true,
+      "Sensor": { "Type": "And", "Sensors": [
+        { "Type": "State", "State": "Defend" },
+        { "Type": "Target", "TargetSlot": "LockedTarget" },
+        { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" },
+        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } }
+      ] },
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AttackPauseRange": [ 1.5, 1.5 ] } ]
+    },
+    {
+      "Continue": true,
+      "Sensor": { "Type": "And", "Sensors": [
+        { "Type": "State", "State": "Defend" },
+        { "Type": "Target", "TargetSlot": "LockedTarget" },
+        { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" }
+      ] },
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AttackPauseRange": [ 0.75, 0.75 ] } ]
     }
   ],
   "InteractionInstruction": {

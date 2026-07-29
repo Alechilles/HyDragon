@@ -1,0 +1,6 @@
+{
+  "$Comment": "Raw Wild apex projectile: damage/range/cadence only.",
+  "Type": "LaunchProjectile",
+  "RunTime": 0.15,
+  "ProjectileId": "HyDragon_Miniwyvern_Wild_Projectile_Apex"
+}
