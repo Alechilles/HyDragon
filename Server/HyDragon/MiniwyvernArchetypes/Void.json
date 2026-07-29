@@ -19,5 +19,6 @@
       "StackingPolicy": "SOURCE_REFRESH"
     }
   ],
+  "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Void_Exposure", "DurationSeconds": 6.0 },
   "FallbackBehavior": "BASIC_BITE"
 }

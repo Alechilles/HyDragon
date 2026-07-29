@@ -133,8 +133,19 @@ class BundledConfigAssetContractTest {
         }
         assertTrue(archetypes.get("nature").getActiveAbilities().isEmpty());
         assertTrue(archetypes.get("nature").getPassiveEffects().contains("HyDragon_Miniwyvern_Nature_Regeneration"));
-        assertEquals("Scarak_Seeker_Spit_Projectile", archetypes.get("toxic").getActiveAbilities().getFirst().getProjectileId());
-        assertEquals("HyDragon_Miniwyvern_Void_Exposure", archetypes.get("toxic").getOwnerAttackAura().getEffectId());
+        assertEquals("Scarak_Seeker_Spitball", archetypes.get("toxic").getActiveAbilities().getFirst().getProjectileId());
+        assertOwnerAttackAura(archetypes, "toxic", "HyDragon_Miniwyvern_Toxic_Weakness", 6.0);
+        assertEquals(0.12, archetypes.get("toxic").getOwnerAttackAura().getDamageReductionFraction());
+        assertOwnerAttackAura(archetypes, "fire", "HyDragon_Miniwyvern_Fire_Burn", 4.0);
+        assertOwnerAttackAura(archetypes, "ice", "HyDragon_Miniwyvern_Ice_Slow", 4.0);
+        assertOwnerAttackAura(archetypes, "void", "HyDragon_Miniwyvern_Void_Exposure", 6.0);
+    }
+
+    private static void assertOwnerAttackAura(Map<String, MiniwyvernArchetypeConfig> archetypes,
+            String form, String effectId, double durationSeconds) {
+        MiniwyvernArchetypeConfig.OwnerAttackAura aura = archetypes.get(form).getOwnerAttackAura();
+        assertEquals(effectId, aura.getEffectId(), form);
+        assertEquals(durationSeconds, aura.getDurationSeconds(), form);
     }
 
     private static <T extends JsonAsset<String>> List<T> decodeDirectory(

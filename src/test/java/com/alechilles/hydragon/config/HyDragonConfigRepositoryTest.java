@@ -172,7 +172,7 @@ class HyDragonConfigRepositoryTest {
                 archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{ability};
             } else if (id.equals("toxic")) {
                 MiniwyvernArchetypeConfig.Ability ability = validAbility("toxic_spit");
-                ability.projectileId = "Scarak_Seeker_Spit_Projectile";
+                ability.projectileId = "Scarak_Seeker_Spitball";
                 archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{ability};
             } else if (id.equals("fire")) {
                 archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{validAbility("fireball")};

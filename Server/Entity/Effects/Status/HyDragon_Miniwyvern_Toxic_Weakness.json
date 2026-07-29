@@ -1,0 +1,9 @@
+{
+  "Name": "server.effects.miniwyvernToxicWeakness.name",
+  "DamageCalculatorMultiplier": -0.12,
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 6.0
+}

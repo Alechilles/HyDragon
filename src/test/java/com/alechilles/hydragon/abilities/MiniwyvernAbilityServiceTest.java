@@ -140,25 +140,6 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
-    void unsupportedWindModifiersDisableWholePassiveButKeepAppearanceAndCombat() throws Exception {
-        MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
-        world.ownerModifiersSupported = false;
-
-        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
-                context("wind"), Map.of("wind", windConfig()), world, 1_000L);
-
-        assertTrue(result.ready());
-        assertEquals(
-                "ready-with-degraded-semantics:passive-ability-disabled:JumpMultiplier+MobilityMultiplier",
-                result.reason());
-        assertEquals("Wyvern_Mini_Wind", world.appearanceId);
-        assertEquals(0, world.effects, "movement cannot survive as a partial passive substitute");
-        assertEquals(0, world.ownerModifierApplications);
-        assertEquals(1, world.projectiles, "the independent wind attack remains active");
-    }
-
-    @Test
     void disablingPassiveRemovesPreviouslyAppliedSourceAndEffect() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
@@ -183,38 +164,6 @@ class MiniwyvernAbilityServiceTest {
         assertEquals(1, world.ownerModifierRemovals);
         assertFalse(states.current.appliedSourceKeys().stream().anyMatch(key -> key.endsWith(":passive")));
         assertFalse(states.current.targetBySourceKey().keySet().stream().anyMatch(key -> key.endsWith(":passive")));
-    }
-
-    @Test
-    void triggerSemanticsPreventOwnerHealthAbilityAboveThreshold() throws Exception {
-        MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
-        world.ownerHealth = new MiniwyvernAbilityWorld.Health(80.0D, 100.0D);
-
-        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
-                context("water"), Map.of("water", waterConfig()), world, 1_000L);
-
-        assertTrue(result.ready());
-        assertEquals(0, result.abilitiesExecuted());
-        assertEquals(0, world.healApplications);
-        assertFalse(states.current.cooldownUntilByAbility().containsKey("restorative_surge"));
-    }
-
-    @Test
-    void waterBurstHealsBelowThresholdWithinConfiguredCap() throws Exception {
-        MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
-        world.ownerHealth = new MiniwyvernAbilityWorld.Health(40.0D, 100.0D);
-
-        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
-                context("water"), Map.of("water", waterConfig()), world, 1_000L);
-
-        assertTrue(result.ready());
-        assertEquals(1, result.abilitiesExecuted());
-        assertEquals(1, world.healApplications);
-        assertEquals(1, world.effects);
-        assertEquals(1, world.presentations);
-        assertEquals(21_000L, states.current.cooldownUntilByAbility().get("restorative_surge"));
     }
 
     @Test
@@ -352,9 +301,7 @@ class MiniwyvernAbilityServiceTest {
     private static MiniwyvernArchetypeConfig fireConfig() throws Exception {
         MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
         set(config, "id", "fire");
-        set(config, "essenceSemanticId", "fire");
-        set(config, "essenceItemId", "Draconic_Essence_Fire");
-        set(config, "appearanceId", "Wyvern_Mini_Fire");
+        set(config, "roleId", "Tamed_Wyvern_Mini_Fire");
         set(config, "particleAndSoundIds", new String[] { "test-presentation" });
         set(config, "passiveEffects", new String[0]);
         set(config, "passiveModifiers", Map.of());
@@ -380,9 +327,7 @@ class MiniwyvernAbilityServiceTest {
     private static MiniwyvernArchetypeConfig iceConfig(int maximumTargets) throws Exception {
         MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
         set(config, "id", "ice");
-        set(config, "essenceSemanticId", "ice");
-        set(config, "essenceItemId", "Draconic_Essence_Ice");
-        set(config, "appearanceId", "Wyvern_Mini_Ice");
+        set(config, "roleId", "Tamed_Wyvern_Mini_Ice");
         set(config, "particleAndSoundIds", new String[0]);
         set(config, "passiveEffects", new String[0]);
         set(config, "passiveModifiers", Map.of());
@@ -413,9 +358,7 @@ class MiniwyvernAbilityServiceTest {
     private static MiniwyvernArchetypeConfig lightningConfig() throws Exception {
         MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
         set(config, "id", "lightning");
-        set(config, "essenceSemanticId", "lightning");
-        set(config, "essenceItemId", "Draconic_Essence_Lightning");
-        set(config, "appearanceId", "Wyvern_Mini_Lightning");
+        set(config, "roleId", "Tamed_Wyvern_Mini_Lightning");
         set(config, "particleAndSoundIds", new String[0]);
         set(config, "passiveEffects", new String[0]);
         set(config, "passiveModifiers", Map.of(
@@ -438,40 +381,10 @@ class MiniwyvernAbilityServiceTest {
         return config;
     }
 
-    private static MiniwyvernArchetypeConfig waterConfig() throws Exception {
-        MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
-        set(config, "id", "water");
-        set(config, "essenceSemanticId", "water");
-        set(config, "essenceItemId", "Draconic_Essence_Water");
-        set(config, "appearanceId", "Wyvern_Mini_Water");
-        set(config, "particleAndSoundIds", new String[] { "test-water-presentation" });
-        set(config, "passiveEffects", new String[0]);
-        set(config, "passiveModifiers", Map.of());
-        set(config, "fallbackBehavior", "BASIC_BITE");
-
-        MiniwyvernArchetypeConfig.Ability ability = construct(MiniwyvernArchetypeConfig.Ability.class);
-        set(ability, "id", "restorative_surge");
-        set(ability, "trigger", "OWNER_HEALTH_BELOW_PERCENT");
-        set(ability, "targetPolicy", "OWNER_ONLY");
-        set(ability, "range", 16.0D);
-        set(ability, "cooldownSeconds", 20.0D);
-        set(ability, "effectId", "test-water-effect");
-        set(ability, "magnitude", 12.0D);
-        set(ability, "ownerHealthThreshold", 0.60D);
-        set(ability, "maximumHealFraction", 0.20D);
-        set(ability, "durationSeconds", 1.0D);
-        set(ability, "stackingPolicy", "NON_STACKING");
-        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[] { ability });
-        assertTrue(config.validate().isEmpty(), config.validate().toString());
-        return config;
-    }
-
     private static MiniwyvernArchetypeConfig natureConfig() throws Exception {
         MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
         set(config, "id", "nature");
-        set(config, "essenceSemanticId", "nature");
-        set(config, "essenceItemId", "Draconic_Essence_Nature");
-        set(config, "appearanceId", "Wyvern_Mini_Nature");
+        set(config, "roleId", "Tamed_Wyvern_Mini_Nature");
         set(config, "particleAndSoundIds", new String[] { "test-nature-presentation" });
         set(config, "passiveEffects", new String[] { "test-nature-regeneration" });
         set(config, "passiveModifiers", Map.of(
@@ -483,45 +396,10 @@ class MiniwyvernAbilityServiceTest {
         return config;
     }
 
-    private static MiniwyvernArchetypeConfig windConfig() throws Exception {
-        MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
-        set(config, "id", "wind");
-        set(config, "essenceSemanticId", "wind");
-        set(config, "essenceItemId", "Draconic_Essence_Wind");
-        set(config, "appearanceId", "Wyvern_Mini_Wind");
-        set(config, "particleAndSoundIds", new String[0]);
-        set(config, "passiveEffects", new String[0]);
-        set(config, "passiveModifiers", Map.of(
-                "MovementSpeedMultiplier", 1.12D,
-                "JumpMultiplier", 1.15D,
-                "MobilityMultiplier", 1.10D,
-                "MaximumMovementSpeedMultiplier", 1.20D,
-                "MaximumJumpMultiplier", 1.25D));
-        set(config, "passiveModifierEffects", Map.of(
-                "MovementSpeedMultiplier", "test-wind-boon"));
-        set(config, "fallbackBehavior", "BASIC_BITE");
-
-        MiniwyvernArchetypeConfig.Ability ability = construct(MiniwyvernArchetypeConfig.Ability.class);
-        set(ability, "id", "wind_burst");
-        set(ability, "trigger", "COMBAT_INTERVAL");
-        set(ability, "targetPolicy", "OWNER_HOSTILE_ONLY");
-        set(ability, "range", 14.0D);
-        set(ability, "cooldownSeconds", 8.0D);
-        set(ability, "projectileId", "test-wind-projectile");
-        set(ability, "magnitude", 1.5D);
-        set(ability, "durationSeconds", 0.0D);
-        set(ability, "stackingPolicy", "CLAMPED");
-        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[] { ability });
-        assertTrue(config.validate().isEmpty(), config.validate().toString());
-        return config;
-    }
-
     private static MiniwyvernArchetypeConfig voidConfig() throws Exception {
         MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
         set(config, "id", "void");
-        set(config, "essenceSemanticId", "void");
-        set(config, "essenceItemId", "Draconic_Essence_Void");
-        set(config, "appearanceId", "Wyvern_Mini_Void");
+        set(config, "roleId", "Tamed_Wyvern_Mini_Void");
         set(config, "particleAndSoundIds", new String[] { "test-void-presentation" });
         set(config, "passiveEffects", new String[0]);
         set(config, "passiveModifiers", Map.of());

@@ -123,6 +123,8 @@ public final class MiniwyvernArchetypeConfig
             .<String>append(new KeyedCodec<>("EffectId", Codec.STRING), (aura, value) -> aura.effectId = value, aura -> aura.effectId).add()
             .<Double>append(new KeyedCodec<>("DurationSeconds", Codec.DOUBLE),
                     (aura, value) -> aura.durationSeconds = value == null ? 0.0 : value, aura -> aura.durationSeconds).add()
+            .<Double>append(new KeyedCodec<>("DamageReductionFraction", Codec.DOUBLE),
+                    (aura, value) -> aura.damageReductionFraction = value, aura -> aura.damageReductionFraction).add()
             .build();
 
     private static final ArrayCodec<Ability> ABILITY_ARRAY_CODEC =
@@ -362,14 +364,20 @@ public final class MiniwyvernArchetypeConfig
     public static final class OwnerAttackAura {
         String effectId;
         double durationSeconds;
+        Double damageReductionFraction;
         private List<String> validate() {
             List<String> errors = new ArrayList<>();
             if (blank(effectId)) errors.add("OwnerAttackAura.EffectId is required");
             if (!Double.isFinite(durationSeconds) || durationSeconds <= 0.0) errors.add("OwnerAttackAura.DurationSeconds must be positive");
+            if (damageReductionFraction != null && (!Double.isFinite(damageReductionFraction)
+                    || damageReductionFraction <= 0.0 || damageReductionFraction >= 1.0)) {
+                errors.add("OwnerAttackAura.DamageReductionFraction must be in (0, 1)");
+            }
             return errors;
         }
         @Nullable public String getEffectId() { return blank(effectId) ? null : effectId.trim(); }
         public double getDurationSeconds() { return durationSeconds; }
+        @Nullable public Double getDamageReductionFraction() { return damageReductionFraction; }
     }
 
     private List<String> validatePassiveModifiers(String archetypeId) {

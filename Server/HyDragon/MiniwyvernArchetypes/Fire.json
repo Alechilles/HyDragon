@@ -18,5 +18,6 @@
       "StackingPolicy": "SOURCE_REFRESH"
     }
   ],
+  "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Fire_Burn", "DurationSeconds": 4.0 },
   "FallbackBehavior": "BASIC_BITE"
 }

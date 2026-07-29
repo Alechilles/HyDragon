@@ -857,7 +857,7 @@ def validate_static_spawn_contracts(
 
 
 def validate_domain_references(
-    parsed: dict[Path, object], known_assets: set[str], errors: list[str]
+    parsed: dict[Path, object], known_assets: set[str], projectile_ids: set[str], errors: list[str]
 ) -> None:
     """Resolve release-critical species, encounter, and archetype references to local/base assets."""
     species_root = ROOT / "Server/HyDragon/DragonSpecies"
@@ -922,6 +922,9 @@ def validate_domain_references(
             for field in ("EffectId", "ProjectileId", "ControlEffectId"):
                 if ability.get(field) is not None:
                     references.append((f"ActiveAbilities.{field}", ability[field]))
+            projectile_id = ability.get("ProjectileId")
+            if projectile_id is not None and (not isinstance(projectile_id, str) or projectile_id not in projectile_ids):
+                fail(errors, f"{path.relative_to(ROOT)} ActiveAbilities.ProjectileId is not a typed projectile asset: {projectile_id}")
         for field, reference in references:
             if not isinstance(reference, str) or reference not in known_assets:
                 fail(errors, f"{path.relative_to(ROOT)} unresolved {field} reference: {reference}")
@@ -1179,7 +1182,11 @@ def main() -> int:
     validate_miniwyvern_role_wiring(parsed, errors)
     validate_spawn_patch_role_identity(parsed, errors)
     validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
-    validate_domain_references(parsed, known_assets, errors)
+    projectile_ids = {
+        path.stem for root in (ROOT, base_root) if root is not None
+        for path in root.rglob("*") if path.is_file() and any("Projectile" in part for part in path.parts)
+    }
+    validate_domain_references(parsed, known_assets, projectile_ids, errors)
     validate_release_content_contracts(parsed, errors)
     validate_altar_recipes(parsed, errors)
     validate_command_item(parsed, errors)
