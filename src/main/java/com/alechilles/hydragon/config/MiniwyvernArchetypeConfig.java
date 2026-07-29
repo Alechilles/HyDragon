@@ -384,7 +384,6 @@ public final class MiniwyvernArchetypeConfig
         List<String> errors = new ArrayList<>();
         if ("lightning".equals(archetypeId)) {
             requireMultiplier(errors, "MovementSpeedMultiplier");
-            requireMultiplier(errors, "ActionSpeedMultiplier");
         } else if ("nature".equals(archetypeId)) {
             Double tick = passiveModifiers.get("RegenerationTickSeconds");
             if (!positive(tick)) errors.add("Nature PassiveModifiers.RegenerationTickSeconds must be positive");

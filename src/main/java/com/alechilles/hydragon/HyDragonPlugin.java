@@ -4,6 +4,8 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.abilities.HyDragonAbilityRegistrationFacade;
 import com.alechilles.hydragon.abilities.HytaleMiniwyvernAbilityWorldDispatcher;
 import com.alechilles.hydragon.abilities.MiniwyvernAbilityRuntime;
+import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraDamageSystem;
+import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraRegistry;
 import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
 import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
@@ -55,6 +57,7 @@ public final class HyDragonPlugin extends JavaPlugin {
     private HyDragonGameplayRuntime gameplayRuntime;
     private DynamicEncounterRuntime encounterRuntime;
     private MiniwyvernAbilityRuntime abilityRuntime;
+    private final MiniwyvernOwnerAuraRegistry miniwyvernOwnerAuras = new MiniwyvernOwnerAuraRegistry();
     private ConsumableSagaRecoveryRuntime sagaRecoveryRuntime;
     private ConsumableRefundClaimService refundClaims;
     private HyDragonRuntimeComposition runtimeComposition;
@@ -69,6 +72,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         registerInteractionCodecs();
         // The persistent encounter marker and damage system must exist before any world loads.
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
+        getEntityStoreRegistry().registerSystem(new MiniwyvernOwnerAuraDamageSystem(miniwyvernOwnerAuras));
         tameworkBridge = TameworkBridge.connect();
         registerConfigAssets();
         getCommandRegistry().registerCommand(new HyDragonStatusCommand(
@@ -196,6 +200,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         gameplayRuntime = null;
         encounterRuntime = null;
         abilityRuntime = null;
+        miniwyvernOwnerAuras.clear();
         sagaRecoveryRuntime = null;
         refundClaims = null;
     }
@@ -248,7 +253,7 @@ public final class HyDragonPlugin extends JavaPlugin {
                         api, store, configRepository::snapshot,
                         () -> bridge.snapshot().feature(
                                 HyDragonFeature.MINIWYVERN_ABILITIES),
-                        new HytaleMiniwyvernAbilityWorldDispatcher(api)));
+                        new HytaleMiniwyvernAbilityWorldDispatcher(api), miniwyvernOwnerAuras));
     }
 
     private void installEncounters(

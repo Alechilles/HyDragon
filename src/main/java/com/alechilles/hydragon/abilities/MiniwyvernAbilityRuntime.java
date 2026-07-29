@@ -345,6 +345,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         generations.clear();
         tickCursor = null;
         reportedDegradations.clear();
+        service.clearOwnerAuras();
     }
 
     private static int insertionPointAfter(List<String> values, String cursor) {

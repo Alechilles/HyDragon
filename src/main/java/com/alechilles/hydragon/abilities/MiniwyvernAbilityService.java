@@ -22,9 +22,16 @@ public final class MiniwyvernAbilityService {
     private static final String SOURCE_PREFIX = "hydragon:mini:";
     private static final long ICE_TARGET_RETENTION_MS = 60_000L;
     private final MiniwyvernAbilityStateRepository states;
+    private final MiniwyvernOwnerAuraRegistry ownerAuras;
 
     public MiniwyvernAbilityService(MiniwyvernAbilityStateRepository states) {
+        this(states, new MiniwyvernOwnerAuraRegistry());
+    }
+
+    public MiniwyvernAbilityService(
+            MiniwyvernAbilityStateRepository states, MiniwyvernOwnerAuraRegistry ownerAuras) {
         this.states = Objects.requireNonNull(states, "states");
+        this.ownerAuras = Objects.requireNonNull(ownerAuras, "ownerAuras");
     }
 
     public TickResult tick(
@@ -60,6 +67,7 @@ public final class MiniwyvernAbilityService {
             return cleanupAndDeny(context, archetypes, world, "role-config-invalid", nowMs);
         }
         String formId = config.getId();
+        synchronizeOwnerAttackAura(context, config);
 
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
@@ -133,6 +141,7 @@ public final class MiniwyvernAbilityService {
         Objects.requireNonNull(archetypes, "archetypes");
         Objects.requireNonNull(world, "world");
         if (!world.isWorldThread()) return TickResult.denied("not-world-thread");
+        ownerAuras.clear(context.ownerUuid(), context.profileId());
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
         if (loaded.status() == MiniwyvernAbilityStateRepository.Status.UNAVAILABLE) {
@@ -483,6 +492,19 @@ public final class MiniwyvernAbilityService {
                 .filter(config -> roleId.equals(config.getRoleId()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /** Clears ephemeral owner-hit state even when the world projection is already gone. */
+    public void clearOwnerAuras() { ownerAuras.clear(); }
+
+    private void synchronizeOwnerAttackAura(ProfileContext context, MiniwyvernArchetypeConfig config) {
+        MiniwyvernArchetypeConfig.OwnerAttackAura aura = config.getOwnerAttackAura();
+        if (aura == null || aura.getEffectId() == null || !ownerAuras.update(
+                context.ownerUuid(), context.profileId(), context.profileId(), context.npcUuid(),
+                config.getId(), aura.getEffectId(), aura.getDurationSeconds(),
+                aura.getDamageReductionFraction())) {
+            ownerAuras.clear(context.ownerUuid(), context.profileId());
+        }
     }
 
     private static String sourceKey(String profileId, String formId, String abilityId) {

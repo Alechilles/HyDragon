@@ -21,13 +21,14 @@ public final class HyDragonAbilityRegistrationFacade {
             HyDragonStateStore stateStore,
             Supplier<HyDragonConfigRepository.Snapshot> configs,
             Supplier<FeatureGate> featureGate,
-            MiniwyvernAbilityWorldDispatcher worlds) {
+            MiniwyvernAbilityWorldDispatcher worlds,
+            MiniwyvernOwnerAuraRegistry ownerAuras) {
         Objects.requireNonNull(api, "api");
         MiniwyvernAbilityService service = new MiniwyvernAbilityService(
                 new TameworkMiniwyvernAbilityStateRepository(
                         new BondedMiniwyvernExtensionStore(
                                 new TameworkGameplayAdapter(api),
-                                new BondedMiniwyvernExtensionCodec())));
+                                new BondedMiniwyvernExtensionCodec())), ownerAuras);
         MiniwyvernAbilityRuntime runtime = new MiniwyvernAbilityRuntime(
                 api, stateStore, configs, featureGate, worlds, service, Clock.systemUTC());
         try {
