@@ -1014,6 +1014,51 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
                for entry in interaction_entries):
         fail(errors, "Tamed Nordic Drake interaction config must expose the Tamework mount entry")
 
+
+def validate_nordic_landing_recovery(parsed: dict[Path, object], errors: list[str]) -> None:
+    """Ensure a failed Nordic Drake touchdown returns to a fresh landing approach."""
+    template_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon.json"
+    template = parsed.get(template_path)
+    if not isinstance(template, dict):
+        fail(errors, "Nordic Drake landing template is unavailable")
+        return
+
+    def contains_recovery(instructions: object) -> bool:
+        if isinstance(instructions, dict):
+            actions = instructions.get("Actions")
+            if isinstance(actions, list):
+                action_types = {action.get("Type") for action in actions if isinstance(action, dict)}
+                if {"Timeout", "ResetSearchRays", "State"} <= action_types and any(
+                        isinstance(action, dict) and action.get("Type") == "State"
+                        and action.get("State") == ".AirLand"
+                        for action in actions):
+                    return True
+            return any(contains_recovery(child) for child in instructions.values())
+        if isinstance(instructions, list):
+            return any(contains_recovery(instruction) for instruction in instructions)
+        return False
+
+    def find_touchdown_instructions(value: object) -> object | None:
+        if isinstance(value, dict):
+            sensor = value.get("Sensor")
+            if isinstance(sensor, dict) and sensor.get("Type") == "State" \
+                    and sensor.get("State") == ".AirTouchdown":
+                return value.get("Instructions")
+            for child in value.values():
+                result = find_touchdown_instructions(child)
+                if result is not None:
+                    return result
+        elif isinstance(value, list):
+            for child in value:
+                result = find_touchdown_instructions(child)
+                if result is not None:
+                    return result
+        return None
+
+    touchdown_instructions = find_touchdown_instructions(template)
+    if not contains_recovery(touchdown_instructions):
+        fail(errors, "Nordic Drake touchdown must retry a fresh landing approach after a bounded failed landing")
+
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
     outputs = {
         "Draconic_Stone",
@@ -1188,6 +1233,7 @@ def main() -> int:
     }
     validate_domain_references(parsed, known_assets, projectile_ids, errors)
     validate_release_content_contracts(parsed, errors)
+    validate_nordic_landing_recovery(parsed, errors)
     validate_altar_recipes(parsed, errors)
     validate_command_item(parsed, errors)
     validate_revival_configs(parsed, errors)
