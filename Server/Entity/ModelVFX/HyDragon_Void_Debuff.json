@@ -1,7 +1,7 @@
 {
-  "SwitchTo": "Distortion",
-  "EffectDirection": "None",
-  "AnimationDuration": 3.0,
+  "SwitchTo": "PostColor",
+  "EffectDirection": "BottomUp",
+  "AnimationDuration": 0.8,
   "AnimationRange": {
     "Y": 0.2,
     "X": 0.1
@@ -10,6 +10,8 @@
   "UseProgessiveHighlight": false,
   "HighlightColor": "#6c31a8",
   "HighlightThickness": 2,
+  "PostColor": "#6D28D9",
+  "PostColorOpacity": 0.65,
   "CurveType": "Linear",
   "LoopOption": "LoopMirror",
   "NoiseScrollSpeed": {

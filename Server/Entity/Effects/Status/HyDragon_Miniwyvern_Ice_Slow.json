@@ -1,10 +1,10 @@
 {
   "Name": "server.effects.miniwyvernIceSlow.name",
   "ApplicationEffects": {
-    "HorizontalSpeedMultiplier": 0.5,
+    "HorizontalSpeedMultiplier": 0.8,
     "Particles": [
       {
-        "SystemId": "HyDragon_Miniwyvern_Ice_ChillGround",
+        "SystemId": "Effect_Snow",
         "TargetEntityPart": "Self",
         "PositionOffset": { "Y": 0.05 },
         "DetachedFromModel": false

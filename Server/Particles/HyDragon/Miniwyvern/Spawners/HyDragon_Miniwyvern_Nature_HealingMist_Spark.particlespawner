@@ -49,7 +49,7 @@
     "Animation": {
       "0": {
         "Color": "#FFF7B2",
-        "Opacity": 0.8,
+        "Opacity": 0.96,
         "Scale": {
           "X": {
             "Min": 0.05,
