@@ -80,7 +80,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void iceAreaAbilityAffectsMultipleTargetsButHonorsConfiguredMaximum() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "ice");
         world.areaTargets = List.of(
                 new MiniwyvernAbilityWorld.Target(ENEMY, null, "world", 3.0D, true),
                 new MiniwyvernAbilityWorld.Target(ENEMY_TWO, null, "world", 4.0D, true),
@@ -102,7 +102,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void unsupportedLightningModifierDisablesWholePassiveButKeepsCombatActive() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "lightning");
         world.ownerModifiersSupported = false;
 
         MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
@@ -120,7 +120,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void unavailableMovementEffectDoesNotDisableLiveRoleCombat() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "lightning");
         world.ownerModifiersSupported = false;
         world.passiveModifierEffectSupported = false;
 
@@ -139,7 +139,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void disablingPassiveRemovesPreviouslyAppliedSourceAndEffect() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "lightning");
         MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
         MiniwyvernArchetypeConfig lightning = lightningConfig();
 
@@ -166,7 +166,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void natureRegenerationHealsAndPresentsOnItsCappedSchedule() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "nature");
         world.ownerHealth = new MiniwyvernAbilityWorld.Health(50.0D, 100.0D);
         MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
 
@@ -185,7 +185,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void iceFourthHitStunsThenImmunitySuppressesTheNextCast() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "ice");
         world.areaTargets = List.of(
                 new MiniwyvernAbilityWorld.Target(ENEMY, null, "world", 3.0D, true));
         MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
@@ -209,7 +209,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void iceAreaTrackingPrunesExpiredSourcesAndStaleTargets() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "ice");
         MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
         MiniwyvernArchetypeConfig config = iceConfig(1);
 
@@ -257,7 +257,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void voidExecutionVerifiesConfiguredDefenseFloorAndReductionCap() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "void");
         world.boundedDefenseSupported = true;
 
         MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
@@ -274,7 +274,7 @@ class MiniwyvernAbilityServiceTest {
     @Test
     void unavailableVoidBoundsSkipOnlyDebuffWhileProjectileRemainsFunctional() throws Exception {
         MemoryRepository states = new MemoryRepository();
-        FakeWorld world = new FakeWorld(states);
+        FakeWorld world = worldFor(states, "void");
 
         MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
                 context("void"), Map.of("void", voidConfig()), world, 1_000L);
@@ -327,6 +327,14 @@ class MiniwyvernAbilityServiceTest {
     private static MiniwyvernAbilityService.ProfileContext context(String ignoredFormId) {
         return new MiniwyvernAbilityService.ProfileContext(
                 "profile-1", OWNER, NPC, true, true, true, true);
+    }
+
+    private static FakeWorld worldFor(MemoryRepository states, String formId) {
+        FakeWorld world = new FakeWorld(states);
+        world.companionRoleId = "Tamed_Wyvern_Mini_"
+                + formId.substring(0, 1).toUpperCase(java.util.Locale.ROOT)
+                + formId.substring(1);
+        return world;
     }
 
     private static MiniwyvernArchetypeConfig fireConfig() throws Exception {
