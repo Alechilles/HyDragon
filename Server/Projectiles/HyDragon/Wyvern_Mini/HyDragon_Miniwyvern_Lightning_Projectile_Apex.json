@@ -1,1 +1,1 @@
-{ "Appearance": "Rubble_Stone", "MuzzleVelocity": 46, "TerminalVelocity": 58, "Gravity": 3, "Damage": 46, "TimeToLive": 10, "DeathEffectsOnHit": true, "ImpactSlowdown": 0 }
+{ "Parent": "Skeleton_Mage_Corruption_Orb", "MuzzleVelocity": 46, "TerminalVelocity": 58, "Gravity": 3, "Damage": 46, "TimeToLive": 10, "DeathEffectsOnHit": true, "ImpactSlowdown": 0 }

@@ -1,6 +1,7 @@
 package com.alechilles.hydragon.config;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonArray;
@@ -12,6 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 /** Contract for the asset-owned Miniwyvern combat execution path. */
@@ -32,10 +36,11 @@ final class MiniwyvernTalentAssetWiringTest {
             String talentId = COMBAT_TALENTS.get(index);
             JsonObject instruction = instructionForTalent(instructions, talentId);
             assertTrue(hasExecutableAction(instruction), talentId + " must select an executable action");
-            if (index + 1 < COMBAT_TALENTS.size()) {
-                assertTrue(hasHigherTierExclusion(instruction, COMBAT_TALENTS.subList(index + 1, COMBAT_TALENTS.size())),
-                        talentId + " must exclude a higher Combat variant");
-            }
+            assertEquals(Set.of(talentId), positiveTalentGates(instruction),
+                    talentId + " must be selected only by its positive talent gate");
+            assertEquals(new HashSet<>(COMBAT_TALENTS.subList(index + 1, COMBAT_TALENTS.size())),
+                    excludedTalents(instruction),
+                    talentId + " must exclude every higher owned combat variant");
         }
     }
 
@@ -49,11 +54,31 @@ final class MiniwyvernTalentAssetWiringTest {
             assertTrue(source.contains("DraconicApex"), form + " must bind the shared Combat capstone");
             assertFalse(source.contains("Miniwyvern_"), form + " must not introduce form-specific talent IDs");
         }
-        for (String tier : List.of("", "_Intermediate", "_Apex")) {
-            String wild = Files.readString(Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon",
-                    "Wyvern_Mini", "Wyvern_Mini_Wild_Projectile" + tier + ".json"));
-            for (String status : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "EffectId")) {
-                assertFalse(wild.contains(status), "Wild projectile must remain raw-only: " + status);
+        JsonObject wildRole = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
+                "Tamed_Wyvern_Mini_Wild.json")).getAsJsonObject("Modify");
+        for (String parameter : List.of("TalentProjectileBase", "TalentProjectileIntermediate", "TalentProjectileApex")) {
+            Path rootPath = rootPath(string(wildRole, parameter));
+            for (JsonElement interaction : load(rootPath).getAsJsonArray("Interactions")) {
+                JsonObject launcher = load(interactionPath(interaction.getAsString()));
+                assertTrue(launcher.has("ProjectileId"), "Wild root interaction must launch a projectile");
+                JsonObject projectile = load(projectilePath(string(launcher, "ProjectileId")));
+                assertRawOnly(projectile, parameter + " projectile");
+            }
+        }
+    }
+
+    @Test
+    void elementalTalentProjectilesRetainTheirThemedBaseAppearance() throws IOException {
+        for (String form : List.of("Lightning", "Toxic", "Void")) {
+            JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
+                    "Tamed_Wyvern_Mini_" + form + ".json")).getAsJsonObject("Modify");
+            String baseProjectileId = projectileIdForRoot(string(role, "TalentProjectileBase"));
+            for (String parameter : List.of("TalentProjectileIntermediate", "TalentProjectileApex")) {
+                JsonObject upgraded = load(projectilePath(projectileIdForRoot(string(role, parameter))));
+                assertFalse("Rubble_Stone".equals(string(upgraded, "Appearance")),
+                        form + " must not replace its themed projectile with generic rubble");
+                assertEquals(baseProjectileId, string(upgraded, "Parent"),
+                        form + " must inherit its base projectile presentation");
             }
         }
     }
@@ -110,20 +135,87 @@ final class MiniwyvernTalentAssetWiringTest {
 
     private static JsonObject instructionForTalent(JsonArray instructions, String talentId) {
         for (JsonElement element : instructions) {
-            if (element.isJsonObject() && hasTalentGate(element, talentId)) return element.getAsJsonObject();
+            if (element.isJsonObject() && positiveTalentGates(element).contains(talentId)) return element.getAsJsonObject();
         }
         throw new AssertionError("missing executable gate for " + talentId);
     }
 
-    private static boolean hasHigherTierExclusion(JsonElement value, List<String> higherTalents) {
+    private static Set<String> positiveTalentGates(JsonElement value) {
+        Set<String> talentIds = new HashSet<>();
+        collectTalentGates(value, false, talentIds);
+        return talentIds;
+    }
+
+    private static Set<String> excludedTalents(JsonElement value) {
+        Set<String> talentIds = new HashSet<>();
+        collectExcludedTalentGates(value, false, talentIds);
+        return talentIds;
+    }
+
+    private static void collectTalentGates(JsonElement value, boolean negated, Set<String> talentIds) {
         if (value.isJsonObject()) {
             JsonObject object = value.getAsJsonObject();
-            if ("Not".equals(string(object, "Type")) && higherTalents.stream().anyMatch(id -> hasTalentGate(object, id))) return true;
-            for (JsonElement child : object.asMap().values()) if (hasHigherTierExclusion(child, higherTalents)) return true;
+            if ("TameworkHasTalent".equals(string(object, "Type"))) {
+                if (!negated) talentIds.add(string(object, "TalentId"));
+                return;
+            }
+            boolean childNegated = negated ^ "Not".equals(string(object, "Type"));
+            for (JsonElement child : object.asMap().values()) collectTalentGates(child, childNegated, talentIds);
         } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) if (hasHigherTierExclusion(child, higherTalents)) return true;
+            for (JsonElement child : value.getAsJsonArray()) collectTalentGates(child, negated, talentIds);
         }
-        return false;
+    }
+
+    private static void collectExcludedTalentGates(JsonElement value, boolean negated, Set<String> talentIds) {
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("TameworkHasTalent".equals(string(object, "Type"))) {
+                if (negated) talentIds.add(string(object, "TalentId"));
+                return;
+            }
+            boolean childNegated = negated ^ "Not".equals(string(object, "Type"));
+            for (JsonElement child : object.asMap().values()) collectExcludedTalentGates(child, childNegated, talentIds);
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) collectExcludedTalentGates(child, negated, talentIds);
+        }
+    }
+
+    private static Path rootPath(String rootId) {
+        return Path.of("Server", "Item", "RootInteractions", "NPCs", "HyDragon", "Wyvern_Mini", rootId + ".json");
+    }
+
+    private static Path interactionPath(String interactionId) {
+        return Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon", "Wyvern_Mini", interactionId + ".json");
+    }
+
+    private static Path projectilePath(String projectileId) {
+        return Path.of("Server", "Projectiles", "HyDragon", "Wyvern_Mini", projectileId + ".json");
+    }
+
+    private static String projectileIdForRoot(String rootId) throws IOException {
+        JsonArray interactions = load(rootPath(rootId)).getAsJsonArray("Interactions");
+        assertEquals(1, interactions.size(), rootId + " must select exactly one projectile interaction");
+        return string(load(interactionPath(interactions.get(0).getAsString())), "ProjectileId");
+    }
+
+    private static void assertRawOnly(JsonObject projectile, String description) {
+        String text = projectile.toString().toLowerCase(Locale.ROOT);
+        for (String forbidden : List.of("fire", "ice", "lightning", "nature", "toxic", "void")) {
+            assertFalse(text.contains(forbidden), description + " must remain raw-only: " + forbidden);
+        }
+        assertNoEffectOrStatusFields(projectile, description);
+    }
+
+    private static void assertNoEffectOrStatusFields(JsonElement value, String description) {
+        if (value.isJsonObject()) {
+            for (Map.Entry<String, JsonElement> entry : value.getAsJsonObject().asMap().entrySet()) {
+                assertFalse(entry.getKey().equalsIgnoreCase("EffectId") || entry.getKey().contains("Status"),
+                        description + " must not include elemental effect/status fields: " + entry.getKey());
+                assertNoEffectOrStatusFields(entry.getValue(), description);
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) assertNoEffectOrStatusFields(child, description);
+        }
     }
 
     private static String string(JsonObject object, String name) {
