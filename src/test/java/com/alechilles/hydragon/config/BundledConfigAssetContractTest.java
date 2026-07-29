@@ -43,11 +43,15 @@ class BundledConfigAssetContractTest {
         List<String> roleIds = MINI_WYVERN_FORMS.stream().map(form -> "Tamed_Wyvern_Mini_" + form).toList();
         String roster = Files.readString(Path.of("Server", "Tamework", "BondedCompanions", "Rosters", "HyDragonMiniwyvern.json"));
         String companion = Files.readString(Path.of("Server", "Tamework", "Companion", "HyDragonMiniwyvern.json"));
+        String horn = Files.readString(Path.of("Server", "Tamework", "Items", "Commands", "HyDragonDragonHorn.json"));
+        String breeding = Files.readString(Path.of("Server", "Tamework", "Breeding", "HyDragonBondedCompanions.json"));
         assertEquals(7, occurrences(roster, "\"Tamed_Wyvern_Mini_"), "roster must contain exactly seven form roles");
         assertEquals(7, occurrences(companion, "\"Tamed_Wyvern_Mini_"), "companion must contain exactly seven form roles");
         for (String roleId : roleIds) {
             assertTrue(roster.contains("\"" + roleId + "\""), "roster omits " + roleId);
             assertTrue(companion.contains("\"" + roleId + "\""), "companion omits " + roleId);
+            assertTrue(horn.contains("\"" + roleId + "\""), "Dragon Horn omits " + roleId);
+            assertTrue(breeding.contains("\"" + roleId + "\""), "breeding config omits " + roleId);
         }
         for (String source : MINI_WYVERN_FORMS) {
             String roleId = "Tamed_Wyvern_Mini_" + source;

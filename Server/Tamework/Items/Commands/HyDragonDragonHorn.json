@@ -17,7 +17,13 @@
       "Tamed_RockDrakeT1",
       "Tamed_RockDrakeT2",
       "Tamed_RockDrakeT3",
-      "Tamed_Wyvern_Mini"
+      "Tamed_Wyvern_Mini_Wild",
+      "Tamed_Wyvern_Mini_Nature",
+      "Tamed_Wyvern_Mini_Toxic",
+      "Tamed_Wyvern_Mini_Fire",
+      "Tamed_Wyvern_Mini_Void",
+      "Tamed_Wyvern_Mini_Lightning",
+      "Tamed_Wyvern_Mini_Ice"
     ]
   }
 }
