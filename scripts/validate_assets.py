@@ -1061,6 +1061,80 @@ def validate_nordic_landing_recovery(parsed: dict[Path, object], errors: list[st
     if not contains_landing_recovery(touchdown_instructions):
         fail(errors, "Nordic Drake touchdown must run its bounded recovery alongside the active Land motion")
 
+
+def validate_nordic_health_phase_recovery(parsed: dict[Path, object], errors: list[str]) -> None:
+    """Keep health-phase transitions coherent when healing interrupts a landing."""
+    template_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon.json"
+    template = parsed.get(template_path)
+    if not isinstance(template, dict):
+        fail(errors, "Nordic Drake health-phase template is unavailable")
+        return
+
+    def has_state(sensor: object, state: str) -> bool:
+        if not isinstance(sensor, dict):
+            return False
+        if sensor.get("Type") == "State" and sensor.get("State") == state:
+            return True
+        return any(has_state(child, state) for child in sensor.get("Sensors", []))
+
+    def has_motion_controller(sensor: object, controller: str) -> bool:
+        if not isinstance(sensor, dict):
+            return False
+        if sensor.get("Type") == "MotionController" and sensor.get("MotionController") == controller:
+            return True
+        return any(has_motion_controller(child, controller) for child in sensor.get("Sensors", []))
+
+    def has_health_range(sensor: object, parameter: str) -> bool:
+        if not isinstance(sensor, dict):
+            return False
+        if sensor.get("Type") == "Self":
+            for filter_ in sensor.get("Filters", []):
+                if isinstance(filter_, dict) and filter_.get("Type") == "Stat" \
+                        and filter_.get("ValueRange") == {"Compute": parameter}:
+                    return True
+        return any(has_health_range(child, parameter) for child in sensor.get("Sensors", []))
+
+    def has_action(actions: object, action_type: str, state: str | None = None) -> bool:
+        return any(
+            isinstance(action, dict) and action.get("Type") == action_type
+            and (state is None or action.get("State") == state)
+            for action in actions if isinstance(actions, list)
+        )
+
+    candidates: list[dict[str, object]] = []
+
+    def collect(value: object) -> None:
+        if isinstance(value, dict):
+            candidates.append(value)
+            for child in value.values():
+                collect(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect(child)
+
+    collect(template.get("Instructions"))
+    landing_cancel = any(
+        has_state(candidate.get("Sensor"), ".AirLand")
+        and has_state(candidate.get("Sensor"), ".AirTouchdown")
+        and has_motion_controller(candidate.get("Sensor"), "Fly")
+        and has_health_range(candidate.get("Sensor"), "AirPhaseHealthRange")
+        and has_action(candidate.get("Actions"), "ResetSearchRays")
+        and has_action(candidate.get("Actions"), "State", ".AirRanged")
+        for candidate in candidates
+    )
+    if not landing_cancel:
+        fail(errors, "Nordic Drake must cancel an airborne landing when health returns to the flight phase")
+
+    grounded_fly_recovery = any(
+        has_state(candidate.get("Sensor"), ".Default")
+        and has_motion_controller(candidate.get("Sensor"), "Fly")
+        and has_health_range(candidate.get("Sensor"), "GroundPhaseHealthRange")
+        and has_action(candidate.get("Actions"), "State", ".AirLand")
+        for candidate in candidates
+    )
+    if not grounded_fly_recovery:
+        fail(errors, "Nordic Drake must route an airborne grounded default state back through landing")
+
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
     outputs = {
         "Draconic_Stone",
@@ -1236,6 +1310,7 @@ def main() -> int:
     validate_domain_references(parsed, known_assets, projectile_ids, errors)
     validate_release_content_contracts(parsed, errors)
     validate_nordic_landing_recovery(parsed, errors)
+    validate_nordic_health_phase_recovery(parsed, errors)
     validate_altar_recipes(parsed, errors)
     validate_command_item(parsed, errors)
     validate_revival_configs(parsed, errors)

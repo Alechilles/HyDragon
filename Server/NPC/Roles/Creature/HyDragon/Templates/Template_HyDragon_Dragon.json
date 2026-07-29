@@ -1786,6 +1786,44 @@
                   ]
                 },
                 {
+                  "$Comment": "Never run the grounded default routine while the dragon still has the fly controller; resume the landing path instead.",
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "State",
+                        "State": ".Default",
+                        "IgnoreMissingSetState": true
+                      },
+                      {
+                        "Type": "MotionController",
+                        "MotionController": "Fly"
+                      },
+                      {
+                        "Type": "Self",
+                        "Filters": [
+                          {
+                            "Type": "Stat",
+                            "StatTarget": "Value",
+                            "RelativeTo": "Health",
+                            "Stat": "Health",
+                            "RelativeToTarget": "Max",
+                            "ValueRange": { "Compute": "GroundPhaseHealthRange" }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "State",
+                      "State": ".AirLand"
+                    }
+                  ]
+                },
+                {
                   "Enabled": { "Compute": "UseHealthPhaseFlight" },
                   "ActionsBlocking": true,
                   "Sensor": {
@@ -1815,6 +1853,57 @@
                           "State": ".AirRanged"
                         }
                       ]
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "Cancel a landing immediately when healing returns the dragon to the flight phase, rather than leaving ground behavior active in midair.",
+                  "Enabled": { "Compute": "UseHealthPhaseFlight" },
+                  "ActionsBlocking": true,
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "Or",
+                        "Sensors": [
+                          {
+                            "Type": "State",
+                            "State": ".AirLand",
+                            "IgnoreMissingSetState": true
+                          },
+                          {
+                            "Type": "State",
+                            "State": ".AirTouchdown",
+                            "IgnoreMissingSetState": true
+                          }
+                        ]
+                      },
+                      {
+                        "Type": "MotionController",
+                        "MotionController": "Fly"
+                      },
+                      {
+                        "Type": "Self",
+                        "Filters": [
+                          {
+                            "Type": "Stat",
+                            "StatTarget": "Value",
+                            "RelativeTo": "Health",
+                            "Stat": "Health",
+                            "RelativeToTarget": "Max",
+                            "ValueRange": { "Compute": "AirPhaseHealthRange" }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "ResetSearchRays"
+                    },
+                    {
+                      "Type": "State",
+                      "State": ".AirRanged"
                     }
                   ]
                 },
