@@ -1,15 +1,7 @@
 {
   "Name": "server.effects.miniwyvernVoidExposure.name",
   "ApplicationEffects": {
-    "ModelVFXId": "HyDragon_Void_Debuff",
-    "Particles": [
-      {
-        "SystemId": "Eye_Void_Smoke_Teal",
-        "TargetEntityPart": "Self",
-        "PositionOffset": { "Y": 0.75 },
-        "DetachedFromModel": false
-      }
-    ]
+    "ModelVFXId": "HyDragon_Void_Debuff"
   },
   "DamageResistance": {
     "Physical": [ { "CalculationType": "Percent", "Amount": -0.12 } ],
