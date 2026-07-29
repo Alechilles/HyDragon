@@ -79,6 +79,8 @@ class BundledConfigAssetContractTest {
         assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Wind.json")));
         assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Water.json")));
         assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Wind.json")));
+        assertFalse(Files.exists(Path.of("Server", "Models", "HyDragon", "Wyvern_Mini", "Wyvern_Mini_Water.json")));
+        assertFalse(Files.exists(Path.of("Server", "Models", "HyDragon", "Wyvern_Mini", "Wyvern_Mini_Wind.json")));
     }
 
     private static int occurrences(String value, String needle) {
