@@ -54,14 +54,43 @@ class MiniwyvernAbilityServiceTest {
     void deactivationCleansOwnerPassiveSourcesWithoutTargetedCombatCleanup() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
-        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+        MiniwyvernOwnerAuraRegistry auras = new MiniwyvernOwnerAuraRegistry();
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states, auras);
         Map<String, MiniwyvernArchetypeConfig> archetypes = Map.of("fire", fireConfig());
         service.tick(context(), archetypes, world, 1_000L);
+        assertEquals("test-fire-owner-aura", auras.activeFor(OWNER).orElseThrow().effectId());
 
         MiniwyvernAbilityService.TickResult result = service.deactivate(context(), archetypes, world, 2_000L);
 
         assertFalse(result.ready());
         assertTrue(world.removedEffects > 0);
+        assertEquals(1, world.ownerModifierRemovals);
+        assertTrue(auras.activeFor(OWNER).isEmpty());
+        assertTrue(states.current.appliedSourceKeys().isEmpty());
+        assertEquals(0, world.projectiles);
+        assertEquals(0, world.damageApplications);
+    }
+
+    @Test
+    void legacyCombatSchedulerStateConvergesWithoutTouchingAssetOwnedTargets() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        states.current = new MiniwyvernAbilityState(
+                MiniwyvernAbilityState.SCHEMA_VERSION, "fire", Map.of("legacy_fireball", 10_000L),
+                Map.of(ENEMY, 25.0D), Map.of(), Map.of(ENEMY, 1_000L),
+                java.util.Set.of("hydragon:mini:profile-1:fire:legacy_fireball"),
+                Map.of("hydragon:mini:profile-1:fire:legacy_fireball", ENEMY),
+                Map.of("hydragon:mini:profile-1:fire:legacy_fireball", 10_000L), 1_000L);
+        FakeWorld world = new FakeWorld(states);
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context(), Map.of("fire", fireConfig()), world, 2_000L);
+
+        assertTrue(result.ready());
+        assertFalse(states.current.cooldownUntilByAbility().containsKey("legacy_fireball"));
+        assertTrue(states.current.iceBuildupByTarget().isEmpty());
+        assertTrue(states.current.controlImmunityUntilByTarget().isEmpty());
+        assertFalse(states.current.appliedSourceKeys().stream().anyMatch(key -> key.contains("legacy_fireball")));
+        assertEquals(0, world.enemyEffects);
         assertEquals(0, world.projectiles);
         assertEquals(0, world.damageApplications);
     }
@@ -89,7 +118,11 @@ class MiniwyvernAbilityServiceTest {
     private static MiniwyvernArchetypeConfig fireConfig() throws Exception {
         MiniwyvernArchetypeConfig config = base("fire", "Tamed_Wyvern_Mini_Fire");
         set(config, "passiveEffects", new String[] { "test-fire-aura" });
-        set(config, "activeAbilities", new MiniwyvernArchetypeConfig.Ability[] { combatAbility() });
+        set(config, "passiveModifiers", Map.of("JumpMultiplier", 1.10D));
+        MiniwyvernArchetypeConfig.OwnerAttackAura aura = construct(MiniwyvernArchetypeConfig.OwnerAttackAura.class);
+        set(aura, "effectId", "test-fire-owner-aura");
+        set(aura, "durationSeconds", 4.0D);
+        set(config, "ownerAttackAura", aura);
         assertTrue(config.validate().isEmpty(), config.validate().toString());
         return config;
     }
@@ -112,21 +145,6 @@ class MiniwyvernAbilityServiceTest {
         set(config, "passiveModifiers", Map.of());
         set(config, "fallbackBehavior", "BASIC_BITE");
         return config;
-    }
-
-    private static MiniwyvernArchetypeConfig.Ability combatAbility() throws Exception {
-        MiniwyvernArchetypeConfig.Ability ability = construct(MiniwyvernArchetypeConfig.Ability.class);
-        set(ability, "id", "legacy_fireball");
-        set(ability, "trigger", "COMBAT_INTERVAL");
-        set(ability, "targetPolicy", "OWNER_HOSTILE_ONLY");
-        set(ability, "range", 18.0D);
-        set(ability, "cooldownSeconds", 2.5D);
-        set(ability, "effectId", "test-burn");
-        set(ability, "projectileId", "test-projectile");
-        set(ability, "maximumStacks", 1);
-        set(ability, "durationSeconds", 4.0D);
-        set(ability, "stackingPolicy", "SOURCE_REFRESH");
-        return ability;
     }
 
     private static <T> T construct(Class<T> type) throws Exception {
@@ -162,6 +180,7 @@ class MiniwyvernAbilityServiceTest {
         int effects;
         int enemyEffects;
         int removedEffects;
+        int ownerModifierRemovals;
         int projectiles;
         int damageApplications;
         int heals;
@@ -186,7 +205,10 @@ class MiniwyvernAbilityServiceTest {
         }
         @Override public boolean supportsOwnerModifiers(Map<String, Double> modifiers) { return true; }
         @Override public boolean applyOwnerModifiers(UUID ownerUuid, String sourceKey, Map<String, Double> modifiers, double durationSeconds) { return true; }
-        @Override public boolean removeOwnerModifiers(UUID ownerUuid, String sourceKey) { return true; }
+        @Override public boolean removeOwnerModifiers(UUID ownerUuid, String sourceKey) {
+            ownerModifierRemovals++;
+            return true;
+        }
         @Override public boolean launchProjectile(UUID sourceUuid, UUID targetUuid, String projectileId) {
             projectiles++;
             return true;

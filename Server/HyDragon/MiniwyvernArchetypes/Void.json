@@ -3,22 +3,6 @@
   "RoleId": "Tamed_Wyvern_Mini_Void",
   "ParticleAndSoundIds": [ "Void_Lightning", "SFX_Eye_Void_Attack_Blast" ],
   "PassiveEffects": [ "HyDragon_Miniwyvern_Void_Aura" ],
-  "ActiveAbilities": [
-    {
-      "Id": "void_exposure",
-      "Trigger": "COMBAT_INTERVAL",
-      "TargetPolicy": "OWNER_HOSTILE_ONLY",
-      "Range": 18.0,
-      "CooldownSeconds": 7.0,
-      "EffectId": "HyDragon_Miniwyvern_Void_Exposure",
-      "ProjectileId": "Eye_Void_Blast",
-      "Magnitude": 0.12,
-      "MinimumDefenseMultiplier": 0.5,
-      "MaximumReduction": 0.12,
-      "DurationSeconds": 6.0,
-      "StackingPolicy": "SOURCE_REFRESH"
-    }
-  ],
   "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Void_Exposure", "DurationSeconds": 6.0 },
   "FallbackBehavior": "BASIC_BITE"
 }

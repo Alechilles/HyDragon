@@ -217,7 +217,6 @@ final class MiniwyvernAbilityRuntimeTest {
         set(config, "particleAndSoundIds", new String[0]);
         set(config, "passiveEffects", new String[0]);
         set(config, "passiveModifiers", Map.of());
-        set(config, "activeAbilities", new com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability[0]);
         set(config, "fallbackBehavior", "BASIC_BITE");
         if ("nature".equals(formId)) {
             set(config, "passiveModifiers", Map.of(
@@ -229,41 +228,9 @@ final class MiniwyvernAbilityRuntimeTest {
                     "ActionSpeedMultiplier", 1.10D));
             set(config, "passiveModifierEffects", Map.of(
                     "MovementSpeedMultiplier", "test-lightning-boon"));
-            set(config, "activeAbilities", new com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability[] {
-                    activeAbility("lightning")});
-        } else if (!"wild".equals(formId)) {
-            set(config, "activeAbilities", new com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability[] {
-                    activeAbility(formId)});
         }
         assertTrue(config.validate().isEmpty(), config.validate().toString());
         return config;
-    }
-
-    private static com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability activeAbility(
-            String formId) throws Exception {
-        com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability ability = construct(
-                com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability.class);
-        set(ability, "id", formId + "-test");
-        set(ability, "trigger", "COMBAT_INTERVAL");
-        set(ability, "targetPolicy", "OWNER_HOSTILE_ONLY");
-        set(ability, "range", 1.0D);
-        set(ability, "cooldownSeconds", 1.0D);
-        set(ability, "projectileId", "test-projectile");
-        set(ability, "magnitude", 1.0D);
-        set(ability, "durationSeconds", 0.0D);
-        set(ability, "stackingPolicy", "SOURCE_REFRESH");
-        if ("ice".equals(formId)) {
-            set(ability, "buildupPerHit", 1.0D);
-            set(ability, "buildupThreshold", 1.0D);
-            set(ability, "buildupCap", 1.0D);
-            set(ability, "controlEffectId", "test-control");
-            set(ability, "controlImmunitySeconds", 1.0D);
-        } else if ("void".equals(formId)) {
-            set(ability, "magnitude", 0.1D);
-            set(ability, "minimumDefenseMultiplier", 0.5D);
-            set(ability, "maximumReduction", 0.1D);
-        }
-        return ability;
     }
 
     private static <T> T construct(Class<T> type) throws Exception {

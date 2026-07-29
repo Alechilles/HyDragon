@@ -81,6 +81,7 @@ public final class MiniwyvernAbilityService {
             state = MiniwyvernAbilityState.empty(formId, nowMs);
         }
         MutableState mutable = new MutableState(state);
+        mutable.discardRetiredCombatState();
         mutable.prune(nowMs);
         PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs);
         Set<String> diagnostics = new LinkedHashSet<>(passive.diagnostics());
@@ -448,6 +449,16 @@ public final class MiniwyvernAbilityService {
             targetsBySource.put(source, target);
             sourceExpiresAt.put(source, expiresAtMs);
             return true;
+        }
+
+        void discardRetiredCombatState() {
+            cooldowns.keySet().removeIf(id -> !id.equals("nature_regeneration"));
+            iceBuildup.clear();
+            immunityUntil.clear();
+            iceTargetUpdatedAt.clear();
+            sources.removeIf(source -> !source.endsWith(":passive"));
+            targetsBySource.keySet().retainAll(sources);
+            sourceExpiresAt.keySet().retainAll(sources);
         }
 
         MiniwyvernAbilityState freeze(String formId) {

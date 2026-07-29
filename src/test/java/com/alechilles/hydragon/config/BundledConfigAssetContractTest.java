@@ -239,9 +239,9 @@ class BundledConfigAssetContractTest {
             String title = Character.toUpperCase(id.charAt(0)) + id.substring(1);
             assertEquals("Tamed_Wyvern_Mini_" + title, archetype.getRoleId(), id);
         }
-        assertTrue(archetypes.get("nature").getActiveAbilities().isEmpty());
         assertTrue(archetypes.get("nature").getPassiveEffects().contains("HyDragon_Miniwyvern_Nature_Regeneration"));
-        assertEquals("Scarak_Seeker_Spitball", archetypes.get("toxic").getActiveAbilities().getFirst().getProjectileId());
+        assertFalse(Files.readString(Path.of("Server", "HyDragon", "MiniwyvernArchetypes", "Toxic.json"))
+                .contains("ActiveAbilities"), "Miniwyvern combat must be owned by role assets");
         assertOwnerAttackAura(archetypes, "toxic", "HyDragon_Miniwyvern_Toxic_Weakness", 6.0);
         assertEquals(0.12, archetypes.get("toxic").getOwnerAttackAura().getDamageReductionFraction());
         assertOwnerAttackAura(archetypes, "fire", "HyDragon_Miniwyvern_Fire_Burn", 4.0);

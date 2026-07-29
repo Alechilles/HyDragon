@@ -7,6 +7,5 @@
     "RegenerationTickSeconds": 2.0,
     "MaximumHealFractionPerTick": 0.01
   },
-  "ActiveAbilities": [],
   "FallbackBehavior": "BASIC_BITE"
 }
