@@ -32,36 +32,6 @@ class HyDragonConfigRepositoryTest {
     }
 
     @Test
-    void rejectsUnboundedVoidAbility() {
-        MiniwyvernArchetypeConfig archetype = validArchetype("void");
-        MiniwyvernArchetypeConfig.Ability ability = validVoidAbility();
-        ability.minimumDefenseMultiplier = null;
-        ability.maximumReduction = null;
-        ability.stackingPolicy = "ADDITIVE";
-        archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{ability};
-
-        List<String> issues = archetype.validate();
-        assertTrue(issues.stream().anyMatch(issue -> issue.contains("MinimumDefenseMultiplier")));
-        assertTrue(issues.stream().anyMatch(issue -> issue.contains("MaximumReduction")));
-        assertTrue(issues.stream().anyMatch(issue -> issue.contains("stacking")));
-    }
-
-    @Test
-    void rejectsUnknownOrMismatchedAbilityTriggers() {
-        MiniwyvernArchetypeConfig.Ability unknown = validAbility("unknown_trigger");
-        unknown.trigger = "SOMETIMES";
-        MiniwyvernArchetypeConfig fire = validArchetype("fire");
-        fire.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{unknown};
-        assertTrue(fire.validate().stream().anyMatch(issue -> issue.contains("Trigger is unsupported")));
-
-        MiniwyvernArchetypeConfig.Ability mismatched = validAbility("mismatched_trigger");
-        mismatched.trigger = "OWNER_HEALTH_BELOW_PERCENT";
-        mismatched.ownerHealthThreshold = 0.5;
-        fire.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{mismatched};
-        assertTrue(fire.validate().stream().anyMatch(issue -> issue.contains("requires OWNER_ONLY")));
-    }
-
-    @Test
     void rejectsModifierEffectMappingWithoutMatchingSemantic() {
         MiniwyvernArchetypeConfig lightning = validArchetype("lightning");
         lightning.passiveModifierEffects = Map.of("JumpMultiplier", "Some_Effect");
@@ -77,8 +47,6 @@ class HyDragonConfigRepositoryTest {
         lightning.passiveModifiers = Map.of();
         lightning.passiveModifierEffects = Map.of();
         lightning.passiveEffects = new String[] { "HyDragon_Miniwyvern_Lightning_Boon" };
-        lightning.activeAbilities = new MiniwyvernArchetypeConfig.Ability[] { validAbility("lightning_strike") };
-
         assertTrue(lightning.validate().isEmpty());
     }
 
@@ -170,27 +138,7 @@ class HyDragonConfigRepositoryTest {
     private static List<MiniwyvernArchetypeConfig> allArchetypes() {
         List<MiniwyvernArchetypeConfig> archetypes = new ArrayList<>();
         for (String id : List.of("wild", "nature", "toxic", "fire", "void", "lightning", "ice")) {
-            MiniwyvernArchetypeConfig archetype = validArchetype(id);
-            if (id.equals("void")) {
-                archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{validVoidAbility()};
-            } else if (id.equals("ice")) {
-                MiniwyvernArchetypeConfig.Ability ability = validAbility("ice_buildup");
-                ability.buildupPerHit = 25.0;
-                ability.buildupThreshold = 100.0;
-                ability.buildupCap = 100.0;
-                ability.controlEffectId = "HyDragon_Miniwyvern_Ice_Stun";
-                ability.controlImmunitySeconds = 12.0;
-                archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{ability};
-            } else if (id.equals("toxic")) {
-                MiniwyvernArchetypeConfig.Ability ability = validAbility("toxic_spit");
-                ability.projectileId = "Scarak_Seeker_Spitball";
-                archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{ability};
-            } else if (id.equals("fire")) {
-                archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{validAbility("fireball")};
-            } else if (id.equals("lightning")) {
-                archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{validAbility("lightning_strike")};
-            }
-            archetypes.add(archetype);
+            archetypes.add(validArchetype(id));
         }
         return archetypes;
     }
@@ -213,34 +161,4 @@ class HyDragonConfigRepositoryTest {
         return archetype;
     }
 
-    private static MiniwyvernArchetypeConfig.Ability validAbility(String id) {
-        MiniwyvernArchetypeConfig.Ability ability = new MiniwyvernArchetypeConfig.Ability();
-        ability.id = id;
-        ability.trigger = "COMBAT_INTERVAL";
-        ability.targetPolicy = "OWNER_HOSTILE_ONLY";
-        ability.range = 18.0;
-        ability.cooldownSeconds = 4.0;
-        ability.effectId = "HyDragon_Test_Effect";
-        ability.magnitude = 1.0;
-        ability.durationSeconds = 1.0;
-        ability.stackingPolicy = "SOURCE_REFRESH";
-        return ability;
-    }
-
-    private static MiniwyvernArchetypeConfig.Ability validVoidAbility() {
-        MiniwyvernArchetypeConfig.Ability ability = new MiniwyvernArchetypeConfig.Ability();
-        ability.id = "void_exposure";
-        ability.trigger = "COMBAT_INTERVAL";
-        ability.targetPolicy = "OWNER_HOSTILE_ONLY";
-        ability.range = 18.0;
-        ability.cooldownSeconds = 7.0;
-        ability.effectId = "HyDragon_Miniwyvern_Void_Exposure";
-        ability.projectileId = "Eye_Void_Blast";
-        ability.magnitude = 0.12;
-        ability.durationSeconds = 6.0;
-        ability.stackingPolicy = "SOURCE_REFRESH";
-        ability.minimumDefenseMultiplier = 0.5;
-        ability.maximumReduction = 0.12;
-        return ability;
-    }
 }

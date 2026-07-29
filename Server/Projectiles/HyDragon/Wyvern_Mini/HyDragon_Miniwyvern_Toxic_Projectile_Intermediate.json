@@ -1,0 +1,1 @@
+{ "Parent": "Scarak_Seeker_Spitball", "MuzzleVelocity": 30, "TerminalVelocity": 38, "Gravity": 7, "Damage": 30, "TimeToLive": 7, "DeathEffectsOnHit": true, "ImpactSlowdown": 0 }

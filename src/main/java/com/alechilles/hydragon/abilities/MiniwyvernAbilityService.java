@@ -81,6 +81,7 @@ public final class MiniwyvernAbilityService {
             state = MiniwyvernAbilityState.empty(formId, nowMs);
         }
         MutableState mutable = new MutableState(state);
+        mutable.discardRetiredCombatState();
         mutable.prune(nowMs);
         PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs);
         Set<String> diagnostics = new LinkedHashSet<>(passive.diagnostics());
@@ -91,33 +92,9 @@ public final class MiniwyvernAbilityService {
         }
 
         int effectsApplied = executePassives(context, config, passive, world);
+        // Combat execution belongs to the role/root-interaction assets. This retained service only
+        // refreshes Java-owned owner passives and their lifecycle cleanup.
         int abilitiesExecuted = 0;
-        for (MiniwyvernArchetypeConfig.Ability ability : config.getActiveAbilities()) {
-            if (nowMs < mutable.cooldowns.getOrDefault(ability.getId(), 0L)) continue;
-            List<AbilityExecution> executions = prepareExecutions(context, config, ability, world, mutable, nowMs);
-            if (executions.isEmpty()) continue;
-
-            long cooldownUntil = saturatingAdd(nowMs, secondsToMs(ability.getCooldownSeconds()));
-            mutable.cooldowns.put(ability.getId(), cooldownUntil);
-            for (AbilityExecution execution : executions) {
-                String source = executionSourceKey(context, config, ability, execution.targetUuid());
-                mutable.trackSource(
-                        source,
-                        execution.targetUuid(),
-                        saturatingAdd(nowMs, secondsToMs(ability.getDurationSeconds())));
-            }
-            mutable.updatedAt = nowMs;
-            MiniwyvernAbilityState beforeMutation = mutable.freeze(formId);
-            if (!states.save(context.ownerUuid(), context.profileId(), beforeMutation)) {
-                return new TickResult(false, "ability-state-commit-failed", effectsApplied, abilitiesExecuted);
-            }
-            boolean executed = false;
-            for (AbilityExecution execution : executions) {
-                String source = executionSourceKey(context, config, ability, execution.targetUuid());
-                executed |= execute(context, config, ability, execution, source, world, mutable, nowMs, diagnostics);
-            }
-            if (executed) abilitiesExecuted++;
-        }
 
         mutable.prune(nowMs);
         MiniwyvernAbilityState finalState = mutable.freeze(formId);
@@ -287,153 +264,12 @@ public final class MiniwyvernAbilityService {
         return applied;
     }
 
-    private List<AbilityExecution> prepareExecutions(
-            ProfileContext context,
-            MiniwyvernArchetypeConfig config,
-            MiniwyvernArchetypeConfig.Ability ability,
-            MiniwyvernAbilityWorld world,
-            MutableState state,
-            long nowMs) {
-        String policy = ability.getTargetPolicy().toUpperCase(Locale.ROOT);
-        String trigger = ability.getTrigger().toUpperCase(Locale.ROOT);
-        if (trigger.equals("OWNER_HEALTH_BELOW_PERCENT")) {
-            if (!policy.equals("OWNER_ONLY")) return List.of();
-            MiniwyvernAbilityWorld.Health health = world.health(context.ownerUuid());
-            Double threshold = ability.getOwnerHealthThreshold();
-            if (threshold == null || health.fraction() > threshold) return List.of();
-            return List.of(new AbilityExecution(context.ownerUuid(), health));
-        }
-        if (!trigger.equals("COMBAT_INTERVAL") || policy.equals("OWNER_ONLY")) return List.of();
-
-        List<MiniwyvernAbilityWorld.Target> candidates = policy.equals("OWNER_HOSTILE_AREA")
-                ? world.hostileTargets(ability.getRange(), ability.getMaximumTargets()).stream()
-                        .limit(ability.getMaximumTargets())
-                        .toList()
-                : world.hostileTarget(ability.getRange()).stream().toList();
-        Map<UUID, AbilityExecution> valid = new LinkedHashMap<>();
-        Set<UUID> trackedIceTargets = state.trackedIceTargets();
-        int availableSourceSlots = MiniwyvernAbilityState.MAX_TRACKED_SOURCE_KEYS - state.sources.size();
-        Set<String> prospectiveSources = new LinkedHashSet<>();
-        for (MiniwyvernAbilityWorld.Target target : candidates) {
-            if (!target.alive() || target.distance() > ability.getRange()
-                    || !world.worldName().equals(target.worldName())
-                    || target.entityUuid().equals(context.ownerUuid())
-                    || target.entityUuid().equals(context.npcUuid())
-                    || context.ownerUuid().equals(target.ownerUuid())
-                    || world.areAllies(context.ownerUuid(), target.entityUuid())) {
-                continue;
-            }
-            if (config.getId().equals("ice")
-                    && nowMs < state.immunityUntil.getOrDefault(target.entityUuid(), 0L)) {
-                continue;
-            }
-            if (config.getId().equals("ice") && !trackedIceTargets.contains(target.entityUuid())
-                    && trackedIceTargets.size() >= MiniwyvernAbilityState.MAX_TRACKED_ICE_TARGETS) {
-                continue;
-            }
-            String source = executionSourceKey(context, config, ability, target.entityUuid());
-            if (!state.sources.contains(source) && prospectiveSources.add(source)
-                    && prospectiveSources.size() > availableSourceSlots) {
-                continue;
-            }
-            valid.putIfAbsent(target.entityUuid(), new AbilityExecution(target.entityUuid(), world.health(target.entityUuid())));
-            if (config.getId().equals("ice")) trackedIceTargets.add(target.entityUuid());
-        }
-        return List.copyOf(valid.values());
-    }
-
-    private boolean execute(
-            ProfileContext context,
-            MiniwyvernArchetypeConfig config,
-            MiniwyvernArchetypeConfig.Ability ability,
-            AbilityExecution execution,
-            String source,
-            MiniwyvernAbilityWorld world,
-            MutableState state,
-            long nowMs,
-            Set<String> diagnostics) {
-        UUID target = execution.targetUuid();
-        boolean applied = false;
-
-        if (ability.getProjectileId() != null) {
-            applied |= world.launchProjectile(context.npcUuid(), target, ability.getProjectileId());
-        }
-        if (ability.getEffectId() != null) {
-            int maximumStacks = Objects.requireNonNullElse(ability.getMaximumStacks(), 1);
-            if (!world.supportsEffectStacking(
-                    ability.getEffectId(), ability.getStackingPolicy(), maximumStacks)) {
-                diagnostics.add("effect-stacking-unavailable:" + ability.getId());
-            } else if (config.getId().equals("void") && !world.supportsBoundedDefenseReduction(
-                    ability.getEffectId(),
-                    Math.abs(ability.getMagnitude()),
-                    Objects.requireNonNullElse(ability.getMinimumDefenseMultiplier(), 1.0D),
-                    Objects.requireNonNullElse(ability.getMaximumReduction(), 0.0D))) {
-                diagnostics.add("void-defense-bounds-unavailable:" + ability.getId());
-            } else {
-                applied |= world.applyEffect(target, source, ability.getEffectId(), ability.getDurationSeconds());
-            }
-        }
-
-        switch (config.getId()) {
-            case "lightning" -> {
-                if (ability.getMagnitude() > 0.0D) {
-                    applied |= world.dealDamage(context.npcUuid(), target, ability.getMagnitude());
-                }
-            }
-            case "ice" -> applied |= applyIce(context, ability, target, source, world, state, nowMs);
-            case "water" -> {
-                MiniwyvernAbilityWorld.Health health = execution.health();
-                double cap = health.maximum() * Objects.requireNonNullElse(ability.getMaximumHealFraction(), 0.0D);
-                double amount = Math.min(Math.min(ability.getMagnitude(), cap), health.maximum() - health.current());
-                if (amount > 0.0D) applied |= world.heal(target, amount);
-            }
-            case "void" -> {
-                // The bounded defense reduction is supplied by the validated effect asset. Source refresh prevents stacking.
-                if (!Set.of("SOURCE_REFRESH", "NON_STACKING", "CLAMPED")
-                        .contains(ability.getStackingPolicy().toUpperCase(Locale.ROOT))) {
-                    return false;
-                }
-            }
-            default -> {
-                // Fire and Wind execute through their projectile/effect assets.
-            }
-        }
-        if (applied) world.emitPresentation(target, config.getParticleAndSoundIds());
-        state.updatedAt = nowMs;
-        return applied;
-    }
-
-    private boolean applyIce(
-            ProfileContext context,
-            MiniwyvernArchetypeConfig.Ability ability,
-            UUID target,
-            String source,
-            MiniwyvernAbilityWorld world,
-            MutableState state,
-            long nowMs) {
-        double perHit = Objects.requireNonNullElse(ability.getBuildupPerHit(), 0.0D);
-        double threshold = Objects.requireNonNullElse(ability.getBuildupThreshold(), Double.POSITIVE_INFINITY);
-        double cap = Objects.requireNonNullElse(ability.getBuildupCap(), threshold);
-        double buildup = Math.min(cap, state.iceBuildup.getOrDefault(target, 0.0D) + perHit);
-        state.iceTargetUpdatedAt.put(target, nowMs);
-        if (buildup < threshold) {
-            state.iceBuildup.put(target, buildup);
-            return false;
-        }
-        state.iceBuildup.remove(target);
-        long immunity = secondsToMs(Objects.requireNonNullElse(ability.getControlImmunitySeconds(), 0.0D));
-        state.immunityUntil.put(target, saturatingAdd(nowMs, immunity));
-        String control = ability.getControlEffectId();
-        return control != null && world.applyEffect(target, source + ":control", control, ability.getDurationSeconds());
-    }
-
     private void cleanupSources(
             ProfileContext context,
             MiniwyvernAbilityState state,
             Map<String, MiniwyvernArchetypeConfig> archetypes,
-            MiniwyvernAbilityWorld world) {
+        MiniwyvernAbilityWorld world) {
         for (String source : state.appliedSourceKeys()) {
-            UUID targetUuid = state.targetBySourceKey().get(source);
             world.removeOwnerModifiers(context.ownerUuid(), source);
             for (MiniwyvernArchetypeConfig config : archetypes.values()) {
                 for (String effectId : config.getPassiveEffects()) {
@@ -441,20 +277,6 @@ public final class MiniwyvernAbilityService {
                 }
                 for (String effectId : new LinkedHashSet<>(config.getPassiveModifierEffects().values())) {
                     world.removeEffect(context.ownerUuid(), source, effectId);
-                }
-                for (MiniwyvernArchetypeConfig.Ability ability : config.getActiveAbilities()) {
-                    if (ability.getEffectId() != null) {
-                        world.removeEffect(context.ownerUuid(), source, ability.getEffectId());
-                        world.removeEffect(context.npcUuid(), source, ability.getEffectId());
-                        if (targetUuid != null) world.removeEffect(targetUuid, source, ability.getEffectId());
-                    }
-                    if (ability.getControlEffectId() != null) {
-                        world.removeEffect(context.ownerUuid(), source + ":control", ability.getControlEffectId());
-                        world.removeEffect(context.npcUuid(), source + ":control", ability.getControlEffectId());
-                        if (targetUuid != null) {
-                            world.removeEffect(targetUuid, source + ":control", ability.getControlEffectId());
-                        }
-                    }
                 }
             }
         }
@@ -512,17 +334,6 @@ public final class MiniwyvernAbilityService {
                 + normalize(formId) + ":" + requiredText(abilityId, "abilityId");
     }
 
-    private static String executionSourceKey(
-            ProfileContext context,
-            MiniwyvernArchetypeConfig config,
-            MiniwyvernArchetypeConfig.Ability ability,
-            UUID targetUuid) {
-        String suffix = ability.getTargetPolicy().equalsIgnoreCase("OWNER_HOSTILE_AREA")
-                ? ability.getId() + ":" + targetUuid
-                : ability.getId();
-        return sourceKey(context.profileId(), config.getId(), suffix);
-    }
-
     private static long secondsToMs(double seconds) {
         if (!Double.isFinite(seconds) || seconds < 0.0D) return Long.MAX_VALUE;
         double millis = seconds * 1000.0D;
@@ -568,9 +379,6 @@ public final class MiniwyvernAbilityService {
         static TickResult denied(String reason) {
             return new TickResult(false, reason, 0, 0);
         }
-    }
-
-    private record AbilityExecution(UUID targetUuid, MiniwyvernAbilityWorld.Health health) {
     }
 
     private record PassiveExecution(
@@ -641,6 +449,16 @@ public final class MiniwyvernAbilityService {
             targetsBySource.put(source, target);
             sourceExpiresAt.put(source, expiresAtMs);
             return true;
+        }
+
+        void discardRetiredCombatState() {
+            cooldowns.keySet().removeIf(id -> !id.equals("nature_regeneration"));
+            iceBuildup.clear();
+            immunityUntil.clear();
+            iceTargetUpdatedAt.clear();
+            sources.removeIf(source -> !source.endsWith(":passive"));
+            targetsBySource.keySet().retainAll(sources);
+            sourceExpiresAt.keySet().retainAll(sources);
         }
 
         MiniwyvernAbilityState freeze(String formId) {

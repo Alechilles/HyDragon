@@ -1,0 +1,1 @@
+{ "Appearance": "Rubble_Stone", "MuzzleVelocity": 40, "TerminalVelocity": 44, "Gravity": 8, "Damage": 26, "TimeToLive": 6, "DeathEffectsOnHit": true, "ImpactSlowdown": 0, "DepthShot": 1 }

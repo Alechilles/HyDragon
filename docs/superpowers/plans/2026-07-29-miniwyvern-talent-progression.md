@@ -4,16 +4,16 @@
 
 **Goal:** Give every bonded Miniwyvern one persistent, freely resettable level-30 talent tree whose shared flags are interpreted by each current form through asset wiring, with combat and capped active-summon XP.
 
-**Architecture:** Tamework owns the reusable engine primitives: a self-targeting purchased-talent sensor and a generic `SUMMONED` XP source. HyDragon owns the Miniwyvern leveling/talent data and each form's asset interpretation of those flags. NPC role instructions gate root interactions and entity effects with `TameworkHasTalent`; once every equivalent path is asset-driven, the existing HyDragon Miniwyvern Java ability runtime is removed.
+**Architecture:** Tamework owns the reusable engine primitives: a self-targeting purchased-talent sensor and a generic `SUMMONED` XP source. HyDragon owns the Miniwyvern leveling/talent data and each form's asset interpretation of those flags. NPC role instructions gate root interactions and entity effects with `TameworkHasTalent`; Java combat dispatch is removed while the existing bonded lifecycle and Java owner-passive path remain.
 
-**Tech Stack:** Java 25, Maven/JUnit 5, Tamework 3.1.0, Hytale 0.5.7, Hytale NPC assets and entity effects, JSON assets, Python asset validator.
+**Tech Stack:** Java 25, Maven/JUnit 5, unreleased Tamework 3.0.0, Hytale 0.5.7, Hytale NPC assets and entity effects, JSON assets, Python asset validator.
 
 **Design source:** [Miniwyvern Talent Progression Design](../specs/2026-07-29-miniwyvern-talent-progression-design.md)
 
 ## Global constraints
 
 - Keep one `TwLevelingConfig` and one `TwTalentConfig` for all seven Miniwyvern roles; never create form-specific XP, point, or purchased-talent state.
-- Put all gameplay that Hytale assets can express in role instructions, root interactions, projectiles, and entity effects. Java is limited to generic Tamework primitives.
+- Put all gameplay that Hytale assets can express in role instructions, root interactions, projectiles, and entity effects. For this implementation, retain the existing Java owner-passive application path until a source-backed generic marked-target effect action is available; do not invent that asset contract.
 - `TameworkHasTalent` evaluates the NPC itself, fails closed for absent/malformed state, and reads only `TameworkTalentsComponent`.
 - Every upgraded instruction must exclude stronger variants with native `Not` sensors so variants do not stack.
 - The Wild form's projectile remains raw damage only. It may gain damage, range, cadence, and additional-projectile upgrades, but never elemental statuses.
@@ -106,14 +106,14 @@
 - [ ] Run `./mvnw test -Dtest=SummonedCompanionExperienceServiceTest` followed by `./mvnw test` and `./mvnw verify`.
 - [ ] Commit as `Feat: award XP to active companions`.
 
-## Task 4: Release the Tamework API change locally for HyDragon integration
+## Task 4: Build the unreleased Tamework 3.0.0 API locally for HyDragon integration
 
 **Repository:** Tamework clean-main worktree, after Tasks 1-3.
 
-- [ ] Bump Tamework's Maven/artifact version from `3.0.0` to `3.1.0`, update any version assertions and release notes required by that repository, and build the mod jar into the normal local mod location.
-- [ ] Verify the resulting jar exposes `TameworkHasTalent`, `SUMMONED`, the `Summoned` config block, and does not regress Avatar Flight XP with `./mvnw verify`.
-- [ ] Commit the version/release metadata as `Release: prepare Tamework 3.1.0`.
-- [ ] Keep this local unless the user separately authorizes publication. HyDragon's integration work uses this exact local artifact and changes `<tamework.version>` to `3.1.0` only after the jar exists.
+- [ ] Keep Tamework's Maven/artifact and manifest version at unreleased `3.0.0`; do not add 3.1.0 release notes or alter public version assertions. Build the current source into the normal local `Alec's Tamework! v3.0.0.jar` location.
+- [ ] Verify the resulting 3.0.0 jar exposes `TameworkHasTalent`, `SUMMONED`, the `Summoned` config block, and does not regress Avatar Flight XP with `./mvnw verify`.
+- [ ] Commit the API additions only; do not create a release/version metadata commit.
+- [ ] Keep this local unless the user separately authorizes publication. HyDragon remains on `<tamework.version>3.0.0</tamework.version>` and uses that exact local artifact.
 
 ## Task 5: Author the complete shared Miniwyvern progression data
 
@@ -125,7 +125,7 @@
 - Create `Server/Tamework/Talents/HyDragonMiniwyvern.json`.
 - Modify `Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json`.
 - Modify `Server/Tamework/Companion/HyDragonMiniwyvern.json`.
-- Modify `pom.xml` (`tamework.version` to `3.1.0`).
+- Do not modify `pom.xml`; it already declares the unreleased `tamework.version` `3.0.0`.
 - Create `src/test/java/com/alechilles/hydragon/config/MiniwyvernTalentProgressionAssetTest.java`.
 - Modify the relevant `Server/Languages/*.lang` files: `en-US`, `de-DE`, `es-ES`, `fr-FR`, and `pt-BR`.
 
@@ -160,41 +160,41 @@
 
 - [ ] With the locked 0.5.7 asset profile, inspect the current bite/root-interaction contract and generate author options for instructions, sensor combinators, projectile launch, target selection, entity effect application/removal, cadence, and multi-projectile behavior. Record the selected supported fields in the task commit description or nearby asset comments where the format permits.
 - [ ] Build a common role-instruction shape for each capability: `And(TameworkHasTalent(flag), normal combat/owner condition, Not(higher-tier flag))` selects exactly one base/upgraded variant; the selected instruction calls a root interaction or effect asset that completely performs the behavior. Never retain an instruction that only checks a talent but has no action path.
-- [ ] Wire the three branches for every form. Bond gates its owner passive and upgrades; Combat gates projectile, range, cadence, force, pattern, advanced attack, and capstone; Vigor's health multipliers come from the talent config while its non-health survival behavior is gated in assets. Existing effect IDs may be retained only when their full behavior is expressed in assets.
-- [ ] Author Wild first as the reference implementation: `EssenceBond` and upgrades grant stamina regeneration/max stamina; `DraconicProjectile` launches raw damage with no effect payload; upgrades only alter raw projectile damage, range, cadence, or count. Add tests/validator assertions that no Wild projectile path applies Fire, Ice, Lightning, Nature, Toxic, or Void status effects.
+- [ ] Wire the asset-expressible branch behavior for every form. Combat gates projectile, range, cadence, force, pattern, advanced attack, and capstone; Vigor's health multipliers come from the talent config while its non-health survival behavior is gated in assets. Retain the existing Java owner-passive application path for Bond until a source-backed generic marked-target effect action is available.
+- [ ] Author Wild first as the reference implementation: `EssenceBond` and upgrades remain on the existing Java owner-passive path for stamina regeneration/max stamina; `DraconicProjectile` launches raw damage with no effect payload; upgrades only alter raw projectile damage, range, cadence, or count. Add tests/validator assertions that no Wild projectile path applies Fire, Ice, Lightning, Nature, Toxic, or Void status effects.
 - [ ] Apply the same shared flags to Fire, Ice, Lightning, Nature, Toxic, and Void with their own asset-level interpretation and presentation. Reuse only generic flag IDs; no form-specific talent ID may appear in the tree.
-- [ ] For every replaceable passive/attack, remove or neutralize the prior Java-owned execution path before enabling its asset counterpart. Test base, intermediate, and highest-tier ownership to show exactly one intended variant fires.
+- [ ] For every replaceable attack, remove or neutralize the prior Java-owned execution path before enabling its asset counterpart. Keep Java owner-passive behavior in place for this release, and test base, intermediate, and highest-tier attack ownership to show exactly one intended variant fires.
 - [ ] Validate each changed role and every generated dependency through the NPC asset tool, then run `python scripts/validate_assets.py` and `./mvnw test`.
 - [ ] Commit as `Feat: wire miniwyvern talents through assets`.
 
-## Task 7: Remove the superseded HyDragon Miniwyvern ability runtime
+## Task 7: Retire superseded HyDragon Miniwyvern combat dispatch
 
 **Repository:** HyDragon, only after Task 6's full asset parity test passes.
 
 **Files:**
 
 - Modify `src/main/java/com/alechilles/hydragon/HyDragonPlugin.java`.
-- Modify `src/main/java/com/alechilles/hydragon/HyDragonAbilityRegistrationFacade.java`.
-- Delete `src/main/java/com/alechilles/hydragon/abilities/MiniwyvernAbilityRuntime.java` and `MiniwyvernAbilityService.java`.
-- Delete their Miniwyvern-only state, repository, world/dispatcher, archetype-config, owner-aura, toxic-weakness, and void-effect-lifetime collaborators only when `rg` proves no other feature imports them.
+- Modify `src/main/java/com/alechilles/hydragon/HyDragonAbilityRegistrationFacade.java` only after separating the retained owner-passive path from superseded attack scheduling.
+- Modify `src/main/java/com/alechilles/hydragon/abilities/MiniwyvernAbilityService.java` to remove target selection, projectile launch, combat damage, and hostile effect dispatch while retaining passive refresh, Nature regeneration cadence, owner-aura synchronization, and lifecycle cleanup.
+- Retain `MiniwyvernAbilityRuntime.java`, the passive state repository, and Java owner-aura/effect collaborators, including Void, for this release.
 - Delete/update the matching tests under `src/test/java/com/alechilles/hydragon/abilities` and `bonded`.
 - Modify `scripts/validate_assets.py` to remove the legacy Java-archetype expectation and replace it with the asset-first contract.
 
 - [ ] Run `rg -n "MiniwyvernAbility|MiniwyvernOwnerAura|MiniwyvernToxicWeakness|MiniwyvernVoidEffectLifetime|MiniwyvernArchetype" src/main src/test scripts` and classify each remaining reference as deletion, migration, or an unrelated retained effect asset. Do not remove generic bonded-companion persistence used elsewhere.
-- [ ] Remove scheduler/system registration from the plugin facade only after the role instruction/root interaction paths handle all former attacks, passives, owner effects, and cleanup. There must be no duplicate damage, effect duration, or cooldown source.
-- [ ] Replace deleted Java-behavior tests with contract tests that inspect the asset wiring: all seven roles use the shared flags; every `TameworkHasTalent` instruction resolves to an existing action/effect; upgraded flags exclude lower variants; Wild remains raw-only.
+- [ ] Remove Java target-selection/attack dispatch only after role instruction/root interaction paths handle those attacks. Preserve the owner-passive Java registration and ensure there is no duplicate attack damage, effect duration, or cooldown source.
+- [ ] Replace deleted attack-behavior tests with contract tests that inspect the asset wiring: all seven roles use the shared flags for asset-owned attacks; every `TameworkHasTalent` instruction resolves to an existing action/effect; upgraded variants exclude lower variants; Wild remains raw-only. Keep Java owner-passive coverage.
 - [ ] Run `./mvnw test`, `./mvnw verify`, and `python scripts/validate_assets.py`; then inspect `git diff --check` and `git status --short` to confirm no unrelated files were changed.
-- [ ] Commit as `Refactor: retire miniwyvern ability runtime`.
+- [ ] Commit as `Refactor: retire miniwyvern Java combat dispatch`.
 
 ## Task 8: End-to-end verification and integration handoff
 
-**Repositories:** Tamework 3.1.0 worktree and HyDragon.
+**Repositories:** unreleased Tamework 3.0.0 worktree and HyDragon.
 
-- [ ] Build/install the Tamework 3.1.0 jar, then run HyDragon `./mvnw clean verify` against that exact jar. Confirm the Maven property resolves `Alec's Tamework! v3.1.0.jar` rather than the old 3.0.0 artifact.
+- [ ] Build/install the unreleased Tamework 3.0.0 jar, then run HyDragon `./mvnw clean verify` against that exact jar. Confirm the Maven property resolves `Alec's Tamework! v3.0.0.jar`.
 - [ ] Run the complete Tamework `./mvnw verify` suite and the complete HyDragon `./mvnw verify` suite, including packaged-roster tests. Extend `PackagedHyDragonRosterIT` if the artifact assertion needs to prove the new Miniwyvern leveling/talent assets are packaged.
 - [ ] Perform the in-game smoke sequence with one bonded Miniwyvern: level to node eligibility, buy a flag, switch through all seven forms, dismiss/resummon, die/revive, relog, use free reset, and confirm the purchased IDs/points and current form behavior match expectations at each step.
 - [ ] Specifically measure: dealt versus taken combat XP; no XP from player/same-owner damage; summon XP only while a live projection exists; no partial-interval catch-up; hourly cap survives dismiss/re-summon; cap refreshes after its wall-clock hour; and a reset immediately removes talent-gated behavior.
-- [ ] Validate every modified NPC asset against Hytale 0.5.7 plus the Tamework 3.1.0 runtime profile and retain the validator output with the implementation handoff.
+- [ ] Validate every modified NPC asset against Hytale 0.5.7 plus the unreleased Tamework 3.0.0 runtime profile and retain the validator output with the implementation handoff.
 - [ ] Commit any verification-only test/packaging fixes as `Test: cover miniwyvern talent integration`.
 
 ## Final acceptance checklist

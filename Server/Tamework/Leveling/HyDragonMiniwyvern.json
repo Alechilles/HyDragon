@@ -1,0 +1,31 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": [
+    "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+    "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+    "Tamed_Wyvern_Mini_Ice"
+  ],
+  "Levels": { "MaxLevel": 30, "BaseXp": 100.0, "GrowthFactor": 1.09 },
+  "XpSources": {
+    "Feed": { "Enabled": false },
+    "Harvest": { "Enabled": false },
+    "Breeding": { "Enabled": false },
+    "Combat": {
+      "Enabled": true,
+      "DamageDealtXpPerPoint": 0.35,
+      "DamageTakenXpPerPoint": 0.12,
+      "MinimumDamageEvent": 2.0,
+      "AwardVsPlayers": false,
+      "AwardVsOwnedAllies": false
+    },
+    "Summoned": {
+      "Enabled": true,
+      "XpPerActiveSecond": 0.03,
+      "AwardIntervalSeconds": 10.0,
+      "MaxXpPerHour": 30.0
+    }
+  },
+  "StatGrowth": { "Effects": [] },
+  "TalentPoints": { "PointsPerLevel": 1 }
+}

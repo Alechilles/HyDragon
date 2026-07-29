@@ -1,0 +1,6 @@
+{
+  "$Comment": "Raw Wild projectile: no elemental effect or status payload.",
+  "Type": "LaunchProjectile",
+  "RunTime": 0.25,
+  "ProjectileId": "HyDragon_Miniwyvern_Wild_Projectile_Base"
+}
