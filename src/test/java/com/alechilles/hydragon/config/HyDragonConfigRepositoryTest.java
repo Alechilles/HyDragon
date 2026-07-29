@@ -176,6 +176,8 @@ class HyDragonConfigRepositoryTest {
                 archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{ability};
             } else if (id.equals("fire")) {
                 archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{validAbility("fireball")};
+            } else if (id.equals("lightning")) {
+                archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{validAbility("lightning_strike")};
             }
             archetypes.add(archetype);
         }
@@ -189,8 +191,7 @@ class HyDragonConfigRepositoryTest {
         archetype.fallbackBehavior = "BASIC_BITE";
         if (id.equals("lightning")) {
             archetype.passiveModifiers = Map.of(
-                    "MovementSpeedMultiplier", 1.15,
-                    "ActionSpeedMultiplier", 1.10);
+                    "MovementSpeedMultiplier", 1.15);
             archetype.passiveModifierEffects = Map.of(
                     "MovementSpeedMultiplier", "HyDragon_Miniwyvern_Lightning_Boon");
         } else if (id.equals("nature")) {

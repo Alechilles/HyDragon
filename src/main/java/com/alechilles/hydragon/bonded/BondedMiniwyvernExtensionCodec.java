@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import java.math.BigDecimal;
@@ -78,7 +77,7 @@ public final class BondedMiniwyvernExtensionCodec {
                     unknownFields(abilityJson, ABILITY_FIELDS));
         } catch (IllegalArgumentException failure) {
             throw failure;
-        } catch (JsonParseException | NullPointerException | ClassCastException failure) {
+        } catch (RuntimeException failure) {
             throw new IllegalArgumentException("Invalid bonded Miniwyvern extension", failure);
         }
     }
