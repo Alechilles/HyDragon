@@ -1,5 +1,5 @@
 {
-  "SwitchTo": "Distortion",
+  "SwitchTo": "PostColor",
   "EffectDirection": "None",
   "AnimationDuration": 3.0,
   "AnimationRange": {
@@ -19,5 +19,7 @@
   "NoiseScale": {
     "X": 40,
     "Y": 40
-  }
+  },
+  "PostColor": "#4f0f61",
+  "PostColorOpacity": 0.7
 }

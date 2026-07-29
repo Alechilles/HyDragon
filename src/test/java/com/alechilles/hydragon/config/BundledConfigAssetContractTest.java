@@ -121,12 +121,14 @@ class BundledConfigAssetContractTest {
         assertTrue(Files.exists(voidVfx),
                 "Void Exposure ModelVFX must be bundled");
         String voidVfxJson = Files.readString(voidVfx);
-        assertTrue(voidVfxJson.contains("\"SwitchTo\": \"Distortion\""),
-                "Void Exposure must retain its authored distortion presentation");
+        assertTrue(voidVfxJson.contains("\"SwitchTo\": \"PostColor\""),
+                "Void Exposure must retain its authored post-color presentation");
         assertTrue(voidVfxJson.contains("\"LoopOption\": \"LoopMirror\""),
                 "Void Exposure must retain its authored mirrored-loop timing");
-        assertFalse(voidVfxJson.contains("\"PostColor\""),
-                "Void Exposure must not replace its authored presentation with a recolor");
+        assertTrue(voidVfxJson.contains("\"PostColor\": \"#4f0f61\""),
+                "Void Exposure must retain its authored void post-color");
+        assertTrue(voidVfxJson.contains("\"PostColorOpacity\": 0.7"),
+                "Void Exposure must retain its authored post-color opacity");
 
         Path iceEffect = Path.of("Server", "Entity", "Effects", "Status", "HyDragon_Miniwyvern_Ice_Slow.json");
         String iceJson = Files.readString(iceEffect);
