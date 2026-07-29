@@ -56,7 +56,7 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
         MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(ownerIdentity.getUuid()).orElse(null);
         if (aura == null || !shouldApply(ownerIdentity.getUuid(), true,
                 damage.isCancelled(), damage.getAmount())) return;
-        EffectControllerComponent controller = store.getComponent(target, EffectControllerComponent.getComponentType());
+        EffectControllerComponent controller = commandBuffer.getComponent(target, EffectControllerComponent.getComponentType());
         EntityEffect effect = EntityEffect.getAssetMap().getAsset(aura.effectId());
         if (controller == null || effect == null) {
             logVoidApplication(aura, store.getComponent(target, UUIDComponent.getComponentType()),
@@ -65,7 +65,7 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
         }
         boolean activeBefore = controller.hasEffect(effect);
         boolean applied = controller.addEffect(target, effect,
-                (float) aura.durationSeconds(), OverlapBehavior.OVERWRITE, store);
+                (float) aura.durationSeconds(), OverlapBehavior.OVERWRITE, commandBuffer);
         boolean activeAfter = controller.hasEffect(effect);
         logVoidApplication(aura, store.getComponent(target, UUIDComponent.getComponentType()),
                 activeBefore, applied, activeAfter, "applied");
