@@ -6,10 +6,10 @@
   },
   "authoringProfile": {
     "schemaCatalog": ".asset-tools/reports/schema-catalog.json",
-    "profile": "runtime-snapshot-2026-07-29",
-    "expectedGameVersion": "unknown",
-    "expectedChannel": "runtime-snapshot",
-    "expectedSourceCommit": "",
+    "profile": "release-0.5.7",
+    "expectedGameVersion": "0.5.7",
+    "expectedChannel": "release",
+    "expectedSourceCommit": "dd07e6a837aaf6378e82ff81d6f520f913624c08",
     "expectedPluginSetSha256": ""
   },
   "runtimeEvidence": {
