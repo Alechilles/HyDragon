@@ -6,7 +6,7 @@
 
 **Architecture:** Tamework owns the reusable engine primitives: a self-targeting purchased-talent sensor and a generic `SUMMONED` XP source. HyDragon owns the Miniwyvern leveling/talent data and each form's asset interpretation of those flags. NPC role instructions gate root interactions and entity effects with `TameworkHasTalent`; once every equivalent path is asset-driven, the existing HyDragon Miniwyvern Java ability runtime is removed.
 
-**Tech Stack:** Java 25, Maven/JUnit 5, Tamework 3.1.0, Hytale 0.5.7, Hytale NPC assets and entity effects, JSON assets, Python asset validator.
+**Tech Stack:** Java 25, Maven/JUnit 5, unreleased Tamework 3.0.0, Hytale 0.5.7, Hytale NPC assets and entity effects, JSON assets, Python asset validator.
 
 **Design source:** [Miniwyvern Talent Progression Design](../specs/2026-07-29-miniwyvern-talent-progression-design.md)
 
@@ -106,14 +106,14 @@
 - [ ] Run `./mvnw test -Dtest=SummonedCompanionExperienceServiceTest` followed by `./mvnw test` and `./mvnw verify`.
 - [ ] Commit as `Feat: award XP to active companions`.
 
-## Task 4: Release the Tamework API change locally for HyDragon integration
+## Task 4: Build the unreleased Tamework 3.0.0 API locally for HyDragon integration
 
 **Repository:** Tamework clean-main worktree, after Tasks 1-3.
 
-- [ ] Bump Tamework's Maven/artifact version from `3.0.0` to `3.1.0`, update any version assertions and release notes required by that repository, and build the mod jar into the normal local mod location.
-- [ ] Verify the resulting jar exposes `TameworkHasTalent`, `SUMMONED`, the `Summoned` config block, and does not regress Avatar Flight XP with `./mvnw verify`.
-- [ ] Commit the version/release metadata as `Release: prepare Tamework 3.1.0`.
-- [ ] Keep this local unless the user separately authorizes publication. HyDragon's integration work uses this exact local artifact and changes `<tamework.version>` to `3.1.0` only after the jar exists.
+- [ ] Keep Tamework's Maven/artifact and manifest version at unreleased `3.0.0`; do not add 3.1.0 release notes or alter public version assertions. Build the current source into the normal local `Alec's Tamework! v3.0.0.jar` location.
+- [ ] Verify the resulting 3.0.0 jar exposes `TameworkHasTalent`, `SUMMONED`, the `Summoned` config block, and does not regress Avatar Flight XP with `./mvnw verify`.
+- [ ] Commit the API additions only; do not create a release/version metadata commit.
+- [ ] Keep this local unless the user separately authorizes publication. HyDragon remains on `<tamework.version>3.0.0</tamework.version>` and uses that exact local artifact.
 
 ## Task 5: Author the complete shared Miniwyvern progression data
 
@@ -125,7 +125,7 @@
 - Create `Server/Tamework/Talents/HyDragonMiniwyvern.json`.
 - Modify `Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json`.
 - Modify `Server/Tamework/Companion/HyDragonMiniwyvern.json`.
-- Modify `pom.xml` (`tamework.version` to `3.1.0`).
+- Do not modify `pom.xml`; it already declares the unreleased `tamework.version` `3.0.0`.
 - Create `src/test/java/com/alechilles/hydragon/config/MiniwyvernTalentProgressionAssetTest.java`.
 - Modify the relevant `Server/Languages/*.lang` files: `en-US`, `de-DE`, `es-ES`, `fr-FR`, and `pt-BR`.
 
