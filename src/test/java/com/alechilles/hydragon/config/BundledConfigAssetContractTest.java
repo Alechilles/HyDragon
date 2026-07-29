@@ -94,6 +94,18 @@ class BundledConfigAssetContractTest {
     }
 
     @Test
+    void itemAssetsDoNotUseEmptyLightColors() throws IOException {
+        try (var assets = Files.walk(Path.of("Server", "Item", "Items"))) {
+            for (Path asset : assets.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".json"))
+                    .toList()) {
+                assertFalse(Files.readString(asset).matches("(?s).*\\\"Light\\\"\\s*:\\s*\\{\\s*\\\"Color\\\"\\s*:\\s*\\\"\\\".*"),
+                        asset + " must omit Light rather than supplying an invalid empty color");
+            }
+        }
+    }
+
+    @Test
     void bundledAssetsDecodeWithoutUnknownFieldsAndCrossValidate() throws IOException {
         List<DragonSpeciesConfig> species = decodeDirectory(
                 "DragonSpecies", DragonSpeciesConfig.class, DragonSpeciesConfig.CODEC);
