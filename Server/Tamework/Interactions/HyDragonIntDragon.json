@@ -9,7 +9,17 @@
       "Type": "Mount",
       "Enabled": true,
       "RequireMountable": false,
-      "RequireCrouching": false
+      "RequireCrouching": false,
+      "Requires": {
+        "All": {
+          "ItemsInHand": [
+            {
+              "Items": [ "Tamework_Flightmasters_Talisman" ],
+              "Quantity": 1
+            }
+          ]
+        }
+      }
     },
     {
       "Type": "Custom",
