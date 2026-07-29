@@ -766,6 +766,39 @@
       ] },
       "ActionsBlocking": true,
       "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AttackPauseRange": [ 0.75, 0.75 ] } ]
+    },
+    {
+      "$Comment": "Range is an executable, mutually-exclusive projectile variant.",
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileRange" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AttackPauseRange": [ 2.0, 2.0 ] } ]
+    },
+    {
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AttackPauseRange": [ 1.25, 1.25 ] } ]
+    },
+    {
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AttackPauseRange": [ 1.5, 1.5 ] } ]
+    },
+    {
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AttackPauseRange": [ 1.0, 1.0 ] } ]
+    },
+    {
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AttackPauseRange": [ 1.0, 1.0 ] } ]
+    },
+    {
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AttackPauseRange": [ 0.9, 0.9 ] } ]
+    },
+    {
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AttackPauseRange": [ 0.85, 0.85 ] } ]
+    },
+    {
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AttackPauseRange": [ 0.8, 0.8 ] } ]
     }
   ],
   "InteractionInstruction": {

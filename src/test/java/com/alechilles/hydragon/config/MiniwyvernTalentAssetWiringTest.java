@@ -18,17 +18,24 @@ final class MiniwyvernTalentAssetWiringTest {
     private static final Path TEMPLATE = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon",
             "Templates", "Template_Wyvern_Mini_Flying_Tamed.json");
     private static final List<String> ROLES = List.of("Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
+    private static final List<String> COMBAT_TALENTS = List.of("DraconicProjectile", "ProjectileRange",
+            "ProjectileCadence", "ProjectileForce", "ProjectileGuidance", "ProjectileImpact",
+            "ProjectilePattern", "DraconicAssault", "AssaultUtility", "AssaultMastery", "DraconicApex");
 
     @Test
     void templateContainsTalentGatedExecutableVariants() throws IOException {
         JsonObject template = load(TEMPLATE);
         JsonArray instructions = template.getAsJsonArray("Instructions");
 
-        assertTrue(hasTalentGate(instructions, "DraconicProjectile"));
-        assertTrue(hasTalentGate(instructions, "ProjectileForce"));
-        assertTrue(hasTalentGate(instructions, "DraconicApex"));
-        assertTrue(hasExecutableAction(instructions));
-        assertTrue(hasHigherTierExclusion(instructions));
+        for (int index = 0; index < COMBAT_TALENTS.size(); index++) {
+            String talentId = COMBAT_TALENTS.get(index);
+            JsonObject instruction = instructionForTalent(instructions, talentId);
+            assertTrue(hasExecutableAction(instruction), talentId + " must select an executable action");
+            if (index + 1 < COMBAT_TALENTS.size()) {
+                assertTrue(hasHigherTierExclusion(instruction, COMBAT_TALENTS.subList(index + 1, COMBAT_TALENTS.size())),
+                        talentId + " must exclude a higher Combat variant");
+            }
+        }
     }
 
     @Test
@@ -41,10 +48,12 @@ final class MiniwyvernTalentAssetWiringTest {
             assertTrue(source.contains("DraconicApex"), form + " must bind the shared Combat capstone");
             assertFalse(source.contains("Miniwyvern_"), form + " must not introduce form-specific talent IDs");
         }
-        String wild = Files.readString(Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon",
-                "Wyvern_Mini", "Wyvern_Mini_Wild_Projectile.json"));
-        for (String status : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void")) {
-            assertFalse(wild.contains(status), "Wild projectile must remain raw-only: " + status);
+        for (String tier : List.of("", "_Intermediate", "_Apex")) {
+            String wild = Files.readString(Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon",
+                    "Wyvern_Mini", "Wyvern_Mini_Wild_Projectile" + tier + ".json"));
+            for (String status : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "EffectId")) {
+                assertFalse(wild.contains(status), "Wild projectile must remain raw-only: " + status);
+            }
         }
     }
 
@@ -74,13 +83,20 @@ final class MiniwyvernTalentAssetWiringTest {
         return false;
     }
 
-    private static boolean hasHigherTierExclusion(JsonElement value) {
+    private static JsonObject instructionForTalent(JsonArray instructions, String talentId) {
+        for (JsonElement element : instructions) {
+            if (element.isJsonObject() && hasTalentGate(element, talentId)) return element.getAsJsonObject();
+        }
+        throw new AssertionError("missing executable gate for " + talentId);
+    }
+
+    private static boolean hasHigherTierExclusion(JsonElement value, List<String> higherTalents) {
         if (value.isJsonObject()) {
             JsonObject object = value.getAsJsonObject();
-            if ("Not".equals(string(object, "Type")) && hasTalentGate(object, "ProjectileForce")) return true;
-            for (JsonElement child : object.asMap().values()) if (hasHigherTierExclusion(child)) return true;
+            if ("Not".equals(string(object, "Type")) && higherTalents.stream().anyMatch(id -> hasTalentGate(object, id))) return true;
+            for (JsonElement child : object.asMap().values()) if (hasHigherTierExclusion(child, higherTalents)) return true;
         } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) if (hasHigherTierExclusion(child)) return true;
+            for (JsonElement child : value.getAsJsonArray()) if (hasHigherTierExclusion(child, higherTalents)) return true;
         }
         return false;
     }
