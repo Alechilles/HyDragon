@@ -1184,7 +1184,7 @@ def main() -> int:
     validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
     projectile_ids = {
         path.stem for root in (ROOT, base_root) if root is not None
-        for path in root.rglob("*") if path.is_file() and any("Projectile" in part for part in path.parts)
+        for path in (root / "Server" / "Projectiles").rglob("*.json")
     }
     validate_domain_references(parsed, known_assets, projectile_ids, errors)
     validate_release_content_contracts(parsed, errors)
