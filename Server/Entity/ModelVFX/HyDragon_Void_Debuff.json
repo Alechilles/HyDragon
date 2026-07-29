@@ -13,8 +13,8 @@
   "CurveType": "Linear",
   "LoopOption": "LoopMirror",
   "NoiseScrollSpeed": {
-    "Y": -0.2,
-    "X": 0.2
+    "Y": -0.02,
+    "X": 0.02
   },
   "NoiseScale": {
     "X": 40,
