@@ -242,21 +242,16 @@ final class MiniwyvernTalentAssetWiringTest {
 
     private static void collectReferencedInteractions(
             JsonElement value, Set<String> visited, String description) throws IOException {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            for (Map.Entry<String, JsonElement> entry : object.asMap().entrySet()) {
-                JsonElement child = entry.getValue();
-                if (child.isJsonPrimitive() && child.getAsJsonPrimitive().isString()) {
-                    String nextId = child.getAsString();
-                    if (nextId.matches("[A-Za-z0-9_-]+")) {
-                        Path nextPath = interactionPath(nextId);
-                        if (Files.isRegularFile(nextPath)) {
-                            assertRawOnlyInteractionChain(nextId, description + " chained interaction", visited);
-                        }
-                    }
-                } else {
-                    collectReferencedInteractions(child, visited, description);
-                }
+        if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
+            String interactionId = value.getAsString();
+            if (!interactionId.matches("[A-Za-z0-9_-]+")) return;
+            Path interaction = interactionPath(interactionId);
+            if (Files.isRegularFile(interaction)) {
+                assertRawOnlyInteractionChain(interactionId, description + " chained interaction", visited);
+            }
+        } else if (value.isJsonObject()) {
+            for (JsonElement child : value.getAsJsonObject().asMap().values()) {
+                collectReferencedInteractions(child, visited, description);
             }
         } else if (value.isJsonArray()) {
             for (JsonElement child : value.getAsJsonArray()) {
