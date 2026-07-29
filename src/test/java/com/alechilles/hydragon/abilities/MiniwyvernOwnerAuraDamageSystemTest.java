@@ -36,12 +36,23 @@ class MiniwyvernOwnerAuraDamageSystemTest {
 
     @Test
     void routesOwnerHitEffectsThroughTheCommandBufferForClientReplication() throws IOException {
-        Path source = Path.of(System.getProperty("hydragon.project.basedir"),
-                "src/main/java/com/alechilles/hydragon/abilities/MiniwyvernOwnerAuraDamageSystem.java");
-        String system = Files.readString(source);
+        String system = source();
 
         assertTrue(system.contains(
                 "commandBuffer.getComponent(target, EffectControllerComponent.getComponentType())"));
         assertTrue(system.contains("OverlapBehavior.OVERWRITE, commandBuffer)"));
+    }
+
+    @Test
+    void runsBeforeTheEntityEffectTrackerSoOwnerHitEffectsReplicateInTheSameTick() throws IOException {
+        String system = source();
+
+        assertTrue(system.contains("new SystemDependency<>(Order.BEFORE, EntityTrackerSystems.EffectControllerSystem.class)"));
+    }
+
+    private static String source() throws IOException {
+        Path source = Path.of(System.getProperty("hydragon.project.basedir"),
+                "src/main/java/com/alechilles/hydragon/abilities/MiniwyvernOwnerAuraDamageSystem.java");
+        return Files.readString(source);
     }
 }

@@ -5,6 +5,9 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
+import com.hypixel.hytale.component.dependency.Dependency;
+import com.hypixel.hytale.component.dependency.Order;
+import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
@@ -19,6 +22,7 @@ import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystem
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,6 +34,8 @@ import javax.annotation.Nullable;
 public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
     private static final Logger LOGGER = Logger.getLogger(MiniwyvernOwnerAuraDamageSystem.class.getName());
     private static final long VOID_DIAGNOSTIC_INTERVAL_MS = 2_000L;
+    private static final Set<Dependency<EntityStore>> DEPENDENCIES = Set.of(
+            new SystemDependency<>(Order.BEFORE, EntityTrackerSystems.EffectControllerSystem.class));
     private final MiniwyvernOwnerAuraRegistry registry;
     private final MiniwyvernVoidEffectLifetimeSystem voidLifetime;
     private final ConcurrentHashMap<UUID, Long> lastVoidDiagnosticAt = new ConcurrentHashMap<>();
@@ -46,6 +52,7 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
     }
 
     @Nullable @Override public SystemGroup<EntityStore> getGroup() { return DamageModule.get().getInspectDamageGroup(); }
+    @Nonnull @Override public Set<Dependency<EntityStore>> getDependencies() { return DEPENDENCIES; }
     @Nonnull @Override public Query<EntityStore> getQuery() { return UUIDComponent.getComponentType(); }
 
     @Override public void handle(int index, @Nonnull ArchetypeChunk<EntityStore> chunk,
