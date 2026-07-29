@@ -6,39 +6,25 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
-import com.hypixel.hytale.server.core.asset.type.entityeffect.config.OverlapBehavior;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
-import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** Applies a currently summoned Miniwyvern's owner-hit aura after Hytale's damage filters. */
 public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
-    private static final Logger LOGGER = Logger.getLogger(MiniwyvernOwnerAuraDamageSystem.class.getName());
-    private static final long VOID_DIAGNOSTIC_INTERVAL_MS = 2_000L;
     private final MiniwyvernOwnerAuraRegistry registry;
-    private final MiniwyvernVoidEffectLifetimeSystem voidLifetime;
-    private final ConcurrentHashMap<UUID, Long> lastVoidDiagnosticAt = new ConcurrentHashMap<>();
-
-    public MiniwyvernOwnerAuraDamageSystem(MiniwyvernOwnerAuraRegistry registry) {
-        this(registry, new MiniwyvernVoidEffectLifetimeSystem());
-    }
+    private final MiniwyvernOwnerAuraEffectQueue effectQueue;
 
     public MiniwyvernOwnerAuraDamageSystem(
-            MiniwyvernOwnerAuraRegistry registry, MiniwyvernVoidEffectLifetimeSystem voidLifetime) {
+            MiniwyvernOwnerAuraRegistry registry, MiniwyvernOwnerAuraEffectQueue effectQueue) {
         this.registry = Objects.requireNonNull(registry, "registry");
-        this.voidLifetime = Objects.requireNonNull(voidLifetime, "voidLifetime");
+        this.effectQueue = Objects.requireNonNull(effectQueue, "effectQueue");
     }
 
     @Nullable @Override public SystemGroup<EntityStore> getGroup() { return DamageModule.get().getInspectDamageGroup(); }
@@ -59,41 +45,7 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
                 damage.isCancelled(), damage.getAmount())) return;
         UUIDComponent targetIdentity = store.getComponent(target, UUIDComponent.getComponentType());
         if (targetIdentity == null) return;
-        World world = store.getExternalData().getWorld();
-        MiniwyvernOwnerAuraEffectScheduler.schedule(
-                world::execute, targetIdentity.getUuid(), aura,
-                (queuedTarget, queuedAura) -> applyQueuedEffect(world, queuedTarget, queuedAura));
-    }
-
-    private void applyQueuedEffect(
-            World world, UUID targetUuid, MiniwyvernOwnerAuraRegistry.Aura aura) {
-        Store<EntityStore> store = world.getEntityStore().getStore();
-        Ref<EntityStore> target = world.getEntityRef(targetUuid);
-        if (!isLiveRef(target)) {
-            logVoidApplication(aura, targetUuid, false, false, false, "missing-target");
-            return;
-        }
-        EffectControllerComponent controller = store.getComponent(
-                target, EffectControllerComponent.getComponentType());
-        EntityEffect effect = EntityEffect.getAssetMap().getAsset(aura.effectId());
-        if (controller == null || effect == null) {
-            logVoidApplication(aura, targetUuid,
-                    false, false, false, controller == null ? "missing-controller" : "missing-effect");
-            return;
-        }
-        boolean activeBefore = controller.hasEffect(effect);
-        boolean applied = controller.addEffect(target, effect,
-                (float) aura.durationSeconds(), OverlapBehavior.OVERWRITE, store);
-        boolean activeAfter = controller.hasEffect(effect);
-        logVoidApplication(aura, targetUuid,
-                activeBefore, applied, activeAfter, "applied");
-        if (applied && "void".equals(aura.formId())) {
-            voidLifetime.observe(targetUuid);
-        }
-        if (applied && aura.damageReductionFraction() > 0.0D) {
-            registry.recordToxicWeakness(targetUuid, aura.effectId(), aura.damageReductionFraction(),
-                    aura.durationSeconds(), System.currentTimeMillis());
-        }
+        effectQueue.submit(store.getExternalData().getWorld().getName(), targetIdentity.getUuid(), aura);
     }
 
     boolean shouldApply(java.util.UUID ownerUuid, boolean playerSource, boolean cancelled, float amount) {
@@ -102,21 +54,4 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
     }
 
     static boolean isLiveRef(@Nullable Ref<EntityStore> ref) { return ref != null && ref.isValid(); }
-
-    private void logVoidApplication(
-            MiniwyvernOwnerAuraRegistry.Aura aura,
-            UUID targetUuid,
-            boolean activeBefore,
-            boolean applied,
-            boolean activeAfter,
-            String outcome) {
-        if (!"void".equals(aura.formId())) return;
-        long nowMs = System.currentTimeMillis();
-        Long last = lastVoidDiagnosticAt.put(targetUuid, nowMs);
-        if (last != null && nowMs - last < VOID_DIAGNOSTIC_INTERVAL_MS) return;
-        LOGGER.info(() -> "Void owner-hit aura " + outcome + " for " + targetUuid
-                + ": activeBefore=" + activeBefore + ", addEffect=" + applied
-                + ", activeAfter=" + activeAfter + ", duration=" + aura.durationSeconds());
-    }
-
 }

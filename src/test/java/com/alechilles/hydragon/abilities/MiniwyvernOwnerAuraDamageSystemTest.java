@@ -16,7 +16,8 @@ class MiniwyvernOwnerAuraDamageSystemTest {
     void appliesToPositivePlayerDamageBeforeTheMiniwyvernFlagsTheTargetHostile() {
         MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
         registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "fire", "burn", 4.0D, null);
-        MiniwyvernOwnerAuraDamageSystem system = new MiniwyvernOwnerAuraDamageSystem(registry);
+        MiniwyvernOwnerAuraDamageSystem system = new MiniwyvernOwnerAuraDamageSystem(
+                registry, new MiniwyvernOwnerAuraEffectQueue());
 
         assertTrue(system.shouldApply(OWNER, true, false, 1.0F));
         assertFalse(system.shouldApply(OWNER, false, false, 1.0F));
