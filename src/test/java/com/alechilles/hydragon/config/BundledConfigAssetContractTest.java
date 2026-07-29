@@ -248,7 +248,7 @@ class BundledConfigAssetContractTest {
         assertEquals(0.12, archetypes.get("toxic").getOwnerAttackAura().getDamageReductionFraction());
         assertOwnerAttackAura(archetypes, "fire", "HyDragon_Miniwyvern_Fire_Burn", 4.0);
         assertOwnerAttackAura(archetypes, "ice", "HyDragon_Miniwyvern_Ice_Slow", 4.0);
-        assertOwnerAttackAura(archetypes, "void", "Burn", 3.0);
+        assertOwnerAttackAura(archetypes, "void", "HyDragon_Miniwyvern_Void_Exposure", 6.0);
     }
 
     private static void assertOwnerAttackAura(Map<String, MiniwyvernArchetypeConfig> archetypes,

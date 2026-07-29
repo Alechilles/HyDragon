@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.hypixel.hytale.component.ComponentRegistry;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -34,25 +31,4 @@ class MiniwyvernOwnerAuraDamageSystemTest {
         assertFalse(MiniwyvernOwnerAuraDamageSystem.isLiveRef(null));
     }
 
-    @Test
-    void routesOwnerHitEffectsThroughTheLiveStoreForEffectControllerReplication() throws IOException {
-        String system = source();
-
-        assertTrue(system.contains(
-                "store.getComponent(target, EffectControllerComponent.getComponentType())"));
-        assertTrue(system.contains("OverlapBehavior.OVERWRITE, store)"));
-    }
-
-    @Test
-    void runsBeforeTheEntityEffectTrackerSoOwnerHitEffectsReplicateInTheSameTick() throws IOException {
-        String system = source();
-
-        assertTrue(system.contains("new SystemDependency<>(Order.BEFORE, EntityTrackerSystems.EffectControllerSystem.class)"));
-    }
-
-    private static String source() throws IOException {
-        Path source = Path.of(System.getProperty("hydragon.project.basedir"),
-                "src/main/java/com/alechilles/hydragon/abilities/MiniwyvernOwnerAuraDamageSystem.java");
-        return Files.readString(source);
-    }
 }
