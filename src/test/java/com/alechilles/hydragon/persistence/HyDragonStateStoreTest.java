@@ -120,7 +120,6 @@ class HyDragonStateStoreTest {
         ProfileExtensionRecord profile = ProfileExtensionRecord.soulboundMiniwyvern(
                 PROFILE_ONE,
                 "hydragon:miniwyvern",
-                "neutral",
                 Optional.of("soul:one"));
         EncounterRecord encounter = encounterRecord();
         assertEquals(MutationOutcome.APPLIED, first.putProfileExtension(profile));
@@ -225,7 +224,6 @@ class HyDragonStateStoreTest {
         ProfileExtensionRecord fire = ProfileExtensionRecord.soulboundMiniwyvern(
                 PROFILE_ONE,
                 "hydragon:miniwyvern",
-                "fire",
                 Optional.of("attune:fire"));
         assertEquals(MutationOutcome.APPLIED, store.putProfileExtension(fire));
         assertEquals(MutationOutcome.ALREADY_APPLIED, store.putProfileExtension(fire));
@@ -234,7 +232,6 @@ class HyDragonStateStoreTest {
                 store.putProfileExtension(ProfileExtensionRecord.soulboundMiniwyvern(
                         PROFILE_ONE,
                         "hydragon:miniwyvern",
-                        "ice",
                         Optional.of("attune:fire"))));
         assertEquals(3, writes.get());
     }
@@ -272,7 +269,6 @@ class HyDragonStateStoreTest {
         ProfileExtensionRecord replacement = ProfileExtensionRecord.soulboundMiniwyvern(
                 PROFILE_ONE,
                 "hydragon:miniwyvern",
-                "fire",
                 Optional.of("attune:one"));
         assertEquals(MutationOutcome.QUARANTINED, store.putProfileExtension(replacement));
         assertEquals(MutationOutcome.QUARANTINED, store.beginSoulBond(PLAYER_TWO, "soul:new"));
