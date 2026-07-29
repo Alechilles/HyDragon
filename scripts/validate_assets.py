@@ -1023,19 +1023,21 @@ def validate_nordic_landing_recovery(parsed: dict[Path, object], errors: list[st
         fail(errors, "Nordic Drake landing template is unavailable")
         return
 
-    def contains_recovery(instructions: object) -> bool:
+    def contains_landing_recovery(instructions: object) -> bool:
         if isinstance(instructions, dict):
+            body_motion = instructions.get("BodyMotion")
             actions = instructions.get("Actions")
-            if isinstance(actions, list):
+            if isinstance(body_motion, dict) and body_motion.get("Type") == "Land" \
+                    and isinstance(actions, list):
                 action_types = {action.get("Type") for action in actions if isinstance(action, dict)}
                 if {"Timeout", "ResetSearchRays", "State"} <= action_types and any(
                         isinstance(action, dict) and action.get("Type") == "State"
                         and action.get("State") == ".AirLand"
                         for action in actions):
                     return True
-            return any(contains_recovery(child) for child in instructions.values())
+            return any(contains_landing_recovery(child) for child in instructions.values())
         if isinstance(instructions, list):
-            return any(contains_recovery(instruction) for instruction in instructions)
+            return any(contains_landing_recovery(instruction) for instruction in instructions)
         return False
 
     def find_touchdown_instructions(value: object) -> object | None:
@@ -1056,8 +1058,8 @@ def validate_nordic_landing_recovery(parsed: dict[Path, object], errors: list[st
         return None
 
     touchdown_instructions = find_touchdown_instructions(template)
-    if not contains_recovery(touchdown_instructions):
-        fail(errors, "Nordic Drake touchdown must retry a fresh landing approach after a bounded failed landing")
+    if not contains_landing_recovery(touchdown_instructions):
+        fail(errors, "Nordic Drake touchdown must run its bounded recovery alongside the active Land motion")
 
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
     outputs = {
