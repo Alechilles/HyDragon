@@ -164,7 +164,7 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
-    void natureRegenerationHealsAndPresentsOnItsCappedSchedule() throws Exception {
+    void natureRegenerationHealsAndPresentsAttachedMagicOnItsCappedSchedule() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = worldFor(states, "nature");
         world.ownerHealth = new MiniwyvernAbilityWorld.Health(50.0D, 100.0D);
@@ -178,7 +178,8 @@ class MiniwyvernAbilityServiceTest {
         assertTrue(first.ready());
         assertTrue(early.ready());
         assertEquals(1, world.healApplications);
-        assertEquals(1, world.presentations);
+        assertEquals(0, world.presentations);
+        assertEquals(1, world.attachedPresentations);
         assertEquals(3_000L, states.current.cooldownUntilByAbility().get("nature_regeneration"));
     }
 
@@ -506,6 +507,7 @@ class MiniwyvernAbilityServiceTest {
         int damageApplications;
         int healApplications;
         int presentations;
+        int attachedPresentations;
         String companionRoleId = "Tamed_Wyvern_Mini_Fire";
         boolean sawCommittedCooldownBeforeMutation;
         boolean ownerModifiersSupported = true;
@@ -579,6 +581,10 @@ class MiniwyvernAbilityServiceTest {
         }
         @Override public int emitPresentation(UUID entityUuid, List<String> particleAndSoundIds) {
             presentations += particleAndSoundIds.size();
+            return particleAndSoundIds.size();
+        }
+        @Override public int emitAttachedPresentation(UUID entityUuid, List<String> particleAndSoundIds) {
+            attachedPresentations += particleAndSoundIds.size();
             return particleAndSoundIds.size();
         }
         @Override public boolean launchProjectile(UUID sourceUuid, UUID targetUuid, String projectileId) {

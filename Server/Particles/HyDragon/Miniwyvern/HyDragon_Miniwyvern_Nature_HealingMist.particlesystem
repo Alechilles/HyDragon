@@ -3,11 +3,17 @@
     {
       "SpawnerId": "HyDragon_Miniwyvern_Nature_HealingMist",
       "PositionOffset": {
-        "Y": 0.65
+        "Y": 0.45
+      }
+    },
+    {
+      "SpawnerId": "HyDragon_Miniwyvern_Nature_HealingMist_Spark",
+      "PositionOffset": {
+        "Y": 0.95
       }
     }
   ],
-  "LifeSpan": 0.75,
+  "LifeSpan": 1.25,
   "CullDistance": 24.0,
   "IsImportant": false
 }

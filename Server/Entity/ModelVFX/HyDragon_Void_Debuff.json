@@ -1,0 +1,23 @@
+{
+  "SwitchTo": "Distortion",
+  "EffectDirection": "None",
+  "AnimationDuration": 3.0,
+  "AnimationRange": {
+    "Y": 0.2,
+    "X": 0.1
+  },
+  "UseBloomOnHighlight": true,
+  "UseProgessiveHighlight": false,
+  "HighlightColor": "#6c31a8",
+  "HighlightThickness": 2,
+  "CurveType": "Linear",
+  "LoopOption": "LoopMirror",
+  "NoiseScrollSpeed": {
+    "Y": -0.2,
+    "X": 0.2
+  },
+  "NoiseScale": {
+    "X": 40,
+    "Y": 40
+  }
+}

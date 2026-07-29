@@ -283,7 +283,7 @@ public final class MiniwyvernAbilityService {
             applied++;
             gameplayApplied = true;
         }
-        if (gameplayApplied) world.emitPresentation(context.ownerUuid(), config.getParticleAndSoundIds());
+        if (gameplayApplied) world.emitAttachedPresentation(context.ownerUuid(), config.getParticleAndSoundIds());
         return applied;
     }
 

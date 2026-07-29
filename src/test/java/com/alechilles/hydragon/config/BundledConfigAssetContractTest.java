@@ -111,6 +111,39 @@ class BundledConfigAssetContractTest {
         }
     }
 
+    @Test
+    void voidExposureAndIceSlowHaveTargetReadableVisuals() throws IOException {
+        Path voidEffect = Path.of("Server", "Entity", "Effects", "Status", "HyDragon_Miniwyvern_Void_Exposure.json");
+        String voidJson = Files.readString(voidEffect);
+        assertTrue(voidJson.contains("\"ModelVFXId\": \"HyDragon_Void_Debuff\""),
+                "Void Exposure must use the bundled target ModelVFX");
+        assertTrue(Files.exists(Path.of("Server", "Entity", "ModelVFX", "HyDragon_Void_Debuff.json")),
+                "Void Exposure ModelVFX must be bundled");
+
+        String frostId = "HyDragon_Miniwyvern_Ice_ChillGround";
+        Path iceEffect = Path.of("Server", "Entity", "Effects", "Status", "HyDragon_Miniwyvern_Ice_Slow.json");
+        String iceJson = Files.readString(iceEffect);
+        assertTrue(iceJson.contains("\"HorizontalSpeedMultiplier\": 0.5"),
+                "Ice Slow must retain its gameplay slow");
+        assertFalse(iceJson.contains("\"EntityBottomTint\""), "Ice Slow must not recolor its target");
+        assertFalse(iceJson.contains("\"EntityTopTint\""), "Ice Slow must not recolor its target");
+        assertTrue(iceJson.contains("\"SystemId\": \"" + frostId + "\""),
+                "Ice Slow must attach its frost ground aura to the target");
+        assertTrue(iceJson.contains("\"TargetEntityPart\": \"Self\""),
+                "Ice Slow frost aura must follow the affected target");
+        assertTrue(iceJson.contains("\"PositionOffset\": { \"Y\": 0.05 }"),
+                "Ice Slow frost aura must sit at the target's feet");
+
+        Path system = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", frostId + ".particlesystem");
+        Path spawner = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", "Spawners", frostId + ".particlespawner");
+        assertTrue(Files.exists(system), "Ice Slow frost particle system must be bundled");
+        assertTrue(Files.exists(spawner), "Ice Slow frost spawner must be bundled");
+        assertTrue(Files.readString(system).contains("\"LifeSpan\": 4.0"),
+                "Ice Slow frost aura must be bounded by the four-second debuff duration");
+        assertTrue(Files.readString(spawner).contains("\"ParticleLifeSpan\": { \"Min\": 4.0, \"Max\": 4.0 }"),
+                "Ice Slow frost particles must not outlive their bounded system");
+    }
+
     private record AuraVisual(String effectId, String iconPath) { }
 
     private static int occurrences(String value, String needle) {
@@ -175,12 +208,15 @@ class BundledConfigAssetContractTest {
 
         Path system = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", mistId + ".particlesystem");
         Path spawner = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", "Spawners", mistId + ".particlespawner");
+        Path sparkSpawner = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", "Spawners", mistId + "_Spark.particlespawner");
         assertTrue(Files.exists(system), "Nature healing mist particle system must be bundled");
         assertTrue(Files.exists(spawner), "Nature healing mist spawner must be bundled");
+        assertTrue(Files.exists(sparkSpawner), "Nature healing magic spark spawner must be bundled");
         String systemJson = Files.readString(system);
         String spawnerJson = Files.readString(spawner);
-        assertTrue(systemJson.contains("\"LifeSpan\": 0.75"), "Nature healing mist must have a bounded system lifetime");
-        assertTrue(spawnerJson.contains("\"Max\": 0.65"), "Nature healing mist particles must expire quickly");
+        assertTrue(systemJson.contains("\"LifeSpan\": 1.25"), "Nature healing magic must have a bounded system lifetime");
+        assertTrue(systemJson.contains("\"Y\": 0.45"), "Nature healing magic must originate above the player's feet");
+        assertTrue(spawnerJson.contains("\"Max\": 1.1"), "Nature healing mist particles must expire quickly");
     }
 
     @Test

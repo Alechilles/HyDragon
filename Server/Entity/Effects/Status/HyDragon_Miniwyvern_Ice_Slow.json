@@ -2,8 +2,14 @@
   "Name": "server.effects.miniwyvernIceSlow.name",
   "ApplicationEffects": {
     "HorizontalSpeedMultiplier": 0.5,
-    "EntityBottomTint": "#38BDF8",
-    "EntityTopTint": "#E0F2FE"
+    "Particles": [
+      {
+        "SystemId": "HyDragon_Miniwyvern_Ice_ChillGround",
+        "TargetEntityPart": "Self",
+        "PositionOffset": { "Y": 0.05 },
+        "DetachedFromModel": false
+      }
+    ]
   },
   "OverlapBehavior": "Overwrite",
   "RemovalBehavior": "Duration",

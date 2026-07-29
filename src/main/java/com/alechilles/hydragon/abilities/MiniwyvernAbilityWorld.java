@@ -70,6 +70,11 @@ public interface MiniwyvernAbilityWorld {
         return 0;
     }
 
+    /** Emits particle systems attached to the requested entity's model. */
+    default int emitAttachedPresentation(UUID entityUuid, List<String> particleAndSoundIds) {
+        return emitPresentation(entityUuid, particleAndSoundIds);
+    }
+
     boolean launchProjectile(UUID sourceUuid, UUID targetUuid, String projectileId);
 
     boolean dealDamage(UUID sourceUuid, UUID targetUuid, double amount);

@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.asset.type.attitude.Attitude;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.OverlapBehavior;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.RemovalBehavior;
+import com.hypixel.hytale.server.core.asset.type.model.config.ModelParticle;
 import com.hypixel.hytale.server.core.asset.type.particle.config.ParticleSystem;
 import com.hypixel.hytale.server.core.asset.type.projectile.config.Projectile;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
@@ -21,6 +22,7 @@ import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.Intangible;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
+import com.hypixel.hytale.server.core.modules.entity.tracker.NetworkId;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageCause;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageSystems;
@@ -31,12 +33,14 @@ import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntitySta
 import com.hypixel.hytale.server.core.modules.physics.util.PhysicsMath;
 import com.hypixel.hytale.server.core.modules.time.TimeResource;
 import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.protocol.SoundCategory;
+import com.hypixel.hytale.protocol.packets.entities.SpawnModelParticles;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -50,6 +54,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 /**
  * Hytale 0.5.6 world-thread adapter for effects, health, hostile target slots, damage, and legacy projectiles.
@@ -359,6 +364,45 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
                         continue;
                     }
                     warnPresentationOnce(id, "asset is neither a loaded ParticleSystem nor SoundEvent");
+                } catch (RuntimeException failure) {
+                    warnPresentationOnce(id, failure.getClass().getSimpleName());
+                }
+            }
+            return emitted;
+        }
+
+        @Override
+        public int emitAttachedPresentation(UUID entityUuid, List<String> particleAndSoundIds) {
+            Ref<EntityStore> ref = resolve(entityUuid);
+            TransformComponent transform = valid(ref)
+                    ? store.getComponent(ref, TransformComponent.getComponentType()) : null;
+            NetworkId networkId = valid(ref) ? store.getComponent(ref, NetworkId.getComponentType()) : null;
+            if (transform == null || networkId == null
+                    || particleAndSoundIds == null || particleAndSoundIds.isEmpty()) return 0;
+            SpatialResource<Ref<EntityStore>, EntityStore> players =
+                    store.getResource(EntityModule.get().getPlayerSpatialResourceType());
+            List<Ref<EntityStore>> nearby = SpatialResource.getThreadLocalReferenceList();
+            players.getSpatialStructure().collect(transform.getPosition(), 32.0D, nearby);
+            int emitted = 0;
+            for (String rawId : particleAndSoundIds) {
+                String id = rawId == null ? "" : rawId.trim();
+                if (id.isEmpty()) continue;
+                try {
+                    if (ParticleSystem.getAssetMap().getAsset(id) == null) {
+                        warnPresentationOnce(id, "attached presentation requires a loaded ParticleSystem");
+                        continue;
+                    }
+                    ModelParticle particle = new ModelParticle();
+                    particle.setSystemId(id);
+                    particle.setPositionOffset(new Vector3f());
+                    particle.setDetachedFromModel(false);
+                    SpawnModelParticles packet = new SpawnModelParticles(
+                            networkId.getId(), new com.hypixel.hytale.protocol.ModelParticle[] {particle.toPacket()});
+                    for (Ref<EntityStore> playerRef : nearby) {
+                        PlayerRef player = store.getComponent(playerRef, PlayerRef.getComponentType());
+                        if (player != null) player.getPacketHandler().write(packet);
+                    }
+                    emitted++;
                 } catch (RuntimeException failure) {
                     warnPresentationOnce(id, failure.getClass().getSimpleName());
                 }

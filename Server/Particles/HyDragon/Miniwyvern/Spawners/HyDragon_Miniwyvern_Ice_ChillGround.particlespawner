@@ -1,0 +1,93 @@
+{
+  "RenderMode": "BlendLinear",
+  "ParticleRotationInfluence": "None",
+  "ParticleRotateWithSpawner": true,
+  "MaxConcurrentParticles": 1,
+  "TotalParticles": {
+    "Min": 1,
+    "Max": 1
+  },
+  "ParticleLifeSpan": { "Min": 4.0, "Max": 4.0 },
+  "SpawnRate": {
+    "Min": 30.0,
+    "Max": 30.0
+  },
+  "InitialVelocity": {
+    "Speed": {
+      "Min": 0.0,
+      "Max": 0.0
+    },
+    "Yaw": {
+      "Min": 0.0,
+      "Max": 0.0
+    },
+    "Pitch": {
+      "Min": 0.0,
+      "Max": 0.0
+    }
+  },
+  "Particle": {
+    "Texture": "Particles/Textures/Ice/Icyground.png",
+    "FrameSize": {
+      "Width": 128,
+      "Height": 128
+    },
+    "ScaleRatioConstraint": "OneToOne",
+    "UVOption": "RandomFlipU",
+    "Animation": {
+      "0": {
+        "FrameIndex": {
+          "Min": 0,
+          "Max": 0
+        },
+        "Color": "#BDEBFF",
+        "Opacity": 0.45,
+        "Scale": {
+          "X": {
+            "Min": 0.55,
+            "Max": 0.75
+          },
+          "Y": {
+            "Min": 0.55,
+            "Max": 0.75
+          }
+        }
+      },
+      "100": {
+        "Color": "#8DD8FF",
+        "Opacity": 0.0,
+        "Scale": {
+          "X": {
+            "Min": 0.9,
+            "Max": 1.1
+          },
+          "Y": {
+            "Min": 0.9,
+            "Max": 1.1
+          }
+        }
+      }
+    },
+    "InitialAnimationFrame": {
+      "Rotation": {
+        "X": {
+          "Min": 90.0,
+          "Max": 90.0
+        },
+        "Y": {
+          "Min": 90.0,
+          "Max": 90.0
+        },
+        "Z": {
+          "Min": 90.0,
+          "Max": 90.0
+        }
+      },
+      "FrameIndex": {
+        "Min": 0,
+        "Max": 0
+      }
+    }
+  },
+  "LinearFiltering": true
+}
