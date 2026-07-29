@@ -1,8 +1,6 @@
 {
   "Id": "fire",
-  "EssenceSemanticId": "fire",
-  "EssenceItemId": "Draconic_Essence_Fire",
-  "AppearanceId": "Wyvern_Mini_Fire",
+  "RoleId": "Tamed_Wyvern_Mini_Fire",
   "ParticleAndSoundIds": [ "Effect_Fire", "SFX_Effect_Burn_World" ],
   "PassiveEffects": [],
   "ActiveAbilities": [

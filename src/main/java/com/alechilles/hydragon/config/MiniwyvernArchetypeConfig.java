@@ -28,8 +28,20 @@ public final class MiniwyvernArchetypeConfig
     private static final MapCodec<String, Map<String, String>> PASSIVE_MODIFIER_EFFECTS_CODEC =
             new MapCodec<>(Codec.STRING, LinkedHashMap::new);
     private static final Set<String> ALLOWED_ARCHETYPES = Set.of(
-            "neutral", "lightning", "wind", "ice", "fire", "water", "nature", "void"
+            "wild", "nature", "toxic", "fire", "void", "lightning", "ice"
     );
+
+    private static final BuilderCodec<OwnerAttackAura> OWNER_ATTACK_AURA_CODEC =
+            BuilderCodec.builder(OwnerAttackAura.class, OwnerAttackAura::new)
+                    .<String>append(new KeyedCodec<>("EffectId", Codec.STRING),
+                            (aura, value) -> aura.effectId = value,
+                            aura -> aura.effectId)
+                    .add()
+                    .<Double>append(new KeyedCodec<>("DurationSeconds", Codec.DOUBLE),
+                            (aura, value) -> aura.durationSeconds = value == null ? 0.0 : value,
+                            aura -> aura.durationSeconds)
+                    .add()
+                    .build();
 
     private static final BuilderCodec<Ability> ABILITY_CODEC = BuilderCodec.builder(Ability.class, Ability::new)
             .<String>append(new KeyedCodec<>("Id", Codec.STRING),
@@ -130,22 +142,14 @@ public final class MiniwyvernArchetypeConfig
             (asset, data) -> asset.data = data,
             asset -> asset.data
     )
-            .documentation("HyDragon Miniwyvern appearance, attunement item, passive effects, and active abilities.")
+            .documentation("HyDragon Miniwyvern role-bound passive effects, owner-hit aura metadata, and active abilities.")
             .<String>append(new KeyedCodec<>("Id", Codec.STRING),
                     (asset, value) -> asset.id = value,
                     asset -> asset.id)
             .add()
-            .<String>append(new KeyedCodec<>("EssenceSemanticId", Codec.STRING),
-                    (asset, value) -> asset.essenceSemanticId = value,
-                    asset -> asset.essenceSemanticId)
-            .add()
-            .<String>append(new KeyedCodec<>("EssenceItemId", Codec.STRING),
-                    (asset, value) -> asset.essenceItemId = value,
-                    asset -> asset.essenceItemId)
-            .add()
-            .<String>append(new KeyedCodec<>("AppearanceId", Codec.STRING),
-                    (asset, value) -> asset.appearanceId = value,
-                    asset -> asset.appearanceId)
+            .<String>append(new KeyedCodec<>("RoleId", Codec.STRING),
+                    (asset, value) -> asset.roleId = value,
+                    asset -> asset.roleId)
             .add()
             .<String[]>append(new KeyedCodec<>("ParticleAndSoundIds", Codec.STRING_ARRAY),
                     (asset, value) -> asset.particleAndSoundIds = value == null ? EMPTY : value,
@@ -167,6 +171,10 @@ public final class MiniwyvernArchetypeConfig
                     (asset, value) -> asset.activeAbilities = value == null ? EMPTY_ABILITIES : value,
                     asset -> asset.activeAbilities)
             .add()
+            .<OwnerAttackAura>append(new KeyedCodec<>("OwnerAttackAura", OWNER_ATTACK_AURA_CODEC),
+                    (asset, value) -> asset.ownerAttackAura = value,
+                    asset -> asset.ownerAttackAura)
+            .add()
             .<String>append(new KeyedCodec<>("FallbackBehavior", Codec.STRING),
                     (asset, value) -> asset.fallbackBehavior = value,
                     asset -> asset.fallbackBehavior)
@@ -176,14 +184,13 @@ public final class MiniwyvernArchetypeConfig
     private AssetExtraInfo.Data data;
     private String assetKey;
     String id;
-    String essenceSemanticId;
-    String essenceItemId;
-    String appearanceId;
+    String roleId;
     String[] particleAndSoundIds = EMPTY;
     String[] passiveEffects = EMPTY;
     Map<String, Double> passiveModifiers = Map.of();
     Map<String, String> passiveModifierEffects = Map.of();
     Ability[] activeAbilities = EMPTY_ABILITIES;
+    OwnerAttackAura ownerAttackAura;
     String fallbackBehavior;
 
     MiniwyvernArchetypeConfig() {
@@ -196,11 +203,11 @@ public final class MiniwyvernArchetypeConfig
         if (!ALLOWED_ARCHETYPES.contains(normalized)) {
             errors.add("Id must be one of " + ALLOWED_ARCHETYPES);
         }
-        if (!normalized.equals("neutral")) {
-            if (blank(essenceSemanticId)) errors.add("EssenceSemanticId is required");
-            if (blank(essenceItemId)) errors.add("EssenceItemId is required");
+        if (blank(roleId)) errors.add("RoleId is required");
+        else if (!roleId.trim().equals("Tamed_Wyvern_Mini_" + titleCase(normalized))) {
+            errors.add("RoleId must map " + normalized + " to Tamed_Wyvern_Mini_"
+                    + titleCase(normalized));
         }
-        if (blank(appearanceId)) errors.add("AppearanceId is required");
         if (blank(fallbackBehavior)) errors.add("FallbackBehavior is required");
         Set<String> presentationIds = new java.util.HashSet<>();
         for (String presentationId : particleAndSoundIds) {
@@ -210,7 +217,8 @@ public final class MiniwyvernArchetypeConfig
                 errors.add("ParticleAndSoundIds contains duplicate " + trim(presentationId));
             }
         }
-        if (Set.of("fire", "ice", "water", "void").contains(normalized) && activeAbilities.length == 0) {
+        if (Set.of("toxic", "fire", "ice", "void", "lightning").contains(normalized)
+                && activeAbilities.length == 0) {
             errors.add("Archetype " + normalized + " requires at least one active ability");
         }
         errors.addAll(validatePassiveModifiers(normalized));
@@ -221,19 +229,19 @@ public final class MiniwyvernArchetypeConfig
                 errors.addAll(ability.validate(normalized));
             }
         }
+        if (ownerAttackAura != null) errors.addAll(ownerAttackAura.validate());
         return List.copyOf(errors);
     }
 
     public String getAssetKey() { return assetKey; }
     public String getId() { return normalize(id); }
-    public String getEssenceSemanticId() { return normalize(essenceSemanticId); }
-    @Nullable public String getEssenceItemId() { return blank(essenceItemId) ? null : essenceItemId.trim(); }
-    public String getAppearanceId() { return trim(appearanceId); }
+    public String getRoleId() { return trim(roleId); }
     public List<String> getParticleAndSoundIds() { return List.of(particleAndSoundIds.clone()); }
     public List<String> getPassiveEffects() { return List.of(passiveEffects.clone()); }
     public Map<String, Double> getPassiveModifiers() { return Map.copyOf(passiveModifiers); }
     public Map<String, String> getPassiveModifierEffects() { return Map.copyOf(passiveModifierEffects); }
     public List<Ability> getActiveAbilities() { return List.of(activeAbilities.clone()); }
+    @Nullable public OwnerAttackAura getOwnerAttackAura() { return ownerAttackAura; }
     public String getFallbackBehavior() { return trim(fallbackBehavior); }
 
     /** One source-keyed, cooldown-gated Miniwyvern ability definition. */
@@ -369,17 +377,29 @@ public final class MiniwyvernArchetypeConfig
         @Nullable public Double getMaximumReduction() { return maximumReduction; }
     }
 
+    /** Data-only owner-hit effect metadata; runtime registration is intentionally separate. */
+    public static final class OwnerAttackAura {
+        String effectId;
+        double durationSeconds;
+
+        private List<String> validate() {
+            List<String> errors = new ArrayList<>();
+            if (blank(effectId)) errors.add("OwnerAttackAura.EffectId is required");
+            if (!Double.isFinite(durationSeconds) || durationSeconds <= 0.0) {
+                errors.add("OwnerAttackAura.DurationSeconds must be positive");
+            }
+            return errors;
+        }
+
+        @Nullable public String getEffectId() { return blank(effectId) ? null : effectId.trim(); }
+        public double getDurationSeconds() { return durationSeconds; }
+    }
+
     private List<String> validatePassiveModifiers(String archetypeId) {
         List<String> errors = new ArrayList<>();
         if ("lightning".equals(archetypeId)) {
             requireMultiplier(errors, "MovementSpeedMultiplier");
             requireMultiplier(errors, "ActionSpeedMultiplier");
-        } else if ("wind".equals(archetypeId)) {
-            requireMultiplier(errors, "MovementSpeedMultiplier");
-            requireMultiplier(errors, "JumpMultiplier");
-            requireMultiplier(errors, "MobilityMultiplier");
-            requireAtLeast(errors, "MaximumMovementSpeedMultiplier", "MovementSpeedMultiplier");
-            requireAtLeast(errors, "MaximumJumpMultiplier", "JumpMultiplier");
         } else if ("nature".equals(archetypeId)) {
             Double tick = passiveModifiers.get("RegenerationTickSeconds");
             if (!positive(tick)) errors.add("Nature PassiveModifiers.RegenerationTickSeconds must be positive");
@@ -402,7 +422,7 @@ public final class MiniwyvernArchetypeConfig
                 errors.add("PassiveModifierEffects." + entry.getKey() + " must name an EntityEffect asset");
             }
         }
-        if (Set.of("lightning", "wind").contains(archetypeId)
+        if (Set.of("lightning").contains(archetypeId)
                 && !passiveModifierEffects.containsKey("MovementSpeedMultiplier")) {
             errors.add("PassiveModifierEffects.MovementSpeedMultiplier is required for " + archetypeId);
         }
@@ -416,16 +436,6 @@ public final class MiniwyvernArchetypeConfig
         }
     }
 
-    private void requireAtLeast(List<String> errors, String maximumKey, String valueKey) {
-        Double maximum = passiveModifiers.get(maximumKey);
-        Double value = passiveModifiers.get(valueKey);
-        if (maximum == null || !Double.isFinite(maximum) || maximum <= 0.0) {
-            errors.add("PassiveModifiers." + maximumKey + " must be positive");
-        } else if (value != null && Double.isFinite(value) && maximum < value) {
-            errors.add("PassiveModifiers." + maximumKey + " cannot be below " + valueKey);
-        }
-    }
-
     private static boolean positive(@Nullable Double value) {
         return value != null && Double.isFinite(value) && value > 0.0;
     }
@@ -436,6 +446,10 @@ public final class MiniwyvernArchetypeConfig
 
     private static String normalize(@Nullable String value) {
         return trim(value).toLowerCase(Locale.ROOT);
+    }
+
+    private static String titleCase(String normalized) {
+        return normalized.isEmpty() ? "" : Character.toUpperCase(normalized.charAt(0)) + normalized.substring(1);
     }
 
     private static boolean blank(@Nullable String value) {

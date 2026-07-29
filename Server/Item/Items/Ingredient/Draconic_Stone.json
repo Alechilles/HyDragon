@@ -68,9 +68,9 @@
     "Rotation": [ 12, -160, -21 ]
   },
   "Tags": { "Type": [ "Tool" ] },
-  "ItemEntity": { "ParticleSystemId": null },
+  "ItemEntity": { "ParticleSystemId": "HyDragon_DragonStone_CaptureMote" },
   "Scale": 1.75,
-  "MaxStack": 1,
+  "MaxStack": 10,
   "ItemSoundSetId": "ISS_Items_Ingots",
   "DropOnDeath": true
 }

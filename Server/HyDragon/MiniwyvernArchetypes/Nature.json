@@ -1,8 +1,6 @@
 {
   "Id": "nature",
-  "EssenceSemanticId": "nature",
-  "EssenceItemId": "Draconic_Essence_Nature",
-  "AppearanceId": "Wyvern_Mini_Nature",
+  "RoleId": "Tamed_Wyvern_Mini_Nature",
   "ParticleAndSoundIds": [ "Effect_Heal", "SFX_Fen_Stalker_Eat" ],
   "PassiveEffects": [ "HyDragon_Miniwyvern_Nature_Regeneration" ],
   "PassiveModifiers": {

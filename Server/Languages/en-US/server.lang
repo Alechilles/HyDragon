@@ -45,8 +45,8 @@ items.Draconic_Stone_Adamantium.name=Adamantium Draconic Stone
 items.Draconic_Stone_Adamantium.description=A highly reliable consumable capture attempt forged from adamantite.
 items.Draconic_Stone_Ancient.name=Ancient Draconic Stone
 items.Draconic_Stone_Ancient.description=A mithril capture attempt that guarantees capture after every other requirement is met.
-items.Wyvern_Egg.name=Wyvern Egg
-items.Wyvern_Egg.description=A rare egg that creates your one lifelong Miniwyvern Soul Bond.
+items.Wyvern_Egg.name=Mysterious Egg
+items.Wyvern_Egg.description=A mysterious, <color is="#b060ff">rare</color> egg.\n\n<color is="#e8edf5">Left-click</color> to hatch.
 items.Draconic_Altar.name=Draconic Altar
 items.Draconic_Altar.description=A ritual workbench for Draconic Stones, Soul Bonds, and companion restoration.
 items.Draconic_Altar.bench.categories.stones.name=Draconic Stones

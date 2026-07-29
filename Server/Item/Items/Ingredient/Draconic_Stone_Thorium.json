@@ -21,7 +21,7 @@
     ],
     "TimeSeconds": 4
   },
-  "Light": { "Color": "#7DD3FC", "Radius": 2 },
+  "Light": { "Color": "", "Radius": 0 },
   "IconProperties": {
     "Scale": 1.2,
     "Translation": [ 3, -2 ],

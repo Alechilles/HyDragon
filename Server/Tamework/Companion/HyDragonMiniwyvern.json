@@ -4,7 +4,15 @@
     "Enabled": true,
     "Priority": 100
   },
-  "RoleIds": [ "Tamed_Wyvern_Mini" ],
+  "RoleIds": [
+    "Tamed_Wyvern_Mini_Wild",
+    "Tamed_Wyvern_Mini_Nature",
+    "Tamed_Wyvern_Mini_Toxic",
+    "Tamed_Wyvern_Mini_Fire",
+    "Tamed_Wyvern_Mini_Void",
+    "Tamed_Wyvern_Mini_Lightning",
+    "Tamed_Wyvern_Mini_Ice"
+  ],
   "Command": {
     "ReturnHomeTeleportDistance": 72.0,
     "ReturnHomePathDistanceBeforeTeleport": 18.0,

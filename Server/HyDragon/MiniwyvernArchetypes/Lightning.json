@@ -1,8 +1,6 @@
 {
   "Id": "lightning",
-  "EssenceSemanticId": "lightning",
-  "EssenceItemId": "Draconic_Essence_Lightning",
-  "AppearanceId": "Wyvern_Mini_Lightning",
+  "RoleId": "Tamed_Wyvern_Mini_Lightning",
   "ParticleAndSoundIds": [ "Lightning", "SFX_Spark_Living_Alerted" ],
   "PassiveEffects": [],
   "PassiveModifiers": {

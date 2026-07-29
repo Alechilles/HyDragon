@@ -22,7 +22,7 @@
     ],
     "TimeSeconds": 8
   },
-  "Light": { "Color": "#A855F7", "Radius": 3 },
+  "Light": { "Color": "", "Radius": 0 },
   "IconProperties": {
     "Scale": 1.2,
     "Translation": [ 3, -2 ],

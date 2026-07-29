@@ -158,11 +158,19 @@ public final class HyDragonConfigRepository {
         }
 
         Set<String> expectedArchetypes = Set.of(
-                "neutral", "lightning", "wind", "ice", "fire", "water", "nature", "void");
+                "wild", "nature", "toxic", "fire", "void", "lightning", "ice");
         Set<String> missingArchetypes = new TreeSet<>(expectedArchetypes);
         missingArchetypes.removeAll(archetypesById.keySet());
         if (!archetypesById.isEmpty() && !missingArchetypes.isEmpty()) {
             issues.add("MiniwyvernArchetypes is missing " + missingArchetypes);
+        }
+        Map<String, String> formByRole = new TreeMap<>();
+        for (MiniwyvernArchetypeConfig archetype : archetypesById.values()) {
+            String prior = formByRole.putIfAbsent(archetype.getRoleId(), archetype.getId());
+            if (prior != null) {
+                issues.add("MiniwyvernArchetypes has duplicate RoleId " + archetype.getRoleId()
+                        + " for " + prior + " and " + archetype.getId());
+            }
         }
 
         return new Snapshot(

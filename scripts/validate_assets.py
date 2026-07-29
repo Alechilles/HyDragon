@@ -298,10 +298,9 @@ def require_files(errors: list[str]) -> None:
         "Server/Item/Items/Ingredient/Draconic_Essence.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Fire.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Ice.json",
-        "Server/Item/Items/Ingredient/Draconic_Essence_Water.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Nature.json",
+        "Server/Item/Items/Ingredient/Draconic_Essence_Toxic.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Lightning.json",
-        "Server/Item/Items/Ingredient/Draconic_Essence_Wind.json",
         "Server/Item/Items/Ingredient/Draconic_Essence_Void.json",
         "Server/Item/Items/Ingredient/Revitalizing_Essence.json",
         "Server/Item/Items/Ingredient/Wyvern_Egg.json",
@@ -323,7 +322,7 @@ def require_files(errors: list[str]) -> None:
     )
     required.extend(
         f"Server/HyDragon/MiniwyvernArchetypes/{name}.json"
-        for name in ("Neutral", "Lightning", "Wind", "Ice", "Fire", "Water", "Nature", "Void")
+        for name in ("Wild", "Nature", "Toxic", "Lightning", "Ice", "Fire", "Void")
     )
     required.extend(
         f"Server/HyDragon/DragonSpecies/{name}.json"
@@ -528,28 +527,21 @@ def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str])
 def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str]) -> None:
     """Validate the Soul Bond companion's complete role/config reference graph."""
     wild_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
-    tamed_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Tamed_Wyvern_Mini.json"
     template_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
     follow_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Components/Component_Tamework_Instruction_Follow_Flying.json"
-    interaction_path = ROOT / "Server/Tamework/Interactions/HyDragonIntWyvernMini.json"
     companion_path = ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json"
     root_bite_path = ROOT / "Server/Item/RootInteractions/NPCs/Creature/HyDragon/Root_NPC_Wyvern_Mini_Bite.json"
     bite_path = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite.json"
     bite_damage_path = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite_Damage.json"
 
     wild = parsed.get(wild_path)
-    tamed = parsed.get(tamed_path)
     template = parsed.get(template_path)
     follow = parsed.get(follow_path)
-    interaction = parsed.get(interaction_path)
     companion = parsed.get(companion_path)
     root_bite = parsed.get(root_bite_path)
     bite = parsed.get(bite_path)
     bite_damage = parsed.get(bite_damage_path)
 
-    if not isinstance(tamed, dict) or tamed.get("Reference") != "Template_Wyvern_Mini_Flying_Tamed":
-        fail(errors, "Tamed_Wyvern_Mini must reference Template_Wyvern_Mini_Flying_Tamed")
-        return
     if not isinstance(template, dict) or template.get("Type") != "Abstract":
         fail(errors, "Miniwyvern tamed template is missing or is not Abstract")
         return
@@ -561,19 +553,72 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
     if isinstance(wild_modify, dict) and wild_modify.get("InteractionConfigId") not in (None, ""):
         fail(errors, "Soul Bond-only wild Miniwyvern must not expose the tamed interaction config")
 
-    tamed_modify = tamed.get("Modify")
-    if not isinstance(tamed_modify, dict):
-        fail(errors, "Tamed_Wyvern_Mini has no Modify block")
-    else:
+    forms = ("Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice")
+    expected_essences = {
+        "Wild": "Draconic_Essence", "Nature": "Draconic_Essence_Nature",
+        "Toxic": "Draconic_Essence_Toxic", "Fire": "Draconic_Essence_Fire",
+        "Void": "Draconic_Essence_Void", "Lightning": "Draconic_Essence_Lightning",
+        "Ice": "Draconic_Essence_Ice",
+    }
+    expected_appearances = {
+        "Wild": "Wyvern_Mini", "Nature": "Wyvern_Mini_Nature", "Toxic": "Wyvern_Mini_Toxic",
+        "Fire": "Wyvern_Mini_Fire", "Void": "Wyvern_Mini_Void",
+        "Lightning": "Wyvern_Mini_Lightning", "Ice": "Wyvern_Mini_Ice",
+    }
+    for form in forms:
+        role_id = f"Tamed_Wyvern_Mini_{form}"
+        role_path = ROOT / f"Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/{role_id}.json"
+        role = parsed.get(role_path)
+        modify = role.get("Modify") if isinstance(role, dict) else None
+        if not isinstance(role, dict) or role.get("Reference") != "Template_Wyvern_Mini_Flying_Tamed" or not isinstance(modify, dict):
+            fail(errors, f"{role_id} must be a Template_Wyvern_Mini_Flying_Tamed variant")
+            continue
         for capability in ("CanFollow", "CanHold", "CanDefend", "CanAttackTarget"):
-            if tamed_modify.get(capability) is not True:
-                fail(errors, f"Tamed_Wyvern_Mini must explicitly enable {capability}")
-        if tamed_modify.get("IsMountable") is not False:
-            fail(errors, "Tamed_Wyvern_Mini must explicitly remain non-mountable")
-        if tamed_modify.get("Attack") != "Root_NPC_Wyvern_Mini_Bite":
-            fail(errors, "Tamed_Wyvern_Mini must retain Root_NPC_Wyvern_Mini_Bite")
-        if tamed_modify.get("InteractionConfigId") != "HyDragonIntWyvernMini":
-            fail(errors, "Tamed_Wyvern_Mini must reference HyDragonIntWyvernMini")
+            if modify.get(capability) is not True:
+                fail(errors, f"{role_id} must explicitly enable {capability}")
+        if modify.get("IsMountable") is not False or modify.get("Attack") != "Root_NPC_Wyvern_Mini_Bite":
+            fail(errors, f"{role_id} must remain non-mountable and retain its bite")
+        if modify.get("Appearance") != expected_appearances[form]:
+            fail(errors, f"{role_id} has the wrong form appearance")
+        config_id = f"HyDragonIntWyvernMini_{form}"
+        if modify.get("InteractionConfigId") != config_id:
+            fail(errors, f"{role_id} must reference {config_id}")
+        interaction = parsed.get(ROOT / f"Server/Tamework/Interactions/{config_id}.json")
+        if not isinstance(interaction, dict) or interaction.get("RoleIds") != [role_id]:
+            fail(errors, f"{config_id} must be scoped only to {role_id}")
+            continue
+        interactions = interaction.get("Interactions")
+        if not isinstance(interactions, list):
+            fail(errors, f"{config_id} has no interaction list")
+            continue
+        transforms = [entry for entry in interactions if isinstance(entry, dict) and entry.get("Type") == "Custom"]
+        if len(transforms) != len(forms) - 1:
+            fail(errors, f"{config_id} must offer exactly six non-self transforms")
+        destinations = set()
+        for entry in transforms:
+            requires = entry.get("Requires", {}).get("All", {})
+            effects = entry.get("Effects", {})
+            set_role = effects.get("SetRole", {})
+            remove = effects.get("RemoveItemsHand", {})
+            destination = set_role.get("Role")
+            destination_form = destination.removeprefix("Tamed_Wyvern_Mini_") if isinstance(destination, str) else ""
+            expected_item = expected_essences.get(destination_form)
+            items = requires.get("ItemsInHand")
+            if (requires.get("IsTamed") is not True or requires.get("PlayerIsOwner") is not True
+                    or not isinstance(items, list) or len(items) != 1
+                    or items[0].get("Items") != [expected_item] or items[0].get("Quantity") != 8
+                    or set_role.get("ChangeAppearance") is not True
+                    or remove.get("Items") != [expected_item] or remove.get("Quantity") != 8):
+                fail(errors, f"{config_id} has an invalid transform cost or ownership gate")
+            if destination == role_id:
+                fail(errors, f"{config_id} must not offer a self transform")
+            destinations.add(destination)
+        expected_destinations = {f"Tamed_Wyvern_Mini_{destination}" for destination in forms if destination != form}
+        if destinations != expected_destinations:
+            fail(errors, f"{config_id} destination set is incomplete or contains a self transform")
+        interaction_types = {entry.get("Type") for entry in interactions if isinstance(entry, dict)}
+        if {"Feed", "ModeCycle"} - interaction_types or interaction_types & {"Mount", "Tame"}:
+            fail(errors, f"{config_id} must preserve Feed and ModeCycle without Mount or Tame")
 
     if template.get("StartState") != "Follow":
         fail(errors, "Soulbound Miniwyvern must start in Follow when no persisted state is restored")
@@ -630,32 +675,9 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
     if not isinstance(bite_damage, dict) or bite_damage.get("Parent") != "DamageEntityParent":
         fail(errors, "Wyvern_Mini_Bite_Damage must inherit DamageEntityParent")
 
-    if not isinstance(interaction, dict):
-        fail(errors, "HyDragonIntWyvernMini interaction config is missing")
-    else:
-        if interaction.get("RoleIds") != ["Tamed_Wyvern_Mini"]:
-            fail(errors, "HyDragonIntWyvernMini must be scoped only to Tamed_Wyvern_Mini")
-        interactions = interaction.get("Interactions", [])
-        interaction_types = {
-            entry.get("Type") for entry in interactions if isinstance(entry, dict)
-        }
-        if {"Feed", "ModeCycle"} - interaction_types:
-            fail(errors, "HyDragonIntWyvernMini must provide Feed and ModeCycle")
-        if interaction_types & {"Mount", "Tame"}:
-            fail(errors, "HyDragonIntWyvernMini must not expose Mount or Tame")
-        mode_cycle = next(
-            (entry for entry in interactions if isinstance(entry, dict) and entry.get("Type") == "ModeCycle"),
-            {},
-        )
-        cycle_states = {
-            entry.get("State") for entry in mode_cycle.get("Cycle", []) if isinstance(entry, dict)
-        }
-        missing_modes = required_states - cycle_states
-        if missing_modes:
-            fail(errors, f"HyDragonIntWyvernMini mode cycle is missing: {', '.join(sorted(missing_modes))}")
-
-    if not isinstance(companion, dict) or companion.get("RoleIds") != ["Tamed_Wyvern_Mini"]:
-        fail(errors, "HyDragonMiniwyvern companion lifecycle config must target Tamed_Wyvern_Mini")
+    expected_roles = [f"Tamed_Wyvern_Mini_{form}" for form in forms]
+    if not isinstance(companion, dict) or companion.get("RoleIds") != expected_roles:
+        fail(errors, "HyDragonMiniwyvern companion lifecycle config must target exactly the seven Miniwyvern roles")
     else:
         if companion.get("Parent") != "TwCompanionDefault":
             fail(errors, "HyDragonMiniwyvern must inherit Tamework's durable companion lifecycle defaults")
@@ -908,9 +930,8 @@ def validate_domain_references(
         if not isinstance(archetype, dict):
             continue
         references: list[tuple[str, object]] = []
-        for field in ("EssenceItemId", "AppearanceId"):
-            if archetype.get(field) is not None:
-                references.append((field, archetype[field]))
+        if archetype.get("RoleId") is not None:
+            references.append(("RoleId", archetype["RoleId"]))
         references.extend(("ParticleAndSoundIds", value) for value in archetype.get("ParticleAndSoundIds", []))
         references.extend(("PassiveEffects", value) for value in archetype.get("PassiveEffects", []))
         passive_modifier_effects = archetype.get("PassiveModifierEffects", {})
@@ -1011,36 +1032,6 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
                for entry in interaction_entries):
         fail(errors, "Tamed Nordic Drake interaction config must expose the Tamework mount entry")
 
-    texture_hashes: dict[str, str] = {}
-    vocabularies: dict[str, tuple[str, ...]] = {}
-    archetype_root = ROOT / "Server/HyDragon/MiniwyvernArchetypes"
-    model_root = ROOT / "Server/Models/HyDragon/Wyvern_Mini"
-    for path in sorted(archetype_root.glob("*.json")):
-        archetype = parsed.get(path)
-        if not isinstance(archetype, dict):
-            continue
-        archetype_id = archetype.get("Id")
-        appearance_id = archetype.get("AppearanceId")
-        if not isinstance(archetype_id, str) or not isinstance(appearance_id, str):
-            continue
-        appearance_path = model_root / f"{appearance_id}.json"
-        appearance = parsed.get(appearance_path)
-        texture = appearance.get("Texture") if isinstance(appearance, dict) else None
-        texture_path = ROOT / "Common" / texture if isinstance(texture, str) else None
-        if texture_path is None or not texture_path.is_file():
-            fail(errors, f"Miniwyvern {archetype_id} appearance does not resolve a texture: {appearance_id}")
-        else:
-            texture_hashes[archetype_id] = hashlib.sha256(texture_path.read_bytes()).hexdigest()
-        vocabulary = archetype.get("ParticleAndSoundIds")
-        if not isinstance(vocabulary, list):
-            fail(errors, f"Miniwyvern {archetype_id} has no resolved presentation vocabulary")
-        else:
-            vocabularies[archetype_id] = tuple(vocabulary)
-    if len(texture_hashes) == 8 and len(set(texture_hashes.values())) != 8:
-        fail(errors, f"Miniwyvern archetype textures must be byte-distinct: {texture_hashes}")
-    if len(vocabularies) == 8 and len(set(vocabularies.values())) != 8:
-        fail(errors, f"Miniwyvern particle/audio vocabularies must be distinct: {vocabularies}")
-
 def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> None:
     outputs = {
         "Draconic_Stone",
@@ -1104,10 +1095,15 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
     if "CommandFamilyId" in config or "ProjectRosterToItemMetadata" in config:
         fail(errors, "Dragon Horn must not retain generic owner-family projection settings")
     allowed = config.get("AllowedRoles")
+    miniwyvern_roles = {
+        "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+        "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+        "Tamed_Wyvern_Mini_Ice",
+    }
     required_roles = {
         "Tamed_Hydra", "Tamed_NordicDrake", "Tamed_RockDrakeT1",
-        "Tamed_RockDrakeT2", "Tamed_RockDrakeT3", "Tamed_Wyvern_Mini",
-    }
+        "Tamed_RockDrakeT2", "Tamed_RockDrakeT3",
+    } | miniwyvern_roles
     actual_roles = set(allowed.get("Allowlist", [])) if isinstance(allowed, dict) else set()
     if actual_roles != required_roles:
         fail(errors, f"HyDragon command role allowlist mismatch: {sorted(actual_roles)}")
@@ -1139,7 +1135,10 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         "HyDragonMiniwyvern.json": {
             "FamilyId": "hydragon:soulbound_mini", "MaximumOwned": 1,
             "MaximumActive": 1, "SessionDurationSeconds": 900,
-            "SummonCooldownSeconds": 180, "AllowedRoles": {"Tamed_Wyvern_Mini"},
+            "SummonCooldownSeconds": 180, "AllowedRoles": {
+                "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+                "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+                "Tamed_Wyvern_Mini_Ice"},
             "Costs": [("Revitalizing_Essence", 1), ("Draconic_Essence", 2)],
             "Features": {"Capture": False, "Provision": True, "Summon": True,
                          "Dismiss": True, "Revive": True},

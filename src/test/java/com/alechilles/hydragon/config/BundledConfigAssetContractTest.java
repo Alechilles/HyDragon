@@ -11,25 +11,92 @@ import com.hypixel.hytale.codec.util.RawJsonReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class BundledConfigAssetContractTest {
     private static final Path CONFIG_ROOT = Path.of("Server", "HyDragon");
-    private static final Pattern TEXTURE_FIELD = Pattern.compile("\\\"Texture\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"");
+    private static final List<String> MINI_WYVERN_FORMS = List.of(
+            "Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
+
+    @Test
+    void miniwyvernRoleSwapAssetsCoverEveryNonSelfDestinationAtExactCost() throws IOException {
+        Map<String, String> essenceByForm = Map.of(
+                "Wild", "Draconic_Essence",
+                "Nature", "Draconic_Essence_Nature",
+                "Toxic", "Draconic_Essence_Toxic",
+                "Fire", "Draconic_Essence_Fire",
+                "Void", "Draconic_Essence_Void",
+                "Lightning", "Draconic_Essence_Lightning",
+                "Ice", "Draconic_Essence_Ice");
+        List<String> roleIds = MINI_WYVERN_FORMS.stream()
+                .map(form -> "Tamed_Wyvern_Mini_" + form)
+                .toList();
+
+        String roster = Files.readString(Path.of(
+                "Server", "Tamework", "BondedCompanions", "Rosters", "HyDragonMiniwyvern.json"));
+        String companion = Files.readString(Path.of(
+                "Server", "Tamework", "Companion", "HyDragonMiniwyvern.json"));
+        assertEquals(7, occurrences(roster, "\"Tamed_Wyvern_Mini_"), "roster must contain exactly seven form roles");
+        assertEquals(7, occurrences(companion, "\"Tamed_Wyvern_Mini_"), "companion must contain exactly seven form roles");
+        for (String roleId : roleIds) {
+            assertTrue(roster.contains("\"" + roleId + "\""), "roster omits " + roleId);
+            assertTrue(companion.contains("\"" + roleId + "\""), "companion omits " + roleId);
+        }
+
+        for (String source : MINI_WYVERN_FORMS) {
+            String roleId = "Tamed_Wyvern_Mini_" + source;
+            Path rolePath = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
+                    roleId + ".json");
+            String role = Files.readString(rolePath);
+            String configId = "HyDragonIntWyvernMini_" + source;
+            assertTrue(role.contains("\"Reference\": \"Template_Wyvern_Mini_Flying_Tamed\""), rolePath.toString());
+            assertTrue(role.contains("\"InteractionConfigId\": \"" + configId + "\""), rolePath.toString());
+
+            String interaction = Files.readString(Path.of(
+                    "Server", "Tamework", "Interactions", configId + ".json"));
+            assertEquals(6, occurrences(interaction, "\"Type\": \"Custom\""), configId);
+            assertTrue(interaction.contains("\"Type\": \"Feed\""), configId);
+            assertTrue(interaction.contains("\"Type\": \"ModeCycle\""), configId);
+            assertFalse(interaction.contains("\"Role\": \"" + roleId + "\""), configId + " must exclude self");
+
+            for (String destination : MINI_WYVERN_FORMS) {
+                if (destination.equals(source)) {
+                    continue;
+                }
+                String destinationRole = "Tamed_Wyvern_Mini_" + destination;
+                String essence = essenceByForm.get(destination);
+                assertTrue(interaction.contains("\"Role\": \"" + destinationRole
+                        + "\", \"ChangeAppearance\": true"), configId + " -> " + destinationRole);
+                assertTrue(interaction.contains("\"Items\": [\"" + essence + "\"], \"Quantity\": 8"),
+                        configId + " must charge " + essence);
+            }
+            assertEquals(6, occurrences(interaction, "\"IsTamed\": true"), configId);
+            assertEquals(6, occurrences(interaction, "\"PlayerIsOwner\": true"), configId);
+        }
+        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
+                "Tamed_Wyvern_Mini_Water.json")));
+        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
+                "Tamed_Wyvern_Mini_Wind.json")));
+        assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Water.json")));
+        assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Wind.json")));
+    }
+
+    private static int occurrences(String value, String needle) {
+        int count = 0;
+        int offset = 0;
+        while ((offset = value.indexOf(needle, offset)) >= 0) {
+            count++;
+            offset += needle.length();
+        }
+        return count;
+    }
 
     @Test
     void bundledAssetsDecodeWithoutUnknownFieldsAndCrossValidate() throws IOException {
@@ -59,70 +126,28 @@ class BundledConfigAssetContractTest {
     }
 
     @Test
-    void elementalArchetypeMatrixHasEssenceAppearancePresentationAndBehavior() throws IOException {
+    void miniwyvernFormConfigsMapExactlySevenFormsToRoleIdsAndBehavior() throws IOException {
         Map<String, MiniwyvernArchetypeConfig> archetypes = decodeDirectory(
                 "MiniwyvernArchetypes", MiniwyvernArchetypeConfig.class,
                 MiniwyvernArchetypeConfig.CODEC).stream().collect(Collectors.toMap(
                         MiniwyvernArchetypeConfig::getId, Function.identity()));
-        assertEquals(Set.of("neutral", "lightning", "wind", "ice", "fire", "water", "nature", "void"),
+        assertEquals(Set.of("wild", "nature", "toxic", "fire", "void", "lightning", "ice"),
                 archetypes.keySet());
 
-        for (String id : Set.of("lightning", "wind", "ice", "fire", "water", "nature", "void")) {
+        for (String id : archetypes.keySet()) {
             MiniwyvernArchetypeConfig archetype = archetypes.get(id);
             String title = Character.toUpperCase(id.charAt(0)) + id.substring(1);
-            assertEquals(id, archetype.getEssenceSemanticId(), id);
-            assertEquals("Draconic_Essence_" + title, archetype.getEssenceItemId(), id);
-            assertEquals("Wyvern_Mini_" + title, archetype.getAppearanceId(), id);
-            assertFalse(archetype.getParticleAndSoundIds().isEmpty(), id + " lacks presentation");
-            assertTrue(!archetype.getActiveAbilities().isEmpty()
-                            || !archetype.getPassiveEffects().isEmpty(),
-                    id + " lacks an active or passive behavior");
+            assertEquals("Tamed_Wyvern_Mini_" + title, archetype.getRoleId(), id);
         }
-
-        MiniwyvernArchetypeConfig neutral = archetypes.get("neutral");
-        assertTrue(neutral.getEssenceSemanticId() == null || neutral.getEssenceSemanticId().isBlank());
-        assertTrue(neutral.getEssenceItemId() == null || neutral.getEssenceItemId().isBlank());
-        assertEquals("Wyvern_Mini", neutral.getAppearanceId());
-        assertEquals("BASIC_BITE", neutral.getFallbackBehavior());
-    }
-
-    @Test
-    void miniwyvernAppearancesResolveToByteDistinctTexturesAndPresentationVocabularies()
-            throws IOException, NoSuchAlgorithmException {
-        List<MiniwyvernArchetypeConfig> archetypes = decodeDirectory(
-                "MiniwyvernArchetypes", MiniwyvernArchetypeConfig.class,
-                MiniwyvernArchetypeConfig.CODEC);
-        Map<String, String> textureHashByArchetype = new HashMap<>();
-        Map<String, List<String>> vocabularyByArchetype = new HashMap<>();
-
-        for (MiniwyvernArchetypeConfig archetype : archetypes) {
-            String appearanceId = archetype.getAppearanceId();
-            Path appearancePath = Path.of(
-                    "Server", "Models", "HyDragon", "Wyvern_Mini", appearanceId + ".json");
-            assertTrue(Files.isRegularFile(appearancePath),
-                    () -> archetype.getId() + " appearance does not resolve: " + appearancePath);
-
-            Matcher textureMatcher = TEXTURE_FIELD.matcher(Files.readString(appearancePath));
-            assertTrue(textureMatcher.find(),
-                    () -> archetype.getId() + " appearance has no concrete texture: " + appearancePath);
-            Path texturePath = Path.of("Common").resolve(textureMatcher.group(1));
-            assertTrue(Files.isRegularFile(texturePath),
-                    () -> archetype.getId() + " texture does not resolve: " + texturePath);
-
-            byte[] digest = MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(texturePath));
-            textureHashByArchetype.put(archetype.getId(), HexFormat.of().formatHex(digest));
-            vocabularyByArchetype.put(archetype.getId(), List.copyOf(archetype.getParticleAndSoundIds()));
-        }
-
-        assertEquals(8, textureHashByArchetype.size());
-        assertEquals(8, new HashSet<>(textureHashByArchetype.values()).size(),
-                () -> "Each resolved Miniwyvern appearance must have distinct texture bytes: "
-                        + textureHashByArchetype);
-        assertEquals(8, vocabularyByArchetype.size());
-        assertEquals(8, new HashSet<>(vocabularyByArchetype.values()).size(),
-                () -> "Each Miniwyvern archetype must have a distinct particle/audio vocabulary: "
-                        + vocabularyByArchetype);
-        assertFalse(vocabularyByArchetype.get("lightning").equals(vocabularyByArchetype.get("void")));
+        assertEquals("BASIC_BITE", archetypes.get("wild").getFallbackBehavior());
+        assertTrue(archetypes.get("nature").getActiveAbilities().isEmpty(), "Nature must remain bite-only");
+        assertTrue(archetypes.get("nature").getPassiveEffects().contains(
+                "HyDragon_Miniwyvern_Nature_Regeneration"), "Nature must retain its healing aura metadata");
+        MiniwyvernArchetypeConfig.Ability toxic = archetypes.get("toxic").getActiveAbilities().getFirst();
+        assertEquals("Scarak_Seeker_Spit_Projectile", toxic.getProjectileId());
+        assertEquals("HyDragon_Miniwyvern_Void_Exposure", archetypes.get("toxic")
+                .getOwnerAttackAura().getEffectId());
+        assertEquals(6.0, archetypes.get("toxic").getOwnerAttackAura().getDurationSeconds());
     }
 
     private static <T extends JsonAsset<String>> List<T> decodeDirectory(

@@ -22,7 +22,7 @@
     ],
     "TimeSeconds": 6
   },
-  "Light": { "Color": "#DC2626", "Radius": 2 },
+  "Light": { "Color": "", "Radius": 0 },
   "IconProperties": {
     "Scale": 1.2,
     "Translation": [ 3, -2 ],

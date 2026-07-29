@@ -1,8 +1,6 @@
 {
-  "Id": "neutral",
-  "EssenceSemanticId": null,
-  "EssenceItemId": null,
-  "AppearanceId": "Wyvern_Mini",
+  "Id": "wild",
+  "RoleId": "Tamed_Wyvern_Mini_Wild",
   "ParticleAndSoundIds": [],
   "PassiveEffects": [],
   "ActiveAbilities": [],
