@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 /** Verify-stage gate for the packaged Dragon Horn roster contract shared by both plugins. */
 final class PackagedHyDragonRosterIT {
-    private static final String HYDRAGON_VERSION = "0.2.1";
+    private static final String HYDRAGON_VERSION = "1.0.0";
     private static final String TAMEWORK_VERSION = "3.0.0";
     private static final String TAMEWORK_RANGE = ">=3.0.0 <4.0.0";
     private static final List<String> STONES = List.of(
