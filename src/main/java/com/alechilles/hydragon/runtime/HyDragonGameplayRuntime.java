@@ -9,13 +9,8 @@ import java.util.concurrent.CompletionStage;
 /** Production composition of HyDragon-owned consumable interactions. */
 public final class HyDragonGameplayRuntime implements HyDragonInteractionRuntime.Handler {
     private final SoulBondService soulBonds;
-    private final MiniwyvernAttunementService attunements;
-
-    public HyDragonGameplayRuntime(
-            SoulBondService soulBonds,
-            MiniwyvernAttunementService attunements) {
+    public HyDragonGameplayRuntime(SoulBondService soulBonds) {
         this.soulBonds = Objects.requireNonNull(soulBonds, "soulBonds");
-        this.attunements = Objects.requireNonNull(attunements, "attunements");
     }
 
     @Override
@@ -27,9 +22,4 @@ public final class HyDragonGameplayRuntime implements HyDragonInteractionRuntime
         return soulBonds.claim(playerUuid, worldName, destination, reservation);
     }
 
-    @Override
-    public CompletionStage<GameplayResult> attune(
-            UUID playerUuid, String archetypeId, ConsumableReservation reservation) {
-        return attunements.attune(playerUuid, archetypeId, reservation);
-    }
 }

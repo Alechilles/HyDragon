@@ -92,7 +92,7 @@
       "Description": "Whether this NPC can be tamed."
     },
     "TameRoleChange": {
-      "Value": "Tamed_Wyvern_Mini",
+      "Value": "Tamed_Wyvern_Mini_Wild",
       "Description": "The role the NPC will change into when it's tamed."
     },
     "TranquilizerSleepThresholdSeconds": {

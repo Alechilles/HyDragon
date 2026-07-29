@@ -4,6 +4,9 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.abilities.HyDragonAbilityRegistrationFacade;
 import com.alechilles.hydragon.abilities.HytaleMiniwyvernAbilityWorldDispatcher;
 import com.alechilles.hydragon.abilities.MiniwyvernAbilityRuntime;
+import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraDamageSystem;
+import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraRegistry;
+import com.alechilles.hydragon.abilities.MiniwyvernToxicWeaknessDamageSystem;
 import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
 import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
 import com.alechilles.hydragon.config.DragonEncounterConfig;
@@ -20,7 +23,6 @@ import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkCapabilityDiagnostics;
-import com.alechilles.hydragon.interactions.HyDragonMiniwyvernAttuneInteraction;
 import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
@@ -28,7 +30,6 @@ import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
 import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
 import com.alechilles.hydragon.runtime.HyDragonGameplayRuntime;
 import com.alechilles.hydragon.runtime.HyDragonRuntimeComposition;
-import com.alechilles.hydragon.runtime.MiniwyvernAttunementService;
 import com.alechilles.hydragon.runtime.SoulBondLedger;
 import com.alechilles.hydragon.runtime.SoulBondService;
 import com.alechilles.hydragon.runtime.StateStoreOperationJournal;
@@ -57,6 +58,7 @@ public final class HyDragonPlugin extends JavaPlugin {
     private HyDragonGameplayRuntime gameplayRuntime;
     private DynamicEncounterRuntime encounterRuntime;
     private MiniwyvernAbilityRuntime abilityRuntime;
+    private final MiniwyvernOwnerAuraRegistry miniwyvernOwnerAuras = new MiniwyvernOwnerAuraRegistry();
     private ConsumableSagaRecoveryRuntime sagaRecoveryRuntime;
     private ConsumableRefundClaimService refundClaims;
     private HyDragonRuntimeComposition runtimeComposition;
@@ -71,6 +73,8 @@ public final class HyDragonPlugin extends JavaPlugin {
         registerInteractionCodecs();
         // The persistent encounter marker and damage system must exist before any world loads.
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
+        getEntityStoreRegistry().registerSystem(new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras));
+        getEntityStoreRegistry().registerSystem(new MiniwyvernOwnerAuraDamageSystem(miniwyvernOwnerAuras));
         tameworkBridge = TameworkBridge.connect();
         registerConfigAssets();
         getCommandRegistry().registerCommand(new HyDragonStatusCommand(
@@ -198,6 +202,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         gameplayRuntime = null;
         encounterRuntime = null;
         abilityRuntime = null;
+        miniwyvernOwnerAuras.clear();
         sagaRecoveryRuntime = null;
         refundClaims = null;
     }
@@ -230,11 +235,7 @@ public final class HyDragonPlugin extends JavaPlugin {
                         adapter, new BondedMiniwyvernExtensionCodec());
         SoulBondService soulBondService = new SoulBondService(
                 adapter, extensions, soulBonds, journal, System::currentTimeMillis);
-        MiniwyvernAttunementService attunementService =
-                new MiniwyvernAttunementService(
-                        adapter, extensions, soulBonds, journal);
-        HyDragonGameplayRuntime gameplay = new HyDragonGameplayRuntime(
-                soulBondService, attunementService);
+        HyDragonGameplayRuntime gameplay = new HyDragonGameplayRuntime(soulBondService);
         HyDragonInteractionRuntime.install(gameplay, bridge::snapshot);
         return new GameplayInstallation(
                 gameplay,
@@ -254,7 +255,7 @@ public final class HyDragonPlugin extends JavaPlugin {
                         api, store, configRepository::snapshot,
                         () -> bridge.snapshot().feature(
                                 HyDragonFeature.MINIWYVERN_ABILITIES),
-                        new HytaleMiniwyvernAbilityWorldDispatcher(api)));
+                        new HytaleMiniwyvernAbilityWorldDispatcher(api), miniwyvernOwnerAuras));
     }
 
     private void installEncounters(
@@ -291,9 +292,7 @@ public final class HyDragonPlugin extends JavaPlugin {
     }
 
     private FeatureGate gameplayGate(TameworkBridge.Snapshot gates) {
-        FeatureGate soulBond = gates.feature(HyDragonFeature.SOUL_BOND_CLAIM);
-        FeatureGate attunement = gates.feature(HyDragonFeature.MINIWYVERN_ATTUNEMENT);
-        return soulBond.available() ? soulBond : attunement;
+        return gates.feature(HyDragonFeature.SOUL_BOND_CLAIM);
     }
 
     private void logRuntimeFailure(HyDragonRuntimeComposition.Failure failure) {
@@ -319,10 +318,6 @@ public final class HyDragonPlugin extends JavaPlugin {
                 HyDragonSoulBondInteraction.TYPE_ID,
                 HyDragonSoulBondInteraction.class,
                 HyDragonSoulBondInteraction.CODEC);
-        getCodecRegistry(Interaction.CODEC).register(
-                HyDragonMiniwyvernAttuneInteraction.TYPE_ID,
-                HyDragonMiniwyvernAttuneInteraction.class,
-                HyDragonMiniwyvernAttuneInteraction.CODEC);
     }
 
     private void registerConfigAssets() {

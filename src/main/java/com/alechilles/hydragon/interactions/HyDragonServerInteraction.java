@@ -112,7 +112,7 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
                 ChunkUtil.chunkCoordinate(transform.getPosition().z()));
 
                 HyDragonInteractionRuntime.dispatch(
-                        action(), requiredFeature(), player.getUuid(), world.getName(), destination, archetypeId(),
+                        action(), requiredFeature(), player.getUuid(), world.getName(), destination,
                         reserved.orElseThrow())
                 .whenComplete((result, failure) -> completeInteraction(
                         worldUuid, player.getUuid(), operationId, destination, result, failure));
@@ -147,10 +147,6 @@ abstract class HyDragonServerInteraction extends SimpleInteraction {
 
     @Nonnull
     protected String expectedItemId() {
-        return "";
-    }
-
-    protected String archetypeId() {
         return "";
     }
 

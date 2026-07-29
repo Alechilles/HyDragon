@@ -71,25 +71,11 @@ public final class ConsumableSagaRecoveryRuntime {
 
     private CompletionStage<GameplayResult> recover(OperationJournal.Entry entry) {
         try {
-            return switch (entry.kind()) {
-                case SOUL_BOND -> nonNull(soulBondRecovery.recover(entry));
-                case MINIWYVERN_ATTUNEMENT -> CompletableFuture.completedFuture(
-                        closeCommittedAttunement(entry));
-            };
+            return nonNull(soulBondRecovery.recover(entry));
         } catch (RuntimeException failure) {
             return CompletableFuture.completedFuture(
                     GameplayResult.reconciliation("consumable saga recovery remains pending"));
         }
-    }
-
-    private GameplayResult closeCommittedAttunement(OperationJournal.Entry entry) {
-        OperationJournal.Decision decision = journal.transition(
-                entry.operationId(), OperationJournal.Phase.MATERIAL_CONSUMED,
-                OperationJournal.Phase.COMMITTED, OperationJournal.Update.EMPTY);
-        return decision == OperationJournal.Decision.APPLIED
-                || decision == OperationJournal.Decision.ALREADY_APPLIED
-                ? new GameplayResult(GameplayResult.Status.ALREADY_APPLIED, "Miniwyvern attuned")
-                : GameplayResult.reconciliation("attunement journal closure remains pending");
     }
 
     private static CompletionStage<GameplayResult> nonNull(CompletionStage<GameplayResult> stage) {

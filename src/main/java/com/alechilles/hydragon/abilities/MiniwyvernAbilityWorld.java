@@ -23,8 +23,8 @@ public interface MiniwyvernAbilityWorld {
         return hostileTarget(maximumRange).stream().limit(maximumTargets).toList();
     }
 
-    /** Applies the archetype's canonical model while preserving the live entity and its scale. */
-    boolean synchronizeAppearance(UUID entityUuid, String appearanceId);
+    /** Returns the exact role currently assigned to the live companion NPC. */
+    Optional<String> companionRoleId();
 
     Health health(UUID entityUuid);
 

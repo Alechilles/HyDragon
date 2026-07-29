@@ -18,6 +18,8 @@ final class PluginLifecycleContractTest {
         assertOrdered(source,
                 "serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);",
                 "registerConfigAssets();");
+        assertTrue(source.contains("new MiniwyvernOwnerAuraDamageSystem(miniwyvernOwnerAuras)"));
+        assertTrue(source.contains("new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras)"));
     }
 
     @Test
@@ -34,11 +36,12 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("new BondedMiniwyvernExtensionStore("));
         assertTrue(source.contains("new BondedMiniwyvernExtensionCodec()"));
         assertTrue(source.contains("new SoulBondService("));
-        assertTrue(source.contains("new MiniwyvernAttunementService("));
+        assertTrue(source.contains("new HyDragonGameplayRuntime(soulBondService)"));
         assertTrue(source.contains("new ConsumableSagaRecoveryRuntime("));
         assertTrue(source.contains("new ConsumableRefundClaimService(journal)"));
         assertTrue(source.contains("HyDragonEncounterRegistrationFacade.install("));
         assertTrue(source.contains("HyDragonAbilityRegistrationFacade.install("));
+        assertTrue(source.contains("miniwyvernOwnerAuras"));
         assertTrue(source.contains("serverRuntime.start("));
         assertTrue(source.contains("encounterRuntime, abilityRuntime,"));
         assertTrue(source.contains("sagaRecoveryRuntime, configRepository::snapshot"));
@@ -55,6 +58,7 @@ final class PluginLifecycleContractTest {
                 "closeRuntime(\"feature composition\", runtimeComposition);",
                 "runtimeComposition = null;");
         assertTrue(source.contains("HyDragonInteractionRuntime.uninstall(gameplay);"));
+        assertTrue(source.contains("miniwyvernOwnerAuras.clear();"));
     }
 
     @Test

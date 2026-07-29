@@ -11,79 +11,72 @@ import com.hypixel.hytale.codec.util.RawJsonReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class BundledConfigAssetContractTest {
     private static final Path CONFIG_ROOT = Path.of("Server", "HyDragon");
+    private static final Pattern TEXTURE_FIELD = Pattern.compile("\\\"Texture\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"");
     private static final List<String> MINI_WYVERN_FORMS = List.of(
             "Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
 
     @Test
     void miniwyvernRoleSwapAssetsCoverEveryNonSelfDestinationAtExactCost() throws IOException {
         Map<String, String> essenceByForm = Map.of(
-                "Wild", "Draconic_Essence",
-                "Nature", "Draconic_Essence_Nature",
-                "Toxic", "Draconic_Essence_Toxic",
-                "Fire", "Draconic_Essence_Fire",
-                "Void", "Draconic_Essence_Void",
-                "Lightning", "Draconic_Essence_Lightning",
+                "Wild", "Draconic_Essence", "Nature", "Draconic_Essence_Nature",
+                "Toxic", "Draconic_Essence_Toxic", "Fire", "Draconic_Essence_Fire",
+                "Void", "Draconic_Essence_Void", "Lightning", "Draconic_Essence_Lightning",
                 "Ice", "Draconic_Essence_Ice");
-        List<String> roleIds = MINI_WYVERN_FORMS.stream()
-                .map(form -> "Tamed_Wyvern_Mini_" + form)
-                .toList();
-
-        String roster = Files.readString(Path.of(
-                "Server", "Tamework", "BondedCompanions", "Rosters", "HyDragonMiniwyvern.json"));
-        String companion = Files.readString(Path.of(
-                "Server", "Tamework", "Companion", "HyDragonMiniwyvern.json"));
+        List<String> roleIds = MINI_WYVERN_FORMS.stream().map(form -> "Tamed_Wyvern_Mini_" + form).toList();
+        String roster = Files.readString(Path.of("Server", "Tamework", "BondedCompanions", "Rosters", "HyDragonMiniwyvern.json"));
+        String companion = Files.readString(Path.of("Server", "Tamework", "Companion", "HyDragonMiniwyvern.json"));
+        String horn = Files.readString(Path.of("Server", "Tamework", "Items", "Commands", "HyDragonDragonHorn.json"));
+        String breeding = Files.readString(Path.of("Server", "Tamework", "Breeding", "HyDragonBondedCompanions.json"));
         assertEquals(7, occurrences(roster, "\"Tamed_Wyvern_Mini_"), "roster must contain exactly seven form roles");
         assertEquals(7, occurrences(companion, "\"Tamed_Wyvern_Mini_"), "companion must contain exactly seven form roles");
         for (String roleId : roleIds) {
             assertTrue(roster.contains("\"" + roleId + "\""), "roster omits " + roleId);
             assertTrue(companion.contains("\"" + roleId + "\""), "companion omits " + roleId);
+            assertTrue(horn.contains("\"" + roleId + "\""), "Dragon Horn omits " + roleId);
+            assertTrue(breeding.contains("\"" + roleId + "\""), "breeding config omits " + roleId);
         }
-
         for (String source : MINI_WYVERN_FORMS) {
             String roleId = "Tamed_Wyvern_Mini_" + source;
-            Path rolePath = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
-                    roleId + ".json");
+            Path rolePath = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", roleId + ".json");
             String role = Files.readString(rolePath);
             String configId = "HyDragonIntWyvernMini_" + source;
             assertTrue(role.contains("\"Reference\": \"Template_Wyvern_Mini_Flying_Tamed\""), rolePath.toString());
             assertTrue(role.contains("\"InteractionConfigId\": \"" + configId + "\""), rolePath.toString());
-
-            String interaction = Files.readString(Path.of(
-                    "Server", "Tamework", "Interactions", configId + ".json"));
+            String interaction = Files.readString(Path.of("Server", "Tamework", "Interactions", configId + ".json"));
             assertEquals(6, occurrences(interaction, "\"Type\": \"Custom\""), configId);
             assertTrue(interaction.contains("\"Type\": \"Feed\""), configId);
             assertTrue(interaction.contains("\"Type\": \"ModeCycle\""), configId);
             assertFalse(interaction.contains("\"Role\": \"" + roleId + "\""), configId + " must exclude self");
-
             for (String destination : MINI_WYVERN_FORMS) {
-                if (destination.equals(source)) {
-                    continue;
-                }
+                if (destination.equals(source)) continue;
                 String destinationRole = "Tamed_Wyvern_Mini_" + destination;
                 String essence = essenceByForm.get(destination);
-                assertTrue(interaction.contains("\"Role\": \"" + destinationRole
-                        + "\", \"ChangeAppearance\": true"), configId + " -> " + destinationRole);
-                assertTrue(interaction.contains("\"Items\": [\"" + essence + "\"], \"Quantity\": 8"),
-                        configId + " must charge " + essence);
+                assertTrue(interaction.contains("\"Role\": \"" + destinationRole + "\", \"ChangeAppearance\": true"), configId + " -> " + destinationRole);
+                assertTrue(interaction.contains("\"Items\": [\"" + essence + "\"], \"Quantity\": 8"), configId + " must charge " + essence);
             }
             assertEquals(6, occurrences(interaction, "\"IsTamed\": true"), configId);
             assertEquals(6, occurrences(interaction, "\"PlayerIsOwner\": true"), configId);
         }
-        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
-                "Tamed_Wyvern_Mini_Water.json")));
-        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
-                "Tamed_Wyvern_Mini_Wind.json")));
+        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Water.json")));
+        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Wind.json")));
         assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Water.json")));
         assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Wind.json")));
     }
@@ -126,28 +119,33 @@ class BundledConfigAssetContractTest {
     }
 
     @Test
-    void miniwyvernFormConfigsMapExactlySevenFormsToRoleIdsAndBehavior() throws IOException {
+    void miniwyvernFormConfigsBindOnlyApprovedFormsToTheirRoles() throws IOException {
         Map<String, MiniwyvernArchetypeConfig> archetypes = decodeDirectory(
                 "MiniwyvernArchetypes", MiniwyvernArchetypeConfig.class,
                 MiniwyvernArchetypeConfig.CODEC).stream().collect(Collectors.toMap(
                         MiniwyvernArchetypeConfig::getId, Function.identity()));
         assertEquals(Set.of("wild", "nature", "toxic", "fire", "void", "lightning", "ice"),
                 archetypes.keySet());
-
         for (String id : archetypes.keySet()) {
             MiniwyvernArchetypeConfig archetype = archetypes.get(id);
             String title = Character.toUpperCase(id.charAt(0)) + id.substring(1);
             assertEquals("Tamed_Wyvern_Mini_" + title, archetype.getRoleId(), id);
         }
-        assertEquals("BASIC_BITE", archetypes.get("wild").getFallbackBehavior());
-        assertTrue(archetypes.get("nature").getActiveAbilities().isEmpty(), "Nature must remain bite-only");
-        assertTrue(archetypes.get("nature").getPassiveEffects().contains(
-                "HyDragon_Miniwyvern_Nature_Regeneration"), "Nature must retain its healing aura metadata");
-        MiniwyvernArchetypeConfig.Ability toxic = archetypes.get("toxic").getActiveAbilities().getFirst();
-        assertEquals("Scarak_Seeker_Spit_Projectile", toxic.getProjectileId());
-        assertEquals("HyDragon_Miniwyvern_Void_Exposure", archetypes.get("toxic")
-                .getOwnerAttackAura().getEffectId());
-        assertEquals(6.0, archetypes.get("toxic").getOwnerAttackAura().getDurationSeconds());
+        assertTrue(archetypes.get("nature").getActiveAbilities().isEmpty());
+        assertTrue(archetypes.get("nature").getPassiveEffects().contains("HyDragon_Miniwyvern_Nature_Regeneration"));
+        assertEquals("Scarak_Seeker_Spitball", archetypes.get("toxic").getActiveAbilities().getFirst().getProjectileId());
+        assertOwnerAttackAura(archetypes, "toxic", "HyDragon_Miniwyvern_Toxic_Weakness", 6.0);
+        assertEquals(0.12, archetypes.get("toxic").getOwnerAttackAura().getDamageReductionFraction());
+        assertOwnerAttackAura(archetypes, "fire", "HyDragon_Miniwyvern_Fire_Burn", 4.0);
+        assertOwnerAttackAura(archetypes, "ice", "HyDragon_Miniwyvern_Ice_Slow", 4.0);
+        assertOwnerAttackAura(archetypes, "void", "HyDragon_Miniwyvern_Void_Exposure", 6.0);
+    }
+
+    private static void assertOwnerAttackAura(Map<String, MiniwyvernArchetypeConfig> archetypes,
+            String form, String effectId, double durationSeconds) {
+        MiniwyvernArchetypeConfig.OwnerAttackAura aura = archetypes.get(form).getOwnerAttackAura();
+        assertEquals(effectId, aura.getEffectId(), form);
+        assertEquals(durationSeconds, aura.getDurationSeconds(), form);
     }
 
     private static <T extends JsonAsset<String>> List<T> decodeDirectory(

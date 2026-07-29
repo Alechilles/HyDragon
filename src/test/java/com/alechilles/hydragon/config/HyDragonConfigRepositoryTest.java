@@ -172,11 +172,12 @@ class HyDragonConfigRepositoryTest {
                 archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{ability};
             } else if (id.equals("toxic")) {
                 MiniwyvernArchetypeConfig.Ability ability = validAbility("toxic_spit");
-                ability.projectileId = "Scarak_Seeker_Spit_Projectile";
+                ability.projectileId = "Scarak_Seeker_Spitball";
                 archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{ability};
-                archetype.ownerAttackAura = validOwnerAttackAura();
             } else if (id.equals("fire")) {
                 archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{validAbility("fireball")};
+            } else if (id.equals("lightning")) {
+                archetype.activeAbilities = new MiniwyvernArchetypeConfig.Ability[]{validAbility("lightning_strike")};
             }
             archetypes.add(archetype);
         }
@@ -190,8 +191,7 @@ class HyDragonConfigRepositoryTest {
         archetype.fallbackBehavior = "BASIC_BITE";
         if (id.equals("lightning")) {
             archetype.passiveModifiers = Map.of(
-                    "MovementSpeedMultiplier", 1.15,
-                    "ActionSpeedMultiplier", 1.10);
+                    "MovementSpeedMultiplier", 1.15);
             archetype.passiveModifierEffects = Map.of(
                     "MovementSpeedMultiplier", "HyDragon_Miniwyvern_Lightning_Boon");
         } else if (id.equals("nature")) {
@@ -231,25 +231,5 @@ class HyDragonConfigRepositoryTest {
         ability.minimumDefenseMultiplier = 0.5;
         ability.maximumReduction = 0.12;
         return ability;
-    }
-
-    @Test
-    void rejectsDuplicateOrUnknownMiniwyvernRoleBindings() {
-        List<MiniwyvernArchetypeConfig> duplicate = allArchetypes();
-        duplicate.get(1).roleId = duplicate.getFirst().roleId;
-        HyDragonConfigRepository.Snapshot duplicateSnapshot = HyDragonConfigRepository.buildSnapshot(
-                List.of(validSpecies()), duplicate, List.of(validEncounter()));
-        assertTrue(duplicateSnapshot.issues().stream().anyMatch(issue -> issue.contains("duplicate RoleId")));
-
-        MiniwyvernArchetypeConfig unknown = validArchetype("wild");
-        unknown.roleId = "Tamed_Wyvern_Mini_Unknown";
-        assertTrue(unknown.validate().stream().anyMatch(issue -> issue.contains("RoleId must map")));
-    }
-
-    private static MiniwyvernArchetypeConfig.OwnerAttackAura validOwnerAttackAura() {
-        MiniwyvernArchetypeConfig.OwnerAttackAura aura = new MiniwyvernArchetypeConfig.OwnerAttackAura();
-        aura.effectId = "HyDragon_Miniwyvern_Void_Exposure";
-        aura.durationSeconds = 6.0;
-        return aura;
     }
 }

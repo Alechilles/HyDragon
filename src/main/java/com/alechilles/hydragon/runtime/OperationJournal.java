@@ -24,7 +24,7 @@ public interface OperationJournal {
 
     boolean available();
 
-    enum Kind { SOUL_BOND, MINIWYVERN_ATTUNEMENT }
+    enum Kind { SOUL_BOND }
 
     enum Phase {
         PREPARED,

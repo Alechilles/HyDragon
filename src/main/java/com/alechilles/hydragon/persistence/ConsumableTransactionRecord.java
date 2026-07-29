@@ -60,10 +60,6 @@ public record ConsumableTransactionRecord(
         if (status != ConsumableTransactionStatus.QUARANTINED && quarantineReason.isPresent()) {
             throw new IllegalArgumentException("quarantineReason is valid only for QUARANTINED");
         }
-        if (kind == ConsumableTransactionKind.MINIWYVERN_ATTUNEMENT
-                && (profileId.isEmpty() || profileRevision.isEmpty())) {
-            throw new IllegalArgumentException("MINIWYVERN_ATTUNEMENT requires profile identity and revision");
-        }
     }
 
     public static ConsumableTransactionRecord prepared(

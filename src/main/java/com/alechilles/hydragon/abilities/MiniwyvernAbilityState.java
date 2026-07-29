@@ -8,7 +8,7 @@ import java.util.UUID;
 /** Durable, engine-neutral scheduler state for one Soul Bond Miniwyvern profile. */
 public record MiniwyvernAbilityState(
         int schemaVersion,
-        String archetypeId,
+        String formId,
         Map<String, Long> cooldownUntilByAbility,
         Map<UUID, Double> iceBuildupByTarget,
         Map<UUID, Long> controlImmunityUntilByTarget,
@@ -25,7 +25,8 @@ public record MiniwyvernAbilityState(
         if (schemaVersion != SCHEMA_VERSION) {
             throw new IllegalArgumentException("Unsupported ability-state schema " + schemaVersion);
         }
-        archetypeId = requiredText(archetypeId, "archetypeId").toLowerCase(java.util.Locale.ROOT);
+        // This is scheduler cleanup/cooldown metadata; the live NPC role is the form authority.
+        formId = requiredText(formId, "formId").toLowerCase(java.util.Locale.ROOT);
         cooldownUntilByAbility = copyLongMap(cooldownUntilByAbility, "cooldownUntilByAbility");
         iceBuildupByTarget = copyDoubleMap(iceBuildupByTarget, "iceBuildupByTarget");
         controlImmunityUntilByTarget = copyLongMap(controlImmunityUntilByTarget, "controlImmunityUntilByTarget");
@@ -60,9 +61,9 @@ public record MiniwyvernAbilityState(
         }
     }
 
-    public static MiniwyvernAbilityState empty(String archetypeId, long nowMs) {
+    public static MiniwyvernAbilityState empty(String formId, long nowMs) {
         return new MiniwyvernAbilityState(
-                SCHEMA_VERSION, archetypeId, Map.of(), Map.of(), Map.of(), Map.of(),
+                SCHEMA_VERSION, formId, Map.of(), Map.of(), Map.of(), Map.of(),
                 Set.of(), Map.of(), Map.of(), nowMs);
     }
 

@@ -34,7 +34,12 @@ class DragonRosterAssetContractTest {
         assertTrue(full.contains("\"Tamed_NordicDrake\""));
         assertTrue(full.contains("\"Tamed_Hydra\""));
         assertTrue(full.contains("\"Tamed_RockDrakeT3\""));
-        assertTrue(mini.contains("\"Tamed_Wyvern_Mini\""));
+        for (String role : List.of(
+                "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+                "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+                "Tamed_Wyvern_Mini_Ice")) {
+            assertTrue(mini.contains("\"" + role + "\""), role);
+        }
         assertTrue(full.contains("\"Capture\": true"));
         assertTrue(full.contains("\"Provision\": false"));
         assertTrue(mini.contains("\"Capture\": false"));

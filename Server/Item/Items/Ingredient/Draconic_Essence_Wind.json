@@ -4,9 +4,6 @@
     "Name": "server.items.Draconic_Essence_Wind.name",
     "Description": "server.items.Draconic_Essence_Wind.description"
   },
-  "Interactions": {
-    "Secondary": { "Interactions": [ { "Type": "HyDragonMiniwyvernAttune", "ArchetypeId": "wind" } ] }
-  },
   "Icon": "Icons/ItemsGenerated/Draconic_Essence_Wind.png",
   "Texture": "Items/HyDragon/Draconic_Essence_Wind.png",
   "Light": {

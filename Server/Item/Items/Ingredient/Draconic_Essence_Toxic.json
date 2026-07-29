@@ -1,0 +1,11 @@
+{
+  "Parent": "Draconic_Essence_Nature",
+  "TranslationProperties": {
+    "Name": "server.items.Draconic_Essence_Toxic.name",
+    "Description": "server.items.Draconic_Essence_Toxic.description"
+  },
+  "Light": {
+    "Color": "#421",
+    "Radius": 1
+  }
+}

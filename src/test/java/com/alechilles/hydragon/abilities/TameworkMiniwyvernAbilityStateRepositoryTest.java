@@ -28,21 +28,18 @@ final class TameworkMiniwyvernAbilityStateRepositoryTest {
             new BondedMiniwyvernExtensionCodec();
 
     @Test
-    void saveMergesAbilityStateWithoutDiscardingAttunementOrProgression() {
+    void saveMergesSchedulerStateWithoutDiscardingProgression() {
         MemoryGateway gateway = new MemoryGateway();
         BondedMiniwyvernExtensionDocument original = CODEC.decode("""
                 {
                   "schemaVersion":1,
                   "companionKind":"SOULBOUND_MINIWYVERN",
                   "speciesId":"hydragon:miniwyvern",
-                  "archetypeId":"ice",
-                  "archetypeRevision":2,
-                  "lastAttunementOperationId":"attune-2",
                   "progression":{"level":7},
                   "futureTop":{"kept":true},
                   "abilityState":{
                     "schemaVersion":2,
-                    "archetypeId":"ice",
+                    "formId":"ice",
                     "cooldownUntilByAbility":{},
                     "iceBuildupByTarget":{},
                     "controlImmunityUntilByTarget":{},
@@ -64,9 +61,6 @@ final class TameworkMiniwyvernAbilityStateRepositoryTest {
 
         BondedMiniwyvernExtensionDocument saved = gateway.document();
         assertEquals(replacement, saved.abilityState());
-        assertEquals("ice", saved.archetypeId());
-        assertEquals(2L, saved.archetypeRevision());
-        assertEquals("attune-2", saved.lastAttunementOperationId().orElseThrow());
         assertEquals(BondedExtensionJsonValue.parse("{\"level\":7}"), saved.progression());
         assertTrue(saved.unknownTopLevelFields().containsKey("futureTop"));
         assertEquals(4L, gateway.revision);
@@ -93,30 +87,29 @@ final class TameworkMiniwyvernAbilityStateRepositoryTest {
     }
 
     @Test
-    void concurrentAttunementCannotBeOverwrittenByAStaleAbilityTick() {
+    void concurrentSchedulerWriteCannotBeOverwrittenByAStaleAbilityTick() {
         MemoryGateway gateway = new MemoryGateway();
-        gateway.install(BondedMiniwyvernExtensionDocument.neutral(
+        gateway.install(BondedMiniwyvernExtensionDocument.wild(
                 "hydragon:miniwyvern", 10L), 0L);
         TameworkMiniwyvernAbilityStateRepository repository = repository(gateway);
         assertEquals(MiniwyvernAbilityStateRepository.Status.LOADED,
                 repository.load(OWNER, PROFILE).status());
-        gateway.externalWrite(gateway.document().attune("ice", "attune-concurrent"));
+        gateway.externalWrite(gateway.document().withAbilityState(
+                MiniwyvernAbilityState.empty("ice", 15L)));
 
         assertFalse(repository.save(
-                OWNER, PROFILE, MiniwyvernAbilityState.empty("neutral", 20L)));
-        assertEquals("ice", gateway.document().archetypeId());
-        assertEquals("attune-concurrent",
-                gateway.document().lastAttunementOperationId().orElseThrow());
+                OWNER, PROFILE, MiniwyvernAbilityState.empty("wild", 20L)));
+        assertEquals("ice", gateway.document().abilityState().formId());
     }
 
     @Test
     void exactDeterministicRetryRecoversALostCasResponse() {
         MemoryGateway gateway = new MemoryGateway();
-        gateway.install(BondedMiniwyvernExtensionDocument.neutral(
+        gateway.install(BondedMiniwyvernExtensionDocument.wild(
                 "hydragon:miniwyvern", 10L), 0L);
         gateway.failNextResponseAfterCommit = true;
         TameworkMiniwyvernAbilityStateRepository repository = repository(gateway);
-        MiniwyvernAbilityState desired = MiniwyvernAbilityState.empty("neutral", 20L);
+        MiniwyvernAbilityState desired = MiniwyvernAbilityState.empty("wild", 20L);
         repository.load(OWNER, PROFILE);
 
         assertFalse(repository.save(OWNER, PROFILE, desired));
@@ -149,7 +142,7 @@ final class TameworkMiniwyvernAbilityStateRepositoryTest {
         assertEquals(MiniwyvernAbilityStateRepository.Status.UNAVAILABLE,
                 repository.load(OWNER, PROFILE).status());
         assertFalse(repository.save(
-                OWNER, PROFILE, MiniwyvernAbilityState.empty("neutral", 20L)));
+                OWNER, PROFILE, MiniwyvernAbilityState.empty("wild", 20L)));
     }
 
     private static TameworkMiniwyvernAbilityStateRepository repository(

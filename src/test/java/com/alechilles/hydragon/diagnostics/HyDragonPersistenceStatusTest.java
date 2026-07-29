@@ -50,7 +50,6 @@ class HyDragonPersistenceStatusTest {
         store.putProfileExtension(ProfileExtensionRecord.soulboundMiniwyvern(
                 PROFILE_ONE,
                 "hydragon:miniwyvern",
-                "neutral",
                 Optional.of("soul:claimed")));
         store.beginConsumableTransaction(ConsumableTransactionRecord.prepared(
                 "soul:item:pending",
@@ -103,7 +102,6 @@ class HyDragonPersistenceStatusTest {
         store.putProfileExtension(ProfileExtensionRecord.soulboundMiniwyvern(
                 PROFILE_ONE,
                 "hydragon:miniwyvern",
-                "neutral",
                 Optional.of("soul:legacy")));
 
         HyDragonPersistenceStatus status = HyDragonPersistenceStatus.from(store, null);

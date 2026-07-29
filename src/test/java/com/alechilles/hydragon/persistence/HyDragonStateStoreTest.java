@@ -31,7 +31,7 @@ class HyDragonStateStoreTest {
     Path temporaryDirectory;
 
     @Test
-    void completesSoulBondAndNeutralMiniwyvernExtensionInOneGeneration() throws Exception {
+    void completesSoulBondWithFormFreeMiniwyvernMetadataInOneGeneration() throws Exception {
         UUID owner = UUID.randomUUID();
         UUID profile = UUID.randomUUID();
         String operationId = "hydragon:soul-bond:" + owner;
@@ -47,7 +47,6 @@ class HyDragonStateStoreTest {
         assertEquals(profile, store.snapshot().playerSoulBond(owner).orElseThrow().profileId().orElseThrow());
         ProfileExtensionRecord extension = store.snapshot().profileExtension(profile).orElseThrow();
         assertEquals(ProfileKind.SOULBOUND_MINIWYVERN, extension.kind());
-        assertEquals(Optional.of("neutral"), extension.archetypeId());
         assertEquals(Optional.of(operationId), extension.lastOperationId());
     }
 
@@ -121,7 +120,6 @@ class HyDragonStateStoreTest {
         ProfileExtensionRecord profile = ProfileExtensionRecord.soulboundMiniwyvern(
                 PROFILE_ONE,
                 "hydragon:miniwyvern",
-                "neutral",
                 Optional.of("soul:one"));
         EncounterRecord encounter = encounterRecord();
         assertEquals(MutationOutcome.APPLIED, first.putProfileExtension(profile));
@@ -226,7 +224,6 @@ class HyDragonStateStoreTest {
         ProfileExtensionRecord fire = ProfileExtensionRecord.soulboundMiniwyvern(
                 PROFILE_ONE,
                 "hydragon:miniwyvern",
-                "fire",
                 Optional.of("attune:fire"));
         assertEquals(MutationOutcome.APPLIED, store.putProfileExtension(fire));
         assertEquals(MutationOutcome.ALREADY_APPLIED, store.putProfileExtension(fire));
@@ -234,8 +231,7 @@ class HyDragonStateStoreTest {
                 MutationOutcome.CONFLICT,
                 store.putProfileExtension(ProfileExtensionRecord.soulboundMiniwyvern(
                         PROFILE_ONE,
-                        "hydragon:miniwyvern",
-                        "ice",
+                        "hydragon:other-miniwyvern",
                         Optional.of("attune:fire"))));
         assertEquals(3, writes.get());
     }
@@ -273,7 +269,6 @@ class HyDragonStateStoreTest {
         ProfileExtensionRecord replacement = ProfileExtensionRecord.soulboundMiniwyvern(
                 PROFILE_ONE,
                 "hydragon:miniwyvern",
-                "fire",
                 Optional.of("attune:one"));
         assertEquals(MutationOutcome.QUARANTINED, store.putProfileExtension(replacement));
         assertEquals(MutationOutcome.QUARANTINED, store.beginSoulBond(PLAYER_TWO, "soul:new"));

@@ -5,13 +5,7 @@
   "Interactions": [
     {
       "Type": "Custom",
-      "Requires": {
-        "All": {
-          "IsTamed": true,
-          "PlayerIsOwner": true,
-          "ItemsInHand": [{ "Items": ["Draconic_Essence"], "Quantity": 8 }]
-        }
-      },
+      "Requires": { "All": { "IsTamed": true, "PlayerIsOwner": true, "ItemsInHand": [{ "Items": ["Draconic_Essence"], "Quantity": 8 }] } },
       "Effects": {
         "SetRole": { "Role": "Tamed_Wyvern_Mini_Wild", "ChangeAppearance": true },
         "RemoveItemsHand": { "Items": ["Draconic_Essence"], "Quantity": 8 }
@@ -19,13 +13,7 @@
     },
     {
       "Type": "Custom",
-      "Requires": {
-        "All": {
-          "IsTamed": true,
-          "PlayerIsOwner": true,
-          "ItemsInHand": [{ "Items": ["Draconic_Essence_Nature"], "Quantity": 8 }]
-        }
-      },
+      "Requires": { "All": { "IsTamed": true, "PlayerIsOwner": true, "ItemsInHand": [{ "Items": ["Draconic_Essence_Nature"], "Quantity": 8 }] } },
       "Effects": {
         "SetRole": { "Role": "Tamed_Wyvern_Mini_Nature", "ChangeAppearance": true },
         "RemoveItemsHand": { "Items": ["Draconic_Essence_Nature"], "Quantity": 8 }
@@ -33,13 +21,7 @@
     },
     {
       "Type": "Custom",
-      "Requires": {
-        "All": {
-          "IsTamed": true,
-          "PlayerIsOwner": true,
-          "ItemsInHand": [{ "Items": ["Draconic_Essence_Toxic"], "Quantity": 8 }]
-        }
-      },
+      "Requires": { "All": { "IsTamed": true, "PlayerIsOwner": true, "ItemsInHand": [{ "Items": ["Draconic_Essence_Toxic"], "Quantity": 8 }] } },
       "Effects": {
         "SetRole": { "Role": "Tamed_Wyvern_Mini_Toxic", "ChangeAppearance": true },
         "RemoveItemsHand": { "Items": ["Draconic_Essence_Toxic"], "Quantity": 8 }
@@ -47,13 +29,7 @@
     },
     {
       "Type": "Custom",
-      "Requires": {
-        "All": {
-          "IsTamed": true,
-          "PlayerIsOwner": true,
-          "ItemsInHand": [{ "Items": ["Draconic_Essence_Void"], "Quantity": 8 }]
-        }
-      },
+      "Requires": { "All": { "IsTamed": true, "PlayerIsOwner": true, "ItemsInHand": [{ "Items": ["Draconic_Essence_Void"], "Quantity": 8 }] } },
       "Effects": {
         "SetRole": { "Role": "Tamed_Wyvern_Mini_Void", "ChangeAppearance": true },
         "RemoveItemsHand": { "Items": ["Draconic_Essence_Void"], "Quantity": 8 }
@@ -61,13 +37,7 @@
     },
     {
       "Type": "Custom",
-      "Requires": {
-        "All": {
-          "IsTamed": true,
-          "PlayerIsOwner": true,
-          "ItemsInHand": [{ "Items": ["Draconic_Essence_Lightning"], "Quantity": 8 }]
-        }
-      },
+      "Requires": { "All": { "IsTamed": true, "PlayerIsOwner": true, "ItemsInHand": [{ "Items": ["Draconic_Essence_Lightning"], "Quantity": 8 }] } },
       "Effects": {
         "SetRole": { "Role": "Tamed_Wyvern_Mini_Lightning", "ChangeAppearance": true },
         "RemoveItemsHand": { "Items": ["Draconic_Essence_Lightning"], "Quantity": 8 }
@@ -75,13 +45,7 @@
     },
     {
       "Type": "Custom",
-      "Requires": {
-        "All": {
-          "IsTamed": true,
-          "PlayerIsOwner": true,
-          "ItemsInHand": [{ "Items": ["Draconic_Essence_Ice"], "Quantity": 8 }]
-        }
-      },
+      "Requires": { "All": { "IsTamed": true, "PlayerIsOwner": true, "ItemsInHand": [{ "Items": ["Draconic_Essence_Ice"], "Quantity": 8 }] } },
       "Effects": {
         "SetRole": { "Role": "Tamed_Wyvern_Mini_Ice", "ChangeAppearance": true },
         "RemoveItemsHand": { "Items": ["Draconic_Essence_Ice"], "Quantity": 8 }
@@ -98,9 +62,7 @@
       ],
       "Effects": {
         "PlaySound": { "SoundEvent": "SFX_Fen_Stalker_Eat", "Volume": 0.3, "Pitch": 2 },
-        "SpawnParticles": {
-          "ParticleSystem": "Effect_Heal", "Color": "#fe6969", "Offset": [0, 0.8, 0], "AttachTarget": "Entity"
-        }
+        "SpawnParticles": { "ParticleSystem": "Effect_Heal", "Color": "#fe6969", "Offset": [0, 0.8, 0], "AttachTarget": "Entity" }
       }
     },
     {

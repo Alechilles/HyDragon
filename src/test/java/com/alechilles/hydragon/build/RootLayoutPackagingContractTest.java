@@ -19,8 +19,8 @@ final class RootLayoutPackagingContractTest {
 
         assertTrue(manifest.contains("\"Main\": \"com.alechilles.hydragon.HyDragonPlugin\""));
         assertTrue(manifest.contains("\"IncludesAssetPack\": true"));
-        assertTrue(manifest.contains("\"ServerVersion\": \">=0.5.6 <0.6.0\""));
-        assertTrue(manifest.contains("\">=3.0.0 <4.0.0\""));
+        assertTrue(manifest.contains("\"ServerVersion\": \"0.5.x\""));
+        assertTrue(manifest.contains("\"Alechilles:Alec's Tamework!\": \">=3.0.0 <4.0.0\""));
         assertFalse(manifest.contains("Master of Flight"));
     }
 
@@ -40,7 +40,7 @@ final class RootLayoutPackagingContractTest {
         String pom = Files.readString(projectRoot.resolve("pom.xml"));
         String manifest = Files.readString(projectRoot.resolve("manifest.json"));
 
-        assertTrue(pom.contains("<version>0.2.1</version>"));
+        assertTrue(pom.contains("<version>1.0.0</version>"));
         assertEquals(1, count(manifest, "${project.version}"));
     }
 

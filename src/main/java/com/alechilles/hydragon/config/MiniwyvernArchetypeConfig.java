@@ -31,18 +31,6 @@ public final class MiniwyvernArchetypeConfig
             "wild", "nature", "toxic", "fire", "void", "lightning", "ice"
     );
 
-    private static final BuilderCodec<OwnerAttackAura> OWNER_ATTACK_AURA_CODEC =
-            BuilderCodec.builder(OwnerAttackAura.class, OwnerAttackAura::new)
-                    .<String>append(new KeyedCodec<>("EffectId", Codec.STRING),
-                            (aura, value) -> aura.effectId = value,
-                            aura -> aura.effectId)
-                    .add()
-                    .<Double>append(new KeyedCodec<>("DurationSeconds", Codec.DOUBLE),
-                            (aura, value) -> aura.durationSeconds = value == null ? 0.0 : value,
-                            aura -> aura.durationSeconds)
-                    .add()
-                    .build();
-
     private static final BuilderCodec<Ability> ABILITY_CODEC = BuilderCodec.builder(Ability.class, Ability::new)
             .<String>append(new KeyedCodec<>("Id", Codec.STRING),
                     (ability, value) -> ability.id = value,
@@ -130,6 +118,15 @@ public final class MiniwyvernArchetypeConfig
             .add()
             .build();
 
+    private static final BuilderCodec<OwnerAttackAura> OWNER_ATTACK_AURA_CODEC = BuilderCodec.builder(
+            OwnerAttackAura.class, OwnerAttackAura::new)
+            .<String>append(new KeyedCodec<>("EffectId", Codec.STRING), (aura, value) -> aura.effectId = value, aura -> aura.effectId).add()
+            .<Double>append(new KeyedCodec<>("DurationSeconds", Codec.DOUBLE),
+                    (aura, value) -> aura.durationSeconds = value == null ? 0.0 : value, aura -> aura.durationSeconds).add()
+            .<Double>append(new KeyedCodec<>("DamageReductionFraction", Codec.DOUBLE),
+                    (aura, value) -> aura.damageReductionFraction = value, aura -> aura.damageReductionFraction).add()
+            .build();
+
     private static final ArrayCodec<Ability> ABILITY_ARRAY_CODEC =
             new ArrayCodec<>(ABILITY_CODEC, Ability[]::new);
 
@@ -142,14 +139,13 @@ public final class MiniwyvernArchetypeConfig
             (asset, data) -> asset.data = data,
             asset -> asset.data
     )
-            .documentation("HyDragon Miniwyvern role-bound passive effects, owner-hit aura metadata, and active abilities.")
+            .documentation("HyDragon Miniwyvern role-bound effects, owner-hit aura metadata, and active abilities.")
             .<String>append(new KeyedCodec<>("Id", Codec.STRING),
                     (asset, value) -> asset.id = value,
                     asset -> asset.id)
             .add()
             .<String>append(new KeyedCodec<>("RoleId", Codec.STRING),
-                    (asset, value) -> asset.roleId = value,
-                    asset -> asset.roleId)
+                    (asset, value) -> asset.roleId = value, asset -> asset.roleId)
             .add()
             .<String[]>append(new KeyedCodec<>("ParticleAndSoundIds", Codec.STRING_ARRAY),
                     (asset, value) -> asset.particleAndSoundIds = value == null ? EMPTY : value,
@@ -172,8 +168,7 @@ public final class MiniwyvernArchetypeConfig
                     asset -> asset.activeAbilities)
             .add()
             .<OwnerAttackAura>append(new KeyedCodec<>("OwnerAttackAura", OWNER_ATTACK_AURA_CODEC),
-                    (asset, value) -> asset.ownerAttackAura = value,
-                    asset -> asset.ownerAttackAura)
+                    (asset, value) -> asset.ownerAttackAura = value, asset -> asset.ownerAttackAura)
             .add()
             .<String>append(new KeyedCodec<>("FallbackBehavior", Codec.STRING),
                     (asset, value) -> asset.fallbackBehavior = value,
@@ -204,10 +199,7 @@ public final class MiniwyvernArchetypeConfig
             errors.add("Id must be one of " + ALLOWED_ARCHETYPES);
         }
         if (blank(roleId)) errors.add("RoleId is required");
-        else if (!roleId.trim().equals("Tamed_Wyvern_Mini_" + titleCase(normalized))) {
-            errors.add("RoleId must map " + normalized + " to Tamed_Wyvern_Mini_"
-                    + titleCase(normalized));
-        }
+        else if (!roleId.trim().equals("Tamed_Wyvern_Mini_" + titleCase(normalized))) errors.add("RoleId must map form to its tamed role");
         if (blank(fallbackBehavior)) errors.add("FallbackBehavior is required");
         Set<String> presentationIds = new java.util.HashSet<>();
         for (String presentationId : particleAndSoundIds) {
@@ -217,8 +209,7 @@ public final class MiniwyvernArchetypeConfig
                 errors.add("ParticleAndSoundIds contains duplicate " + trim(presentationId));
             }
         }
-        if (Set.of("toxic", "fire", "ice", "void", "lightning").contains(normalized)
-                && activeAbilities.length == 0) {
+        if (Set.of("toxic", "fire", "ice", "void", "lightning").contains(normalized) && activeAbilities.length == 0) {
             errors.add("Archetype " + normalized + " requires at least one active ability");
         }
         errors.addAll(validatePassiveModifiers(normalized));
@@ -320,14 +311,6 @@ public final class MiniwyvernArchetypeConfig
                     errors.add("Ice abilities require positive ControlImmunitySeconds");
                 }
             }
-            if ("water".equals(archetypeId)) {
-                if (!fraction(ownerHealthThreshold)) {
-                    errors.add("Water abilities require OwnerHealthThreshold in (0, 1]");
-                }
-                if (!fraction(maximumHealFraction)) {
-                    errors.add("Water abilities require MaximumHealFraction in (0, 1]");
-                }
-            }
             if ("void".equals(archetypeId)) {
                 if (minimumDefenseMultiplier == null || !Double.isFinite(minimumDefenseMultiplier)
                         || minimumDefenseMultiplier <= 0.0 || minimumDefenseMultiplier > 1.0) {
@@ -377,29 +360,30 @@ public final class MiniwyvernArchetypeConfig
         @Nullable public Double getMaximumReduction() { return maximumReduction; }
     }
 
-    /** Data-only owner-hit effect metadata; runtime registration is intentionally separate. */
+    /** Data-only owner-hit effect metadata; its runtime is deliberately separate. */
     public static final class OwnerAttackAura {
         String effectId;
         double durationSeconds;
-
+        Double damageReductionFraction;
         private List<String> validate() {
             List<String> errors = new ArrayList<>();
             if (blank(effectId)) errors.add("OwnerAttackAura.EffectId is required");
-            if (!Double.isFinite(durationSeconds) || durationSeconds <= 0.0) {
-                errors.add("OwnerAttackAura.DurationSeconds must be positive");
+            if (!Double.isFinite(durationSeconds) || durationSeconds <= 0.0) errors.add("OwnerAttackAura.DurationSeconds must be positive");
+            if (damageReductionFraction != null && (!Double.isFinite(damageReductionFraction)
+                    || damageReductionFraction <= 0.0 || damageReductionFraction >= 1.0)) {
+                errors.add("OwnerAttackAura.DamageReductionFraction must be in (0, 1)");
             }
             return errors;
         }
-
         @Nullable public String getEffectId() { return blank(effectId) ? null : effectId.trim(); }
         public double getDurationSeconds() { return durationSeconds; }
+        @Nullable public Double getDamageReductionFraction() { return damageReductionFraction; }
     }
 
     private List<String> validatePassiveModifiers(String archetypeId) {
         List<String> errors = new ArrayList<>();
         if ("lightning".equals(archetypeId)) {
             requireMultiplier(errors, "MovementSpeedMultiplier");
-            requireMultiplier(errors, "ActionSpeedMultiplier");
         } else if ("nature".equals(archetypeId)) {
             Double tick = passiveModifiers.get("RegenerationTickSeconds");
             if (!positive(tick)) errors.add("Nature PassiveModifiers.RegenerationTickSeconds must be positive");
@@ -448,8 +432,8 @@ public final class MiniwyvernArchetypeConfig
         return trim(value).toLowerCase(Locale.ROOT);
     }
 
-    private static String titleCase(String normalized) {
-        return normalized.isEmpty() ? "" : Character.toUpperCase(normalized.charAt(0)) + normalized.substring(1);
+    private static String titleCase(String value) {
+        return value.isEmpty() ? "" : Character.toUpperCase(value.charAt(0)) + value.substring(1);
     }
 
     private static boolean blank(@Nullable String value) {

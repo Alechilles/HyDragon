@@ -1,8 +1,1 @@
-{
-  "Id": "wild",
-  "RoleId": "Tamed_Wyvern_Mini_Wild",
-  "ParticleAndSoundIds": [],
-  "PassiveEffects": [],
-  "ActiveAbilities": [],
-  "FallbackBehavior": "BASIC_BITE"
-}
+{"Id":"wild","RoleId":"Tamed_Wyvern_Mini_Wild","ParticleAndSoundIds":[],"PassiveEffects":[],"ActiveAbilities":[],"FallbackBehavior":"BASIC_BITE"}

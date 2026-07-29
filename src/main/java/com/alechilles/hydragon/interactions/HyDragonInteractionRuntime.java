@@ -48,7 +48,6 @@ public final class HyDragonInteractionRuntime {
             UUID playerUuid,
             String worldName,
             PopulationAdmissionLocation destination,
-            String archetypeId,
             ConsumableReservation reservation) {
         Installation installation = INSTALLATION.get();
         if (installation == null) {
@@ -71,7 +70,6 @@ public final class HyDragonInteractionRuntime {
             return switch (action) {
                 case SOUL_BOND -> installation.handler().soulBond(
                         playerUuid, worldName, destination, reservation);
-                case ATTUNE -> installation.handler().attune(playerUuid, archetypeId, reservation);
             };
         } catch (RuntimeException failure) {
             return reservation.release().handle((ignored, releaseFailure) ->
@@ -79,7 +77,7 @@ public final class HyDragonInteractionRuntime {
         }
     }
 
-    enum Action { SOUL_BOND, ATTUNE }
+    enum Action { SOUL_BOND }
 
     private record Installation(
             Handler handler,
@@ -92,8 +90,5 @@ public final class HyDragonInteractionRuntime {
                 String worldName,
                 PopulationAdmissionLocation destination,
                 ConsumableReservation reservation);
-
-        CompletionStage<GameplayResult> attune(
-                UUID playerUuid, String archetypeId, ConsumableReservation reservation);
     }
 }

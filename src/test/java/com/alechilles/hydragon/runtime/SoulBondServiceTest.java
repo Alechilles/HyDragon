@@ -55,12 +55,12 @@ final class SoulBondServiceTest {
         BondedCompanionProvisionRequest request = fixture.authority.lastRequest;
         assertEquals(TameworkGameplayAdapter.DRAGON_HORN_ROSTER, request.rosterId());
         assertEquals(TameworkGameplayAdapter.MINIWYVERN_FAMILY, request.familyId());
-        assertEquals(TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE, request.roleId());
+        assertEquals(TameworkGameplayAdapter.WILD_MINIWYVERN_ROLE, request.roleId());
         assertEquals(BondedCompanionStateView.STORED,
                 fixture.authority.profile().state());
         assertNull(fixture.authority.profile().activeLease());
         assertEquals("miniwyvern", fixture.authority.extension().speciesId());
-        assertEquals("neutral", fixture.authority.extension().archetypeId());
+        assertEquals("wild", fixture.authority.extension().abilityState().formId());
         assertEquals(SoulBondState.CLAIMED,
                 fixture.store.snapshot().playerSoulBond(fixture.owner)
                         .orElseThrow().state());
@@ -315,7 +315,7 @@ final class SoulBondServiceTest {
             String family = evidenceMismatch == EvidenceMismatch.FAMILY
                     ? "other:family" : TameworkGameplayAdapter.MINIWYVERN_FAMILY;
             String role = evidenceMismatch == EvidenceMismatch.ROLE
-                    ? "Other_Role" : TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE;
+                    ? "Other_Role" : TameworkGameplayAdapter.WILD_MINIWYVERN_ROLE;
             BondedCompanionStateView state = evidenceMismatch == EvidenceMismatch.STATE
                     ? BondedCompanionStateView.DEAD : BondedCompanionStateView.STORED;
             return new BondedCompanionProfileView(

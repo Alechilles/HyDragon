@@ -23,5 +23,6 @@
       "StackingPolicy": "THRESHOLD_STUN_100"
     }
   ],
+  "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Ice_Slow", "DurationSeconds": 4.0 },
   "FallbackBehavior": "BASIC_BITE"
 }

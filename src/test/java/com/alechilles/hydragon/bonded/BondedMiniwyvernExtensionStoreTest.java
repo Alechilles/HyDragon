@@ -23,10 +23,10 @@ final class BondedMiniwyvernExtensionStoreTest {
 
     @Test
     void loadsAndDecodesOnlyExactExtensionAuthority() {
-        BondedMiniwyvernExtensionDocument neutral =
-                BondedMiniwyvernExtensionDocument.neutral("hydragon:miniwyvern", 10L);
+        BondedMiniwyvernExtensionDocument wild =
+                BondedMiniwyvernExtensionDocument.wild("hydragon:miniwyvern", 10L);
         FakeGateway gateway = new FakeGateway();
-        gateway.read.complete(success(data(OWNER, PROFILE, CODEC.encode(neutral), 4L)));
+        gateway.read.complete(success(data(OWNER, PROFILE, CODEC.encode(wild), 4L)));
 
         BondedMiniwyvernExtensionStore.ReadResult result =
                 new BondedMiniwyvernExtensionStore(gateway, CODEC)
@@ -34,7 +34,7 @@ final class BondedMiniwyvernExtensionStoreTest {
 
         assertEquals(BondedMiniwyvernExtensionStore.ReadStatus.LOADED, result.status());
         assertEquals(4L, result.revision());
-        assertEquals("neutral", result.document().archetypeId());
+        assertEquals("wild", result.document().abilityState().formId());
     }
 
     @Test
@@ -52,16 +52,16 @@ final class BondedMiniwyvernExtensionStoreTest {
 
     @Test
     void compareAndSetAcceptsOnlyExactPayloadKeyAndNextRevision() {
-        BondedMiniwyvernExtensionDocument neutral =
-                BondedMiniwyvernExtensionDocument.neutral("hydragon:miniwyvern", 10L);
-        String payload = CODEC.encode(neutral);
+        BondedMiniwyvernExtensionDocument wild =
+                BondedMiniwyvernExtensionDocument.wild("hydragon:miniwyvern", 10L);
+        String payload = CODEC.encode(wild);
         FakeGateway gateway = new FakeGateway();
         gateway.write.complete(success(data(OWNER, PROFILE, payload, 5L)));
         BondedMiniwyvernExtensionStore store =
                 new BondedMiniwyvernExtensionStore(gateway, CODEC);
 
         BondedMiniwyvernExtensionStore.WriteResult applied = store.compareAndSet(
-                OWNER, PROFILE, "ability-5", 4L, neutral).toCompletableFuture().join();
+                OWNER, PROFILE, "ability-5", 4L, wild).toCompletableFuture().join();
 
         assertEquals(BondedMiniwyvernExtensionStore.WriteStatus.APPLIED, applied.status());
         assertEquals(5L, applied.revision());
@@ -73,7 +73,7 @@ final class BondedMiniwyvernExtensionStoreTest {
         wrongRevision.write.complete(success(data(OWNER, PROFILE, payload, 7L)));
         assertEquals(BondedMiniwyvernExtensionStore.WriteStatus.INVALID,
                 new BondedMiniwyvernExtensionStore(wrongRevision, CODEC)
-                        .compareAndSet(OWNER, PROFILE, "ability-6", 4L, neutral)
+                        .compareAndSet(OWNER, PROFILE, "ability-6", 4L, wild)
                         .toCompletableFuture().join().status());
     }
 
@@ -82,11 +82,11 @@ final class BondedMiniwyvernExtensionStoreTest {
         FakeGateway gateway = new FakeGateway();
         BondedMiniwyvernExtensionStore store =
                 new BondedMiniwyvernExtensionStore(gateway, CODEC);
-        BondedMiniwyvernExtensionDocument neutral =
-                BondedMiniwyvernExtensionDocument.neutral("hydragon:miniwyvern", 10L);
+        BondedMiniwyvernExtensionDocument wild =
+                BondedMiniwyvernExtensionDocument.wild("hydragon:miniwyvern", 10L);
 
         CompletionStage<BondedMiniwyvernExtensionStore.WriteResult> pending =
-                store.compareAndSet(OWNER, PROFILE, "ability-7", -1L, neutral);
+                store.compareAndSet(OWNER, PROFILE, "ability-7", -1L, wild);
         assertFalse(pending.toCompletableFuture().isDone());
 
         gateway.write.complete(new BondedCompanionResult<>(
@@ -98,7 +98,7 @@ final class BondedMiniwyvernExtensionStoreTest {
         unavailable.write.complete(BondedCompanionResult.unavailable("offline"));
         assertEquals(BondedMiniwyvernExtensionStore.WriteStatus.UNAVAILABLE,
                 new BondedMiniwyvernExtensionStore(unavailable, CODEC)
-                        .compareAndSet(OWNER, PROFILE, "ability-8", -1L, neutral)
+                        .compareAndSet(OWNER, PROFILE, "ability-8", -1L, wild)
                         .toCompletableFuture().join().status());
     }
 
