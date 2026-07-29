@@ -3,6 +3,9 @@ package com.alechilles.hydragon.abilities;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.hypixel.hytale.component.ComponentRegistry;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -20,5 +23,12 @@ class MiniwyvernOwnerAuraDamageSystemTest {
         assertFalse(system.shouldApply(OWNER, true, false, false, 1.0F));
         assertFalse(system.shouldApply(OWNER, true, true, true, 1.0F));
         assertFalse(system.shouldApply(OWNER, true, true, false, 0.0F));
+    }
+
+    @Test
+    void rejectsInvalidEntitySourcesBeforeTheGlobalDamagePathReadsTheirComponents() {
+        assertFalse(MiniwyvernOwnerAuraDamageSystem.isLiveRef(
+                new Ref<EntityStore>(null, ComponentRegistry.UNASSIGNED_INDEX)));
+        assertFalse(MiniwyvernOwnerAuraDamageSystem.isLiveRef(null));
     }
 }

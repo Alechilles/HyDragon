@@ -141,7 +141,7 @@ public final class MiniwyvernAbilityService {
         Objects.requireNonNull(archetypes, "archetypes");
         Objects.requireNonNull(world, "world");
         if (!world.isWorldThread()) return TickResult.denied("not-world-thread");
-        ownerAuras.clear(context.ownerUuid(), context.profileId());
+        ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
         if (loaded.status() == MiniwyvernAbilityStateRepository.Status.UNAVAILABLE) {
@@ -500,10 +500,10 @@ public final class MiniwyvernAbilityService {
     private void synchronizeOwnerAttackAura(ProfileContext context, MiniwyvernArchetypeConfig config) {
         MiniwyvernArchetypeConfig.OwnerAttackAura aura = config.getOwnerAttackAura();
         if (aura == null || aura.getEffectId() == null || !ownerAuras.update(
-                context.ownerUuid(), context.profileId(), context.profileId(), context.npcUuid(),
+                context.ownerUuid(), context.profileId(), context.npcUuid().toString(), context.npcUuid(),
                 config.getId(), aura.getEffectId(), aura.getDurationSeconds(),
                 aura.getDamageReductionFraction())) {
-            ownerAuras.clear(context.ownerUuid(), context.profileId());
+            ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
         }
     }
 

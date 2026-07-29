@@ -19,6 +19,7 @@ final class PluginLifecycleContractTest {
                 "serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);",
                 "registerConfigAssets();");
         assertTrue(source.contains("new MiniwyvernOwnerAuraDamageSystem(miniwyvernOwnerAuras)"));
+        assertTrue(source.contains("new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras)"));
     }
 
     @Test

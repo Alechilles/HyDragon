@@ -35,10 +35,10 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
     @Override public void handle(int index, @Nonnull ArchetypeChunk<EntityStore> chunk,
             @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer,
             @Nonnull Damage damage) {
-        Ref<EntityStore> target = chunk.getReferenceTo(index);
         if (!(damage.getSource() instanceof Damage.EntitySource source)) return;
         Ref<EntityStore> ownerRef = source.getRef();
-        reduceToxicWeaknessOutgoingDamage(ownerRef, store, damage);
+        if (!isLiveRef(ownerRef)) return;
+        Ref<EntityStore> target = chunk.getReferenceTo(index);
         PlayerRef player = store.getComponent(ownerRef, PlayerRef.getComponentType());
         UUIDComponent ownerIdentity = store.getComponent(ownerRef, UUIDComponent.getComponentType());
         if (player == null || !player.isValid() || ownerIdentity == null) return;
@@ -62,25 +62,16 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
                 && amount > 0.0F && registry.activeFor(ownerUuid).isPresent();
     }
 
+    static boolean isLiveRef(@Nullable Ref<EntityStore> ref) { return ref != null && ref.isValid(); }
+
     private static boolean hostile(MiniwyvernOwnerAuraRegistry.Aura aura, Ref<EntityStore> target,
                                    Store<EntityStore> store) {
         Ref<EntityStore> npcRef = store.getExternalData().getRefFromUUID(aura.npcUuid());
-        NPCEntity npc = npcRef == null ? null : store.getComponent(npcRef, NPCEntity.getComponentType());
+        NPCEntity npc = !isLiveRef(npcRef)
+                ? null : store.getComponent(npcRef, NPCEntity.getComponentType());
         if (npc == null || npc.getRole() == null) return false;
         try { return npc.getRole().getWorldSupport().getAttitude(npcRef, target, store) == Attitude.HOSTILE; }
         catch (RuntimeException ignored) { return false; }
     }
 
-    private void reduceToxicWeaknessOutgoingDamage(Ref<EntityStore> source, Store<EntityStore> store, Damage damage) {
-        if (damage.isCancelled() || !Float.isFinite(damage.getAmount()) || damage.getAmount() <= 0.0F) return;
-        UUIDComponent identity = store.getComponent(source, UUIDComponent.getComponentType());
-        if (identity == null) return;
-        MiniwyvernOwnerAuraRegistry.ToxicWeakness weakness = registry.activeToxicWeakness(
-                identity.getUuid(), System.currentTimeMillis()).orElse(null);
-        if (weakness == null) return;
-        EffectControllerComponent controller = store.getComponent(source, EffectControllerComponent.getComponentType());
-        int effectIndex = EntityEffect.getAssetMap().getIndex(weakness.effectId());
-        if (controller == null || effectIndex < 0 || !controller.getActiveEffects().containsKey(effectIndex)) return;
-        damage.setAmount((float) (damage.getAmount() * (1.0D - weakness.damageReductionFraction())));
-    }
 }
