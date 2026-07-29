@@ -6,7 +6,7 @@
   },
   "authoringProfile": {
     "schemaCatalog": ".asset-tools/reports/schema-catalog.json",
-    "profile": "runtime-snapshot-2026-06-02",
+    "profile": "runtime-snapshot-2026-07-29",
     "expectedGameVersion": "unknown",
     "expectedChannel": "runtime-snapshot",
     "expectedSourceCommit": "",
