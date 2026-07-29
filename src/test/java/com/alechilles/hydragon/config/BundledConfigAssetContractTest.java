@@ -99,8 +99,13 @@ class BundledConfigAssetContractTest {
                     archetype + " must maintain its owner aura EntityEffect while summoned");
             Path effect = Path.of("Server", "Entity", "Effects", "Status", expected.getValue().effectId() + ".json");
             assertTrue(Files.exists(effect), expected.getValue().effectId() + " must be a bundled EntityEffect");
-            assertTrue(Files.readString(effect).contains("\"StatusEffectIcon\": \"" + expected.getValue().iconPath() + "\""),
+            String effectJson = Files.readString(effect);
+            assertTrue(effectJson.contains("\"StatusEffectIcon\": \"" + expected.getValue().iconPath() + "\""),
                     expected.getValue().effectId() + " must declare its generated HUD icon");
+            assertFalse(effectJson.contains("\"EntityBottomTint\""),
+                    expected.getValue().effectId() + " must not tint the owner while its aura is active");
+            assertFalse(effectJson.contains("\"EntityTopTint\""),
+                    expected.getValue().effectId() + " must not tint the owner while its aura is active");
             assertTrue(Files.exists(Path.of("Common", expected.getValue().iconPath())),
                     expected.getValue().iconPath() + " must be bundled with the HUD effect");
         }
@@ -153,8 +158,29 @@ class BundledConfigAssetContractTest {
             String json = Files.readString(path);
             assertFalse(json.contains("\"Parent\""), path + " must not inherit an additional healing mechanic");
             assertFalse(json.contains("\"StatModifiers\""), path + " must not apply health outside the capped service");
-            assertTrue(json.contains("\"ApplicationEffects\""), path + " should retain visible feedback");
+            assertTrue(json.contains("\"StatusEffectIcon\"") || json.contains("\"ApplicationEffects\""),
+                    path + " should retain visible feedback");
         }
+    }
+
+    @Test
+    void natureHealingPresentationIsSilentAndFinite() throws IOException {
+        Path archetype = Path.of("Server", "HyDragon", "MiniwyvernArchetypes", "Nature.json");
+        String archetypeJson = Files.readString(archetype);
+        String mistId = "HyDragon_Miniwyvern_Nature_HealingMist";
+        assertTrue(archetypeJson.contains("\"ParticleAndSoundIds\": [ \"" + mistId + "\" ]"),
+                "Nature healing must emit only its bounded custom mist");
+        assertFalse(archetypeJson.contains("Effect_Heal"), "Nature healing must not use the persistent stock heal effect");
+        assertFalse(archetypeJson.contains("SFX_"), "Nature healing must not play a sound");
+
+        Path system = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", mistId + ".particlesystem");
+        Path spawner = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", "Spawners", mistId + ".particlespawner");
+        assertTrue(Files.exists(system), "Nature healing mist particle system must be bundled");
+        assertTrue(Files.exists(spawner), "Nature healing mist spawner must be bundled");
+        String systemJson = Files.readString(system);
+        String spawnerJson = Files.readString(spawner);
+        assertTrue(systemJson.contains("\"LifeSpan\": 0.75"), "Nature healing mist must have a bounded system lifetime");
+        assertTrue(spawnerJson.contains("\"Max\": 0.65"), "Nature healing mist particles must expire quickly");
     }
 
     @Test

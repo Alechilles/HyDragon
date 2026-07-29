@@ -6,7 +6,6 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.query.Query;
-import com.hypixel.hytale.server.core.asset.type.attitude.Attitude;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.OverlapBehavior;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -16,7 +15,6 @@ import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +41,7 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
         UUIDComponent ownerIdentity = store.getComponent(ownerRef, UUIDComponent.getComponentType());
         if (player == null || !player.isValid() || ownerIdentity == null) return;
         MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(ownerIdentity.getUuid()).orElse(null);
-        if (aura == null || !shouldApply(ownerIdentity.getUuid(), true, hostile(aura, target, store),
+        if (aura == null || !shouldApply(ownerIdentity.getUuid(), true,
                 damage.isCancelled(), damage.getAmount())) return;
         EffectControllerComponent controller = store.getComponent(target, EffectControllerComponent.getComponentType());
         EntityEffect effect = EntityEffect.getAssetMap().getAsset(aura.effectId());
@@ -56,22 +54,11 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
         }
     }
 
-    boolean shouldApply(java.util.UUID ownerUuid, boolean playerSource, boolean hostile,
-                        boolean cancelled, float amount) {
-        return ownerUuid != null && playerSource && hostile && !cancelled && Float.isFinite(amount)
+    boolean shouldApply(java.util.UUID ownerUuid, boolean playerSource, boolean cancelled, float amount) {
+        return ownerUuid != null && playerSource && !cancelled && Float.isFinite(amount)
                 && amount > 0.0F && registry.activeFor(ownerUuid).isPresent();
     }
 
     static boolean isLiveRef(@Nullable Ref<EntityStore> ref) { return ref != null && ref.isValid(); }
-
-    private static boolean hostile(MiniwyvernOwnerAuraRegistry.Aura aura, Ref<EntityStore> target,
-                                   Store<EntityStore> store) {
-        Ref<EntityStore> npcRef = store.getExternalData().getRefFromUUID(aura.npcUuid());
-        NPCEntity npc = !isLiveRef(npcRef)
-                ? null : store.getComponent(npcRef, NPCEntity.getComponentType());
-        if (npc == null || npc.getRole() == null) return false;
-        try { return npc.getRole().getWorldSupport().getAttitude(npcRef, target, store) == Attitude.HOSTILE; }
-        catch (RuntimeException ignored) { return false; }
-    }
 
 }
