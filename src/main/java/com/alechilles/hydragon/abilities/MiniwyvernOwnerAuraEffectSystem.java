@@ -35,15 +35,18 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
     private final MiniwyvernOwnerAuraEffectQueue queue;
     private final MiniwyvernOwnerAuraRegistry registry;
     private final MiniwyvernVoidEffectLifetimeSystem voidLifetime;
+    private final MiniwyvernVoidEffectReplicationProbe replicationProbe;
     private final ConcurrentHashMap<UUID, Long> lastVoidDiagnosticAt = new ConcurrentHashMap<>();
 
     public MiniwyvernOwnerAuraEffectSystem(
             MiniwyvernOwnerAuraEffectQueue queue,
             MiniwyvernOwnerAuraRegistry registry,
-            MiniwyvernVoidEffectLifetimeSystem voidLifetime) {
+            MiniwyvernVoidEffectLifetimeSystem voidLifetime,
+            MiniwyvernVoidEffectReplicationProbe replicationProbe) {
         this.queue = Objects.requireNonNull(queue, "queue");
         this.registry = Objects.requireNonNull(registry, "registry");
         this.voidLifetime = Objects.requireNonNull(voidLifetime, "voidLifetime");
+        this.replicationProbe = Objects.requireNonNull(replicationProbe, "replicationProbe");
     }
 
     @Nullable
@@ -96,6 +99,11 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
         // ImpactEffect and Hytale's ApplyEffect interaction.
         boolean applied = controller.addEffect(target, effect, commandBuffer);
         boolean activeAfter = controller.hasEffect(effect);
+        replicationProbe.observeApplication(
+                targetUuid,
+                EntityEffect.getAssetMap().getIndex(aura.effectId()),
+                aura.formId(),
+                applied);
         logVoidApplication(aura, targetUuid, activeBefore, applied, activeAfter,
                 "applied", effect.getDuration());
         if (applied && "void".equals(aura.formId())) {

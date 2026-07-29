@@ -46,7 +46,8 @@ class MiniwyvernOwnerAuraEffectQueueTest {
         MiniwyvernOwnerAuraEffectSystem system = new MiniwyvernOwnerAuraEffectSystem(
                 new MiniwyvernOwnerAuraEffectQueue(),
                 new MiniwyvernOwnerAuraRegistry(),
-                new MiniwyvernVoidEffectLifetimeSystem());
+                new MiniwyvernVoidEffectLifetimeSystem(),
+                new MiniwyvernVoidEffectReplicationProbe());
 
         Map<Class<?>, Order> dependencies = system.getDependencies().stream()
                 .filter(SystemDependency.class::isInstance)
