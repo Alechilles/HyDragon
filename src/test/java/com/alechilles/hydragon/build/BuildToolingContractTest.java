@@ -69,5 +69,7 @@ final class BuildToolingContractTest {
 
         assertFalse(repository.contains(
                 "JsonAssetWithMap<String, DefaultAssetMap<String, T>>"));
+        assertFalse(repository.contains(
+                "AssetStore<String, T, DefaultAssetMap<String, T>>"));
     }
 }

@@ -34,9 +34,9 @@ public final class HyDragonConfigRepository {
     /** Reads all registered asset maps. Safe to call at start and during reconciliation. */
     public void refreshFromAssetRegistry() {
         synchronized (reloadLock) {
-            speciesAssets = copyRegisteredAssets(AssetRegistry.getAssetStore(DragonSpeciesConfig.class));
-            archetypeAssets = copyRegisteredAssets(AssetRegistry.getAssetStore(MiniwyvernArchetypeConfig.class));
-            encounterAssets = copyRegisteredAssets(AssetRegistry.getAssetStore(DragonEncounterConfig.class));
+            speciesAssets = copyRegisteredSpeciesAssets();
+            archetypeAssets = copyRegisteredArchetypeAssets();
+            encounterAssets = copyRegisteredEncounterAssets();
             rebuild();
         }
     }
@@ -210,8 +210,21 @@ public final class HyDragonConfigRepository {
         return indexed;
     }
 
-    private static <T extends JsonAsset<String>> Map<String, T> copyRegisteredAssets(
-            @Nullable AssetStore<String, T, DefaultAssetMap<String, T>> store) {
+    private static Map<String, DragonSpeciesConfig> copyRegisteredSpeciesAssets() {
+        AssetStore<String, DragonSpeciesConfig, DefaultAssetMap<String, DragonSpeciesConfig>> store =
+                AssetRegistry.getAssetStore(DragonSpeciesConfig.class);
+        return store == null ? Map.of() : copy(store.getAssetMap());
+    }
+
+    private static Map<String, MiniwyvernArchetypeConfig> copyRegisteredArchetypeAssets() {
+        AssetStore<String, MiniwyvernArchetypeConfig, DefaultAssetMap<String, MiniwyvernArchetypeConfig>> store =
+                AssetRegistry.getAssetStore(MiniwyvernArchetypeConfig.class);
+        return store == null ? Map.of() : copy(store.getAssetMap());
+    }
+
+    private static Map<String, DragonEncounterConfig> copyRegisteredEncounterAssets() {
+        AssetStore<String, DragonEncounterConfig, DefaultAssetMap<String, DragonEncounterConfig>> store =
+                AssetRegistry.getAssetStore(DragonEncounterConfig.class);
         return store == null ? Map.of() : copy(store.getAssetMap());
     }
 
