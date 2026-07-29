@@ -22,6 +22,8 @@ import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
 import com.alechilles.hydragon.runtime.TameworkGameplayAdapter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.time.Clock;
@@ -29,6 +31,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -98,6 +101,7 @@ final class MiniwyvernAbilityRuntimeTest {
                     TameworkGameplayAdapter.MINIWYVERN_FAMILY, roleId);
             fixture.runtime.start();
             assertEquals(1, fixture.runtime.tickSome(8), roleId);
+            assertEquals(formId(roleId), fixture.states.state.formId(), roleId);
             fixture.runtime.close();
         }
     }
@@ -183,18 +187,95 @@ final class MiniwyvernAbilityRuntimeTest {
         store.beginSoulBond(owner, "claim");
         store.completeSoulBond(owner, "claim", profile, 10L);
         BondedAuthority authority = new BondedAuthority(owner, profile, npc, familyId, roleId);
-        RecordingWorldDispatcher worlds = new RecordingWorldDispatcher(owner, npc);
-        MiniwyvernAbilityService service = new MiniwyvernAbilityService(
-                new MemoryAbilityStates());
+        RecordingWorldDispatcher worlds = new RecordingWorldDispatcher(owner, npc, roleId);
+        MemoryAbilityStates states = new MemoryAbilityStates();
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+        Map<String, com.alechilles.hydragon.config.MiniwyvernArchetypeConfig> archetypes = Map.of(
+                formId(roleId), roleConfig(roleId));
         MiniwyvernAbilityRuntime runtime = new MiniwyvernAbilityRuntime(
                 api(authority), store,
                 () -> new HyDragonConfigRepository.Snapshot(
-                        Map.of(), Map.of(), Map.of(), List.of()),
+                        Map.of(), archetypes, Map.of(), List.of()),
                 MiniwyvernAbilityRuntimeTest::availableGate,
                 worlds,
                 service,
                 Clock.fixed(Instant.ofEpochMilli(100L), ZoneOffset.UTC));
-        return new Fixture(owner, profile, authority, worlds, runtime);
+        return new Fixture(owner, profile, authority, worlds, states, runtime);
+    }
+
+    private static String formId(String roleId) {
+        return roleId.substring("Tamed_Wyvern_Mini_".length()).toLowerCase(Locale.ROOT);
+    }
+
+    private static com.alechilles.hydragon.config.MiniwyvernArchetypeConfig roleConfig(
+            String roleId) throws Exception {
+        String formId = formId(roleId);
+        com.alechilles.hydragon.config.MiniwyvernArchetypeConfig config = construct(
+                com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.class);
+        set(config, "id", formId);
+        set(config, "roleId", roleId);
+        set(config, "particleAndSoundIds", new String[0]);
+        set(config, "passiveEffects", new String[0]);
+        set(config, "passiveModifiers", Map.of());
+        set(config, "activeAbilities", new com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability[0]);
+        set(config, "fallbackBehavior", "BASIC_BITE");
+        if ("nature".equals(formId)) {
+            set(config, "passiveModifiers", Map.of(
+                    "RegenerationTickSeconds", 2.0D,
+                    "MaximumHealFractionPerTick", 0.01D));
+        } else if ("lightning".equals(formId)) {
+            set(config, "passiveModifiers", Map.of(
+                    "MovementSpeedMultiplier", 1.15D,
+                    "ActionSpeedMultiplier", 1.10D));
+            set(config, "passiveModifierEffects", Map.of(
+                    "MovementSpeedMultiplier", "test-lightning-boon"));
+            set(config, "activeAbilities", new com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability[] {
+                    activeAbility("lightning")});
+        } else if (!"wild".equals(formId)) {
+            set(config, "activeAbilities", new com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability[] {
+                    activeAbility(formId)});
+        }
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability activeAbility(
+            String formId) throws Exception {
+        com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability ability = construct(
+                com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Ability.class);
+        set(ability, "id", formId + "-test");
+        set(ability, "trigger", "COMBAT_INTERVAL");
+        set(ability, "targetPolicy", "OWNER_HOSTILE_ONLY");
+        set(ability, "range", 1.0D);
+        set(ability, "cooldownSeconds", 1.0D);
+        set(ability, "projectileId", "test-projectile");
+        set(ability, "magnitude", 1.0D);
+        set(ability, "durationSeconds", 0.0D);
+        set(ability, "stackingPolicy", "SOURCE_REFRESH");
+        if ("ice".equals(formId)) {
+            set(ability, "buildupPerHit", 1.0D);
+            set(ability, "buildupThreshold", 1.0D);
+            set(ability, "buildupCap", 1.0D);
+            set(ability, "controlEffectId", "test-control");
+            set(ability, "controlImmunitySeconds", 1.0D);
+        } else if ("void".equals(formId)) {
+            set(ability, "magnitude", 0.1D);
+            set(ability, "minimumDefenseMultiplier", 0.5D);
+            set(ability, "maximumReduction", 0.1D);
+        }
+        return ability;
+    }
+
+    private static <T> T construct(Class<T> type) throws Exception {
+        Constructor<T> constructor = type.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        return constructor.newInstance();
+    }
+
+    private static void set(Object target, String fieldName, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
     }
 
     private static FeatureGate availableGate() {
@@ -242,6 +323,7 @@ final class MiniwyvernAbilityRuntimeTest {
             UUID profile,
             BondedAuthority authority,
             RecordingWorldDispatcher worlds,
+            MemoryAbilityStates states,
             MiniwyvernAbilityRuntime runtime) {
     }
 
@@ -400,11 +482,13 @@ final class MiniwyvernAbilityRuntimeTest {
             implements MiniwyvernAbilityWorldDispatcher {
         private final UUID owner;
         private final UUID npc;
+        private final String liveRoleId;
         private int dispatches;
 
-        private RecordingWorldDispatcher(UUID owner, UUID npc) {
+        private RecordingWorldDispatcher(UUID owner, UUID npc, String liveRoleId) {
             this.owner = owner;
             this.npc = npc;
+            this.liveRoleId = liveRoleId;
         }
 
         public void dispatch(
@@ -414,11 +498,11 @@ final class MiniwyvernAbilityRuntimeTest {
             assertEquals(owner, ownerUuid);
             assertEquals(npc, npcUuid);
             dispatches++;
-            callback.accept(new EmptyWorld(owner, npc));
+            callback.accept(new EmptyWorld(owner, npc, liveRoleId));
         }
     }
 
-    private record EmptyWorld(UUID ownerUuid, UUID npcUuid)
+    private record EmptyWorld(UUID ownerUuid, UUID npcUuid, String liveRoleId)
             implements MiniwyvernAbilityWorld {
         public boolean isWorldThread() { return true; }
         public String worldName() { return "default"; }
@@ -429,7 +513,7 @@ final class MiniwyvernAbilityRuntimeTest {
             return Optional.of(new Target(npcUuid, ownerUuid, "default", 0D, true));
         }
         public Optional<Target> hostileTarget(double maximumRange) { return Optional.empty(); }
-        public Optional<String> companionRoleId() { return Optional.of("Tamed_Wyvern_Mini_Fire"); }
+        public Optional<String> companionRoleId() { return Optional.of(liveRoleId); }
         public Health health(UUID entityUuid) { return new Health(10D, 10D); }
         public boolean applyEffect(UUID entityUuid, String source, String effect, double duration) {
             return true;

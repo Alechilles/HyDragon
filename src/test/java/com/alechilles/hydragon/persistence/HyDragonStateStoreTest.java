@@ -231,7 +231,7 @@ class HyDragonStateStoreTest {
                 MutationOutcome.CONFLICT,
                 store.putProfileExtension(ProfileExtensionRecord.soulboundMiniwyvern(
                         PROFILE_ONE,
-                        "hydragon:miniwyvern",
+                        "hydragon:other-miniwyvern",
                         Optional.of("attune:fire"))));
         assertEquals(3, writes.get());
     }
