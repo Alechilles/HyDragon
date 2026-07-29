@@ -6,6 +6,7 @@ import com.alechilles.hydragon.abilities.HytaleMiniwyvernAbilityWorldDispatcher;
 import com.alechilles.hydragon.abilities.MiniwyvernAbilityRuntime;
 import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraDamageSystem;
 import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraRegistry;
+import com.alechilles.hydragon.abilities.MiniwyvernVoidEffectLifetimeSystem;
 import com.alechilles.hydragon.abilities.MiniwyvernToxicWeaknessDamageSystem;
 import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionCodec;
 import com.alechilles.hydragon.bonded.BondedMiniwyvernExtensionStore;
@@ -75,7 +76,9 @@ public final class HyDragonPlugin extends JavaPlugin {
         // The persistent encounter marker and damage system must exist before any world loads.
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
         getEntityStoreRegistry().registerSystem(new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras));
-        getEntityStoreRegistry().registerSystem(new MiniwyvernOwnerAuraDamageSystem(miniwyvernOwnerAuras));
+        MiniwyvernVoidEffectLifetimeSystem voidLifetime = new MiniwyvernVoidEffectLifetimeSystem();
+        getEntityStoreRegistry().registerSystem(voidLifetime);
+        getEntityStoreRegistry().registerSystem(new MiniwyvernOwnerAuraDamageSystem(miniwyvernOwnerAuras, voidLifetime));
         tameworkBridge = TameworkBridge.connect();
         registerConfigAssets();
         getCommandRegistry().registerCommand(new HyDragonStatusCommand(

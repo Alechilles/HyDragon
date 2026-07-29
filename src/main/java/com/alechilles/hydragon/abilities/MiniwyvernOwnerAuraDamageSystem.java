@@ -27,10 +27,17 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
     private static final Logger LOGGER = Logger.getLogger(MiniwyvernOwnerAuraDamageSystem.class.getName());
     private static final long VOID_DIAGNOSTIC_INTERVAL_MS = 2_000L;
     private final MiniwyvernOwnerAuraRegistry registry;
+    private final MiniwyvernVoidEffectLifetimeSystem voidLifetime;
     private final ConcurrentHashMap<UUID, Long> lastVoidDiagnosticAt = new ConcurrentHashMap<>();
 
     public MiniwyvernOwnerAuraDamageSystem(MiniwyvernOwnerAuraRegistry registry) {
+        this(registry, new MiniwyvernVoidEffectLifetimeSystem());
+    }
+
+    public MiniwyvernOwnerAuraDamageSystem(
+            MiniwyvernOwnerAuraRegistry registry, MiniwyvernVoidEffectLifetimeSystem voidLifetime) {
         this.registry = Objects.requireNonNull(registry, "registry");
+        this.voidLifetime = Objects.requireNonNull(voidLifetime, "voidLifetime");
     }
 
     @Nullable @Override public SystemGroup<EntityStore> getGroup() { return DamageModule.get().getInspectDamageGroup(); }
@@ -62,6 +69,10 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
         boolean activeAfter = controller.hasEffect(effect);
         logVoidApplication(aura, store.getComponent(target, UUIDComponent.getComponentType()),
                 activeBefore, applied, activeAfter, "applied");
+        if (applied && "void".equals(aura.formId())) {
+            UUIDComponent targetIdentity = store.getComponent(target, UUIDComponent.getComponentType());
+            if (targetIdentity != null) voidLifetime.observe(targetIdentity.getUuid());
+        }
         if (applied && aura.damageReductionFraction() > 0.0D) {
             UUIDComponent targetIdentity = store.getComponent(target, UUIDComponent.getComponentType());
             if (targetIdentity != null) registry.recordToxicWeakness(targetIdentity.getUuid(), aura.effectId(),
