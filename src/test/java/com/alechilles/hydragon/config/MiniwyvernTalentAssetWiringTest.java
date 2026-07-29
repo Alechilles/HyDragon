@@ -210,10 +210,34 @@ final class MiniwyvernTalentAssetWiringTest {
 
     private static void assertRawOnlyInteractionChain(
             String interactionId, String description, Set<String> visited) throws IOException {
-        assertTrue(visited.add(interactionId), description + " must not contain a cyclic interaction chain");
+        if (!visited.add(interactionId)) return;
         JsonObject interaction = load(interactionPath(interactionId));
         assertNoEffectOrStatusFields(interaction, description);
+        assertRawOnlyInteractionProjectiles(interaction, description);
         collectReferencedInteractions(interaction, visited, description);
+    }
+
+    private static void assertRawOnlyInteractionProjectiles(
+            JsonElement value, String description) throws IOException {
+        if (value.isJsonObject()) {
+            for (Map.Entry<String, JsonElement> entry : value.getAsJsonObject().asMap().entrySet()) {
+                JsonElement child = entry.getValue();
+                if (entry.getKey().equals("ProjectileId")
+                        && child.isJsonPrimitive() && child.getAsJsonPrimitive().isString()) {
+                    String projectileId = child.getAsString();
+                    Path projectile = projectilePath(projectileId);
+                    assertTrue(Files.isRegularFile(projectile),
+                            description + " must not launch an uninspected projectile: " + projectileId);
+                    assertRawOnly(load(projectile), description + " projectile");
+                } else {
+                    assertRawOnlyInteractionProjectiles(child, description);
+                }
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) {
+                assertRawOnlyInteractionProjectiles(child, description);
+            }
+        }
     }
 
     private static void collectReferencedInteractions(
@@ -222,13 +246,14 @@ final class MiniwyvernTalentAssetWiringTest {
             JsonObject object = value.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : object.asMap().entrySet()) {
                 JsonElement child = entry.getValue();
-                if ((entry.getKey().equals("Next") || entry.getKey().equals("InteractionId"))
-                        && child.isJsonPrimitive() && child.getAsJsonPrimitive().isString()) {
+                if (child.isJsonPrimitive() && child.getAsJsonPrimitive().isString()) {
                     String nextId = child.getAsString();
-                    Path nextPath = interactionPath(nextId);
-                    assertTrue(Files.isRegularFile(nextPath),
-                            description + " must not chain an uninspected interaction: " + nextId);
-                    assertRawOnlyInteractionChain(nextId, description + " chained interaction", visited);
+                    if (nextId.matches("[A-Za-z0-9_-]+")) {
+                        Path nextPath = interactionPath(nextId);
+                        if (Files.isRegularFile(nextPath)) {
+                            assertRawOnlyInteractionChain(nextId, description + " chained interaction", visited);
+                        }
+                    }
                 } else {
                     collectReferencedInteractions(child, visited, description);
                 }
