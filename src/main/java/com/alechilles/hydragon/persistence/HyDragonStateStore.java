@@ -185,6 +185,31 @@ public final class HyDragonStateStore implements PendingProfileProjectionStore {
     }
 
     /**
+     * Releases a completed Soul Bond after Tamework has permanently abandoned its canonical Miniwyvern
+     * profile. The profile identity check prevents unrelated roster removals from reopening the entitlement.
+     */
+    public MutationOutcome releaseSoulBondAfterAbandonment(
+            UUID playerUuid,
+            UUID profileId) throws IOException {
+        Objects.requireNonNull(playerUuid, "playerUuid");
+        Objects.requireNonNull(profileId, "profileId");
+        synchronized (mutationLock) {
+            MutationOutcome blocked = mutationBlock(PersistentRecordType.PLAYER_SOUL_BOND, playerUuid.toString());
+            if (blocked != null) return blocked;
+
+            PlayerSoulBondRecord current = snapshot.playerSoulBonds().get(playerUuid);
+            if (current == null || current.state() == SoulBondState.UNCLAIMED) {
+                return MutationOutcome.ALREADY_APPLIED;
+            }
+            if (current.state() != SoulBondState.CLAIMED
+                    || current.profileId().filter(profileId::equals).isEmpty()) {
+                return MutationOutcome.CONFLICT;
+            }
+            return putPlayerSoulBondLocked(PlayerSoulBondRecord.unclaimed(playerUuid));
+        }
+    }
+
+    /**
      * Atomically completes a Soul Bond and creates the HyDragon-owned neutral Miniwyvern extension.
      * Neither record is published unless the same file generation contains both.
      */

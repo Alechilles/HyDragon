@@ -36,7 +36,9 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("new BondedMiniwyvernExtensionStore("));
         assertTrue(source.contains("new BondedMiniwyvernExtensionCodec()"));
         assertTrue(source.contains("new SoulBondService("));
-        assertTrue(source.contains("new HyDragonGameplayRuntime(soulBondService)"));
+        assertTrue(source.contains("new HyDragonGameplayRuntime("));
+        assertTrue(source.contains("soulBondService, new SoulBondAbandonmentHandler(soulBonds)"));
+        assertTrue(source.contains("gameplay.start(adapter);"));
         assertTrue(source.contains("new ConsumableSagaRecoveryRuntime("));
         assertTrue(source.contains("new ConsumableRefundClaimService(journal)"));
         assertTrue(source.contains("HyDragonEncounterRegistrationFacade.install("));
@@ -58,6 +60,7 @@ final class PluginLifecycleContractTest {
                 "closeRuntime(\"feature composition\", runtimeComposition);",
                 "runtimeComposition = null;");
         assertTrue(source.contains("HyDragonInteractionRuntime.uninstall(gameplay);"));
+        assertTrue(source.contains("gameplay.close();"));
         assertTrue(source.contains("miniwyvernOwnerAuras.clear();"));
     }
 

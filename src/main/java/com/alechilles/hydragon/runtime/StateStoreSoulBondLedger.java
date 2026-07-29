@@ -49,6 +49,15 @@ public final class StateStoreSoulBondLedger implements SoulBondLedger {
     }
 
     @Override
+    public Reservation releaseAfterAbandonment(UUID playerUuid, UUID profileId) {
+        try {
+            return map(store.releaseSoulBondAfterAbandonment(playerUuid, profileId));
+        } catch (IOException exception) {
+            return Reservation.UNAVAILABLE;
+        }
+    }
+
+    @Override
     public Reservation reconcile(UUID playerUuid, String operationId, Optional<UUID> profileId) {
         try {
             return map(store.markSoulBondNeedsReconciliation(

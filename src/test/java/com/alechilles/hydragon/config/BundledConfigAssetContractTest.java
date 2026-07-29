@@ -83,6 +83,25 @@ class BundledConfigAssetContractTest {
         assertFalse(Files.exists(Path.of("Server", "Models", "HyDragon", "Wyvern_Mini", "Wyvern_Mini_Wind.json")));
     }
 
+    @Test
+    void elementalMiniwyvernsApplyAVisibleOwnerAuraEffect() throws IOException {
+        Map<String, String> expectedEffectByForm = Map.of(
+                "Nature", "HyDragon_Miniwyvern_Nature_Regeneration",
+                "Toxic", "HyDragon_Miniwyvern_Toxic_Aura",
+                "Fire", "HyDragon_Miniwyvern_Fire_Aura",
+                "Void", "HyDragon_Miniwyvern_Void_Aura",
+                "Lightning", "HyDragon_Miniwyvern_Lightning_Boon",
+                "Ice", "HyDragon_Miniwyvern_Ice_Aura");
+        for (Map.Entry<String, String> expected : expectedEffectByForm.entrySet()) {
+            Path archetype = Path.of("Server", "HyDragon", "MiniwyvernArchetypes", expected.getKey() + ".json");
+            String json = Files.readString(archetype);
+            assertTrue(json.contains("\"PassiveEffects\": [ \"" + expected.getValue() + "\" ]"),
+                    archetype + " must maintain its owner aura EntityEffect while summoned");
+            assertTrue(Files.exists(Path.of("Server", "Entity", "Effects", "Status", expected.getValue() + ".json")),
+                    expected.getValue() + " must be a bundled EntityEffect");
+        }
+    }
+
     private static int occurrences(String value, String needle) {
         int count = 0;
         int offset = 0;

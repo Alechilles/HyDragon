@@ -82,6 +82,10 @@ effects.miniwyvernFireBurn.name=Draconic Flame
 effects.miniwyvernWaterHeal.name=Restorative Surge
 effects.miniwyvernNatureRegeneration.name=Verdant Renewal
 effects.miniwyvernVoidExposure.name=Void Exposure
+effects.miniwyvernFireAura.name=Fire Aura
+effects.miniwyvernIceAura.name=Ice Aura
+effects.miniwyvernToxicAura.name=Toxic Aura
+effects.miniwyvernVoidAura.name=Void Aura
 
 messages.capture.miniwyvernDenied=Miniwyverns can only be created through a Draconic Soul Bond.
 messages.capture.tranquilizerRequired=The dragon must be tranquilized first.

@@ -2,7 +2,7 @@
   "Id": "ice",
   "RoleId": "Tamed_Wyvern_Mini_Ice",
   "ParticleAndSoundIds": [ "Hydra_Rain_Impact_Ice", "SFX_Staff_Ice_Shoot" ],
-  "PassiveEffects": [],
+  "PassiveEffects": [ "HyDragon_Miniwyvern_Ice_Aura" ],
   "ActiveAbilities": [
     {
       "Id": "ice_buildup",

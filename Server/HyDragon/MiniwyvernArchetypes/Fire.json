@@ -2,7 +2,7 @@
   "Id": "fire",
   "RoleId": "Tamed_Wyvern_Mini_Fire",
   "ParticleAndSoundIds": [ "Effect_Fire", "SFX_Effect_Burn_World" ],
-  "PassiveEffects": [],
+  "PassiveEffects": [ "HyDragon_Miniwyvern_Fire_Aura" ],
   "ActiveAbilities": [
     {
       "Id": "fireball",

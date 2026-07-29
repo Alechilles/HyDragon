@@ -1,0 +1,8 @@
+{
+  "Name": "server.effects.miniwyvernVoidAura.name",
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 8.0
+}

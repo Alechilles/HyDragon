@@ -82,6 +82,10 @@ effects.miniwyvernFireBurn.name=Chama Dracônica
 effects.miniwyvernWaterHeal.name=Onda Restauradora
 effects.miniwyvernNatureRegeneration.name=Renovação Verdejante
 effects.miniwyvernVoidExposure.name=Exposição ao Vazio
+effects.miniwyvernFireAura.name=Aura de Fogo
+effects.miniwyvernIceAura.name=Aura de Gelo
+effects.miniwyvernToxicAura.name=Aura Tóxica
+effects.miniwyvernVoidAura.name=Aura do Vazio
 
 messages.capture.miniwyvernDenied=Miniwyverns só podem ser criados por meio de um Vínculo de Alma Dracônico.
 messages.capture.tranquilizerRequired=O dragão precisa ser tranquilizado primeiro.

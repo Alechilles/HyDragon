@@ -82,6 +82,10 @@ effects.miniwyvernFireBurn.name=Flamme Draconique
 effects.miniwyvernWaterHeal.name=Vague Réparatrice
 effects.miniwyvernNatureRegeneration.name=Renouveau Verdoyant
 effects.miniwyvernVoidExposure.name=Exposition au Néant
+effects.miniwyvernFireAura.name=Aura de Feu
+effects.miniwyvernIceAura.name=Aura de Glace
+effects.miniwyvernToxicAura.name=Aura Toxique
+effects.miniwyvernVoidAura.name=Aura du Néant
 
 messages.capture.miniwyvernDenied=Les Miniwyvernes ne peuvent être créés qu'avec un Lien d'Âme Draconique.
 messages.capture.tranquilizerRequired=Le dragon doit d'abord être tranquillisé.

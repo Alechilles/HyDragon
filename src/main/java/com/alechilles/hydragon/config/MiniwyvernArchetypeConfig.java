@@ -383,7 +383,12 @@ public final class MiniwyvernArchetypeConfig
     private List<String> validatePassiveModifiers(String archetypeId) {
         List<String> errors = new ArrayList<>();
         if ("lightning".equals(archetypeId)) {
-            requireMultiplier(errors, "MovementSpeedMultiplier");
+            boolean hasLegacyModifier = passiveModifiers.containsKey("MovementSpeedMultiplier");
+            if (hasLegacyModifier) {
+                requireMultiplier(errors, "MovementSpeedMultiplier");
+            } else if (!List.of(passiveEffects).contains("HyDragon_Miniwyvern_Lightning_Boon")) {
+                errors.add("Lightning requires HyDragon_Miniwyvern_Lightning_Boon in PassiveEffects");
+            }
         } else if ("nature".equals(archetypeId)) {
             Double tick = passiveModifiers.get("RegenerationTickSeconds");
             if (!positive(tick)) errors.add("Nature PassiveModifiers.RegenerationTickSeconds must be positive");
@@ -406,7 +411,8 @@ public final class MiniwyvernArchetypeConfig
                 errors.add("PassiveModifierEffects." + entry.getKey() + " must name an EntityEffect asset");
             }
         }
-        if (Set.of("lightning").contains(archetypeId)
+        if ("lightning".equals(archetypeId)
+                && passiveModifiers.containsKey("MovementSpeedMultiplier")
                 && !passiveModifierEffects.containsKey("MovementSpeedMultiplier")) {
             errors.add("PassiveModifierEffects.MovementSpeedMultiplier is required for " + archetypeId);
         }

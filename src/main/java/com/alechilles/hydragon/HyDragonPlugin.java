@@ -30,6 +30,7 @@ import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
 import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
 import com.alechilles.hydragon.runtime.HyDragonGameplayRuntime;
 import com.alechilles.hydragon.runtime.HyDragonRuntimeComposition;
+import com.alechilles.hydragon.runtime.SoulBondAbandonmentHandler;
 import com.alechilles.hydragon.runtime.SoulBondLedger;
 import com.alechilles.hydragon.runtime.SoulBondService;
 import com.alechilles.hydragon.runtime.StateStoreOperationJournal;
@@ -235,7 +236,9 @@ public final class HyDragonPlugin extends JavaPlugin {
                         adapter, new BondedMiniwyvernExtensionCodec());
         SoulBondService soulBondService = new SoulBondService(
                 adapter, extensions, soulBonds, journal, System::currentTimeMillis);
-        HyDragonGameplayRuntime gameplay = new HyDragonGameplayRuntime(soulBondService);
+        HyDragonGameplayRuntime gameplay = new HyDragonGameplayRuntime(
+                soulBondService, new SoulBondAbandonmentHandler(soulBonds));
+        gameplay.start(adapter);
         HyDragonInteractionRuntime.install(gameplay, bridge::snapshot);
         return new GameplayInstallation(
                 gameplay,
@@ -368,6 +371,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         @Override
         public void close() {
             HyDragonInteractionRuntime.uninstall(gameplay);
+            gameplay.close();
         }
     }
 }

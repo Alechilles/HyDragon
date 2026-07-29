@@ -72,6 +72,17 @@ class HyDragonConfigRepositoryTest {
     }
 
     @Test
+    void acceptsLightningSpeedAsItsOwnerPassiveEntityEffect() {
+        MiniwyvernArchetypeConfig lightning = validArchetype("lightning");
+        lightning.passiveModifiers = Map.of();
+        lightning.passiveModifierEffects = Map.of();
+        lightning.passiveEffects = new String[] { "HyDragon_Miniwyvern_Lightning_Boon" };
+        lightning.activeAbilities = new MiniwyvernArchetypeConfig.Ability[] { validAbility("lightning_strike") };
+
+        assertTrue(lightning.validate().isEmpty());
+    }
+
+    @Test
     void rejectsBrokenSpeciesEncounterCrossReference() {
         DragonSpeciesConfig species = validSpecies();
         DragonEncounterConfig encounter = validEncounter();

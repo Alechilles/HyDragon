@@ -20,6 +20,11 @@ public interface SoulBondLedger {
         return Reservation.UNAVAILABLE;
     }
 
+    /** Releases the entitlement only after its exact canonical Miniwyvern profile was abandoned. */
+    default Reservation releaseAfterAbandonment(UUID playerUuid, UUID profileId) {
+        return Reservation.UNAVAILABLE;
+    }
+
     Reservation reconcile(UUID playerUuid, String operationId, Optional<UUID> profileId);
 
     Optional<Claim> find(UUID playerUuid);

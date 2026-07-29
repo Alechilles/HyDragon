@@ -2,7 +2,7 @@
   "Id": "void",
   "RoleId": "Tamed_Wyvern_Mini_Void",
   "ParticleAndSoundIds": [ "Void_Lightning", "SFX_Eye_Void_Attack_Blast" ],
-  "PassiveEffects": [],
+  "PassiveEffects": [ "HyDragon_Miniwyvern_Void_Aura" ],
   "ActiveAbilities": [
     {
       "Id": "void_exposure",

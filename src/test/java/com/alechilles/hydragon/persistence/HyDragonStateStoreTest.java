@@ -1,6 +1,7 @@
 package com.alechilles.hydragon.persistence;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -48,6 +50,25 @@ class HyDragonStateStoreTest {
         ProfileExtensionRecord extension = store.snapshot().profileExtension(profile).orElseThrow();
         assertEquals(ProfileKind.SOULBOUND_MINIWYVERN, extension.kind());
         assertEquals(Optional.of(operationId), extension.lastOperationId());
+    }
+
+    @Test
+    void releasesClaimedSoulBondOnlyForTheMatchingAbandonedMiniwyvern() throws Exception {
+        HyDragonStateStore store = new HyDragonStateStore(
+                temporaryDirectory.resolve("abandoned-miniwyvern.properties"));
+        assertEquals(MutationOutcome.APPLIED, store.beginSoulBond(PLAYER_ONE, "soul:abandoned"));
+        assertEquals(MutationOutcome.APPLIED,
+                store.completeSoulBond(PLAYER_ONE, "soul:abandoned", PROFILE_ONE, 42L));
+
+        Method release = assertDoesNotThrow(() -> HyDragonStateStore.class.getMethod(
+                "releaseSoulBondAfterAbandonment", UUID.class, UUID.class));
+        assertEquals(MutationOutcome.CONFLICT, release.invoke(store, PLAYER_ONE, PROFILE_TWO));
+        assertEquals(SoulBondState.CLAIMED,
+                store.snapshot().playerSoulBond(PLAYER_ONE).orElseThrow().state());
+        assertEquals(MutationOutcome.APPLIED, release.invoke(store, PLAYER_ONE, PROFILE_ONE));
+        assertEquals(SoulBondState.UNCLAIMED,
+                store.snapshot().playerSoulBond(PLAYER_ONE).orElseThrow().state());
+        assertEquals(MutationOutcome.ALREADY_APPLIED, release.invoke(store, PLAYER_ONE, PROFILE_ONE));
     }
 
     @Test
