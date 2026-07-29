@@ -1,6 +1,6 @@
 {
   "SwitchTo": "PostColor",
-  "EffectDirection": "ToCenter",
+  "EffectDirection": "None",
   "AnimationDuration": 3.0,
   "AnimationRange": {
     "Y": 0.2,
@@ -8,8 +8,8 @@
   },
   "UseBloomOnHighlight": true,
   "UseProgessiveHighlight": false,
-  "HighlightColor": "#6c31a8",
-  "HighlightThickness": 2,
+  "HighlightColor": "#540f99",
+  "HighlightThickness": 1,
   "CurveType": "Linear",
   "LoopOption": "LoopMirror",
   "NoiseScrollSpeed": {
@@ -20,6 +20,6 @@
     "X": 40,
     "Y": 40
   },
-  "PostColor": "#4f0f61",
+  "PostColor": "#560c7d",
   "PostColorOpacity": 0.7
 }
