@@ -14,7 +14,7 @@
     "ReturnHomePathDistanceBeforeTeleport": 18.0,
     "RecallSafeSpawnDistance": 12.0,
     "RecallForceRelocateDistance": 48.0,
-    "PlacementMinRelativeY": -2.0,
-    "PlacementMaxRelativeY": 6.0
+    "PlacementMinRelativeY": -4.0,
+    "PlacementMaxRelativeY": 8.0
   }
 }

@@ -52,6 +52,9 @@ final class MiniwyvernTalentProgressionAssetTest {
         assertEquals(ROLE_IDS, strings(talents.getAsJsonArray("RoleIds")));
         assertEquals(ROLE_IDS, strings(roster.getAsJsonArray("AllowedRoles")));
         assertEquals(ROLE_IDS, strings(companion.getAsJsonArray("RoleIds")));
+        JsonObject command = companion.getAsJsonObject("Command");
+        assertEquals(-4.0d, command.get("PlacementMinRelativeY").getAsDouble());
+        assertEquals(8.0d, command.get("PlacementMaxRelativeY").getAsDouble());
 
         JsonObject combat = leveling.getAsJsonObject("XpSources").getAsJsonObject("Combat");
         assertTrue(combat.get("Enabled").getAsBoolean());
