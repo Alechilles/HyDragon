@@ -30,6 +30,62 @@ import org.junit.jupiter.api.Test;
 class BundledConfigAssetContractTest {
     private static final Path CONFIG_ROOT = Path.of("Server", "HyDragon");
     private static final Pattern TEXTURE_FIELD = Pattern.compile("\\\"Texture\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"");
+    private static final List<String> MINI_WYVERN_FORMS = List.of(
+            "Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
+
+    @Test
+    void miniwyvernRoleSwapAssetsCoverEveryNonSelfDestinationAtExactCost() throws IOException {
+        Map<String, String> essenceByForm = Map.of(
+                "Wild", "Draconic_Essence", "Nature", "Draconic_Essence_Nature",
+                "Toxic", "Draconic_Essence_Toxic", "Fire", "Draconic_Essence_Fire",
+                "Void", "Draconic_Essence_Void", "Lightning", "Draconic_Essence_Lightning",
+                "Ice", "Draconic_Essence_Ice");
+        List<String> roleIds = MINI_WYVERN_FORMS.stream().map(form -> "Tamed_Wyvern_Mini_" + form).toList();
+        String roster = Files.readString(Path.of("Server", "Tamework", "BondedCompanions", "Rosters", "HyDragonMiniwyvern.json"));
+        String companion = Files.readString(Path.of("Server", "Tamework", "Companion", "HyDragonMiniwyvern.json"));
+        assertEquals(7, occurrences(roster, "\"Tamed_Wyvern_Mini_"), "roster must contain exactly seven form roles");
+        assertEquals(7, occurrences(companion, "\"Tamed_Wyvern_Mini_"), "companion must contain exactly seven form roles");
+        for (String roleId : roleIds) {
+            assertTrue(roster.contains("\"" + roleId + "\""), "roster omits " + roleId);
+            assertTrue(companion.contains("\"" + roleId + "\""), "companion omits " + roleId);
+        }
+        for (String source : MINI_WYVERN_FORMS) {
+            String roleId = "Tamed_Wyvern_Mini_" + source;
+            Path rolePath = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", roleId + ".json");
+            String role = Files.readString(rolePath);
+            String configId = "HyDragonIntWyvernMini_" + source;
+            assertTrue(role.contains("\"Reference\": \"Template_Wyvern_Mini_Flying_Tamed\""), rolePath.toString());
+            assertTrue(role.contains("\"InteractionConfigId\": \"" + configId + "\""), rolePath.toString());
+            String interaction = Files.readString(Path.of("Server", "Tamework", "Interactions", configId + ".json"));
+            assertEquals(6, occurrences(interaction, "\"Type\": \"Custom\""), configId);
+            assertTrue(interaction.contains("\"Type\": \"Feed\""), configId);
+            assertTrue(interaction.contains("\"Type\": \"ModeCycle\""), configId);
+            assertFalse(interaction.contains("\"Role\": \"" + roleId + "\""), configId + " must exclude self");
+            for (String destination : MINI_WYVERN_FORMS) {
+                if (destination.equals(source)) continue;
+                String destinationRole = "Tamed_Wyvern_Mini_" + destination;
+                String essence = essenceByForm.get(destination);
+                assertTrue(interaction.contains("\"Role\": \"" + destinationRole + "\", \"ChangeAppearance\": true"), configId + " -> " + destinationRole);
+                assertTrue(interaction.contains("\"Items\": [\"" + essence + "\"], \"Quantity\": 8"), configId + " must charge " + essence);
+            }
+            assertEquals(6, occurrences(interaction, "\"IsTamed\": true"), configId);
+            assertEquals(6, occurrences(interaction, "\"PlayerIsOwner\": true"), configId);
+        }
+        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Water.json")));
+        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Wind.json")));
+        assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Water.json")));
+        assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Wind.json")));
+    }
+
+    private static int occurrences(String value, String needle) {
+        int count = 0;
+        int offset = 0;
+        while ((offset = value.indexOf(needle, offset)) >= 0) {
+            count++;
+            offset += needle.length();
+        }
+        return count;
+    }
 
     @Test
     void bundledAssetsDecodeWithoutUnknownFieldsAndCrossValidate() throws IOException {

@@ -2,7 +2,11 @@
   "Priority": 100,
   "RosterId": "hydragon:dragon_horn",
   "FamilyId": "hydragon:soulbound_mini",
-  "AllowedRoles": [ "Tamed_Wyvern_Mini" ],
+  "AllowedRoles": [
+    "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+    "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+    "Tamed_Wyvern_Mini_Ice"
+  ],
   "MaximumOwned": 1,
   "MaximumActive": 1,
   "SessionDurationSeconds": 900,
