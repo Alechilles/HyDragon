@@ -50,8 +50,8 @@ final class MiniwyvernTalentAssetWiringTest {
             JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
                     "Tamed_Wyvern_Mini_" + form + ".json"));
             String source = role.toString();
-            assertTrue(source.contains("DraconicProjectile"), form + " must bind the shared Combat flag");
-            assertTrue(source.contains("DraconicApex"), form + " must bind the shared Combat capstone");
+            assertFalse(role.getAsJsonObject("Modify").has("TalentCombatFlags"),
+                    form + " must not override an undeclared template parameter");
             assertFalse(source.contains("Miniwyvern_"), form + " must not introduce form-specific talent IDs");
         }
         JsonObject wildRole = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
