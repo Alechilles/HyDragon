@@ -1225,8 +1225,9 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
     policies = {
         "HyDragonFullDragons.json": {
             "FamilyId": "hydragon:full_dragons", "MaximumOwned": 0,
-            "MaximumActive": 1, "SessionDurationSeconds": 600,
-            "SummonCooldownSeconds": 300,
+            "MaximumActive": 1,
+            "Timers": {"SessionDurationSeconds": 600,
+                       "SummonCooldownSeconds": 300},
             "AllowedRoles": {"Tamed_NordicDrake", "Tamed_Hydra", "Tamed_RockDrakeT1",
                              "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"},
             "Costs": [("Revitalizing_Essence", 2), ("Draconic_Essence", 4)],
@@ -1235,8 +1236,11 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         },
         "HyDragonMiniwyvern.json": {
             "FamilyId": "hydragon:soulbound_mini", "MaximumOwned": 1,
-            "MaximumActive": 1, "SessionDurationSeconds": 900,
-            "SummonCooldownSeconds": 180, "AllowedRoles": {"Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic", "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning", "Tamed_Wyvern_Mini_Ice"},
+            "MaximumActive": 1,
+            # An omitted timer decodes to Tamework's zero/unlimited sentinel.
+            "AbsentTimers": {"SessionDurationSeconds",
+                             "SummonCooldownSeconds"},
+            "AllowedRoles": {"Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic", "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning", "Tamed_Wyvern_Mini_Ice"},
             "Costs": [("Revitalizing_Essence", 1), ("Draconic_Essence", 2)],
             "Features": {"Capture": False, "Provision": True, "Summon": True,
                          "Dismiss": True, "Revive": True},
@@ -1249,10 +1253,15 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         if not isinstance(data, dict):
             fail(errors, f"missing bonded roster policy: {path.relative_to(ROOT)}")
             continue
-        for field in ("FamilyId", "MaximumOwned", "MaximumActive",
-                      "SessionDurationSeconds", "SummonCooldownSeconds"):
+        for field in ("FamilyId", "MaximumOwned", "MaximumActive"):
             if data.get(field) != expected[field]:
                 fail(errors, f"{path.relative_to(ROOT)} has invalid {field}")
+        for field, value in expected.get("Timers", {}).items():
+            if data.get(field) != value:
+                fail(errors, f"{path.relative_to(ROOT)} has invalid {field}")
+        for field in expected.get("AbsentTimers", set()):
+            if field in data:
+                fail(errors, f"{path.relative_to(ROOT)} must omit {field} for an unlimited Miniwyvern")
         if data.get("RosterId") != "hydragon:dragon_horn" \
                 or set(data.get("AllowedRoles", [])) != expected["AllowedRoles"]:
             fail(errors, f"{path.relative_to(ROOT)} has invalid roster/role authority")

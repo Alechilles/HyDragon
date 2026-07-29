@@ -29,7 +29,7 @@ class DragonRosterAssetContractTest {
 
         assertPolicy(full, "hydragon:full_dragons", 0, 1, 600, 300,
                 List.of("Revitalizing_Essence:2", "Draconic_Essence:4"));
-        assertPolicy(mini, "hydragon:soulbound_mini", 1, 1, 900, 180,
+        assertPolicy(mini, "hydragon:soulbound_mini", 1, 1, null, null,
                 List.of("Revitalizing_Essence:1", "Draconic_Essence:2"));
         assertTrue(full.contains("\"Tamed_NordicDrake\""));
         assertTrue(full.contains("\"Tamed_Hydra\""));
@@ -128,21 +128,29 @@ class DragonRosterAssetContractTest {
             String familyId,
             int maximumOwned,
             int maximumActive,
-            int sessionSeconds,
-            int cooldownSeconds,
+            Integer sessionSeconds,
+            Integer cooldownSeconds,
             List<String> expectedCosts
     ) {
         assertTrue(json.contains("\"RosterId\": \"hydragon:dragon_horn\""));
         assertTrue(json.contains("\"FamilyId\": \"" + familyId + "\""));
         assertTrue(json.contains("\"MaximumOwned\": " + maximumOwned));
         assertTrue(json.contains("\"MaximumActive\": " + maximumActive));
-        assertTrue(json.contains("\"SessionDurationSeconds\": " + sessionSeconds));
-        assertTrue(json.contains("\"SummonCooldownSeconds\": " + cooldownSeconds));
+        assertTimer(json, "SessionDurationSeconds", sessionSeconds);
+        assertTimer(json, "SummonCooldownSeconds", cooldownSeconds);
         assertTrue(json.contains("\"RevivePrice\""));
         Matcher costs = COST.matcher(json);
         List<String> actual = new java.util.ArrayList<>();
         while (costs.find()) actual.add(costs.group(1) + ":" + costs.group(2));
         assertEquals(expectedCosts, actual);
+    }
+
+    private static void assertTimer(String json, String field, Integer seconds) {
+        if (seconds == null) {
+            assertFalse(json.contains("\"" + field + "\""), field);
+            return;
+        }
+        assertTrue(json.contains("\"" + field + "\": " + seconds), field);
     }
 
     private static String read(String relative) throws Exception {
