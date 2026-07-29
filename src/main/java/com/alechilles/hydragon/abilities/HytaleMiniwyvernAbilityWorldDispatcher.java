@@ -12,8 +12,6 @@ import com.hypixel.hytale.server.core.asset.type.attitude.Attitude;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.OverlapBehavior;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.RemovalBehavior;
-import com.hypixel.hytale.server.core.asset.type.model.config.Model;
-import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.asset.type.particle.config.ParticleSystem;
 import com.hypixel.hytale.server.core.asset.type.projectile.config.Projectile;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
@@ -21,7 +19,6 @@ import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.entity.entities.ProjectileComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.Intangible;
-import com.hypixel.hytale.server.core.modules.entity.component.ModelComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.EntityModule;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
@@ -179,18 +176,10 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
         }
 
         @Override
-        public boolean synchronizeAppearance(UUID entityUuid, String appearanceId) {
-            Ref<EntityStore> ref = resolve(entityUuid);
-            if (!valid(ref) || appearanceId == null || appearanceId.isBlank()) return false;
-            ModelAsset asset = ModelAsset.getAssetMap().getAsset(appearanceId);
-            ModelComponent component = store.getComponent(ref, ModelComponent.getComponentType());
-            Model current = component == null ? null : component.getModel();
-            if (asset == null || current == null) return false;
-            if (appearanceId.equals(current.getModelAssetId())) return true;
-            float scale = Math.max(asset.getMinScale(), Math.min(asset.getMaxScale(), current.getScale()));
-            store.putComponent(ref, ModelComponent.getComponentType(),
-                    new ModelComponent(Model.createScaledModel(asset, scale)));
-            return true;
+        public Optional<String> companionRoleId() {
+            NPCEntity npc = store.getComponent(npcRef, NPCEntity.getComponentType());
+            String roleId = npc == null ? null : npc.getRoleName();
+            return roleId == null || roleId.isBlank() ? Optional.empty() : Optional.of(roleId);
         }
 
         @Override

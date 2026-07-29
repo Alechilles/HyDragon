@@ -77,7 +77,7 @@ final class MiniwyvernAbilityRuntimeTest {
         assertEquals(0, fixture.runtime.tickSome(8));
         assertEquals(2, fixture.worlds.dispatches,
                 "one active tick and one source cleanup dispatch are expected");
-        assertEquals("fire", fixture.authority.extensionDocument().archetypeId());
+        assertEquals("wild", fixture.authority.extensionDocument().abilityState().formId());
     }
 
     @Test
@@ -89,6 +89,17 @@ final class MiniwyvernAbilityRuntimeTest {
 
         assertEquals(0, fixture.runtime.tickSome(8));
         assertEquals(0, fixture.worlds.dispatches);
+    }
+
+    @Test
+    void everyConfiguredMiniwyvernRoleActivatesTheLiveRuntime() throws Exception {
+        for (String roleId : TameworkGameplayAdapter.MINIWYVERN_ROLE_IDS) {
+            Fixture fixture = fixture("role-" + roleId + ".properties",
+                    TameworkGameplayAdapter.MINIWYVERN_FAMILY, roleId);
+            fixture.runtime.start();
+            assertEquals(1, fixture.runtime.tickSome(8), roleId);
+            fixture.runtime.close();
+        }
     }
 
     /** Regression: malformed bonded extension evidence must revoke a cached same-lease binding. */
@@ -161,13 +172,17 @@ final class MiniwyvernAbilityRuntimeTest {
     }
 
     private Fixture fixture(String fileName, String familyId) throws Exception {
+        return fixture(fileName, familyId, "Tamed_Wyvern_Mini_Fire");
+    }
+
+    private Fixture fixture(String fileName, String familyId, String roleId) throws Exception {
         UUID owner = UUID.randomUUID();
         UUID profile = UUID.randomUUID();
         UUID npc = UUID.randomUUID();
         HyDragonStateStore store = new HyDragonStateStore(temp.resolve(fileName));
         store.beginSoulBond(owner, "claim");
         store.completeSoulBond(owner, "claim", profile, 10L);
-        BondedAuthority authority = new BondedAuthority(owner, profile, npc, familyId);
+        BondedAuthority authority = new BondedAuthority(owner, profile, npc, familyId, roleId);
         RecordingWorldDispatcher worlds = new RecordingWorldDispatcher(owner, npc);
         MiniwyvernAbilityService service = new MiniwyvernAbilityService(
                 new MemoryAbilityStates());
@@ -235,6 +250,7 @@ final class MiniwyvernAbilityRuntimeTest {
         private final UUID profileId;
         private final UUID npc;
         private final String familyId;
+        private final String roleId;
         private final String extensionPayload;
         private BondedCompanionProfileView profile;
         private ExtensionMode extensionMode = ExtensionMode.VALID;
@@ -249,14 +265,15 @@ final class MiniwyvernAbilityRuntimeTest {
                 UUID owner,
                 UUID profileId,
                 UUID npc,
-                String familyId) {
+                String familyId,
+                String roleId) {
             this.owner = owner;
             this.profileId = profileId;
             this.npc = npc;
             this.familyId = familyId;
+            this.roleId = roleId;
             extensionPayload = CODEC.encode(
-                    BondedMiniwyvernExtensionDocument.neutral("miniwyvern", 0L)
-                            .attune("fire", "test-attunement"));
+                    BondedMiniwyvernExtensionDocument.wild("miniwyvern", 0L));
             profile = activeProfile();
         }
 
@@ -341,7 +358,7 @@ final class MiniwyvernAbilityRuntimeTest {
                     profileId.toString(), owner,
                     TameworkGameplayAdapter.DRAGON_HORN_ROSTER,
                     familyId,
-                    TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE,
+                    roleId,
                     "Bonded Miniwyvern", "Miniwyvern", null,
                     revision, state,
                     state == BondedCompanionStateView.STORED,
@@ -412,7 +429,7 @@ final class MiniwyvernAbilityRuntimeTest {
             return Optional.of(new Target(npcUuid, ownerUuid, "default", 0D, true));
         }
         public Optional<Target> hostileTarget(double maximumRange) { return Optional.empty(); }
-        public boolean synchronizeAppearance(UUID entityUuid, String appearanceId) { return true; }
+        public Optional<String> companionRoleId() { return Optional.of("Tamed_Wyvern_Mini_Fire"); }
         public Health health(UUID entityUuid) { return new Health(10D, 10D); }
         public boolean applyEffect(UUID entityUuid, String source, String effect, double duration) {
             return true;

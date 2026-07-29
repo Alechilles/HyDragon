@@ -51,14 +51,15 @@ public final class MiniwyvernAbilityService {
             return cleanupAndDeny(context, archetypes, world, "projection-unresolved", nowMs);
         }
 
-        String archetypeId = normalize(context.archetypeId());
-        MiniwyvernArchetypeConfig config = archetypes.get(archetypeId);
+        String roleId = world.companionRoleId().orElse(null);
+        if (roleId == null) {
+            return cleanupAndDeny(context, archetypes, world, "companion-role-unresolved", nowMs);
+        }
+        MiniwyvernArchetypeConfig config = configForRole(archetypes, roleId);
         if (config == null || !config.validate().isEmpty()) {
-            return cleanupAndDeny(context, archetypes, world, "archetype-config-invalid", nowMs);
+            return cleanupAndDeny(context, archetypes, world, "role-config-invalid", nowMs);
         }
-        if (!world.synchronizeAppearance(context.npcUuid(), config.getAppearanceId())) {
-            return cleanupAndDeny(context, archetypes, world, "appearance-sync-unavailable", nowMs);
-        }
+        String formId = config.getId();
 
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
@@ -66,10 +67,10 @@ public final class MiniwyvernAbilityService {
             return TickResult.denied("ability-state-unavailable");
         }
         MiniwyvernAbilityState state = loaded.status() == MiniwyvernAbilityStateRepository.Status.LOADED
-                ? loaded.state() : MiniwyvernAbilityState.empty(archetypeId, nowMs);
-        if (!state.archetypeId().equals(archetypeId)) {
+                ? loaded.state() : MiniwyvernAbilityState.empty(formId, nowMs);
+        if (!state.formId().equals(formId)) {
             cleanupSources(context, state, archetypes, world);
-            state = MiniwyvernAbilityState.empty(archetypeId, nowMs);
+            state = MiniwyvernAbilityState.empty(formId, nowMs);
         }
         MutableState mutable = new MutableState(state);
         mutable.prune(nowMs);
@@ -77,7 +78,7 @@ public final class MiniwyvernAbilityService {
         Set<String> diagnostics = new LinkedHashSet<>(passive.diagnostics());
         // Establish source ownership and every non-idempotent cooldown before mutating the world.
         if (!states.save(context.ownerUuid(), context.profileId(),
-                mutable.freeze(archetypeId))) {
+                mutable.freeze(formId))) {
             return TickResult.denied("ability-state-unavailable");
         }
 
@@ -98,7 +99,7 @@ public final class MiniwyvernAbilityService {
                         saturatingAdd(nowMs, secondsToMs(ability.getDurationSeconds())));
             }
             mutable.updatedAt = nowMs;
-            MiniwyvernAbilityState beforeMutation = mutable.freeze(archetypeId);
+            MiniwyvernAbilityState beforeMutation = mutable.freeze(formId);
             if (!states.save(context.ownerUuid(), context.profileId(), beforeMutation)) {
                 return new TickResult(false, "ability-state-commit-failed", effectsApplied, abilitiesExecuted);
             }
@@ -111,7 +112,7 @@ public final class MiniwyvernAbilityService {
         }
 
         mutable.prune(nowMs);
-        MiniwyvernAbilityState finalState = mutable.freeze(archetypeId);
+        MiniwyvernAbilityState finalState = mutable.freeze(formId);
         if (!finalState.equals(state) && !states.save(
                 context.ownerUuid(), context.profileId(), finalState)) {
             return new TickResult(false, "ability-state-finalize-failed", effectsApplied, abilitiesExecuted);
@@ -139,9 +140,9 @@ public final class MiniwyvernAbilityService {
         }
         MiniwyvernAbilityState state = loaded.status() == MiniwyvernAbilityStateRepository.Status.LOADED
                 ? loaded.state()
-                : MiniwyvernAbilityState.empty(normalize(context.archetypeId()), nowMs);
+                : MiniwyvernAbilityState.empty("wild", nowMs);
         cleanupSources(context, state, archetypes, world);
-        MiniwyvernAbilityState cleared = MiniwyvernAbilityState.empty(normalize(context.archetypeId()), nowMs);
+        MiniwyvernAbilityState cleared = MiniwyvernAbilityState.empty(state.formId(), nowMs);
         return states.save(context.ownerUuid(), context.profileId(), cleared)
                 ? TickResult.denied("inactive")
                 : TickResult.denied("ability-state-cleanup-pending");
@@ -475,9 +476,18 @@ public final class MiniwyvernAbilityService {
         return maximumId == null ? requestedValue : modifiers.getOrDefault(maximumId, requestedValue);
     }
 
-    private static String sourceKey(String profileId, String archetypeId, String abilityId) {
+    private static MiniwyvernArchetypeConfig configForRole(
+            Map<String, MiniwyvernArchetypeConfig> archetypes,
+            String roleId) {
+        return archetypes.values().stream()
+                .filter(config -> roleId.equals(config.getRoleId()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static String sourceKey(String profileId, String formId, String abilityId) {
         return SOURCE_PREFIX + requiredText(profileId, "profileId") + ":"
-                + normalize(archetypeId) + ":" + requiredText(abilityId, "abilityId");
+                + normalize(formId) + ":" + requiredText(abilityId, "abilityId");
     }
 
     private static String executionSourceKey(
@@ -516,7 +526,6 @@ public final class MiniwyvernAbilityService {
             String profileId,
             UUID ownerUuid,
             UUID npcUuid,
-            String archetypeId,
             boolean owned,
             boolean active,
             boolean alive,
@@ -525,7 +534,6 @@ public final class MiniwyvernAbilityService {
             profileId = requiredText(profileId, "profileId");
             Objects.requireNonNull(ownerUuid, "ownerUuid");
             Objects.requireNonNull(npcUuid, "npcUuid");
-            archetypeId = normalize(archetypeId);
         }
     }
 
@@ -613,10 +621,10 @@ public final class MiniwyvernAbilityService {
             return true;
         }
 
-        MiniwyvernAbilityState freeze(String archetypeId) {
+        MiniwyvernAbilityState freeze(String formId) {
             return new MiniwyvernAbilityState(
                     MiniwyvernAbilityState.SCHEMA_VERSION,
-                    archetypeId,
+                    formId,
                     cooldowns,
                     iceBuildup,
                     immunityUntil,

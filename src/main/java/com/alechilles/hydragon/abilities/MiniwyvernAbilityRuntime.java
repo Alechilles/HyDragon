@@ -136,10 +136,9 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
                 || !result.reason().startsWith("ready-with-degraded-semantics:")) {
             return;
         }
-        String diagnosticKey = binding.archetypeId() + ':' + result.reason();
+        String diagnosticKey = result.reason();
         if (reportedDegradations.add(diagnosticKey)) {
-            LOGGER.warning("Miniwyvern archetype '" + binding.archetypeId()
-                    + "' remains active with unavailable optional semantics: "
+            LOGGER.warning("Miniwyvern role-driven ability behavior remains active with unavailable optional semantics: "
                     + result.reason());
         }
     }
@@ -219,8 +218,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
                 BondedCompanionLeaseView lease = profile.activeLease();
                 ActiveBinding candidate = new ActiveBinding(
                         profile.profileId(), ownerUuid, lease.liveNpcUuid(),
-                        lease.leaseToken(), lease.worldKey(),
-                        read.document().archetypeId(), new BindingAuthority());
+                        lease.leaseToken(), lease.worldKey(), new BindingAuthority());
                 ActiveBinding previous = active.put(profile.profileId(), candidate);
                 if (previous != null && !sameProjection(previous, lease)) {
                     deactivate(previous, clock.millis());
@@ -269,7 +267,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
             boolean available) {
         return new MiniwyvernAbilityService.ProfileContext(
                 binding.profileId(), binding.ownerUuid(), binding.npcUuid(),
-                binding.archetypeId(), true, activeState, activeState, available);
+                true, activeState, activeState, available);
     }
 
     private String claimedProfile(UUID ownerUuid) {
@@ -309,7 +307,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
                 && claimedProfile.equals(profile.profileId())
                 && TameworkGameplayAdapter.DRAGON_HORN_ROSTER.equals(profile.rosterId())
                 && TameworkGameplayAdapter.MINIWYVERN_FAMILY.equals(profile.familyId())
-                && TameworkGameplayAdapter.SOULBOUND_MINIWYVERN_ROLE.equals(profile.roleId())
+                && TameworkGameplayAdapter.MINIWYVERN_ROLE_IDS.contains(profile.roleId())
                 && profile.state() == BondedCompanionStateView.ACTIVE
                 && lease != null && lease.liveNpcUuid() != null;
     }
@@ -372,7 +370,6 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
             UUID npcUuid,
             String leaseToken,
             String worldKey,
-            String archetypeId,
             BindingAuthority authority) {
         private ActiveBinding {
             profileId = requiredText(profileId, "profileId");
@@ -380,7 +377,6 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
             Objects.requireNonNull(npcUuid, "npcUuid");
             leaseToken = requiredText(leaseToken, "leaseToken");
             worldKey = requiredText(worldKey, "worldKey");
-            archetypeId = requiredText(archetypeId, "archetypeId");
             Objects.requireNonNull(authority, "authority");
         }
     }

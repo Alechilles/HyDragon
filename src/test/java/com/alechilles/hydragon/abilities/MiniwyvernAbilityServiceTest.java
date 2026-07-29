@@ -37,7 +37,6 @@ class MiniwyvernAbilityServiceTest {
         assertEquals(1, world.effects);
         assertEquals(1, world.presentations);
         assertTrue(world.sawCommittedCooldownBeforeMutation);
-        assertEquals("Wyvern_Mini_Fire", world.appearanceId);
 
         MiniwyvernAbilityService.TickResult replay = service.tick(
                 context, Map.of("fire", fireConfig()), world, 1_000L);
@@ -101,7 +100,7 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
-    void unsupportedLightningModifierDisablesWholePassiveButKeepsAppearanceAndCombat() throws Exception {
+    void unsupportedLightningModifierDisablesWholePassiveButKeepsCombatActive() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
         world.ownerModifiersSupported = false;
@@ -113,14 +112,13 @@ class MiniwyvernAbilityServiceTest {
         assertEquals(
                 "ready-with-degraded-semantics:passive-ability-disabled:ActionSpeedMultiplier",
                 result.reason());
-        assertEquals("Wyvern_Mini_Lightning", world.appearanceId);
         assertEquals(0, world.effects, "a partial movement-only substitute is forbidden");
         assertEquals(1, world.damageApplications, "the archetype's combat ability remains active");
         assertEquals(0, world.ownerModifierApplications);
     }
 
     @Test
-    void unavailableMovementEffectDoesNotDisableAppearanceOrArchetype() throws Exception {
+    void unavailableMovementEffectDoesNotDisableLiveRoleCombat() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
         world.ownerModifiersSupported = false;
@@ -134,7 +132,6 @@ class MiniwyvernAbilityServiceTest {
                 "ready-with-degraded-semantics:passive-ability-disabled:"
                         + "ActionSpeedMultiplier+MovementSpeedMultiplier",
                 result.reason());
-        assertEquals("Wyvern_Mini_Lightning", world.appearanceId);
         assertEquals(0, world.effects);
         assertEquals(1, world.damageApplications);
     }
@@ -289,13 +286,47 @@ class MiniwyvernAbilityServiceTest {
         assertEquals(1, result.abilitiesExecuted());
     }
 
+    @Test
+    void usesTheLiveCompanionRoleInsteadOfPersistedFormAuthority() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.companionRoleId = "Tamed_Wyvern_Mini_Lightning";
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states).tick(
+                context(), Map.of("fire", fireConfig(), "lightning", lightningConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertEquals(1, world.damageApplications);
+        assertEquals(0, world.projectiles);
+        assertEquals("lightning", states.current.formId());
+    }
+
+    @Test
+    void liveRoleChangeCleansPriorSourcesAndResetsSchedulerState() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+        Map<String, MiniwyvernArchetypeConfig> configs = Map.of(
+                "fire", fireConfig(), "lightning", lightningConfig());
+
+        assertEquals(1, service.tick(context(), configs, world, 1_000L).abilitiesExecuted());
+        world.companionRoleId = "Tamed_Wyvern_Mini_Lightning";
+
+        MiniwyvernAbilityService.TickResult changed = service.tick(context(), configs, world, 2_000L);
+
+        assertTrue(changed.ready());
+        assertEquals("lightning", states.current.formId());
+        assertTrue(world.removedEffects >= 1, "role swap must clean previous form sources");
+        assertFalse(states.current.cooldownUntilByAbility().containsKey("fireball"));
+    }
+
     private static MiniwyvernAbilityService.ProfileContext context() {
         return context("fire");
     }
 
-    private static MiniwyvernAbilityService.ProfileContext context(String archetypeId) {
+    private static MiniwyvernAbilityService.ProfileContext context(String ignoredFormId) {
         return new MiniwyvernAbilityService.ProfileContext(
-                "profile-1", OWNER, NPC, archetypeId, true, true, true, true);
+                "profile-1", OWNER, NPC, true, true, true, true);
     }
 
     private static MiniwyvernArchetypeConfig fireConfig() throws Exception {
@@ -467,7 +498,7 @@ class MiniwyvernAbilityServiceTest {
         int damageApplications;
         int healApplications;
         int presentations;
-        String appearanceId;
+        String companionRoleId = "Tamed_Wyvern_Mini_Fire";
         boolean sawCommittedCooldownBeforeMutation;
         boolean ownerModifiersSupported = true;
         boolean passiveModifierEffectSupported = true;
@@ -496,11 +527,7 @@ class MiniwyvernAbilityServiceTest {
         @Override public List<Target> hostileTargets(double maximumRange, int maximumTargets) {
             return areaTargets;
         }
-        @Override public boolean synchronizeAppearance(UUID entityUuid, String requestedAppearanceId) {
-            if (!NPC.equals(entityUuid)) return false;
-            appearanceId = requestedAppearanceId;
-            return true;
-        }
+        @Override public Optional<String> companionRoleId() { return Optional.of(companionRoleId); }
         @Override public Health health(UUID entityUuid) {
             return OWNER.equals(entityUuid) ? ownerHealth : new Health(50.0D, 100.0D);
         }
