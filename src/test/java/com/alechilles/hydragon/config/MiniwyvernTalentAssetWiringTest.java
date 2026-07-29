@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -53,6 +54,30 @@ final class MiniwyvernTalentAssetWiringTest {
                     "Wyvern_Mini", "Wyvern_Mini_Wild_Projectile" + tier + ".json"));
             for (String status : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "EffectId")) {
                 assertFalse(wild.contains(status), "Wild projectile must remain raw-only: " + status);
+            }
+        }
+    }
+
+    @Test
+    void elementalProjectileTalentRootsAreDistinctAndResolvable() throws IOException {
+        for (String form : List.of("Nature", "Toxic", "Fire", "Void", "Lightning", "Ice")) {
+            JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
+                    "Tamed_Wyvern_Mini_" + form + ".json")).getAsJsonObject("Modify");
+            List<String> roots = List.of(
+                    string(role, "TalentProjectileBase"),
+                    string(role, "TalentProjectileIntermediate"),
+                    string(role, "TalentProjectileApex"));
+            assertTrue(new HashSet<>(roots).size() == 3,
+                    form + " must use distinct base, intermediate, and apex projectile roots");
+            for (String rootId : roots) {
+                Path rootPath = Path.of("Server", "Item", "RootInteractions", "NPCs", "HyDragon", "Wyvern_Mini",
+                        rootId + ".json");
+                assertTrue(Files.isRegularFile(rootPath), form + " root must exist: " + rootId);
+                for (JsonElement interaction : load(rootPath).getAsJsonArray("Interactions")) {
+                    Path interactionPath = Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon",
+                            "Wyvern_Mini", interaction.getAsString() + ".json");
+                    assertTrue(Files.isRegularFile(interactionPath), rootId + " interaction must exist: " + interaction);
+                }
             }
         }
     }

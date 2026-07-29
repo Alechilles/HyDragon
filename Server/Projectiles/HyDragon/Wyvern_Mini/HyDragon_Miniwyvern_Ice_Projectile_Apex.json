@@ -1,0 +1,1 @@
+{ "Appearance": "Ice_Ball", "MuzzleVelocity": 40, "TerminalVelocity": 52, "Gravity": 3, "Damage": 64, "TimeToLive": 10, "DeathEffectsOnHit": true, "ImpactSlowdown": 0 }
