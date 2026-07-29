@@ -59,8 +59,10 @@ final class MiniwyvernTalentAssetWiringTest {
         for (String parameter : List.of("TalentProjectileBase", "TalentProjectileIntermediate", "TalentProjectileApex")) {
             Path rootPath = rootPath(string(wildRole, parameter));
             for (JsonElement interaction : load(rootPath).getAsJsonArray("Interactions")) {
-                JsonObject launcher = load(interactionPath(interaction.getAsString()));
+                String launcherId = interaction.getAsString();
+                JsonObject launcher = load(interactionPath(launcherId));
                 assertTrue(launcher.has("ProjectileId"), "Wild root interaction must launch a projectile");
+                assertRawOnlyInteractionChain(launcherId, parameter + " launcher", new HashSet<>());
                 JsonObject projectile = load(projectilePath(string(launcher, "ProjectileId")));
                 assertRawOnly(projectile, parameter + " projectile");
             }
@@ -206,10 +208,48 @@ final class MiniwyvernTalentAssetWiringTest {
         assertNoEffectOrStatusFields(projectile, description);
     }
 
+    private static void assertRawOnlyInteractionChain(
+            String interactionId, String description, Set<String> visited) throws IOException {
+        assertTrue(visited.add(interactionId), description + " must not contain a cyclic interaction chain");
+        JsonObject interaction = load(interactionPath(interactionId));
+        assertNoEffectOrStatusFields(interaction, description);
+        collectReferencedInteractions(interaction, visited, description);
+    }
+
+    private static void collectReferencedInteractions(
+            JsonElement value, Set<String> visited, String description) throws IOException {
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            for (Map.Entry<String, JsonElement> entry : object.asMap().entrySet()) {
+                JsonElement child = entry.getValue();
+                if ((entry.getKey().equals("Next") || entry.getKey().equals("InteractionId"))
+                        && child.isJsonPrimitive() && child.getAsJsonPrimitive().isString()) {
+                    String nextId = child.getAsString();
+                    Path nextPath = interactionPath(nextId);
+                    assertTrue(Files.isRegularFile(nextPath),
+                            description + " must not chain an uninspected interaction: " + nextId);
+                    assertRawOnlyInteractionChain(nextId, description + " chained interaction", visited);
+                } else {
+                    collectReferencedInteractions(child, visited, description);
+                }
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) {
+                collectReferencedInteractions(child, visited, description);
+            }
+        }
+    }
+
     private static void assertNoEffectOrStatusFields(JsonElement value, String description) {
         if (value.isJsonObject()) {
-            for (Map.Entry<String, JsonElement> entry : value.getAsJsonObject().asMap().entrySet()) {
-                assertFalse(entry.getKey().equalsIgnoreCase("EffectId") || entry.getKey().contains("Status"),
+            JsonObject object = value.getAsJsonObject();
+            assertFalse("ApplyEffect".equals(string(object, "Type"))
+                            || "ApplyEntityEffect".equals(string(object, "Type")),
+                    description + " must not apply an effect/status action");
+            for (Map.Entry<String, JsonElement> entry : object.asMap().entrySet()) {
+                String key = entry.getKey().toLowerCase(Locale.ROOT);
+                assertFalse(key.equals("effectid") || key.equals("entityeffectid")
+                                || key.contains("status"),
                         description + " must not include elemental effect/status fields: " + entry.getKey());
                 assertNoEffectOrStatusFields(entry.getValue(), description);
             }
