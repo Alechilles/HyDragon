@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.hypixel.hytale.protocol.ComponentUpdate;
+import com.hypixel.hytale.protocol.CombatTextUpdate;
 import com.hypixel.hytale.protocol.EffectOp;
 import com.hypixel.hytale.protocol.EntityEffectUpdate;
 import com.hypixel.hytale.protocol.EntityEffectsUpdate;
+import com.hypixel.hytale.protocol.ModelUpdate;
 import com.hypixel.hytale.component.dependency.Order;
 import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.server.core.modules.entity.livingentity.LivingEntityEffectClearChangesSystem;
@@ -29,11 +31,21 @@ class MiniwyvernVoidEffectReplicationProbeTest {
 
         MiniwyvernVoidEffectReplicationProbe.PacketEvidence evidence =
                 MiniwyvernVoidEffectReplicationProbe.inspectQueuedUpdates(
-                        17, new ComponentUpdate[] {effects});
+                        17, new ComponentUpdate[] {
+                                new CombatTextUpdate(10.0F, "3"),
+                                effects,
+                                new ModelUpdate(null, 0.0F)
+                        });
 
         assertEquals(1, evidence.adds());
         assertEquals(1, evidence.removes());
         assertEquals(6.0F, evidence.latestAddRemainingSeconds());
+        assertEquals(false, evidence.latestAddInfinite());
+        assertEquals(true, evidence.latestAddDebuff());
+        assertEquals("void", evidence.latestAddStatusEffectIcon());
+        assertEquals(
+                java.util.List.of("CombatTextUpdate", "EntityEffectsUpdate", "ModelUpdate"),
+                evidence.componentUpdateTypes());
     }
 
     @Test

@@ -13,25 +13,32 @@ import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.protocol.ComponentUpdate;
 import com.hypixel.hytale.protocol.EntityEffectsUpdate;
+import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.modules.entity.livingentity.LivingEntityEffectClearChangesSystem;
 import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 /** One-shot trace of the exact effect update queued to visible clients. */
 public final class MiniwyvernVoidEffectReplicationSystem extends EntityTickingSystem<EntityStore> {
+    private static final String VOID_EFFECT_ID = "HyDragon_Miniwyvern_Void_Exposure";
+    private static final long FOLLOW_UP_WINDOW_MS = 2_000L;
     private static final Logger LOGGER = Logger.getLogger(MiniwyvernVoidEffectReplicationSystem.class.getName());
     private static final Set<Dependency<EntityStore>> DEPENDENCIES = Set.of(
             new SystemDependency<>(Order.AFTER, EntityTrackerSystems.EffectControllerSystem.class),
             new SystemDependency<>(Order.BEFORE, LivingEntityEffectClearChangesSystem.class));
 
     private final MiniwyvernVoidEffectReplicationProbe probe;
+    private final ConcurrentHashMap<UUID, Long> watchedUntilMs = new ConcurrentHashMap<>();
 
     public MiniwyvernVoidEffectReplicationSystem(MiniwyvernVoidEffectReplicationProbe probe) {
         this.probe = Objects.requireNonNull(probe, "probe");
@@ -61,21 +68,43 @@ public final class MiniwyvernVoidEffectReplicationSystem extends EntityTickingSy
         if (identity == null) return;
         UUID targetUuid = identity.getUuid();
         MiniwyvernVoidEffectReplicationProbe.Observation observation = probe.consume(targetUuid);
-        if (observation == null) return;
-
-        Ref<EntityStore> target = chunk.getReferenceTo(index);
         EffectControllerComponent controller = chunk.getComponent(
                 index, EffectControllerComponent.getComponentType());
+        if (controller == null) return;
+
+        int voidEffectIndex = EntityEffect.getAssetMap().getIndex(VOID_EFFECT_ID);
+        int effectIndex = observation == null ? voidEffectIndex : observation.effectIndex();
+        if (effectIndex < 0) return;
+
+        long nowMs = System.currentTimeMillis();
+        Long watchedUntil = watchedUntilMs.get(targetUuid);
+        boolean withinFollowUpWindow = watchedUntil != null && nowMs <= watchedUntil;
+        if (watchedUntil != null && !withinFollowUpWindow) {
+            watchedUntilMs.remove(targetUuid, watchedUntil);
+        }
+        if (observation == null && !withinFollowUpWindow && !controller.hasEffect(effectIndex)) return;
+
         MiniwyvernVoidEffectReplicationProbe.PacketEvidence controllerEvidence =
                 MiniwyvernVoidEffectReplicationProbe.inspectQueuedUpdates(
-                        observation.effectIndex(),
+                        effectIndex,
                         new ComponentUpdate[] {new EntityEffectsUpdate(controller.consumeChanges())});
+        boolean hasEffectChange = controllerEvidence.adds() > 0 || controllerEvidence.removes() > 0;
+        if (observation == null && !withinFollowUpWindow && !hasEffectChange) return;
+        if (controllerEvidence.adds() > 0) {
+            watchedUntilMs.put(targetUuid, nowMs + FOLLOW_UP_WINDOW_MS);
+            withinFollowUpWindow = true;
+        }
 
+        Ref<EntityStore> target = chunk.getReferenceTo(index);
         int visibleViewers = 0;
         int queuedViewers = 0;
         int queuedAdds = 0;
         int queuedRemoves = 0;
         float queuedRemaining = Float.NaN;
+        boolean queuedInfinite = false;
+        boolean queuedDebuff = false;
+        String queuedStatusEffectIcon = null;
+        List<String> queuedUpdateTypes = new ArrayList<>();
         EntityTrackerSystems.Visible visible = store.getComponent(
                 target, EntityTrackerSystems.Visible.getComponentType());
         if (visible != null) {
@@ -84,15 +113,22 @@ public final class MiniwyvernVoidEffectReplicationSystem extends EntityTickingSy
                 EntityTrackerSystems.EntityUpdate queued = viewer.updates.get(target);
                 MiniwyvernVoidEffectReplicationProbe.PacketEvidence evidence =
                         MiniwyvernVoidEffectReplicationProbe.inspectQueuedUpdates(
-                                observation.effectIndex(), queued == null ? null : queued.toUpdatesArray());
+                                effectIndex, queued == null ? null : queued.toUpdatesArray());
+                queuedUpdateTypes.addAll(evidence.componentUpdateTypes());
                 if (evidence.adds() > 0 || evidence.removes() > 0) queuedViewers++;
                 queuedAdds += evidence.adds();
                 queuedRemoves += evidence.removes();
                 if (!Float.isNaN(evidence.latestAddRemainingSeconds())) {
                     queuedRemaining = evidence.latestAddRemainingSeconds();
+                    queuedInfinite = evidence.latestAddInfinite();
+                    queuedDebuff = evidence.latestAddDebuff();
+                    queuedStatusEffectIcon = evidence.latestAddStatusEffectIcon();
                 }
             }
         }
+
+        boolean primaryObservation = observation != null || hasEffectChange;
+        if (!primaryObservation && withinFollowUpWindow && queuedUpdateTypes.isEmpty()) return;
 
         SystemOrder systemOrder = locateSystemOrder(store);
         int finalVisibleViewers = visibleViewers;
@@ -100,8 +136,14 @@ public final class MiniwyvernVoidEffectReplicationSystem extends EntityTickingSy
         int finalQueuedAdds = queuedAdds;
         int finalQueuedRemoves = queuedRemoves;
         float finalQueuedRemaining = queuedRemaining;
+        boolean finalQueuedInfinite = queuedInfinite;
+        boolean finalQueuedDebuff = queuedDebuff;
+        String finalQueuedStatusEffectIcon = queuedStatusEffectIcon;
+        List<String> finalQueuedUpdateTypes = List.copyOf(queuedUpdateTypes);
+        String origin = observation != null ? "owner-hit" : hasEffectChange ? "external" : "follow-up";
         LOGGER.info(() -> "Void replication probe for " + targetUuid
-                + ": effectIndex=" + observation.effectIndex()
+                + ": origin=" + origin
+                + ", effectIndex=" + effectIndex
                 + ", controllerAdds=" + controllerEvidence.adds()
                 + ", controllerRemoves=" + controllerEvidence.removes()
                 + ", controllerRemaining=" + controllerEvidence.latestAddRemainingSeconds()
@@ -110,6 +152,10 @@ public final class MiniwyvernVoidEffectReplicationSystem extends EntityTickingSy
                 + ", queuedAdds=" + finalQueuedAdds
                 + ", queuedRemoves=" + finalQueuedRemoves
                 + ", queuedRemaining=" + finalQueuedRemaining
+                + ", queuedInfinite=" + finalQueuedInfinite
+                + ", queuedDebuff=" + finalQueuedDebuff
+                + ", queuedStatusEffectIcon=" + finalQueuedStatusEffectIcon
+                + ", queuedUpdateTypes=" + finalQueuedUpdateTypes
                 + ", order=" + systemOrder);
     }
 
