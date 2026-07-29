@@ -13,7 +13,7 @@
 ## Global constraints
 
 - Keep one `TwLevelingConfig` and one `TwTalentConfig` for all seven Miniwyvern roles; never create form-specific XP, point, or purchased-talent state.
-- Put all gameplay that Hytale assets can express in role instructions, root interactions, projectiles, and entity effects. Java is limited to generic Tamework primitives.
+- Put all gameplay that Hytale assets can express in role instructions, root interactions, projectiles, and entity effects. For this implementation, retain the existing Java owner-passive application path until a source-backed generic marked-target effect action is available; do not invent that asset contract.
 - `TameworkHasTalent` evaluates the NPC itself, fails closed for absent/malformed state, and reads only `TameworkTalentsComponent`.
 - Every upgraded instruction must exclude stronger variants with native `Not` sensors so variants do not stack.
 - The Wild form's projectile remains raw damage only. It may gain damage, range, cadence, and additional-projectile upgrades, but never elemental statuses.
@@ -160,29 +160,29 @@
 
 - [ ] With the locked 0.5.7 asset profile, inspect the current bite/root-interaction contract and generate author options for instructions, sensor combinators, projectile launch, target selection, entity effect application/removal, cadence, and multi-projectile behavior. Record the selected supported fields in the task commit description or nearby asset comments where the format permits.
 - [ ] Build a common role-instruction shape for each capability: `And(TameworkHasTalent(flag), normal combat/owner condition, Not(higher-tier flag))` selects exactly one base/upgraded variant; the selected instruction calls a root interaction or effect asset that completely performs the behavior. Never retain an instruction that only checks a talent but has no action path.
-- [ ] Wire the three branches for every form. Bond gates its owner passive and upgrades; Combat gates projectile, range, cadence, force, pattern, advanced attack, and capstone; Vigor's health multipliers come from the talent config while its non-health survival behavior is gated in assets. Existing effect IDs may be retained only when their full behavior is expressed in assets.
-- [ ] Author Wild first as the reference implementation: `EssenceBond` and upgrades grant stamina regeneration/max stamina; `DraconicProjectile` launches raw damage with no effect payload; upgrades only alter raw projectile damage, range, cadence, or count. Add tests/validator assertions that no Wild projectile path applies Fire, Ice, Lightning, Nature, Toxic, or Void status effects.
+- [ ] Wire the asset-expressible branch behavior for every form. Combat gates projectile, range, cadence, force, pattern, advanced attack, and capstone; Vigor's health multipliers come from the talent config while its non-health survival behavior is gated in assets. Retain the existing Java owner-passive application path for Bond until a source-backed generic marked-target effect action is available.
+- [ ] Author Wild first as the reference implementation: `EssenceBond` and upgrades remain on the existing Java owner-passive path for stamina regeneration/max stamina; `DraconicProjectile` launches raw damage with no effect payload; upgrades only alter raw projectile damage, range, cadence, or count. Add tests/validator assertions that no Wild projectile path applies Fire, Ice, Lightning, Nature, Toxic, or Void status effects.
 - [ ] Apply the same shared flags to Fire, Ice, Lightning, Nature, Toxic, and Void with their own asset-level interpretation and presentation. Reuse only generic flag IDs; no form-specific talent ID may appear in the tree.
-- [ ] For every replaceable passive/attack, remove or neutralize the prior Java-owned execution path before enabling its asset counterpart. Test base, intermediate, and highest-tier ownership to show exactly one intended variant fires.
+- [ ] For every replaceable attack, remove or neutralize the prior Java-owned execution path before enabling its asset counterpart. Keep Java owner-passive behavior in place for this release, and test base, intermediate, and highest-tier attack ownership to show exactly one intended variant fires.
 - [ ] Validate each changed role and every generated dependency through the NPC asset tool, then run `python scripts/validate_assets.py` and `./mvnw test`.
 - [ ] Commit as `Feat: wire miniwyvern talents through assets`.
 
-## Task 7: Remove the superseded HyDragon Miniwyvern ability runtime
+## Task 7: Remove only superseded HyDragon Miniwyvern attack runtime
 
 **Repository:** HyDragon, only after Task 6's full asset parity test passes.
 
 **Files:**
 
 - Modify `src/main/java/com/alechilles/hydragon/HyDragonPlugin.java`.
-- Modify `src/main/java/com/alechilles/hydragon/HyDragonAbilityRegistrationFacade.java`.
+- Modify `src/main/java/com/alechilles/hydragon/HyDragonAbilityRegistrationFacade.java` only after separating the retained owner-passive path from superseded attack scheduling.
 - Delete `src/main/java/com/alechilles/hydragon/abilities/MiniwyvernAbilityRuntime.java` and `MiniwyvernAbilityService.java`.
-- Delete their Miniwyvern-only state, repository, world/dispatcher, archetype-config, owner-aura, toxic-weakness, and void-effect-lifetime collaborators only when `rg` proves no other feature imports them.
+- Delete only Miniwyvern-only attack scheduling/state collaborators after `rg` proves no other feature imports them. Retain the Java owner-aura/effect application collaborators, including Void, for this release.
 - Delete/update the matching tests under `src/test/java/com/alechilles/hydragon/abilities` and `bonded`.
 - Modify `scripts/validate_assets.py` to remove the legacy Java-archetype expectation and replace it with the asset-first contract.
 
 - [ ] Run `rg -n "MiniwyvernAbility|MiniwyvernOwnerAura|MiniwyvernToxicWeakness|MiniwyvernVoidEffectLifetime|MiniwyvernArchetype" src/main src/test scripts` and classify each remaining reference as deletion, migration, or an unrelated retained effect asset. Do not remove generic bonded-companion persistence used elsewhere.
-- [ ] Remove scheduler/system registration from the plugin facade only after the role instruction/root interaction paths handle all former attacks, passives, owner effects, and cleanup. There must be no duplicate damage, effect duration, or cooldown source.
-- [ ] Replace deleted Java-behavior tests with contract tests that inspect the asset wiring: all seven roles use the shared flags; every `TameworkHasTalent` instruction resolves to an existing action/effect; upgraded flags exclude lower variants; Wild remains raw-only.
+- [ ] Remove only attack-scheduler registration from the plugin facade after role instruction/root interaction paths handle those attacks. Preserve the owner-passive Java registration and ensure there is no duplicate attack damage, effect duration, or cooldown source.
+- [ ] Replace deleted attack-behavior tests with contract tests that inspect the asset wiring: all seven roles use the shared flags for asset-owned attacks; every `TameworkHasTalent` instruction resolves to an existing action/effect; upgraded variants exclude lower variants; Wild remains raw-only. Keep Java owner-passive coverage.
 - [ ] Run `./mvnw test`, `./mvnw verify`, and `python scripts/validate_assets.py`; then inspect `git diff --check` and `git status --short` to confirm no unrelated files were changed.
 - [ ] Commit as `Refactor: retire miniwyvern ability runtime`.
 

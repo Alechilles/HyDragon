@@ -157,10 +157,11 @@ Every talent-gated role instruction must have a complete execution path:
 
 Projectile launches, damage calculations, status effects, cadence, targeting,
 and presentation belong in the NPC/root-interaction/entity-effect assets.
-Existing Miniwyvern Java ability scheduling and owner-hit systems must be
-retired as an equivalent asset path becomes available. If the engine lacks a
-primitive, the replacement belongs in Tamework as a generic capability rather
-than in a HyDragon-specific gameplay runtime.
+Existing Miniwyvern Java attack scheduling must be retired as an equivalent
+asset path becomes available. The current release retains the Java owner-passive
+application path (including Void effects) because applying an entity effect to
+the NPC's marked owner target lacks a source-backed asset action contract. That
+owner-target primitive is deferred; it must not be guessed in role JSON.
 
 ## 7. Experience and point progression
 
