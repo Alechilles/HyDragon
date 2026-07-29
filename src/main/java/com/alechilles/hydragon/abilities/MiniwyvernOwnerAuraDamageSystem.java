@@ -6,6 +6,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
 import com.hypixel.hytale.server.core.asset.type.entityeffect.config.OverlapBehavior;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
@@ -13,11 +14,14 @@ import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
+import com.hypixel.hytale.server.core.modules.entity.livingentity.LivingEntityEffectClearChangesSystem;
+import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystems;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +33,7 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
     private final MiniwyvernOwnerAuraRegistry registry;
     private final MiniwyvernVoidEffectLifetimeSystem voidLifetime;
     private final ConcurrentHashMap<UUID, Long> lastVoidDiagnosticAt = new ConcurrentHashMap<>();
+    private final AtomicBoolean schedulingLogged = new AtomicBoolean();
 
     public MiniwyvernOwnerAuraDamageSystem(MiniwyvernOwnerAuraRegistry registry) {
         this(registry, new MiniwyvernVoidEffectLifetimeSystem());
@@ -56,6 +61,7 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
         MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(ownerIdentity.getUuid()).orElse(null);
         if (aura == null || !shouldApply(ownerIdentity.getUuid(), true,
                 damage.isCancelled(), damage.getAmount())) return;
+        logEffectScheduling(store);
         EffectControllerComponent controller = commandBuffer.getComponent(target, EffectControllerComponent.getComponentType());
         EntityEffect effect = EntityEffect.getAssetMap().getAsset(aura.effectId());
         if (controller == null || effect == null) {
@@ -86,6 +92,22 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
     }
 
     static boolean isLiveRef(@Nullable Ref<EntityStore> ref) { return ref != null && ref.isValid(); }
+
+    private void logEffectScheduling(Store<EntityStore> store) {
+        if (!schedulingLogged.compareAndSet(false, true)) return;
+        int auraSystem = -1;
+        int effectTracker = -1;
+        int clearChanges = -1;
+        var data = store.getRegistry().getData();
+        for (int index = 0; index < data.getSystemSize(); index++) {
+            ISystem<EntityStore> system = data.getSystem(index);
+            if (system == this) auraSystem = index;
+            if (system instanceof EntityTrackerSystems.EffectControllerSystem) effectTracker = index;
+            if (system instanceof LivingEntityEffectClearChangesSystem) clearChanges = index;
+        }
+        LOGGER.info("Miniwyvern owner-hit effect schedule: aura=" + auraSystem
+                + ", effectTracker=" + effectTracker + ", clearChanges=" + clearChanges);
+    }
 
     private void logVoidApplication(
             MiniwyvernOwnerAuraRegistry.Aura aura,
