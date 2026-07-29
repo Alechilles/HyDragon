@@ -117,6 +117,12 @@ class BundledConfigAssetContractTest {
         String voidJson = Files.readString(voidEffect);
         assertTrue(voidJson.contains("\"ModelVFXId\": \"HyDragon_Void_Debuff\""),
                 "Void Exposure must use the bundled target ModelVFX");
+        assertTrue(voidJson.contains("\"SystemId\": \"Eye_Void_Smoke_Teal\""),
+                "Void Exposure must retain a target-attached persistent void particle layer");
+        assertTrue(voidJson.contains("\"TargetEntityPart\": \"Self\""),
+                "Void Exposure particles must follow the affected target");
+        assertTrue(voidJson.contains("\"PositionOffset\": { \"Y\": 0.75 }"),
+                "Void Exposure particles must sit around the affected target's torso");
         Path voidVfx = Path.of("Server", "Entity", "ModelVFX", "HyDragon_Void_Debuff.json");
         assertTrue(Files.exists(voidVfx),
                 "Void Exposure ModelVFX must be bundled");
