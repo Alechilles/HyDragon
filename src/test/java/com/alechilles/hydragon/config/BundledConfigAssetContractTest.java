@@ -123,7 +123,7 @@ class BundledConfigAssetContractTest {
         String voidVfxJson = Files.readString(voidVfx);
         assertTrue(voidVfxJson.contains("\"LoopOption\": \"LoopMirror\""),
                 "Void Exposure must retain its authored mirrored-loop timing");
-        assertTrue(voidVfxJson.contains("\"PostColor\": \"#4f0f61\""),
+        assertTrue(voidVfxJson.contains("\"PostColor\": \"#560c7d\""),
                 "Void Exposure must retain its authored void post-color");
         assertTrue(voidVfxJson.contains("\"PostColorOpacity\": 0.7"),
                 "Void Exposure must retain its authored post-color opacity");
