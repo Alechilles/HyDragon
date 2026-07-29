@@ -17,3 +17,4 @@ target/
 .worktrees/
 artifacts/
 .vscode/settings.json
+/.asset-tools/

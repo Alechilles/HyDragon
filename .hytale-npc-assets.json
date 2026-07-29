@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "project": {
+    "name": "HyDragon",
+    "modRoot": "."
+  },
+  "authoringProfile": {
+    "schemaCatalog": ".asset-tools/reports/schema-catalog.json",
+    "profile": "runtime-snapshot-2026-06-02",
+    "expectedGameVersion": "unknown",
+    "expectedChannel": "runtime-snapshot",
+    "expectedSourceCommit": "",
+    "expectedPluginSetSha256": ""
+  },
+  "runtimeEvidence": {
+    "descriptorProfile": ".asset-tools/reports/runtime-profile.json",
+    "required": false
+  },
+  "policy": {
+    "allowNightly": false,
+    "allowDirtySemanticSource": false,
+    "requireExactPluginSet": true,
+    "requireCandidateSourceHashes": true
+  }
+}
