@@ -600,24 +600,6 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Origin": {
-      "position": [
-        {
-          "time": 0,
-          "delta": {"x": 0, "y": 0, "z": 0},
-          "interpolationType": "linear"
-        },
-        {
-          "time": 24,
-          "delta": {"x": 0, "y": 55, "z": 0},
-          "interpolationType": "linear"
-        }
-      ],
-      "orientation": [],
-      "shapeStretch": [],
-      "shapeVisible": [],
-      "shapeUvOffset": []
-    },
     "R-Wing": {
       "position": [],
       "orientation": [

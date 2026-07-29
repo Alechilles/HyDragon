@@ -379,18 +379,8 @@
       "position": [
         {
           "time": 0,
-          "delta": {"x": 0, "y": 96, "z": 0},
-          "interpolationType": "linear"
-        },
-        {
-          "time": 17,
-          "delta": {"x": 0, "y": 96, "z": 0},
-          "interpolationType": "linear"
-        },
-        {
-          "time": 28,
-          "delta": {"x": 0, "y": 132, "z": 0},
-          "interpolationType": "linear"
+          "delta": {"x": 0, "y": 0, "z": 0},
+          "interpolationType": "smooth"
         }
       ],
       "orientation": [
