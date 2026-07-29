@@ -20,7 +20,7 @@ final class RootLayoutPackagingContractTest {
         assertTrue(manifest.contains("\"Main\": \"com.alechilles.hydragon.HyDragonPlugin\""));
         assertTrue(manifest.contains("\"IncludesAssetPack\": true"));
         assertTrue(manifest.contains("\"ServerVersion\": \"0.5.x\""));
-        assertTrue(manifest.contains("\"Alechilles:Alec's Tamework!\": \"3.x\""));
+        assertTrue(manifest.contains("\"Alechilles:Alec's Tamework!\": \">=3.0.0 <4.0.0\""));
         assertFalse(manifest.contains("Master of Flight"));
     }
 
