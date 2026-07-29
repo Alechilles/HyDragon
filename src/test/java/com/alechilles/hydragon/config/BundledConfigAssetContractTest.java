@@ -123,10 +123,8 @@ class BundledConfigAssetContractTest {
         String voidVfxJson = Files.readString(voidVfx);
         assertTrue(voidVfxJson.contains("\"SwitchTo\": \"Distortion\""),
                 "Void Exposure must retain its authored distortion presentation");
-        assertTrue(voidVfxJson.contains("\"AnimationDuration\": 6.0"),
-                "Void Exposure's one-shot test must span its six-second EntityEffect");
-        assertTrue(voidVfxJson.contains("\"LoopOption\": \"PlayOnce\""),
-                "Void Exposure must isolate ModelVFX loop behavior during the diagnostic");
+        assertTrue(voidVfxJson.contains("\"LoopOption\": \"LoopMirror\""),
+                "Void Exposure must retain its authored mirrored-loop timing");
         assertFalse(voidVfxJson.contains("\"PostColor\""),
                 "Void Exposure must not replace its authored presentation with a recolor");
 
