@@ -1,6 +1,6 @@
 {
   "SwitchTo": "PostColor",
-  "EffectDirection": "None",
+  "EffectDirection": "ToCenter",
   "AnimationDuration": 3.0,
   "AnimationRange": {
     "Y": 0.2,

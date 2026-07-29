@@ -125,6 +125,8 @@ class BundledConfigAssetContractTest {
                 "Void Exposure must retain its authored post-color presentation");
         assertTrue(voidVfxJson.contains("\"LoopOption\": \"LoopMirror\""),
                 "Void Exposure must retain its authored mirrored-loop timing");
+        assertTrue(voidVfxJson.contains("\"EffectDirection\": \"ToCenter\""),
+                "Void Exposure must use the tested persistent-status effect direction");
         assertTrue(voidVfxJson.contains("\"PostColor\": \"#4f0f61\""),
                 "Void Exposure must retain its authored void post-color");
         assertTrue(voidVfxJson.contains("\"PostColorOpacity\": 0.7"),
