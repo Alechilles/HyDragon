@@ -24,6 +24,11 @@ plan. The previous Bond and Vigor designs remain authoritative. Any future
 implementation plan must use this document for Combat node IDs, prerequisites,
 costs, and behavior and must not restore the old eleven-node Combat layout.
 
+MiniWyvern projectile damage, status effects, pattern values, and delivery
+architecture are defined by
+`2026-07-30-miniwyvern-projectile-balance-design.md`. That focused design is
+authoritative wherever the two documents discuss projectile profiles.
+
 ## Combat Identity and Balance
 
 The two routes are deliberately asymmetrical. They are specialization routes,
@@ -97,11 +102,12 @@ Projectile cadence retains three deliberate bands:
 | `ProjectileMastery` | 3–5 seconds |
 
 Range and guidance talents must not accidentally reduce the cooldown on their
-own. The base, intermediate, and apex projectile profiles remain the concrete
-damage progression, with `ProjectileMastery` selecting the strongest profile.
-Exact per-form projectile values remain subject to later in-game balance
-testing, but every form must preserve the ranged route's sustained-DPS lead
-over its mastered swoop.
+own. The focused projectile-balance design locks elemental ordinary
+single-shot benchmarks to 8 / 12 / 16 and Wild benchmarks to 10 / 15 / 20,
+plus the form status matrix. Pattern deliberately replaces the would-be Apex
+single shot with its locked two-shot damage. Every form must preserve the
+ranged route's sustained-DPS lead over its mastered swoop through cadence and
+uptime, not oversized individual hits.
 
 Projectile features compose deterministically when several talents are owned:
 
@@ -111,14 +117,20 @@ Projectile features compose deterministically when several talents are owned:
 | `ProjectileRange` | Intermediate velocity, gravity, and lifetime profile | Unchanged | One shot | Unchanged |
 | `ProjectileCadence` | Intermediate profile | Unchanged | One shot | 4–6 seconds |
 | `ProjectileGuidance` | Intermediate profile | 0.55–0.85 seconds | One shot | Unchanged |
-| `ProjectilePattern` | Pattern-tuned apex profile | Unchanged unless guidance is also owned | Two-shot sequence | 4–6 seconds |
-| `ProjectileMastery` | Pattern-tuned apex profile | 0.55–0.85 seconds | Two-shot sequence | 3–5 seconds |
+| `ProjectilePattern` | Pattern damage with Intermediate ballistics | Unchanged unless guidance is also owned | Two-shot sequence | 4–6 seconds |
+| `ProjectileMastery` | Pattern damage with Apex ballistics | 0.55–0.85 seconds | Two-shot sequence | 3–5 seconds |
 
 The two pattern shots are separated by 0.25–0.4 seconds. Their per-shot damage
-is tuned to approximately 65 percent of that form's ordinary apex projectile,
-for approximately 130 percent total volley damage if both hit. Pattern assets
-retain each form's visual identity and status-effect rules. Wild remains raw
-physical damage and cannot acquire an elemental effect.
+is exactly 10 + 10 for elemental forms and 12 + 12 for Wild. Only the first
+pattern shot is status-enabled. Pattern assets retain each form's visual
+identity and the focused projectile-balance design's refresh-without-stacking
+status rules. Wild remains raw physical damage and cannot acquire an elemental
+effect.
+
+The focused projectile-balance design's volley-active latch keeps the complete
+two-shot sequence inside one aim-and-fire operation. Swoop pending may reserve
+the next scheduling turn during that sequence but cannot preempt the second
+shot by itself.
 
 These features compose rather than overwrite one another. For example, owning
 both `ProjectileRange` and `ProjectileCadence` produces the intermediate
@@ -221,9 +233,10 @@ recovery is active. Projectile scheduling and execution require
 `Miniwyvern_Swoop_Pending` and `Miniwyvern_Swooping` to be false. Swoop
 cooldown expiry sets pending through an instruction ordered before the
 projectile scheduler. An already active aim-and-fire sequence may complete,
-but pending prevents another sequence from starting; the swoop claims control
-as soon as the aim flag clears and continues blocking projectiles until
-recovery ends.
+including both shots of an active pattern volley, but pending prevents another
+sequence from starting; the swoop claims control as soon as the aim and
+`Miniwyvern_Projectile_Volley_Active` flags clear and continues blocking
+projectiles until recovery ends.
 
 Talent changes alter the next eligible attack profile or cooldown. They do not
 cancel an attack already in progress, reset the other attack's cooldown, or
@@ -247,7 +260,9 @@ the talent-tree redesign.
 The expanded tree should be implemented in two dependency-ordered stages:
 
 1. add and verify Tamework's `RequiresAnyTalentIds` contract, then add the
-   projectile and melee route assets and behavior; and
+   projectile and melee route assets and behavior, using
+   `2026-07-30-miniwyvern-projectile-balance-design.md` for every projectile
+   value and hit effect; and
 2. after the seven form-specific abilities are designed, activate
    `DraconicAssault`, its upgrades, and `DraconicApex`.
 
@@ -275,11 +290,14 @@ Stage-one implementation plans must include tests proving:
 - UI prerequisite text and connectors represent the fixture OR merge;
 - malformed any-of configs fail validation under the rules above;
 - every projectile talent combination resolves to the specified profile,
-  aiming, pattern, and cooldown outputs;
+  aiming, pattern, cooldown, direct damage, and status outputs from the focused
+  projectile-balance design;
 - swoop damage and cooldown profiles progress monotonically to 28 and 18–24;
 - projectile cooldowns remain independent from swoop cooldowns;
 - simultaneous projectile and swoop readiness gives the swoop a starvation-
   free pending handoff;
+- an active two-shot volley completes before a pending swoop claims control,
+  while combat cancellation clears the unfinished volley;
 - no talent removes swoop recovery or grants force, impact, knockback, stun,
   or invulnerability; and
 - no non-MiniWyvern species or locomotion state changes.
