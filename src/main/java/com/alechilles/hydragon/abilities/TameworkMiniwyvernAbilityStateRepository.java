@@ -28,6 +28,10 @@ public final class TameworkMiniwyvernAbilityStateRepository
     @Override
     public synchronized LoadResult load(UUID ownerUuid, String profileId) {
         Key key = key(ownerUuid, profileId);
+        Observed cached = observed.get(key);
+        if (cached != null) {
+            return LoadResult.loaded(cached.document().abilityState());
+        }
         BondedMiniwyvernExtensionStore.ReadResult result = extensions
                 .load(key.ownerUuid(), key.profileId())
                 .toCompletableFuture()

@@ -87,6 +87,21 @@ final class TameworkMiniwyvernAbilityStateRepositoryTest {
     }
 
     @Test
+    void reusesObservedStateWithoutReloadingTheExtensionOnEveryAbilityTick() {
+        MemoryGateway gateway = new MemoryGateway();
+        gateway.install(BondedMiniwyvernExtensionDocument.wild(
+                "hydragon:miniwyvern", 10L), 0L);
+        TameworkMiniwyvernAbilityStateRepository repository = repository(gateway);
+
+        assertEquals(MiniwyvernAbilityStateRepository.Status.LOADED,
+                repository.load(OWNER, PROFILE).status());
+        assertEquals(MiniwyvernAbilityStateRepository.Status.LOADED,
+                repository.load(OWNER, PROFILE).status());
+        assertEquals(1, gateway.reads,
+                "world-thread ability ticks must reuse their observed extension state");
+    }
+
+    @Test
     void concurrentSchedulerWriteCannotBeOverwrittenByAStaleAbilityTick() {
         MemoryGateway gateway = new MemoryGateway();
         gateway.install(BondedMiniwyvernExtensionDocument.wild(
@@ -157,6 +172,7 @@ final class TameworkMiniwyvernAbilityStateRepositoryTest {
         private long revision = -1L;
         private boolean failNextResponseAfterCommit;
         private int commits;
+        private int reads;
 
         private void install(BondedMiniwyvernExtensionDocument document, long revision) {
             rawPayload = CODEC.encode(document);
@@ -174,6 +190,7 @@ final class TameworkMiniwyvernAbilityStateRepositoryTest {
         @Override
         public CompletionStage<BondedCompanionResult<BondedCompanionExtensionData>>
                 getMiniwyvernExtension(UUID ownerUuid, String profileId) {
+            reads++;
             if (rawPayload == null) {
                 return CompletableFuture.completedFuture(new BondedCompanionResult<>(
                         BondedCompanionResultCode.NOT_FOUND, null, "missing"));

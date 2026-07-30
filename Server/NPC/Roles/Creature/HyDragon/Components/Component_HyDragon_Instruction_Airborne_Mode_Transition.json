@@ -10,6 +10,20 @@
     },
     "Instructions": [
       {
+        "$Comment": "Neutralize the legacy Tamework landing controller saved by pre-native-flight Horn builds.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "Any",
+          "Once": true
+        },
+        "Actions": [
+          {
+            "Type": "TameworkSetFlyingCompanionMode",
+            "Mode": "Follow"
+          }
+        ]
+      },
+      {
         "$Comment": "Consume one horn toggle and flip only the native mode flag.",
         "Continue": true,
         "Sensor": {
