@@ -176,8 +176,9 @@
       },
       "MaxSinkSpeed": 8,
       "MaxClimbSpeed": 10,
-      "MinAirSpeed": 3,
+      "MinAirSpeed": 0,
       "Acceleration": 6,
+      "Deceleration": 12,
       "MinHeightOverGround": 4,
       "MaxHeightOverGround": 10,
       "MaxRollAngle": 70,
@@ -221,6 +222,49 @@
       "$Comment": "Keep the Horn airborne mode controller transition global across every order.",
       "Continue": true,
       "Reference": "Component_HyDragon_Instruction_Airborne_Mode_Transition"
+    },
+    {
+      "$Comment": "Cancel a stale projectile line-up before ordinary state motion is selected.",
+      "Continue": true,
+      "Sensor": { "Type": "And", "Sensors": [
+        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
+        { "Type": "Or", "Sensors": [
+          { "Type": "Not", "Sensor": { "Type": "State", "State": "Defend" } },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } }
+        ] }
+      ] },
+      "Actions": [
+        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false },
+        { "Type": "TimerStop", "Name": "Miniwyvern_Projectile_Aim" },
+        { "Type": "ResetInstructions" }
+      ]
+    },
+    {
+      "$Comment": "Start one visible line-up when the projectile cadence is ready.",
+      "Continue": true,
+      "Sensor": { "Type": "And", "Sensors": [
+        { "Type": "State", "State": "Defend" },
+        { "Type": "Target", "TargetSlot": "LockedTarget" },
+        { "Type": "TameworkHasTalent", "TalentId": "DraconicProjectile" },
+        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming", "Set": false },
+        { "Type": "Timer", "Name": "Miniwyvern_Projectile_Cooldown", "State": "Stopped" }
+      ] },
+      "Actions": [
+        { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Aim", "StartValueRange": [ 0.4, 0.7 ], "RestartValueRange": [ 0.4, 0.7 ] },
+        { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Aim" },
+        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": true }
+      ]
+    },
+    {
+      "$Comment": "First-match ownership: stop and turn with the aimed head until the shot sequence completes.",
+      "Continue": true,
+      "Sensor": { "Type": "And", "Sensors": [
+        { "Type": "State", "State": "Defend" },
+        { "Type": "Target", "TargetSlot": "LockedTarget" },
+        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }
+      ] },
+      "BodyMotion": { "Type": "MatchLook" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "$Comment": "Keep owner-relative modes bounded and fail safe when their owner target is unavailable.",
@@ -537,6 +581,8 @@
       "Sensor": { "Type": "And", "Sensors": [
         { "Type": "State", "State": "Defend" },
         { "Type": "Target", "TargetSlot": "LockedTarget" },
+        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
+        { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" },
         { "Type": "TameworkHasTalent", "TalentId": "DraconicProjectile" },
         { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileRange" } },
         { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" } },
@@ -550,15 +596,20 @@
         { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } }
       ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileBase" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [
+        { "Type": "Attack", "Attack": { "Compute": "TalentProjectileBase" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] },
+        { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 5, 7 ], "RestartValueRange": [ 5, 7 ] },
+        { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
+        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
+      ]
     },
     {
       "Continue": true,
       "Sensor": { "Type": "And", "Sensors": [
         { "Type": "State", "State": "Defend" },
         { "Type": "Target", "TargetSlot": "LockedTarget" },
+        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
+        { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" },
         { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" },
         { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } },
         { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } },
@@ -569,78 +620,70 @@
         { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } }
       ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [
+        { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] },
+        { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 5, 7 ], "RestartValueRange": [ 5, 7 ] },
+        { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
+        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
+      ]
     },
     {
       "Continue": true,
       "Sensor": { "Type": "And", "Sensors": [
         { "Type": "State", "State": "Defend" },
         { "Type": "Target", "TargetSlot": "LockedTarget" },
+        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
+        { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" },
         { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" }
       ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [
+        { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] },
+        { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 3, 5 ], "RestartValueRange": [ 3, 5 ] },
+        { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
+        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
+      ]
     },
     {
       "$Comment": "Range is an executable, mutually-exclusive projectile variant.",
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileRange" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileRange" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 5, 7 ], "RestartValueRange": [ 5, 7 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     },
     {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 4, 6 ], "RestartValueRange": [ 4, 6 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     },
     {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 4, 6 ], "RestartValueRange": [ 4, 6 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     },
     {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 5, 7 ], "RestartValueRange": [ 5, 7 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     },
     {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 4, 6 ], "RestartValueRange": [ 4, 6 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     },
     {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 3, 5 ], "RestartValueRange": [ 3, 5 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     },
     {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 3, 5 ], "RestartValueRange": [ 3, 5 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     },
     {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
+      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ],
-      "BodyMotion": { "Type": "Nothing" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 3, 5 ], "RestartValueRange": [ 3, 5 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     }
   ],
   "InteractionInstruction": {

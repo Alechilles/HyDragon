@@ -26,6 +26,9 @@ final class MiniwyvernTalentAssetWiringTest {
     private static final List<String> COMBAT_TALENTS = List.of("DraconicProjectile", "ProjectileRange",
             "ProjectileCadence", "ProjectileForce", "ProjectileGuidance", "ProjectileImpact",
             "ProjectilePattern", "DraconicAssault", "AssaultUtility", "AssaultMastery", "DraconicApex");
+    private static final String AIM_FLAG = "Miniwyvern_Projectile_Aiming";
+    private static final String AIM_TIMER = "Miniwyvern_Projectile_Aim";
+    private static final String COOLDOWN_TIMER = "Miniwyvern_Projectile_Cooldown";
 
     @Test
     void templateContainsTalentGatedExecutableVariants() throws IOException {
@@ -47,13 +50,7 @@ final class MiniwyvernTalentAssetWiringTest {
     @Test
     void defendDispatchContinuesToTheUnlockedProjectileVariant() throws IOException {
         JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
-        JsonObject defendDispatch = instructions.asList().stream()
-                .filter(JsonElement::isJsonObject)
-                .map(JsonElement::getAsJsonObject)
-                .filter(instruction -> instruction.has("Instructions")
-                        && containsDefendStateInstruction(instruction.get("Instructions")))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("missing Miniwyvern Defend state dispatch"));
+        JsonObject defendDispatch = defendDispatch(instructions);
 
         assertTrue(defendDispatch.has("Continue") && defendDispatch.get("Continue").getAsBoolean(),
                 "the Defend state dispatch must continue so its later talent projectile instruction can run");
@@ -86,41 +83,76 @@ final class MiniwyvernTalentAssetWiringTest {
                 Map.entry("DraconicApex", JsonParser.parseString("[3,5]")));
 
         for (String talentId : COMBAT_TALENTS) {
-            JsonObject attack = projectileAttack(instructionForTalent(instructions, talentId));
-            JsonArray pause = attack.getAsJsonArray("AttackPauseRange");
-            assertEquals(expected.get(talentId), pause, talentId);
-            assertTrue(pause.get(0).getAsDouble() >= 3.0, talentId + " fires too quickly");
-            assertTrue(pause.get(0).getAsDouble() < pause.get(1).getAsDouble(),
-                    talentId + " cadence must be randomized");
-        }
-    }
-
-    @Test
-    void everyProjectileVariantWaitsForItsAimWindowBeforeFiring() throws IOException {
-        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
-        JsonElement expectedAimWindow = JsonParser.parseString("[0.4,0.7]");
-
-        for (String talentId : COMBAT_TALENTS) {
-            JsonObject attack = projectileAttack(instructionForTalent(instructions, talentId));
-            assertEquals(expectedAimWindow, attack.get("AimingTimeRange"),
-                    talentId + " must aim for 0.4-0.7 seconds before firing");
-        }
-    }
-
-    @Test
-    void everyProjectileVariantPausesMovementWhileAimingAtItsTarget() throws IOException {
-        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
-        JsonElement expectedBodyMotion = JsonParser.parseString("{\"Type\":\"Nothing\"}");
-        JsonElement expectedHeadMotion = JsonParser.parseString(
-                "{\"Type\":\"Aim\",\"Spread\":0,\"HitProbability\":1,\"Deflection\":true}");
-
-        for (String talentId : COMBAT_TALENTS) {
             JsonObject instruction = instructionForTalent(instructions, talentId);
-            assertEquals(expectedBodyMotion, instruction.get("BodyMotion"),
-                    talentId + " must pause movement while aiming");
-            assertEquals(expectedHeadMotion, instruction.get("HeadMotion"),
-                    talentId + " must use deterministic ballistic aiming");
+            JsonObject attack = projectileAttack(instruction);
+            JsonObject cooldown = action(instruction, "TimerStart", COOLDOWN_TIMER);
+            JsonArray actions = instruction.getAsJsonArray("Actions");
+            JsonArray startRange = cooldown.getAsJsonArray("StartValueRange");
+
+            assertEquals(JsonParser.parseString("[0.1,0.2]"), attack.get("AimingTimeRange"), talentId);
+            assertEquals(JsonParser.parseString("[0,0]"), attack.get("AttackPauseRange"), talentId);
+            assertEquals(expected.get(talentId), startRange, talentId);
+            assertEquals(expected.get(talentId), cooldown.get("RestartValueRange"), talentId);
+            assertTrue(startRange.get(0).getAsDouble() >= 3.0, talentId + " fires too quickly");
+            assertTrue(startRange.get(0).getAsDouble() < startRange.get(1).getAsDouble(),
+                    talentId + " cadence must be randomized");
+            assertTrue(hasAction(instruction, "TimerRestart", COOLDOWN_TIMER), talentId);
+            assertTrue(hasStoppedTimerSensor(instruction, AIM_TIMER), talentId);
+            assertTrue(hasPositiveFlagSensor(instruction, AIM_FLAG), talentId);
+            assertTrue(instruction.get("ActionsBlocking").getAsBoolean(), talentId);
+            assertEquals("SetFlag", string(actions.get(actions.size() - 1).getAsJsonObject(), "Type"), talentId);
+            assertTrue(hasSetFlag(actions.get(actions.size() - 1), AIM_FLAG, false), talentId);
+            assertFalse(instruction.has("BodyMotion"), talentId + " motion belongs to the shared priority phase");
+            assertFalse(instruction.has("HeadMotion"), talentId + " motion belongs to the shared priority phase");
         }
+    }
+
+    @Test
+    void nativeFlightCanBrakeToAStationaryHover() throws IOException {
+        JsonObject template = load(TEMPLATE);
+        JsonObject fly = template.getAsJsonArray("MotionControllerList").asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(controller -> "Fly".equals(string(controller, "Type")))
+                .findFirst().orElseThrow();
+
+        assertEquals(0.0, fly.get("MinAirSpeed").getAsDouble());
+        assertEquals(12.0, fly.get("Deceleration").getAsDouble());
+    }
+
+    @Test
+    void dedicatedAimPhaseOwnsMotionBeforeOrdinaryDefendMovement() throws IOException {
+        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        JsonObject aim = instructionUsingFlagAndMotion(instructions, AIM_FLAG, "MatchLook");
+        JsonObject defendDispatch = defendDispatch(instructions);
+
+        assertTrue(topLevelIndex(instructions, aim) < topLevelIndex(instructions, defendDispatch));
+        assertEquals(JsonParser.parseString("{\"Type\":\"MatchLook\"}"), aim.get("BodyMotion"));
+        assertEquals(JsonParser.parseString(
+                "{\"Type\":\"Aim\",\"Spread\":0,\"HitProbability\":1,\"Deflection\":true}"),
+                aim.get("HeadMotion"));
+    }
+
+    @Test
+    void projectileAimSchedulerAndRecoveryAreExplicit() throws IOException {
+        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        JsonObject scheduler = instructionWithAction(instructions, "TimerStart", AIM_TIMER);
+        JsonObject recovery = instructionWithAction(instructions, "TimerStop", AIM_TIMER);
+        JsonObject defendDispatch = defendDispatch(instructions);
+
+        assertTrue(topLevelIndex(instructions, recovery) < topLevelIndex(instructions, scheduler));
+        assertTrue(topLevelIndex(instructions, scheduler) < topLevelIndex(instructions, defendDispatch));
+
+        JsonObject start = action(scheduler, "TimerStart", AIM_TIMER);
+        assertEquals(JsonParser.parseString("[0.4,0.7]"), start.get("StartValueRange"));
+        assertEquals(JsonParser.parseString("[0.4,0.7]"), start.get("RestartValueRange"));
+        assertTrue(hasAction(scheduler, "TimerRestart", AIM_TIMER));
+        assertTrue(hasSetFlag(scheduler, AIM_FLAG, true));
+        JsonArray schedulerActions = scheduler.getAsJsonArray("Actions");
+        assertTrue(hasSetFlag(schedulerActions.get(schedulerActions.size() - 1), AIM_FLAG, true));
+
+        assertTrue(hasSetFlag(recovery, AIM_FLAG, false));
+        assertTrue(hasAction(recovery, "TimerStop", AIM_TIMER));
+        assertTrue(hasAction(recovery, "ResetInstructions", null));
     }
 
     @Test
@@ -203,7 +235,7 @@ final class MiniwyvernTalentAssetWiringTest {
         return false;
     }
 
-    private boolean containsDefendStateInstruction(JsonElement value) {
+    private static boolean containsDefendStateInstruction(JsonElement value) {
         if (value.isJsonObject()) {
             JsonObject object = value.getAsJsonObject();
             if ("State".equals(string(object, "Type")) && "Defend".equals(string(object, "State"))) {
@@ -233,9 +265,142 @@ final class MiniwyvernTalentAssetWiringTest {
 
     private static JsonObject instructionForTalent(JsonArray instructions, String talentId) {
         for (JsonElement element : instructions) {
-            if (element.isJsonObject() && positiveTalentGates(element).contains(talentId)) return element.getAsJsonObject();
+            if (element.isJsonObject()
+                    && hasExecutableAction(element)
+                    && positiveTalentGates(element).contains(talentId)) {
+                return element.getAsJsonObject();
+            }
         }
         throw new AssertionError("missing executable gate for " + talentId);
+    }
+
+    private static JsonObject defendDispatch(JsonArray instructions) {
+        return instructions.asList().stream()
+                .filter(JsonElement::isJsonObject)
+                .map(JsonElement::getAsJsonObject)
+                .filter(instruction -> instruction.has("Instructions")
+                        && containsDefendStateInstruction(instruction.get("Instructions")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("missing Miniwyvern Defend state dispatch"));
+    }
+
+    private static int topLevelIndex(JsonArray instructions, JsonObject expected) {
+        for (int index = 0; index < instructions.size(); index++) {
+            if (instructions.get(index) == expected) return index;
+        }
+        throw new AssertionError("instruction is not top-level");
+    }
+
+    private static JsonObject instructionUsingFlagAndMotion(
+            JsonArray instructions, String flagName, String bodyMotionType) {
+        for (JsonElement element : instructions) {
+            if (!element.isJsonObject()) continue;
+            JsonObject instruction = element.getAsJsonObject();
+            if (hasPositiveFlagSensor(instruction.get("Sensor"), flagName)
+                    && instruction.has("BodyMotion")
+                    && bodyMotionType.equals(string(instruction.getAsJsonObject("BodyMotion"), "Type"))) {
+                return instruction;
+            }
+        }
+        throw new AssertionError("missing top-level " + bodyMotionType + " instruction for " + flagName);
+    }
+
+    private static JsonObject instructionWithAction(JsonArray instructions, String type, String name) {
+        for (JsonElement element : instructions) {
+            if (element.isJsonObject() && findAction(element, type, name) != null) return element.getAsJsonObject();
+        }
+        throw new AssertionError("missing top-level instruction with " + type + " action for " + name);
+    }
+
+    private static JsonObject action(JsonElement value, String type, String name) {
+        JsonObject match = findAction(value, type, name);
+        if (match == null) throw new AssertionError("missing " + type + " action for " + name);
+        return match;
+    }
+
+    private static boolean hasAction(JsonElement value, String type, String name) {
+        return findAction(value, type, name) != null;
+    }
+
+    private static JsonObject findAction(JsonElement value, String type, String name) {
+        if (value == null) return null;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if (type.equals(string(object, "Type")) && (name == null || name.equals(string(object, "Name")))) {
+                return object;
+            }
+            for (JsonElement child : object.asMap().values()) {
+                JsonObject match = findAction(child, type, name);
+                if (match != null) return match;
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) {
+                JsonObject match = findAction(child, type, name);
+                if (match != null) return match;
+            }
+        }
+        return null;
+    }
+
+    private static boolean hasSetFlag(JsonElement value, String name, boolean setTo) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("SetFlag".equals(string(object, "Type"))
+                    && name.equals(string(object, "Name"))
+                    && object.has("SetTo")
+                    && object.get("SetTo").getAsBoolean() == setTo) {
+                return true;
+            }
+            for (JsonElement child : object.asMap().values()) {
+                if (hasSetFlag(child, name, setTo)) return true;
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) {
+                if (hasSetFlag(child, name, setTo)) return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasStoppedTimerSensor(JsonElement value, String name) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("Timer".equals(string(object, "Type"))
+                    && name.equals(string(object, "Name"))
+                    && "Stopped".equals(string(object, "State"))) {
+                return true;
+            }
+            for (JsonElement child : object.asMap().values()) {
+                if (hasStoppedTimerSensor(child, name)) return true;
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) {
+                if (hasStoppedTimerSensor(child, name)) return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasPositiveFlagSensor(JsonElement value, String name) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("Flag".equals(string(object, "Type"))
+                    && name.equals(string(object, "Name"))
+                    && (!object.has("Set") || object.get("Set").getAsBoolean())) {
+                return true;
+            }
+            for (JsonElement child : object.asMap().values()) {
+                if (hasPositiveFlagSensor(child, name)) return true;
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) {
+                if (hasPositiveFlagSensor(child, name)) return true;
+            }
+        }
+        return false;
     }
 
     private static JsonObject projectileAttack(JsonElement value) {
