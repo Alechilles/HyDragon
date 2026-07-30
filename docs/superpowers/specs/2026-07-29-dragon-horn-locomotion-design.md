@@ -2,7 +2,7 @@
 
 ## Goal
 
-Extend the Dragon Horn command wheel so bonded Miniwyverns and full dragons can
+Extend the Dragon Horn command wheel so bonded Miniwyverns and Nordic Drakes can
 defend independently, explicitly attack a selected target, and switch their
 locomotion between grounded and airborne behavior without changing their
 current order or target.
@@ -53,8 +53,13 @@ current order and combat target while their movement style changes.
 
 ## Species Behavior
 
-Both `Template_Wyvern_Mini_Flying_Tamed` and
+`Template_Wyvern_Mini_Flying_Tamed` and
 `Template_HyDragon_Dragon_Tamed` declare and consume `AirborneMode`.
+
+Hydras and Rock Drakes intentionally remain ground-only. They keep the shared
+Horn command wheel for its non-flight orders, but their
+`Template_HyDragon_Tamed` inheritance path must not receive an `AirborneMode`
+consumer or a native Fly controller.
 
 - Grounded Follow, Defend, Hold, and Idle use their grounded movement branches.
 - Airborne Follow, Defend, Hold, and Idle use their respective flight, hover,
@@ -77,8 +82,9 @@ Automated coverage must prove:
 - Defend and AttackTarget have distinct target semantics;
 - the command request is one-shot and only addresses declared vanilla flags;
 - `AirborneMode` defaults to unset after spawning;
-- Miniwyvern and full-dragon templates each contain grounded and airborne
-  branches for Follow, Hold, Defend, and Idle; and
+- Miniwyvern and Nordic Drake templates each contain grounded and airborne
+  branches for Follow, Hold, Defend, and Idle, while Hydra/Rock Drake roles
+  remain walk-only; and
 - the existing Miniwyvern Defend plus locked-target talent projectile contract
   remains intact.
 
