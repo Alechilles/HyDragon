@@ -650,6 +650,7 @@
   "KnockbackScale": {
     "Compute": "KnockbackScale"
   },
+  "InitialMotionController": "Walk",
   "MotionControllerList": [
     {
       "Type": "Fly",

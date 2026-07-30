@@ -84,6 +84,10 @@ final class DragonHornLocomotionAssetContractTest {
 
         assertGlobalContinuingReference(miniwyvern);
         assertGlobalContinuingReference(fullDragon);
+        assertEquals("Walk", string(miniwyvern, "InitialMotionController"),
+                "Miniwyverns must spawn grounded instead of randomly selecting a flight controller");
+        assertEquals("Walk", string(fullDragon, "InitialMotionController"),
+                "Nordic Drakes must spawn grounded instead of randomly selecting a ride or flight controller");
 
         assertEquals("Component", transition.get("Type").getAsString());
         assertEquals("Instruction", transition.get("Class").getAsString());
@@ -145,6 +149,7 @@ final class DragonHornLocomotionAssetContractTest {
         JsonObject fullDragon = readJson("Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon_Tamed.json");
 
         assertNativeFlyController(fullDragon);
+        assertEquals("Walk", string(fullDragon, "InitialMotionController"));
         assertMountedControllerContract(fullDragon);
 
         JsonObject idle = stateBehavior(fullDragon, "Idle");
