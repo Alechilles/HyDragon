@@ -38,12 +38,13 @@ newly summoned companion has the flag unset and therefore begins in grounded
 mode. The flag is not saved in bonded-companion data and does not survive
 dismissal or resummoning.
 
-Tamework gains a generic, one-shot command request for toggling a named,
-declared vanilla role flag. The command executor must not invent a second flag
-store. It raises a request for `AirborneMode`; the matching NPC template
-consumes that request and uses vanilla `Flag` sensors and `SetFlag` actions to
-flip the compiled role flag. The request is consumed exactly once per recipient
-so one Horn use cannot oscillate a companion across instruction ticks.
+Tamework 3.0.0 already provides the generic, one-shot request bridge needed
+here: a command `TriggerHook` step writes a request which a `TameworkHook`
+sensor consumes. The command executor must not invent a second flag store. It
+raises `HyDragon.Command.ToggleAirborneMode`; the matching NPC instruction uses
+vanilla `Flag` sensors and `SetFlag` actions to flip the compiled
+`AirborneMode` role flag. The request is consumed exactly once per recipient so
+one Horn use cannot oscillate a companion across instruction ticks.
 
 The request does not call `SetState`, clear `LockedTarget`, or overwrite
 `MasterTarget`. It only changes the locomotion branch selected by the companion
