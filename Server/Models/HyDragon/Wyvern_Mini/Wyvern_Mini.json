@@ -54,15 +54,15 @@
     "Walk": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Landed.blockyanim",
-          "Speed": 0.9
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Walk.blockyanim",
+          "Speed": 0.7
         }
       ]
     },
     "Run": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Landed.blockyanim",
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Walk.blockyanim",
           "Speed": 1.1
         }
       ]
@@ -89,7 +89,14 @@
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
           "Speed": 1,
-          "Looping": true
+          "Looping": true,
+          "Weight": 1
+        },
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Glide.blockyanim",
+          "Speed": 0.2,
+          "Looping": true,
+          "Weight": 0.2
         }
       ]
     },
