@@ -45,12 +45,14 @@ The numerical target is:
 
 | State | Swoop damage | Swoop cooldown |
 | --- | ---: | --- |
-| Default, no melee talents | 32 | 25–35 seconds |
-| Fully mastered melee route | 64 | 18–24 seconds |
+| Default, no melee talents | 16 | 25–35 seconds |
+| Fully mastered melee route | 28 | 18–24 seconds |
 
-At mastery, the swoop is about twice as damaging. Its average cooldown is 30
+At mastery, the swoop deals 75 percent more damage. Its average cooldown is 30
 percent shorter, making it approximately 43 percent more frequent than the
-default version. Even then, its isolated sustained DPS remains below the
+default version. Together those upgrades produce approximately 2.5 times the
+default swoop's sustained contribution without turning an individual strike
+into a powerhouse attack. Its isolated sustained DPS remains below the
 existing 3–7-second projectile cadence. Swoop damage is physical and adds no
 force, impact, launch, stun, or knockback mechanic.
 
@@ -142,7 +144,7 @@ route; it does not unlock the behavior.
 The implementation may use a small set of mutually exclusive swoop profiles,
 but the externally observable progression must be monotonic:
 
-- damage progresses 32 → 40 → 52 → 64 across `SwoopFerocity`, `RendingDive`,
+- damage progresses 16 → 20 → 24 → 28 across `SwoopFerocity`, `RendingDive`,
   and `SwoopMastery`;
 - cooldown progresses 25–35 → 22–30 → 20–26 → 18–24 seconds across
   `SwoopCadence`, `RelentlessSwoop`, and `SwoopMastery`; and
@@ -274,7 +276,7 @@ Stage-one implementation plans must include tests proving:
 - malformed any-of configs fail validation under the rules above;
 - every projectile talent combination resolves to the specified profile,
   aiming, pattern, and cooldown outputs;
-- swoop damage and cooldown profiles progress monotonically to 64 and 18–24;
+- swoop damage and cooldown profiles progress monotonically to 28 and 18–24;
 - projectile cooldowns remain independent from swoop cooldowns;
 - simultaneous projectile and swoop readiness gives the swoop a starvation-
   free pending handoff;

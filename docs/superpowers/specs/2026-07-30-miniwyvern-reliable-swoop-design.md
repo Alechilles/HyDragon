@@ -84,15 +84,15 @@ into `.Swoop`.
 ## Swoop Damage
 
 The aerial swoop uses a dedicated physical-damage interaction instead of the
-ordinary 16-damage grounded bite interaction. Its default target is 32 damage.
-This makes the infrequent commitment visible in combat while keeping the
-default swoop far below the sustained output of talent-driven projectiles.
+ordinary grounded bite interaction. Its default target is the same 16 damage.
+The dedicated path exists to remove the ordinary bite's knockback and support
+melee talent profiles without changing grounded combat.
 
 The implementation adds these dedicated assets:
 
 - `Root_NPC_Wyvern_Mini_Swoop_Bite` as the aerial attack root;
 - `Wyvern_Mini_Swoop_Bite` as the bite animation and selector interaction; and
-- `Wyvern_Mini_Swoop_Bite_Damage` as the 32-damage physical hit.
+- `Wyvern_Mini_Swoop_Bite_Damage` as the 16-damage physical hit.
 
 The aerial component exposes a `SwoopAttack` parameter whose default is the
 new root and uses it only from the `.Swoop` attack action. Existing role
@@ -178,7 +178,7 @@ contracts:
   source;
 - one route improves the default melee swoop as supplemental, higher-risk
   burst damage;
-- full melee mastery targets 64 swoop damage and an 18–24-second cooldown;
+- full melee mastery targets 28 swoop damage and an 18–24-second cooldown;
 - the routes merge into a future form-specific special ability; and
 - that merge requires either route endpoint, not both.
 
@@ -222,8 +222,8 @@ Test-driven implementation must first add a failing asset contract proving:
 - the bite remains inside the swoop phase only;
 - one cycle can invoke the swoop attack at most once and immediately advances
   to recovery after that attempt;
-- the aerial swoop uses its dedicated 32-damage interaction while grounded
-  combat retains the ordinary 16-damage bite;
+- the aerial swoop uses its dedicated knockback-free 16-damage interaction
+  while grounded combat retains the ordinary 16-damage bite;
 - the approach has a finite timeout and safe abort path;
 - the approach timeout is six seconds;
 - recovery retains the existing two-to-four-second backoff;
