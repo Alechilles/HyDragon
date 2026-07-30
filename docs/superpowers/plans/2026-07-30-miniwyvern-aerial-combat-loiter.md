@@ -364,47 +364,33 @@ python -m hytale_npc_assets.cli author inspect \
 
 Expected: fresh snapshots, no blocker diagnostics, the template resolves the new component, and the component's Tamework references resolve.
 
-- [ ] **Step 3: Produce affected-scope candidate validation**
+- [ ] **Step 3: Build and prove the actual committed-delta candidate**
 
-Create the ignored file `.asset-tools/reports/miniwyvern-aerial-combat-noop.patch.json` with `apply_patch`; its complete contents are:
+Create a detached temporary worktree at `c15adc0`, the state immediately before Tasks 1 and 2, and give it an exact-profile project file pointing to the same locked schema catalog and runtime descriptor profile. Build `.asset-tools/reports/miniwyvern-aerial-combat-verification-candidate.json` from the complete asset diff `c15adc0..87910c3`: 44 RFC 6902 operations for the Miniwyvern template plus creation of `Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend`.
 
-```json
-[]
-```
+Use `hytale_npc_assets.patching.apply_patch_operations` without materializing files and write `.asset-tools/reports/miniwyvern-aerial-combat-candidate-equivalence.json`.
 
-Then validate the already-edited template and its affected reference graph without materializing another change:
-
-```bash
-python -m hytale_npc_assets.cli author validate \
-  --project-profile "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.hytale-npc-assets.json" \
-  --asset Template_Wyvern_Mini_Flying_Tamed \
-  --source-path Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json \
-  --patch "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-noop.patch.json" \
-  --scope affected --simulate --fail-on blocker --format json \
-  --out "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-validation.json"
-```
-
-Expected: candidate validation succeeds with no blocker and includes the changed template's affected graph. If this tool release rejects an empty RFC 6902 patch, generate the equivalent no-op `replace` operation for `/Type` from `"Template"` to `"Template"`; do not invent or apply a semantic asset change merely to produce a candidate report.
+Expected: both candidate targets reproduce their committed documents exactly, the created component is absent at the base commit, and the two candidate paths equal the complete two-path production asset diff. Do not substitute a post-change no-op candidate; it cannot prove the committed delta.
 
 - [ ] **Step 4: Generate and run the static verification plan**
 
-Use an exact-profile verification candidate representing the committed asset delta as `--candidate`. The no-op affected-scope report from Step 3 has no patch operations and therefore cannot be used to generate verification cases:
+Generate the verification plan against the detached pre-change worktree so source hashes and component creation are evaluated in their real pre-change state:
 
 ```bash
 python -m hytale_npc_assets.cli author verify generate \
-  --project-profile "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.hytale-npc-assets.json" \
+  --project-profile "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/miniwyvern-verification-base/.hytale-npc-assets-verification.json" \
   --candidate "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-verification-candidate.json" \
   --behavior-goal "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-behavior-goal.json" \
   --out "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-verification-plan.json"
 
 python -m hytale_npc_assets.cli author verify run \
-  --project-profile "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.hytale-npc-assets.json" \
+  --project-profile "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/miniwyvern-verification-base/.hytale-npc-assets-verification.json" \
   --verification "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-verification-plan.json" \
   --mode static \
   --out "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-verification-result.json"
 ```
 
-Expected: static checks pass. Record any live-runtime checks as unavailable rather than passing them; this profile has no live harness capability.
+Expected: record the actual validator result rather than weakening or replacing the candidate. HytaleNpcAssetTools 0.1.0 may block the real delta because its create-target classifier treats NPC components as generic roles and its base semantic pack marks descriptor-provided Tamework types unavailable. If encountered, preserve those diagnostics as a tooling limitation, prove candidate/document equivalence separately, require the repository asset validator and contract tests to pass, and do not report any static or live verification case as passed. Record runtime cases as unavailable; `.asset-tools/reports/miniwyvern-aerial-combat-profile-check.json` is the evidence for `liveHarness=false`.
 
 - [ ] **Step 5: Run complete HyDragon verification**
 
