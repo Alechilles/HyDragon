@@ -76,6 +76,8 @@ final class DragonHornLocomotionAssetContractTest {
                 "newly spawned roles must reset AirborneMode to false exactly once");
         assertEquals(1, countHookSensors(content, "HyDragon.Command.ToggleAirborneMode"),
                 "the transition component must consume exactly the ToggleAirborneMode hook");
+        assertTrue(hasConsumingHook(content, "HyDragon.Command.ToggleAirborneMode"),
+                "the exact ToggleAirborneMode hook must explicitly consume its one signal");
         assertTrue(hasMutuallyExclusiveToggle(content),
                 "the native Flag branches must clear when set and set when unset");
         assertTrue(hasTakeOff(content), "AirborneMode=true on Walk must take off");
@@ -107,6 +109,12 @@ final class DragonHornLocomotionAssetContractTest {
                 && hookId.equals(string(object, "HookId")));
     }
 
+    private static boolean hasConsumingHook(JsonElement node, String hookId) {
+        return anyObject(node, object -> "TameworkHook".equals(string(object, "Type"))
+                && hookId.equals(string(object, "HookId"))
+                && object.has("Consume") && object.get("Consume").getAsBoolean());
+    }
+
     private static boolean hasMutuallyExclusiveToggle(JsonElement node) {
         return anyObject(node, object -> "Flag".equals(string(object, "Type"))
                         && "AirborneMode".equals(string(object, "Name"))
@@ -127,10 +135,36 @@ final class DragonHornLocomotionAssetContractTest {
 
     private static boolean hasSafeLanding(JsonElement node) {
         return anyObject(node, instruction -> isAirborneControllerBranch(instruction, false, "Fly")
-                && anyObject(instruction, object -> "AdjustPosition".equals(string(object, "Type"))
-                        && anyObject(object, nested -> "SearchRay".equals(string(nested, "Type"))))
-                && anyObject(instruction, object -> "Land".equals(string(object, "Type"))))
-                && anyObject(node, object -> "ResetSearchRays".equals(string(object, "Type")));
+                && anyObject(instruction, DragonHornLocomotionAssetContractTest::isFullDragonLandingRay)
+                && anyObject(instruction, DragonHornLocomotionAssetContractTest::isFullDragonLandMotion)
+                && !anyObject(instruction, object -> object.has("BodyMotion")
+                        && "Wander".equals(string(object.getAsJsonObject("BodyMotion"), "Type"))))
+                && anyObject(node, instruction -> isAirborneControllerBranch(instruction, false, "Walk")
+                        && instruction.has("Actions")
+                        && actionTypeExists(instruction.getAsJsonArray("Actions"), "ResetSearchRays"));
+    }
+
+    private static boolean isFullDragonLandingRay(JsonObject object) {
+        return "SearchRay".equals(string(object, "Type"))
+                && "LandingRay".equals(string(object, "Name"))
+                && object.get("Range").getAsInt() == 64
+                && object.get("Angle").getAsInt() == 90
+                && "StoneAndSoil".equals(string(object, "Blocks"));
+    }
+
+    private static boolean isFullDragonLandMotion(JsonObject object) {
+        if (!object.has("BodyMotion")) {
+            return false;
+        }
+        JsonObject motion = object.getAsJsonObject("BodyMotion");
+        return "Land".equals(string(motion, "Type"))
+                && !motion.get("UsePathfinder").getAsBoolean()
+                && !motion.get("SkipSteering").getAsBoolean()
+                && motion.get("SlowDownDistance").getAsInt() == 5
+                && motion.get("StopDistance").getAsDouble() == 0.5
+                && motion.getAsJsonArray("HeightDifference").equals(JsonParser.parseString("[-3,2]"))
+                && motion.get("GoalLenience").getAsInt() == 3
+                && motion.get("DesiredAltitudeWeight").getAsInt() == 0;
     }
 
     private static boolean isAirborneControllerBranch(JsonObject instruction, boolean airborne, String controller) {
@@ -164,6 +198,11 @@ final class DragonHornLocomotionAssetContractTest {
         return actions.asList().stream().map(JsonElement::getAsJsonObject)
                 .anyMatch(action -> type.equals(string(action, "Type")) && name.equals(string(action, "Name"))
                         && action.has("SetTo") && setTo == action.get("SetTo").getAsBoolean());
+    }
+
+    private static boolean actionTypeExists(JsonArray actions, String type) {
+        return actions.asList().stream().map(JsonElement::getAsJsonObject)
+                .anyMatch(action -> type.equals(string(action, "Type")));
     }
 
     private static boolean actionExistsInParent(JsonElement root, JsonObject sensor, String type, String name, boolean setTo) {

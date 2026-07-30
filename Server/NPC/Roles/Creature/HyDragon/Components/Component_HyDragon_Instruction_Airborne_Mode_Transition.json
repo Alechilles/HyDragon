@@ -112,22 +112,23 @@
               "Sensor": {
                 "Type": "SearchRay",
                 "Name": "LandingRay",
-                "Range": 20,
-                "Angle": 45,
-                "Blocks": "Gaia"
+                "Range": 64,
+                "Angle": 90,
+                "Blocks": "StoneAndSoil"
               }
             },
             "BodyMotion": {
               "Type": "Land",
+              "UsePathfinder": false,
+              "SkipSteering": false,
               "SlowDownDistance": 5,
               "StopDistance": 0.5,
-              "GoalLenience": 3
-            }
-          },
-          {
-            "BodyMotion": {
-              "Type": "Wander",
-              "RelativeSpeed": 0.2
+              "HeightDifference": [
+                -3,
+                2
+              ],
+              "GoalLenience": 3,
+              "DesiredAltitudeWeight": 0
             }
           }
         ]
