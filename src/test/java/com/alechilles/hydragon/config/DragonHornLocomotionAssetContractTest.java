@@ -29,6 +29,22 @@ final class DragonHornLocomotionAssetContractTest {
             "hydragon.commands.toggleAirborneMode.name",
             "hydragon.commands.toggleAirborneMode.hud");
     private static final List<String> LOCALES = List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR");
+    private static final Map<String, JsonElement> FULL_DRAGON_UNCHANGED_CONTROLLERS = Map.of(
+            "Walk", JsonParser.parseString("""
+                    {"Type":"Walk","MaxWalkSpeed":{"Compute":"MaxSpeed"},"Gravity":10,"RunThreshold":{"Compute":"RunThreshold"},"RunThresholdRange":0.05,"MaxFallSpeed":15,"MaxRotationSpeed":180,"Acceleration":10,"MaxClimbHeight":{"Compute":"ClimbHeight"},"MinJumpHeight":{"Compute":"MinJumpHeight"},"AscentAnimationType":{"Compute":"AscentAnimationType"},"ClimbSpeedMult":{"Compute":"ClimbSpeedMult"},"ClimbSpeedPow":{"Compute":"ClimbSpeedPow"},"ClimbSpeedConst":{"Compute":"ClimbSpeedConst"},"DescendSpeedCompensation":{"Compute":"DescendSpeedCompensation"},"DescendFlatness":{"Compute":"DescendFlatness"},"DescentSteepness":{"Compute":"DescentSteepness"},"DescentBlending":{"Compute":"DescentBlending"}}
+                    """),
+            "TameworkRideWalk", JsonParser.parseString("""
+                    {"Type":"TameworkRideWalk","MaxWalkSpeed":{"Compute":"MaxSpeed"},"MountedMaxWalkSpeed":50,"MountedSprintMultiplier":1.35,"Gravity":10,"RunThreshold":{"Compute":"RunThreshold"},"RunThresholdRange":0.05,"MaxFallSpeed":15,"MaxRotationSpeed":180,"Acceleration":25,"MaxClimbHeight":{"Compute":"ClimbHeight"},"MinJumpHeight":{"Compute":"MinJumpHeight"},"AscentAnimationType":{"Compute":"AscentAnimationType"},"ClimbSpeedMult":{"Compute":"ClimbSpeedMult"},"ClimbSpeedPow":{"Compute":"ClimbSpeedPow"},"ClimbSpeedConst":{"Compute":"ClimbSpeedConst"},"DescendSpeedCompensation":{"Compute":"DescendSpeedCompensation"},"DescendFlatness":{"Compute":"DescendFlatness"},"DescentSteepness":{"Compute":"DescentSteepness"},"DescentBlending":{"Compute":"DescentBlending"}}
+                    """),
+            "TameworkFly", JsonParser.parseString("""
+                    {"Type":"TameworkFly","MinAirSpeed":0,"MaxHorizontalSpeed":10,"MaxClimbSpeed":8,"MaxSinkSpeed":10,"MaxFallSpeed":25,"MaxSinkSpeedFluid":4,"MaxClimbAngle":65,"MaxSinkAngle":75,"Acceleration":5,"Deceleration":12,"Gravity":18,"MaxTurnSpeed":240,"MaxRollAngle":35,"MaxRollSpeed":240,"RollDamping":0.78,"MinHeightOverGround":8,"MaxHeightOverGround":25,"FastFlyThreshold":0.55,"AutoLevel":true,"DesiredAltitudeWeight":0.8,"MountedMaxHorizontalSpeed":20,"MountedMaxClimbSpeed":8,"MountedMaxSinkSpeed":8,"MountedAcceleration":8,"MountedDeceleration":20,"MountedSprintMultiplier":1.70}
+                    """),
+            "TameworkMountedGlide", JsonParser.parseString("""
+                    {"Type":"TameworkMountedGlide","MinAirSpeed":0,"MaxHorizontalSpeed":48,"MaxClimbSpeed":16,"MaxSinkSpeed":18,"MaxFallSpeed":32,"MaxSinkSpeedFluid":4,"MaxClimbAngle":70,"MaxSinkAngle":80,"Acceleration":10,"Deceleration":16,"Gravity":14,"MaxTurnSpeed":260,"MaxRollAngle":40,"MaxRollSpeed":260,"RollDamping":0.78,"MinHeightOverGround":4,"MaxHeightOverGround":36,"FastFlyThreshold":0.55,"AutoLevel":false,"DesiredAltitudeWeight":0.35}
+                    """));
+    private static final JsonElement FULL_DRAGON_RIDDEN_BEHAVIOR = JsonParser.parseString("""
+            {"$Comment":"Mounted State: rider input fully drives land and flight movement.","Sensor":{"Type":"State","State":"Ridden"},"Instructions":[{"BodyMotion":{"Type":"TameworkMountedGlide"}}]}
+            """);
 
     @Test
     void dragonHornDefinesTheExplicitStatePreservingLocomotionCommandContract() throws IOException {
@@ -146,7 +162,7 @@ final class DragonHornLocomotionAssetContractTest {
         assertExactlyTwoDirectModeBranches(defend);
         assertModeBranch(defend, false, "Walk", null, "Component_Tamework_Instruction_Defend");
         assertModeBranch(defend, true, "Fly", null, "Component_Tamework_Instruction_Defend");
-        assertDefendFollowMacro(defend, false, "Component_Tamework_Instruction_Follow_Advanced");
+        assertNoDefendFollowMacro(defend, false);
         assertDefendFollowMacro(defend, true, "Component_Tamework_Instruction_Follow_Flying");
         assertFullDragonDefendTuning(defend, false);
         assertFullDragonDefendTuning(defend, true);
@@ -165,9 +181,8 @@ final class DragonHornLocomotionAssetContractTest {
         }
 
         JsonObject ridden = stateBehavior(fullDragon, "Ridden");
-        assertFalse(hasAirborneModeSelector(ridden.getAsJsonObject("Sensor")));
-        assertEquals("TameworkMountedGlide", string(ridden.getAsJsonArray("Instructions")
-                .get(0).getAsJsonObject().getAsJsonObject("BodyMotion"), "Type"));
+        assertEquals(FULL_DRAGON_RIDDEN_BEHAVIOR, ridden,
+                "Ridden behavior must remain exactly the pre-flight-mode baseline structure");
     }
 
     @Test
@@ -311,18 +326,15 @@ final class DragonHornLocomotionAssetContractTest {
 
     private static void assertMountedControllerContract(JsonObject template) {
         JsonArray controllers = template.getAsJsonArray("MotionControllerList");
-        assertTrue(controllers.asList().stream().map(JsonElement::getAsJsonObject)
-                .anyMatch(controller -> "TameworkRideWalk".equals(string(controller, "Type"))
-                        && controller.get("MountedMaxWalkSpeed").equals(JsonParser.parseString("50"))
-                        && controller.get("MountedSprintMultiplier").equals(JsonParser.parseString("1.35"))));
-        assertTrue(controllers.asList().stream().map(JsonElement::getAsJsonObject)
-                .anyMatch(controller -> "TameworkFly".equals(string(controller, "Type"))
-                        && controller.get("MaxHorizontalSpeed").equals(JsonParser.parseString("10"))
-                        && controller.get("MountedMaxHorizontalSpeed").equals(JsonParser.parseString("20"))));
-        assertTrue(controllers.asList().stream().map(JsonElement::getAsJsonObject)
-                .anyMatch(controller -> "TameworkMountedGlide".equals(string(controller, "Type"))
-                        && controller.get("MaxHorizontalSpeed").equals(JsonParser.parseString("48"))
-                        && controller.get("MaxClimbSpeed").equals(JsonParser.parseString("16"))));
+        for (Map.Entry<String, JsonElement> expected : FULL_DRAGON_UNCHANGED_CONTROLLERS.entrySet()) {
+            JsonElement actual = controllers.asList().stream()
+                    .filter(JsonElement::isJsonObject)
+                    .filter(controller -> expected.getKey().equals(string(controller.getAsJsonObject(), "Type")))
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("missing " + expected.getKey() + " controller"));
+            assertEquals(expected.getValue(), actual,
+                    expected.getKey() + " controller must remain exactly the pre-flight-mode baseline structure");
+        }
     }
 
     private static boolean hasOnceSetFlag(JsonElement node, String name, boolean value) {
@@ -452,6 +464,17 @@ final class DragonHornLocomotionAssetContractTest {
                         object -> "Component_Tamework_Instruction_Defend".equals(string(object, "Reference")))
                 .stream().findFirst().orElseThrow();
         assertEquals(expectedMacro, string(defendReference.getAsJsonObject("Modify"), "DefendFollowMacroElement"));
+    }
+
+    private static void assertNoDefendFollowMacro(JsonObject defend, boolean airborne) {
+        JsonObject branch = directModeBranches(defend).stream()
+                .filter(candidate -> isModeControllerPair(candidate, airborne, airborne ? "Fly" : "Walk"))
+                .findFirst().orElseThrow();
+        JsonObject modify = objects(branch,
+                        object -> "Component_Tamework_Instruction_Defend".equals(string(object, "Reference")))
+                .stream().findFirst().orElseThrow().getAsJsonObject("Modify");
+        assertFalse(modify.has("DefendFollowMacroElement"),
+                "grounded Defend must retain Tamework's inherited follow macro default");
     }
 
     private static void assertExactlyTwoDirectModeBranches(JsonObject behavior) {
