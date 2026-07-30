@@ -198,7 +198,7 @@ private static void assertAerialDefendTuning(JsonObject defend) throws IOExcepti
     assertEquals("Component", string(component, "Type"));
     assertEquals("Instruction", string(component, "Class"));
     assertTrue(anyObject(component, object -> "TameworkFlyingOrbit".equals(string(object, "Type"))
-            && "WanderTarget".equals(string(object, "Mode"))
+            && "WANDER_TARGET".equals(string(object, "Mode"))
             && JsonParser.parseString("{\"Compute\":\"LoiterDistanceRange\"}")
                     .equals(object.get("WanderRadiusRange"))
             && JsonParser.parseString("{\"Compute\":\"LoiterAltitudeRange\"}")
@@ -268,7 +268,7 @@ The component content must implement these exact phases:
 3. In `.Default`, reuse `Component_Tamework_Sensor_Defend_Attacked_MasterTarget` and `Component_Tamework_Sensor_Defend_Hostile_To_MasterTarget` with their existing owner/friendly exclusions to fill `LockedTarget`; enter `.Combat` when a valid locked target is present.
 4. In `.Default` without a target, run the computed `DefendFollowMacroElement` through interfaces `Hytale.Instruction.Null` and `Tamework.Instruction.Follow`.
 5. In `.Combat`, always watch `LockedTarget` and run a `Type=Random` instruction with `ExecuteFor=[3,7]`.
-6. The loiter choice has `Weight={Compute:"LoiterWeight"}`, a `LockedTarget` sensor, and `BodyMotion.Type=TameworkFlyingOrbit`. Set `Mode="WanderTarget"`; bind `WanderRadiusRange`, `WanderRetargetTimeRange`, `WanderStopDistance`, `RelativeSpeed`, and `DesiredAltitudeRange` to the corresponding computed loiter parameters; set `ClimbRelativeSpeed=0.45` and `SinkRelativeSpeed=0.35`. These are target-relative waypoints, not flight-controller ground-clearance limits.
+6. The loiter choice has `Weight={Compute:"LoiterWeight"}`, a `LockedTarget` sensor, and `BodyMotion.Type=TameworkFlyingOrbit`. Set the registered enum literal `Mode="WANDER_TARGET"`; bind `WanderRadiusRange`, `WanderRetargetTimeRange`, `WanderStopDistance`, `RelativeSpeed`, and `DesiredAltitudeRange` to the corresponding computed loiter parameters; set `ClimbRelativeSpeed=0.45` and `SinkRelativeSpeed=0.35`. These are target-relative waypoints, not flight-controller ground-clearance limits.
 7. The dive choice has `Weight={Compute:"DiveWeight"}`, a `LockedTarget` sensor, and a nested `Instructions` array. Its continuing movement child uses `BodyMotion.Type=Seek`, `RelativeSpeed={Compute:"DiveRelativeSpeed"}`, `SlowDownDistance=4`, and `StopDistance=2.2` while not backing away.
 8. Inside that same selected dive choice only, add a second child whose `LockedTarget` range/line-of-sight sensor at `AttackDistance` executes the computed bite with `BitePauseRange`, `TimerStart`, and `TimerRestart` for `Miniwyvern_Combat_Back_Off`. Add `Component_Instruction_Combat_Back_Off` as a third nested child with `TimerName="Miniwyvern_Combat_Back_Off"`, `CombatBackOffAfterAttack=true`, the computed `[8,14]` distance and `[2,4]` duration, `BlockAbility=""`, `BlockProbability=0`, `CombatStrafingDurationRange=[1.5,4]`, `CombatStrafingFrequencyRange=[1.25,3.5]`, `CombatBehaviorDistance=14`, and `CombatMovingRelativeSpeed={Compute:"LoiterRelativeSpeed"}`.
 9. Reuse Tamework's lost-target detector to release `LockedTarget` and return to `.Default`.
