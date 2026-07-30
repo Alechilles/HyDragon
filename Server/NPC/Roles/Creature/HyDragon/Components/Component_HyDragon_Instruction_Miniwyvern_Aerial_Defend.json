@@ -1,0 +1,181 @@
+{
+  "Type": "Component",
+  "Class": "Instruction",
+  "DefaultState": ".Default",
+  "Parameters": {
+    "HardLeashDistance": { "Value": 30 },
+    "AlertedRange": { "Value": 28 },
+    "ViewSector": { "Value": 180 },
+    "HearingRange": { "Value": 18 },
+    "AbsoluteDetectionRange": { "Value": 4 },
+    "ViewRange": { "Value": 28 },
+    "Attack": { "Value": "Root_NPC_Wyvern_Mini_Bite" },
+    "AttackDistance": { "Value": 2.75 },
+    "BitePauseRange": { "Value": [8, 12] },
+    "LoiterDistanceRange": { "Value": [8, 14] },
+    "LoiterAltitudeRange": { "Value": [5, 9] },
+    "LoiterRelativeSpeed": { "Value": 0.28 },
+    "LoiterRetargetTimeRange": { "Value": [3, 6] },
+    "LoiterStopDistance": { "Value": 2.5 },
+    "LoiterWeight": { "Value": 9 },
+    "DiveWeight": { "Value": 1 },
+    "DiveRelativeSpeed": { "Value": 0.55 },
+    "CombatBackOffDistanceRange": { "Value": [8, 14] },
+    "CombatBackOffDurationRange": { "Value": [2, 4] },
+    "DefendFollowMacroElement": { "Value": "Component_Tamework_Instruction_Follow_Flying" }
+  },
+  "Content": {
+    "Continue": true,
+    "Sensor": { "Type": "Any" },
+    "Instructions": [
+      {
+        "Sensor": { "Type": "Not", "Sensor": { "Type": "Player", "Range": { "Compute": "HardLeashDistance" } } },
+        "Actions": [
+          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+          { "Type": "State", "State": ".Default" }
+        ]
+      },
+      {
+        "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Filters": [ { "Type": "TameworkIsOwner" } ] },
+        "Actions": [
+          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+          { "Type": "State", "State": ".Default" }
+        ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } }
+        ] },
+        "Actions": [ { "Type": "State", "State": ".Combat" } ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
+          { "Reference": "Component_Tamework_Sensor_Defend_Attacked_MasterTarget", "Modify": {
+            "ViewRange": { "Compute": "AlertedRange" },
+            "ViewSector": { "Compute": "ViewSector" },
+            "HearingRange": { "Compute": "HearingRange" },
+            "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+            "SourceTargetSlot": "MasterTarget", "RecentAttackMaxAgeSeconds": 30,
+            "IncludeSelfAsSource": true, "ExcludeGroups": ["Self"]
+          } }
+        ] },
+        "Actions": [ { "Type": "State", "State": ".Combat" } ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
+          { "Reference": "Component_Tamework_Sensor_Defend_Hostile_To_MasterTarget", "Modify": {
+            "ViewRange": { "Compute": "AlertedRange" },
+            "ViewSector": { "Compute": "ViewSector" },
+            "HearingRange": { "Compute": "HearingRange" },
+            "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+            "SourceTargetSlot": "MasterTarget", "ExcludeGroups": ["Self"]
+          } }
+        ] },
+        "Actions": [ { "Type": "State", "State": ".Combat" } ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } } }
+        ] },
+        "Actions": [ { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" } ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } } }
+        ] },
+        "Instructions": [ { "Reference": { "Compute": "DefendFollowMacroElement" }, "Interfaces": ["Hytale.Instruction.Null", "Tamework.Instruction.Follow"] } ]
+      },
+      {
+        "Sensor": { "Type": "State", "State": ".Combat" },
+        "Instructions": [
+          {
+            "Continue": true,
+            "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "ViewRange" }, "Filters": [ { "Type": "LineOfSight" } ] },
+            "HeadMotion": { "Type": "Watch" }
+          },
+          {
+            "Type": "Random",
+            "ExecuteFor": [3, 7],
+            "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" },
+            "Instructions": [
+              {
+                "Weight": { "Compute": "LoiterWeight" },
+                "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" },
+                "HeadMotion": { "Type": "Watch" },
+                "BodyMotion": {
+                  "Type": "TameworkFlyingOrbit", "Mode": "WANDER_TARGET",
+                  "WanderRadiusRange": { "Compute": "LoiterDistanceRange" },
+                  "DesiredAltitudeRange": { "Compute": "LoiterAltitudeRange" },
+                  "WanderRetargetTimeRange": { "Compute": "LoiterRetargetTimeRange" },
+                  "WanderStopDistance": { "Compute": "LoiterStopDistance" },
+                  "RelativeSpeed": { "Compute": "LoiterRelativeSpeed" },
+                  "ClimbRelativeSpeed": 0.45, "SinkRelativeSpeed": 0.35
+                }
+              },
+              {
+                "Weight": { "Compute": "DiveWeight" },
+                "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" },
+                "Instructions": [
+                  {
+                    "Continue": true,
+                    "Sensor": { "Type": "And", "Sensors": [
+                      { "Type": "Target", "TargetSlot": "LockedTarget" },
+                      { "Type": "Not", "Sensor": { "Type": "IsBackingAway" } }
+                    ] },
+                    "HeadMotion": { "Type": "Watch" },
+                    "BodyMotion": { "Type": "Seek", "RelativeSpeed": { "Compute": "DiveRelativeSpeed" }, "SlowDownDistance": 4, "StopDistance": 2.2 }
+                  },
+                  {
+                    "Continue": true,
+                    "ActionsBlocking": true,
+                    "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AttackDistance" }, "Filters": [ { "Type": "LineOfSight" } ] },
+                    "Actions": [
+                      { "Type": "Attack", "Attack": { "Compute": "Attack" }, "AttackPauseRange": { "Compute": "BitePauseRange" } },
+                      { "Type": "TimerStart", "Name": "Miniwyvern_Combat_Back_Off", "StartValueRange": { "Compute": "CombatBackOffDurationRange" }, "RestartValueRange": { "Compute": "CombatBackOffDurationRange" } },
+                      { "Type": "TimerRestart", "Name": "Miniwyvern_Combat_Back_Off" }
+                    ],
+                    "HeadMotion": { "Type": "Aim" }
+                  },
+                  {
+                    "Reference": "Component_Instruction_Combat_Back_Off",
+                    "Modify": {
+                      "TimerName": "Miniwyvern_Combat_Back_Off", "CombatBackOffAfterAttack": true,
+                      "CombatBackOffDistanceRange": { "Compute": "CombatBackOffDistanceRange" },
+                      "CombatBackOffDurationRange": { "Compute": "CombatBackOffDurationRange" },
+                      "BlockAbility": "", "BlockProbability": 0,
+                      "CombatStrafingDurationRange": [1.5, 4], "CombatStrafingFrequencyRange": [1.25, 3.5],
+                      "CombatBehaviorDistance": 14, "CombatMovingRelativeSpeed": { "Compute": "LoiterRelativeSpeed" }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Sensor": { "Type": "Not", "Sensor": { "Reference": "Component_Sensor_Lost_Target_Detection", "Modify": {
+              "ViewRange": { "Compute": "AlertedRange" }, "ViewSector": { "Compute": "ViewSector" },
+              "HearingRange": { "Compute": "HearingRange" }, "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+              "TargetSlot": "LockedTarget"
+            } } },
+            "Actions": [
+              { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+              { "Type": "State", "State": ".Default" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
