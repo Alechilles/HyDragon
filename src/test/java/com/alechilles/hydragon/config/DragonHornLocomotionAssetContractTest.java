@@ -84,6 +84,8 @@ final class DragonHornLocomotionAssetContractTest {
 
         assertGlobalContinuingReference(miniwyvern);
         assertGlobalContinuingReference(fullDragon);
+        assertEquals("Walk", string(miniwyvern, "InitialMotionController"),
+                "Miniwyverns must spawn grounded instead of randomly selecting flight");
         assertEquals("Walk", string(fullDragon, "InitialMotionController"),
                 "Nordic Drakes must spawn grounded instead of randomly selecting a ride or flight controller");
         assertNonFlyingDragonRolesRemainWalkOnly();
