@@ -96,6 +96,18 @@ final class MiniwyvernTalentAssetWiringTest {
     }
 
     @Test
+    void everyProjectileVariantWaitsForItsAimWindowBeforeFiring() throws IOException {
+        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        JsonElement expectedAimWindow = JsonParser.parseString("[0.4,0.7]");
+
+        for (String talentId : COMBAT_TALENTS) {
+            JsonObject attack = projectileAttack(instructionForTalent(instructions, talentId));
+            assertEquals(expectedAimWindow, attack.get("AimingTimeRange"),
+                    talentId + " must aim for 0.4-0.7 seconds before firing");
+        }
+    }
+
+    @Test
     void allFormsProvideOnlyGenericTalentBindingsAndWildCombatIsRawOnly() throws IOException {
         for (String form : ROLES) {
             JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
