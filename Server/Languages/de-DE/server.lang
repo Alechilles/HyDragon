@@ -257,3 +257,7 @@ hydragon.talents.nordic_drake.sagascar.name=Sagennarbe
 hydragon.talents.nordic_drake.sagascar.description=Verringert erlittenen Schaden stark.
 hydragon.talents.nordic_drake.northern_bulwark.name=Noerdlicher Bollwerk
 hydragon.talents.nordic_drake.northern_bulwark.description=Erhoeht Gesundheit und verringert erlittenen Schaden.
+hydragon.commands.defend.name=Verteidigen
+hydragon.commands.defend.hud=Dein Drache wird dich verteidigen.
+hydragon.commands.toggleAirborneMode.name=Flug-/Bodenmodus wechseln
+hydragon.commands.toggleAirborneMode.hud=Dein Drache hat den Flug-/Bodenmodus gewechselt.
