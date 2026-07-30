@@ -90,30 +90,65 @@ final class DragonHornLocomotionAssetContractTest {
         JsonObject miniwyvern = readJson("Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json");
 
         JsonObject idle = stateBehavior(miniwyvern, "Idle");
+        assertExactlyTwoDirectModeBranches(idle);
         assertModeBranch(idle, false, "Walk", "WanderInCircle", null);
         assertModeBranch(idle, true, "Fly", "WanderInCircle", null);
 
         JsonObject follow = stateBehavior(miniwyvern, "Follow");
+        assertExactlyTwoDirectModeBranches(follow);
         assertModeBranch(follow, false, "Walk", null, "Component_Tamework_Instruction_Follow_Advanced");
         assertModeBranch(follow, true, "Fly", null, "Component_Tamework_Instruction_Follow_Flying");
+        assertAerialFollowTuning(follow);
 
         JsonObject defend = stateBehavior(miniwyvern, "Defend");
+        assertExactlyTwoDirectModeBranches(defend);
         assertModeBranch(defend, false, "Walk", null, "Component_Tamework_Instruction_Defend");
         assertModeBranch(defend, true, "Fly", null, "Component_Tamework_Instruction_Defend");
         assertDefendFollowMacro(defend, false, "Component_Tamework_Instruction_Follow_Advanced");
         assertDefendFollowMacro(defend, true, "Component_Tamework_Instruction_Follow_Flying");
+        assertDefendTuning(defend, false);
+        assertDefendTuning(defend, true);
 
         JsonObject hold = stateBehavior(miniwyvern, "Hold");
+        assertExactlyTwoDirectModeBranches(hold);
         assertModeBranch(hold, false, "Walk", "Nothing", null);
         assertModeBranch(hold, true, "Fly", "Nothing", null);
         assertFalse(anyObject(hold, object -> object.has("BodyMotion")
                 && "Sleep".equals(string(object.getAsJsonObject("BodyMotion"), "Type"))));
 
         for (JsonObject behavior : List.of(idle, follow, defend, hold)) {
-            for (JsonObject branch : modeBranches(behavior)) {
+            for (JsonObject branch : directModeBranches(behavior)) {
                 assertNoModeSelectionMutation(branch);
             }
         }
+    }
+
+    @Test
+    void modeSelectorContractRejectsConflictingOrExtraDirectBranches() {
+        JsonObject conflicting = JsonParser.parseString("""
+                { "Instructions": [
+                  { "Sensor": { "Type": "And", "Sensors": [
+                    { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                    { "Type": "MotionController", "MotionController": "Walk" } ] } },
+                  { "Sensor": { "Type": "And", "Sensors": [
+                    { "Type": "Flag", "Name": "AirborneMode" },
+                    { "Type": "MotionController", "MotionController": "Walk" } ] } }
+                ] }
+                """).getAsJsonObject();
+        assertFalse(hasExactModeSelectorPairSet(conflicting));
+
+        JsonObject extra = conflicting.deepCopy();
+        extra.getAsJsonArray("Instructions").add(JsonParser.parseString("""
+                { "Sensor": { "Type": "And", "Sensors": [
+                  { "Type": "Flag", "Name": "AirborneMode" },
+                  { "Type": "MotionController", "MotionController": "Fly" } ] } }
+                """));
+        extra.getAsJsonArray("Instructions").add(JsonParser.parseString("""
+                { "Sensor": { "Type": "And", "Sensors": [
+                  { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                  { "Type": "MotionController", "MotionController": "Walk" } ] } }
+                """));
+        assertFalse(hasExactModeSelectorPairSet(extra));
     }
 
     @Test
@@ -269,7 +304,7 @@ final class DragonHornLocomotionAssetContractTest {
 
     private static void assertModeBranch(
             JsonObject behavior, boolean airborne, String controller, String bodyMotion, String reference) {
-        JsonObject branch = modeBranches(behavior).stream()
+        JsonObject branch = directModeBranches(behavior).stream()
                 .filter(candidate -> hasAirborneMode(candidate.getAsJsonObject("Sensor"), airborne)
                         && hasMotionController(candidate.getAsJsonObject("Sensor"), controller))
                 .findFirst()
@@ -286,7 +321,7 @@ final class DragonHornLocomotionAssetContractTest {
     }
 
     private static void assertDefendFollowMacro(JsonObject defend, boolean airborne, String expectedMacro) {
-        JsonObject branch = modeBranches(defend).stream()
+        JsonObject branch = directModeBranches(defend).stream()
                 .filter(candidate -> hasAirborneMode(candidate.getAsJsonObject("Sensor"), airborne))
                 .findFirst()
                 .orElseThrow();
@@ -296,11 +331,35 @@ final class DragonHornLocomotionAssetContractTest {
         assertEquals(expectedMacro, string(defendReference.getAsJsonObject("Modify"), "DefendFollowMacroElement"));
     }
 
-    private static List<JsonObject> modeBranches(JsonObject behavior) {
-        return objects(behavior, object -> object.has("Sensor")
-                && "And".equals(string(object.getAsJsonObject("Sensor"), "Type"))
-                && (hasAirborneMode(object.getAsJsonObject("Sensor"), true)
-                        || hasAirborneMode(object.getAsJsonObject("Sensor"), false)));
+    private static void assertExactlyTwoDirectModeBranches(JsonObject behavior) {
+        assertTrue(hasExactModeSelectorPairSet(behavior),
+                "behavior must have exactly direct AirborneMode=false/Walk and AirborneMode=true/Fly branches");
+    }
+
+    private static boolean hasExactModeSelectorPairSet(JsonObject behavior) {
+        List<JsonObject> branches = directModeBranches(behavior);
+        return branches.size() == 2
+                && branches.stream().anyMatch(branch -> isModeControllerPair(branch, false, "Walk"))
+                && branches.stream().anyMatch(branch -> isModeControllerPair(branch, true, "Fly"));
+    }
+
+    private static List<JsonObject> directModeBranches(JsonObject behavior) {
+        if (!behavior.has("Instructions")) return List.of();
+        return behavior.getAsJsonArray("Instructions").asList().stream()
+                .filter(JsonElement::isJsonObject)
+                .map(JsonElement::getAsJsonObject)
+                .filter(branch -> branch.has("Sensor")
+                        && "And".equals(string(branch.getAsJsonObject("Sensor"), "Type"))
+                        && (hasAirborneMode(branch.getAsJsonObject("Sensor"), true)
+                                || hasAirborneMode(branch.getAsJsonObject("Sensor"), false)))
+                .toList();
+    }
+
+    private static boolean isModeControllerPair(JsonObject branch, boolean airborne, String controller) {
+        JsonObject sensor = branch.getAsJsonObject("Sensor");
+        return hasAirborneMode(sensor, airborne) && hasMotionController(sensor, controller)
+                && !hasAirborneMode(sensor, !airborne)
+                && !hasMotionController(sensor, airborne ? "Walk" : "Fly");
     }
 
     private static boolean hasAirborneMode(JsonObject sensor, boolean airborne) {
@@ -314,6 +373,50 @@ final class DragonHornLocomotionAssetContractTest {
     private static boolean hasMotionController(JsonObject sensor, String controller) {
         return anyObject(sensor, object -> "MotionController".equals(string(object, "Type"))
                 && controller.equals(string(object, "MotionController")));
+    }
+
+    private static void assertAerialFollowTuning(JsonObject follow) {
+        JsonObject branch = directModeBranches(follow).stream()
+                .filter(candidate -> isModeControllerPair(candidate, true, "Fly"))
+                .findFirst().orElseThrow();
+        JsonObject reference = objects(branch,
+                        object -> "Component_Tamework_Instruction_Follow_Flying".equals(string(object, "Reference")))
+                .stream().findFirst().orElseThrow();
+        JsonObject modify = reference.getAsJsonObject("Modify");
+        assertEquals(JsonParser.parseString("[4,8]"), modify.get("FollowDesiredAltitudeRange"));
+        assertEquals(JsonParser.parseString("32"), modify.get("FollowTeleportThresholdRange"));
+        assertEquals(JsonParser.parseString("10"), modify.get("FollowSeekSlowDownDistance"));
+        assertEquals(JsonParser.parseString("6"), modify.get("FollowSeekStopDistance"));
+        assertEquals(JsonParser.parseString("0.9"), modify.get("FollowSeekRelativeSpeed"));
+        assertEquals(JsonParser.parseString("1.75"), modify.get("FollowHoverRadius"));
+        assertEquals(JsonParser.parseString("0.12"), modify.get("FollowHoverRelativeSpeed"));
+    }
+
+    private static void assertDefendTuning(JsonObject defend, boolean airborne) {
+        JsonObject branch = directModeBranches(defend).stream()
+                .filter(candidate -> isModeControllerPair(candidate, airborne, airborne ? "Fly" : "Walk"))
+                .findFirst().orElseThrow();
+        JsonObject reference = objects(branch,
+                        object -> "Component_Tamework_Instruction_Defend".equals(string(object, "Reference")))
+                .stream().findFirst().orElseThrow();
+        JsonObject modify = reference.getAsJsonObject("Modify");
+        assertEquals(JsonParser.parseString("{\"Compute\":\"HardLeashDistance\"}"), modify.get("HardLeashDistance"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"ViewRange\"}"), modify.get("AlertedRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"ViewSector\"}"), modify.get("ViewSector"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"HearingRange\"}"), modify.get("HearingRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"AbsoluteDetectionRange\"}"), modify.get("AbsoluteDetectionRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"ViewRange\"}"), modify.get("ViewRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"Attack\"}"), modify.get("Attack"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"AttackDistance\"}"), modify.get("AttackDistance"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"AttackPauseRange\"}"), modify.get("AttackPauseRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"CombatAttackPreDelay\"}"), modify.get("CombatAttackPreDelay"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"CombatAttackPostDelay\"}"), modify.get("CombatAttackPostDelay"));
+        assertEquals(JsonParser.parseString("8"), modify.get("CombatBehaviorDistance"));
+        assertEquals(JsonParser.parseString("[2.5,4]"), modify.get("CombatBackOffDistanceRange"));
+        assertEquals(JsonParser.parseString("4"), modify.get("CombatStrafeWeight"));
+        assertEquals(JsonParser.parseString("8"), modify.get("CombatDirectWeight"));
+        assertEquals(JsonParser.parseString("8"), modify.get("CombatAlwaysMovingWeight"));
+        assertEquals(JsonParser.parseString("0.9"), modify.get("ChaseRelativeSpeed"));
     }
 
     private static void assertNoModeSelectionMutation(JsonObject branch) {
