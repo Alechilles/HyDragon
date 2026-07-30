@@ -335,12 +335,12 @@ From `C:/Users/22ale/AppData/Roaming/Hytale/Modding/HytaleNpcAssetTools`, run:
 ```bash
 python -m hytale_npc_assets.cli profile check \
   --project-profile "$baseline_wt/.hytale-npc-assets.json" \
-  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-pause-aim.local.json" \
+  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim.local.json" \
   --mod "$baseline_wt" --json
 
 python -m hytale_npc_assets.cli author inspect \
   --project-profile "$baseline_wt/.hytale-npc-assets.json" \
-  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-pause-aim.local.json" \
+  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim.local.json" \
   --mod "$baseline_wt" \
   --workspace-root "$baseline_wt" \
   --workspace-root "$main_root" \
@@ -353,7 +353,7 @@ Expected: the profile check reports exact release `0.5.7`, and the snapshot iden
 
 - [ ] **Step 3: Build and validate an exact candidate envelope**
 
-Generate one RFC 6902 root replacement from the committed candidate, then wrap it with the exact profile and source hash returned by the baseline inspection. This generated report avoids brittle array-index patch construction:
+Generate an RFC 6902 structural patch from the committed candidate, then wrap it with the exact profile and source hash returned by the baseline inspection. The authoring service rejects document-root replacement operations, so the patch adds the three new instructions and replaces the eleven moved attack branches at their post-insertion indices:
 
 ```bash
 python - \
@@ -368,19 +368,30 @@ from pathlib import Path
 source, context_path, patch_path, candidate_path = map(Path, sys.argv[1:])
 document = json.loads(source.read_text(encoding="utf-8"))
 context = json.loads(context_path.read_text(encoding="utf-8"))
-operation = {"op": "replace", "path": "", "value": document}
-patch_path.write_text(json.dumps([operation], indent=2) + "\n", encoding="utf-8")
+operations = [
+    {"op": "replace", "path": "/MotionControllerList/0/MinAirSpeed", "value": 0},
+    {"op": "add", "path": "/MotionControllerList/0/Deceleration", "value": 12},
+]
+operations.extend(
+    {"op": "add", "path": f"/Instructions/{index}", "value": document["Instructions"][index]}
+    for index in range(2, 5)
+)
+operations.extend(
+    {"op": "replace", "path": f"/Instructions/{index}", "value": document["Instructions"][index]}
+    for index in range(8, 19)
+)
+patch_path.write_text(json.dumps(operations, indent=2) + "\n", encoding="utf-8")
 
 snapshot = context["snapshot"]
 envelope = {
     "formatVersion": 1,
-    "profile": snapshot["profile"],
+    "profile": {key: value for key, value in snapshot["profile"].items() if key != "name"},
     "targets": [{
         "mode": "patch",
         "assetId": snapshot["asset"]["id"],
         "sourcePath": snapshot["asset"]["sourcePath"],
         "expectedSha256": snapshot["asset"]["sourceSha256"],
-        "operations": [operation],
+        "operations": operations,
     }],
     "intent": "Give the tamed MiniWyvern a stationary aim phase and native airborne hover.",
 }
@@ -393,16 +404,17 @@ Validate the candidate from the same tool directory:
 ```bash
 python -m hytale_npc_assets.cli author validate \
   --project-profile "$baseline_wt/.hytale-npc-assets.json" \
-  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-pause-aim.local.json" \
+  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim.local.json" \
   --mod "$baseline_wt" \
   --workspace-root "$baseline_wt" \
   --workspace-root "$main_root" \
+  --request-json '{"formatVersion":1,"budget":{"maxBytes":1048576,"maxItems":1000,"maxDepth":40}}' \
   --patch "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim.candidate.json" \
   --scope affected --simulate \
   --out "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim-validation.json"
 ```
 
-Accept exit `0` (`safe-static`) or exit `1` (`review-required`) with no blocker/regression diagnostic. Stop for exit `2`, `3`, or `4`.
+Accept exit `0` (`safe-static`) or exit `1` (`review-required`) with no blocker/regression diagnostic. For exit `2`, inspect the full artifact before stopping: the exact release profile does not model Tamework's custom `TameworkHasTalent` sensor, so path shifts can reclassify unchanged plugin-owned sensors as added blockers. Continue only when every blocker is attributable to that documented profile-coverage limitation and project tests independently verify the talent wiring. Stop for any other blocker, regression, or exit `3`/`4`.
 
 - [ ] **Step 4: Generate and run the static verification plan**
 
@@ -411,19 +423,21 @@ Use the same exact candidate envelope:
 ```bash
 python -m hytale_npc_assets.cli author verify generate \
   --project-profile "$baseline_wt/.hytale-npc-assets.json" \
-  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-pause-aim.local.json" \
+  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim.local.json" \
   --mod "$baseline_wt" \
   --workspace-root "$baseline_wt" \
   --workspace-root "$main_root" \
+  --request-json '{"formatVersion":1,"budget":{"maxBytes":1048576,"maxItems":1000,"maxDepth":40}}' \
   --candidate "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim.candidate.json" \
   --out "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim-verification-plan.json"
 
 python -m hytale_npc_assets.cli author verify run \
   --project-profile "$baseline_wt/.hytale-npc-assets.json" \
-  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-pause-aim.local.json" \
+  --project-profile-local "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim.local.json" \
   --mod "$baseline_wt" \
   --workspace-root "$baseline_wt" \
   --workspace-root "$main_root" \
+  --request-json '{"formatVersion":1,"budget":{"maxBytes":1048576,"maxItems":1000,"maxDepth":40}}' \
   --verification "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim-verification-plan.json" \
   --mode static \
   --out "$main_root/.asset-tools/reports/miniwyvern-dedicated-aim-verification-result.json"
