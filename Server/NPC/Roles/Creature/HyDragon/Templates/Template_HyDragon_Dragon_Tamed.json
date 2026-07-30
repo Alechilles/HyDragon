@@ -63,6 +63,10 @@
       "Value": 8,
       "Description": "Maximum walking speed."
     },
+    "FlightSpeed": {
+      "Value": 12,
+      "Description": "Maximum horizontal speed while airborne."
+    },
     "RunThreshold": {
       "Value": 0.55,
       "Description": "At what ratio NPC switches to run animation e.g MaxSpeed is 10, at RunThreshold 0.55 NPC will run at speed 5.5."
@@ -648,6 +652,22 @@
   },
   "MotionControllerList": [
     {
+      "Type": "Fly",
+      "MaxHorizontalSpeed": {
+        "Compute": "FlightSpeed"
+      },
+      "MaxSinkSpeed": 8,
+      "MaxClimbSpeed": 10,
+      "MinAirSpeed": 0,
+      "Acceleration": 6,
+      "MinHeightOverGround": 8,
+      "MaxHeightOverGround": 25,
+      "MaxRollAngle": 70,
+      "MaxTurnSpeed": 180,
+      "DesiredAltitudeWeight": 0.8,
+      "AutoLevel": true
+    },
+    {
       "Type": "Walk",
       "MaxWalkSpeed": {
         "Compute": "MaxSpeed"
@@ -1218,26 +1238,24 @@
           },
           "Instructions": [
             {
-              "$Comment": "Keep flock followers near their leader before regular idle wander.",
-              "Reference": "Component_Tamework_Instruction_Flock_Follow_Wander",
-              "Modify": {
-                "LeashEnabled": {
-                  "Compute": "!isEmptyStringArray(FlockArray)"
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "Instructions": [
+                {
+                  "$Comment": "Keep flock followers near their leader before regular idle wander.",
+                  "Reference": "Component_Tamework_Instruction_Flock_Follow_Wander",
+                  "Modify": {
+                    "LeashEnabled": { "Compute": "!isEmptyStringArray(FlockArray)" },
+                    "FlockFollowerWanderRadius": { "Compute": "FlockFollowerWanderRadius" },
+                    "FlockFollowerRelativeSpeed": { "Compute": "FlockFollowerRelativeSpeed" },
+                    "FlockFollowerStopDistance": { "Compute": "FlockFollowerStopDistance" }
+                  }
                 },
-                "FlockFollowerWanderRadius": {
-                  "Compute": "FlockFollowerWanderRadius"
-                },
-                "FlockFollowerRelativeSpeed": {
-                  "Compute": "FlockFollowerRelativeSpeed"
-                },
-                "FlockFollowerStopDistance": {
-                  "Compute": "FlockFollowerStopDistance"
-                }
-              }
-            },
-            {
-              "Reference": "Component_Tamework_Instruction_Wander",
-              "Modify": {
+                {
+                  "Reference": "Component_Tamework_Instruction_Wander",
+                  "Modify": {
                 "_ExportStates": [
                   "Sleep"
                 ],
@@ -1298,9 +1316,22 @@
                 "SleepDelayAfterEntryRange": {
                   "Compute": "SleepDelayAfterHoldEnterRange"
                 },
-                "SleepDelayAfterLastSleepRange": {
-                  "Compute": "SleepDelayAfterLastSleepRange"
+                    "SleepDelayAfterLastSleepRange": {
+                      "Compute": "SleepDelayAfterLastSleepRange"
+                    }
+                  }
                 }
+              ]
+            },
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode" },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "BodyMotion": {
+                "Type": "WanderInCircle",
+                "Radius": { "Compute": "WanderRadius + 2" },
+                "RelativeSpeed": 0.3
               }
             }
           ]
@@ -1327,8 +1358,13 @@
           },
           "Instructions": [
             {
-              "Reference": "Component_Tamework_Instruction_Follow_Advanced",
-              "Modify": {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "Instructions": [ {
+                "Reference": "Component_Tamework_Instruction_Follow_Advanced",
+                "Modify": {
                 "MasterTargetSlot": "MasterTarget",
                 "FollowDefaultSpotRange": 10,
                 "FollowLockOnRange": 20,
@@ -1338,8 +1374,28 @@
                 "FollowMaintainDistanceRange": [
                   5,
                   9
-                ]
-              }
+                  ]
+                }
+              } ]
+            },
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode" },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "Instructions": [ {
+                "Reference": "Component_Tamework_Instruction_Follow_Flying",
+                "Modify": {
+                  "MasterTargetSlot": "MasterTarget",
+                  "FollowDesiredAltitudeRange": [ 4, 8 ],
+                  "FollowTeleportThresholdRange": 32,
+                  "FollowSeekSlowDownDistance": 10,
+                  "FollowSeekStopDistance": 6,
+                  "FollowSeekRelativeSpeed": 0.9,
+                  "FollowHoverRadius": 1.75,
+                  "FollowHoverRelativeSpeed": 0.12
+                }
+              } ]
             }
           ]
         },
@@ -1351,8 +1407,11 @@
           },
           "Instructions": [
             {
-              "Reference": "Component_Tamework_Instruction_Defend",
-              "Modify": {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Defend", "Modify": {
                 "HardLeashDistance": {
                   "Compute": "HardLeashDistance"
                 },
@@ -1430,8 +1489,44 @@
                 },
                 "AdditionalCombatBehaviorMacroElement": {
                   "Compute": "AdditionalCombatBehaviorMacroElement"
-                }
-              }
+                },
+                "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Advanced"
+              } } ]
+            },
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode" },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Defend", "Modify": {
+                "HardLeashDistance": { "Compute": "HardLeashDistance" },
+                "AlertedRange": { "Compute": "AlertedRange" },
+                "ViewSector": { "Compute": "ViewSector" },
+                "HearingRange": { "Compute": "HearingRange" },
+                "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+                "ViewRange": { "Compute": "ViewRange" },
+                "Attack": { "Compute": "Attack" },
+                "AttackDistance": { "Compute": "AttackDistance" },
+                "AttackPauseRange": { "Compute": "AttackPauseRange" },
+                "CombatAttackPreDelay": { "Compute": "CombatAttackPreDelay" },
+                "CombatAttackPostDelay": { "Compute": "CombatAttackPostDelay" },
+                "CombatBackOffAfterAttack": { "Compute": "CombatBackOffAfterAttack" },
+                "CombatBackOffDistanceRange": { "Compute": "CombatBackOffDistanceRange" },
+                "CombatBackOffDurationRange": { "Compute": "CombatBackOffDurationRange" },
+                "BlockAbility": { "Compute": "BlockAbility" },
+                "BlockProbability": { "Compute": "BlockProbability" },
+                "CombatStrafingDurationRange": { "Compute": "CombatStrafingDurationRange" },
+                "CombatStrafingFrequencyRange": { "Compute": "CombatStrafingFrequencyRange" },
+                "CombatBehaviorDistance": { "Compute": "CombatBehaviorDistance" },
+                "CombatMovingRelativeSpeed": { "Compute": "CombatMovingRelativeSpeed" },
+                "CombatStrafeWeight": { "Compute": "CombatStrafeWeight" },
+                "CombatDirectWeight": { "Compute": "CombatDirectWeight" },
+                "CombatAlwaysMovingWeight": { "Compute": "CombatAlwaysMovingWeight" },
+                "CombatRelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" },
+                "ChaseRelativeSpeed": { "Compute": "ChaseRelativeSpeed" },
+                "AdditionalCombatBehaviorMacroElement": { "Compute": "AdditionalCombatBehaviorMacroElement" },
+                "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Flying"
+              } } ]
             }
           ]
         },
@@ -1535,8 +1630,13 @@
           },
           "Instructions": [
             {
-              "Reference": "Component_Tamework_Instruction_Hold",
-              "Modify": {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "Instructions": [ {
+                "Reference": "Component_Tamework_Instruction_Hold",
+                "Modify": {
                 "_ExportStates": [
                   "Sleep"
                 ],
@@ -1588,10 +1688,18 @@
                 "AlwaysSleepAtNight": {
                   "Compute": "AlwaysSleepAtNight"
                 },
-                "SleepEnabled": {
-                  "Compute": "!isEmpty(SleepAnimation)"
+                  "SleepEnabled": {
+                    "Compute": "!isEmpty(SleepAnimation)"
+                  }
                 }
-              }
+              } ]
+            },
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode" },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "BodyMotion": { "Type": "Nothing" }
             }
           ]
         },
