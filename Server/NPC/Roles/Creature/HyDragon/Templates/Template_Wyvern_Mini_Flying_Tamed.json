@@ -204,10 +204,6 @@
         },
         {
           "Type": "State",
-          "State": "TakeOff"
-        },
-        {
-          "Type": "State",
           "State": "Follow"
         },
         {
@@ -216,15 +212,7 @@
         },
         {
           "Type": "State",
-          "State": "HoldGrounded"
-        },
-        {
-          "Type": "State",
           "State": "Defend"
-        },
-        {
-          "Type": "State",
-          "State": "Land"
         }
       ]
     },
@@ -345,23 +333,12 @@
             },
             {
               "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Walk"
+                "Type": "And",
+                "Sensors": [
+                  { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                  { "Type": "MotionController", "MotionController": "Walk" }
+                ]
               },
-              "ActionsBlocking": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    6,
-                    10
-                  ]
-                },
-                {
-                  "Type": "State",
-                  "State": "TakeOff"
-                }
-              ],
               "BodyMotion": {
                 "Type": "WanderInCircle",
                 "Radius": {
@@ -371,23 +348,12 @@
             },
             {
               "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Fly"
+                "Type": "And",
+                "Sensors": [
+                  { "Type": "Flag", "Name": "AirborneMode" },
+                  { "Type": "MotionController", "MotionController": "Fly" }
+                ]
               },
-              "ActionsBlocking": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    8,
-                    12
-                  ]
-                },
-                {
-                  "Type": "State",
-                  "State": "Land"
-                }
-              ],
               "BodyMotion": {
                 "Type": "WanderInCircle",
                 "Radius": {
@@ -401,32 +367,6 @@
         {
           "Sensor": {
             "Type": "State",
-            "State": "TakeOff"
-          },
-          "Instructions": [
-            {
-              "BodyMotion": {
-                "Type": "TakeOff",
-                "JumpSpeed": 4
-              }
-            },
-            {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Fly"
-              },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "Idle"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "Sensor": {
-            "Type": "State",
             "State": "Follow"
           },
           "Instructions": [
@@ -434,33 +374,39 @@
               "Reference": "Component_Instruction_Clear_Status_Animation"
             },
             {
-              "Continue": true,
-              "Sensor": {
-                "Type": "Any",
-                "Once": true
-              },
-              "Actions": [
-                {
-                  "Type": "TameworkSetFlyingCompanionMode",
-                  "Mode": "Follow"
-                }
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "Instructions": [
+                { "Reference": "Component_Tamework_Instruction_Follow_Advanced", "Modify": {
+                  "MasterTargetSlot": "MasterTarget",
+                  "FollowDefaultSpotRange": 10,
+                  "FollowLockOnRange": 20,
+                  "FollowSeekSlowDownDistance": 8,
+                  "FollowSeekStopDistance": 6,
+                  "FollowScanRange": 16,
+                  "FollowMaintainDistanceRange": [ 5, 9 ]
+                } }
               ]
             },
             {
-              "Reference": "Component_Tamework_Instruction_Follow_Flying",
-              "Modify": {
-                "MasterTargetSlot": "MasterTarget",
-                "FollowDesiredAltitudeRange": [
-                  4,
-                  8
-                ],
-                "FollowTeleportThresholdRange": 32,
-                "FollowSeekSlowDownDistance": 10,
-                "FollowSeekStopDistance": 6,
-                "FollowSeekRelativeSpeed": 0.9,
-                "FollowHoverRadius": 1.75,
-                "FollowHoverRelativeSpeed": 0.12
-              }
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode" },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "Instructions": [
+                { "Reference": "Component_Tamework_Instruction_Follow_Flying", "Modify": {
+                  "MasterTargetSlot": "MasterTarget",
+                  "FollowDesiredAltitudeRange": [ 4, 8 ],
+                  "FollowTeleportThresholdRange": 32,
+                  "FollowSeekSlowDownDistance": 10,
+                  "FollowSeekStopDistance": 6,
+                  "FollowSeekRelativeSpeed": 0.9,
+                  "FollowHoverRadius": 1.75,
+                  "FollowHoverRelativeSpeed": 0.12
+                } }
+              ]
             }
           ]
         },
@@ -475,8 +421,11 @@
           },
           "Instructions": [
             {
-              "Reference": "Component_Tamework_Instruction_Defend",
-              "Modify": {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Defend", "Modify": {
                 "HardLeashDistance": {
                   "Compute": "HardLeashDistance"
                 },
@@ -519,9 +468,36 @@
                 "CombatDirectWeight": 8,
                 "CombatAlwaysMovingWeight": 8,
                 "ChaseRelativeSpeed": 0.9,
+                "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Advanced",
+                "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
+              } } ]
+            },
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode" },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Defend", "Modify": {
+                "HardLeashDistance": { "Compute": "HardLeashDistance" },
+                "AlertedRange": { "Compute": "ViewRange" },
+                "ViewSector": { "Compute": "ViewSector" },
+                "HearingRange": { "Compute": "HearingRange" },
+                "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+                "ViewRange": { "Compute": "ViewRange" },
+                "Attack": { "Compute": "Attack" },
+                "AttackDistance": { "Compute": "AttackDistance" },
+                "AttackPauseRange": { "Compute": "AttackPauseRange" },
+                "CombatAttackPreDelay": { "Compute": "CombatAttackPreDelay" },
+                "CombatAttackPostDelay": { "Compute": "CombatAttackPostDelay" },
+                "CombatBehaviorDistance": 8,
+                "CombatBackOffDistanceRange": [ 2.5, 4 ],
+                "CombatStrafeWeight": 4,
+                "CombatDirectWeight": 8,
+                "CombatAlwaysMovingWeight": 8,
+                "ChaseRelativeSpeed": 0.9,
                 "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Flying",
                 "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
-              }
+              } } ]
             }
           ]
         },
@@ -535,204 +511,18 @@
               "Reference": "Component_Instruction_Clear_Status_Animation"
             },
             {
-              "Continue": true,
-              "Sensor": {
-                "Type": "Any",
-                "Once": true
-              },
-              "Actions": [
-                {
-                  "Type": "TameworkSetFlyingCompanionMode",
-                  "Mode": "Hold",
-                  "LandingState": "Hold",
-                  "GroundedState": "HoldGrounded",
-                  "DescendStep": 0.12,
-                  "ReissueDelayMs": 50,
-                  "GroundedStableTicks": 3,
-                  "VerticalMovementEpsilon": 0.15
-                }
-              ]
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "BodyMotion": { "Type": "Nothing" }
             },
             {
-              "BodyMotion": {
-                "Type": "Nothing"
-              }
-            }
-          ]
-        },
-        {
-          "Sensor": {
-            "Type": "State",
-            "State": "HoldGrounded"
-          },
-          "Instructions": [
-            {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Walk"
-              },
-              "Instructions": [
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Any",
-                    "Once": true
-                  },
-                  "Actions": [
-                    {
-                      "Type": "SetFlag",
-                      "Name": "HoldLandingPending",
-                      "SetTo": false
-                    },
-                    {
-                      "Type": "ResetSearchRays"
-                    },
-                    {
-                      "Type": "SetFlag",
-                      "Name": "HoldLandAnimationPending",
-                      "SetTo": true
-                    },
-                    {
-                      "Type": "PlayAnimation",
-                      "Slot": "Status",
-                      "Animation": "Land"
-                    }
-                  ]
-                },
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Flag",
-                    "Name": "HoldLandAnimationPending"
-                  },
-                  "ActionsBlocking": true,
-                  "Actions": [
-                    {
-                      "Type": "Timeout",
-                      "Delay": [
-                        0.6,
-                        0.6
-                      ]
-                    },
-                    {
-                      "Type": "SetFlag",
-                      "Name": "HoldLandAnimationPending",
-                      "SetTo": false
-                    }
-                  ]
-                },
-                {
-                  "Sensor": {
-                    "Type": "Not",
-                    "Sensor": {
-                      "Type": "Flag",
-                      "Name": "HoldLandAnimationPending"
-                    }
-                  },
-                  "Instructions": [
-                    {
-                      "Reference": "Component_Instruction_Clear_Status_Animation"
-                    }
-                  ]
-                },
-                {
-                  "BodyMotion": {
-                    "Type": "Nothing"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "Sensor": {
-            "Type": "State",
-            "State": "Land"
-          },
-          "Instructions": [
-            {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Fly"
-              },
-              "Instructions": [
-                {
-                  "Sensor": {
-                    "Type": "AdjustPosition",
-                    "Offset": [
-                      0,
-                      1,
-                      0
-                    ],
-                    "Sensor": {
-                      "Type": "SearchRay",
-                      "Name": "LandingRay",
-                      "Range": 20,
-                      "Angle": 45,
-                      "Blocks": "Gaia"
-                    }
-                  },
-                  "BodyMotion": {
-                    "Type": "Land",
-                    "SlowDownDistance": 5,
-                    "StopDistance": 0.5,
-                    "GoalLenience": 3
-                  }
-                },
-                {
-                  "BodyMotion": {
-                    "Type": "Wander",
-                    "RelativeSpeed": 0.2
-                  }
-                }
-              ]
-            },
-            {
-              "Sensor": {
-                "Type": "Flag",
-                "Name": "HoldLandingPending"
-              },
-              "ActionsBlocking": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    4,
-                    6
-                  ]
-                },
-                {
-                  "Type": "ResetSearchRays"
-                },
-                {
-                  "Type": "State",
-                  "State": "HoldGrounded"
-                }
-              ]
-            },
-            {
-              "Sensor": {
-                "Type": "Flag",
-                "Name": "HoldLandingPending",
-                "Set": false
-              },
-              "ActionsBlocking": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    4,
-                    6
-                  ]
-                },
-                {
-                  "Type": "ResetSearchRays"
-                },
-                {
-                  "Type": "State",
-                  "State": "Idle"
-                }
-              ]
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode" },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "BodyMotion": { "Type": "Nothing" }
             }
           ]
         }
