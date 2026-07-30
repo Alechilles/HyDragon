@@ -108,6 +108,22 @@ final class MiniwyvernTalentAssetWiringTest {
     }
 
     @Test
+    void everyProjectileVariantPausesMovementWhileAimingAtItsTarget() throws IOException {
+        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        JsonElement expectedBodyMotion = JsonParser.parseString("{\"Type\":\"Nothing\"}");
+        JsonElement expectedHeadMotion = JsonParser.parseString(
+                "{\"Type\":\"Aim\",\"Spread\":0,\"HitProbability\":1,\"Deflection\":true}");
+
+        for (String talentId : COMBAT_TALENTS) {
+            JsonObject instruction = instructionForTalent(instructions, talentId);
+            assertEquals(expectedBodyMotion, instruction.get("BodyMotion"),
+                    talentId + " must pause movement while aiming");
+            assertEquals(expectedHeadMotion, instruction.get("HeadMotion"),
+                    talentId + " must use deterministic ballistic aiming");
+        }
+    }
+
+    @Test
     void allFormsProvideOnlyGenericTalentBindingsAndWildCombatIsRawOnly() throws IOException {
         for (String form : ROLES) {
             JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",

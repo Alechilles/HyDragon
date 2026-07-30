@@ -550,7 +550,9 @@
         { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } }
       ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileBase" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ]
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileBase" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Continue": true,
@@ -567,7 +569,9 @@
         { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } }
       ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ]
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Continue": true,
@@ -577,40 +581,66 @@
         { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" }
       ] },
       "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ]
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "$Comment": "Range is an executable, mutually-exclusive projectile variant.",
       "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileRange" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ]
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ]
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ]
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ]
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 5, 7 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ]
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 4, 6 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ]
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ]
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true, "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ]
+      "ActionsBlocking": true,
+      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.4, 0.7 ], "AttackPauseRange": [ 3, 5 ] } ],
+      "BodyMotion": { "Type": "Nothing" },
+      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     }
   ],
   "InteractionInstruction": {
