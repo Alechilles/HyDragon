@@ -3,8 +3,8 @@
   "EffectDirection": "None",
   "AnimationDuration": 3.0,
   "AnimationRange": {
-    "Y": 0.2,
-    "X": 0.1
+    "Y": 0.3,
+    "X": 0.2
   },
   "UseBloomOnHighlight": true,
   "UseProgessiveHighlight": false,
