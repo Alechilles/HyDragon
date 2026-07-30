@@ -84,6 +84,8 @@ final class DragonHornLocomotionAssetContractTest {
 
         assertGlobalContinuingReference(miniwyvern);
         assertGlobalContinuingReference(fullDragon);
+        assertEquals("Walk", string(miniwyvern, "InitialMotionController"),
+                "Miniwyverns must spawn grounded instead of randomly selecting flight");
         assertEquals("Walk", string(fullDragon, "InitialMotionController"),
                 "Nordic Drakes must spawn grounded instead of randomly selecting a ride or flight controller");
         assertNonFlyingDragonRolesRemainWalkOnly();
@@ -91,8 +93,10 @@ final class DragonHornLocomotionAssetContractTest {
         assertEquals("Component", transition.get("Type").getAsString());
         assertEquals("Instruction", transition.get("Class").getAsString());
         JsonObject content = transition.getAsJsonObject("Content");
-        assertTrue(hasOnceSetFlag(content, "AirborneMode", false),
-                "newly spawned roles must reset AirborneMode to false exactly once");
+        assertFalse(hasOnceSetFlag(content, "AirborneMode", false),
+                "changing a horn command state must never reset a dragon's selected airborne mode");
+        assertTrue(hasLegacyFlyingControllerNeutralizer(content),
+                "legacy flying-controller state must be neutralized before it can force a grounded handoff");
         assertEquals(1, countHookSensors(content, "HyDragon.Command.ToggleAirborneMode"),
                 "the transition component must consume exactly the ToggleAirborneMode hook");
         assertTrue(hasConsumingHook(content, "HyDragon.Command.ToggleAirborneMode"),
@@ -290,7 +294,10 @@ final class DragonHornLocomotionAssetContractTest {
         JsonObject content = readJson("Server/NPC/Roles/Creature/HyDragon/Components/"
                 + "Component_HyDragon_Instruction_Airborne_Mode_Transition.json")
                 .getAsJsonObject("Content").deepCopy();
-        JsonObject landingInstruction = content.getAsJsonArray("Instructions").get(3).getAsJsonObject();
+        JsonObject landingInstruction = content.getAsJsonArray("Instructions").asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(instruction -> isAirborneControllerBranch(instruction, false, "Fly"))
+                .findFirst().orElseThrow();
         JsonObject landingAttempt = landingInstruction.getAsJsonArray("Instructions").get(0).getAsJsonObject();
         landingAttempt.add("Sensor", landingAttempt.getAsJsonObject("Sensor").get("Sensor"));
         assertFalse(hasSafeLanding(content), "a SearchRay outside AdjustPosition is not a safe landing branch");
@@ -361,6 +368,11 @@ final class DragonHornLocomotionAssetContractTest {
                 && object.getAsJsonObject("Sensor").has("Once")
                 && object.getAsJsonObject("Sensor").get("Once").getAsBoolean()
                 && actionExists(object.getAsJsonArray("Actions"), "SetFlag", name, value));
+    }
+
+    private static boolean hasLegacyFlyingControllerNeutralizer(JsonElement node) {
+        return anyObject(node, object -> "TameworkSetFlyingCompanionMode".equals(string(object, "Type"))
+                && "Follow".equals(string(object, "Mode")));
     }
 
     private static int countHookSensors(JsonElement node, String hookId) {
@@ -670,12 +682,14 @@ final class DragonHornLocomotionAssetContractTest {
     }
 
     private static void assertNoTransitionScopeViolations(JsonElement node) {
-        Set<String> prohibited = Set.of("State", "ParentState", "SetTarget", "ReleaseTarget", "ClearTarget",
-                "TameworkSetFlyingCompanionMode");
+        Set<String> prohibited = Set.of("State", "ParentState", "SetTarget", "ReleaseTarget", "ClearTarget");
         assertEquals(0, countObjects(node, object -> {
             String type = string(object, "Type");
             return type != null && prohibited.contains(type);
         }));
+        assertEquals(0, countObjects(node, object -> "TameworkSetFlyingCompanionMode".equals(string(object, "Type"))
+                && !"Follow".equals(string(object, "Mode"))),
+                "the legacy migration may only neutralize, never command, Tamework's flying controller");
     }
 
     private static boolean actionExists(JsonArray actions, String type, String name, boolean setTo) {

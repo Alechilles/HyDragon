@@ -49,6 +49,8 @@ public final class MiniwyvernArchetypeConfig
                     (asset, value) -> asset.id = value, asset -> asset.id).add()
             .<String>append(new KeyedCodec<>("RoleId", Codec.STRING),
                     (asset, value) -> asset.roleId = value, asset -> asset.roleId).add()
+            .<String>append(new KeyedCodec<>("RequiredTalentId", Codec.STRING),
+                    (asset, value) -> asset.requiredTalentId = value, asset -> asset.requiredTalentId).add()
             .<String[]>append(new KeyedCodec<>("ParticleAndSoundIds", Codec.STRING_ARRAY),
                     (asset, value) -> asset.particleAndSoundIds = value == null ? EMPTY : value,
                     asset -> asset.particleAndSoundIds).add()
@@ -71,6 +73,7 @@ public final class MiniwyvernArchetypeConfig
     private String assetKey;
     String id;
     String roleId;
+    String requiredTalentId;
     String[] particleAndSoundIds = EMPTY;
     String[] passiveEffects = EMPTY;
     Map<String, Double> passiveModifiers = Map.of();
@@ -105,6 +108,7 @@ public final class MiniwyvernArchetypeConfig
     public String getAssetKey() { return assetKey; }
     public String getId() { return normalize(id); }
     public String getRoleId() { return trim(roleId); }
+    public String getRequiredTalentId() { return trim(requiredTalentId); }
     public List<String> getParticleAndSoundIds() { return List.of(particleAndSoundIds.clone()); }
     public List<String> getPassiveEffects() { return List.of(passiveEffects.clone()); }
     public Map<String, Double> getPassiveModifiers() { return Map.copyOf(passiveModifiers); }

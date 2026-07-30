@@ -167,6 +167,7 @@
   "MaxHealth": {
     "Compute": "MaxHealth"
   },
+  "InitialMotionController": "Walk",
   "MotionControllerList": [
     {
       "Type": "Fly",
@@ -321,6 +322,7 @@
       ]
     },
     {
+      "Continue": true,
       "Instructions": [
         {
           "Sensor": {

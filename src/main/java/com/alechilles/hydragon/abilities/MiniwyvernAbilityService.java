@@ -67,13 +67,15 @@ public final class MiniwyvernAbilityService {
             return cleanupAndDeny(context, archetypes, world, "role-config-invalid", nowMs);
         }
         String formId = config.getId();
-        synchronizeOwnerAttackAura(context, config);
+        boolean requiredTalentPurchased = requiredTalentPurchased(config, world);
+        synchronizeOwnerAttackAura(context, config, requiredTalentPurchased);
 
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
         if (loaded.status() == MiniwyvernAbilityStateRepository.Status.UNAVAILABLE) {
             return TickResult.denied("ability-state-unavailable");
         }
+        boolean stateMissing = loaded.status() == MiniwyvernAbilityStateRepository.Status.MISSING;
         MiniwyvernAbilityState state = loaded.status() == MiniwyvernAbilityStateRepository.Status.LOADED
                 ? loaded.state() : MiniwyvernAbilityState.empty(formId, nowMs);
         if (!state.formId().equals(formId)) {
@@ -83,11 +85,13 @@ public final class MiniwyvernAbilityService {
         MutableState mutable = new MutableState(state);
         mutable.discardRetiredCombatState();
         mutable.prune(nowMs);
-        PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs);
+        PassiveExecution passive = preparePassives(
+                context, config, world, mutable, requiredTalentPurchased, nowMs);
         Set<String> diagnostics = new LinkedHashSet<>(passive.diagnostics());
         // Establish source ownership and every non-idempotent cooldown before mutating the world.
-        if (!states.save(context.ownerUuid(), context.profileId(),
-                mutable.freeze(formId))) {
+        MiniwyvernAbilityState preparedState = mutable.freeze(formId);
+        if ((stateMissing || !preparedState.equals(state)) && !states.save(
+                context.ownerUuid(), context.profileId(), preparedState)) {
             return TickResult.denied("ability-state-unavailable");
         }
 
@@ -98,7 +102,7 @@ public final class MiniwyvernAbilityService {
 
         mutable.prune(nowMs);
         MiniwyvernAbilityState finalState = mutable.freeze(formId);
-        if (!finalState.equals(state) && !states.save(
+        if (!finalState.equals(preparedState) && !states.save(
                 context.ownerUuid(), context.profileId(), finalState)) {
             return new TickResult(false, "ability-state-finalize-failed", effectsApplied, abilitiesExecuted);
         }
@@ -149,6 +153,7 @@ public final class MiniwyvernAbilityService {
             MiniwyvernArchetypeConfig config,
             MiniwyvernAbilityWorld world,
             MutableState state,
+            boolean requiredTalentPurchased,
             long nowMs) {
         String passiveSource = sourceKey(context.profileId(), config.getId(), "passive");
         Map<String, String> supportedEffectModifiers = new LinkedHashMap<>();
@@ -178,12 +183,16 @@ public final class MiniwyvernAbilityService {
                 unsupportedModifiers.addAll(rawModifierCandidates.keySet());
             }
         }
-        boolean passiveDisabled = !unsupportedModifiers.isEmpty();
-        List<String> diagnostics = passiveDisabled
-                ? List.of("passive-ability-disabled:" + String.join("+", unsupportedModifiers))
-                : List.of();
+        boolean passiveDisabled = !requiredTalentPurchased || !unsupportedModifiers.isEmpty();
+        List<String> diagnostics = !requiredTalentPurchased
+                ? List.of("passive-ability-disabled:talent-locked:" + config.getRequiredTalentId())
+                : passiveDisabled
+                        ? List.of("passive-ability-disabled:" + String.join("+", unsupportedModifiers))
+                        : List.of();
         boolean hasPassive = !passiveDisabled && (!config.getPassiveEffects().isEmpty()
                 || !supportedEffectModifiers.isEmpty() || !supportedRawModifiers.isEmpty());
+        boolean refreshPassive = hasPassive && shouldRefreshPassiveLease(
+                state.sourceExpiresAt.get(passiveSource), nowMs, passiveRefreshSeconds(config));
         boolean cleanupDisabledPassive = false;
         if (passiveDisabled) {
             cleanupDisabledPassive = state.sources.remove(passiveSource);
@@ -193,11 +202,12 @@ public final class MiniwyvernAbilityService {
             supportedEffectModifiers.clear();
             supportedRawModifiers.clear();
         }
-        if (hasPassive && !state.trackSource(
+        if (refreshPassive && !state.trackSource(
                 passiveSource,
                 context.ownerUuid(),
                 saturatingAdd(nowMs, secondsToMs(passiveRefreshSeconds(config))))) {
             hasPassive = false;
+            refreshPassive = false;
             diagnostics = List.of("passive-ability-disabled:source-tracking-capacity");
             supportedEffectModifiers.clear();
             supportedRawModifiers.clear();
@@ -219,6 +229,7 @@ public final class MiniwyvernAbilityService {
         return new PassiveExecution(
                 passiveSource,
                 hasPassive,
+                refreshPassive,
                 cleanupDisabledPassive,
                 natureHeal,
                 Map.copyOf(supportedEffectModifiers),
@@ -242,7 +253,7 @@ public final class MiniwyvernAbilityService {
             }
             world.removeOwnerModifiers(context.ownerUuid(), passive.sourceKey());
         }
-        if (passive.hasPassive()) {
+        if (passive.refreshPassive()) {
             double refreshSeconds = passiveRefreshSeconds(config);
             for (String effectId : config.getPassiveEffects()) {
                 if (world.applyEffect(context.ownerUuid(), passive.sourceKey(), effectId, refreshSeconds)) applied++;
@@ -286,6 +297,13 @@ public final class MiniwyvernAbilityService {
         return config.getId().equals("nature") ? 10.0D : 8.0D;
     }
 
+    private static boolean shouldRefreshPassiveLease(
+            Long expiresAtMs, long nowMs, double durationSeconds) {
+        long durationMs = secondsToMs(durationSeconds);
+        long renewalLeadMs = Math.max(1_000L, durationMs / 2L);
+        return expiresAtMs == null || expiresAtMs <= saturatingAdd(nowMs, renewalLeadMs);
+    }
+
     private static boolean isModifierConstraint(String modifierId) {
         return modifierId.startsWith("Maximum") && modifierId.endsWith("Multiplier");
     }
@@ -319,14 +337,24 @@ public final class MiniwyvernAbilityService {
     /** Clears ephemeral owner-hit state even when the world projection is already gone. */
     public void clearOwnerAuras() { ownerAuras.clear(); }
 
-    private void synchronizeOwnerAttackAura(ProfileContext context, MiniwyvernArchetypeConfig config) {
+    private void synchronizeOwnerAttackAura(
+            ProfileContext context,
+            MiniwyvernArchetypeConfig config,
+            boolean requiredTalentPurchased) {
         MiniwyvernArchetypeConfig.OwnerAttackAura aura = config.getOwnerAttackAura();
-        if (aura == null || aura.getEffectId() == null || !ownerAuras.update(
+        if (!requiredTalentPurchased || aura == null || aura.getEffectId() == null || !ownerAuras.update(
                 context.ownerUuid(), context.profileId(), context.npcUuid().toString(), context.npcUuid(),
                 config.getId(), aura.getEffectId(), aura.getDurationSeconds(),
                 aura.getDamageReductionFraction())) {
             ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
         }
+    }
+
+    private static boolean requiredTalentPurchased(
+            MiniwyvernArchetypeConfig config,
+            MiniwyvernAbilityWorld world) {
+        String requiredTalentId = config.getRequiredTalentId();
+        return requiredTalentId.isEmpty() || world.hasPurchasedTalent(requiredTalentId);
     }
 
     private static String sourceKey(String profileId, String formId, String abilityId) {
@@ -384,6 +412,7 @@ public final class MiniwyvernAbilityService {
     private record PassiveExecution(
             String sourceKey,
             boolean hasPassive,
+            boolean refreshPassive,
             boolean cleanupDisabledPassive,
             double natureHeal,
             Map<String, String> effectModifiers,
