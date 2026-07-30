@@ -88,6 +88,7 @@ final class DragonHornLocomotionAssetContractTest {
                 "Miniwyverns must spawn grounded instead of randomly selecting a flight controller");
         assertEquals("Walk", string(fullDragon, "InitialMotionController"),
                 "Nordic Drakes must spawn grounded instead of randomly selecting a ride or flight controller");
+        assertNonFlyingDragonRolesRemainWalkOnly();
 
         assertEquals("Component", transition.get("Type").getAsString());
         assertEquals("Instruction", transition.get("Class").getAsString());
@@ -306,6 +307,20 @@ final class DragonHornLocomotionAssetContractTest {
                                 && instruction.has("Continue")
                                 && instruction.get("Continue").getAsBoolean()),
                 "tamed template must invoke the shared transition as a global continuing instruction");
+    }
+
+    private static void assertNonFlyingDragonRolesRemainWalkOnly() throws IOException {
+        JsonObject genericDragon = readJson("Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Tamed.json");
+        assertEquals(1, genericDragon.getAsJsonArray("MotionControllerList").size(),
+                "the Hydra/Rock Drake shared template must remain walk-only");
+        assertEquals("Walk", string(genericDragon.getAsJsonArray("MotionControllerList")
+                .get(0).getAsJsonObject(), "Type"));
+        for (String role : List.of(
+                "Hydra/Tamed_Hydra", "RockDrake/Tamed_RockDrakeT1", "RockDrake/Tamed_RockDrakeT2",
+                "RockDrake/Tamed_RockDrakeT3")) {
+            assertEquals("Template_HyDragon_Tamed", string(readJson(
+                    "Server/NPC/Roles/Creature/HyDragon/" + role + ".json"), "Reference"));
+        }
     }
 
     private static void assertNativeFlyController(JsonObject template) {
