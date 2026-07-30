@@ -642,28 +642,179 @@ final class DragonHornLocomotionAssetContractTest {
                 + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
         assertEquals("Component", string(component, "Type"));
         assertEquals("Instruction", string(component, "Class"));
-        assertTrue(anyObject(component, object -> "TameworkFlyingOrbit".equals(string(object, "Type"))
-                && "WANDER_TARGET".equals(string(object, "Mode"))
-                && JsonParser.parseString("{\"Compute\":\"LoiterDistanceRange\"}")
-                        .equals(object.get("WanderRadiusRange"))
-                && JsonParser.parseString("{\"Compute\":\"LoiterAltitudeRange\"}")
-                        .equals(object.get("DesiredAltitudeRange"))
-                && JsonParser.parseString("{\"Compute\":\"LoiterRetargetTimeRange\"}")
-                        .equals(object.get("WanderRetargetTimeRange"))
-                && JsonParser.parseString("{\"Compute\":\"LoiterStopDistance\"}")
-                        .equals(object.get("WanderStopDistance"))
-                && JsonParser.parseString("{\"Compute\":\"LoiterRelativeSpeed\"}")
-                        .equals(object.get("RelativeSpeed"))
-                && JsonParser.parseString("0.45").equals(object.get("ClimbRelativeSpeed"))
-                && JsonParser.parseString("0.35").equals(object.get("SinkRelativeSpeed"))));
-        assertTrue(anyObject(component, object -> "Random".equals(string(object, "Type"))
-                && JsonParser.parseString("[3,7]").equals(object.get("ExecuteFor"))));
-        assertTrue(anyObject(component, object -> "Seek".equals(string(object, "Type"))
-                && JsonParser.parseString("{\"Compute\":\"DiveRelativeSpeed\"}")
-                        .equals(object.get("RelativeSpeed"))));
-        assertTrue(anyObject(component, object -> "Attack".equals(string(object, "Type"))
-                && JsonParser.parseString("{\"Compute\":\"BitePauseRange\"}")
-                        .equals(object.get("AttackPauseRange"))));
+        assertMiniwyvernAerialDefendStructure(component);
+    }
+
+    private static void assertMiniwyvernAerialDefendStructure(JsonObject component) {
+        JsonObject content = component.getAsJsonObject("Content");
+        JsonArray rootInstructions = content.getAsJsonArray("Instructions");
+
+        assertHardLeashReleaseAndReset(rootInstructions);
+        assertOwnerTargetRejection(rootInstructions);
+        assertFlyingFollowFallback(rootInstructions);
+
+        JsonObject combat = directInstruction(rootInstructions,
+                instruction -> hasStateSensor(instruction.getAsJsonObject("Sensor"), ".Combat"));
+        JsonArray combatInstructions = combat.getAsJsonArray("Instructions");
+        JsonObject random = directInstruction(combatInstructions,
+                instruction -> "Random".equals(string(instruction, "Type"))
+                        && JsonParser.parseString("[3,7]").equals(instruction.get("ExecuteFor")));
+        JsonArray randomChildren = random.getAsJsonArray("Instructions");
+        assertEquals(2, randomChildren.size(), "combat Random must choose exactly loiter or dive");
+
+        JsonObject loiter = directInstruction(randomChildren,
+                instruction -> computedValue(instruction, "Weight", "LoiterWeight"));
+        JsonObject dive = directInstruction(randomChildren,
+                instruction -> computedValue(instruction, "Weight", "DiveWeight"));
+        assertEquals(1, countDirectInstructions(randomChildren, instruction -> computedValue(instruction, "Weight", "LoiterWeight")));
+        assertEquals(1, countDirectInstructions(randomChildren, instruction -> computedValue(instruction, "Weight", "DiveWeight")));
+
+        JsonObject loiterMotion = loiter.getAsJsonObject("BodyMotion");
+        assertEquals("TameworkFlyingOrbit", string(loiterMotion, "Type"));
+        assertEquals("WANDER_TARGET", string(loiterMotion, "Mode"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"LoiterDistanceRange\"}"), loiterMotion.get("WanderRadiusRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"LoiterAltitudeRange\"}"), loiterMotion.get("DesiredAltitudeRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"LoiterRetargetTimeRange\"}"), loiterMotion.get("WanderRetargetTimeRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"LoiterStopDistance\"}"), loiterMotion.get("WanderStopDistance"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"LoiterRelativeSpeed\"}"), loiterMotion.get("RelativeSpeed"));
+        assertEquals(JsonParser.parseString("0.45"), loiterMotion.get("ClimbRelativeSpeed"));
+        assertEquals(JsonParser.parseString("0.35"), loiterMotion.get("SinkRelativeSpeed"));
+
+        assertFalse(anyObject(loiter, object -> "Attack".equals(string(object, "Type"))),
+                "bite attack must not be reachable from the loiter child");
+        assertFalse(anyObject(loiter, object -> "Component_Instruction_Combat_Back_Off".equals(string(object, "Reference"))),
+                "combat back-off must not be reachable from the loiter child");
+
+        JsonArray diveInstructions = dive.getAsJsonArray("Instructions");
+        JsonObject seek = directInstruction(diveInstructions,
+                instruction -> instruction.has("BodyMotion")
+                        && "Seek".equals(string(instruction.getAsJsonObject("BodyMotion"), "Type")));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"DiveRelativeSpeed\"}"),
+                seek.getAsJsonObject("BodyMotion").get("RelativeSpeed"));
+        JsonObject attack = directInstruction(diveInstructions,
+                instruction -> instruction.has("Actions") && actionTypeExists(instruction.getAsJsonArray("Actions"), "Attack"));
+        JsonArray attackActions = attack.getAsJsonArray("Actions");
+        assertEquals(JsonParser.parseString("{\"Compute\":\"BitePauseRange\"}"),
+                directAction(attackActions, "Attack").get("AttackPauseRange"));
+        JsonObject timerStart = directAction(attackActions, "TimerStart");
+        assertEquals("Miniwyvern_Combat_Back_Off", string(timerStart, "Name"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"CombatBackOffDurationRange\"}"),
+                timerStart.get("StartValueRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"CombatBackOffDurationRange\"}"),
+                timerStart.get("RestartValueRange"));
+        assertEquals("Miniwyvern_Combat_Back_Off", string(directAction(attackActions, "TimerRestart"), "Name"));
+
+        JsonObject backOff = directInstruction(diveInstructions,
+                instruction -> "Component_Instruction_Combat_Back_Off".equals(string(instruction, "Reference")));
+        JsonObject backOffModify = backOff.getAsJsonObject("Modify");
+        assertEquals("Miniwyvern_Combat_Back_Off", string(backOffModify, "TimerName"));
+        assertTrue(backOffModify.get("CombatBackOffAfterAttack").getAsBoolean());
+        assertEquals(JsonParser.parseString("{\"Compute\":\"CombatBackOffDistanceRange\"}"),
+                backOffModify.get("CombatBackOffDistanceRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"CombatBackOffDurationRange\"}"),
+                backOffModify.get("CombatBackOffDurationRange"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"LoiterRelativeSpeed\"}"),
+                backOffModify.get("CombatMovingRelativeSpeed"));
+        assertEquals(1, objects(component, object -> "Attack".equals(string(object, "Type"))).size(),
+                "bite attack must exist exclusively inside the dive child");
+        assertEquals(1, objects(component, object ->
+                        "Component_Instruction_Combat_Back_Off".equals(string(object, "Reference"))).size(),
+                "combat back-off must exist exclusively inside the dive child");
+
+        assertLostTargetReleaseAndReset(combatInstructions);
+    }
+
+    private static void assertHardLeashReleaseAndReset(JsonArray rootInstructions) {
+        JsonObject hardLeash = directInstruction(rootInstructions, instruction -> instruction.has("Sensor")
+                && "Not".equals(string(instruction.getAsJsonObject("Sensor"), "Type"))
+                && hasPlayerRange(instruction.getAsJsonObject("Sensor"), "HardLeashDistance"));
+        assertReleaseAndDefaultReset(hardLeash.getAsJsonArray("Actions"));
+    }
+
+    private static void assertOwnerTargetRejection(JsonArray rootInstructions) {
+        JsonObject ownerTarget = directInstruction(rootInstructions, instruction -> instruction.has("Sensor")
+                && "LockedTarget".equals(string(instruction.getAsJsonObject("Sensor"), "TargetSlot"))
+                && instruction.getAsJsonObject("Sensor").has("Filters")
+                && instruction.getAsJsonObject("Sensor").getAsJsonArray("Filters").asList().stream()
+                        .map(JsonElement::getAsJsonObject)
+                        .anyMatch(filter -> "TameworkIsOwner".equals(string(filter, "Type"))));
+        assertReleaseAndDefaultReset(ownerTarget.getAsJsonArray("Actions"));
+    }
+
+    private static void assertFlyingFollowFallback(JsonArray rootInstructions) {
+        JsonObject fallback = directInstruction(rootInstructions, instruction -> instruction.has("Sensor")
+                && hasStateSensor(instruction.getAsJsonObject("Sensor"), ".Default")
+                && hasMissingLockedTargetSensor(instruction.getAsJsonObject("Sensor"))
+                && instruction.has("Instructions"));
+        JsonObject followReference = directInstruction(fallback.getAsJsonArray("Instructions"), instruction ->
+                computedValue(instruction, "Reference", "DefendFollowMacroElement"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"DefendFollowMacroElement\"}"),
+                followReference.get("Reference"));
+    }
+
+    private static void assertLostTargetReleaseAndReset(JsonArray combatInstructions) {
+        JsonObject lostTarget = directInstruction(combatInstructions, instruction -> instruction.has("Sensor")
+                && "Not".equals(string(instruction.getAsJsonObject("Sensor"), "Type"))
+                && hasLostTargetDetection(instruction.getAsJsonObject("Sensor")));
+        assertReleaseAndDefaultReset(lostTarget.getAsJsonArray("Actions"));
+    }
+
+    private static JsonObject directInstruction(
+            JsonArray instructions, java.util.function.Predicate<JsonObject> predicate) {
+        List<JsonObject> matches = instructions.asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(predicate)
+                .toList();
+        assertEquals(1, matches.size(), "expected exactly one matching direct instruction");
+        return matches.get(0);
+    }
+
+    private static int countDirectInstructions(
+            JsonArray instructions, java.util.function.Predicate<JsonObject> predicate) {
+        return (int) instructions.asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(predicate)
+                .count();
+    }
+
+    private static JsonObject directAction(JsonArray actions, String type) {
+        List<JsonObject> matches = actions.asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(action -> type.equals(string(action, "Type")))
+                .toList();
+        assertEquals(1, matches.size(), "expected exactly one " + type + " action");
+        return matches.get(0);
+    }
+
+    private static boolean computedValue(JsonObject object, String property, String parameter) {
+        return object.has(property)
+                && JsonParser.parseString("{\"Compute\":\"" + parameter + "\"}").equals(object.get(property));
+    }
+
+    private static boolean hasPlayerRange(JsonObject notSensor, String parameter) {
+        return notSensor.has("Sensor")
+                && "Player".equals(string(notSensor.getAsJsonObject("Sensor"), "Type"))
+                && computedValue(notSensor.getAsJsonObject("Sensor"), "Range", parameter);
+    }
+
+    private static boolean hasMissingLockedTargetSensor(JsonObject sensor) {
+        return anyObject(sensor, candidate -> "Not".equals(string(candidate, "Type"))
+                && candidate.has("Sensor")
+                && "LockedTarget".equals(string(candidate.getAsJsonObject("Sensor"), "TargetSlot")));
+    }
+
+    private static boolean hasLostTargetDetection(JsonObject notSensor) {
+        return notSensor.has("Sensor")
+                && "Component_Sensor_Lost_Target_Detection".equals(
+                        string(notSensor.getAsJsonObject("Sensor"), "Reference"));
+    }
+
+    private static void assertReleaseAndDefaultReset(JsonArray actions) {
+        assertEquals(2, actions.size());
+        assertEquals("ReleaseTarget", string(actions.get(0).getAsJsonObject(), "Type"));
+        assertEquals("LockedTarget", string(actions.get(0).getAsJsonObject(), "TargetSlot"));
+        assertEquals("State", string(actions.get(1).getAsJsonObject(), "Type"));
+        assertEquals(".Default", string(actions.get(1).getAsJsonObject(), "State"));
     }
 
     private static void assertFullDragonDefendTuning(JsonObject defend, boolean airborne) {
