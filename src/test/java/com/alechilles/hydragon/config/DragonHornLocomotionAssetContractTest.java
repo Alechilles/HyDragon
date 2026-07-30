@@ -126,11 +126,11 @@ final class DragonHornLocomotionAssetContractTest {
         JsonObject defend = stateBehavior(miniwyvern, "Defend");
         assertExactlyTwoDirectModeBranches(defend);
         assertModeBranch(defend, false, "Walk", null, "Component_Tamework_Instruction_Defend");
-        assertModeBranch(defend, true, "Fly", null, "Component_Tamework_Instruction_Defend");
+        assertModeBranch(defend, true, "Fly", null,
+                "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend");
         assertDefendFollowMacro(defend, false, "Component_Tamework_Instruction_Follow_Advanced");
-        assertDefendFollowMacro(defend, true, "Component_Tamework_Instruction_Follow_Flying");
-        assertDefendTuning(defend, false);
-        assertDefendTuning(defend, true);
+        assertGroundedDefendTuning(defend);
+        assertAerialDefendTuning(defend);
 
         JsonObject hold = stateBehavior(miniwyvern, "Hold");
         assertExactlyTwoDirectModeBranches(hold);
@@ -588,9 +588,9 @@ final class DragonHornLocomotionAssetContractTest {
         assertEquals(JsonParser.parseString("0.12"), modify.get("FollowHoverRelativeSpeed"));
     }
 
-    private static void assertDefendTuning(JsonObject defend, boolean airborne) {
+    private static void assertGroundedDefendTuning(JsonObject defend) {
         JsonObject branch = directModeBranches(defend).stream()
-                .filter(candidate -> isModeControllerPair(candidate, airborne, airborne ? "Fly" : "Walk"))
+                .filter(candidate -> isModeControllerPair(candidate, false, "Walk"))
                 .findFirst().orElseThrow();
         JsonObject reference = objects(branch,
                         object -> "Component_Tamework_Instruction_Defend".equals(string(object, "Reference")))
@@ -614,6 +614,56 @@ final class DragonHornLocomotionAssetContractTest {
         assertEquals(JsonParser.parseString("8"), modify.get("CombatAlwaysMovingWeight"));
         assertEquals(JsonParser.parseString("0.9"), modify.get("ChaseRelativeSpeed"));
         assertEquals("Component_Instruction_Null", string(modify, "AdditionalCombatBehaviorMacroElement"));
+    }
+
+    private static void assertAerialDefendTuning(JsonObject defend) throws IOException {
+        JsonObject branch = directModeBranches(defend).stream()
+                .filter(candidate -> isModeControllerPair(candidate, true, "Fly"))
+                .findFirst().orElseThrow();
+        JsonObject reference = objects(branch, object ->
+                "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend"
+                        .equals(string(object, "Reference"))).stream().findFirst().orElseThrow();
+        JsonObject modify = reference.getAsJsonObject("Modify");
+        assertEquals(JsonParser.parseString("[8,14]"), modify.get("LoiterDistanceRange"));
+        assertEquals(JsonParser.parseString("[5,9]"), modify.get("LoiterAltitudeRange"));
+        assertEquals(JsonParser.parseString("0.28"), modify.get("LoiterRelativeSpeed"));
+        assertEquals(JsonParser.parseString("[3,6]"), modify.get("LoiterRetargetTimeRange"));
+        assertEquals(JsonParser.parseString("2.5"), modify.get("LoiterStopDistance"));
+        assertEquals(JsonParser.parseString("9"), modify.get("LoiterWeight"));
+        assertEquals(JsonParser.parseString("1"), modify.get("DiveWeight"));
+        assertEquals(JsonParser.parseString("0.55"), modify.get("DiveRelativeSpeed"));
+        assertEquals(JsonParser.parseString("[8,14]"), modify.get("CombatBackOffDistanceRange"));
+        assertEquals(JsonParser.parseString("[2,4]"), modify.get("CombatBackOffDurationRange"));
+        assertEquals(JsonParser.parseString("[8,12]"), modify.get("BitePauseRange"));
+        assertEquals("Component_Tamework_Instruction_Follow_Flying",
+                string(modify, "DefendFollowMacroElement"));
+
+        JsonObject component = readJson("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
+        assertEquals("Component", string(component, "Type"));
+        assertEquals("Instruction", string(component, "Class"));
+        assertTrue(anyObject(component, object -> "TameworkFlyingOrbit".equals(string(object, "Type"))
+                && "WANDER_TARGET".equals(string(object, "Mode"))
+                && JsonParser.parseString("{\"Compute\":\"LoiterDistanceRange\"}")
+                        .equals(object.get("WanderRadiusRange"))
+                && JsonParser.parseString("{\"Compute\":\"LoiterAltitudeRange\"}")
+                        .equals(object.get("DesiredAltitudeRange"))
+                && JsonParser.parseString("{\"Compute\":\"LoiterRetargetTimeRange\"}")
+                        .equals(object.get("WanderRetargetTimeRange"))
+                && JsonParser.parseString("{\"Compute\":\"LoiterStopDistance\"}")
+                        .equals(object.get("WanderStopDistance"))
+                && JsonParser.parseString("{\"Compute\":\"LoiterRelativeSpeed\"}")
+                        .equals(object.get("RelativeSpeed"))
+                && JsonParser.parseString("0.45").equals(object.get("ClimbRelativeSpeed"))
+                && JsonParser.parseString("0.35").equals(object.get("SinkRelativeSpeed"))));
+        assertTrue(anyObject(component, object -> "Random".equals(string(object, "Type"))
+                && JsonParser.parseString("[3,7]").equals(object.get("ExecuteFor"))));
+        assertTrue(anyObject(component, object -> "Seek".equals(string(object, "Type"))
+                && JsonParser.parseString("{\"Compute\":\"DiveRelativeSpeed\"}")
+                        .equals(object.get("RelativeSpeed"))));
+        assertTrue(anyObject(component, object -> "Attack".equals(string(object, "Type"))
+                && JsonParser.parseString("{\"Compute\":\"BitePauseRange\"}")
+                        .equals(object.get("AttackPauseRange"))));
     }
 
     private static void assertFullDragonDefendTuning(JsonObject defend, boolean airborne) {
