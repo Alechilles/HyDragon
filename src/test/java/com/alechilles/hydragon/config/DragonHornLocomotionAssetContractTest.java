@@ -163,6 +163,19 @@ final class DragonHornLocomotionAssetContractTest {
                 """).getAsJsonObject();
         assertFalse(hasExactModeSelectorPairSet(extraLockedTarget));
 
+        JsonObject controllerOnly = JsonParser.parseString("""
+                { "Instructions": [
+                  { "Sensor": { "Type": "And", "Sensors": [
+                    { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                    { "Type": "MotionController", "MotionController": "Walk" } ] } },
+                  { "Sensor": { "Type": "And", "Sensors": [
+                    { "Type": "Flag", "Name": "AirborneMode" },
+                    { "Type": "MotionController", "MotionController": "Fly" } ] } },
+                  { "Sensor": { "Type": "MotionController", "MotionController": "Fly" } }
+                ] }
+                """).getAsJsonObject();
+        assertFalse(hasExactModeSelectorPairSet(controllerOnly));
+
         JsonObject extra = looseFlag.deepCopy();
         extra.getAsJsonArray("Instructions").remove(2);
         extra.getAsJsonArray("Instructions").add(JsonParser.parseString("""
@@ -374,7 +387,9 @@ final class DragonHornLocomotionAssetContractTest {
         return behavior.getAsJsonArray("Instructions").asList().stream()
                 .filter(JsonElement::isJsonObject)
                 .map(JsonElement::getAsJsonObject)
-                .filter(branch -> branch.has("Sensor") && hasAirborneModeSelector(branch.getAsJsonObject("Sensor")))
+                .filter(branch -> branch.has("Sensor")
+                        && (hasAirborneModeSelector(branch.getAsJsonObject("Sensor"))
+                                || hasMotionControllerSelector(branch.getAsJsonObject("Sensor"))))
                 .toList();
     }
 
@@ -393,6 +408,10 @@ final class DragonHornLocomotionAssetContractTest {
     private static boolean hasAirborneModeSelector(JsonObject sensor) {
         return anyObject(sensor, object -> "Flag".equals(string(object, "Type"))
                 && "AirborneMode".equals(string(object, "Name")));
+    }
+
+    private static boolean hasMotionControllerSelector(JsonObject sensor) {
+        return anyObject(sensor, object -> "MotionController".equals(string(object, "Type")));
     }
 
     private static boolean isAirborneModeFlag(JsonObject object, boolean airborne) {
