@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Work only in `C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes` on `feat/dragon-horn-flight-modes`.
-- Use the exact `.hytale-npc-assets.json` profile: game `0.5.7`, channel `release`, identity `0caa7f5e27a3925cca89e5f858c49e14ed54d067874c7d49fa0e227462e63e65`.
+- Use the exact `.hytale-npc-assets.json` profile: game `0.5.7`, channel `release`, identity `f25abea21f0112a88ec9ed92b5cbbdaebf0ef7fb40eeea0a697519ca97fe1c1c` after deliberately refreshing the ignored runtime evidence to the current installed Tamework descriptor export.
 - Do not add Java world-tick movement or projectile scheduling.
 - Do not modify Rockdrake, Hydra, Nordic Drake, or full-dragon flight behavior.
 - Grounded Miniwyvern `Defend` behavior remains byte-for-byte equivalent in values: `CombatBehaviorDistance=8`, `CombatBackOffDistanceRange=[2.5,4]`, strafe/direct/always-moving weights `4/8/8`, and `ChaseRelativeSpeed=0.9`.
@@ -338,7 +338,7 @@ python -m hytale_npc_assets.cli profile check \
   --json
 ```
 
-Expected: `status=ready`, game `0.5.7`, channel `release`, and identity `0caa7f5e27a3925cca89e5f858c49e14ed54d067874c7d49fa0e227462e63e65`.
+Expected: `status=ready`, game `0.5.7`, channel `release`, and identity `f25abea21f0112a88ec9ed92b5cbbdaebf0ef7fb40eeea0a697519ca97fe1c1c`.
 
 - [ ] **Step 2: Reopen the graph after source edits and inspect both changed assets**
 
