@@ -1,0 +1,160 @@
+{
+  "$Comment": "Shared native controller transition for the Dragon Horn airborne mode.",
+  "Type": "Component",
+  "Class": "Instruction",
+  "Interface": "HyDragon.Instruction.AirborneModeTransition",
+  "Content": {
+    "Continue": true,
+    "Sensor": {
+      "Type": "Any"
+    },
+    "Instructions": [
+      {
+        "$Comment": "Each new role starts in grounded mode.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "Any",
+          "Once": true
+        },
+        "Actions": [
+          {
+            "Type": "SetFlag",
+            "Name": "AirborneMode",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "$Comment": "Consume one horn toggle and flip only the native mode flag.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "TameworkHook",
+          "HookId": "HyDragon.Command.ToggleAirborneMode",
+          "Consume": true
+        },
+        "Instructions": [
+          {
+            "Sensor": {
+              "Type": "Flag",
+              "Name": "AirborneMode"
+            },
+            "Actions": [
+              {
+                "Type": "SetFlag",
+                "Name": "AirborneMode",
+                "SetTo": false
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "Flag",
+              "Name": "AirborneMode",
+              "Set": false
+            },
+            "Actions": [
+              {
+                "Type": "SetFlag",
+                "Name": "AirborneMode",
+                "SetTo": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "$Comment": "Aerial mode starts the native flight controller without changing the active order.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "Flag",
+              "Name": "AirborneMode"
+            },
+            {
+              "Type": "MotionController",
+              "MotionController": "Walk"
+            }
+          ]
+        },
+        "BodyMotion": {
+          "Type": "TakeOff",
+          "JumpSpeed": 4
+        }
+      },
+      {
+        "$Comment": "Grounded mode descends with the proven native landing ray without changing the active order.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "Flag",
+              "Name": "AirborneMode",
+              "Set": false
+            },
+            {
+              "Type": "MotionController",
+              "MotionController": "Fly"
+            }
+          ]
+        },
+        "Instructions": [
+          {
+            "Sensor": {
+              "Type": "AdjustPosition",
+              "Offset": [
+                0,
+                1,
+                0
+              ],
+              "Sensor": {
+                "Type": "SearchRay",
+                "Name": "LandingRay",
+                "Range": 20,
+                "Angle": 45,
+                "Blocks": "Gaia"
+              }
+            },
+            "BodyMotion": {
+              "Type": "Land",
+              "SlowDownDistance": 5,
+              "StopDistance": 0.5,
+              "GoalLenience": 3
+            }
+          },
+          {
+            "BodyMotion": {
+              "Type": "Wander",
+              "RelativeSpeed": 0.2
+            }
+          }
+        ]
+      },
+      {
+        "$Comment": "Clear the landing ray after touchdown.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "Flag",
+              "Name": "AirborneMode",
+              "Set": false
+            },
+            {
+              "Type": "MotionController",
+              "MotionController": "Walk"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "ResetSearchRays"
+          }
+        ]
+      }
+    ]
+  }
+}

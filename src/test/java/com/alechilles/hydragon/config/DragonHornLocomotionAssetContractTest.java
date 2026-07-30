@@ -59,6 +59,145 @@ final class DragonHornLocomotionAssetContractTest {
         assertIdenticalHornCommandCatalogs();
     }
 
+    @Test
+    void tamedDragonTemplatesUseTheSharedNativeAirborneModeTransition() throws IOException {
+        JsonObject miniwyvern = readJson("Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json");
+        JsonObject fullDragon = readJson("Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon_Tamed.json");
+        JsonObject transition = readJson("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Airborne_Mode_Transition.json");
+
+        assertGlobalContinuingReference(miniwyvern);
+        assertGlobalContinuingReference(fullDragon);
+
+        assertEquals("Component", transition.get("Type").getAsString());
+        assertEquals("Instruction", transition.get("Class").getAsString());
+        JsonObject content = transition.getAsJsonObject("Content");
+        assertTrue(hasOnceSetFlag(content, "AirborneMode", false),
+                "newly spawned roles must reset AirborneMode to false exactly once");
+        assertEquals(1, countHookSensors(content, "HyDragon.Command.ToggleAirborneMode"),
+                "the transition component must consume exactly the ToggleAirborneMode hook");
+        assertTrue(hasMutuallyExclusiveToggle(content),
+                "the native Flag branches must clear when set and set when unset");
+        assertTrue(hasTakeOff(content), "AirborneMode=true on Walk must take off");
+        assertTrue(hasSafeLanding(content), "AirborneMode=false on Fly must safely land and reset its search ray");
+        assertNoTransitionScopeViolations(content);
+    }
+
+    private static void assertGlobalContinuingReference(JsonObject template) {
+        JsonArray instructions = template.getAsJsonArray("Instructions");
+        assertTrue(instructions.asList().stream()
+                        .map(JsonElement::getAsJsonObject)
+                        .anyMatch(instruction -> "Component_HyDragon_Instruction_Airborne_Mode_Transition".equals(
+                                        string(instruction, "Reference"))
+                                && instruction.has("Continue")
+                                && instruction.get("Continue").getAsBoolean()),
+                "tamed template must invoke the shared transition as a global continuing instruction");
+    }
+
+    private static boolean hasOnceSetFlag(JsonElement node, String name, boolean value) {
+        return anyObject(node, object -> object.has("Actions")
+                && object.has("Sensor")
+                && object.getAsJsonObject("Sensor").has("Once")
+                && object.getAsJsonObject("Sensor").get("Once").getAsBoolean()
+                && actionExists(object.getAsJsonArray("Actions"), "SetFlag", name, value));
+    }
+
+    private static int countHookSensors(JsonElement node, String hookId) {
+        return countObjects(node, object -> "TameworkHook".equals(string(object, "Type"))
+                && hookId.equals(string(object, "HookId")));
+    }
+
+    private static boolean hasMutuallyExclusiveToggle(JsonElement node) {
+        return anyObject(node, object -> "Flag".equals(string(object, "Type"))
+                        && "AirborneMode".equals(string(object, "Name"))
+                        && !object.has("Set")
+                        && actionExistsInParent(node, object, "SetFlag", "AirborneMode", false))
+                && anyObject(node, object -> "Flag".equals(string(object, "Type"))
+                        && "AirborneMode".equals(string(object, "Name"))
+                        && object.has("Set")
+                        && !object.get("Set").getAsBoolean()
+                        && actionExistsInParent(node, object, "SetFlag", "AirborneMode", true));
+    }
+
+    private static boolean hasTakeOff(JsonElement node) {
+        return anyObject(node, instruction -> isAirborneControllerBranch(instruction, true, "Walk")
+                && instruction.has("BodyMotion")
+                && "TakeOff".equals(string(instruction.getAsJsonObject("BodyMotion"), "Type")));
+    }
+
+    private static boolean hasSafeLanding(JsonElement node) {
+        return anyObject(node, instruction -> isAirborneControllerBranch(instruction, false, "Fly")
+                && anyObject(instruction, object -> "AdjustPosition".equals(string(object, "Type"))
+                        && anyObject(object, nested -> "SearchRay".equals(string(nested, "Type"))))
+                && anyObject(instruction, object -> "Land".equals(string(object, "Type"))))
+                && anyObject(node, object -> "ResetSearchRays".equals(string(object, "Type")));
+    }
+
+    private static boolean isAirborneControllerBranch(JsonObject instruction, boolean airborne, String controller) {
+        if (!instruction.has("Sensor")) {
+            return false;
+        }
+        JsonObject sensor = instruction.getAsJsonObject("Sensor");
+        if (!"And".equals(string(sensor, "Type")) || !sensor.has("Sensors")) {
+            return false;
+        }
+        return sensor.getAsJsonArray("Sensors").asList().stream().map(JsonElement::getAsJsonObject)
+                        .anyMatch(child -> "Flag".equals(string(child, "Type"))
+                                && "AirborneMode".equals(string(child, "Name"))
+                                && (airborne ? !child.has("Set") || child.get("Set").getAsBoolean()
+                                        : child.has("Set") && !child.get("Set").getAsBoolean()))
+                && sensor.getAsJsonArray("Sensors").asList().stream().map(JsonElement::getAsJsonObject)
+                        .anyMatch(child -> "MotionController".equals(string(child, "Type"))
+                                && controller.equals(string(child, "MotionController")));
+    }
+
+    private static void assertNoTransitionScopeViolations(JsonElement node) {
+        Set<String> prohibited = Set.of("State", "ParentState", "SetTarget", "ReleaseTarget", "ClearTarget",
+                "TameworkSetFlyingCompanionMode");
+        assertEquals(0, countObjects(node, object -> {
+            String type = string(object, "Type");
+            return type != null && prohibited.contains(type);
+        }));
+    }
+
+    private static boolean actionExists(JsonArray actions, String type, String name, boolean setTo) {
+        return actions.asList().stream().map(JsonElement::getAsJsonObject)
+                .anyMatch(action -> type.equals(string(action, "Type")) && name.equals(string(action, "Name"))
+                        && action.has("SetTo") && setTo == action.get("SetTo").getAsBoolean());
+    }
+
+    private static boolean actionExistsInParent(JsonElement root, JsonObject sensor, String type, String name, boolean setTo) {
+        return anyObject(root, object -> object.has("Sensor") && object.get("Sensor").equals(sensor)
+                && object.has("Actions") && actionExists(object.getAsJsonArray("Actions"), type, name, setTo));
+    }
+
+    private static boolean anyObject(JsonElement node, java.util.function.Predicate<JsonObject> predicate) {
+        return countObjects(node, predicate) > 0;
+    }
+
+    private static int countObjects(JsonElement node, java.util.function.Predicate<JsonObject> predicate) {
+        if (node.isJsonObject()) {
+            JsonObject object = node.getAsJsonObject();
+            int count = predicate.test(object) ? 1 : 0;
+            for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+                count += countObjects(entry.getValue(), predicate);
+            }
+            return count;
+        }
+        if (node.isJsonArray()) {
+            int count = 0;
+            for (JsonElement element : node.getAsJsonArray()) {
+                count += countObjects(element, predicate);
+            }
+            return count;
+        }
+        return 0;
+    }
+
+    private static String string(JsonObject object, String property) {
+        return object.has(property) ? object.get(property).getAsString() : null;
+    }
+
     private static void assertDefendSteps(JsonArray steps) {
         assertEquals(3, steps.size());
         assertEquals(JsonParser.parseString("""

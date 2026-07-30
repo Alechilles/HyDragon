@@ -229,6 +229,11 @@
       ]
     },
     {
+      "$Comment": "Keep the Horn airborne mode controller transition global across every order.",
+      "Continue": true,
+      "Reference": "Component_HyDragon_Instruction_Airborne_Mode_Transition"
+    },
+    {
       "$Comment": "Keep owner-relative modes bounded and fail safe when their owner target is unavailable.",
       "Continue": true,
       "Sensor": {

@@ -1060,6 +1060,11 @@
       ]
     },
     {
+      "$Comment": "Keep the Horn airborne mode controller transition global across every order.",
+      "Continue": true,
+      "Reference": "Component_HyDragon_Instruction_Airborne_Mode_Transition"
+    },
+    {
       "$Comment": "",
       "Instructions": [
         {
