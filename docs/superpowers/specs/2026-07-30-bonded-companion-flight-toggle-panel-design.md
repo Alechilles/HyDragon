@@ -10,9 +10,9 @@ and toggle only companions that explicitly opt into the capability.
 
 The card renderer, panel event routing, live projection lookup, and reusable
 capability belong to Alec's Tamework. HyDragon opts its flight-capable bonded
-profiles into the capability. HyDragon's existing `AirborneMode` flag and
-locomotion implementation remain the source of behavior; the panel does not
-create a second movement controller.
+profiles into the capability. HyDragon's existing locomotion transition and
+hook remain the source of behavior; the panel does not create a second movement
+controller.
 
 Hydras and Rock Drakes remain ground-only. They receive no capability flag and
 no panel button.
@@ -24,12 +24,17 @@ capability. A card is eligible only when all of these conditions hold:
 
 1. Its resolved profile enables `FlightToggle`.
 2. The profile currently has a matching active in-world projection.
-3. The active projection exposes the existing locomotion-mode state.
+3. The active projection has a recognized walking or flying controller family.
 
-The card never infers availability from a species name or an NPC motion
-controller. Stored, dead, stale, and ground-only cards render without the
-control. `AirborneMode` remains projection-local, so dismissing and re-summoning
-starts from the existing grounded default.
+The card never infers capability availability from a species name or an NPC
+motion controller. After explicit opt-in, Tamework reads the current live mode
+from controller class inheritance: `MotionControllerFly` and its subclasses are
+airborne, while `MotionControllerWalk` and its subclasses are grounded. This
+covers both Hytale's native controllers and Tamework's flight, mounted-glide,
+ride-walk subclasses without exact type-string matching. An absent or unknown
+controller makes the live mode unavailable and hides the control. Stored, dead,
+stale, and ground-only cards render without the control. Dismissing and
+re-summoning continues to use HyDragon's existing grounded default.
 
 ## Presentation
 
@@ -49,14 +54,15 @@ state currently read from the live projection, not the most recent click.
 
 ## Interaction and refresh flow
 
-1. The panel's active-card snapshot carries the current `AirborneMode` value.
+1. The panel's active-card snapshot carries the current normalized live
+   controller-family mode.
 2. The card binds the matching icon and a profile-specific flight-toggle event.
 3. A click resolves the profile's active projection on the authoritative
    server/world thread.
 4. The handler delegates to the established locomotion-toggle path, preserving
    the companion's current target and order.
 5. The panel refreshes from a new live snapshot. It changes the icon only when
-   the authoritative projection state changed.
+   the active controller family changed.
 
 If a projection is missing, no longer active, no longer configured, or rejects
 the state change, the handler performs no speculative UI mutation. The normal
@@ -76,10 +82,11 @@ Use test-first coverage in Tamework for:
 
 1. capability inheritance and its default-disabled behavior;
 2. active-only rendering and absence for a disabled/ground-only profile;
-3. standing versus flying icon binding from the actual snapshot value;
-4. profile-scoped event routing to the existing authoritative toggle path;
-5. stale or rejected actions producing a refreshed, non-speculative card; and
-6. localization and final packaged icon/UI asset availability.
+3. native and Tamework walking/flying controller-family classification;
+4. standing versus flying icon binding from the actual snapshot value;
+5. profile-scoped event routing to the existing authoritative toggle path;
+6. stale or rejected actions producing a refreshed, non-speculative card; and
+7. localization and final packaged icon/UI asset availability.
 
 Use HyDragon tests for the opt-in profile assets and confirm that no
 ground-only profile gains `FlightToggle`. Build both source repositories, then
@@ -90,6 +97,6 @@ grounded and one airborne active companion.
 
 - No stored-card preference or next-summon mode setting.
 - No change to hydra or Rock Drake movement.
-- No persistence of `AirborneMode` across dismissal, death, or re-summon.
+- No persistence of flight mode across dismissal, death, or re-summon.
 - No duplicated locomotion, target, or order-management implementation in the
   panel.

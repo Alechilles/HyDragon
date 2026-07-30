@@ -4,7 +4,7 @@
 
 **Goal:** Add an active-card button that shows and toggles the authoritative grounded/airborne state for explicitly configured bonded companions, while Hydras, Rock Drakes, stored companions, dead companions, and stale projections never receive the control.
 
-**Architecture:** Alec's Tamework owns a default-disabled per-role `Command.FlightToggle` capability, reads its named NPC flag from the live role sensor scope, projects that transient value into the bonded-card snapshot, and routes clicks through the existing hook component boundary. HyDragon opts MiniWyverns and Nordic Drakes into `AirborneMode` plus `HyDragon.Command.ToggleAirborneMode`; its existing transition instructions remain the only locomotion implementation.
+**Architecture:** Alec's Tamework owns a default-disabled per-role `Command.FlightToggle` capability, classifies the live active motion controller by its walk/fly class family, projects that transient value into the bonded-card snapshot, and routes clicks through the existing hook component boundary. HyDragon opts MiniWyverns and Nordic Drakes into `HyDragon.Command.ToggleAirborneMode`; its existing transition instructions remain the only locomotion implementation.
 
 **Tech Stack:** Java 25, Hytale 0.5.7 server API, Tamework JSON asset codecs and bonded-companion panel, Hytale custom UI, JUnit 5, Maven Wrapper, Python asset validation, Codex image generation, transparent PNG UI assets, Git Bash.
 
@@ -22,16 +22,15 @@
 ```json
 "FlightToggle": {
   "Enabled": true,
-  "StateFlag": "AirborneMode",
   "HookId": "HyDragon.Command.ToggleAirborneMode"
 }
 ```
 
-- `Enabled` defaults to `false`; `StateFlag` and `HookId` default to blank. A toggle is configured only when all three values are valid after inheritance.
-- Read `AirborneMode` through `role.getEntitySupport().getSensorScope().getBooleanSupplier(stateFlag)`. Do not infer capability or current mode from species names, role-name allowlists, `MotionController.getType()`, `inAir()`, or `onGround()`.
+- `Enabled` defaults to `false`; `HookId` defaults to blank. A toggle is configured only when both values are valid after inheritance.
+- Never infer capability from a controller; capability is explicit role configuration only. Once configured, classify current state from the active controller class: `MotionControllerFly.class.isAssignableFrom(active.getClass())` means airborne and `MotionControllerWalk.class.isAssignableFrom(active.getClass())` means grounded. This covers native `Fly`/`Walk` plus Tamework subclasses such as `TameworkFly`, `TameworkMountedGlide`, and `TameworkRideWalk`. An absent or unknown controller makes the mode unavailable. Do not compare `MotionController.getType()` strings and do not use `inAir()` or `onGround()`.
 - A click may only write a `TameworkHookComponent` for the current live NPC. It must not directly set a role flag, controller, target, order, or durable profile field.
-- The card icon represents the current flag value: standing means grounded; flying means airborne. Its tooltip describes the action that will result: `Switch to flight` or `Switch to ground`.
-- The control is visible only when the row is `ACTIVE`, its configured live projection resolves in the event world, and the named state flag is readable. No optimistic icon change is allowed.
+- The card icon represents the current controller-family state: standing means grounded; flying means airborne. Its tooltip describes the action that will result: `Switch to flight` or `Switch to ground`.
+- The control is visible only when the row is `ACTIVE`, its configured live projection resolves in the event world, and its active controller belongs to the recognized walk/fly family. No optimistic icon change is allowed.
 - Preserve the existing one-second lightweight card refresh and rebind the flight event on every refresh payload.
 - Do not persist a next-summon mode. Dismissal, death, and resummon continue to use HyDragon's existing grounded default.
 - Hydras and all three Rock Drake tiers must remain without `FlightToggle` and without any new flying state or controller behavior.
@@ -52,7 +51,7 @@
 - Modify: `src/test/java/com/alechilles/alecstamework/config/assets/TwCompanionConfigInheritanceTest.java`
 
 **Interfaces:**
-- Consumes: `Command.FlightToggle.Enabled`, `StateFlag`, and `HookId` from role-scoped companion assets.
+- Consumes: `Command.FlightToggle.Enabled` and `HookId` from role-scoped companion assets.
 - Produces: an immutable-by-copy effective capability available from `TwCompanionConfig.EffectiveSettings#getFlightToggle()`.
 
 - [ ] **Step 1: Create the Tamework feature branch and verify edit custody**
@@ -76,25 +75,22 @@ void defaultsAreDisabledAndIncomplete() {
             new TwCompanionFlightToggleSettings();
     assertFalse(settings.isEnabled());
     assertFalse(settings.isConfigured());
-    assertEquals("", settings.getStateFlag());
     assertEquals("", settings.getHookId());
 }
 
 @Test
-void enabledCapabilityRequiresBothStateFlagAndHook() {
+void enabledCapabilityRequiresHook() {
     TwCompanionFlightToggleSettings settings = configured(
-            true, "AirborneMode", "HyDragon.Command.ToggleAirborneMode");
+            true, "HyDragon.Command.ToggleAirborneMode");
     assertTrue(settings.isConfigured());
-    assertFalse(configured(true, "", "HyDragon.Command.ToggleAirborneMode")
-            .isConfigured());
-    assertFalse(configured(true, "AirborneMode", "").isConfigured());
+    assertFalse(configured(true, "").isConfigured());
 }
 ```
 
 Add inheritance tests to `TwCompanionConfigInheritanceTest` for:
 
 1. an omitted `FlightToggle` copying all parent values;
-2. `FlightToggle.StateFlag` overriding only the parent state flag while inheriting `Enabled` and `HookId`;
+2. `FlightToggle.HookId` overriding only the parent hook while inheriting `Enabled`;
 3. `FlightToggle.Enabled: false` explicitly disabling an inherited capability; and
 4. `EffectiveSettings.from(scoped, global).getFlightToggle()` preserving the resolved role-scoped values.
 
@@ -102,7 +98,7 @@ Use explicit-key sets matching the existing nested inheritance convention:
 
 ```java
 Map.of("Command", Set.of(
-        "FlightToggle", "FlightToggle.StateFlag"))
+        "FlightToggle", "FlightToggle.HookId"))
 ```
 
 - [ ] **Step 3: Run the focused tests and verify the intended red state**
@@ -120,29 +116,26 @@ Implement `TwCompanionFlightToggleSettings` with normalized, trimmed strings and
 ```java
 public final class TwCompanionFlightToggleSettings {
     private boolean enabled;
-    private String stateFlag = "";
     private String hookId = "";
 
     public boolean isEnabled() { return enabled; }
-    public String getStateFlag() { return stateFlag; }
     public String getHookId() { return hookId; }
 
     public boolean isConfigured() {
-        return enabled && !stateFlag.isBlank() && !hookId.isBlank();
+        return enabled && !hookId.isBlank();
     }
 
     TwCompanionFlightToggleSettings copy() {
         TwCompanionFlightToggleSettings copy =
                 new TwCompanionFlightToggleSettings();
         copy.enabled = enabled;
-        copy.stateFlag = stateFlag;
         copy.hookId = hookId;
         return copy;
     }
 }
 ```
 
-Keep setters package-private for the codec and normalize null to `""`. Add a `FLIGHT_TOGGLE_CODEC` to `TwCompanionCommandSettingsCodec` with the exact JSON keys `Enabled`, `StateFlag`, and `HookId`, then append it to the command codec under `FlightToggle`.
+Keep setters package-private for the codec and normalize null to `""`. Add a `FLIGHT_TOGGLE_CODEC` to `TwCompanionCommandSettingsCodec` with the exact JSON keys `Enabled` and `HookId`, then append it to the command codec under `FlightToggle`.
 
 - [ ] **Step 5: Wire copy, nested inheritance, and effective settings**
 
@@ -157,9 +150,6 @@ if (!explicit.contains("FlightToggle")) {
 }
 if (!explicit.contains("FlightToggle.Enabled")) {
     current.flightToggle.setEnabled(parent.getFlightToggle().isEnabled());
-}
-if (!explicit.contains("FlightToggle.StateFlag")) {
-    current.flightToggle.setStateFlag(parent.getFlightToggle().getStateFlag());
 }
 if (!explicit.contains("FlightToggle.HookId")) {
     current.flightToggle.setHookId(parent.getFlightToggle().getHookId());
@@ -188,7 +178,7 @@ Expected: focused tests pass and only the seven listed files are staged.
 
 ---
 
-### Task 2: Reuse the authoritative named flag and hook boundaries
+### Task 2: Classify native and Tamework controller families and share the hook boundary
 
 **Repository:** `C:/Users/22ale/AppData/Roaming/Hytale/Modding/alecstamework`
 
@@ -201,35 +191,41 @@ Expected: focused tests pass and only the seven listed files are staged.
 - Modify: `src/test/java/com/alechilles/alecstamework/items/CommandGenericTargetAuthorityTest.java`
 
 **Interfaces:**
-- Consumes: a configured `StateFlag`, a live `Role`, and hook metadata.
-- Produces: `Optional<Boolean>` for the exact named role flag and one shared hook-dispatch implementation used by commands and the panel.
+- Consumes: a configured capability, a live `Role`, and hook metadata.
+- Produces: `Optional<Boolean>` for a recognized active controller family and one shared hook-dispatch implementation used by commands and the panel.
 
-- [ ] **Step 1: Write failing flag-reader tests**
+- [ ] **Step 1: Write failing controller-family reader tests**
 
-Test the package-private supplier boundary so it does not require a live server store:
+Test a package-private class-classification boundary so it does not require a live server store:
 
 ```java
 @Test
-void readsConfiguredNamedFlagWithoutControllerInference() {
-    TwCompanionFlightToggleSettings settings = configuredFlightToggle();
-    Optional<Boolean> result = BondedCompanionFlightModeReader.read(
-            settings, name -> "AirborneMode".equals(name)
-                    ? () -> true : null);
-    assertEquals(Optional.of(true), result);
+void classifiesNativeAndTameworkFlightControllers() {
+    assertEquals(Optional.of(true), BondedCompanionFlightModeReader
+            .classify(MotionControllerFly.class));
+    assertEquals(Optional.of(true), BondedCompanionFlightModeReader
+            .classify(MotionControllerTameworkFly.class));
+    assertEquals(Optional.of(true), BondedCompanionFlightModeReader
+            .classify(MotionControllerTameworkMountedGlide.class));
 }
 
 @Test
-void missingOrThrowingSupplierIsUnavailable() {
-    assertTrue(BondedCompanionFlightModeReader.read(
-            configuredFlightToggle(), ignored -> null).isEmpty());
-    assertTrue(BondedCompanionFlightModeReader.read(
-            configuredFlightToggle(), ignored -> () -> {
-                throw new IllegalStateException("stale role scope");
-            }).isEmpty());
+void classifiesNativeAndTameworkGroundControllers() {
+    assertEquals(Optional.of(false), BondedCompanionFlightModeReader
+            .classify(MotionControllerWalk.class));
+    assertEquals(Optional.of(false), BondedCompanionFlightModeReader
+            .classify(MotionControllerTameworkRideWalk.class));
+}
+
+@Test
+void missingOrUnknownControllerIsUnavailable() {
+    assertTrue(BondedCompanionFlightModeReader.classify(null).isEmpty());
+    assertTrue(BondedCompanionFlightModeReader
+            .classify(UnknownMotionController.class).isEmpty());
 }
 ```
 
-Also assert a disabled/incomplete capability returns empty without invoking the supplier lookup.
+Also assert a disabled/incomplete capability returns empty before consulting the live role. The tests must use class inheritance, not exact controller type strings.
 
 - [ ] **Step 2: Write failing shared-hook factory tests**
 
@@ -243,21 +239,18 @@ Move the component construction contract into a testable method on `CommandNpcHo
 
 Expected: compilation fails because both new services are absent.
 
-- [ ] **Step 4: Implement the exact named-flag reader**
+- [ ] **Step 4: Implement the controller-family reader**
 
 Production reading must follow this path and return empty for every missing/stale layer:
 
 ```java
 Role role = npc == null ? null : npc.getRole();
-EntitySupport entity = role == null ? null : role.getEntitySupport();
-StdScope scope = entity == null ? null : entity.getSensorScope();
-BooleanSupplier supplier = scope == null
-        ? null : scope.getBooleanSupplier(settings.getStateFlag());
-return supplier == null ? Optional.empty()
-        : Optional.of(supplier.getAsBoolean());
+MotionController active = role == null
+        ? null : role.getActiveMotionController();
+return classify(active == null ? null : active.getClass());
 ```
 
-Catch `RuntimeException | LinkageError` at the live boundary (which includes `IllegalStateException`) and return empty. Do not consult `Role#flags` reflectively and do not inspect motion controllers.
+`classify(...)` must use `MotionControllerFly.class.isAssignableFrom(controllerClass)` and `MotionControllerWalk.class.isAssignableFrom(controllerClass)`, returning empty for every other class. Catch `RuntimeException | LinkageError` at the live role boundary and return empty. Do not consult `Role#flags`, compare `getType()` strings, or use `inAir()`/`onGround()`.
 
 - [ ] **Step 5: Extract shared hook dispatch without changing command semantics**
 
@@ -307,7 +300,7 @@ Expected: the old command tests stay green and the diff removes the duplicate co
 
 **Interfaces:**
 - Consumes: role-scoped effective settings and the current active projection.
-- Produces: transient `bonded.flightToggle.available` and `bonded.flightToggle.airborne` card attributes only when the configured flag is readable.
+- Produces: transient `bonded.flightToggle.available` and `bonded.flightToggle.airborne` card attributes only when the configured live controller family is recognized.
 
 - [ ] **Step 1: Add failing overlay and snapshot tests**
 
@@ -323,9 +316,9 @@ public static final String FLIGHT_TOGGLE_AIRBORNE =
 
 Test all of these cases:
 
-1. active + configured + readable false produces `available=true`, `airborne=false`;
-2. active + configured + readable true produces `available=true`, `airborne=true`;
-3. stored, dead, disabled, incomplete, missing live UUID, wrong-world, missing role, and unreadable flag produce neither flight attribute;
+1. active + configured + walking controller produces `available=true`, `airborne=false`;
+2. active + configured + flying controller produces `available=true`, `airborne=true`;
+3. stored, dead, disabled, incomplete, missing live UUID, wrong-world, missing role, missing controller, and unknown controller family produce neither flight attribute;
 4. applying the transient overlay does not change profile revision, lease, state, role ID, or durable API data; and
 5. a change only to either flight attribute is classified by `BondedCompanionCardDynamicState.changedOnlyByLiveFields(...)` as a lightweight dynamic update.
 
@@ -352,7 +345,7 @@ In `BondedCompanionPanelEntrySourceService#withLivePresentation(...)`, after nam
 3. read `NPCEntity` and resolve its role ID with `CompanionRoleIdResolver`;
 4. require the live role ID to match `profile.roleId()`;
 5. resolve `TwCompanionConfig.resolveEffectiveForRole(roleId).getFlightToggle()`;
-6. require `settings.isConfigured()` before attempting the flag lookup; and
+6. require `settings.isConfigured()` before attempting controller classification; and
 7. pass the reader's `Optional<Boolean>` to `withFlightMode`, allowing an empty result to remove both transient keys.
 
 Replace the presentation source's literal `"bonded.liveNpcUuid"` with `BondedCompanionPresentationAttributes.LIVE_NPC_UUID`.
@@ -405,7 +398,7 @@ The action-service tests must prove that it rejects:
 - a missing, invalid, or wrong-store live ref;
 - a live role ID different from the profile role ID;
 - current settings that are disabled/incomplete even if the old snapshot said available; and
-- a current named flag that is no longer readable.
+- a current controller that is absent or no longer belongs to a recognized walk/fly family.
 
 The success test must prove it dispatches exactly the re-resolved `HookId` to the one live ref and does not set state, controller, target, or presentation attributes directly.
 
@@ -443,7 +436,7 @@ boolean toggle(
         @Nonnull BondedCompanionPanelPresentation row)
 ```
 
-Resolve the current player through `BondedCompanionPanelActionRouter.resolvePlayerFromEvent(...)`, then repeat every live projection, role ID, effective-settings, and named-flag check from the snapshot path before dispatching the configured hook through `CommandNpcHookDispatchService`. Reading the current flag is an availability check; do not choose a different hook based on its value because HyDragon's existing transition owns the toggle.
+Resolve the current player through `BondedCompanionPanelActionRouter.resolvePlayerFromEvent(...)`, then repeat every live projection, role ID, effective-settings, and controller-family check from the snapshot path before dispatching the configured hook through `CommandNpcHookDispatchService`. Reading the current controller family is an availability check; do not choose a different hook based on its value because HyDragon's existing transition owns the toggle.
 
 - [ ] **Step 5: Wire the event through the page without speculative state**
 
@@ -661,18 +654,17 @@ Create `HyDragonNordicDrake.json` with:
     "PlacementMaxRelativeY": 8.0,
     "FlightToggle": {
       "Enabled": true,
-      "StateFlag": "AirborneMode",
       "HookId": "HyDragon.Command.ToggleAirborneMode"
     }
   }
 }
 ```
 
-Add the identical `FlightToggle` block inside `HyDragonMiniwyvern.json`'s existing `Command` object. Do not change the horn command, roster policies, role templates, locomotion transition component, or any Hydra/Rock Drake file.
+Add the identical two-key `FlightToggle` block inside `HyDragonMiniwyvern.json`'s existing `Command` object. Do not change the horn command, roster policies, role templates, locomotion transition component, or any Hydra/Rock Drake file.
 
 - [ ] **Step 4: Update Python validation for the three companion assets**
 
-Add `HyDragonNordicDrake.json` to required/parsed/package path lists. Update the expected role partitions and extend validation to require the exact three-key object only for Nordic/Mini, while rejecting `FlightToggle`, `AirborneMode`, and `HyDragon.Command.ToggleAirborneMode` from the ground-only companion asset.
+Add `HyDragonNordicDrake.json` to required/parsed/package path lists. Update the expected role partitions and extend validation to require the exact two-key object only for Nordic/Mini, while rejecting `FlightToggle`, `AirborneMode`, and `HyDragon.Command.ToggleAirborneMode` from the ground-only companion asset.
 
 Keep the lifecycle ownership assertion: none of the three companion assets may add `Travel`, `Summon`, or `Revive`.
 
@@ -751,7 +743,8 @@ Use `superpowers:requesting-code-review` and request review of:
 
 - live-world/thread authority and stale-ref rejection;
 - no optimistic UI state;
-- exact named-flag reading rather than controller/species inference;
+- controller-family classification covering native and Tamework subclasses without exact string matching;
+- capability availability remaining explicit configuration rather than controller/species inference;
 - shared hook dispatch preserving command behavior;
 - default-disabled and partial inheritance semantics;
 - event rebinding on lightweight refreshes; and
@@ -785,8 +778,8 @@ With the newly installed jars:
 
 1. Open the Dragon Horn panel with a stored MiniWyvern and confirm no flight button appears.
 2. Summon the MiniWyvern; confirm the standing icon appears once the active projection resolves.
-3. Click it; confirm the companion keeps its current order/target, transitions to flight, and the icon changes to flying only after the live `AirborneMode` refresh.
-4. Click again; confirm the companion lands through the existing transition and the icon changes to standing only after the flag changes.
+3. Click it; confirm the companion keeps its current order/target, transitions to flight, and the icon changes to flying only after the active controller changes to the flying family.
+4. Click again; confirm the companion lands through the existing transition and the icon changes to standing only after the active controller changes to the walking family.
 5. Repeat the grounded/airborne cycle with an active Nordic Drake.
 6. Open cards for an active Hydra and each Rock Drake tier; confirm no flight button is rendered.
 7. Dismiss or kill an eligible companion while the panel is open; confirm the next refresh removes the button without an error or stale click effect.
