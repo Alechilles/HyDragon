@@ -720,6 +720,10 @@ final class DragonHornLocomotionAssetContractTest {
         assertEquals(1, objects(component, object ->
                         "Component_Instruction_Combat_Back_Off".equals(string(object, "Reference"))).size(),
                 "combat back-off must exist exclusively inside the dive child");
+        assertEquals(1, objects(component, object -> "TimerStart".equals(string(object, "Type"))).size(),
+                "back-off timer start must exist exclusively inside the dive child");
+        assertEquals(1, objects(component, object -> "TimerRestart".equals(string(object, "Type"))).size(),
+                "back-off timer restart must exist exclusively inside the dive child");
 
         assertLostTargetReleaseAndReset(combatInstructions);
     }
