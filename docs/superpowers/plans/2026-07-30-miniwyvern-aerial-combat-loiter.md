@@ -388,13 +388,13 @@ Expected: candidate validation succeeds with no blocker and includes the changed
 
 - [ ] **Step 4: Generate and run the static verification plan**
 
-Use the candidate report produced in Step 3 as `--candidate`:
+Use an exact-profile verification candidate representing the committed asset delta as `--candidate`. The no-op affected-scope report from Step 3 has no patch operations and therefore cannot be used to generate verification cases:
 
 ```bash
 python -m hytale_npc_assets.cli author verify generate \
   --project-profile "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.hytale-npc-assets.json" \
-  --candidate "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-validation.json" \
-  --behavior-goal "Airborne Miniwyvern loiters at range, rarely dives, and fires periodically" \
+  --candidate "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-verification-candidate.json" \
+  --behavior-goal "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-behavior-goal.json" \
   --out "C:/Users/22ale/AppData/Roaming/Hytale/Modding/HyDragon/.worktrees/dragon-horn-flight-modes/.asset-tools/reports/miniwyvern-aerial-combat-verification-plan.json"
 
 python -m hytale_npc_assets.cli author verify run \
