@@ -257,3 +257,7 @@ hydragon.talents.nordic_drake.sagascar.name=Sagascar
 hydragon.talents.nordic_drake.sagascar.description=Greatly reduces incoming damage.
 hydragon.talents.nordic_drake.northern_bulwark.name=Northern Bulwark
 hydragon.talents.nordic_drake.northern_bulwark.description=Increases maximum health and reduces incoming damage.
+hydragon.commands.defend.name=Defend
+hydragon.commands.defend.hud=Your dragon will defend you.
+hydragon.commands.toggleAirborneMode.name=Toggle Flight/Ground Mode
+hydragon.commands.toggleAirborneMode.hud=Your dragon toggled flight/ground mode.

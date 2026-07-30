@@ -257,3 +257,7 @@ hydragon.talents.nordic_drake.sagascar.name=Cicatriz de Saga
 hydragon.talents.nordic_drake.sagascar.description=Reduce mucho el dano recibido.
 hydragon.talents.nordic_drake.northern_bulwark.name=Baluarte del Norte
 hydragon.talents.nordic_drake.northern_bulwark.description=Aumenta la salud maxima y reduce el dano recibido.
+hydragon.commands.defend.name=Defender
+hydragon.commands.defend.hud=Tu dragon te defendera.
+hydragon.commands.toggleAirborneMode.name=Alternar modo vuelo/suelo
+hydragon.commands.toggleAirborneMode.hud=Tu dragon alterno el modo vuelo/suelo.

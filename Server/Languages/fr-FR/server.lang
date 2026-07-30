@@ -257,3 +257,7 @@ hydragon.talents.nordic_drake.sagascar.name=Cicatrice de Saga
 hydragon.talents.nordic_drake.sagascar.description=Reduit fortement les degats recus.
 hydragon.talents.nordic_drake.northern_bulwark.name=Bastion du Nord
 hydragon.talents.nordic_drake.northern_bulwark.description=Augmente la sante maximale et reduit les degats recus.
+hydragon.commands.defend.name=Defendre
+hydragon.commands.defend.hud=Votre dragon vous defendra.
+hydragon.commands.toggleAirborneMode.name=Basculer le mode vol/sol
+hydragon.commands.toggleAirborneMode.hud=Votre dragon a bascule le mode vol/sol.

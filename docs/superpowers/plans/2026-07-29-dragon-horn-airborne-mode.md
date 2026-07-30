@@ -31,7 +31,7 @@
 | HyDragon | `Server/Tamework/Items/Commands/HyDragonDragonHorn.json` | Exact Dragon Horn radial-menu command contract. |
 | HyDragon | `Server/NPC/Roles/Creature/HyDragon/Components/` | Shared hook consumer plus native, state-preserving takeoff/landing transition. |
 | HyDragon | `Template_Wyvern_Mini_Flying_Tamed.json` | Miniwyvern grounded/airborne behavior and talent-combat preservation. |
-| HyDragon | `Template_HyDragon_Dragon_Tamed.json` | Shared full-dragon grounded/airborne behavior for Nordic, Hydra, and Rock Drake variants. |
+| HyDragon | `Template_HyDragon_Dragon_Tamed.json` | Nordic Drake grounded/airborne behavior; Hydra and Rock Drake roles remain ground-only. |
 | HyDragon | `Server/Languages/*/server.lang`, `src/test/java/...` | Command text, static asset contracts, and regression coverage. |
 
 ---
@@ -112,7 +112,7 @@
 - [ ] Run `./mvnw -Dtest=DragonHornLocomotionAssetContractTest,MiniwyvernTalentAssetWiringTest test`, then resolve/lint the template and all seven `Tamed_Wyvern_Mini_*.json` variants with the release-0.5.7 profile.
 - [ ] Commit as `Feat: add miniwyvern flight modes`.
 
-## Task 5: Give every full dragon the same state-preserving flight modes
+## Task 5: Give Nordic Drakes state-preserving flight modes
 
 **Repository:** HyDragon, after Task 3.
 
@@ -126,7 +126,7 @@
 - [ ] Preserve the existing grounded full-dragon Follow, Defend, Hold, and Idle blocks under `AirborneMode=false`. In particular, keep all current full-dragon combat, flock, sleep, and grounded follow behavior intact.
 - [ ] Add aerial alternatives under `AirborneMode=true`: use `Component_Tamework_Instruction_Follow_Flying` for Follow; use the existing Defend configuration with its `DefendFollowMacroElement` switched to that flight follow component; use a Fly-controller hover for Hold without entering Sleep; and use a Fly-controller aerial wander/hover for Idle. Keep the `Ridden` state and mounted glide action unchanged.
 - [ ] Do not turn a Horn toggle into `Ridden`, `Follow`, `Hold`, `Idle`, or any new flight-only parent state. The common transition component changes controller mode under the current order; the state branch changes only movement behavior.
-- [ ] Resolve and lint the template, then resolve every inherited full-dragon role (`Tamed_NordicDrake`, `Tamed_Hydra`, and all tamed Rock Drake tiers). Run the focused contract test.
+- [ ] Resolve and lint the Nordic Drake template and `Tamed_NordicDrake`; assert `Tamed_Hydra` and all tamed Rock Drake tiers remain on their ground-only shared template. Run the focused contract test.
 - [ ] Commit as `Feat: add dragon flight modes`.
 
 ## Task 6: Validate integration, package, and perform the in-game acceptance pass
@@ -151,7 +151,7 @@
 
   Run `./mvnw verify` in the Tamework repository as a dependency regression check, with no source changes expected there.
 - [ ] Package HyDragon with `./mvnw package` and inspect the artifact to ensure the Horn config, shared transition component, both templates, and all five language catalogs are present. Do not copy the jar into `UserData/Mods` unless installation is explicitly requested.
-- [ ] In game, use the Dragon Horn with one Miniwyvern and one representative each of Nordic Drake, Hydra, and Rock Drake. Confirm the wheel has exactly the intended eight entries, Defend independently protects the owner, and Attack Target locks and pursues the crosshair target.
+- [ ] In game, use the Dragon Horn with one Miniwyvern and one Nordic Drake. Confirm the wheel has exactly the intended eight entries, Defend independently protects the owner, and Attack Target locks and pursues the crosshair target. Confirm Hydra and Rock Drake remain ground-only.
 - [ ] For Follow, Hold, Defend, and Idle, toggle Flight/Ground while the companion is already in that order. Verify: the state and target remain unchanged; grounded mode lands and uses walking behavior; airborne mode takes off and flies/hovers; and a Defending Miniwyvern still fires its talent-gated projectile when the talent is unlocked.
 - [ ] Dismiss and re-summon each representative while it was last airborne. Confirm every new projection begins grounded. Also test the landing fallback over uneven terrain: it may continue seeking a safe landing position, but it must not discard its target or switch orders.
 - [ ] Review `git diff --check` and `git status --short`. Commit any verification-only test or packaging fix separately as `Test: verify dragon horn flight modes`.
@@ -160,8 +160,8 @@
 
 - [ ] The Dragon Horn explicitly defines the eight-command wheel, with Defend and Attack Target distinct and neither home command present.
 - [ ] Toggling uses the existing Tamework hook bridge and the vanilla `AirborneMode` flag only; no new Tamework Java API or persistent flag store exists.
-- [ ] Every newly summoned Miniwyvern and full dragon starts grounded.
+- [ ] Every newly summoned Miniwyvern and Nordic Drake starts grounded; Hydra and Rock Drake remain ground-only.
 - [ ] Follow, Hold, Defend, and Idle switch only their movement style. Toggling does not change state, clear targets, or overwrite the owner target.
 - [ ] Miniwyvern projectile talents remain active only through Defend plus LockedTarget, in both grounded and aerial movement branches.
-- [ ] Nordic Drake, Hydra, Rock Drake, and all seven Miniwyvern forms inherit valid grounded and airborne behavior from their shared templates.
+- [ ] Nordic Drake and all seven Miniwyvern forms inherit valid grounded and airborne behavior; Hydra and Rock Drake remain ground-only from their shared template.
 - [ ] Assets validate against Hytale 0.5.7, test suites pass, language keys are present in all shipped locales, and the packaged artifact contains every modified asset.
