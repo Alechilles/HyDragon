@@ -70,6 +70,32 @@ final class MiniwyvernTalentAssetWiringTest {
     }
 
     @Test
+    void projectileCadenceUsesDeliberateRandomizedProgressionBands() throws IOException {
+        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        Map<String, JsonElement> expected = Map.ofEntries(
+                Map.entry("DraconicProjectile", JsonParser.parseString("[5,7]")),
+                Map.entry("ProjectileRange", JsonParser.parseString("[5,7]")),
+                Map.entry("ProjectileCadence", JsonParser.parseString("[4,6]")),
+                Map.entry("ProjectileForce", JsonParser.parseString("[5,7]")),
+                Map.entry("ProjectileGuidance", JsonParser.parseString("[4,6]")),
+                Map.entry("ProjectileImpact", JsonParser.parseString("[5,7]")),
+                Map.entry("ProjectilePattern", JsonParser.parseString("[4,6]")),
+                Map.entry("DraconicAssault", JsonParser.parseString("[3,5]")),
+                Map.entry("AssaultUtility", JsonParser.parseString("[3,5]")),
+                Map.entry("AssaultMastery", JsonParser.parseString("[3,5]")),
+                Map.entry("DraconicApex", JsonParser.parseString("[3,5]")));
+
+        for (String talentId : COMBAT_TALENTS) {
+            JsonObject attack = projectileAttack(instructionForTalent(instructions, talentId));
+            JsonArray pause = attack.getAsJsonArray("AttackPauseRange");
+            assertEquals(expected.get(talentId), pause, talentId);
+            assertTrue(pause.get(0).getAsDouble() >= 3.0, talentId + " fires too quickly");
+            assertTrue(pause.get(0).getAsDouble() < pause.get(1).getAsDouble(),
+                    talentId + " cadence must be randomized");
+        }
+    }
+
+    @Test
     void allFormsProvideOnlyGenericTalentBindingsAndWildCombatIsRawOnly() throws IOException {
         for (String form : ROLES) {
             JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
@@ -182,6 +208,29 @@ final class MiniwyvernTalentAssetWiringTest {
             if (element.isJsonObject() && positiveTalentGates(element).contains(talentId)) return element.getAsJsonObject();
         }
         throw new AssertionError("missing executable gate for " + talentId);
+    }
+
+    private static JsonObject projectileAttack(JsonElement value) {
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("Attack".equals(string(object, "Type")) && object.has("AttackPauseRange")) return object;
+            for (JsonElement child : object.asMap().values()) {
+                try {
+                    return projectileAttack(child);
+                } catch (IllegalArgumentException ignored) {
+                    // Search the next child.
+                }
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) {
+                try {
+                    return projectileAttack(child);
+                } catch (IllegalArgumentException ignored) {
+                    // Search the next child.
+                }
+            }
+        }
+        throw new IllegalArgumentException("missing projectile Attack action");
     }
 
     private static Set<String> positiveTalentGates(JsonElement value) {
