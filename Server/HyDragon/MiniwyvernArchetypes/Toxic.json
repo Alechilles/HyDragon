@@ -1,6 +1,7 @@
 {
   "Id": "toxic",
   "RoleId": "Tamed_Wyvern_Mini_Toxic",
+  "RequiredTalentId": "EssenceBond",
   "ParticleAndSoundIds": [ "Effect_Poison", "SFX_Scarak_Spitball_Fire" ],
   "PassiveEffects": [ "HyDragon_Miniwyvern_Toxic_Aura" ],
   "OwnerAttackAura": {

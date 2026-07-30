@@ -26,6 +26,11 @@ public interface MiniwyvernAbilityWorld {
     /** Returns the exact role currently assigned to the live companion NPC. */
     Optional<String> companionRoleId();
 
+    /** Returns whether the live companion has purchased the exact Tamework talent. */
+    default boolean hasPurchasedTalent(String talentId) {
+        return false;
+    }
+
     Health health(UUID entityUuid);
 
     boolean applyEffect(UUID entityUuid, String sourceKey, String effectId, double durationSeconds);

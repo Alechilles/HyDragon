@@ -2,6 +2,7 @@ package com.alechilles.hydragon.abilities;
 
 import com.alechilles.alecstamework.api.NpcProfileView;
 import com.alechilles.alecstamework.api.TameworkApi;
+import com.alechilles.alecstamework.npc.components.TameworkTalentsComponent;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
@@ -185,6 +186,14 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
             NPCEntity npc = store.getComponent(npcRef, NPCEntity.getComponentType());
             String roleId = npc == null ? null : npc.getRoleName();
             return roleId == null || roleId.isBlank() ? Optional.empty() : Optional.of(roleId);
+        }
+
+        @Override
+        public boolean hasPurchasedTalent(String talentId) {
+            if (!valid(npcRef) || talentId == null || talentId.isBlank()) return false;
+            var type = TameworkTalentsComponent.getComponentType();
+            TameworkTalentsComponent talents = type == null ? null : store.getComponent(npcRef, type);
+            return talents != null && talents.hasPurchasedTalent(talentId);
         }
 
         @Override

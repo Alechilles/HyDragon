@@ -1,6 +1,7 @@
 {
   "Id": "ice",
   "RoleId": "Tamed_Wyvern_Mini_Ice",
+  "RequiredTalentId": "EssenceBond",
   "ParticleAndSoundIds": [ "Hydra_Rain_Impact_Ice", "SFX_Staff_Ice_Shoot" ],
   "PassiveEffects": [ "HyDragon_Miniwyvern_Ice_Aura" ],
   "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Ice_Slow", "DurationSeconds": 4.0 },

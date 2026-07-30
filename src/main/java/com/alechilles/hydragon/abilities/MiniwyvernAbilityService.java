@@ -67,7 +67,8 @@ public final class MiniwyvernAbilityService {
             return cleanupAndDeny(context, archetypes, world, "role-config-invalid", nowMs);
         }
         String formId = config.getId();
-        synchronizeOwnerAttackAura(context, config);
+        boolean requiredTalentPurchased = requiredTalentPurchased(config, world);
+        synchronizeOwnerAttackAura(context, config, requiredTalentPurchased);
 
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
@@ -84,7 +85,8 @@ public final class MiniwyvernAbilityService {
         MutableState mutable = new MutableState(state);
         mutable.discardRetiredCombatState();
         mutable.prune(nowMs);
-        PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs);
+        PassiveExecution passive = preparePassives(
+                context, config, world, mutable, requiredTalentPurchased, nowMs);
         Set<String> diagnostics = new LinkedHashSet<>(passive.diagnostics());
         // Establish source ownership and every non-idempotent cooldown before mutating the world.
         MiniwyvernAbilityState preparedState = mutable.freeze(formId);
@@ -151,6 +153,7 @@ public final class MiniwyvernAbilityService {
             MiniwyvernArchetypeConfig config,
             MiniwyvernAbilityWorld world,
             MutableState state,
+            boolean requiredTalentPurchased,
             long nowMs) {
         String passiveSource = sourceKey(context.profileId(), config.getId(), "passive");
         Map<String, String> supportedEffectModifiers = new LinkedHashMap<>();
@@ -180,10 +183,12 @@ public final class MiniwyvernAbilityService {
                 unsupportedModifiers.addAll(rawModifierCandidates.keySet());
             }
         }
-        boolean passiveDisabled = !unsupportedModifiers.isEmpty();
-        List<String> diagnostics = passiveDisabled
-                ? List.of("passive-ability-disabled:" + String.join("+", unsupportedModifiers))
-                : List.of();
+        boolean passiveDisabled = !requiredTalentPurchased || !unsupportedModifiers.isEmpty();
+        List<String> diagnostics = !requiredTalentPurchased
+                ? List.of("passive-ability-disabled:talent-locked:" + config.getRequiredTalentId())
+                : passiveDisabled
+                        ? List.of("passive-ability-disabled:" + String.join("+", unsupportedModifiers))
+                        : List.of();
         boolean hasPassive = !passiveDisabled && (!config.getPassiveEffects().isEmpty()
                 || !supportedEffectModifiers.isEmpty() || !supportedRawModifiers.isEmpty());
         boolean refreshPassive = hasPassive && shouldRefreshPassiveLease(
@@ -332,14 +337,24 @@ public final class MiniwyvernAbilityService {
     /** Clears ephemeral owner-hit state even when the world projection is already gone. */
     public void clearOwnerAuras() { ownerAuras.clear(); }
 
-    private void synchronizeOwnerAttackAura(ProfileContext context, MiniwyvernArchetypeConfig config) {
+    private void synchronizeOwnerAttackAura(
+            ProfileContext context,
+            MiniwyvernArchetypeConfig config,
+            boolean requiredTalentPurchased) {
         MiniwyvernArchetypeConfig.OwnerAttackAura aura = config.getOwnerAttackAura();
-        if (aura == null || aura.getEffectId() == null || !ownerAuras.update(
+        if (!requiredTalentPurchased || aura == null || aura.getEffectId() == null || !ownerAuras.update(
                 context.ownerUuid(), context.profileId(), context.npcUuid().toString(), context.npcUuid(),
                 config.getId(), aura.getEffectId(), aura.getDurationSeconds(),
                 aura.getDamageReductionFraction())) {
             ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
         }
+    }
+
+    private static boolean requiredTalentPurchased(
+            MiniwyvernArchetypeConfig config,
+            MiniwyvernAbilityWorld world) {
+        String requiredTalentId = config.getRequiredTalentId();
+        return requiredTalentId.isEmpty() || world.hasPurchasedTalent(requiredTalentId);
     }
 
     private static String sourceKey(String profileId, String formId, String abilityId) {

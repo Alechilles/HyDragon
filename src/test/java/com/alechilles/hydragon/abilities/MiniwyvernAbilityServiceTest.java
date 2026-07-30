@@ -66,6 +66,22 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
+    void keepsOwnerPassivesAndAttackAuraLockedUntilEssenceBondIsPurchased() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.essenceBondPurchased = false;
+        MiniwyvernOwnerAuraRegistry auras = new MiniwyvernOwnerAuraRegistry();
+
+        MiniwyvernAbilityService.TickResult result = new MiniwyvernAbilityService(states, auras).tick(
+                context(), Map.of("fire", fireConfig()), world, 1_000L);
+
+        assertTrue(result.ready());
+        assertEquals(0, world.effects, "a locked bond talent must not apply its owner passive");
+        assertTrue(auras.activeFor(OWNER).isEmpty(),
+                "a locked bond talent must not register an owner-hit aura");
+    }
+
+    @Test
     void deactivationCleansOwnerPassiveSourcesWithoutTargetedCombatCleanup() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
@@ -132,6 +148,7 @@ class MiniwyvernAbilityServiceTest {
 
     private static MiniwyvernArchetypeConfig fireConfig() throws Exception {
         MiniwyvernArchetypeConfig config = base("fire", "Tamed_Wyvern_Mini_Fire");
+        set(config, "requiredTalentId", "EssenceBond");
         set(config, "passiveEffects", new String[] { "test-fire-aura" });
         set(config, "passiveModifiers", Map.of("JumpMultiplier", 1.10D));
         MiniwyvernArchetypeConfig.OwnerAttackAura aura = construct(MiniwyvernArchetypeConfig.OwnerAttackAura.class);
@@ -202,6 +219,7 @@ class MiniwyvernAbilityServiceTest {
         int damageApplications;
         int heals;
         String roleId = "Tamed_Wyvern_Mini_Fire";
+        boolean essenceBondPurchased = true;
 
         private FakeWorld(MemoryRepository states) { this.states = states; }
         @Override public boolean isWorldThread() { return true; }
@@ -239,6 +257,9 @@ class MiniwyvernAbilityServiceTest {
             return true;
         }
         @Override public boolean areAllies(UUID ownerUuid, UUID targetUuid) { return false; }
+        @Override public boolean hasPurchasedTalent(String talentId) {
+            return "EssenceBond".equals(talentId) && essenceBondPurchased;
+        }
         private static Target target(UUID id) { return new Target(id, null, "world", 0.0D, true); }
     }
 }

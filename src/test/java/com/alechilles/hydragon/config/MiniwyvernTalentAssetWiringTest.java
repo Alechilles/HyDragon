@@ -45,6 +45,31 @@ final class MiniwyvernTalentAssetWiringTest {
     }
 
     @Test
+    void defendDispatchContinuesToTheUnlockedProjectileVariant() throws IOException {
+        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        JsonObject defendDispatch = instructions.asList().stream()
+                .filter(JsonElement::isJsonObject)
+                .map(JsonElement::getAsJsonObject)
+                .filter(instruction -> instruction.has("Instructions")
+                        && containsDefendStateInstruction(instruction.get("Instructions")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("missing Miniwyvern Defend state dispatch"));
+
+        assertTrue(defendDispatch.has("Continue") && defendDispatch.get("Continue").getAsBoolean(),
+                "the Defend state dispatch must continue so its later talent projectile instruction can run");
+    }
+
+    @Test
+    void formPassivesRequireEssenceBond() throws IOException {
+        for (String form : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void")) {
+            JsonObject archetype = load(Path.of("Server", "HyDragon", "MiniwyvernArchetypes",
+                    form + ".json"));
+            assertEquals("EssenceBond", string(archetype, "RequiredTalentId"),
+                    form + " owner passive must remain locked until Essence Bond is purchased");
+        }
+    }
+
+    @Test
     void allFormsProvideOnlyGenericTalentBindingsAndWildCombatIsRawOnly() throws IOException {
         for (String form : ROLES) {
             JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
@@ -120,6 +145,23 @@ final class MiniwyvernTalentAssetWiringTest {
             }
         } else if (value.isJsonArray()) {
             for (JsonElement child : value.getAsJsonArray()) if (hasTalentGate(child, talentId)) return true;
+        }
+        return false;
+    }
+
+    private boolean containsDefendStateInstruction(JsonElement value) {
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("State".equals(string(object, "Type")) && "Defend".equals(string(object, "State"))) {
+                return true;
+            }
+            for (JsonElement child : object.asMap().values()) {
+                if (containsDefendStateInstruction(child)) return true;
+            }
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) {
+                if (containsDefendStateInstruction(child)) return true;
+            }
         }
         return false;
     }
