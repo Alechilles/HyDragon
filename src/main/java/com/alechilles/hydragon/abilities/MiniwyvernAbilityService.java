@@ -74,6 +74,7 @@ public final class MiniwyvernAbilityService {
         if (loaded.status() == MiniwyvernAbilityStateRepository.Status.UNAVAILABLE) {
             return TickResult.denied("ability-state-unavailable");
         }
+        boolean stateMissing = loaded.status() == MiniwyvernAbilityStateRepository.Status.MISSING;
         MiniwyvernAbilityState state = loaded.status() == MiniwyvernAbilityStateRepository.Status.LOADED
                 ? loaded.state() : MiniwyvernAbilityState.empty(formId, nowMs);
         if (!state.formId().equals(formId)) {
@@ -86,8 +87,9 @@ public final class MiniwyvernAbilityService {
         PassiveExecution passive = preparePassives(context, config, world, mutable, nowMs);
         Set<String> diagnostics = new LinkedHashSet<>(passive.diagnostics());
         // Establish source ownership and every non-idempotent cooldown before mutating the world.
-        if (!states.save(context.ownerUuid(), context.profileId(),
-                mutable.freeze(formId))) {
+        MiniwyvernAbilityState preparedState = mutable.freeze(formId);
+        if ((stateMissing || !preparedState.equals(state)) && !states.save(
+                context.ownerUuid(), context.profileId(), preparedState)) {
             return TickResult.denied("ability-state-unavailable");
         }
 
@@ -98,7 +100,7 @@ public final class MiniwyvernAbilityService {
 
         mutable.prune(nowMs);
         MiniwyvernAbilityState finalState = mutable.freeze(formId);
-        if (!finalState.equals(state) && !states.save(
+        if (!finalState.equals(preparedState) && !states.save(
                 context.ownerUuid(), context.profileId(), finalState)) {
             return new TickResult(false, "ability-state-finalize-failed", effectsApplied, abilitiesExecuted);
         }
@@ -184,6 +186,8 @@ public final class MiniwyvernAbilityService {
                 : List.of();
         boolean hasPassive = !passiveDisabled && (!config.getPassiveEffects().isEmpty()
                 || !supportedEffectModifiers.isEmpty() || !supportedRawModifiers.isEmpty());
+        boolean refreshPassive = hasPassive && shouldRefreshPassiveLease(
+                state.sourceExpiresAt.get(passiveSource), nowMs, passiveRefreshSeconds(config));
         boolean cleanupDisabledPassive = false;
         if (passiveDisabled) {
             cleanupDisabledPassive = state.sources.remove(passiveSource);
@@ -193,11 +197,12 @@ public final class MiniwyvernAbilityService {
             supportedEffectModifiers.clear();
             supportedRawModifiers.clear();
         }
-        if (hasPassive && !state.trackSource(
+        if (refreshPassive && !state.trackSource(
                 passiveSource,
                 context.ownerUuid(),
                 saturatingAdd(nowMs, secondsToMs(passiveRefreshSeconds(config))))) {
             hasPassive = false;
+            refreshPassive = false;
             diagnostics = List.of("passive-ability-disabled:source-tracking-capacity");
             supportedEffectModifiers.clear();
             supportedRawModifiers.clear();
@@ -219,6 +224,7 @@ public final class MiniwyvernAbilityService {
         return new PassiveExecution(
                 passiveSource,
                 hasPassive,
+                refreshPassive,
                 cleanupDisabledPassive,
                 natureHeal,
                 Map.copyOf(supportedEffectModifiers),
@@ -242,7 +248,7 @@ public final class MiniwyvernAbilityService {
             }
             world.removeOwnerModifiers(context.ownerUuid(), passive.sourceKey());
         }
-        if (passive.hasPassive()) {
+        if (passive.refreshPassive()) {
             double refreshSeconds = passiveRefreshSeconds(config);
             for (String effectId : config.getPassiveEffects()) {
                 if (world.applyEffect(context.ownerUuid(), passive.sourceKey(), effectId, refreshSeconds)) applied++;
@@ -284,6 +290,13 @@ public final class MiniwyvernAbilityService {
 
     private static double passiveRefreshSeconds(MiniwyvernArchetypeConfig config) {
         return config.getId().equals("nature") ? 10.0D : 8.0D;
+    }
+
+    private static boolean shouldRefreshPassiveLease(
+            Long expiresAtMs, long nowMs, double durationSeconds) {
+        long durationMs = secondsToMs(durationSeconds);
+        long renewalLeadMs = Math.max(1_000L, durationMs / 2L);
+        return expiresAtMs == null || expiresAtMs <= saturatingAdd(nowMs, renewalLeadMs);
     }
 
     private static boolean isModifierConstraint(String modifierId) {
@@ -384,6 +397,7 @@ public final class MiniwyvernAbilityService {
     private record PassiveExecution(
             String sourceKey,
             boolean hasPassive,
+            boolean refreshPassive,
             boolean cleanupDisabledPassive,
             double natureHeal,
             Map<String, String> effectModifiers,

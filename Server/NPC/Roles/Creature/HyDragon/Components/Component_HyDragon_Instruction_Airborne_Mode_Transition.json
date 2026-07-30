@@ -10,21 +10,6 @@
     },
     "Instructions": [
       {
-        "$Comment": "Each new role starts in grounded mode.",
-        "Continue": true,
-        "Sensor": {
-          "Type": "Any",
-          "Once": true
-        },
-        "Actions": [
-          {
-            "Type": "SetFlag",
-            "Name": "AirborneMode",
-            "SetTo": false
-          }
-        ]
-      },
-      {
         "$Comment": "Consume one horn toggle and flip only the native mode flag.",
         "Continue": true,
         "Sensor": {

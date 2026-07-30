@@ -51,6 +51,21 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
+    void doesNotRewriteAnActivePassiveLeaseBeforeItNeedsRenewal() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+
+        assertTrue(service.tick(context(), Map.of("fire", fireConfig()), world, 1_000L).ready());
+        assertTrue(service.tick(context(), Map.of("fire", fireConfig()), world, 2_000L).ready());
+
+        assertEquals(1, states.saves,
+                "an already-valid passive lease must not synchronously rewrite bonded extension state every second");
+        assertEquals(1, world.effects,
+                "the existing effect duration keeps the passive active until its renewal window");
+    }
+
+    @Test
     void deactivationCleansOwnerPassiveSourcesWithoutTargetedCombatCleanup() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
@@ -162,6 +177,7 @@ class MiniwyvernAbilityServiceTest {
     private static final class MemoryRepository implements MiniwyvernAbilityStateRepository {
         MiniwyvernAbilityState current;
         boolean unavailable;
+        int saves;
 
         @Override public LoadResult load(UUID ownerUuid, String profileId) {
             return unavailable ? LoadResult.unavailable()
@@ -170,6 +186,7 @@ class MiniwyvernAbilityServiceTest {
 
         @Override public boolean save(UUID ownerUuid, String profileId, MiniwyvernAbilityState state) {
             if (unavailable) return false;
+            saves++;
             current = state;
             return true;
         }

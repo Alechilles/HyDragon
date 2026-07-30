@@ -93,8 +93,8 @@ final class DragonHornLocomotionAssetContractTest {
         assertEquals("Component", transition.get("Type").getAsString());
         assertEquals("Instruction", transition.get("Class").getAsString());
         JsonObject content = transition.getAsJsonObject("Content");
-        assertTrue(hasOnceSetFlag(content, "AirborneMode", false),
-                "newly spawned roles must reset AirborneMode to false exactly once");
+        assertFalse(hasOnceSetFlag(content, "AirborneMode", false),
+                "changing a horn command state must never reset a dragon's selected airborne mode");
         assertEquals(1, countHookSensors(content, "HyDragon.Command.ToggleAirborneMode"),
                 "the transition component must consume exactly the ToggleAirborneMode hook");
         assertTrue(hasConsumingHook(content, "HyDragon.Command.ToggleAirborneMode"),
@@ -292,7 +292,10 @@ final class DragonHornLocomotionAssetContractTest {
         JsonObject content = readJson("Server/NPC/Roles/Creature/HyDragon/Components/"
                 + "Component_HyDragon_Instruction_Airborne_Mode_Transition.json")
                 .getAsJsonObject("Content").deepCopy();
-        JsonObject landingInstruction = content.getAsJsonArray("Instructions").get(3).getAsJsonObject();
+        JsonObject landingInstruction = content.getAsJsonArray("Instructions").asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(instruction -> isAirborneControllerBranch(instruction, false, "Fly"))
+                .findFirst().orElseThrow();
         JsonObject landingAttempt = landingInstruction.getAsJsonArray("Instructions").get(0).getAsJsonObject();
         landingAttempt.add("Sensor", landingAttempt.getAsJsonObject("Sensor").get("Sensor"));
         assertFalse(hasSafeLanding(content), "a SearchRay outside AdjustPosition is not a safe landing branch");
