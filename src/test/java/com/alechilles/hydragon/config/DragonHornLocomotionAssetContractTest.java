@@ -85,6 +85,29 @@ final class DragonHornLocomotionAssetContractTest {
         assertNoTransitionScopeViolations(content);
     }
 
+    @Test
+    void fullDragonLandingContractRejectsFractionalValuesAndAnUnwrappedLandingRay() throws IOException {
+        JsonObject fractionalRay = JsonParser.parseString("""
+                { "Type": "SearchRay", "Name": "LandingRay", "Range": 64.5,
+                  "Angle": 90, "Blocks": "StoneAndSoil" }
+                """).getAsJsonObject();
+        JsonObject fractionalLand = JsonParser.parseString("""
+                { "BodyMotion": { "Type": "Land", "UsePathfinder": false, "SkipSteering": false,
+                  "SlowDownDistance": 5, "StopDistance": 0.55, "HeightDifference": [-3, 2],
+                  "GoalLenience": 3, "DesiredAltitudeWeight": 0 } }
+                """).getAsJsonObject();
+        assertFalse(isFullDragonLandingRay(fractionalRay));
+        assertFalse(isFullDragonLandMotion(fractionalLand));
+
+        JsonObject content = readJson("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Airborne_Mode_Transition.json")
+                .getAsJsonObject("Content").deepCopy();
+        JsonObject landingInstruction = content.getAsJsonArray("Instructions").get(3).getAsJsonObject();
+        JsonObject landingAttempt = landingInstruction.getAsJsonArray("Instructions").get(0).getAsJsonObject();
+        landingAttempt.add("Sensor", landingAttempt.getAsJsonObject("Sensor").get("Sensor"));
+        assertFalse(hasSafeLanding(content), "a SearchRay outside AdjustPosition is not a safe landing branch");
+    }
+
     private static void assertGlobalContinuingReference(JsonObject template) {
         JsonArray instructions = template.getAsJsonArray("Instructions");
         assertTrue(instructions.asList().stream()
@@ -135,7 +158,9 @@ final class DragonHornLocomotionAssetContractTest {
 
     private static boolean hasSafeLanding(JsonElement node) {
         return anyObject(node, instruction -> isAirborneControllerBranch(instruction, false, "Fly")
-                && anyObject(instruction, DragonHornLocomotionAssetContractTest::isFullDragonLandingRay)
+                && anyObject(instruction, object -> "AdjustPosition".equals(string(object, "Type"))
+                        && object.getAsJsonArray("Offset").equals(JsonParser.parseString("[0,1,0]").getAsJsonArray())
+                        && object.has("Sensor") && isFullDragonLandingRay(object.getAsJsonObject("Sensor")))
                 && anyObject(instruction, DragonHornLocomotionAssetContractTest::isFullDragonLandMotion)
                 && !anyObject(instruction, object -> object.has("BodyMotion")
                         && "Wander".equals(string(object.getAsJsonObject("BodyMotion"), "Type"))))
@@ -147,8 +172,8 @@ final class DragonHornLocomotionAssetContractTest {
     private static boolean isFullDragonLandingRay(JsonObject object) {
         return "SearchRay".equals(string(object, "Type"))
                 && "LandingRay".equals(string(object, "Name"))
-                && object.get("Range").getAsInt() == 64
-                && object.get("Angle").getAsInt() == 90
+                && object.get("Range").equals(JsonParser.parseString("64"))
+                && object.get("Angle").equals(JsonParser.parseString("90"))
                 && "StoneAndSoil".equals(string(object, "Blocks"));
     }
 
@@ -160,11 +185,11 @@ final class DragonHornLocomotionAssetContractTest {
         return "Land".equals(string(motion, "Type"))
                 && !motion.get("UsePathfinder").getAsBoolean()
                 && !motion.get("SkipSteering").getAsBoolean()
-                && motion.get("SlowDownDistance").getAsInt() == 5
-                && motion.get("StopDistance").getAsDouble() == 0.5
+                && motion.get("SlowDownDistance").equals(JsonParser.parseString("5"))
+                && motion.get("StopDistance").equals(JsonParser.parseString("0.5"))
                 && motion.getAsJsonArray("HeightDifference").equals(JsonParser.parseString("[-3,2]"))
-                && motion.get("GoalLenience").getAsInt() == 3
-                && motion.get("DesiredAltitudeWeight").getAsInt() == 0;
+                && motion.get("GoalLenience").equals(JsonParser.parseString("3"))
+                && motion.get("DesiredAltitudeWeight").equals(JsonParser.parseString("0"));
     }
 
     private static boolean isAirborneControllerBranch(JsonObject instruction, boolean airborne, String controller) {
