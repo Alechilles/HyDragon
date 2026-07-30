@@ -124,7 +124,7 @@ final class DragonHornLocomotionAssetContractTest {
     }
 
     @Test
-    void modeSelectorContractRejectsConflictingOrExtraDirectBranches() {
+    void modeSelectorContractRejectsConflictingLooseAndOverconstrainedDirectBranches() {
         JsonObject conflicting = JsonParser.parseString("""
                 { "Instructions": [
                   { "Sensor": { "Type": "And", "Sensors": [
@@ -137,7 +137,34 @@ final class DragonHornLocomotionAssetContractTest {
                 """).getAsJsonObject();
         assertFalse(hasExactModeSelectorPairSet(conflicting));
 
-        JsonObject extra = conflicting.deepCopy();
+        JsonObject looseFlag = JsonParser.parseString("""
+                { "Instructions": [
+                  { "Sensor": { "Type": "And", "Sensors": [
+                    { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                    { "Type": "MotionController", "MotionController": "Walk" } ] } },
+                  { "Sensor": { "Type": "And", "Sensors": [
+                    { "Type": "Flag", "Name": "AirborneMode" },
+                    { "Type": "MotionController", "MotionController": "Fly" } ] } },
+                  { "Sensor": { "Type": "Flag", "Name": "AirborneMode" } }
+                ] }
+                """).getAsJsonObject();
+        assertFalse(hasExactModeSelectorPairSet(looseFlag));
+
+        JsonObject extraLockedTarget = JsonParser.parseString("""
+                { "Instructions": [
+                  { "Sensor": { "Type": "And", "Sensors": [
+                    { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                    { "Type": "MotionController", "MotionController": "Walk" },
+                    { "Type": "Target", "TargetSlot": "LockedTarget" } ] } },
+                  { "Sensor": { "Type": "And", "Sensors": [
+                    { "Type": "Flag", "Name": "AirborneMode" },
+                    { "Type": "MotionController", "MotionController": "Fly" } ] } }
+                ] }
+                """).getAsJsonObject();
+        assertFalse(hasExactModeSelectorPairSet(extraLockedTarget));
+
+        JsonObject extra = looseFlag.deepCopy();
+        extra.getAsJsonArray("Instructions").remove(2);
         extra.getAsJsonArray("Instructions").add(JsonParser.parseString("""
                 { "Sensor": { "Type": "And", "Sensors": [
                   { "Type": "Flag", "Name": "AirborneMode" },
@@ -305,8 +332,7 @@ final class DragonHornLocomotionAssetContractTest {
     private static void assertModeBranch(
             JsonObject behavior, boolean airborne, String controller, String bodyMotion, String reference) {
         JsonObject branch = directModeBranches(behavior).stream()
-                .filter(candidate -> hasAirborneMode(candidate.getAsJsonObject("Sensor"), airborne)
-                        && hasMotionController(candidate.getAsJsonObject("Sensor"), controller))
+                .filter(candidate -> isModeControllerPair(candidate, airborne, controller))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("missing " + (airborne ? "airborne" : "grounded")
                         + " " + controller + " branch"));
@@ -348,18 +374,31 @@ final class DragonHornLocomotionAssetContractTest {
         return behavior.getAsJsonArray("Instructions").asList().stream()
                 .filter(JsonElement::isJsonObject)
                 .map(JsonElement::getAsJsonObject)
-                .filter(branch -> branch.has("Sensor")
-                        && "And".equals(string(branch.getAsJsonObject("Sensor"), "Type"))
-                        && (hasAirborneMode(branch.getAsJsonObject("Sensor"), true)
-                                || hasAirborneMode(branch.getAsJsonObject("Sensor"), false)))
+                .filter(branch -> branch.has("Sensor") && hasAirborneModeSelector(branch.getAsJsonObject("Sensor")))
                 .toList();
     }
 
     private static boolean isModeControllerPair(JsonObject branch, boolean airborne, String controller) {
         JsonObject sensor = branch.getAsJsonObject("Sensor");
-        return hasAirborneMode(sensor, airborne) && hasMotionController(sensor, controller)
-                && !hasAirborneMode(sensor, !airborne)
-                && !hasMotionController(sensor, airborne ? "Walk" : "Fly");
+        if (!"And".equals(string(sensor, "Type")) || !sensor.has("Sensors") || sensor.getAsJsonArray("Sensors").size() != 2) {
+            return false;
+        }
+        return sensor.getAsJsonArray("Sensors").asList().stream().map(JsonElement::getAsJsonObject)
+                        .anyMatch(child -> isAirborneModeFlag(child, airborne))
+                && sensor.getAsJsonArray("Sensors").asList().stream().map(JsonElement::getAsJsonObject)
+                        .anyMatch(child -> "MotionController".equals(string(child, "Type"))
+                                && controller.equals(string(child, "MotionController")));
+    }
+
+    private static boolean hasAirborneModeSelector(JsonObject sensor) {
+        return anyObject(sensor, object -> "Flag".equals(string(object, "Type"))
+                && "AirborneMode".equals(string(object, "Name")));
+    }
+
+    private static boolean isAirborneModeFlag(JsonObject object, boolean airborne) {
+        return "Flag".equals(string(object, "Type"))
+                && "AirborneMode".equals(string(object, "Name"))
+                && (airborne ? !object.has("Set") : object.has("Set") && !object.get("Set").getAsBoolean());
     }
 
     private static boolean hasAirborneMode(JsonObject sensor, boolean airborne) {
@@ -383,6 +422,7 @@ final class DragonHornLocomotionAssetContractTest {
                         object -> "Component_Tamework_Instruction_Follow_Flying".equals(string(object, "Reference")))
                 .stream().findFirst().orElseThrow();
         JsonObject modify = reference.getAsJsonObject("Modify");
+        assertEquals("MasterTarget", string(modify, "MasterTargetSlot"));
         assertEquals(JsonParser.parseString("[4,8]"), modify.get("FollowDesiredAltitudeRange"));
         assertEquals(JsonParser.parseString("32"), modify.get("FollowTeleportThresholdRange"));
         assertEquals(JsonParser.parseString("10"), modify.get("FollowSeekSlowDownDistance"));
@@ -417,6 +457,7 @@ final class DragonHornLocomotionAssetContractTest {
         assertEquals(JsonParser.parseString("8"), modify.get("CombatDirectWeight"));
         assertEquals(JsonParser.parseString("8"), modify.get("CombatAlwaysMovingWeight"));
         assertEquals(JsonParser.parseString("0.9"), modify.get("ChaseRelativeSpeed"));
+        assertEquals("Component_Instruction_Null", string(modify, "AdditionalCombatBehaviorMacroElement"));
     }
 
     private static void assertNoModeSelectionMutation(JsonObject branch) {
