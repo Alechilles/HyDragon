@@ -30,6 +30,18 @@ final class PackagedJarContractIT {
         assertTrue(entries.stream().anyMatch(name -> name.startsWith("Server/")));
         assertTrue(entries.contains("Common/Items/HyDragon/Draconic_Essence_Wind.png"),
                 "the Wind essence texture must ship with its item asset");
+        for (String entry : Set.of(
+                "Server/Audio/SoundEvents/SFX/HyDragon/Wyvern_Mini/SFX_HyDragon_Miniwyvern_Projectile.json",
+                "Server/Audio/SoundEvents/SFX/HyDragon/Wyvern_Mini/SFX_HyDragon_Miniwyvern_Bite.json",
+                "Common/Sounds/HyDragon/Wyvern_Mini/Attack/Projectile_01.ogg",
+                "Common/Sounds/HyDragon/Wyvern_Mini/Attack/Projectile_02.ogg",
+                "Common/Sounds/HyDragon/Wyvern_Mini/Attack/Projectile_03.ogg",
+                "Common/Sounds/HyDragon/Wyvern_Mini/Attack/Projectile_04.ogg",
+                "Common/Sounds/HyDragon/Wyvern_Mini/Attack/Bite_01.ogg",
+                "Common/Sounds/HyDragon/Wyvern_Mini/Attack/Bite_02.ogg",
+                "Common/Sounds/HyDragon/Wyvern_Mini/Attack/Bite_03.ogg")) {
+            assertTrue(entries.contains(entry), "missing MiniWyvern attack-feedback resource " + entry);
+        }
         assertFalse(entries.stream().anyMatch(name -> name.equals("HyDragon.zip") || name.startsWith("docs/")));
         assertFalse(entries.stream().anyMatch(name -> name.startsWith("target/") || name.startsWith(".idea/")));
         assertFalse(entries.stream().anyMatch(name -> name.contains("/Source/") || name.endsWith(".bbmodel")));
