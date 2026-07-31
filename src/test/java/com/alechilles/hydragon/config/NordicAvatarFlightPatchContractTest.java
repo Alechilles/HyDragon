@@ -43,4 +43,18 @@ final class NordicAvatarFlightPatchContractTest {
         assertTrue(modify.get("IsMountable").getAsBoolean());
         assertEquals("HyDragonIntDragon", modify.get("InteractionConfigId").getAsString());
     }
+
+    @Test
+    void avatarFlightConfigMapsNativeCombatSlotsToPlayerSafeNordicRoots() throws IOException {
+        JsonObject config = JsonParser.parseString(Files.readString(Path.of(
+                "Server", "Tamework", "AvatarFlight", "HyDragonNordicDrake.json"))).getAsJsonObject();
+        JsonObject abilities = config.getAsJsonObject("CombatAbilities");
+
+        assertEquals("Root_NPC_NordicDrake_Avatar_Fire_Ball",
+                abilities.getAsJsonObject("Ability2").get("RootInteraction").getAsString());
+        assertEquals("FIRE", abilities.getAsJsonObject("Ability2").get("Glyph").getAsString());
+        assertEquals("Root_NPC_NordicDrake_Avatar_Flying_Flame_Breath",
+                abilities.getAsJsonObject("Ability3").get("RootInteraction").getAsString());
+        assertEquals("BREATH", abilities.getAsJsonObject("Ability3").get("Glyph").getAsString());
+    }
 }
