@@ -198,6 +198,7 @@
             "Name": "Miniwyvern_Swoop_Pending",
             "SetTo": false
           },
+          { "Type": "SetFlag", "Name": "Miniwyvern_Aerial_Combat_Active", "SetTo": false },
           {
             "Type": "SetFlag",
             "Name": "Miniwyvern_Swooping",
@@ -286,6 +287,7 @@
           ]
         },
         "Actions": [
+          { "Type": "SetFlag", "Name": "Miniwyvern_Aerial_Combat_Active", "SetTo": true },
           {
             "Type": "TimerStart",
             "Name": "Miniwyvern_Swoop_Cooldown",
@@ -297,7 +299,8 @@
               25,
               35
             ]
-          }
+          },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" }
         ]
       },
       {
@@ -323,6 +326,7 @@
           ]
         },
         "Actions": [
+          { "Type": "SetFlag", "Name": "Miniwyvern_Aerial_Combat_Active", "SetTo": true },
           {
             "Type": "TimerStart",
             "Name": "Miniwyvern_Swoop_Cooldown",
@@ -334,7 +338,8 @@
               22,
               30
             ]
-          }
+          },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" }
         ]
       },
       {
@@ -359,6 +364,7 @@
           ]
         },
         "Actions": [
+          { "Type": "SetFlag", "Name": "Miniwyvern_Aerial_Combat_Active", "SetTo": true },
           {
             "Type": "TimerStart",
             "Name": "Miniwyvern_Swoop_Cooldown",
@@ -370,7 +376,8 @@
               20,
               26
             ]
-          }
+          },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" }
         ]
       },
       {
@@ -394,6 +401,7 @@
           ]
         },
         "Actions": [
+          { "Type": "SetFlag", "Name": "Miniwyvern_Aerial_Combat_Active", "SetTo": true },
           {
             "Type": "TimerStart",
             "Name": "Miniwyvern_Swoop_Cooldown",
@@ -405,7 +413,8 @@
               18,
               24
             ]
-          }
+          },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" }
         ]
       },
       {

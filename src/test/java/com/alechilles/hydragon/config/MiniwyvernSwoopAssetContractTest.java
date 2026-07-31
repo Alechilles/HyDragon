@@ -119,10 +119,169 @@ final class MiniwyvernSwoopAssetContractTest {
         assertTrue(objectsWithMotion(instructions, 0.55, false).size() >= 1);
     }
 
+    @Test
+    void templateCancellationOwnsEveryInvalidContextAndActiveLifecycleCleanup() throws IOException {
+        JsonObject template = load("Server/NPC/Roles/Creature/HyDragon/Templates/"
+                + "Template_Wyvern_Mini_Flying_Tamed.json");
+        JsonObject cancellation = findCancellation(template.getAsJsonArray("Instructions"));
+        JsonArray cancellationTerms = cancellation.getAsJsonObject("Sensor").getAsJsonArray("Sensors");
+        JsonObject invalidContext = cancellationTerms.get(0).getAsJsonObject();
+        assertEquals("Or", type(invalidContext));
+        assertTrue(hasNegatedState(invalidContext, "Defend"));
+        assertTrue(hasNegatedTarget(invalidContext, "LockedTarget"));
+        assertTrue(hasFalseFlagSensor(invalidContext, "AirborneMode"));
+        assertTrue(hasNegatedMotionController(invalidContext, "Fly"));
+
+        JsonObject activeLifecycle = cancellationTerms.get(1).getAsJsonObject();
+        assertEquals("Or", type(activeLifecycle));
+        for (String flag : java.util.List.of(
+                "Miniwyvern_Aerial_Combat_Active",
+                "Miniwyvern_Swoop_Pending",
+                "Miniwyvern_Swooping",
+                "Miniwyvern_Swoop_Strike_Committed",
+                "Miniwyvern_Swoop_Recovery_Started",
+                "Miniwyvern_Projectile_Aiming")) {
+            assertTrue(hasPositiveFlagSensor(activeLifecycle, flag), "missing active lifecycle flag " + flag);
+            assertTrue(hasSetFlag(cancellation.get("Actions"), flag, false), "cleanup must clear " + flag);
+        }
+        for (String timer : java.util.List.of(
+                "Miniwyvern_Swoop_Cooldown",
+                "Miniwyvern_Swoop_Approach",
+                "Miniwyvern_Swoop_Recovery",
+                "Miniwyvern_Projectile_Aim",
+                "Miniwyvern_Projectile_Cooldown")) {
+            assertTrue(actionIndex(cancellation.getAsJsonArray("Actions"), "TimerStop", timer) >= 0,
+                    "cleanup must stop " + timer);
+        }
+    }
+
+    @Test
+    void combatEntryCooldownProfilesAreExclusiveExactAndRestartSafe() throws IOException {
+        JsonArray instructions = load("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json")
+                .getAsJsonObject("Content").getAsJsonArray("Instructions");
+        java.util.List<JsonObject> entries = new java.util.ArrayList<>();
+        for (JsonElement instruction : instructions) {
+            JsonObject candidate = instruction.getAsJsonObject();
+            if (hasStateSensor(candidate.get("Sensor"), ".Combat")
+                    && hasStoppedTimerSensor(candidate.get("Sensor"), "Miniwyvern_Swoop_Cooldown")
+                    && actionIndex(candidate.getAsJsonArray("Actions"), "TimerStart", "Miniwyvern_Swoop_Cooldown") >= 0
+                    && actionIndex(candidate.getAsJsonArray("Actions"), "TimerRestart", "Miniwyvern_Swoop_Cooldown") >= 0) {
+                entries.add(candidate);
+            }
+        }
+        assertEquals(4, entries.size(), "exactly four mutually exclusive cooldown-entry profiles are required");
+        assertCooldownEntry(entries, 18, 24, "SwoopMastery");
+        assertCooldownEntry(entries, 20, 26, "RelentlessSwoop", "SwoopMastery");
+        assertCooldownEntry(entries, 22, 30, "SwoopCadence", "SwoopMastery", "RelentlessSwoop");
+        assertCooldownEntry(entries, 25, 35, null, "SwoopMastery", "RelentlessSwoop", "SwoopCadence");
+    }
+
+    @Test
+    void everySwoopDamageChainRemainsFreeOfControlAndImmunityEffects() throws IOException {
+        for (String suffix : java.util.List.of("", "_Ferocity", "_Rending", "_Mastery")) {
+            JsonObject damage = load("Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/"
+                    + "Wyvern_Mini_Swoop_Bite_Damage" + suffix + ".json");
+            for (String prohibited : java.util.List.of(
+                    "knockback", "force", "impact", "launch", "stun", "invulnerability")) {
+                assertFalse(containsForbiddenGameplayMechanic(damage, prohibited),
+                        "swoop damage " + suffix + " must not add " + prohibited + " mechanics");
+            }
+        }
+    }
+
     private static JsonObject findCancellation(JsonArray instructions) {
         return instructions.asList().stream().map(JsonElement::getAsJsonObject)
                 .filter(i -> i.has("Actions") && actionIndex(i.getAsJsonArray("Actions"), "ResetInstructions", null) >= 0)
                 .findFirst().orElseThrow();
+    }
+    private static void assertCooldownEntry(java.util.List<JsonObject> entries, int minimum, int maximum,
+            String requiredTalent, String... excludedTalents) {
+        JsonObject entry = entries.stream()
+                .filter(candidate -> requiredTalent == null
+                        ? java.util.Arrays.stream(excludedTalents).allMatch(talent -> hasNegatedTalent(candidate.get("Sensor"), talent))
+                        : hasPositiveTalent(candidate.get("Sensor"), requiredTalent))
+                .findFirst().orElseThrow(() -> new AssertionError("missing cooldown profile " + minimum + "-" + maximum));
+        for (String excluded : excludedTalents) {
+            assertTrue(hasNegatedTalent(entry.get("Sensor"), excluded), "profile must exclude " + excluded);
+        }
+        JsonArray actions = entry.getAsJsonArray("Actions");
+        int start = actionIndex(actions, "TimerStart", "Miniwyvern_Swoop_Cooldown");
+        int restart = actionIndex(actions, "TimerRestart", "Miniwyvern_Swoop_Cooldown");
+        assertTrue(start >= 0 && restart > start, "TimerStart must precede TimerRestart");
+        JsonArray range = actions.get(start).getAsJsonObject().getAsJsonArray("StartValueRange");
+        assertEquals(minimum, range.get(0).getAsInt());
+        assertEquals(maximum, range.get(1).getAsInt());
+    }
+    private static boolean hasNegatedState(JsonElement value, String state) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("Not".equals(type(object)) && hasStateSensor(object.get("Sensor"), state)) return true;
+            for (JsonElement child : object.asMap().values()) if (hasNegatedState(child, state)) return true;
+        } else if (value.isJsonArray()) for (JsonElement child : value.getAsJsonArray()) if (hasNegatedState(child, state)) return true;
+        return false;
+    }
+    private static boolean hasNegatedTarget(JsonElement value, String targetSlot) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("Not".equals(type(object)) && hasTargetSensor(object.get("Sensor"), targetSlot)) return true;
+            for (JsonElement child : object.asMap().values()) if (hasNegatedTarget(child, targetSlot)) return true;
+        } else if (value.isJsonArray()) for (JsonElement child : value.getAsJsonArray()) if (hasNegatedTarget(child, targetSlot)) return true;
+        return false;
+    }
+    private static boolean hasTargetSensor(JsonElement value, String targetSlot) {
+        return value != null && value.isJsonObject() && "Target".equals(type(value))
+                && targetSlot.equals(string(value.getAsJsonObject(), "TargetSlot"));
+    }
+    private static boolean hasFalseFlagSensor(JsonElement value, String name) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("Flag".equals(type(object)) && name.equals(string(object, "Name"))
+                    && object.has("Set") && !object.get("Set").getAsBoolean()) return true;
+            for (JsonElement child : object.asMap().values()) if (hasFalseFlagSensor(child, name)) return true;
+        } else if (value.isJsonArray()) for (JsonElement child : value.getAsJsonArray()) if (hasFalseFlagSensor(child, name)) return true;
+        return false;
+    }
+    private static boolean hasNegatedMotionController(JsonElement value, String controller) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            JsonElement sensor = object.get("Sensor");
+            if ("Not".equals(type(object)) && sensor != null && sensor.isJsonObject()
+                    && "MotionController".equals(type(sensor))
+                    && controller.equals(string(sensor.getAsJsonObject(), "MotionController"))) return true;
+            for (JsonElement child : object.asMap().values()) if (hasNegatedMotionController(child, controller)) return true;
+        } else if (value.isJsonArray()) for (JsonElement child : value.getAsJsonArray()) if (hasNegatedMotionController(child, controller)) return true;
+        return false;
+    }
+    private static boolean containsForbiddenGameplayMechanic(JsonElement value, String prohibited) {
+        if (value.isJsonObject()) {
+            for (java.util.Map.Entry<String, JsonElement> entry : value.getAsJsonObject().entrySet()) {
+                String key = entry.getKey();
+                if (key.toLowerCase(java.util.Locale.ROOT).contains(prohibited)) return true;
+                if (isPresentationOnlyField(key)) continue;
+                JsonElement child = entry.getValue();
+                if (child.isJsonPrimitive() && child.getAsJsonPrimitive().isString()
+                        && ("Type".equals(key) || isGameplayEffectIdentifier(key))
+                        && child.getAsString().toLowerCase(java.util.Locale.ROOT).contains(prohibited)) return true;
+                if (containsForbiddenGameplayMechanic(child, prohibited)) return true;
+            }
+        } else if (value.isJsonArray()) for (JsonElement child : value.getAsJsonArray())
+            if (containsForbiddenGameplayMechanic(child, prohibited)) return true;
+        return false;
+    }
+    private static boolean isPresentationOnlyField(String key) {
+        String normalized = key.toLowerCase(java.util.Locale.ROOT);
+        return normalized.contains("sound") || normalized.contains("particle") || normalized.equals("systemid")
+                || normalized.equals("visualeffectid");
+    }
+    private static boolean isGameplayEffectIdentifier(String key) {
+        String normalized = key.toLowerCase(java.util.Locale.ROOT);
+        return normalized.equals("effectid") || normalized.equals("statusid") || normalized.equals("mechanicid")
+                || normalized.equals("interactionid") || normalized.equals("actionid");
     }
     private static void collectInstructionsWithState(JsonElement value, String state, java.util.List<JsonObject> out) {
         if (value.isJsonObject()) { JsonObject o = value.getAsJsonObject(); if (hasStateSensor(o.get("Sensor"), state)) out.add(o); for (JsonElement c : o.asMap().values()) collectInstructionsWithState(c, state, out); }
@@ -246,6 +405,17 @@ final class MiniwyvernSwoopAssetContractTest {
             if ("TameworkHasTalent".equals(type(object)) && talent.equals(string(object, "TalentId"))) return true;
             for (JsonElement child : object.asMap().values()) if (hasTalent(child, talent)) return true;
         } else if (value.isJsonArray()) for (JsonElement child : value.getAsJsonArray()) if (hasTalent(child, talent)) return true;
+        return false;
+    }
+
+    private static boolean hasPositiveTalent(JsonElement value, String talent) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("Not".equals(type(object))) return false;
+            if ("TameworkHasTalent".equals(type(object)) && talent.equals(string(object, "TalentId"))) return true;
+            for (JsonElement child : object.asMap().values()) if (hasPositiveTalent(child, talent)) return true;
+        } else if (value.isJsonArray()) for (JsonElement child : value.getAsJsonArray()) if (hasPositiveTalent(child, talent)) return true;
         return false;
     }
 
