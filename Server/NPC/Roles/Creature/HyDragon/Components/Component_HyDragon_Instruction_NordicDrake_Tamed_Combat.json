@@ -131,6 +131,7 @@
             ]
           },
           {
+            "Continue": true,
             "Sensor": {
               "Type": "And",
               "Sensors": [
@@ -164,7 +165,7 @@
             },
             "Instructions": [
               {
-                "Weight": 3,
+                "Weight": { "Compute": "GroundBiteWeight" },
                 "Sensor": {
                   "Type": "And",
                   "Sensors": [
@@ -186,7 +187,7 @@
                 ]
               },
               {
-                "Weight": 4,
+                "Weight": { "Compute": "GroundBreathWeight" },
                 "Sensor": {
                   "Type": "And",
                   "Sensors": [
