@@ -1,0 +1,48 @@
+{
+  "Type": "Serial",
+  "$Comment": "Player-safe Nordic Drake fireball aimed from the transformed player's look direction.",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "PrepareShoot"
+      },
+      "RunTime": 0.6
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "ChargeShoot"
+      },
+      "RunTime": 0.8
+    },
+    {
+      "Type": "TameworkLaunchProjectile",
+      "RunTime": 0,
+      "ProjectileId": "NordicDrake_Dragon_Fire_Ball",
+      "LaunchPositionOffset": {
+        "X": 0.0,
+        "Y": 1.5,
+        "Z": -3.0
+      },
+      "TrajectoryMode": "Direct",
+      "LookTargetDistance": 48.0,
+      "ImpactEffect": {
+        "EffectId": "Flame_Staff_Burn",
+        "Radius": 3,
+        "ExcludeSource": true
+      },
+      "Tags": {}
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "FinishShoot"
+      },
+      "RunTime": 0.35
+    }
+  ]
+}

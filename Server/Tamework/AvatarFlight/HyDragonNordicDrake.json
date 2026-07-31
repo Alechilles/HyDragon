@@ -20,6 +20,16 @@
     "LaunchReleaseMidScale": 6.0,
     "LaunchReleaseFullScale": 7.2
   },
+  "CombatAbilities": {
+    "Ability2": {
+      "RootInteraction": "Root_NPC_NordicDrake_Avatar_Fire_Ball",
+      "Glyph": "FIRE"
+    },
+    "Ability3": {
+      "RootInteraction": "Root_NPC_NordicDrake_Avatar_Flying_Flame_Breath",
+      "Glyph": "BREATH"
+    }
+  },
   "Trails": {
     "Enabled": true,
     "LaunchRootInteraction": "Root_HyDragon_AvatarFlight_Trails_Launch",
