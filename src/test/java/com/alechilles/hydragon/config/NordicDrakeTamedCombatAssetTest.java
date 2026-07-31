@@ -61,6 +61,67 @@ final class NordicDrakeTamedCombatAssetTest {
         assertGroundedAttackChoice(groundCombat);
     }
 
+    @Test
+    void nordicAerialCombatUsesTheApprovedLockedTargetFlightCycle() throws IOException {
+        JsonObject component = readJson(COMPONENT);
+        JsonObject parameters = component.getAsJsonObject("Parameters");
+        assertParameter(parameters, "AirFireballAttack", "Root_NPC_NordicDrake_Fire_Ball");
+        assertParameter(parameters, "AirFireballAttackDistance", 28);
+        assertParameter(parameters, "AirFireballCooldownRange", List.of(1, 3));
+        assertParameter(parameters, "AirVolleyAttack2", "Root_NPC_NordicDrake_Fire_Ball_Volley_2");
+        assertParameter(parameters, "AirVolleyAttack3", "Root_NPC_NordicDrake_Fire_Ball_Volley_3");
+        assertParameter(parameters, "AirVolleyAttack4", "Root_NPC_NordicDrake_Fire_Ball_Volley_4");
+        assertParameter(parameters, "AirVolleyCooldownRange", List.of(12, 20));
+        assertParameter(parameters, "AirVolleyWeight", 3);
+        assertParameter(parameters, "AirBreathAttack", "Root_NPC_NordicDrake_Flying_Flame_Breath");
+        assertParameter(parameters, "AirBreathAttackDistance", 13);
+        assertParameter(parameters, "AirBreathCooldownRange", List.of(15, 30));
+        assertParameter(parameters, "AirBreathWeight", 6);
+        assertParameter(parameters, "AirCombatAltitudeRange", List.of(8, 16));
+        assertParameter(parameters, "AirCombatClimbRelativeSpeed", 1);
+        assertParameter(parameters, "AirCombatSinkRelativeSpeed", 0.8);
+        assertParameter(parameters, "AirCombatWanderRelativeSpeed", 0.9);
+        assertParameter(parameters, "AirCombatWanderRadiusRange", List.of(18, 36));
+        assertParameter(parameters, "AirCombatWanderRetargetTimeRange", List.of(4, 8));
+        assertParameter(parameters, "AirCombatWanderStopDistance", 5);
+        assertParameter(parameters, "AirBreathAttackAltitudeRange", List.of(2, 4));
+        assertParameter(parameters, "AirBreathAttackRelativeSpeed", 1.15);
+        assertParameter(parameters, "AirBreathIngressTimeout", List.of(6, 7));
+        assertParameter(parameters, "AirBreathPassDistance", 18);
+        assertParameter(parameters, "AirBreathPassStopDistance", 2);
+        assertParameter(parameters, "AirBreathPassDuration", List.of(1.85, 2));
+        assertParameter(parameters, "AirCombatRecoveryDuration", List.of(3, 4));
+        assertParameter(parameters, "AirCombatRecoveryRelativeSpeed", 1.1);
+        assertParameter(parameters, "AirCombatRecoveryClimbRelativeSpeed", 1.5);
+
+        JsonObject ranged = aerialState(component, ".AirRanged");
+        JsonObject volley = aerialState(component, ".AirVolley");
+        JsonObject ingress = aerialState(component, ".AirBreathIngress");
+        JsonObject pass = aerialState(component, ".AirBreathPass");
+        JsonObject recovery = aerialState(component, ".AirRecovery");
+        for (JsonObject state : List.of(ranged, volley, ingress, pass, recovery)) assertAerialContext(state);
+        assertOrbitMode(ranged, "WANDER_TARGET");
+        assertOrbitMode(volley, "FACE_TARGET");
+        assertOrbitMode(ingress, "APPROACH");
+        assertOrbitMode(pass, "PASS_THROUGH_TARGET");
+        assertOrbitMode(recovery, "WANDER_TARGET");
+        assertTrue(containsAttack(ranged, "AirFireballAttack"));
+        assertTrue(containsAttack(volley, "AirVolleyAttack2"));
+        assertTrue(containsAttack(volley, "AirVolleyAttack3"));
+        assertTrue(containsAttack(volley, "AirVolleyAttack4"));
+        assertTrue(containsAttack(pass, "AirBreathAttack"));
+        assertTrue(objects(ranged, object -> "Timer".equals(string(object, "Type"))
+                && "NordicDrake_Air_Volley".equals(string(object, "Name"))
+                && "Stopped".equals(string(object, "State"))).size() >= 1);
+        assertTrue(objects(ranged, object -> "Timer".equals(string(object, "Type"))
+                && "NordicDrake_Air_Breath".equals(string(object, "Name"))
+                && "Stopped".equals(string(object, "State"))).size() >= 1);
+        assertEquals(0, objects(component, object -> string(object, "Type") != null
+                && (string(object, "Type").contains("CombatActionEvaluator")
+                || string(object, "Type").contains("HostileTargetMemory")
+                || "Health".equals(string(object, "Stat")))).size());
+    }
+
     private static JsonObject readJson(Path path) throws IOException {
         return JsonParser.parseString(Files.readString(path)).getAsJsonObject();
     }
@@ -230,6 +291,29 @@ final class NordicDrakeTamedCombatAssetTest {
                 && "State".equals(string(object.getAsJsonObject("Sensor"), "Type"))
                 && ".GroundCombat".equals(string(object.getAsJsonObject("Sensor"), "State"))).stream().findFirst()
                 .orElseThrow(() -> new AssertionError("missing .GroundCombat branch"));
+    }
+
+    private static JsonObject aerialState(JsonObject component, String state) {
+        return objects(component, object -> object.has("Sensor") && object.has("Instructions")
+                && objects(object.getAsJsonObject("Sensor"), child -> "State".equals(string(child, "Type"))
+                && state.equals(string(child, "State"))).size() == 1).stream().findFirst()
+                .orElseThrow(() -> new AssertionError("missing " + state + " branch"));
+    }
+
+    private static void assertAerialContext(JsonObject state) {
+        List<JsonObject> branchSensors = objects(state, object -> object.has("Sensor") && object.has("Actions"));
+        assertTrue(branchSensors.stream().anyMatch(branch -> objects(branch.getAsJsonObject("Sensor"), object ->
+                "Target".equals(string(object, "Type")) && "LockedTarget".equals(string(object, "TargetSlot"))).size() > 0));
+        assertTrue(branchSensors.stream().anyMatch(branch -> objects(branch.getAsJsonObject("Sensor"), object ->
+                "Flag".equals(string(object, "Type")) && "AirborneMode".equals(string(object, "Name"))
+                        && object.has("Set") && object.get("Set").getAsBoolean()).size() > 0));
+        assertTrue(branchSensors.stream().anyMatch(branch -> objects(branch.getAsJsonObject("Sensor"), object ->
+                "MotionController".equals(string(object, "Type")) && "Fly".equals(string(object, "MotionController"))).size() > 0));
+    }
+
+    private static void assertOrbitMode(JsonObject state, String mode) {
+        assertTrue(objects(state, object -> "TameworkFlyingOrbit".equals(string(object, "Type"))
+                && mode.equals(string(object, "Mode"))).size() >= 1, "missing " + mode + " orbit");
     }
 
     private static void assertGroundedMovement(JsonObject groundCombat) {
