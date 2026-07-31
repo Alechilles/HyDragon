@@ -223,7 +223,18 @@ Remove `LoiterWeight`, `DiveWeight`, and the Random dive instruction. Preserve t
 }
 ```
 
-Use highest-owned selection order `SwoopMastery`, `RendingDive`, `SwoopFerocity`, default for attack roots and `SwoopMastery`, `RelentlessSwoop`, `SwoopCadence`, default for cooldowns. On first entry to valid `.Combat`, start the selected cooldown if it is neither running nor expired. Strike completion or six-second timeout restarts that cooldown immediately, enters `.Recovery`, starts a `[2,4]` recovery timer, and leaves `Miniwyvern_Swooping` true. Recovery completion alone clears `Miniwyvern_Swooping` and `Miniwyvern_Swoop_Strike_Committed` and returns to `.Combat`; invalid combat stops all timers and clears every latch.
+Use highest-owned selection order `SwoopMastery`, `RendingDive`,
+`SwoopFerocity`, default for attack roots and `SwoopMastery`,
+`RelentlessSwoop`, `SwoopCadence`, default for cooldowns. These selections are
+independent: Precision changes only approach speed, and the damage route must
+neither grant nor erase a cadence upgrade. On first entry to valid `.Combat`,
+start the selected cooldown if it is neither running nor expired. Strike
+completion or the six-second timeout enters `.Recovery` without embedding a
+cooldown range. Before starting the `[2,4]` recovery timer, four exclusive
+Recovery instructions restart the highest-owned cooldown at
+`[18,24]`/`[20,26]`/`[22,30]`/`[25,35]`. Recovery completion alone clears
+`Miniwyvern_Swooping` and `Miniwyvern_Swoop_Strike_Committed` and returns to
+`.Combat`; invalid combat stops all timers and clears every latch.
 
 - [ ] **Step 5: Wire only the tamed aerial template**
 
