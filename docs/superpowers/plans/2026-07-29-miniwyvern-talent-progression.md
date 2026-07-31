@@ -1,5 +1,11 @@
 # Miniwyvern Talent Progression Implementation Plan
 
+> **Superseded Combat scope:** Do not execute this plan's Combat tasks or
+> restore `ProjectileForce`, `ProjectileImpact`, or projectile-backed
+> `DraconicAssault` nodes. The authoritative pre-1.1 Combat implementation is
+> `2026-07-30-miniwyvern-stage-one-combat.md`. Bond and Vigor behavior already
+> shipped from this historical plan remains governed by its dedicated design.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Give every bonded Miniwyvern one persistent, freely resettable level-30 talent tree whose shared flags are interpreted by each current form through asset wiring, with combat and capped active-summon XP.

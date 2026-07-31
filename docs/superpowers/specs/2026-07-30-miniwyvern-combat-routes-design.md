@@ -13,8 +13,9 @@ at the form-specific special ability:
 
 The tree structure and shared contracts are defined now. The actual Fire,
 Ice, Lightning, Nature, Toxic, Void, and Wild special abilities unlocked by
-`DraconicAssault` remain TBD and require a later design before that portion of
-the tree is implemented.
+`DraconicAssault` remain undefined and are deferred beyond the initial release,
+likely to a 1.1-era feature pass. That portion of the tree requires a later
+design before it is implemented.
 
 ## Relationship to the Previous Talent Design
 
@@ -306,7 +307,8 @@ Stage-two special-ability plans must additionally prove that production
 `DraconicAssault` accepts either `ProjectileMastery` or `SwoopMastery`, rejects
 a companion with neither, and that all four shared nodes execute their defined
 per-form behavior. Those production-tree assertions do not gate the stage-one
-endpoint while the special abilities remain TBD.
+endpoint while the special abilities remain deferred beyond the initial
+release.
 
 All affected Hytale NPC assets require exact-profile validation against the
 locked 0.5.7 release, focused Maven tests, full verification in both changed

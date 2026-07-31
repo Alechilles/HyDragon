@@ -77,11 +77,17 @@ collision executes the miss presentation and terminates without block damage.
 Lifetime expiry terminates through the same harmless miss/despawn path.
 
 Owner, party, allied, and otherwise friendly entities must never be damaged or
-debuffed and do not consume the projectile. Collision filtering treats them as
-pass-through entities so allies cannot unintentionally shield an enemy. The
-first terminal hostile or world collision owns an atomic at-most-once outcome;
-the despawn in that outcome prevents later collision callbacks from executing
-another chain.
+debuffed. Hytale 0.5.7 projectile physics already ignores the projectile's
+creator, so the owner does not consume the shot. Other collidable allies cannot
+be made pass-through through `ProjectileConfig`: the core physics tick marks a
+projectile inactive before its hit interaction and exposes no safe
+pre-collision veto hook. Those allied collisions therefore terminate through a
+harmless no-damage/no-status path. Replacing core projectile physics solely to
+let a shot pass through a party member is outside this balance pass.
+
+The first terminal hostile, allied, or world collision owns an atomic
+at-most-once outcome; the despawn in that outcome prevents later collision
+callbacks from executing another chain.
 
 Dedicated configs may share physics or presentation parents where their
 observable behavior is identical, but they must not inherit adult-dragon
@@ -176,7 +182,7 @@ but does not silently improve guidance. `ProjectileGuidance` extends the
 dedicated hover-and-aim phase and improves practical delivery without making
 shots perfectly accurate.
 
-The pattern sequence fires two shots 0.25–0.4 seconds apart:
+The pattern sequence fires two shots exactly 0.30 seconds apart:
 
 | Form class | First shot | Second shot | Total if both hit |
 | --- | ---: | ---: | ---: |
@@ -191,7 +197,7 @@ cadence by two full-power apex shots.
 
 Before the first pattern shot, the scheduler asserts a dedicated
 `Miniwyvern_Projectile_Volley_Active` latch. It remains asserted through the
-0.25–0.4-second interval and the second launch, then clears immediately. The
+0.30-second interval and the second launch, then clears immediately. The
 existing aim/attack-active signal also remains asserted for that entire
 sequence. Swoop readiness may set `Miniwyvern_Swoop_Pending` during a volley,
 which prevents any new projectile sequence, but the active volley completes
@@ -202,19 +208,29 @@ swoop alone never cancels it.
 
 ## Ballistics and Presentation
 
-Each form retains its recognizable projectile model, trail, sound, and
-trajectory character. Those differences may not make one form unusable at the
-MiniWyvern's normal 8–20-block combat distance. Base, Intermediate, and Apex
-ballistics must progress monotonically in practical reach; Pattern uses
-Intermediate ballistics and Mastery uses Apex ballistics. Every profile must
-have sufficient lifetime to reach a stationary target at 20 blocks after a
-valid aim phase.
+Each form retains its recognizable projectile model, model-owned trail,
+sound, and trajectory character. Those differences may not make one form
+unusable at the MiniWyvern's normal 8–20-block combat distance. The attack is
+authored entirely through modern `ProjectileConfig` assets; no legacy
+`Server/Projectiles` profile participates.
 
-Runtime tuning owns exact launch-force, gravity, lifetime, collision-size,
-and dispersion constants. Acceptance testing, rather than inherited adult
-values, locks them. Shots are not intended to cross an entire battlefield:
-the existing combat target limit remains authoritative, and profiles should
-not create useful reach beyond that target-selection range.
+The exact `{LaunchForce, TerminalVelocityAir, Gravity, ProjectileSpawn
+timeout}` profiles are Base `{28,32,6,4}`, Intermediate `{34,40,4,5}`, and
+Apex `{40,48,3,6}`. Pattern uses Intermediate and Mastery uses Apex. Physics
+uses inline `Type: Standard`; launch depth is `SpawnOffset.Z = 1`. Damage
+exists only in the `DamageEntity` hit interaction.
+
+Each config starts a 4/5/6-second `ProjectileSpawn` interaction that waits and
+removes the projectile. Hytale 0.5.7 queues projectile-generated hit/miss
+chains without applying interaction interruption rules, so a hit or miss
+removes the proxy immediately while the short spawn timeout may remain queued.
+Its later `RemoveEntity` against the already-removed proxy is an idempotent
+no-op and cannot replay damage, status, presentation, or removal side effects.
+An owner-scoped interrupt is forbidden because it could cancel a different
+projectile in the same volley.
+Shots are not intended to cross an entire battlefield: the existing combat
+target limit remains authoritative, and profiles should not create useful
+reach beyond that target-selection range.
 
 The balance pass must not modify the dedicated aiming phase, hover behavior,
 orbit behavior, or general flight-state arbitration except for the explicit
@@ -262,9 +278,10 @@ Automated verification must prove:
   attack activity asserted throughout, and complete before a pending swoop;
 - command change, target loss, death, despawn, or combat exit cancels a pending
   second shot and clears volley activity;
-- a hostile hit executes once and despawns atomically, terrain collision and
-  lifetime expiry use the harmless miss path, and owner or friendly collision
-  passes through without consuming the projectile;
+- a hostile hit executes once and despawns atomically, terrain collision uses
+  the harmless miss path, the explicit `ProjectileSpawn` timeout removes an
+  expired shot, the creator is ignored by core physics, and other friendly
+  collisions terminate without damage or status;
 - owner and friendly targets are immune to both damage and statuses;
 - Base, Intermediate, and Apex ballistics progress monotonically in practical
   reach, all reach a stationary target at 20 blocks, and none creates useful
