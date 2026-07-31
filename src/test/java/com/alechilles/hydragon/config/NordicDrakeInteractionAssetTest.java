@@ -79,13 +79,26 @@ final class NordicDrakeInteractionAssetTest {
         JsonObject effects = flameBreathSteps.get(0).getAsJsonObject().getAsJsonArray("Interactions")
                 .get(0).getAsJsonObject().getAsJsonArray("Interactions")
                 .get(1).getAsJsonObject().getAsJsonObject("Effects");
-        assertEquals(4.05, effects.getAsJsonArray("Particles").get(0).getAsJsonObject()
+        assertEquals(5.05, effects.getAsJsonArray("Particles").get(0).getAsJsonObject()
                 .getAsJsonObject("PositionOffset").get("Z").getAsDouble());
         String flameBreathJson = flameBreath.toString();
         assertTrue(flameBreathJson.contains("\"Type\":\"Selector\""));
         assertTrue(flameBreathJson.contains("\"NordicDrake_Flame_Breath_Damage\""));
         assertFalse(flameBreathJson.contains("LockedTarget"));
         assertFalse(flameBreathJson.contains("\"TargetSlot\""));
+    }
+
+    @Test
+    void avatarFlameBreathPlaysTheMonsterRoarAtVisualStart() throws IOException {
+        JsonObject flameBreath = readInteraction("NordicDrake_Avatar_Flying_Flame_Breath");
+        JsonObject effects = flameBreath.getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                .getAsJsonArray("Interactions").get(0).getAsJsonObject().getAsJsonArray("Interactions")
+                .get(1).getAsJsonObject().getAsJsonObject("Effects");
+        assertTrue(effects.has("WorldSoundEventId"));
+        assertEquals("SFX_HyDragon_NordicDrake_Avatar_Flame_Breath_Roar",
+                effects.get("WorldSoundEventId").getAsString());
+        assertSoundEvent("SFX_HyDragon_NordicDrake_Avatar_Flame_Breath_Roar",
+                "Avatar_Flame_Breath_Roar.ogg");
     }
 
     private static JsonObject findMount(JsonArray interactions) {
