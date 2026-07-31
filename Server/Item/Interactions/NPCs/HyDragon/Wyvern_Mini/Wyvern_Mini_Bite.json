@@ -52,7 +52,7 @@
             "Type": "Simple",
             "RunTime": 0.167,
             "Effects": {
-              "WorldSoundEventId": "SFX_Rex_Bite"
+              "WorldSoundEventId": "SFX_HyDragon_Miniwyvern_Bite"
             }
           }
         ]

@@ -2093,10 +2093,6 @@
                 ]
               },
               {
-                "Type": "PlaySound",
-                "SoundEventId": "SFX_HyDragon_Miniwyvern_Bite"
-              },
-              {
                 "Type": "State",
                 "State": ".Recovery"
               }
@@ -2151,10 +2147,6 @@
                   0,
                   0
                 ]
-              },
-              {
-                "Type": "PlaySound",
-                "SoundEventId": "SFX_HyDragon_Miniwyvern_Bite"
               },
               {
                 "Type": "State",
@@ -2217,10 +2209,6 @@
                   0,
                   0
                 ]
-              },
-              {
-                "Type": "PlaySound",
-                "SoundEventId": "SFX_HyDragon_Miniwyvern_Bite"
               },
               {
                 "Type": "State",
@@ -2290,10 +2278,6 @@
                   0,
                   0
                 ]
-              },
-              {
-                "Type": "PlaySound",
-                "SoundEventId": "SFX_HyDragon_Miniwyvern_Bite"
               },
               {
                 "Type": "State",

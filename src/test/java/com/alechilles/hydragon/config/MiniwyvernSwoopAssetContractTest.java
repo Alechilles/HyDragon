@@ -94,12 +94,19 @@ final class MiniwyvernSwoopAssetContractTest {
             assertFalse(interaction.has("Parent"), "profile must not rely on a root-level override for a nested selector");
             assertFalse(interaction.has("HitEntity"), "HitEntity belongs to the nested Selector");
             assertEquals("Simple", type(interaction));
-            JsonObject selector = interaction.getAsJsonObject("Next").getAsJsonArray("Interactions")
-                    .get(0).getAsJsonObject().getAsJsonArray("Interactions")
-                    .get(0).getAsJsonObject();
+            assertEquals(0.25, interaction.get("RunTime").getAsDouble(), 0.0);
+            JsonObject parallel = interaction.getAsJsonObject("Next");
+            assertEquals("Parallel", type(parallel));
+            assertEquals(2, parallel.getAsJsonArray("Interactions").size(),
+                    "bite selector and timed attack sound must be the only parallel branches");
+            JsonObject selector = parallel.getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                    .getAsJsonArray("Interactions").get(0).getAsJsonObject();
             assertEquals("Selector", type(selector));
+            assertEquals(0.167, selector.get("RunTime").getAsDouble(), 0.0);
             assertEquals(profile.getValue(), selector.getAsJsonObject("HitEntity")
                     .getAsJsonArray("Interactions").get(0).getAsString());
+            assertEquals("Simple", type(selector.getAsJsonObject("Next")));
+            assertEquals(0.25, selector.getAsJsonObject("Next").get("RunTime").getAsDouble(), 0.0);
         }
     }
 

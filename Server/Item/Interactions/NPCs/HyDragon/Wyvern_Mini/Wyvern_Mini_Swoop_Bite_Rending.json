@@ -3,5 +3,5 @@
   "Next": { "Type": "Parallel", "Interactions": [ { "Interactions": [ { "Type": "Selector", "RunTime": 0.167,
     "Selector": { "Id": "Horizontal", "Direction": "ToLeft", "TestLineOfSight": true, "ExtendTop": 0.5, "ExtendBottom": 0.5, "StartDistance": 0.5, "EndDistance": 3.75, "Length": 45, "RollOffset": -90, "YawStartOffset": -20 },
     "HitEntity": { "Interactions": [ "Wyvern_Mini_Swoop_Bite_Damage_Rending" ] }, "Next": { "Type": "Simple", "RunTime": 0.25 }
-  } ] } ] }
+  } ] }, { "Interactions": [ { "Type": "Simple", "RunTime": 0.167, "Effects": { "WorldSoundEventId": "SFX_HyDragon_Miniwyvern_Bite" } } ] } ] }
 }

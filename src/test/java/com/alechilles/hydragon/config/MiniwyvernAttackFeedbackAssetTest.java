@@ -30,7 +30,7 @@ final class MiniwyvernAttackFeedbackAssetTest {
     }
 
     @Test
-    void everyAttackPlaysItsAnimationBeforeAndItsSoundAtDispatch() throws IOException {
+    void everyAttackPlaysItsAnimationAndProjectileUsesDispatchSound() throws IOException {
         JsonObject component = load("Server/NPC/Roles/Creature/HyDragon/Components/"
                 + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
         List<JsonArray> sequences = new ArrayList<>();
@@ -48,7 +48,10 @@ final class MiniwyvernAttackFeedbackAssetTest {
                     assertFeedback(actions, index, "Shoot", "SFX_HyDragon_Miniwyvern_Projectile");
                     projectileCount++;
                 } else if (attack.startsWith("SwoopAttack")) {
-                    assertFeedback(actions, index, "Bite", "SFX_HyDragon_Miniwyvern_Bite");
+                    assertAnimationBefore(actions, index, "Bite");
+                    assertFalse(index + 1 < actions.size()
+                                    && "PlaySound".equals(type(actions.get(index + 1).getAsJsonObject())),
+                            "bite audio must be timed by the attack interaction, not dispatch");
                     biteCount++;
                 }
             }
@@ -58,12 +61,18 @@ final class MiniwyvernAttackFeedbackAssetTest {
     }
 
     @Test
-    void swoopInteractionsDoNotLayerTheLegacyRexBiteOverTheNewSoundPool() throws IOException {
-        for (String suffix : List.of("", "_Ferocity", "_Rending", "_Mastery")) {
+    void biteInteractionsDoNotLayerTheLegacyRexBiteOverTheNewSoundPool() throws IOException {
+        for (String suffix : List.of("_Bite", "_Swoop_Bite", "_Swoop_Bite_Ferocity",
+                "_Swoop_Bite_Rending", "_Swoop_Bite_Mastery")) {
             JsonObject interaction = load("Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/"
-                    + "Wyvern_Mini_Swoop_Bite" + suffix + ".json");
+                    + "Wyvern_Mini" + suffix + ".json");
+            assertTrue(containsStringProperty(interaction, "WorldSoundEventId",
+                            "SFX_HyDragon_Miniwyvern_Bite"),
+                    "bite profile " + suffix + " must play the randomized Miniwyvern bite pool");
             assertFalse(containsStringProperty(interaction, "WorldSoundEventId", "SFX_Rex_Bite"),
-                    "swoop profile " + suffix + " must leave bite audio to the NPC feedback action");
+                    "bite profile " + suffix + " must not layer the legacy Rex bite");
+            assertFalse(containsUndersizedParallel(interaction),
+                    "bite profile " + suffix + " must not contain a one-child Parallel");
         }
     }
 
@@ -104,13 +113,18 @@ final class MiniwyvernAttackFeedbackAssetTest {
             String animation, String soundEvent) {
         assertTrue(attackIndex > 0 && attackIndex + 1 < actions.size(),
                 "attack feedback must be adjacent to dispatch");
+        assertAnimationBefore(actions, attackIndex, animation);
+        JsonObject after = actions.get(attackIndex + 1).getAsJsonObject();
+        assertEquals("PlaySound", type(after));
+        assertEquals(soundEvent, after.get("SoundEventId").getAsString());
+    }
+
+    private static void assertAnimationBefore(JsonArray actions, int attackIndex, String animation) {
+        assertTrue(attackIndex > 0, "attack animation must immediately precede dispatch");
         JsonObject before = actions.get(attackIndex - 1).getAsJsonObject();
         assertEquals("PlayAnimation", type(before));
         assertEquals("Action", before.get("Slot").getAsString());
         assertEquals(animation, before.get("Animation").getAsString());
-        JsonObject after = actions.get(attackIndex + 1).getAsJsonObject();
-        assertEquals("PlaySound", type(after));
-        assertEquals(soundEvent, after.get("SoundEventId").getAsString());
     }
 
     private static void collectActionSequences(JsonElement element, List<JsonArray> sequences) {
@@ -156,6 +170,31 @@ final class MiniwyvernAttackFeedbackAssetTest {
         }
         for (var entry : object.entrySet()) {
             if (containsStringProperty(entry.getValue(), property, value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean containsUndersizedParallel(JsonElement element) {
+        if (element == null || element.isJsonNull() || element.isJsonPrimitive()) {
+            return false;
+        }
+        if (element.isJsonArray()) {
+            for (JsonElement child : element.getAsJsonArray()) {
+                if (containsUndersizedParallel(child)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        JsonObject object = element.getAsJsonObject();
+        if ("Parallel".equals(type(object)) && object.has("Interactions")
+                && object.getAsJsonArray("Interactions").size() < 2) {
+            return true;
+        }
+        for (var entry : object.entrySet()) {
+            if (containsUndersizedParallel(entry.getValue())) {
                 return true;
             }
         }
