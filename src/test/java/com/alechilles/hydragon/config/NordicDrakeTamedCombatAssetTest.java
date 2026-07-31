@@ -26,6 +26,10 @@ final class NordicDrakeTamedCombatAssetTest {
     private static final Path COMPONENT = ROOT.resolve("Server/NPC/Roles/Creature/HyDragon/Components/"
             + "Component_HyDragon_Instruction_NordicDrake_Tamed_Combat.json");
     private static final Path ROLES = ROOT.resolve("Server/NPC/Roles/Creature/HyDragon");
+    private static final Set<String> FORBIDDEN_IMPLICIT_COMBAT_TYPES = Set.of(
+            "SetTarget", "LockOnTarget", "LockOnInteractionTarget", "SelectTarget", "SelectBasicAttackTarget",
+            "CombatActionEvaluator", "SetMarkedTarget", "CombatAbility", "HasHostileTargetMemory",
+            "AddToHostileTargetMemory", "State", "BodyMotion", "Attack");
 
     @Test
     void nordicCombatIsAnExclusiveLockedTargetTakeoverWithBoundedSafety() throws IOException {
@@ -158,12 +162,9 @@ final class NordicDrakeTamedCombatAssetTest {
     }
 
     private static void assertNoImplicitTargetSelection(JsonObject component) {
-        Set<String> forbiddenTypes = Set.of(
-                "SetTarget", "LockOnTarget", "LockOnInteractionTarget", "SelectTarget", "SelectBasicAttackTarget",
-                "CombatActionEvaluator", "SetMarkedTarget");
         assertEquals(0, objects(component, object -> {
             String type = string(object, "Type");
-            return type != null && forbiddenTypes.contains(type);
+            return type != null && FORBIDDEN_IMPLICIT_COMBAT_TYPES.contains(type);
         }).size(),
                 "Task 1 must only consume the outer Defend LockedTarget, never select or mutate a target");
         assertEquals(0, objects(component, object -> object.has("LockOnTarget")).size(),
@@ -182,13 +183,10 @@ final class NordicDrakeTamedCombatAssetTest {
                 """).getAsJsonObject(), children.get(4),
                 "the fifth Task 1 child must be the exact terminal no-op");
 
-        Set<String> forbiddenTypes = Set.of(
-                "State", "BodyMotion", "Attack", "CombatActionEvaluator", "SelectTarget", "SelectBasicAttackTarget",
-                "SetMarkedTarget");
         assertEquals(0, objects(component, object -> {
             String type = string(object, "Type");
             return object.has("BodyMotion") || object.has("Attack")
-                    || type != null && forbiddenTypes.contains(type);
+                    || type != null && FORBIDDEN_IMPLICIT_COMBAT_TYPES.contains(type);
         }).size(),
                 "Task 1 must not add combat state, motion, or attack behavior before the later combat tasks");
     }
