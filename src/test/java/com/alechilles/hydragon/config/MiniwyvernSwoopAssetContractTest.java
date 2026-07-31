@@ -62,6 +62,26 @@ final class MiniwyvernSwoopAssetContractTest {
     }
 
     @Test
+    void swoopApproachesTargetsInThreeDimensionsWhenAlreadyHorizontallyClose() throws IOException {
+        JsonArray instructions = load("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json")
+                .getAsJsonObject("Content").getAsJsonArray("Instructions");
+        java.util.List<JsonObject> approaches = new java.util.ArrayList<>();
+        approaches.addAll(objectsWithMotion(instructions, 0.55, false));
+        approaches.addAll(objectsWithMotion(instructions, 0.7, true));
+
+        assertEquals(2, approaches.size(), "both swoop talent profiles need one direct approach motion");
+        for (JsonObject approach : approaches) {
+            JsonObject motion = approach.getAsJsonObject("BodyMotion");
+            assertEquals("Seek", type(motion));
+            assertTrue(motion.has("DesiredAltitudeWeight"),
+                    "swoop Seek must override the Fly controller's altitude-biased steering");
+            assertEquals(0.0, motion.get("DesiredAltitudeWeight").getAsDouble(), 0.0,
+                    "direct 3D pursuit must not derive descent from horizontal steering magnitude");
+        }
+    }
+
+    @Test
     void everySwoopProfileOwnsItsEffectiveNestedSelectorDamage() throws IOException {
         Map<String, String> profiles = Map.of(
                 "", "Wyvern_Mini_Swoop_Bite_Damage",
