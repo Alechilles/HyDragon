@@ -2053,6 +2053,26 @@
                       ]
                     },
                     {
+                      "$Comment": "Confirm touchdown from physical contact so a pitched collision box cannot remain on the Fly controller while Land waits for its positional goal.",
+                      "Sensor": {
+                        "Type": "And",
+                        "Sensors": [
+                          {
+                            "Type": "MotionController",
+                            "MotionController": "Fly"
+                          },
+                          {
+                            "Type": "OnGround"
+                          }
+                        ]
+                      },
+                      "Actions": [
+                        {
+                          "Type": "TameworkConfirmLanding"
+                        }
+                      ]
+                    },
+                    {
                       "Sensor": {
                         "Type": "MotionController",
                         "MotionController": "Fly"
