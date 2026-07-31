@@ -16,6 +16,7 @@
               "Effects": {
                 "ItemPlayerAnimationsId": "NordicDrake_Default",
                 "ItemAnimationId": "ChargeShoot",
+                "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Flame_Breath_Roar",
                 "Particles": [
                   {
                     "TargetEntityPart": "Entity",
@@ -24,7 +25,7 @@
                     "DetachedFromModel": false,
                     "PositionOffset": {
                       "Y": -0.1,
-                      "Z": 4.05
+                      "Z": 5.05
                     },
                     "RotationOffset": {
                       "Pitch": 0,
@@ -42,6 +43,10 @@
         },
         {
           "Interactions": [
+            {
+              "Type": "Simple",
+              "RunTime": 0.15
+            },
             {
               "Type": "Selector",
               "RunTime": 0.05,
