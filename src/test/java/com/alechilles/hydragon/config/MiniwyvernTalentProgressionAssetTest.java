@@ -144,6 +144,37 @@ final class MiniwyvernTalentProgressionAssetTest {
         }
     }
 
+    @Test
+    void englishSwoopDescriptionsStateTheBindingDamageAndCooldownBands() throws IOException {
+        Map<String, String> entries = localeEntries("en-US");
+        assertEquals(Map.of(
+                LOCALE_PREFIX + "swoop_ferocity.description",
+                "Unlock a 20-damage swoop with a 25-35 second cooldown.",
+                LOCALE_PREFIX + "swoop_cadence.description",
+                "Keep the 20-damage swoop and reduce its cooldown to 22-30 seconds.",
+                LOCALE_PREFIX + "swoop_precision.description",
+                "Increase swoop damage to 24 with a 25-35 second cooldown.",
+                LOCALE_PREFIX + "relentless_swoop.description",
+                "Keep the 20-damage swoop and reduce its cooldown to 20-26 seconds.",
+                LOCALE_PREFIX + "rending_dive.description",
+                "Increase swoop damage to 28 with a 25-35 second cooldown.",
+                LOCALE_PREFIX + "swoop_mastery.description",
+                "Master the swoop route for 28 damage and an 18-24 second cooldown."),
+                Map.of(
+                        LOCALE_PREFIX + "swoop_ferocity.description",
+                        entries.get(LOCALE_PREFIX + "swoop_ferocity.description"),
+                        LOCALE_PREFIX + "swoop_cadence.description",
+                        entries.get(LOCALE_PREFIX + "swoop_cadence.description"),
+                        LOCALE_PREFIX + "swoop_precision.description",
+                        entries.get(LOCALE_PREFIX + "swoop_precision.description"),
+                        LOCALE_PREFIX + "relentless_swoop.description",
+                        entries.get(LOCALE_PREFIX + "relentless_swoop.description"),
+                        LOCALE_PREFIX + "rending_dive.description",
+                        entries.get(LOCALE_PREFIX + "rending_dive.description"),
+                        LOCALE_PREFIX + "swoop_mastery.description",
+                        entries.get(LOCALE_PREFIX + "swoop_mastery.description")));
+    }
+
     private static Map<String, TalentExpectation> expectedTalents() {
         String bond = LOCALE_PREFIX + "branch.bond";
         String combat = LOCALE_PREFIX + "branch.combat";
