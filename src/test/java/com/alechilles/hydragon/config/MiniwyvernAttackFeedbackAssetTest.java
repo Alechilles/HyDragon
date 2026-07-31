@@ -22,8 +22,10 @@ final class MiniwyvernAttackFeedbackAssetTest {
     void attackSoundPoolsUseTrimmedMonoVorbisClipsWithoutImmediateRepeats() throws IOException {
         assertPool("Projectile", List.of(
                 "Projectile_01.ogg", "Projectile_02.ogg",
-                "Projectile_03.ogg", "Projectile_04.ogg"));
-        assertPool("Bite", List.of("Bite_01.ogg", "Bite_02.ogg", "Bite_03.ogg"));
+                "Projectile_03.ogg", "Projectile_04.ogg"),
+                List.of(0.70, 0.67, 0.64, 0.72));
+        assertPool("Bite", List.of("Bite_01.ogg", "Bite_02.ogg", "Bite_03.ogg"),
+                List.of(0.47, 0.47, 0.37));
     }
 
     @Test
@@ -57,18 +59,30 @@ final class MiniwyvernAttackFeedbackAssetTest {
     @Test
     void miniwyvernModelPreservesTheUserAuthoredAttackAnimationsAndFlightTuning() throws IOException {
         JsonObject model = load("Server/Models/HyDragon/Wyvern_Mini/Wyvern_Mini.json");
+        assertEquals("NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Normal.png",
+                model.get("Texture").getAsString());
         assertEquals(0.75, model.get("EyeHeight").getAsDouble(), 0.0);
         JsonObject sets = model.getAsJsonObject("AnimationSets");
+        JsonObject bite = sets.getAsJsonObject("Bite").getAsJsonArray("Animations")
+                .get(0).getAsJsonObject();
         assertEquals("NPC/HyDragon/Wyvern_Mini/Animations/Bite.blockyanim",
-                sets.getAsJsonObject("Bite").getAsJsonArray("Animations").get(0)
-                        .getAsJsonObject().get("Animation").getAsString());
+                bite.get("Animation").getAsString());
+        assertEquals(0.4, bite.get("BlendingDuration").getAsDouble(), 0.0);
+        JsonObject shoot = sets.getAsJsonObject("Shoot").getAsJsonArray("Animations")
+                .get(0).getAsJsonObject();
         assertEquals("NPC/HyDragon/Wyvern_Mini/Animations/Shoot.blockyanim",
-                sets.getAsJsonObject("Shoot").getAsJsonArray("Animations").get(0)
-                        .getAsJsonObject().get("Animation").getAsString());
+                shoot.get("Animation").getAsString());
+        assertEquals(0.4, shoot.get("BlendingDuration").getAsDouble(), 0.0);
         JsonArray fly = sets.getAsJsonObject("Fly").getAsJsonArray("Animations");
         assertEquals(0.2, fly.get(0).getAsJsonObject().get("BlendingDuration").getAsDouble(), 0.0);
         assertEquals(0.1, fly.get(1).getAsJsonObject().get("Weight").getAsDouble(), 0.0);
         assertEquals(0.2, fly.get(1).getAsJsonObject().get("BlendingDuration").getAsDouble(), 0.0);
+        JsonObject icon = model.getAsJsonObject("IconProperties");
+        assertEquals(1.0, icon.get("Scale").getAsDouble(), 0.0);
+        assertEquals(List.of(0.0, 0.0), icon.getAsJsonArray("Translation").asList().stream()
+                .map(JsonElement::getAsDouble).toList());
+        assertEquals(List.of(26.4, -84.8, 0.0), icon.getAsJsonArray("Rotation").asList().stream()
+                .map(JsonElement::getAsDouble).toList());
     }
 
     private static void assertFeedback(JsonArray actions, int attackIndex,
@@ -113,7 +127,9 @@ final class MiniwyvernAttackFeedbackAssetTest {
         return JsonParser.parseString(Files.readString(ROOT.resolve(relativePath))).getAsJsonObject();
     }
 
-    private static void assertPool(String family, List<String> files) throws IOException {
+    private static void assertPool(String family, List<String> files, List<Double> durations)
+            throws IOException {
+        assertEquals(files.size(), durations.size(), "each attack clip needs an expected duration");
         Path eventPath = ROOT.resolve(Path.of("Server", "Audio", "SoundEvents", "SFX", "HyDragon",
                 "Wyvern_Mini", "SFX_HyDragon_Miniwyvern_" + family + ".json"));
         assertTrue(Files.isRegularFile(eventPath), () -> "missing attack SoundEvent " + eventPath);
@@ -124,14 +140,15 @@ final class MiniwyvernAttackFeedbackAssetTest {
         assertEquals(1, layer.get("RoundRobinHistorySize").getAsInt());
         assertEquals(files.stream().map(name -> "Sounds/HyDragon/Wyvern_Mini/Attack/" + name).toList(),
                 layer.getAsJsonArray("Files").asList().stream().map(JsonElement::getAsString).toList());
-        for (String file : files) {
+        for (int index = 0; index < files.size(); index++) {
+            String file = files.get(index);
             Path audio = ROOT.resolve(Path.of("Common", "Sounds", "HyDragon", "Wyvern_Mini", "Attack", file));
             assertTrue(Files.isRegularFile(audio), () -> "missing attack sound " + audio);
-            assertMonoVorbis(audio);
+            assertMonoVorbis(audio, durations.get(index));
         }
     }
 
-    private static void assertMonoVorbis(Path soundPath) throws IOException {
+    private static void assertMonoVorbis(Path soundPath, double expectedDuration) throws IOException {
         byte[] bytes = Files.readAllBytes(soundPath);
         byte[] identificationHeader = {1, 'v', 'o', 'r', 'b', 'i', 's'};
         for (int index = 0; index <= bytes.length - identificationHeader.length - 5; index++) {
@@ -145,9 +162,51 @@ final class MiniwyvernAttackFeedbackAssetTest {
             if (matches) {
                 assertEquals(1, Byte.toUnsignedInt(bytes[index + identificationHeader.length + 4]),
                         () -> soundPath + " must be mono");
+                int sampleRate = (int) readLittleEndian(
+                        bytes, index + identificationHeader.length + 5, 4);
+                assertEquals(48_000, sampleRate, () -> soundPath + " must use 48 kHz audio");
+                long finalGranule = finalOggGranule(bytes, soundPath);
+                assertEquals(expectedDuration, finalGranule / (double) sampleRate, 0.000_001,
+                        () -> soundPath + " must remain tightly trimmed");
                 return;
             }
         }
         throw new AssertionError("missing Vorbis identification header in " + soundPath);
+    }
+
+    private static long finalOggGranule(byte[] bytes, Path soundPath) {
+        int pageOffset = 0;
+        long finalGranule = -1;
+        while (pageOffset < bytes.length) {
+            assertTrue(pageOffset + 27 <= bytes.length, () -> "truncated Ogg page in " + soundPath);
+            assertTrue(bytes[pageOffset] == 'O' && bytes[pageOffset + 1] == 'g'
+                            && bytes[pageOffset + 2] == 'g' && bytes[pageOffset + 3] == 'S',
+                    () -> "invalid Ogg capture pattern in " + soundPath);
+            int segmentCount = Byte.toUnsignedInt(bytes[pageOffset + 26]);
+            int headerSize = 27 + segmentCount;
+            assertTrue(pageOffset + headerSize <= bytes.length,
+                    () -> "truncated Ogg segment table in " + soundPath);
+            int bodySize = 0;
+            for (int segment = 0; segment < segmentCount; segment++) {
+                bodySize += Byte.toUnsignedInt(bytes[pageOffset + 27 + segment]);
+            }
+            assertTrue(pageOffset + headerSize + bodySize <= bytes.length,
+                    () -> "truncated Ogg page body in " + soundPath);
+            long granule = readLittleEndian(bytes, pageOffset + 6, 8);
+            if (granule >= 0) {
+                finalGranule = granule;
+            }
+            pageOffset += headerSize + bodySize;
+        }
+        assertTrue(finalGranule >= 0, () -> "missing final Ogg granule position in " + soundPath);
+        return finalGranule;
+    }
+
+    private static long readLittleEndian(byte[] bytes, int offset, int length) {
+        long value = 0;
+        for (int index = 0; index < length; index++) {
+            value |= (long) Byte.toUnsignedInt(bytes[offset + index]) << (index * 8);
+        }
+        return value;
     }
 }
