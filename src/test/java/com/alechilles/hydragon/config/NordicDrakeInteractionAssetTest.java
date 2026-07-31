@@ -120,7 +120,28 @@ final class NordicDrakeInteractionAssetTest {
         assertEquals("Sounds/HyDragon/NordicDrake/" + soundFileName,
                 soundEvent.getAsJsonArray("Layers").get(0).getAsJsonObject().getAsJsonArray("Files")
                         .get(0).getAsString());
-        assertTrue(Files.isRegularFile(Path.of("Common", "Sounds", "HyDragon", "NordicDrake", soundFileName)));
+        Path soundPath = Path.of("Common", "Sounds", "HyDragon", "NordicDrake", soundFileName);
+        assertTrue(Files.isRegularFile(soundPath));
+        assertMonoVorbis(soundPath);
+    }
+
+    private static void assertMonoVorbis(Path soundPath) throws IOException {
+        byte[] bytes = Files.readAllBytes(soundPath);
+        byte[] identificationHeader = {1, 'v', 'o', 'r', 'b', 'i', 's'};
+        for (int index = 0; index <= bytes.length - identificationHeader.length - 5; index++) {
+            boolean matches = true;
+            for (int offset = 0; offset < identificationHeader.length; offset++) {
+                if (bytes[index + offset] != identificationHeader[offset]) {
+                    matches = false;
+                    break;
+                }
+            }
+            if (matches) {
+                assertEquals(1, Byte.toUnsignedInt(bytes[index + identificationHeader.length + 4]));
+                return;
+            }
+        }
+        throw new AssertionError("missing Vorbis identification header in " + soundPath);
     }
 
     private static Path interactionPath(String interactionId) {
