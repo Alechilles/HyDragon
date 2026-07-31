@@ -62,7 +62,7 @@
         ]
       },
       {
-        "$Comment": "Aerial mode starts the native flight controller without changing the active order.",
+        "$Comment": "Aerial mode clears the grounded status animation before starting the native flight controller without changing the active order.",
         "Continue": true,
         "Sensor": {
           "Type": "And",
@@ -77,6 +77,12 @@
             }
           ]
         },
+        "Actions": [
+          {
+            "Type": "PlayAnimation",
+            "Slot": "Status"
+          }
+        ],
         "BodyMotion": {
           "Type": "TakeOff",
           "JumpSpeed": 4

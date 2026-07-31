@@ -140,6 +140,15 @@ final class DragonHornLocomotionAssetContractTest {
     }
 
     @Test
+    void nativeTakeoffClearsGroundedStatusAnimationBeforeFlightControllerStarts() throws IOException {
+        JsonObject transition = readJson("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Airborne_Mode_Transition.json");
+
+        assertTrue(hasTakeOffWithStatusAnimationClear(transition.getAsJsonObject("Content")),
+                "native takeoff must clear the grounded Status animation so FlyIdle can be selected without a command");
+    }
+
+    @Test
     void miniwyvernSelectsLocomotionInsideEachCommandWithoutMutatingCommandStateOrTargets() throws IOException {
         JsonObject miniwyvern = readJson("Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json");
 
@@ -433,6 +442,18 @@ final class DragonHornLocomotionAssetContractTest {
         return anyObject(node, instruction -> isAirborneControllerBranch(instruction, true, "Walk")
                 && instruction.has("BodyMotion")
                 && "TakeOff".equals(string(instruction.getAsJsonObject("BodyMotion"), "Type")));
+    }
+
+    private static boolean hasTakeOffWithStatusAnimationClear(JsonElement node) {
+        return anyObject(node, instruction -> isAirborneControllerBranch(instruction, true, "Walk")
+                && instruction.has("BodyMotion")
+                && "TakeOff".equals(string(instruction.getAsJsonObject("BodyMotion"), "Type"))
+                && instruction.has("Actions")
+                && instruction.getAsJsonArray("Actions").asList().stream()
+                        .map(JsonElement::getAsJsonObject)
+                        .anyMatch(action -> "PlayAnimation".equals(string(action, "Type"))
+                                && "Status".equals(string(action, "Slot"))
+                                && !action.has("Animation")));
     }
 
     private static boolean hasSafeLanding(JsonElement node) {
