@@ -11,6 +11,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /** Regression contract for the deterministic Miniwyvern aerial swoop cycle. */
@@ -57,6 +58,28 @@ final class MiniwyvernSwoopAssetContractTest {
                     .get("RandomPercentageModifier").getAsInt());
             assertFalse(asset.toString().contains("Knockback"));
             assertFalse(asset.toString().contains("EffectId"));
+        }
+    }
+
+    @Test
+    void everySwoopProfileOwnsItsEffectiveNestedSelectorDamage() throws IOException {
+        Map<String, String> profiles = Map.of(
+                "", "Wyvern_Mini_Swoop_Bite_Damage",
+                "_Ferocity", "Wyvern_Mini_Swoop_Bite_Damage_Ferocity",
+                "_Rending", "Wyvern_Mini_Swoop_Bite_Damage_Rending",
+                "_Mastery", "Wyvern_Mini_Swoop_Bite_Damage_Mastery");
+        for (Map.Entry<String, String> profile : profiles.entrySet()) {
+            JsonObject interaction = load("Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/"
+                    + "Wyvern_Mini_Swoop_Bite" + profile.getKey() + ".json");
+            assertFalse(interaction.has("Parent"), "profile must not rely on a root-level override for a nested selector");
+            assertFalse(interaction.has("HitEntity"), "HitEntity belongs to the nested Selector");
+            assertEquals("Simple", type(interaction));
+            JsonObject selector = interaction.getAsJsonObject("Next").getAsJsonArray("Interactions")
+                    .get(0).getAsJsonObject().getAsJsonArray("Interactions")
+                    .get(0).getAsJsonObject();
+            assertEquals("Selector", type(selector));
+            assertEquals(profile.getValue(), selector.getAsJsonObject("HitEntity")
+                    .getAsJsonArray("Interactions").get(0).getAsString());
         }
     }
 
