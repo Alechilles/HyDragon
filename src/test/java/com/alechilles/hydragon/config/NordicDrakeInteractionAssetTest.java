@@ -108,7 +108,7 @@ final class NordicDrakeInteractionAssetTest {
                 .getAsJsonArray("Interactions").get(1).getAsJsonObject().getAsJsonArray("Interactions");
         JsonObject delay = damageSteps.get(0).getAsJsonObject();
         assertEquals("Simple", delay.get("Type").getAsString());
-        assertEquals(0.15, delay.get("RunTime").getAsDouble());
+        assertEquals(0.5, delay.get("RunTime").getAsDouble());
         assertEquals("Selector", damageSteps.get(1).getAsJsonObject().get("Type").getAsString());
     }
 
