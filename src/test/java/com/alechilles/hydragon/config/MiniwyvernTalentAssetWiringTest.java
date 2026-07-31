@@ -20,6 +20,11 @@ import org.junit.jupiter.api.Test;
 
 /** Contract for the asset-owned Miniwyvern combat execution path. */
 final class MiniwyvernTalentAssetWiringTest {
+    private static final Path TALENTS = Path.of("Server", "Tamework", "Talents", "HyDragonMiniwyvern.json");
+    private static final List<String> STAGE_ONE_COMBAT_MARKERS = List.of(
+            "DraconicProjectile", "ProjectileRange", "ProjectileCadence", "ProjectileGuidance",
+            "ProjectilePattern", "ProjectileMastery", "SwoopFerocity", "SwoopCadence",
+            "SwoopPrecision", "RelentlessSwoop", "RendingDive", "SwoopMastery");
     private static final Path TEMPLATE = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon",
             "Templates", "Template_Wyvern_Mini_Flying_Tamed.json");
     private static final List<String> ROLES = List.of("Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
@@ -29,6 +34,24 @@ final class MiniwyvernTalentAssetWiringTest {
     private static final String AIM_FLAG = "Miniwyvern_Projectile_Aiming";
     private static final String AIM_TIMER = "Miniwyvern_Projectile_Aim";
     private static final String COOLDOWN_TIMER = "Miniwyvern_Projectile_Cooldown";
+
+    @Test
+    void stageOneCombatGraphShipsTheTwelveMarkerEffectsConsumedByLaterAssets() throws IOException {
+        JsonArray talents = load(TALENTS).getAsJsonArray("Talents");
+        Map<String, JsonObject> talentsById = new java.util.LinkedHashMap<>();
+        for (JsonElement element : talents) {
+            JsonObject talent = element.getAsJsonObject();
+            talentsById.put(string(talent, "Id"), talent);
+        }
+
+        for (String id : STAGE_ONE_COMBAT_MARKERS) {
+            JsonObject talent = talentsById.get(id);
+            assertTrue(talent != null, "missing stage-one marker " + id);
+            JsonObject effect = talent.getAsJsonArray("Effects").get(0).getAsJsonObject();
+            assertEquals(id, string(effect, "EffectKey"), id);
+            assertEquals(1.0d, effect.get("Multiplier").getAsDouble(), 0.000_001d, id);
+        }
+    }
 
     @Test
     void templateContainsTalentGatedExecutableVariants() throws IOException {

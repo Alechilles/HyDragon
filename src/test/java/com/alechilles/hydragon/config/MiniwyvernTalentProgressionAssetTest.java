@@ -98,9 +98,25 @@ final class MiniwyvernTalentProgressionAssetTest {
         }
         assertEquals(Map.of(
                 LOCALE_PREFIX + "branch.bond", 15,
-                LOCALE_PREFIX + "branch.combat", 19,
+                LOCALE_PREFIX + "branch.combat", 20,
                 LOCALE_PREFIX + "branch.vigor", 17), costsByBranch);
-        assertEquals(51, costsByBranch.values().stream().mapToInt(Integer::intValue).sum());
+        assertEquals(52, costsByBranch.values().stream().mapToInt(Integer::intValue).sum());
+
+        for (String id : List.of(
+                "DraconicProjectile", "ProjectileRange", "ProjectileCadence", "ProjectileGuidance",
+                "ProjectilePattern", "ProjectileMastery", "SwoopFerocity", "SwoopCadence",
+                "SwoopPrecision", "RelentlessSwoop", "RendingDive", "SwoopMastery")) {
+            JsonObject effect = talents.get(id).getAsJsonArray("Effects").get(0).getAsJsonObject();
+            assertEquals(id, effect.get("EffectKey").getAsString(), id);
+            assertEquals(1.0d, effect.get("Multiplier").getAsDouble(), 0.000_001d, id);
+        }
+        for (String removedId : Set.of("ProjectileForce", "ProjectileImpact", "DraconicAssault",
+                "AssaultUtility", "AssaultMastery", "DraconicApex")) {
+            assertFalse(talents.containsKey(removedId), removedId + " must not ship in stage one");
+        }
+        for (JsonObject talent : talents.values()) {
+            assertFalse(talent.has("RequiresAnyTalentIds"), talent.get("Id").getAsString());
+        }
 
         assertHealthEffect(talents.get("VitalScales"), 1.05d);
         assertHealthEffect(talents.get("HardenedScales"), 1.05d);
@@ -117,7 +133,7 @@ final class MiniwyvernTalentProgressionAssetTest {
             keys.add(talent.get("DisplayName").getAsString());
             keys.add(talent.get("Description").getAsString());
         }
-        assertEquals(63, keys.size());
+        assertEquals(65, keys.size());
         assertTrue(keys.stream().allMatch(key -> key.startsWith(LOCALE_PREFIX)));
 
         for (String locale : LOCALES) {
@@ -145,14 +161,17 @@ final class MiniwyvernTalentProgressionAssetTest {
         expected.put("DraconicProjectile", talent(combat, 1, 3, 1));
         expected.put("ProjectileRange", talent(combat, 2, 5, 1, "DraconicProjectile"));
         expected.put("ProjectileCadence", talent(combat, 2, 5, 1, "DraconicProjectile"));
-        expected.put("ProjectileForce", talent(combat, 3, 8, 2, "ProjectileRange"));
-        expected.put("ProjectileGuidance", talent(combat, 3, 9, 1, "ProjectileCadence"));
-        expected.put("ProjectileImpact", talent(combat, 4, 12, 2, "ProjectileForce"));
-        expected.put("ProjectilePattern", talent(combat, 4, 14, 2, "ProjectileGuidance"));
-        expected.put("DraconicAssault", talent(combat, 5, 17, 2, "ProjectileImpact", "ProjectilePattern"));
-        expected.put("AssaultUtility", talent(combat, 5, 18, 1, "DraconicAssault"));
-        expected.put("AssaultMastery", talent(combat, 5, 21, 2, "DraconicAssault"));
-        expected.put("DraconicApex", talent(combat, 6, 27, 4, "AssaultUtility", "AssaultMastery"));
+        expected.put("ProjectileGuidance", talent(combat, 3, 9, 2, "ProjectileRange"));
+        expected.put("ProjectilePattern", talent(combat, 3, 11, 2, "ProjectileCadence"));
+        expected.put("ProjectileMastery", talent(combat, 4, 14, 3,
+                "ProjectileGuidance", "ProjectilePattern"));
+        expected.put("SwoopFerocity", talent(combat, 1, 3, 1));
+        expected.put("SwoopCadence", talent(combat, 2, 5, 1, "SwoopFerocity"));
+        expected.put("SwoopPrecision", talent(combat, 2, 5, 1, "SwoopFerocity"));
+        expected.put("RelentlessSwoop", talent(combat, 3, 9, 2, "SwoopCadence"));
+        expected.put("RendingDive", talent(combat, 3, 11, 2, "SwoopPrecision"));
+        expected.put("SwoopMastery", talent(combat, 4, 14, 3,
+                "RelentlessSwoop", "RendingDive"));
         expected.put("VitalScales", talent(vigor, 1, 2, 1));
         expected.put("HardenedScales", talent(vigor, 2, 4, 1, "VitalScales"));
         expected.put("ElderScales", talent(vigor, 3, 7, 2, "HardenedScales"));
