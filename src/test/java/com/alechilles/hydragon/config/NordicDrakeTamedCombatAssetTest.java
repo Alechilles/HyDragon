@@ -324,10 +324,16 @@ final class NordicDrakeTamedCombatAssetTest {
         assertRangeAndLineOfSight(branch.getAsJsonObject("Sensor"), range);
         assertEquals(blocking, branch.has("ActionsBlocking") && branch.get("ActionsBlocking").getAsBoolean());
         assertEquals(attack, string(action(branch, "Attack").getAsJsonObject("Attack"), "Compute"));
-        assertEquals(timer, actionTypesAfterAttack(branch, "TimerStart").get(0).getAsJsonObject().get("Name").getAsString());
-        assertEquals(timer, actionTypesAfterAttack(branch, "TimerRestart").get(0).getAsJsonObject().get("Name").getAsString());
-        assertEquals(cooldown, string(actionTypesAfterAttack(branch, "TimerStart").get(0).getAsJsonObject()
-                .getAsJsonObject("StartValueRange"), "Compute"));
+        List<JsonObject> timers = actionsAfterAttack(branch).stream()
+                .filter(candidate -> string(candidate, "Type").startsWith("Timer")).toList();
+        assertEquals(List.of("TimerStart", "TimerRestart"),
+                timers.stream().map(timerAction -> string(timerAction, "Type")).toList(),
+                "each attack must start and restart exactly its own cooldown timer");
+        assertTrue(timers.stream().allMatch(timerAction -> timer.equals(string(timerAction, "Name"))),
+                "post-attack timer actions must not target another attack timer");
+        JsonObject timerStart = timers.get(0);
+        assertEquals(cooldown, string(timerStart.getAsJsonObject("StartValueRange"), "Compute"));
+        assertEquals(cooldown, string(timerStart.getAsJsonObject("RestartValueRange"), "Compute"));
         JsonObject aim = branch.getAsJsonObject("HeadMotion");
         assertEquals("Aim", string(aim, "Type"));
         assertEquals(0, aim.get("Spread").getAsInt());
@@ -355,16 +361,10 @@ final class NordicDrakeTamedCombatAssetTest {
                 .map(action -> string(action, "Type")).toList();
     }
 
-    private static List<String> actionTypesAfterAttack(JsonObject branch) {
-        List<String> actions = actionTypes(branch);
-        return actions.subList(actions.indexOf("Attack") + 1, actions.size());
-    }
-
-    private static List<JsonElement> actionTypesAfterAttack(JsonObject branch, String type) {
+    private static List<JsonObject> actionsAfterAttack(JsonObject branch) {
         List<JsonElement> actions = branch.getAsJsonArray("Actions").asList();
         int attackIndex = actionTypes(branch).indexOf("Attack");
-        return actions.subList(attackIndex + 1, actions.size()).stream()
-                .filter(action -> type.equals(string(action.getAsJsonObject(), "Type"))).toList();
+        return actions.subList(attackIndex + 1, actions.size()).stream().map(JsonElement::getAsJsonObject).toList();
     }
 
     private static boolean isChaseBranch(JsonObject branch) {
