@@ -1061,6 +1061,7 @@
             }
           ]
         },
+        "ActionsBlocking": true,
         "Actions": [
           {
             "Type": "SetFlag",
@@ -1137,6 +1138,7 @@
             }
           ]
         },
+        "ActionsBlocking": true,
         "Actions": [
           {
             "Type": "SetFlag",
@@ -1216,6 +1218,7 @@
             }
           ]
         },
+        "ActionsBlocking": true,
         "Actions": [
           { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": true },
           { "Type": "Attack", "Attack": { "Compute": "TalentProjectilePattern" }, "AimingTimeRange": [0.1, 0.2], "AttackPauseRange": [0, 0] },
@@ -1735,7 +1738,6 @@
         "Sensor": { "Type": "And", "Sensors": [
           { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" },
           { "Type": "Flag", "Name": "AirborneMode" }, { "Type": "MotionController", "MotionController": "Fly" },
-          { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active" },
           { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }, { "Type": "Flag", "Name": "Miniwyvern_Swooping", "Set": false },
           { "Type": "TameworkHasTalent", "TalentId": "ProjectileMastery" }
         ] },
@@ -1745,35 +1747,35 @@
           { "Type": "Attack", "Attack": { "Compute": "TalentProjectileMasteryEcho" }, "AimingTimeRange": [0.1, 0.2], "AttackPauseRange": [0, 0] },
           { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [3, 5], "RestartValueRange": [3, 5] },
           { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
-          { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Echo_Pending", "SetTo": false },
           { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": false },
-          { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
+          { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false },
+          { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Echo_Pending", "SetTo": false }
         ]
       },
       {
         "$Comment": "Pattern guided echo continues a protected two-phase volley.",
         "Sensor": { "Type": "And", "Sensors": [
           { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "AirborneMode" }, { "Type": "MotionController", "MotionController": "Fly" },
-          { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }, { "Type": "Flag", "Name": "Miniwyvern_Swooping", "Set": false },
+          { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }, { "Type": "Flag", "Name": "Miniwyvern_Swooping", "Set": false },
           { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileMastery" } }
         ] }, "ActionsBlocking": true,
         "Actions": [
           { "Type": "Timeout", "Delay": [0.3, 0.3] }, { "Type": "Attack", "Attack": { "Compute": "TalentProjectilePatternEcho" }, "AimingTimeRange": [0.1, 0.2], "AttackPauseRange": [0, 0] },
           { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [4, 6], "RestartValueRange": [4, 6] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
-          { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Echo_Pending", "SetTo": false }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": false }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
+          { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": false }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Echo_Pending", "SetTo": false }
         ]
       },
       {
         "$Comment": "Pattern standard echo continues a protected two-phase volley.",
         "Sensor": { "Type": "And", "Sensors": [
           { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "AirborneMode" }, { "Type": "MotionController", "MotionController": "Fly" },
-          { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }, { "Type": "Flag", "Name": "Miniwyvern_Swooping", "Set": false },
+          { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }, { "Type": "Flag", "Name": "Miniwyvern_Swooping", "Set": false },
           { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileMastery" } }
         ] }, "ActionsBlocking": true,
         "Actions": [
           { "Type": "Timeout", "Delay": [0.3, 0.3] }, { "Type": "Attack", "Attack": { "Compute": "TalentProjectilePatternEcho" }, "AimingTimeRange": [0.1, 0.2], "AttackPauseRange": [0, 0] },
           { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [4, 6], "RestartValueRange": [4, 6] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
-          { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Echo_Pending", "SetTo": false }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": false }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
+          { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": false }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Echo_Pending", "SetTo": false }
         ]
       },
       {
