@@ -27,46 +27,7 @@
         }
       ]
     },
-    "ProjectileHit": {
-      "Cooldown": {
-        "Cooldown": 0
-      },
-      "Interactions": [
-        {
-          "Type": "DamageEntity",
-          "Entity": "Target",
-          "DamageCalculator": {
-            "Type": "Absolute",
-            "BaseDamage": {
-              "Physical": 8
-            },
-            "RandomPercentageModifier": 0
-          },
-          "Next": {
-            "Type": "Serial",
-            "Interactions": [
-              {
-                "Type": "ApplyEffect",
-                "Entity": "Target",
-                "EffectId": "HyDragon_Miniwyvern_Ice_Slow"
-              },
-              {
-                "Type": "RemoveEntity",
-                "Entity": "User"
-              }
-            ]
-          },
-          "Failed": {
-            "Type": "RemoveEntity",
-            "Entity": "User"
-          },
-          "Blocked": {
-            "Type": "RemoveEntity",
-            "Entity": "User"
-          }
-        }
-      ]
-    },
+    "ProjectileHit": "Root_HyDragon_Miniwyvern_Ice_ProjectileHit_Base",
     "ProjectileMiss": {
       "Cooldown": {
         "Cooldown": 0

@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 final class MiniwyvernProjectileBalanceAssetTest {
@@ -26,6 +27,7 @@ final class MiniwyvernProjectileBalanceAssetTest {
     // A wrong projectile profile, status route, or legacy launch type must fail this contract.
     @Test
     void formOwnedProjectilesUseTheApprovedDamagePhysicsAndTerminalSafetyChains() throws IOException {
+        Map<String, Integer> hitReferences = new LinkedHashMap<>();
         for (Map.Entry<String, FormProfile> entry : FORMS.entrySet()) {
             String form = entry.getKey();
             FormProfile profile = entry.getValue();
@@ -34,12 +36,19 @@ final class MiniwyvernProjectileBalanceAssetTest {
             assertSerialRoot(form, "Pattern", configId(form, "Pattern_First"), configId(form, "Pattern_Echo"));
             assertSerialRoot(form, "Mastery", configId(form, "Mastery_First"), configId(form, "Mastery_Echo"));
 
-            assertConfig(form, "Base", profile.baseDamage(), 28, 32, 6, 4.0, profile.status(), true);
-            assertConfig(form, "Intermediate", profile.intermediateDamage(), 34, 40, 4, 5.0, profile.status(), true);
-            assertConfig(form, "Pattern_First", profile.intermediateDamage(), 34, 40, 4, 5.0, profile.status(), true);
-            assertConfig(form, "Pattern_Echo", profile.intermediateDamage(), 34, 40, 4, 5.0, null, false);
-            assertConfig(form, "Mastery_First", profile.apexDamage(), 40, 48, 3, 6.0, profile.status(), true);
-            assertConfig(form, "Mastery_Echo", profile.apexDamage(), 40, 48, 3, 6.0, null, false);
+            assertConfig(form, "Base", "Base", profile.baseDamage(), 28, 32, 6, 4.0, profile.status(), true, hitReferences);
+            assertConfig(form, "Intermediate", "Intermediate_First", profile.intermediateDamage(), 34, 40, 4, 5.0, profile.status(), true, hitReferences);
+            assertConfig(form, "Pattern_First", "Intermediate_First", profile.intermediateDamage(), 34, 40, 4, 5.0, profile.status(), true, hitReferences);
+            assertConfig(form, "Pattern_Echo", "Intermediate_Echo", profile.intermediateDamage(), 34, 40, 4, 5.0, null, false, hitReferences);
+            assertConfig(form, "Mastery_First", "Mastery_First", profile.apexDamage(), 40, 48, 3, 6.0, profile.status(), true, hitReferences);
+            assertConfig(form, "Mastery_Echo", "Mastery_Echo", profile.apexDamage(), 40, 48, 3, 6.0, null, false, hitReferences);
+        }
+        for (String form : FORMS.keySet()) {
+            assertEquals(1, hitReferences.get("Root_HyDragon_Miniwyvern_" + form + "_ProjectileHit_Base"));
+            assertEquals(2, hitReferences.get("Root_HyDragon_Miniwyvern_" + form + "_ProjectileHit_Intermediate_First"));
+            assertEquals(1, hitReferences.get("Root_HyDragon_Miniwyvern_" + form + "_ProjectileHit_Intermediate_Echo"));
+            assertEquals(1, hitReferences.get("Root_HyDragon_Miniwyvern_" + form + "_ProjectileHit_Mastery_First"));
+            assertEquals(1, hitReferences.get("Root_HyDragon_Miniwyvern_" + form + "_ProjectileHit_Mastery_Echo"));
         }
     }
 
@@ -84,8 +93,9 @@ final class MiniwyvernProjectileBalanceAssetTest {
         assertEquals(echo, launches.get(2).getAsJsonObject().get("Config").getAsString());
     }
 
-    private static void assertConfig(String form, String tier, int damage, int force, int terminalVelocity,
-                                     int gravity, double timeout, String status, boolean first) throws IOException {
+    private static void assertConfig(String form, String tier, String hitTier, int damage, int force, int terminalVelocity,
+                                     int gravity, double timeout, String status, boolean first,
+                                     Map<String, Integer> hitReferences) throws IOException {
         JsonObject config = load(CONFIG_ROOT.resolve(configId(form, tier) + ".json"));
         assertNotNull(config.get("Model"));
         assertEquals(force, config.get("LaunchForce").getAsInt());
@@ -102,27 +112,26 @@ final class MiniwyvernProjectileBalanceAssetTest {
                 || config.has("Impact"), "forbidden projectile behavior in " + form + " " + tier);
 
         JsonObject interactions = config.getAsJsonObject("Interactions");
-        JsonObject hit = interactions.getAsJsonObject("ProjectileHit");
-        JsonObject damageInteraction = hit.getAsJsonArray("Interactions").get(0).getAsJsonObject();
+        String hitRootId = "Root_HyDragon_Miniwyvern_" + form + "_ProjectileHit_" + hitTier;
+        JsonElement hitReference = interactions.get("ProjectileHit");
+        assertTrue(hitReference.isJsonPrimitive() && hitReference.getAsJsonPrimitive().isString(),
+                "ProjectileHit must be a root string in " + form + " " + tier);
+        assertEquals(hitRootId, hitReference.getAsString());
+        hitReferences.merge(hitRootId, 1, Integer::sum);
+        JsonObject hitRoot = load(ROOT_ROOT.resolve("ProjectileHits").resolve(hitRootId + ".json"));
+        assertEquals(List.of("HyDragon_Miniwyvern_" + form + "_ProjectileHit_" + hitTier),
+                strings(hitRoot.getAsJsonArray("Interactions")));
+        JsonObject damageInteraction = load(INTERACTION_ROOT.resolve("ProjectileHits")
+                .resolve("HyDragon_Miniwyvern_" + form + "_ProjectileHit_" + hitTier + ".json"));
+        assertEquals(Set.of("Type", "Entity", "DamageCalculator", "Next", "Failed", "Blocked"),
+                damageInteraction.keySet(), "DamageEntity must not contain extra nested behavior");
         assertEquals("DamageEntity", damageInteraction.get("Type").getAsString());
         assertEquals(damage, damageInteraction.getAsJsonObject("DamageCalculator")
                 .getAsJsonObject("BaseDamage").get("Physical").getAsInt());
         assertEquals(0, damageInteraction.getAsJsonObject("DamageCalculator").get("RandomPercentageModifier").getAsInt());
         assertTerminal(damageInteraction.getAsJsonObject("Failed"));
         assertTerminal(damageInteraction.getAsJsonObject("Blocked"));
-        JsonObject next = damageInteraction.getAsJsonObject("Next");
-        assertNotNull(next, "accepted damage must own terminal chain");
-        String serializedNext = next.toString();
-        if (status == null || !first) {
-            assertFalse(serializedNext.contains("ApplyEffect"), "echo/wild must not apply status");
-        } else {
-            assertTrue(serializedNext.contains(status), "first hit must apply its status");
-            if (form.equals("Lightning")) {
-                assertTrue(serializedNext.contains("\"Type\":\"Interrupt\""));
-                assertTrue(serializedNext.contains("\"ExcludedTag\":\"Uninterruptable\""));
-            }
-        }
-        assertTerminal(lastInteraction(next));
+        assertAcceptedChain(form, tier, damageInteraction.getAsJsonObject("Next"), status, first);
         assertTerminal(interactions.getAsJsonObject("ProjectileMiss").getAsJsonArray("Interactions").get(0).getAsJsonObject());
         JsonArray timeoutInteractions = interactions.getAsJsonObject("ProjectileSpawn").getAsJsonArray("Interactions");
         assertEquals(2, timeoutInteractions.size());
@@ -131,14 +140,40 @@ final class MiniwyvernProjectileBalanceAssetTest {
         assertTerminal(timeoutInteractions.get(1).getAsJsonObject());
     }
 
-    private static JsonObject lastInteraction(JsonObject chain) {
-        if ("RemoveEntity".equals(chain.get("Type").getAsString())) {
-            return chain;
+    private static void assertAcceptedChain(String form, String tier, JsonObject next, String status, boolean first) {
+        assertNotNull(next, "accepted damage must own terminal chain");
+        if (status == null || !first) {
+            assertEquals("RemoveEntity", next.get("Type").getAsString(), "echo/wild must remove directly");
+            assertTerminal(next);
+            return;
         }
-        return chain.getAsJsonArray("Interactions").get(chain.getAsJsonArray("Interactions").size() - 1).getAsJsonObject();
+        assertEquals("Serial", next.get("Type").getAsString());
+        JsonArray steps = next.getAsJsonArray("Interactions");
+        if (form.equals("Lightning")) {
+            assertEquals(3, steps.size(), "Lightning must interrupt, apply status, then remove");
+            JsonObject interrupt = steps.get(0).getAsJsonObject();
+            assertEquals(Set.of("Type", "Entity", "ExcludedTag"), interrupt.keySet());
+            assertEquals("Interrupt", interrupt.get("Type").getAsString());
+            assertEquals("Target", interrupt.get("Entity").getAsString());
+            assertEquals("Uninterruptable", interrupt.get("ExcludedTag").getAsString());
+            assertEffect(steps.get(1).getAsJsonObject(), status);
+            assertTerminal(steps.get(2).getAsJsonObject());
+        } else {
+            assertEquals(2, steps.size(), form + " " + tier + " has an unexpected accepted-hit chain");
+            assertEffect(steps.get(0).getAsJsonObject(), status);
+            assertTerminal(steps.get(1).getAsJsonObject());
+        }
+    }
+
+    private static void assertEffect(JsonObject interaction, String status) {
+        assertEquals(Set.of("Type", "Entity", "EffectId"), interaction.keySet());
+        assertEquals("ApplyEffect", interaction.get("Type").getAsString());
+        assertEquals("Target", interaction.get("Entity").getAsString());
+        assertEquals(status, interaction.get("EffectId").getAsString());
     }
 
     private static void assertTerminal(JsonObject interaction) {
+        assertEquals(Set.of("Type", "Entity"), interaction.keySet());
         assertEquals("RemoveEntity", interaction.get("Type").getAsString());
         assertEquals("User", interaction.get("Entity").getAsString());
     }

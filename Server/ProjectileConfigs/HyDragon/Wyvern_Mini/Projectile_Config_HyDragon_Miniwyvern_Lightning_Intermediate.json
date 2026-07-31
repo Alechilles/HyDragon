@@ -27,51 +27,7 @@
         }
       ]
     },
-    "ProjectileHit": {
-      "Cooldown": {
-        "Cooldown": 0
-      },
-      "Interactions": [
-        {
-          "Type": "DamageEntity",
-          "Entity": "Target",
-          "DamageCalculator": {
-            "Type": "Absolute",
-            "BaseDamage": {
-              "Physical": 12
-            },
-            "RandomPercentageModifier": 0
-          },
-          "Next": {
-            "Type": "Serial",
-            "Interactions": [
-              {
-                "Type": "Interrupt",
-                "Entity": "Target",
-                "ExcludedTag": "Uninterruptable"
-              },
-              {
-                "Type": "ApplyEffect",
-                "Entity": "Target",
-                "EffectId": "HyDragon_Miniwyvern_Lightning_Shock"
-              },
-              {
-                "Type": "RemoveEntity",
-                "Entity": "User"
-              }
-            ]
-          },
-          "Failed": {
-            "Type": "RemoveEntity",
-            "Entity": "User"
-          },
-          "Blocked": {
-            "Type": "RemoveEntity",
-            "Entity": "User"
-          }
-        }
-      ]
-    },
+    "ProjectileHit": "Root_HyDragon_Miniwyvern_Lightning_ProjectileHit_Intermediate_First",
     "ProjectileMiss": {
       "Cooldown": {
         "Cooldown": 0
