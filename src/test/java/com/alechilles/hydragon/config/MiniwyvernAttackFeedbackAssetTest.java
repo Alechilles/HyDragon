@@ -58,6 +58,16 @@ final class MiniwyvernAttackFeedbackAssetTest {
     }
 
     @Test
+    void swoopInteractionsDoNotLayerTheLegacyRexBiteOverTheNewSoundPool() throws IOException {
+        for (String suffix : List.of("", "_Ferocity", "_Rending", "_Mastery")) {
+            JsonObject interaction = load("Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/"
+                    + "Wyvern_Mini_Swoop_Bite" + suffix + ".json");
+            assertFalse(containsStringProperty(interaction, "WorldSoundEventId", "SFX_Rex_Bite"),
+                    "swoop profile " + suffix + " must leave bite audio to the NPC feedback action");
+        }
+    }
+
+    @Test
     void miniwyvernModelPreservesTheUserAuthoredAttackAnimationsAndFlightTuning() throws IOException {
         JsonObject model = load("Server/Models/HyDragon/Wyvern_Mini/Wyvern_Mini.json");
         assertEquals("NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Normal.png",
@@ -122,6 +132,34 @@ final class MiniwyvernAttackFeedbackAssetTest {
             }
             collectActionSequences(entry.getValue(), sequences);
         }
+    }
+
+    private static boolean containsStringProperty(JsonElement element, String property, String value) {
+        if (element == null || element.isJsonNull()) {
+            return false;
+        }
+        if (element.isJsonArray()) {
+            for (JsonElement child : element.getAsJsonArray()) {
+                if (containsStringProperty(child, property, value)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        if (!element.isJsonObject()) {
+            return false;
+        }
+        JsonObject object = element.getAsJsonObject();
+        if (object.has(property) && object.get(property).isJsonPrimitive()
+                && value.equals(object.get(property).getAsString())) {
+            return true;
+        }
+        for (var entry : object.entrySet()) {
+            if (containsStringProperty(entry.getValue(), property, value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String type(JsonObject object) {
