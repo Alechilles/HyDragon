@@ -1,7 +1,16 @@
 {
   "Type": "Serial",
-  "$Comment": "Instant player-safe Nordic Drake fireball aimed from the transformed player's look direction.",
+  "$Comment": "Player-safe Nordic Drake fireball with a short roar-and-charge cue before the look-targeted launch.",
   "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "ChargeShoot",
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Roar"
+      },
+      "RunTime": 0.35
+    },
     {
       "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
@@ -19,6 +28,13 @@
         "ExcludeSource": true
       },
       "Tags": {}
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch"
+      },
+      "RunTime": 0
     },
     {
       "Type": "Simple",
