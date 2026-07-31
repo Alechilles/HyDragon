@@ -85,6 +85,56 @@ final class MiniwyvernSwoopAssetContractTest {
         assertExclusiveProfile(instructions, "SwoopFerocity", "SwoopAttackFerocity", "SwoopMastery", "RendingDive");
     }
 
+    @Test
+    void recoveryCancellationInitializationAndApproachOwnershipAreStructural() throws IOException {
+        JsonObject component = load("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
+        JsonArray instructions = component.getAsJsonObject("Content").getAsJsonArray("Instructions");
+        java.util.List<JsonObject> recovery = new java.util.ArrayList<>();
+        collectInstructionsWithState(instructions, ".Recovery", recovery);
+        assertTrue(recovery.size() >= 2, "recovery start and completion must be sibling instructions");
+        JsonObject entry = recovery.stream().filter(i -> actionIndex(i.getAsJsonArray("Actions"), "TimerStart", "Miniwyvern_Swoop_Recovery") >= 0)
+                .findFirst().orElseThrow();
+        assertFalse(entry.has("Instructions"), "recovery entry actions cannot share an instruction with children");
+        assertTrue(actionIndex(entry.getAsJsonArray("Actions"), "SetFlag", "Miniwyvern_Swoop_Recovery_Started") >= 0);
+        assertTrue(actionIndex(entry.getAsJsonArray("Actions"), "TimerRestart", "Miniwyvern_Swoop_Recovery") >= 0);
+        JsonObject complete = recovery.stream().filter(i -> actionIndex(i.getAsJsonArray("Actions"), "State", ".Combat") >= 0)
+                .findFirst().orElseThrow();
+        assertTrue(hasPositiveFlagSensor(complete.get("Sensor"), "Miniwyvern_Swoop_Recovery_Started"));
+        assertTrue(hasStoppedTimerSensor(complete.get("Sensor"), "Miniwyvern_Swoop_Recovery"));
+        assertTrue(hasSetFlag(complete.get("Actions"), "Miniwyvern_Swoop_Recovery_Started", false));
+        assertTrue(hasSetFlag(complete.get("Actions"), "Miniwyvern_Swooping", false));
+        assertTrue(hasSetFlag(complete.get("Actions"), "Miniwyvern_Swoop_Strike_Committed", false));
+
+        JsonObject template = load("Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json");
+        JsonObject templateCancel = findCancellation(template.getAsJsonArray("Instructions"));
+        assertEquals("And", type(templateCancel.get("Sensor")));
+        assertTrue(hasSetFlag(templateCancel.get("Actions"), "Miniwyvern_Swoop_Recovery_Started", false));
+        for (String timer : java.util.List.of("Miniwyvern_Swoop_Cooldown", "Miniwyvern_Swoop_Approach", "Miniwyvern_Swoop_Recovery", "Miniwyvern_Projectile_Aim", "Miniwyvern_Projectile_Cooldown"))
+            assertTrue(actionIndex(templateCancel.getAsJsonArray("Actions"), "TimerStop", timer) >= 0);
+
+        for (JsonObject claim : objectsWithAction(instructions, "TimerStart", "Miniwyvern_Swoop_Approach"))
+            assertTrue(actionIndex(claim.getAsJsonArray("Actions"), "TimerRestart", "Miniwyvern_Swoop_Approach") >= 0);
+        assertTrue(objectsWithMotion(instructions, 0.7, true).size() >= 1);
+        assertTrue(objectsWithMotion(instructions, 0.55, false).size() >= 1);
+    }
+
+    private static JsonObject findCancellation(JsonArray instructions) {
+        return instructions.asList().stream().map(JsonElement::getAsJsonObject)
+                .filter(i -> i.has("Actions") && actionIndex(i.getAsJsonArray("Actions"), "ResetInstructions", null) >= 0)
+                .findFirst().orElseThrow();
+    }
+    private static void collectInstructionsWithState(JsonElement value, String state, java.util.List<JsonObject> out) {
+        if (value.isJsonObject()) { JsonObject o = value.getAsJsonObject(); if (hasStateSensor(o.get("Sensor"), state)) out.add(o); for (JsonElement c : o.asMap().values()) collectInstructionsWithState(c, state, out); }
+        else if (value.isJsonArray()) for (JsonElement c : value.getAsJsonArray()) collectInstructionsWithState(c, state, out);
+    }
+    private static boolean hasStateSensor(JsonElement value, String state) {
+        if (value == null) return false; if (value.isJsonObject()) { JsonObject o=value.getAsJsonObject(); if ("State".equals(type(o)) && state.equals(string(o,"State"))) return true; for(JsonElement c:o.asMap().values()) if(hasStateSensor(c,state)) return true; } else if(value.isJsonArray()) for(JsonElement c:value.getAsJsonArray()) if(hasStateSensor(c,state)) return true; return false;
+    }
+    private static java.util.List<JsonObject> objectsWithAction(JsonElement value, String action, String name) { java.util.List<JsonObject> out=new java.util.ArrayList<>(); collectActionOwners(value,action,name,out); return out; }
+    private static void collectActionOwners(JsonElement v,String a,String n,java.util.List<JsonObject> out){ if(v.isJsonObject()){JsonObject o=v.getAsJsonObject();if(actionIndex(o.getAsJsonArray("Actions"),a,n)>=0)out.add(o);for(JsonElement c:o.asMap().values())collectActionOwners(c,a,n,out);}else if(v.isJsonArray())for(JsonElement c:v.getAsJsonArray())collectActionOwners(c,a,n,out); }
+    private static java.util.List<JsonObject> objectsWithMotion(JsonElement v,double speed,boolean precision){ java.util.List<JsonObject> out=new java.util.ArrayList<>(); if(v.isJsonObject()){JsonObject o=v.getAsJsonObject();boolean profile=precision?hasTalent(o.get("Sensor"),"SwoopPrecision"):hasNegatedTalent(o.get("Sensor"),"SwoopPrecision");if(o.has("BodyMotion")&&o.getAsJsonObject("BodyMotion").has("RelativeSpeed")&&o.getAsJsonObject("BodyMotion").get("RelativeSpeed").isJsonPrimitive()&&o.getAsJsonObject("BodyMotion").get("RelativeSpeed").getAsDouble()==speed&&profile)out.add(o);for(JsonElement c:o.asMap().values())out.addAll(objectsWithMotion(c,speed,precision));}else if(v.isJsonArray())for(JsonElement c:v.getAsJsonArray())out.addAll(objectsWithMotion(c,speed,precision));return out; }
+
     private static void assertExclusiveProfile(
             JsonArray instructions, String talent, String attackParameter, String... excluded) {
         JsonObject instruction = topLevelWithTalentAndAttack(instructions, talent, attackParameter);
@@ -210,6 +260,16 @@ final class MiniwyvernSwoopAssetContractTest {
         if ("Not".equals(type(object)) && hasTalent(object.get("Sensor"), talent)) return true;
         for (JsonElement child : object.asMap().values()) if (hasNegatedTalent(child, talent)) return true;
         return false;
+    }
+
+    private static boolean hasPositiveFlagSensor(JsonElement value, String name) {
+        if (value == null) return false; if (value.isJsonObject()) { JsonObject o=value.getAsJsonObject(); if ("Flag".equals(type(o)) && name.equals(string(o,"Name")) && (!o.has("Set") || o.get("Set").getAsBoolean())) return true; for(JsonElement c:o.asMap().values())if(hasPositiveFlagSensor(c,name))return true; } else if(value.isJsonArray())for(JsonElement c:value.getAsJsonArray())if(hasPositiveFlagSensor(c,name))return true; return false;
+    }
+    private static boolean hasStoppedTimerSensor(JsonElement value, String name) {
+        if (value == null) return false; if(value.isJsonObject()){JsonObject o=value.getAsJsonObject();if("Timer".equals(type(o))&&name.equals(string(o,"Name"))&&"Stopped".equals(string(o,"State")))return true;for(JsonElement c:o.asMap().values())if(hasStoppedTimerSensor(c,name))return true;}else if(value.isJsonArray())for(JsonElement c:value.getAsJsonArray())if(hasStoppedTimerSensor(c,name))return true;return false;
+    }
+    private static boolean hasSetFlag(JsonElement value, String name, boolean setTo) {
+        if(value==null)return false;if(value.isJsonObject()){JsonObject o=value.getAsJsonObject();if("SetFlag".equals(type(o))&&name.equals(string(o,"Name"))&&o.has("SetTo")&&o.get("SetTo").getAsBoolean()==setTo)return true;for(JsonElement c:o.asMap().values())if(hasSetFlag(c,name,setTo))return true;}else if(value.isJsonArray())for(JsonElement c:value.getAsJsonArray())if(hasSetFlag(c,name,setTo))return true;return false;
     }
 
     private static String type(JsonElement value) { return value != null && value.isJsonObject() ? string(value.getAsJsonObject(), "Type") : ""; }

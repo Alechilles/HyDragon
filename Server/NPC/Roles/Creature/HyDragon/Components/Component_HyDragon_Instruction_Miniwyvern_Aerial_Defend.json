@@ -208,6 +208,7 @@
             "Name": "Miniwyvern_Swoop_Strike_Committed",
             "SetTo": false
           },
+          { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Recovery_Started", "SetTo": false },
           {
             "Type": "SetFlag",
             "Name": "Miniwyvern_Projectile_Aiming",
@@ -1725,6 +1726,10 @@
             }
           },
           {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Swoop_Approach"
+          },
+          {
             "Type": "State",
             "State": ".Swoop"
           }
@@ -1750,6 +1755,10 @@
                   "Sensor": {
                     "Type": "IsBackingAway"
                   }
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopPrecision" }
                 }
               ]
             },
@@ -1770,6 +1779,17 @@
               "SlowDownDistance": 4,
               "StopDistance": 2.2
             }
+          },
+          {
+            "Continue": true,
+            "Sensor": { "Type": "And", "Sensors": [
+              { "Type": "Target", "TargetSlot": "LockedTarget" },
+              { "Type": "Not", "Sensor": { "Type": "IsBackingAway" } },
+              { "Type": "TameworkHasTalent", "TalentId": "SwoopPrecision" }
+            ] },
+            "Actions": [{ "Type": "OverrideAltitude", "DesiredAltitudeRange": { "Compute": "SwoopAltitudeRange" } }],
+            "HeadMotion": { "Type": "Watch" },
+            "BodyMotion": { "Type": "Seek", "RelativeSpeed": 0.7, "SlowDownDistance": 4, "StopDistance": 2.2 }
           },
           {
             "Continue": true,
@@ -1996,58 +2016,27 @@
         ]
       },
       {
-        "Sensor": {
-          "Type": "And",
-          "Sensors": [
-            {
-              "Type": "State",
-              "State": ".Recovery"
-            },
-            {
-              "Type": "Timer",
-              "Name": "Miniwyvern_Swoop_Recovery",
-              "State": "Stopped"
-            }
-          ]
-        },
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Recovery" },
+          { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started", "Set": false }
+        ] },
         "Actions": [
-          {
-            "Type": "TimerStart",
-            "Name": "Miniwyvern_Swoop_Recovery",
-            "StartValueRange": [
-              2,
-              4
-            ],
-            "RestartValueRange": [
-              2,
-              4
-            ]
-          }
-        ],
-        "Instructions": [
-          {
-            "Sensor": {
-              "Type": "Timer",
-              "Name": "Miniwyvern_Swoop_Recovery",
-              "State": "Stopped"
-            },
-            "Actions": [
-              {
-                "Type": "SetFlag",
-                "Name": "Miniwyvern_Swooping",
-                "SetTo": false
-              },
-              {
-                "Type": "SetFlag",
-                "Name": "Miniwyvern_Swoop_Strike_Committed",
-                "SetTo": false
-              },
-              {
-                "Type": "State",
-                "State": ".Combat"
-              }
-            ]
-          }
+          { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Recovery_Started", "SetTo": true },
+          { "Type": "TimerStart", "Name": "Miniwyvern_Swoop_Recovery", "StartValueRange": [2, 4], "RestartValueRange": [2, 4] },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Recovery" }
+        ]
+      },
+      {
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Recovery" },
+          { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started" },
+          { "Type": "Timer", "Name": "Miniwyvern_Swoop_Recovery", "State": "Stopped" }
+        ] },
+        "Actions": [
+          { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Recovery_Started", "SetTo": false },
+          { "Type": "SetFlag", "Name": "Miniwyvern_Swooping", "SetTo": false },
+          { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Strike_Committed", "SetTo": false },
+          { "Type": "State", "State": ".Combat" }
         ]
       },
       {

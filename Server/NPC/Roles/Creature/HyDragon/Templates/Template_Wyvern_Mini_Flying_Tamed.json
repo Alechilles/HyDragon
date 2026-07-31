@@ -350,18 +350,28 @@
       "$Comment": "Cancel aerial combat when the outer Defend context or flight prerequisites are lost.",
       "Continue": true,
       "Sensor": {
-        "Type": "Or",
+        "Type": "And",
         "Sensors": [
-          { "Type": "Not", "Sensor": { "Type": "State", "State": "Defend" } },
-          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
-          { "Type": "Flag", "Name": "AirborneMode", "Set": false },
-          { "Type": "Not", "Sensor": { "Type": "MotionController", "MotionController": "Fly" } }
+          { "Type": "Or", "Sensors": [
+            { "Type": "Not", "Sensor": { "Type": "State", "State": "Defend" } },
+            { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
+            { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+            { "Type": "Not", "Sensor": { "Type": "MotionController", "MotionController": "Fly" } }
+          ] },
+          { "Type": "Or", "Sensors": [
+            { "Type": "Flag", "Name": "Miniwyvern_Swoop_Pending" },
+            { "Type": "Flag", "Name": "Miniwyvern_Swooping" },
+            { "Type": "Flag", "Name": "Miniwyvern_Swoop_Strike_Committed" },
+            { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started" },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }
+          ] }
         ]
       },
       "Actions": [
         { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Pending", "SetTo": false },
         { "Type": "SetFlag", "Name": "Miniwyvern_Swooping", "SetTo": false },
         { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Strike_Committed", "SetTo": false },
+        { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Recovery_Started", "SetTo": false },
         { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false },
         { "Type": "TimerStop", "Name": "Miniwyvern_Swoop_Cooldown" },
         { "Type": "TimerStop", "Name": "Miniwyvern_Swoop_Approach" },
