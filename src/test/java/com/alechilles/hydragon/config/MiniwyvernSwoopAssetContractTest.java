@@ -113,8 +113,11 @@ final class MiniwyvernSwoopAssetContractTest {
         for (String timer : java.util.List.of("Miniwyvern_Swoop_Cooldown", "Miniwyvern_Swoop_Approach", "Miniwyvern_Swoop_Recovery", "Miniwyvern_Projectile_Aim", "Miniwyvern_Projectile_Cooldown"))
             assertTrue(actionIndex(templateCancel.getAsJsonArray("Actions"), "TimerStop", timer) >= 0);
 
-        for (JsonObject claim : objectsWithAction(instructions, "TimerStart", "Miniwyvern_Swoop_Approach"))
+        for (JsonObject claim : objectsWithAction(instructions, "TimerStart", "Miniwyvern_Swoop_Approach")) {
             assertTrue(actionIndex(claim.getAsJsonArray("Actions"), "TimerRestart", "Miniwyvern_Swoop_Approach") >= 0);
+            assertTrue(hasDirectFlagTerm(claim.get("Sensor"), "Miniwyvern_Projectile_Echo_Pending", false),
+                    "swoop cannot claim control before a queued echo resolves or is cancelled");
+        }
         assertTrue(objectsWithMotion(instructions, 0.7, true).size() >= 1);
         assertTrue(objectsWithMotion(instructions, 0.55, false).size() >= 1);
     }
@@ -140,7 +143,9 @@ final class MiniwyvernSwoopAssetContractTest {
                 "Miniwyvern_Swooping",
                 "Miniwyvern_Swoop_Strike_Committed",
                 "Miniwyvern_Swoop_Recovery_Started",
-                "Miniwyvern_Projectile_Aiming")) {
+                "Miniwyvern_Projectile_Aiming",
+                "Miniwyvern_Projectile_Volley_Active",
+                "Miniwyvern_Projectile_Echo_Pending")) {
             assertTrue(hasPositiveFlagSensor(activeLifecycle, flag), "missing active lifecycle flag " + flag);
             assertTrue(hasSetFlag(cancellation.get("Actions"), flag, false), "cleanup must clear " + flag);
         }

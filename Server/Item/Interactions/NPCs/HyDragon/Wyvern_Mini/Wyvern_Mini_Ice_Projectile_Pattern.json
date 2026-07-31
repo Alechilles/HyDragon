@@ -1,17 +1,4 @@
 {
-  "Type": "Serial",
-  "Interactions": [
-    {
-      "Type": "Projectile",
-      "Config": "Projectile_Config_HyDragon_Miniwyvern_Ice_Pattern_First"
-    },
-    {
-      "Type": "Simple",
-      "RunTime": 0.3
-    },
-    {
-      "Type": "Projectile",
-      "Config": "Projectile_Config_HyDragon_Miniwyvern_Ice_Pattern_Echo"
-    }
-  ]
+  "Type": "Projectile",
+  "Config": "Projectile_Config_HyDragon_Miniwyvern_Ice_Pattern_First"
 }

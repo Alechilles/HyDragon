@@ -87,9 +87,17 @@
       "Value": "",
       "Description": "Combat talent volley root interaction; selected by TameworkHasTalent."
     },
+    "TalentProjectilePatternEcho": {
+      "Value": "",
+      "Description": "Combat talent volley echo root interaction; selected after the cancellable delay."
+    },
     "TalentProjectileMastery": {
       "Value": "",
       "Description": "Combat talent mastery root interaction; selected by TameworkHasTalent."
+    },
+    "TalentProjectileMasteryEcho": {
+      "Value": "",
+      "Description": "Combat talent mastery echo root interaction; selected after the cancellable delay."
     },
     "AttackPauseRange": {
       "Value": [
@@ -369,7 +377,8 @@
             { "Type": "Flag", "Name": "Miniwyvern_Swoop_Strike_Committed" },
             { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started" },
             { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
-            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active" }
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active" },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }
           ] }
         ]
       },
@@ -381,6 +390,7 @@
         { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Recovery_Started", "SetTo": false },
         { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false },
         { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": false },
+        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Echo_Pending", "SetTo": false },
         { "Type": "TimerStop", "Name": "Miniwyvern_Swoop_Cooldown" },
         { "Type": "TimerStop", "Name": "Miniwyvern_Swoop_Approach" },
         { "Type": "TimerStop", "Name": "Miniwyvern_Swoop_Recovery" },

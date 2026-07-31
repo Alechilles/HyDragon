@@ -33,8 +33,10 @@ final class MiniwyvernProjectileBalanceAssetTest {
             FormProfile profile = entry.getValue();
             assertRoot(form, "Base", List.of(configId(form, "Base")));
             assertRoot(form, "Intermediate", List.of(configId(form, "Intermediate")));
-            assertSerialRoot(form, "Pattern", configId(form, "Pattern_First"), configId(form, "Pattern_Echo"));
-            assertSerialRoot(form, "Mastery", configId(form, "Mastery_First"), configId(form, "Mastery_Echo"));
+            assertRoot(form, "Pattern", List.of(configId(form, "Pattern_First")));
+            assertRoot(form, "Pattern_Echo", List.of(configId(form, "Pattern_Echo")));
+            assertRoot(form, "Mastery", List.of(configId(form, "Mastery_First")));
+            assertRoot(form, "Mastery_Echo", List.of(configId(form, "Mastery_Echo")));
 
             assertConfig(form, "Base", "Base", profile.baseDamage(), 28, 32, 6, 4.0, profile.status(), true, hitReferences);
             assertConfig(form, "Intermediate", "Intermediate_First", profile.intermediateDamage(), 34, 40, 4, 5.0, profile.status(), true, hitReferences);
@@ -84,29 +86,6 @@ final class MiniwyvernProjectileBalanceAssetTest {
         assertEquals(configs.getFirst(), interaction.get("Config").getAsString());
     }
 
-    private static void assertSerialRoot(String form, String tier, String first, String echo) throws IOException {
-        JsonObject root = load(ROOT_ROOT.resolve("Root_NPC_Wyvern_Mini_" + form + "_Projectile_" + tier + ".json"));
-        String interactionId = "Wyvern_Mini_" + form + "_Projectile_" + tier;
-        assertEquals(Set.of("Interactions", "Tags"), root.keySet(), "root must not contain extra behavior");
-        assertEquals(Set.of("Attack"), root.getAsJsonObject("Tags").keySet(), "root tags must stay bounded");
-        assertEquals(List.of("Ranged"), strings(root.getAsJsonObject("Tags").getAsJsonArray("Attack")));
-        assertEquals(List.of(interactionId), strings(root.getAsJsonArray("Interactions")),
-                "root must resolve exactly its projectile child");
-        JsonObject serial = load(INTERACTION_ROOT.resolve(interactionId + ".json"));
-        assertEquals(Set.of("Type", "Interactions"), serial.keySet(), "serial child must not contain extra behavior");
-        assertEquals("Serial", serial.get("Type").getAsString());
-        JsonArray launches = serial.getAsJsonArray("Interactions");
-        assertEquals(3, launches.size());
-        assertEquals(Set.of("Type", "Config"), launches.get(0).getAsJsonObject().keySet());
-        assertEquals("Projectile", launches.get(0).getAsJsonObject().get("Type").getAsString());
-        assertEquals(first, launches.get(0).getAsJsonObject().get("Config").getAsString());
-        assertEquals(Set.of("Type", "RunTime"), launches.get(1).getAsJsonObject().keySet());
-        assertEquals("Simple", launches.get(1).getAsJsonObject().get("Type").getAsString());
-        assertEquals(0.30, launches.get(1).getAsJsonObject().get("RunTime").getAsDouble());
-        assertEquals(Set.of("Type", "Config"), launches.get(2).getAsJsonObject().keySet());
-        assertEquals("Projectile", launches.get(2).getAsJsonObject().get("Type").getAsString());
-        assertEquals(echo, launches.get(2).getAsJsonObject().get("Config").getAsString());
-    }
 
     private static void assertConfig(String form, String tier, String hitTier, int damage, int force, int terminalVelocity,
                                      int gravity, double timeout, String status, boolean first,

@@ -1431,13 +1431,13 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
             interaction = parsed.get(interaction_root / f"Wyvern_Mini_{form}_Projectile_{tier}.json")
             prefix = f"Projectile_Config_HyDragon_Miniwyvern_{form}_{tier}_"
             expected_root = {"Interactions": [f"Wyvern_Mini_{form}_Projectile_{tier}"], "Tags": {"Attack": ["Ranged"]}}
-            expected_interaction = {"Type": "Serial", "Interactions": [
-                {"Type": "Projectile", "Config": prefix + "First"},
-                {"Type": "Simple", "RunTime": 0.30},
-                {"Type": "Projectile", "Config": prefix + "Echo"},
-            ]}
-            if root != expected_root or interaction != expected_interaction:
-                fail(errors, f"Miniwyvern {form} {tier} root is not the required two-shot serial")
+            echo_root = parsed.get(root_root / f"Root_NPC_Wyvern_Mini_{form}_Projectile_{tier}_Echo.json")
+            echo_interaction = parsed.get(interaction_root / f"Wyvern_Mini_{form}_Projectile_{tier}_Echo.json")
+            expected_interaction = {"Type": "Projectile", "Config": prefix + "First"}
+            expected_echo_root = {"Interactions": [f"Wyvern_Mini_{form}_Projectile_{tier}_Echo"], "Tags": {"Attack": ["Ranged"]}}
+            expected_echo_interaction = {"Type": "Projectile", "Config": prefix + "Echo"}
+            if root != expected_root or interaction != expected_interaction or echo_root != expected_echo_root or echo_interaction != expected_echo_interaction:
+                fail(errors, f"Miniwyvern {form} {tier} roots must expose direct first and echo projectiles")
 
 
 def main() -> int:
