@@ -49,15 +49,22 @@ final class NordicDrakeInteractionAssetTest {
             throws IOException {
         JsonObject fireball = readInteraction("NordicDrake_Avatar_Fire_Ball");
         JsonArray steps = fireball.getAsJsonArray("Interactions");
-        JsonObject launch = steps.get(0).getAsJsonObject();
+        JsonObject launchAndAnimation = steps.get(0).getAsJsonObject();
+        assertEquals("Parallel", launchAndAnimation.get("Type").getAsString());
+        JsonArray launchAndAnimationSteps = launchAndAnimation.getAsJsonArray("Interactions");
+        JsonObject launch = launchAndAnimationSteps.get(0).getAsJsonObject();
         assertEquals("TameworkLaunchProjectile", launch.get("Type").getAsString());
         assertEquals(48.0, launch.get("LookTargetDistance").getAsDouble());
         assertFalse(launch.has("TargetSlot"));
         JsonObject launchOffset = launch.getAsJsonObject("LaunchPositionOffset");
         assertEquals(-1.0, launchOffset.get("Y").getAsDouble());
         assertEquals(-3.0, launchOffset.get("Z").getAsDouble());
+        JsonObject shootAnimation = launchAndAnimationSteps.get(1).getAsJsonObject();
+        assertEquals("Simple", shootAnimation.get("Type").getAsString());
+        assertEquals("ChargeShoot", shootAnimation.getAsJsonObject("Effects")
+                .get("ItemAnimationId").getAsString());
+        assertEquals(0.35, shootAnimation.get("RunTime").getAsDouble());
         assertFalse(fireball.toString().contains("PrepareShoot"));
-        assertFalse(fireball.toString().contains("ChargeShoot"));
 
         JsonObject flameBreath = readInteraction("NordicDrake_Avatar_Flying_Flame_Breath");
         JsonArray flameBreathSteps = flameBreath.getAsJsonArray("Interactions");
@@ -65,7 +72,7 @@ final class NordicDrakeInteractionAssetTest {
         JsonObject effects = flameBreathSteps.get(0).getAsJsonObject().getAsJsonArray("Interactions")
                 .get(0).getAsJsonObject().getAsJsonArray("Interactions")
                 .get(1).getAsJsonObject().getAsJsonObject("Effects");
-        assertEquals(3.8, effects.getAsJsonArray("Particles").get(0).getAsJsonObject()
+        assertEquals(4.05, effects.getAsJsonArray("Particles").get(0).getAsJsonObject()
                 .getAsJsonObject("PositionOffset").get("Z").getAsDouble());
         String flameBreathJson = flameBreath.toString();
         assertTrue(flameBreathJson.contains("\"Type\":\"Selector\""));
