@@ -4,18 +4,17 @@
     "Enabled": true,
     "Priority": 100
   },
-  "RoleIds": [
-    "Tamed_Hydra",
-    "Tamed_RockDrakeT1",
-    "Tamed_RockDrakeT2",
-    "Tamed_RockDrakeT3"
-  ],
+  "RoleIds": ["Tamed_NordicDrake"],
   "Command": {
     "ReturnHomeTeleportDistance": 128.0,
     "ReturnHomePathDistanceBeforeTeleport": 32.0,
     "RecallSafeSpawnDistance": 24.0,
     "RecallForceRelocateDistance": 96.0,
     "PlacementMinRelativeY": -4.0,
-    "PlacementMaxRelativeY": 8.0
+    "PlacementMaxRelativeY": 8.0,
+    "FlightToggle": {
+      "Enabled": true,
+      "HookId": "HyDragon.Command.ToggleAirborneMode"
+    }
   }
 }

@@ -306,6 +306,9 @@ def require_files(errors: list[str]) -> None:
         "Server/Item/Items/Ingredient/Wyvern_Egg.json",
         "Server/Item/Items/Tool/HyDragon_Dragon_Horn.json",
         "Server/Tamework/Items/Commands/HyDragonDragonHorn.json",
+        "Server/Tamework/Companion/HyDragonFullDragons.json",
+        "Server/Tamework/Companion/HyDragonMiniwyvern.json",
+        "Server/Tamework/Companion/HyDragonNordicDrake.json",
         "Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json",
         "Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json",
         "Server/Tamework/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json",
@@ -660,6 +663,42 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
         command = companion.get("Command")
         if any(field in command for field in ("Travel", "Summon", "Revive")):
             fail(errors, "HyDragonMiniwyvern must leave bonded travel/summon/revive lifecycle to its roster policy")
+
+
+def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors: list[str]) -> None:
+    companion_root = ROOT / "Server/Tamework/Companion"
+    expected_toggle = {
+        "Enabled": True,
+        "HookId": "HyDragon.Command.ToggleAirborneMode",
+    }
+    expected_roles = {
+        "HyDragonMiniwyvern.json": [
+            "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+            "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+            "Tamed_Wyvern_Mini_Ice",
+        ],
+        "HyDragonNordicDrake.json": ["Tamed_NordicDrake"],
+        "HyDragonFullDragons.json": [
+            "Tamed_Hydra", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3",
+        ],
+    }
+    for filename, roles in expected_roles.items():
+        path = companion_root / filename
+        data = parsed.get(path)
+        if not isinstance(data, dict) or data.get("RoleIds") != roles:
+            fail(errors, f"{path.relative_to(ROOT)} has an invalid flight-toggle role partition")
+            continue
+        command = data.get("Command")
+        if not isinstance(command, dict):
+            fail(errors, f"{path.relative_to(ROOT)} has no command configuration")
+            continue
+        if filename == "HyDragonFullDragons.json":
+            serialized = json.dumps(data, sort_keys=True)
+            if "FlightToggle" in serialized or "AirborneMode" in serialized \
+                    or "HyDragon.Command.ToggleAirborneMode" in serialized:
+                fail(errors, "ground-only full-dragon companion config must not expose flight toggle state or hook")
+        elif command.get("FlightToggle") != expected_toggle:
+            fail(errors, f"{path.relative_to(ROOT)} must use the exact enabled flight-toggle configuration")
 
 
 def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[str]) -> None:
@@ -1214,6 +1253,7 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
     companion_paths = [
         ROOT / "Server/Tamework/Companion/HyDragonFullDragons.json",
         ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json",
+        ROOT / "Server/Tamework/Companion/HyDragonNordicDrake.json",
     ]
     for path in companion_paths:
         data = parsed.get(path)
@@ -1310,6 +1350,7 @@ def main() -> int:
     validate_stone_tiers(parsed, errors)
     validate_no_miniwyvern_spawns(parsed, errors)
     validate_miniwyvern_role_wiring(parsed, errors)
+    validate_companion_flight_toggle_contract(parsed, errors)
     validate_spawn_patch_role_identity(parsed, errors)
     validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
     projectile_ids = {
