@@ -1,0 +1,82 @@
+{
+  "Model": "Ice_Ball",
+  "Physics": {
+    "Type": "Standard",
+    "Gravity": 6,
+    "TerminalVelocityAir": 32
+  },
+  "LaunchForce": 28,
+  "SpawnOffset": {
+    "X": 0,
+    "Y": 0,
+    "Z": 1
+  },
+  "Interactions": {
+    "ProjectileSpawn": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "RunTime": 4
+        },
+        {
+          "Type": "RemoveEntity",
+          "Entity": "User"
+        }
+      ]
+    },
+    "ProjectileHit": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "DamageEntity",
+          "Entity": "Target",
+          "DamageCalculator": {
+            "Type": "Absolute",
+            "BaseDamage": {
+              "Physical": 8
+            },
+            "RandomPercentageModifier": 0
+          },
+          "Next": {
+            "Type": "Serial",
+            "Interactions": [
+              {
+                "Type": "ApplyEffect",
+                "Entity": "Target",
+                "EffectId": "HyDragon_Miniwyvern_Ice_Slow"
+              },
+              {
+                "Type": "RemoveEntity",
+                "Entity": "User"
+              }
+            ]
+          },
+          "Failed": {
+            "Type": "RemoveEntity",
+            "Entity": "User"
+          },
+          "Blocked": {
+            "Type": "RemoveEntity",
+            "Entity": "User"
+          }
+        }
+      ]
+    },
+    "ProjectileMiss": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "RemoveEntity",
+          "Entity": "User"
+        }
+      ]
+    }
+  }
+}

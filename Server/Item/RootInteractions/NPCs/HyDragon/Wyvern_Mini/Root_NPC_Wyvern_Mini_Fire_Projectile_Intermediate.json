@@ -1,1 +1,10 @@
-{ "Interactions": ["Wyvern_Mini_Fire_Projectile_Intermediate"], "Tags": { "Attack": ["Ranged"] } }
+{
+  "Interactions": [
+    "Wyvern_Mini_Fire_Projectile_Intermediate"
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  }
+}

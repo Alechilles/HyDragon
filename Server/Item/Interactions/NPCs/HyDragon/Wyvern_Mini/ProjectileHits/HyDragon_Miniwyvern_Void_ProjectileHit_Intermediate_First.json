@@ -1,0 +1,33 @@
+{
+  "Type": "DamageEntity",
+  "Entity": "Target",
+  "DamageCalculator": {
+    "Type": "Absolute",
+    "BaseDamage": {
+      "Physical": 12
+    },
+    "RandomPercentageModifier": 0
+  },
+  "Next": {
+    "Type": "Serial",
+    "Interactions": [
+      {
+        "Type": "ApplyEffect",
+        "Entity": "Target",
+        "EffectId": "HyDragon_Miniwyvern_Void_Projectile_Exposure"
+      },
+      {
+        "Type": "RemoveEntity",
+        "Entity": "User"
+      }
+    ]
+  },
+  "Failed": {
+    "Type": "RemoveEntity",
+    "Entity": "User"
+  },
+  "Blocked": {
+    "Type": "RemoveEntity",
+    "Entity": "User"
+  }
+}

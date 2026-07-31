@@ -1,1 +1,10 @@
-{ "Interactions": ["Wyvern_Mini_Toxic_Projectile"], "Tags": { "Attack": ["Ranged"] } }
+{
+  "Interactions": [
+    "Wyvern_Mini_Toxic_Projectile"
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  }
+}
