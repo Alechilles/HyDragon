@@ -49,22 +49,29 @@ final class NordicDrakeInteractionAssetTest {
             throws IOException {
         JsonObject fireball = readInteraction("NordicDrake_Avatar_Fire_Ball");
         JsonArray steps = fireball.getAsJsonArray("Interactions");
-        JsonObject launchAndAnimation = steps.get(0).getAsJsonObject();
-        assertEquals("Parallel", launchAndAnimation.get("Type").getAsString());
-        JsonArray launchAndAnimationSteps = launchAndAnimation.getAsJsonArray("Interactions");
-        JsonObject launch = launchAndAnimationSteps.get(0).getAsJsonObject();
+        JsonObject charge = steps.get(0).getAsJsonObject();
+        assertEquals("Simple", charge.get("Type").getAsString());
+        JsonObject chargeEffects = charge.getAsJsonObject("Effects");
+        assertEquals("ChargeShoot", chargeEffects.get("ItemAnimationId").getAsString());
+        assertEquals("SFX_HyDragon_NordicDrake_Avatar_Fireball_Roar",
+                chargeEffects.get("WorldSoundEventId").getAsString());
+        assertEquals(0.35, charge.get("RunTime").getAsDouble());
+
+        JsonObject launch = steps.get(1).getAsJsonObject();
         assertEquals("TameworkLaunchProjectile", launch.get("Type").getAsString());
         assertEquals(48.0, launch.get("LookTargetDistance").getAsDouble());
         assertFalse(launch.has("TargetSlot"));
         JsonObject launchOffset = launch.getAsJsonObject("LaunchPositionOffset");
         assertEquals(-1.0, launchOffset.get("Y").getAsDouble());
         assertEquals(-3.0, launchOffset.get("Z").getAsDouble());
-        JsonObject shootAnimation = launchAndAnimationSteps.get(1).getAsJsonObject();
-        assertEquals("Simple", shootAnimation.get("Type").getAsString());
-        assertEquals("ChargeShoot", shootAnimation.getAsJsonObject("Effects")
-                .get("ItemAnimationId").getAsString());
-        assertEquals(0.35, shootAnimation.get("RunTime").getAsDouble());
+        JsonObject launchSound = steps.get(2).getAsJsonObject();
+        assertEquals("Simple", launchSound.get("Type").getAsString());
+        assertEquals("SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
+                launchSound.getAsJsonObject("Effects").get("WorldSoundEventId").getAsString());
+        assertEquals(0, launchSound.get("RunTime").getAsInt());
         assertFalse(fireball.toString().contains("PrepareShoot"));
+        assertSoundEvent("SFX_HyDragon_NordicDrake_Avatar_Fireball_Roar", "Avatar_Fireball_Roar.ogg");
+        assertSoundEvent("SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch", "Avatar_Fireball_Launch.ogg");
 
         JsonObject flameBreath = readInteraction("NordicDrake_Avatar_Flying_Flame_Breath");
         JsonArray flameBreathSteps = flameBreath.getAsJsonArray("Interactions");
@@ -103,6 +110,17 @@ final class NordicDrakeInteractionAssetTest {
 
     private static JsonObject readInteraction(String interactionId) throws IOException {
         return JsonParser.parseString(Files.readString(interactionPath(interactionId))).getAsJsonObject();
+    }
+
+    private static void assertSoundEvent(String soundEventId, String soundFileName) throws IOException {
+        Path soundEventPath = Path.of("Server", "Audio", "SoundEvents", "SFX", "HyDragon", "NordicDrake",
+                soundEventId + ".json");
+        JsonObject soundEvent = JsonParser.parseString(Files.readString(soundEventPath)).getAsJsonObject();
+        assertEquals("SFX_Attn_Quiet", soundEvent.get("Parent").getAsString());
+        assertEquals("Sounds/HyDragon/NordicDrake/" + soundFileName,
+                soundEvent.getAsJsonArray("Layers").get(0).getAsJsonObject().getAsJsonArray("Files")
+                        .get(0).getAsString());
+        assertTrue(Files.isRegularFile(Path.of("Common", "Sounds", "HyDragon", "NordicDrake", soundFileName)));
     }
 
     private static Path interactionPath(String interactionId) {
