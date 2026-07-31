@@ -62,7 +62,7 @@ final class NordicDrakeInteractionAssetTest {
                 .get(1).getAsJsonObject().getAsJsonArray("Interactions")
                 .get(0).getAsJsonObject().getAsJsonArray("Interactions")
                 .get(1).getAsJsonObject().getAsJsonObject("Effects");
-        assertEquals(-3.6, effects.getAsJsonArray("Particles").get(0).getAsJsonObject()
+        assertEquals(3.8, effects.getAsJsonArray("Particles").get(0).getAsJsonObject()
                 .getAsJsonObject("PositionOffset").get("Z").getAsDouble());
         String flameBreathJson = flameBreath.toString();
         assertTrue(flameBreathJson.contains("\"Type\":\"Selector\""));
