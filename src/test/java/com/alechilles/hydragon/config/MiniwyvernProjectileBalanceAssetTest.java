@@ -23,6 +23,14 @@ final class MiniwyvernProjectileBalanceAssetTest {
     private static final Path ROOT_ROOT = Path.of("Server", "Item", "RootInteractions", "NPCs", "HyDragon", "Wyvern_Mini");
     private static final Path INTERACTION_ROOT = Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon", "Wyvern_Mini");
     private static final Map<String, FormProfile> FORMS = forms();
+    private static final Map<String, String> IMPACT_EVENTS = Map.of(
+            "Fire", "SFX_Staff_Flame_Fireball_Impact",
+            "Ice", "SFX_Ice_Bolt_Death",
+            "Lightning", "SFX_Spear_Projectile_Impact",
+            "Nature", "SFX_Plant_Hit",
+            "Toxic", "SFX_Effect_Poison_World",
+            "Void", "SFX_Eye_Void_Attack_Blast",
+            "Wild", "SFX_Rubble_Hit");
 
     // A wrong projectile profile, status route, or legacy launch type must fail this contract.
     @Test
@@ -106,7 +114,7 @@ final class MiniwyvernProjectileBalanceAssetTest {
                 || config.has("Impact"), "forbidden projectile behavior in " + form + " " + tier);
 
         JsonObject interactions = config.getAsJsonObject("Interactions");
-        assertEquals(Set.of("ProjectileSpawn", "ProjectileHit", "ProjectileMiss"), interactions.keySet(),
+        assertEquals(Set.of("ProjectileSpawn", "ProjectileHit", "ProjectileMiss", "ProjectileBounce"), interactions.keySet(),
                 "projectile interactions must not contain extra behavior");
         String hitRootId = "Root_HyDragon_Miniwyvern_" + form + "_ProjectileHit_" + hitTier;
         JsonElement hitReference = interactions.get("ProjectileHit");
@@ -117,10 +125,15 @@ final class MiniwyvernProjectileBalanceAssetTest {
         JsonObject hitRoot = load(ROOT_ROOT.resolve("ProjectileHits").resolve(hitRootId + ".json"));
         assertEquals(List.of("HyDragon_Miniwyvern_" + form + "_ProjectileHit_" + hitTier),
                 strings(hitRoot.getAsJsonArray("Interactions")));
-        JsonObject damageInteraction = load(INTERACTION_ROOT.resolve("ProjectileHits")
+        JsonObject hitInteraction = load(INTERACTION_ROOT.resolve("ProjectileHits")
                 .resolve("HyDragon_Miniwyvern_" + form + "_ProjectileHit_" + hitTier + ".json"));
-        assertEquals(Set.of("Type", "DamageCalculator", "Next", "Failed", "Blocked"),
-                damageInteraction.keySet(), "DamageEntity must not contain extra nested behavior");
+        assertEquals(Set.of("Type", "Interactions"), hitInteraction.keySet(),
+                "hit interaction must contain exactly audio and damage branches");
+        assertEquals("Parallel", hitInteraction.get("Type").getAsString());
+        JsonArray hitBranches = hitInteraction.getAsJsonArray("Interactions");
+        assertEquals(2, hitBranches.size(), "hit interaction must emit one sound and one damage branch");
+        assertImpactSound(hitBranches.get(0).getAsJsonObject(), IMPACT_EVENTS.get(form));
+        JsonObject damageInteraction = hitBranches.get(1).getAsJsonObject();
         assertEquals("DamageEntity", damageInteraction.get("Type").getAsString());
         assertFalse(damageInteraction.has("Entity"),
                 "DamageEntity always damages the interaction target; Entity is not a supported 0.5.7 field");
@@ -135,8 +148,15 @@ final class MiniwyvernProjectileBalanceAssetTest {
         assertEquals(Set.of("Cooldown"), miss.getAsJsonObject("Cooldown").keySet(), "miss cooldown must stay bounded");
         assertEquals(0, miss.getAsJsonObject("Cooldown").get("Cooldown").getAsInt());
         JsonArray missInteractions = miss.getAsJsonArray("Interactions");
-        assertEquals(1, missInteractions.size());
-        assertTerminal(missInteractions.get(0).getAsJsonObject());
+        assertEquals(2, missInteractions.size());
+        assertImpactSound(missInteractions.get(0).getAsJsonObject(), IMPACT_EVENTS.get(form));
+        assertTerminal(missInteractions.get(1).getAsJsonObject());
+        JsonObject bounce = interactions.getAsJsonObject("ProjectileBounce");
+        assertEquals(Set.of("Cooldown", "Interactions"), bounce.keySet(), "bounce wrapper must stay bounded");
+        assertEquals(0, bounce.getAsJsonObject("Cooldown").get("Cooldown").getAsInt());
+        JsonArray bounceInteractions = bounce.getAsJsonArray("Interactions");
+        assertEquals(1, bounceInteractions.size());
+        assertImpactSound(bounceInteractions.get(0).getAsJsonObject(), IMPACT_EVENTS.get(form));
         JsonObject spawn = interactions.getAsJsonObject("ProjectileSpawn");
         assertEquals(Set.of("Cooldown", "Interactions"), spawn.keySet(), "spawn wrapper must stay bounded");
         assertEquals(Set.of("Cooldown"), spawn.getAsJsonObject("Cooldown").keySet(), "spawn cooldown must stay bounded");
@@ -184,6 +204,14 @@ final class MiniwyvernProjectileBalanceAssetTest {
         assertEquals(Set.of("Type", "Entity"), interaction.keySet());
         assertEquals("RemoveEntity", interaction.get("Type").getAsString());
         assertEquals("User", interaction.get("Entity").getAsString());
+    }
+
+    private static void assertImpactSound(JsonObject interaction, String eventId) {
+        assertEquals(Set.of("Type", "RunTime", "Effects"), interaction.keySet());
+        assertEquals("Simple", interaction.get("Type").getAsString());
+        assertEquals(0, interaction.get("RunTime").getAsInt());
+        assertEquals(eventId, interaction.getAsJsonObject("Effects")
+                .get("WorldSoundEventId").getAsString());
     }
 
     private static String configId(String form, String tier) {

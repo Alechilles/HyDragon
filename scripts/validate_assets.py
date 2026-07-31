@@ -1342,6 +1342,15 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
         "Void": (8, 12, 10, "HyDragon_Miniwyvern_Void_Projectile_Exposure"),
         "Wild": (10, 15, 12, None),
     }
+    impact_events = {
+        "Fire": "SFX_Staff_Flame_Fireball_Impact",
+        "Ice": "SFX_Ice_Bolt_Death",
+        "Lightning": "SFX_Spear_Projectile_Impact",
+        "Nature": "SFX_Plant_Hit",
+        "Toxic": "SFX_Effect_Poison_World",
+        "Void": "SFX_Eye_Void_Attack_Blast",
+        "Wild": "SFX_Rubble_Hit",
+    }
     config_root = ROOT / "Server/ProjectileConfigs/HyDragon/Wyvern_Mini"
     interaction_root = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini"
     root_root = ROOT / "Server/Item/RootInteractions/NPCs/HyDragon/Wyvern_Mini"
@@ -1385,7 +1394,8 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
                     ("Parent", "Damage", "Splash", "BlockDamage", "Knockback", "Impact")):
                 fail(errors, f"Miniwyvern {form} {tier} is not self-contained and bounded")
             interactions = config.get("Interactions")
-            if not isinstance(interactions, dict) or set(interactions) != {"ProjectileSpawn", "ProjectileHit", "ProjectileMiss"}:
+            if not isinstance(interactions, dict) or set(interactions) != {
+                    "ProjectileSpawn", "ProjectileHit", "ProjectileMiss", "ProjectileBounce"}:
                 fail(errors, f"Miniwyvern {form} {tier} has no interactions")
                 continue
             expected_hit_tier = {
@@ -1406,7 +1416,17 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
             if not isinstance(hit_root, dict) or hit_root.get("Interactions") != [hit_child_id]:
                 fail(errors, f"Miniwyvern {form} {tier} hit root does not resolve its intended hit child")
                 continue
-            damage_step = parsed.get(hit_child_dir / f"{hit_child_id}.json")
+            hit_step = parsed.get(hit_child_dir / f"{hit_child_id}.json")
+            impact_sound = {"Type": "Simple", "RunTime": 0, "Effects": {
+                "WorldSoundEventId": impact_events[form]}}
+            if not isinstance(hit_step, dict) or set(hit_step) != {"Type", "Interactions"} \
+                    or hit_step.get("Type") != "Parallel" \
+                    or not isinstance(hit_step.get("Interactions"), list) \
+                    or len(hit_step["Interactions"]) != 2 \
+                    or hit_step["Interactions"][0] != impact_sound:
+                fail(errors, f"Miniwyvern {form} {tier} has invalid hit impact audio")
+                continue
+            damage_step = hit_step["Interactions"][1]
             calculator = damage_step.get("DamageCalculator") if isinstance(damage_step, dict) else None
             actual_damage = calculator.get("BaseDamage", {}).get("Physical") if isinstance(calculator, dict) else None
             if not isinstance(damage_step, dict) or set(damage_step) != {"Type", "DamageCalculator", "Next", "Failed", "Blocked"} \
@@ -1437,14 +1457,19 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
             spawn_steps = spawn.get("Interactions") if isinstance(spawn, dict) else None
             miss = interactions.get("ProjectileMiss")
             miss_steps = miss.get("Interactions") if isinstance(miss, dict) else None
+            bounce = interactions.get("ProjectileBounce")
+            bounce_steps = bounce.get("Interactions") if isinstance(bounce, dict) else None
             if not isinstance(spawn, dict) or set(spawn) != {"Cooldown", "Interactions"} \
                     or spawn.get("Cooldown") != {"Cooldown": 0} \
                     or not isinstance(miss, dict) or set(miss) != {"Cooldown", "Interactions"} \
                     or miss.get("Cooldown") != {"Cooldown": 0} \
+                    or not isinstance(bounce, dict) or set(bounce) != {"Cooldown", "Interactions"} \
+                    or bounce.get("Cooldown") != {"Cooldown": 0} \
                     or not isinstance(spawn_steps, list) or len(spawn_steps) != 2 \
                     or spawn_steps[0] != {"Type": "Simple", "RunTime": timeout} \
                     or spawn_steps[1] != {"Type": "RemoveEntity", "Entity": "User"} \
-                    or miss_steps != [{"Type": "RemoveEntity", "Entity": "User"}]:
+                    or miss_steps != [impact_sound, {"Type": "RemoveEntity", "Entity": "User"}] \
+                    or bounce_steps != [impact_sound]:
                 fail(errors, f"Miniwyvern {form} {tier} has unsafe miss/timeout behavior")
 
         expected_references = {

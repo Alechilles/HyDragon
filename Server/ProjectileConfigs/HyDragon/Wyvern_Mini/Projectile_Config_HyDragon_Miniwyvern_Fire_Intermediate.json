@@ -34,8 +34,29 @@
       },
       "Interactions": [
         {
+          "Type": "Simple",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Flame_Fireball_Impact"
+          }
+        },
+        {
           "Type": "RemoveEntity",
           "Entity": "User"
+        }
+      ]
+    },
+    "ProjectileBounce": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "RunTime": 0,
+          "Effects": {
+            "WorldSoundEventId": "SFX_Staff_Flame_Fireball_Impact"
+          }
         }
       ]
     }

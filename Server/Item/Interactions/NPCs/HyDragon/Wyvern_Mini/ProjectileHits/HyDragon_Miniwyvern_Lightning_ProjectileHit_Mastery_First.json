@@ -1,37 +1,49 @@
 {
-  "Type": "DamageEntity",
-  "DamageCalculator": {
-    "Type": "Absolute",
-    "BaseDamage": {
-      "Physical": 10
+  "Type": "Parallel",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "RunTime": 0,
+      "Effects": {
+        "WorldSoundEventId": "SFX_Spear_Projectile_Impact"
+      }
     },
-    "RandomPercentageModifier": 0
-  },
-  "Next": {
-    "Type": "Serial",
-    "Interactions": [
-      {
-        "Type": "Interrupt",
-        "Entity": "Target",
-        "ExcludedTag": "Uninterruptable"
+    {
+      "Type": "DamageEntity",
+      "DamageCalculator": {
+        "Type": "Absolute",
+        "BaseDamage": {
+          "Physical": 10
+        },
+        "RandomPercentageModifier": 0
       },
-      {
-        "Type": "ApplyEffect",
-        "Entity": "Target",
-        "EffectId": "HyDragon_Miniwyvern_Lightning_Shock"
+      "Next": {
+        "Type": "Serial",
+        "Interactions": [
+          {
+            "Type": "Interrupt",
+            "Entity": "Target",
+            "ExcludedTag": "Uninterruptable"
+          },
+          {
+            "Type": "ApplyEffect",
+            "Entity": "Target",
+            "EffectId": "HyDragon_Miniwyvern_Lightning_Shock"
+          },
+          {
+            "Type": "RemoveEntity",
+            "Entity": "User"
+          }
+        ]
       },
-      {
+      "Failed": {
+        "Type": "RemoveEntity",
+        "Entity": "User"
+      },
+      "Blocked": {
         "Type": "RemoveEntity",
         "Entity": "User"
       }
-    ]
-  },
-  "Failed": {
-    "Type": "RemoveEntity",
-    "Entity": "User"
-  },
-  "Blocked": {
-    "Type": "RemoveEntity",
-    "Entity": "User"
-  }
+    }
+  ]
 }
