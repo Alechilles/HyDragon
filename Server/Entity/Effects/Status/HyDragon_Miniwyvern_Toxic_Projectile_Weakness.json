@@ -1,0 +1,10 @@
+{
+  "ApplicationEffects": {
+    "ModelVFXId": "HyDragon_Toxic_Debuff"
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 5.0
+}

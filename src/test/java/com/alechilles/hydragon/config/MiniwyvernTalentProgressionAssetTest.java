@@ -98,9 +98,25 @@ final class MiniwyvernTalentProgressionAssetTest {
         }
         assertEquals(Map.of(
                 LOCALE_PREFIX + "branch.bond", 15,
-                LOCALE_PREFIX + "branch.combat", 19,
+                LOCALE_PREFIX + "branch.combat", 20,
                 LOCALE_PREFIX + "branch.vigor", 17), costsByBranch);
-        assertEquals(51, costsByBranch.values().stream().mapToInt(Integer::intValue).sum());
+        assertEquals(52, costsByBranch.values().stream().mapToInt(Integer::intValue).sum());
+
+        for (String id : List.of(
+                "DraconicProjectile", "ProjectileRange", "ProjectileCadence", "ProjectileGuidance",
+                "ProjectilePattern", "ProjectileMastery", "SwoopFerocity", "SwoopCadence",
+                "SwoopPrecision", "RelentlessSwoop", "RendingDive", "SwoopMastery")) {
+            JsonObject effect = talents.get(id).getAsJsonArray("Effects").get(0).getAsJsonObject();
+            assertEquals(id, effect.get("EffectKey").getAsString(), id);
+            assertEquals(1.0d, effect.get("Multiplier").getAsDouble(), 0.000_001d, id);
+        }
+        for (String removedId : Set.of("ProjectileForce", "ProjectileImpact", "DraconicAssault",
+                "AssaultUtility", "AssaultMastery", "DraconicApex")) {
+            assertFalse(talents.containsKey(removedId), removedId + " must not ship in stage one");
+        }
+        for (JsonObject talent : talents.values()) {
+            assertFalse(talent.has("RequiresAnyTalentIds"), talent.get("Id").getAsString());
+        }
 
         assertHealthEffect(talents.get("VitalScales"), 1.05d);
         assertHealthEffect(talents.get("HardenedScales"), 1.05d);
@@ -117,7 +133,7 @@ final class MiniwyvernTalentProgressionAssetTest {
             keys.add(talent.get("DisplayName").getAsString());
             keys.add(talent.get("Description").getAsString());
         }
-        assertEquals(63, keys.size());
+        assertEquals(65, keys.size());
         assertTrue(keys.stream().allMatch(key -> key.startsWith(LOCALE_PREFIX)));
 
         for (String locale : LOCALES) {
@@ -126,6 +142,37 @@ final class MiniwyvernTalentProgressionAssetTest {
                 assertNotNull(entries.get(key), locale + " missing " + key);
             }
         }
+    }
+
+    @Test
+    void englishSwoopDescriptionsStateTheBindingDamageAndCooldownBands() throws IOException {
+        Map<String, String> entries = localeEntries("en-US");
+        assertEquals(Map.of(
+                LOCALE_PREFIX + "swoop_ferocity.description",
+                "Increase swoop damage from 16 to 20 with a 25-35 second cooldown.",
+                LOCALE_PREFIX + "swoop_cadence.description",
+                "Keep the 20-damage swoop and reduce its cooldown to 22-30 seconds.",
+                LOCALE_PREFIX + "swoop_precision.description",
+                "Increase swoop approach speed from 0.55 to 0.70 for a more reliable strike.",
+                LOCALE_PREFIX + "relentless_swoop.description",
+                "Keep the 20-damage swoop and reduce its cooldown to 20-26 seconds.",
+                LOCALE_PREFIX + "rending_dive.description",
+                "Increase swoop damage to 24 with a 25-35 second cooldown.",
+                LOCALE_PREFIX + "swoop_mastery.description",
+                "Master the swoop route for 28 damage and an 18-24 second cooldown."),
+                Map.of(
+                        LOCALE_PREFIX + "swoop_ferocity.description",
+                        entries.get(LOCALE_PREFIX + "swoop_ferocity.description"),
+                        LOCALE_PREFIX + "swoop_cadence.description",
+                        entries.get(LOCALE_PREFIX + "swoop_cadence.description"),
+                        LOCALE_PREFIX + "swoop_precision.description",
+                        entries.get(LOCALE_PREFIX + "swoop_precision.description"),
+                        LOCALE_PREFIX + "relentless_swoop.description",
+                        entries.get(LOCALE_PREFIX + "relentless_swoop.description"),
+                        LOCALE_PREFIX + "rending_dive.description",
+                        entries.get(LOCALE_PREFIX + "rending_dive.description"),
+                        LOCALE_PREFIX + "swoop_mastery.description",
+                        entries.get(LOCALE_PREFIX + "swoop_mastery.description")));
     }
 
     private static Map<String, TalentExpectation> expectedTalents() {
@@ -145,14 +192,17 @@ final class MiniwyvernTalentProgressionAssetTest {
         expected.put("DraconicProjectile", talent(combat, 1, 3, 1));
         expected.put("ProjectileRange", talent(combat, 2, 5, 1, "DraconicProjectile"));
         expected.put("ProjectileCadence", talent(combat, 2, 5, 1, "DraconicProjectile"));
-        expected.put("ProjectileForce", talent(combat, 3, 8, 2, "ProjectileRange"));
-        expected.put("ProjectileGuidance", talent(combat, 3, 9, 1, "ProjectileCadence"));
-        expected.put("ProjectileImpact", talent(combat, 4, 12, 2, "ProjectileForce"));
-        expected.put("ProjectilePattern", talent(combat, 4, 14, 2, "ProjectileGuidance"));
-        expected.put("DraconicAssault", talent(combat, 5, 17, 2, "ProjectileImpact", "ProjectilePattern"));
-        expected.put("AssaultUtility", talent(combat, 5, 18, 1, "DraconicAssault"));
-        expected.put("AssaultMastery", talent(combat, 5, 21, 2, "DraconicAssault"));
-        expected.put("DraconicApex", talent(combat, 6, 27, 4, "AssaultUtility", "AssaultMastery"));
+        expected.put("ProjectileGuidance", talent(combat, 3, 9, 2, "ProjectileRange"));
+        expected.put("ProjectilePattern", talent(combat, 3, 11, 2, "ProjectileCadence"));
+        expected.put("ProjectileMastery", talent(combat, 4, 14, 3,
+                "ProjectileGuidance", "ProjectilePattern"));
+        expected.put("SwoopFerocity", talent(combat, 1, 3, 1));
+        expected.put("SwoopCadence", talent(combat, 2, 5, 1, "SwoopFerocity"));
+        expected.put("SwoopPrecision", talent(combat, 2, 5, 1, "SwoopFerocity"));
+        expected.put("RelentlessSwoop", talent(combat, 3, 9, 2, "SwoopCadence"));
+        expected.put("RendingDive", talent(combat, 3, 11, 2, "SwoopPrecision"));
+        expected.put("SwoopMastery", talent(combat, 4, 14, 3,
+                "RelentlessSwoop", "RendingDive"));
         expected.put("VitalScales", talent(vigor, 1, 2, 1));
         expected.put("HardenedScales", talent(vigor, 2, 4, 1, "VitalScales"));
         expected.put("ElderScales", talent(vigor, 3, 7, 2, "HardenedScales"));

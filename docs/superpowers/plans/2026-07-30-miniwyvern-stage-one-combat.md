@@ -223,7 +223,18 @@ Remove `LoiterWeight`, `DiveWeight`, and the Random dive instruction. Preserve t
 }
 ```
 
-Use highest-owned selection order `SwoopMastery`, `RendingDive`, `SwoopFerocity`, default for attack roots and `SwoopMastery`, `RelentlessSwoop`, `SwoopCadence`, default for cooldowns. On first entry to valid `.Combat`, start the selected cooldown if it is neither running nor expired. Strike completion or six-second timeout restarts that cooldown immediately, enters `.Recovery`, starts a `[2,4]` recovery timer, and leaves `Miniwyvern_Swooping` true. Recovery completion alone clears `Miniwyvern_Swooping` and `Miniwyvern_Swoop_Strike_Committed` and returns to `.Combat`; invalid combat stops all timers and clears every latch.
+Use highest-owned selection order `SwoopMastery`, `RendingDive`,
+`SwoopFerocity`, default for attack roots and `SwoopMastery`,
+`RelentlessSwoop`, `SwoopCadence`, default for cooldowns. These selections are
+independent: Precision changes only approach speed, and the damage route must
+neither grant nor erase a cadence upgrade. On first entry to valid `.Combat`,
+start the selected cooldown if it is neither running nor expired. Strike
+completion or the six-second timeout enters `.Recovery` without embedding a
+cooldown range. Before starting the `[2,4]` recovery timer, four exclusive
+Recovery instructions restart the highest-owned cooldown at
+`[18,24]`/`[20,26]`/`[22,30]`/`[25,35]`. Recovery completion alone clears
+`Miniwyvern_Swooping` and `Miniwyvern_Swoop_Strike_Committed` and returns to
+`.Combat`; invalid combat stops all timers and clears every latch.
 
 - [ ] **Step 5: Wire only the tamed aerial template**
 
@@ -401,7 +412,8 @@ git commit -m "Feat: add MiniWyvern projectile debuffs"
 
 **Interfaces:**
 - Consumes: Fire/Ice existing effects and Task 3's Lightning/Nature/Toxic/Void status IDs.
-- Produces: four launch roots per form: Base, Intermediate, Pattern, and Mastery.
+- Produces: six launch roots per form: Base, Intermediate, Pattern,
+  Pattern_Echo, Mastery, and Mastery_Echo.
 
 - [ ] **Step 1: Add a red seven-form matrix contract**
 
@@ -421,10 +433,10 @@ Map<String, FormProfile> forms = Map.of(
 
 For each form, assert:
 
-- every launch uses `Type: "Projectile"` or a `Type: "Serial"` containing two modern Projectile entries;
+- every launch root uses exactly one modern `Type: "Projectile"` entry;
 - no MiniWyvern interaction contains `LaunchProjectile` or `ProjectileId`;
-- Base/Intermediate/Pattern/Mastery roots resolve;
-- Pattern and Mastery contain exactly two launches with one `Simple.RunTime: 0.30` between them;
+- Base/Intermediate/Pattern/Pattern_Echo/Mastery/Mastery_Echo roots resolve;
+- Pattern and Mastery first/echo roots resolve to their corresponding configs;
 - first/echo configs share damage but only first hit chains contain an effect;
 - physical damage is exact in hit interactions and no config/legacy projectile damage field exists;
 - hit `DamageEntity.Next` contains the status/interrupt/presentation/despawn chain, while `Failed` and `Blocked` despawn without status;
@@ -492,7 +504,7 @@ presentation, or removal side effects. Do not use an owner-scoped `Interrupt`,
 which could cancel another projectile in the same volley. First configs use
 status-enabled hit roots; echo configs use damage-only hit roots. Wild
 first/echo may share the same damage-only hit root but retain both config IDs
-so the serial matrix stays uniform.
+so the profile matrix stays uniform.
 
 - [ ] **Step 4: Create safe hit chains**
 
@@ -525,26 +537,30 @@ Lightning's successful `Next` begins with:
 
 then applies Shock and despawns. Wild omits ApplyEffect. Every chain terminates exactly once.
 
-- [ ] **Step 5: Replace launch/root assets with four roots per form**
+- [ ] **Step 5: Replace launch/root assets with six direct roots per form**
 
-Use suffixes `_Base`, `_Intermediate`, `_Pattern`, and `_Mastery`. Base/Intermediate child interactions are a single modern Projectile interaction. Pattern/Mastery child interactions use:
+Use suffixes `_Base`, `_Intermediate`, `_Pattern`, `_Pattern_Echo`,
+`_Mastery`, and `_Mastery_Echo`. Every child interaction is one direct modern
+Projectile interaction. For example, the Pattern roots resolve independently:
 
 ```json
 {
-  "Type": "Serial",
-  "Interactions": [
-    { "Type": "Projectile", "Config": "Projectile_Config_HyDragon_Miniwyvern_Fire_Pattern_First" },
-    { "Type": "Simple", "RunTime": 0.30 },
-    { "Type": "Projectile", "Config": "Projectile_Config_HyDragon_Miniwyvern_Fire_Pattern_Echo" }
-  ]
+  "Type": "Projectile",
+  "Config": "Projectile_Config_HyDragon_Miniwyvern_Fire_Pattern_First"
 }
 ```
 
-Mastery substitutes the two Mastery config IDs. All roots retain `Tags.Attack = ["Ranged"]`.
+The separate `_Pattern_Echo` root uses the Pattern echo config; Mastery and
+Mastery_Echo use their corresponding Mastery configs. All roots retain
+`Tags.Attack = ["Ranged"]`. The NPC instruction lifecycle in Task 5 owns the
+0.30-second delay so it can cancel an unlaunched echo safely.
 
 - [ ] **Step 6: Extend static asset validation and commit**
 
-Update `scripts/validate_assets.py` to enumerate all seven forms/four roots/six configs, reject deprecated launch types in the MiniWyvern namespace, validate damage/effect/despawn chains, and ensure no role points to the old Apex root naming.
+Update `scripts/validate_assets.py` to enumerate all seven forms/six roots/six
+configs, reject deprecated launch types in the MiniWyvern namespace, validate
+damage/effect/despawn chains, and ensure no role points to the old Apex root
+naming.
 
 ```bash
 ./mvnw -Dtest=MiniwyvernProjectileBalanceAssetTest test
@@ -580,7 +596,7 @@ Before committing, inspect `git diff --cached --name-only` and unstage any user-
 - Modify: `src/test/java/com/alechilles/hydragon/config/MiniwyvernSwoopAssetContractTest.java`
 
 **Interfaces:**
-- Consumes: four form roots from Task 4 and swoop flags/state from Task 2.
+- Consumes: six form roots from Task 4 and swoop flags/state from Task 2.
 - Produces: exact talent composition, guidance aiming, volley latch, cancellation, and starvation-free swoop priority.
 
 - [ ] **Step 1: Replace old mutually exclusive branch tests with the six milestones**
@@ -604,7 +620,11 @@ Add table-driven combination cases rather than treating ownership as one linear 
 | +Guidance+Pattern | Pattern | [0.55,0.85] | [4,6] | true |
 | ProjectileMastery prerequisites + Mastery | Mastery | [0.55,0.85] | [3,5] | true |
 
-Assert every scheduler and executable branch rejects `Miniwyvern_Swoop_Pending` and `Miniwyvern_Swooping`. Assert the volley latch is set before Pattern/Mastery Attack, remains set while Attack blocks through the serial second launch, and clears afterward.
+Assert every scheduler and executable branch rejects `Miniwyvern_Swoop_Pending`
+and `Miniwyvern_Swooping`. Assert the volley latch is set before the direct
+Pattern/Mastery first Attack, then the echo-pending latch is set. Assert a
+separate blocking echo phase waits 0.30 seconds, launches the matching echo,
+starts cooldown, and clears echo-pending last.
 Assert every projectile scheduler remains in the aerial component after the
 swoop pending setter, and that the template contains no independent projectile
 readiness scheduler.
@@ -625,10 +645,13 @@ Template parameters become:
 TalentProjectileBase
 TalentProjectileIntermediate
 TalentProjectilePattern
+TalentProjectilePatternEcho
 TalentProjectileMastery
+TalentProjectileMasteryEcho
 ```
 
-Remove `TalentProjectileApex`. Each role binds the four exact form roots from Task 4. Do not add form-specific talent IDs.
+Remove `TalentProjectileApex`. Each role binds the six exact form roots from
+Task 4. Do not add form-specific talent IDs.
 
 - [ ] **Step 4: Collapse projectile execution to explicit profile branches**
 
@@ -648,20 +671,31 @@ Guidance scheduler starts `Miniwyvern_Projectile_Aim` with `[0.55,0.85]`; all ot
 
 - [ ] **Step 5: Add the volley lifecycle and swoop handoff**
 
-Pattern/Mastery action order is exact:
+Pattern/Mastery phase-one action order is exact and blocking:
 
 ```json
 "Actions": [
   { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": true },
   { "Type": "Attack", "Attack": { "Compute": "TalentProjectilePattern" }, "AimingTimeRange": [0.1, 0.2], "AttackPauseRange": [0, 0] },
-  { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [4, 6], "RestartValueRange": [4, 6] },
-  { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
-  { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": false },
-  { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
+  { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Echo_Pending", "SetTo": true }
 ]
 ```
 
-Mastery substitutes its root and `[3,5]`. Swoop pending may be set during the blocking Attack but cannot claim control until both flags clear. Command/target/airborne/controller cancellation clears aiming and volley flags, stops aim timer, and resets blocking instructions so an unfinished serial interaction does not launch the echo.
+The separate blocking echo phase uses an NPC `Timeout` action with
+`Delay: [0.3,0.3]`, attacks `TalentProjectilePatternEcho`, starts/restarts the
+`[4,6]` cooldown, then clears volley, aiming, and echo-pending in that order.
+Mastery substitutes `TalentProjectileMasteryEcho` and `[3,5]`.
+
+The swoop readiness setter must precede both aim schedulers. Its projectile
+handoff is exactly
+`Miniwyvern_Projectile_Aiming == false OR Miniwyvern_Projectile_Echo_Pending == true`.
+It must not use `Miniwyvern_Projectile_Volley_Active` as the alternative:
+phase one sets volley before its blocking Attack completes. This rule lets
+phase one finish and makes a pending swoop wait during the cancellable echo
+delay. Swoop claim still requires aiming, volley, and echo-pending all false.
+Command/target/airborne/controller cancellation clears echo-pending, volley,
+and aiming before stopping the aim timer and resetting instructions, so an
+unfinished echo cannot launch.
 
 - [ ] **Step 6: Run combined contracts and commit**
 

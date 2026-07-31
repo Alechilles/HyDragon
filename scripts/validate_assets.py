@@ -1331,6 +1331,155 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         fail(errors, "Revitalizing Essence must override inherited Fire attunement with a runtime-valid no-op")
 
 
+def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: list[str]) -> None:
+    """Keep the seven modern Miniwyvern projectile forms self-contained and safe."""
+    forms = {
+        "Fire": (8, 12, 10, "HyDragon_Miniwyvern_Fire_Burn"),
+        "Ice": (8, 12, 10, "HyDragon_Miniwyvern_Ice_Slow"),
+        "Lightning": (8, 12, 10, "HyDragon_Miniwyvern_Lightning_Shock"),
+        "Nature": (8, 12, 10, "HyDragon_Miniwyvern_Nature_Root"),
+        "Toxic": (8, 12, 10, "HyDragon_Miniwyvern_Toxic_Projectile_Weakness"),
+        "Void": (8, 12, 10, "HyDragon_Miniwyvern_Void_Projectile_Exposure"),
+        "Wild": (10, 15, 12, None),
+    }
+    config_root = ROOT / "Server/ProjectileConfigs/HyDragon/Wyvern_Mini"
+    interaction_root = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini"
+    root_root = ROOT / "Server/Item/RootInteractions/NPCs/HyDragon/Wyvern_Mini"
+    profiles = {
+        "Base": (28, 32, 6, 4.0, 0),
+        "Intermediate": (34, 40, 4, 5.0, 1),
+        "Pattern_First": (34, 40, 4, 5.0, 1),
+        "Pattern_Echo": (34, 40, 4, 5.0, 1),
+        "Mastery_First": (40, 48, 3, 6.0, 2),
+        "Mastery_Echo": (40, 48, 3, 6.0, 2),
+    }
+    legacy_root = ROOT / "Server/Projectiles/HyDragon/Wyvern_Mini"
+    hit_root_dir = root_root / "ProjectileHits"
+    hit_child_dir = interaction_root / "ProjectileHits"
+    hit_references: dict[str, int] = {}
+    if legacy_root.is_dir() and any(legacy_root.glob("*.json")):
+        fail(errors, "obsolete Miniwyvern Server/Projectiles profiles remain")
+
+    for path in sorted(interaction_root.rglob("*.json")):
+        source = path.read_text(encoding="utf-8-sig")
+        if "LaunchProjectile" in source or "ProjectileId" in source:
+            fail(errors, f"deprecated Miniwyvern projectile launch in {path.relative_to(ROOT)}")
+
+    for form, (base_damage, intermediate_damage, apex_damage, status) in forms.items():
+        damages = (base_damage, intermediate_damage, intermediate_damage,
+                   intermediate_damage, apex_damage, apex_damage)
+        for (tier, (force, terminal, gravity, timeout, damage_index)), damage in zip(profiles.items(), damages):
+            config_id = f"Projectile_Config_HyDragon_Miniwyvern_{form}_{tier}"
+            config_path = config_root / f"{config_id}.json"
+            config = parsed.get(config_path)
+            if not isinstance(config, dict):
+                fail(errors, f"missing Miniwyvern projectile config: {config_path.relative_to(ROOT)}")
+                continue
+            physics = config.get("Physics")
+            offset = config.get("SpawnOffset")
+            if config.get("LaunchForce") != force or not isinstance(physics, dict) \
+                    or physics.get("Type") != "Standard" or physics.get("Gravity") != gravity \
+                    or physics.get("TerminalVelocityAir") != terminal or offset != {"X": 0, "Y": 0, "Z": 1}:
+                fail(errors, f"invalid Miniwyvern {form} {tier} physics profile")
+            if not isinstance(config.get("Model"), str) or any(field in config for field in
+                    ("Parent", "Damage", "Splash", "BlockDamage", "Knockback", "Impact")):
+                fail(errors, f"Miniwyvern {form} {tier} is not self-contained and bounded")
+            interactions = config.get("Interactions")
+            if not isinstance(interactions, dict) or set(interactions) != {"ProjectileSpawn", "ProjectileHit", "ProjectileMiss"}:
+                fail(errors, f"Miniwyvern {form} {tier} has no interactions")
+                continue
+            expected_hit_tier = {
+                "Base": "Base",
+                "Intermediate": "Intermediate_First",
+                "Pattern_First": "Intermediate_First",
+                "Pattern_Echo": "Intermediate_Echo",
+                "Mastery_First": "Mastery_First",
+                "Mastery_Echo": "Mastery_Echo",
+            }[tier]
+            hit_root_id = f"Root_HyDragon_Miniwyvern_{form}_ProjectileHit_{expected_hit_tier}"
+            hit_child_id = f"HyDragon_Miniwyvern_{form}_ProjectileHit_{expected_hit_tier}"
+            if interactions.get("ProjectileHit") != hit_root_id:
+                fail(errors, f"Miniwyvern {form} {tier} must reference {hit_root_id} as ProjectileHit")
+                continue
+            hit_references[hit_root_id] = hit_references.get(hit_root_id, 0) + 1
+            hit_root = parsed.get(hit_root_dir / f"{hit_root_id}.json")
+            if not isinstance(hit_root, dict) or hit_root.get("Interactions") != [hit_child_id]:
+                fail(errors, f"Miniwyvern {form} {tier} hit root does not resolve its intended hit child")
+                continue
+            damage_step = parsed.get(hit_child_dir / f"{hit_child_id}.json")
+            calculator = damage_step.get("DamageCalculator") if isinstance(damage_step, dict) else None
+            actual_damage = calculator.get("BaseDamage", {}).get("Physical") if isinstance(calculator, dict) else None
+            if not isinstance(damage_step, dict) or set(damage_step) != {"Type", "Entity", "DamageCalculator", "Next", "Failed", "Blocked"} \
+                    or damage_step.get("Type") != "DamageEntity" or damage_step.get("Entity") != "Target" \
+                    or not isinstance(calculator, dict) or calculator != {"Type": "Absolute", "BaseDamage": {"Physical": damage}, "RandomPercentageModifier": 0} \
+                    or actual_damage != damage:
+                fail(errors, f"Miniwyvern {form} {tier} has invalid hit damage")
+                continue
+            next_step = damage_step.get("Next")
+            failed = damage_step.get("Failed")
+            blocked = damage_step.get("Blocked")
+            if not isinstance(next_step, dict) or failed != {"Type": "RemoveEntity", "Entity": "User"} \
+                    or blocked != {"Type": "RemoveEntity", "Entity": "User"}:
+                fail(errors, f"Miniwyvern {form} {tier} does not safely terminate hit outcomes")
+            expected_status = status if not tier.endswith("Echo") else None
+            remove = {"Type": "RemoveEntity", "Entity": "User"}
+            effect = {"Type": "ApplyEffect", "Entity": "Target", "EffectId": expected_status}
+            if expected_status is None:
+                expected_next = remove
+            elif form == "Lightning":
+                expected_next = {"Type": "Serial", "Interactions": [
+                    {"Type": "Interrupt", "Entity": "Target", "ExcludedTag": "Uninterruptable"}, effect, remove]}
+            else:
+                expected_next = {"Type": "Serial", "Interactions": [effect, remove]}
+            if next_step != expected_next:
+                fail(errors, f"Miniwyvern {form} {tier} has an invalid accepted DamageEntity chain")
+            spawn = interactions.get("ProjectileSpawn")
+            spawn_steps = spawn.get("Interactions") if isinstance(spawn, dict) else None
+            miss = interactions.get("ProjectileMiss")
+            miss_steps = miss.get("Interactions") if isinstance(miss, dict) else None
+            if not isinstance(spawn, dict) or set(spawn) != {"Cooldown", "Interactions"} \
+                    or spawn.get("Cooldown") != {"Cooldown": 0} \
+                    or not isinstance(miss, dict) or set(miss) != {"Cooldown", "Interactions"} \
+                    or miss.get("Cooldown") != {"Cooldown": 0} \
+                    or not isinstance(spawn_steps, list) or len(spawn_steps) != 2 \
+                    or spawn_steps[0] != {"Type": "Simple", "RunTime": timeout} \
+                    or spawn_steps[1] != {"Type": "RemoveEntity", "Entity": "User"} \
+                    or miss_steps != [{"Type": "RemoveEntity", "Entity": "User"}]:
+                fail(errors, f"Miniwyvern {form} {tier} has unsafe miss/timeout behavior")
+
+        expected_references = {
+            f"Root_HyDragon_Miniwyvern_{form}_ProjectileHit_Base": 1,
+            f"Root_HyDragon_Miniwyvern_{form}_ProjectileHit_Intermediate_First": 2,
+            f"Root_HyDragon_Miniwyvern_{form}_ProjectileHit_Intermediate_Echo": 1,
+            f"Root_HyDragon_Miniwyvern_{form}_ProjectileHit_Mastery_First": 1,
+            f"Root_HyDragon_Miniwyvern_{form}_ProjectileHit_Mastery_Echo": 1,
+        }
+        for hit_root_id, expected_count in expected_references.items():
+            if hit_references.get(hit_root_id) != expected_count:
+                fail(errors, f"Miniwyvern {form} hit root {hit_root_id} has an invalid reference count")
+
+        for tier in ("Base", "Intermediate"):
+            root = parsed.get(root_root / f"Root_NPC_Wyvern_Mini_{form}_Projectile_{tier}.json")
+            interaction = parsed.get(interaction_root / f"Wyvern_Mini_{form}_Projectile_{tier}.json")
+            expected = f"Projectile_Config_HyDragon_Miniwyvern_{form}_{tier}"
+            expected_root = {"Interactions": [f"Wyvern_Mini_{form}_Projectile_{tier}"], "Tags": {"Attack": ["Ranged"]}}
+            if root != expected_root \
+                    or not isinstance(interaction, dict) or interaction != {"Type": "Projectile", "Config": expected}:
+                fail(errors, f"Miniwyvern {form} {tier} root does not resolve its modern projectile")
+        for tier in ("Pattern", "Mastery"):
+            root = parsed.get(root_root / f"Root_NPC_Wyvern_Mini_{form}_Projectile_{tier}.json")
+            interaction = parsed.get(interaction_root / f"Wyvern_Mini_{form}_Projectile_{tier}.json")
+            prefix = f"Projectile_Config_HyDragon_Miniwyvern_{form}_{tier}_"
+            expected_root = {"Interactions": [f"Wyvern_Mini_{form}_Projectile_{tier}"], "Tags": {"Attack": ["Ranged"]}}
+            echo_root = parsed.get(root_root / f"Root_NPC_Wyvern_Mini_{form}_Projectile_{tier}_Echo.json")
+            echo_interaction = parsed.get(interaction_root / f"Wyvern_Mini_{form}_Projectile_{tier}_Echo.json")
+            expected_interaction = {"Type": "Projectile", "Config": prefix + "First"}
+            expected_echo_root = {"Interactions": [f"Wyvern_Mini_{form}_Projectile_{tier}_Echo"], "Tags": {"Attack": ["Ranged"]}}
+            expected_echo_interaction = {"Type": "Projectile", "Config": prefix + "Echo"}
+            if root != expected_root or interaction != expected_interaction or echo_root != expected_echo_root or echo_interaction != expected_echo_interaction:
+                fail(errors, f"Miniwyvern {form} {tier} roots must expose direct first and echo projectiles")
+
+
 def main() -> int:
     errors: list[str] = []
     parsed = load_json_assets(errors)
@@ -1347,6 +1496,7 @@ def main() -> int:
     require_files(errors)
     validate_capture_configs(parsed, errors)
     validate_miniwyvern_ability_contract(parsed, errors)
+    validate_miniwyvern_projectile_contract(parsed, errors)
     validate_stone_tiers(parsed, errors)
     validate_no_miniwyvern_spawns(parsed, errors)
     validate_miniwyvern_role_wiring(parsed, errors)

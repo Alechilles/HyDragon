@@ -1,1 +1,4 @@
-{ "Type": "LaunchProjectile", "RunTime": 0.22, "ProjectileId": "HyDragon_Miniwyvern_Fire_Projectile_Intermediate" }
+{
+  "Type": "Projectile",
+  "Config": "Projectile_Config_HyDragon_Miniwyvern_Fire_Intermediate"
+}

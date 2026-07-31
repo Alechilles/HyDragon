@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 
 /** Reduces Toxic-weakened entities' outgoing damage during Hytale's pre-application filter phase. */
 public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem {
+    private static final String PROJECTILE_EFFECT_ID = "HyDragon_Miniwyvern_Toxic_Projectile_Weakness";
     private final MiniwyvernOwnerAuraRegistry registry;
 
     public MiniwyvernToxicWeaknessDamageSystem(MiniwyvernOwnerAuraRegistry registry) {
@@ -36,22 +37,37 @@ public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem
     @Override public void handle(int index, @Nonnull ArchetypeChunk<EntityStore> chunk,
             @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer,
             @Nonnull Damage damage) {
-        if (damage.isCancelled() || !Float.isFinite(damage.getAmount()) || damage.getAmount() <= 0.0F
-                || !(damage.getSource() instanceof Damage.EntitySource source)) return;
+        if (!(damage.getSource() instanceof Damage.EntitySource source)) return;
         Ref<EntityStore> sourceRef = source.getRef();
-        if (!MiniwyvernOwnerAuraDamageSystem.isLiveRef(sourceRef)) return;
+        Ref<EntityStore> targetRef = chunk.getReferenceTo(index);
+        boolean blocked = Boolean.TRUE.equals(damage.getIfPresentMetaObject(Damage.BLOCKED));
+        boolean healing = damage.getCause() != null && "healing".equalsIgnoreCase(damage.getCause().getId());
+        if (!shouldModify(damage.isCancelled(), damage.getAmount(), MiniwyvernOwnerAuraDamageSystem.isLiveRef(sourceRef),
+                sourceRef != null && sourceRef.equals(targetRef), blocked, healing)) return;
         UUIDComponent identity = store.getComponent(sourceRef, UUIDComponent.getComponentType());
         if (identity == null) return;
         MiniwyvernOwnerAuraRegistry.ToxicWeakness weakness = registry.activeToxicWeakness(
                 identity.getUuid(), System.currentTimeMillis()).orElse(null);
-        if (weakness == null) return;
         EffectControllerComponent controller = store.getComponent(sourceRef, EffectControllerComponent.getComponentType());
-        int effectIndex = EntityEffect.getAssetMap().getIndex(weakness.effectId());
-        if (controller == null || effectIndex < 0 || !controller.getActiveEffects().containsKey(effectIndex)) return;
-        damage.setAmount(reducedAmount(damage.getAmount(), weakness.damageReductionFraction()));
+        if (controller == null) return;
+        boolean bondActive = weakness != null && hasEffect(controller, weakness.effectId());
+        boolean projectileActive = hasEffect(controller, PROJECTILE_EFFECT_ID);
+        if (!bondActive && !projectileActive) return;
+        damage.setAmount(reducedAmount(damage.getAmount(), bondActive, projectileActive));
     }
 
-    static float reducedAmount(float amount, double fraction) {
+    static boolean shouldModify(boolean cancelled, float amount, boolean entityCaused, boolean self,
+            boolean blocked, boolean healing) {
+        return !cancelled && Float.isFinite(amount) && amount > 0.0F && entityCaused && !self && !blocked && !healing;
+    }
+
+    static float reducedAmount(float amount, boolean bondActive, boolean projectileActive) {
+        double fraction = bondActive ? 0.12D : projectileActive ? 0.10D : 0.0D;
         return (float) (amount * (1.0D - fraction));
+    }
+
+    private static boolean hasEffect(EffectControllerComponent controller, String effectId) {
+        int effectIndex = EntityEffect.getAssetMap().getIndex(effectId);
+        return effectIndex >= 0 && controller.getActiveEffects().containsKey(effectIndex);
     }
 }

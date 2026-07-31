@@ -3,12 +3,6 @@
   "ApplicationEffects": {
     "ModelVFXId": "HyDragon_Void_Debuff"
   },
-  "DamageResistance": {
-    "Physical": [ { "CalculationType": "Percent", "Amount": -0.12 } ],
-    "Projectile": [ { "CalculationType": "Percent", "Amount": -0.12 } ],
-    "Fire": [ { "CalculationType": "Percent", "Amount": -0.12 } ],
-    "Ice": [ { "CalculationType": "Percent", "Amount": -0.12 } ]
-  },
   "OverlapBehavior": "Overwrite",
   "RemovalBehavior": "Duration",
   "Infinite": false,

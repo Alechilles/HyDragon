@@ -1,0 +1,43 @@
+{
+  "Model": "Rubble_Stone",
+  "Physics": {
+    "Type": "Standard",
+    "Gravity": 3,
+    "TerminalVelocityAir": 48
+  },
+  "LaunchForce": 40,
+  "SpawnOffset": {
+    "X": 0,
+    "Y": 0,
+    "Z": 1
+  },
+  "Interactions": {
+    "ProjectileSpawn": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "Simple",
+          "RunTime": 6
+        },
+        {
+          "Type": "RemoveEntity",
+          "Entity": "User"
+        }
+      ]
+    },
+    "ProjectileHit": "Root_HyDragon_Miniwyvern_Wild_ProjectileHit_Mastery_First",
+    "ProjectileMiss": {
+      "Cooldown": {
+        "Cooldown": 0
+      },
+      "Interactions": [
+        {
+          "Type": "RemoveEntity",
+          "Entity": "User"
+        }
+      ]
+    }
+  }
+}
