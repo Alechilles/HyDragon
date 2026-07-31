@@ -83,9 +83,13 @@
       "Value": "",
       "Description": "Combat talent upgraded root interaction; selected by TameworkHasTalent."
     },
-    "TalentProjectileApex": {
+    "TalentProjectilePattern": {
       "Value": "",
-      "Description": "Combat talent capstone root interaction; selected by TameworkHasTalent."
+      "Description": "Combat talent volley root interaction; selected by TameworkHasTalent."
+    },
+    "TalentProjectileMastery": {
+      "Value": "",
+      "Description": "Combat talent mastery root interaction; selected by TameworkHasTalent."
     },
     "AttackPauseRange": {
       "Value": [
@@ -364,7 +368,8 @@
             { "Type": "Flag", "Name": "Miniwyvern_Swooping" },
             { "Type": "Flag", "Name": "Miniwyvern_Swoop_Strike_Committed" },
             { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started" },
-            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active" }
           ] }
         ]
       },
@@ -375,6 +380,7 @@
         { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Strike_Committed", "SetTo": false },
         { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Recovery_Started", "SetTo": false },
         { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false },
+        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Volley_Active", "SetTo": false },
         { "Type": "TimerStop", "Name": "Miniwyvern_Swoop_Cooldown" },
         { "Type": "TimerStop", "Name": "Miniwyvern_Swoop_Approach" },
         { "Type": "TimerStop", "Name": "Miniwyvern_Swoop_Recovery" },
@@ -681,8 +687,11 @@
                     "TalentProjectileIntermediate": {
                       "Compute": "TalentProjectileIntermediate"
                     },
-                    "TalentProjectileApex": {
-                      "Compute": "TalentProjectileApex"
+                    "TalentProjectilePattern": {
+                      "Compute": "TalentProjectilePattern"
+                    },
+                    "TalentProjectileMastery": {
+                      "Compute": "TalentProjectileMastery"
                     }
                   }
                 }

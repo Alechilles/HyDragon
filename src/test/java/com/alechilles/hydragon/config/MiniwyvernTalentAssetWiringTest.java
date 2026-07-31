@@ -1,7 +1,7 @@
 package com.alechilles.hydragon.config;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonArray;
@@ -11,647 +11,169 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
-/** Contract for the asset-owned Miniwyvern combat execution path. */
+/** Contract for Miniwyvern's highest-observable projectile talent profile. */
 final class MiniwyvernTalentAssetWiringTest {
-    private static final Path TALENTS = Path.of("Server", "Tamework", "Talents", "HyDragonMiniwyvern.json");
-    private static final List<String> STAGE_ONE_COMBAT_MARKERS = List.of(
-            "DraconicProjectile", "ProjectileRange", "ProjectileCadence", "ProjectileGuidance",
-            "ProjectilePattern", "ProjectileMastery", "SwoopFerocity", "SwoopCadence",
-            "SwoopPrecision", "RelentlessSwoop", "RendingDive", "SwoopMastery");
+    private static final Path COMPONENT = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon",
+            "Components", "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
     private static final Path TEMPLATE = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon",
             "Templates", "Template_Wyvern_Mini_Flying_Tamed.json");
-    private static final Path AERIAL_COMPONENT = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon",
-            "Components", "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
-    private static final List<String> ROLES = List.of("Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
-    private static final List<String> COMBAT_TALENTS = List.of("DraconicProjectile", "ProjectileRange",
-            "ProjectileCadence", "ProjectileForce", "ProjectileGuidance", "ProjectileImpact",
-            "ProjectilePattern", "DraconicAssault", "AssaultUtility", "AssaultMastery", "DraconicApex");
-    private static final String AIM_FLAG = "Miniwyvern_Projectile_Aiming";
-    private static final String AIM_TIMER = "Miniwyvern_Projectile_Aim";
-    private static final String COOLDOWN_TIMER = "Miniwyvern_Projectile_Cooldown";
+    private static final List<String> TALENTS = List.of("DraconicProjectile", "ProjectileRange", "ProjectileCadence",
+            "ProjectileGuidance", "ProjectilePattern", "ProjectileMastery");
+    private static final List<String> FORMS = List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "Wild");
+    private static final String AIMING = "Miniwyvern_Projectile_Aiming";
+    private static final String VOLLEY = "Miniwyvern_Projectile_Volley_Active";
 
     @Test
-    void stageOneCombatGraphShipsTheTwelveMarkerEffectsConsumedByLaterAssets() throws IOException {
-        JsonArray talents = load(TALENTS).getAsJsonArray("Talents");
-        Map<String, JsonObject> talentsById = new java.util.LinkedHashMap<>();
-        for (JsonElement element : talents) {
-            JsonObject talent = element.getAsJsonObject();
-            talentsById.put(string(talent, "Id"), talent);
-        }
+    void sixMilestonesResolveToTheHighestObservableProfile() throws IOException {
+        JsonArray instructions = instructions();
+        assertProfile(instructions, "DraconicProjectile", "TalentProjectileBase", "[0.4,0.7]", "[5,7]", false,
+                "ProjectileRange", "ProjectileCadence", "ProjectileGuidance", "ProjectilePattern", "ProjectileMastery");
+        assertProfile(instructions, "ProjectileRange", "TalentProjectileIntermediate", "[0.4,0.7]", "[5,7]", false,
+                "ProjectileCadence", "ProjectileGuidance", "ProjectilePattern", "ProjectileMastery");
+        assertProfile(instructions, "ProjectileCadence", "TalentProjectileIntermediate", "[0.4,0.7]", "[4,6]", false,
+                "ProjectileGuidance", "ProjectilePattern", "ProjectileMastery");
+        assertProfile(instructions, "ProjectileGuidance", "TalentProjectileIntermediate", "[0.55,0.85]", "[5,7]", false,
+                "ProjectileCadence", "ProjectilePattern", "ProjectileMastery");
+        assertProfile(instructions, "ProjectilePattern", "TalentProjectilePattern", "[0.4,0.7]", "[4,6]", true,
+                "ProjectileGuidance", "ProjectileMastery");
+        assertProfile(instructions, "ProjectilePattern", "TalentProjectilePattern", "[0.55,0.85]", "[4,6]", true,
+                "ProjectileMastery");
+        assertProfile(instructions, "ProjectileMastery", "TalentProjectileMastery", "[0.55,0.85]", "[3,5]", true);
+    }
 
-        for (String id : STAGE_ONE_COMBAT_MARKERS) {
-            JsonObject talent = talentsById.get(id);
-            assertTrue(talent != null, "missing stage-one marker " + id);
-            JsonObject effect = talent.getAsJsonArray("Effects").get(0).getAsJsonObject();
-            assertEquals(id, string(effect, "EffectKey"), id);
-            assertEquals(1.0d, effect.get("Multiplier").getAsDouble(), 0.000_001d, id);
+    @Test
+    void onlyTheSixProjectileMilestonesSelectProjectileBranches() throws IOException {
+        String source = Files.readString(COMPONENT);
+        for (String stale : List.of("ProjectileForce", "ProjectileImpact", "DraconicAssault", "AssaultUtility",
+                "AssaultMastery", "DraconicApex", "TalentProjectileApex")) {
+            assertFalse(source.contains(stale), "obsolete projectile branch remains: " + stale);
+        }
+        for (JsonObject branch : projectileBranches(instructions())) {
+            assertTrue(TALENTS.containsAll(talentIds(branch.get("Sensor"))), "branch has only the six milestones");
+            assertRejectsSwoop(branch, "every executable branch must yield to swoop lifecycle");
         }
     }
 
     @Test
-    void templateContainsTalentGatedExecutableVariants() throws IOException {
+    void schedulerIsCentralizedAfterSwoopReadinessAndYieldsToSwoops() throws IOException {
         JsonObject template = load(TEMPLATE);
-        JsonArray instructions = aerialInstructions();
-        assertFalse(hasProjectileScheduler(template),
-                "projectile scheduling must be centralized in the aerial component");
+        assertFalse(containsTimerStart(template, "Miniwyvern_Projectile_Aim"),
+                "template must not own a projectile readiness scheduler");
+        JsonArray instructions = instructions();
+        int readiness = indexWithSetFlag(instructions, "Miniwyvern_Swoop_Pending", true);
+        int scheduler = indexWithAction(instructions, "TimerStart", "Miniwyvern_Projectile_Aim");
+        assertTrue(readiness >= 0 && scheduler > readiness, "scheduler must follow swoop-pending setter");
+        JsonObject schedulerInstruction = instructions.get(scheduler).getAsJsonObject();
+        assertRejectsSwoop(schedulerInstruction, "scheduler must yield to swoop lifecycle");
+    }
 
-        for (int index = 0; index < COMBAT_TALENTS.size(); index++) {
-            String talentId = COMBAT_TALENTS.get(index);
-            JsonObject instruction = instructionForTalent(instructions, talentId);
-            assertTrue(hasExecutableAction(instruction), talentId + " must select an executable action");
-            assertEquals(Set.of(talentId), positiveTalentGates(instruction),
-                    talentId + " must be selected only by its positive talent gate");
-            assertEquals(new HashSet<>(COMBAT_TALENTS.subList(index + 1, COMBAT_TALENTS.size())),
-                    excludedTalents(instruction),
-                    talentId + " must exclude every higher owned combat variant");
+    @Test
+    void volleyLatchesBeforeSerialAttackThenReleasesOnlyAfterCooldownRestart() throws IOException {
+        for (JsonObject branch : projectileBranches(instructions())) {
+            if (!List.of("TalentProjectilePattern", "TalentProjectileMastery").contains(attackCompute(branch))) continue;
+            JsonArray actions = branch.getAsJsonArray("Actions");
+            int volleyOn = actionIndex(actions, "SetFlag", VOLLEY, true);
+            int attack = actionIndex(actions, "Attack", null, false);
+            int restart = actionIndex(actions, "TimerRestart", "Miniwyvern_Projectile_Cooldown", false);
+            int volleyOff = actionIndex(actions, "SetFlag", VOLLEY, false);
+            int aimingOff = actionIndex(actions, "SetFlag", AIMING, false);
+            assertTrue(volleyOn >= 0 && volleyOn < attack, "volley must latch before blocking serial attack");
+            assertTrue(restart > attack && volleyOff > restart && aimingOff > volleyOff,
+                    "volley must cover serial attack and release after exact cooldown restart");
         }
     }
 
     @Test
-    void defendDispatchContinuesToTheUnlockedProjectileVariant() throws IOException {
-        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
-        JsonObject defendDispatch = defendDispatch(instructions);
-
-        assertTrue(defendDispatch.has("Continue") && defendDispatch.get("Continue").getAsBoolean(),
-                "the Defend state dispatch must continue so its later talent projectile instruction can run");
-    }
-
-    @Test
-    void formPassivesRequireEssenceBond() throws IOException {
-        for (String form : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void")) {
-            JsonObject archetype = load(Path.of("Server", "HyDragon", "MiniwyvernArchetypes",
-                    form + ".json"));
-            assertEquals("EssenceBond", string(archetype, "RequiredTalentId"),
-                    form + " owner passive must remain locked until Essence Bond is purchased");
-        }
-    }
-
-    @Test
-    void projectileCadenceUsesDeliberateRandomizedProgressionBands() throws IOException {
-        JsonArray instructions = aerialInstructions();
-        assertFalse(hasProjectileScheduler(load(TEMPLATE)));
-        Map<String, JsonElement> expected = Map.ofEntries(
-                Map.entry("DraconicProjectile", JsonParser.parseString("[5,7]")),
-                Map.entry("ProjectileRange", JsonParser.parseString("[5,7]")),
-                Map.entry("ProjectileCadence", JsonParser.parseString("[4,6]")),
-                Map.entry("ProjectileForce", JsonParser.parseString("[5,7]")),
-                Map.entry("ProjectileGuidance", JsonParser.parseString("[4,6]")),
-                Map.entry("ProjectileImpact", JsonParser.parseString("[5,7]")),
-                Map.entry("ProjectilePattern", JsonParser.parseString("[4,6]")),
-                Map.entry("DraconicAssault", JsonParser.parseString("[3,5]")),
-                Map.entry("AssaultUtility", JsonParser.parseString("[3,5]")),
-                Map.entry("AssaultMastery", JsonParser.parseString("[3,5]")),
-                Map.entry("DraconicApex", JsonParser.parseString("[3,5]")));
-
-        for (String talentId : COMBAT_TALENTS) {
-            JsonObject instruction = instructionForTalent(instructions, talentId);
-            JsonObject attack = projectileAttack(instruction);
-            JsonObject cooldown = action(instruction, "TimerStart", COOLDOWN_TIMER);
-            JsonArray actions = instruction.getAsJsonArray("Actions");
-            JsonArray startRange = cooldown.getAsJsonArray("StartValueRange");
-
-            assertEquals(JsonParser.parseString("[0.1,0.2]"), attack.get("AimingTimeRange"), talentId);
-            assertEquals(JsonParser.parseString("[0,0]"), attack.get("AttackPauseRange"), talentId);
-            assertEquals(expected.get(talentId), startRange, talentId);
-            assertEquals(expected.get(talentId), cooldown.get("RestartValueRange"), talentId);
-            assertTrue(startRange.get(0).getAsDouble() >= 3.0, talentId + " fires too quickly");
-            assertTrue(startRange.get(0).getAsDouble() < startRange.get(1).getAsDouble(),
-                    talentId + " cadence must be randomized");
-            assertTrue(hasAction(instruction, "TimerRestart", COOLDOWN_TIMER), talentId);
-            assertTrue(hasStoppedTimerSensor(instruction, AIM_TIMER), talentId);
-            assertTrue(hasPositiveFlagSensor(instruction, AIM_FLAG), talentId);
-            assertTrue(instruction.get("ActionsBlocking").getAsBoolean(), talentId);
-            assertEquals("SetFlag", string(actions.get(actions.size() - 1).getAsJsonObject(), "Type"), talentId);
-            assertTrue(hasSetFlag(actions.get(actions.size() - 1), AIM_FLAG, false), talentId);
-            assertFalse(instruction.has("BodyMotion"), talentId + " motion belongs to the shared priority phase");
-            assertFalse(instruction.has("HeadMotion"), talentId + " motion belongs to the shared priority phase");
-        }
-    }
-
-    @Test
-    void nativeFlightCanBrakeToAStationaryHover() throws IOException {
-        JsonObject template = load(TEMPLATE);
-        JsonObject fly = template.getAsJsonArray("MotionControllerList").asList().stream()
-                .map(JsonElement::getAsJsonObject)
-                .filter(controller -> "Fly".equals(string(controller, "Type")))
-                .findFirst().orElseThrow();
-
-        assertEquals(0.0, fly.get("MinAirSpeed").getAsDouble());
-        assertEquals(12.0, fly.get("Deceleration").getAsDouble());
-    }
-
-    @Test
-    void dedicatedAimPhaseOwnsMotionBeforeOrdinaryDefendMovement() throws IOException {
-        JsonArray instructions = aerialInstructions();
-        JsonObject aim = instructionUsingFlagAndMotion(instructions, AIM_FLAG, "MatchLook");
-
-        assertFalse(hasProjectileScheduler(load(TEMPLATE)));
-        assertTrue(topLevelIndex(instructions, aim) > 0,
-                "the shared aim motion must execute after the swoop readiness setter");
-        assertEquals(JsonParser.parseString("{\"Type\":\"MatchLook\"}"), aim.get("BodyMotion"));
-        assertEquals(JsonParser.parseString(
-                "{\"Type\":\"Aim\",\"Spread\":0,\"HitProbability\":1,\"Deflection\":true}"),
-                aim.get("HeadMotion"));
-    }
-
-    @Test
-    void projectileAimSchedulerAndRecoveryAreExplicit() throws IOException {
-        JsonArray instructions = aerialInstructions();
-        JsonObject scheduler = instructionWithAction(instructions, "TimerStart", AIM_TIMER);
-        JsonObject recovery = instructionWithAction(instructions, "TimerStop", AIM_TIMER);
-
-        assertFalse(hasProjectileScheduler(load(TEMPLATE)));
-        assertTrue(topLevelIndex(instructions, recovery) < topLevelIndex(instructions, scheduler));
-
-        JsonObject start = action(scheduler, "TimerStart", AIM_TIMER);
-        assertEquals(JsonParser.parseString("[0.4,0.7]"), start.get("StartValueRange"));
-        assertEquals(JsonParser.parseString("[0.4,0.7]"), start.get("RestartValueRange"));
-        assertTrue(hasAction(scheduler, "TimerRestart", AIM_TIMER));
-        assertTrue(hasSetFlag(scheduler, AIM_FLAG, true));
-        JsonArray schedulerActions = scheduler.getAsJsonArray("Actions");
-        assertTrue(hasSetFlag(schedulerActions.get(schedulerActions.size() - 1), AIM_FLAG, true));
-
-        assertTrue(hasSetFlag(recovery, AIM_FLAG, false));
-        assertTrue(hasAction(recovery, "TimerStop", AIM_TIMER));
-        assertTrue(hasAction(recovery, "ResetInstructions", null));
-    }
-
-    @Test
-    void projectileSchedulersHaveOneExclusiveGraphInTheAerialComponent() throws IOException {
-        JsonArray instructions = aerialInstructions();
-        assertEquals(1, countTopLevelActions(instructions, "TimerStart", AIM_TIMER),
-                "the talent variants must share one scheduler; no duplicate volley may remain");
-        for (String talentId : COMBAT_TALENTS) {
-            JsonObject scheduler = instructionForTalent(instructions, talentId);
-            assertTrue(containsDefendStateInstruction(scheduler) || hasCombatStateSensor(scheduler),
-                    talentId + " scheduler must stay within the aerial combat gate");
-        }
-    }
-
-    @Test
-    void allFormsProvideOnlyGenericTalentBindingsAndWildCombatIsRawOnly() throws IOException {
-        for (String form : ROLES) {
-            JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
-                    "Tamed_Wyvern_Mini_" + form + ".json"));
-            String source = role.toString();
-            assertFalse(role.getAsJsonObject("Modify").has("TalentCombatFlags"),
-                    form + " must not override an undeclared template parameter");
-            assertFalse(source.contains("Miniwyvern_"), form + " must not introduce form-specific talent IDs");
-        }
-        JsonObject wildRole = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
-                "Tamed_Wyvern_Mini_Wild.json")).getAsJsonObject("Modify");
-        for (String parameter : List.of("TalentProjectileBase", "TalentProjectileIntermediate", "TalentProjectileApex")) {
-            Path rootPath = rootPath(string(wildRole, parameter));
-            for (JsonElement interaction : load(rootPath).getAsJsonArray("Interactions")) {
-                String launcherId = interaction.getAsString();
-                JsonObject launcher = load(interactionPath(launcherId));
-                assertTrue(launcher.has("ProjectileId"), "Wild root interaction must launch a projectile");
-                assertRawOnlyInteractionChain(launcherId, parameter + " launcher", new HashSet<>());
-                JsonObject projectile = load(projectilePath(string(launcher, "ProjectileId")));
-                assertRawOnly(projectile, parameter + " projectile");
-            }
-        }
-    }
-
-    @Test
-    void elementalTalentProjectilesRetainTheirThemedBaseAppearance() throws IOException {
-        for (String form : List.of("Lightning", "Toxic", "Void")) {
-            JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
+    void templateAndEveryFormBindExactlyFourModernRoots() throws IOException {
+        JsonObject parameters = load(TEMPLATE).getAsJsonObject("Parameters");
+        Set<String> expected = Set.of("TalentProjectileBase", "TalentProjectileIntermediate",
+                "TalentProjectilePattern", "TalentProjectileMastery");
+        assertTrue(parameters.keySet().containsAll(expected));
+        assertFalse(parameters.has("TalentProjectileApex"));
+        for (String form : FORMS) {
+            JsonObject modify = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
                     "Tamed_Wyvern_Mini_" + form + ".json")).getAsJsonObject("Modify");
-            String baseProjectileId = projectileIdForRoot(string(role, "TalentProjectileBase"));
-            for (String parameter : List.of("TalentProjectileIntermediate", "TalentProjectileApex")) {
-                JsonObject upgraded = load(projectilePath(projectileIdForRoot(string(role, parameter))));
-                assertFalse("Rubble_Stone".equals(string(upgraded, "Appearance")),
-                        form + " must not replace its themed projectile with generic rubble");
-                assertEquals(baseProjectileId, string(upgraded, "Parent"),
-                        form + " must inherit its base projectile presentation");
+            assertEquals(expected, modify.keySet().stream().filter(expected::contains).collect(java.util.stream.Collectors.toSet()));
+            for (String parameter : expected) {
+                String root = modify.get(parameter).getAsString();
+                assertTrue(root.endsWith("_" + parameter.substring("TalentProjectile".length())), root);
+                assertTrue(Files.isRegularFile(Path.of("Server", "Item", "RootInteractions", "NPCs", "HyDragon",
+                        "Wyvern_Mini", root + ".json")), form + " root is missing: " + root);
             }
+            assertFalse(modify.has("TalentProjectileApex"));
         }
     }
 
-    @Test
-    void elementalProjectileTalentRootsAreDistinctAndResolvable() throws IOException {
-        for (String form : List.of("Nature", "Toxic", "Fire", "Void", "Lightning", "Ice")) {
-            JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
-                    "Tamed_Wyvern_Mini_" + form + ".json")).getAsJsonObject("Modify");
-            List<String> roots = List.of(
-                    string(role, "TalentProjectileBase"),
-                    string(role, "TalentProjectileIntermediate"),
-                    string(role, "TalentProjectileApex"));
-            assertTrue(new HashSet<>(roots).size() == 3,
-                    form + " must use distinct base, intermediate, and apex projectile roots");
-            for (String rootId : roots) {
-                Path rootPath = Path.of("Server", "Item", "RootInteractions", "NPCs", "HyDragon", "Wyvern_Mini",
-                        rootId + ".json");
-                assertTrue(Files.isRegularFile(rootPath), form + " root must exist: " + rootId);
-                for (JsonElement interaction : load(rootPath).getAsJsonArray("Interactions")) {
-                    Path interactionPath = Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon",
-                            "Wyvern_Mini", interaction.getAsString() + ".json");
-                    assertTrue(Files.isRegularFile(interactionPath), rootId + " interaction must exist: " + interaction);
-                }
-            }
-        }
+    private static void assertProfile(JsonArray instructions, String requiredTalent, String root, String aim,
+            String cooldown, boolean volley, String... forbiddenTalents) {
+        JsonObject branch = projectileBranches(instructions).stream()
+                .filter(candidate -> hasTalent(candidate.get("Sensor"), requiredTalent))
+                .filter(candidate -> root.equals(attackCompute(candidate)))
+                .filter(candidate -> java.util.Arrays.stream(forbiddenTalents).allMatch(talent -> hasNegatedTalent(candidate.get("Sensor"), talent)))
+                .findFirst().orElseThrow(() -> new AssertionError("missing " + requiredTalent + " profile " + root));
+        assertEquals(JsonParser.parseString(aim), aimRangeForBranch(instructions, branch));
+        assertEquals(JsonParser.parseString(cooldown), cooldownRange(branch));
+        assertEquals(volley, actionIndex(branch.getAsJsonArray("Actions"), "SetFlag", VOLLEY, true) >= 0);
     }
 
-    private static boolean hasTalentGate(JsonElement value, String talentId) {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("TameworkHasTalent".equals(string(object, "Type")) && talentId.equals(string(object, "TalentId"))) {
-                return true;
-            }
-            for (JsonElement child : object.asMap().values()) {
-                if (hasTalentGate(child, talentId)) return true;
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) if (hasTalentGate(child, talentId)) return true;
-        }
-        return false;
+    private static JsonElement aimRangeForBranch(JsonArray instructions, JsonObject branch) {
+        boolean guided = hasPositiveTalent(branch.get("Sensor"), "ProjectileGuidance")
+                || hasPositiveTalent(branch.get("Sensor"), "ProjectileMastery");
+        return instructions.asList().stream().map(JsonElement::getAsJsonObject)
+                .filter(i -> actionIndex(i.getAsJsonArray("Actions"), "TimerStart", "Miniwyvern_Projectile_Aim", false) >= 0)
+                .filter(i -> guided == (hasPositiveTalent(i.get("Sensor"), "ProjectileGuidance")
+                        || hasPositiveTalent(i.get("Sensor"), "ProjectileMastery")))
+                .findFirst().orElseThrow().getAsJsonArray("Actions").get(0).getAsJsonObject().get("StartValueRange");
     }
 
-    private static boolean containsDefendStateInstruction(JsonElement value) {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("State".equals(string(object, "Type")) && "Defend".equals(string(object, "State"))) {
-                return true;
-            }
-            for (JsonElement child : object.asMap().values()) {
-                if (containsDefendStateInstruction(child)) return true;
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) {
-                if (containsDefendStateInstruction(child)) return true;
-            }
-        }
-        return false;
+    private static JsonElement cooldownRange(JsonObject branch) {
+        JsonObject start = action(branch.getAsJsonArray("Actions"), "TimerStart", "Miniwyvern_Projectile_Cooldown");
+        assertEquals(start.get("StartValueRange"), start.get("RestartValueRange"));
+        return start.get("StartValueRange");
     }
 
-    private static boolean hasExecutableAction(JsonElement value) {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("Attack".equals(string(object, "Type")) || "ApplyEntityEffect".equals(string(object, "Type"))) return true;
-            for (JsonElement child : object.asMap().values()) if (hasExecutableAction(child)) return true;
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) if (hasExecutableAction(child)) return true;
-        }
-        return false;
+    private static List<JsonObject> projectileBranches(JsonArray instructions) {
+        return instructions.asList().stream().filter(JsonElement::isJsonObject).map(JsonElement::getAsJsonObject)
+                .filter(i -> actionIndex(i.getAsJsonArray("Actions"), "Attack", null, false) >= 0)
+                .filter(i -> attackCompute(i).startsWith("TalentProjectile")).toList();
     }
 
-    private static JsonObject instructionForTalent(JsonArray instructions, String talentId) {
-        for (JsonElement element : instructions) {
-            if (element.isJsonObject()
-                    && hasExecutableAction(element)
-                    && positiveTalentGates(element).contains(talentId)) {
-                return element.getAsJsonObject();
-            }
-        }
-        throw new AssertionError("missing executable gate for " + talentId);
+    private static String attackCompute(JsonObject instruction) {
+        for (JsonElement action : instruction.getAsJsonArray("Actions")) if ("Attack".equals(type(action)))
+            return action.getAsJsonObject().getAsJsonObject("Attack").get("Compute").getAsString();
+        return "";
     }
 
-    private static JsonArray aerialInstructions() throws IOException {
-        return load(AERIAL_COMPONENT).getAsJsonObject("Content").getAsJsonArray("Instructions");
+    private static void assertRejectsSwoop(JsonObject instruction, String message) {
+        assertTrue(hasFalseFlag(instruction.get("Sensor"), "Miniwyvern_Swoop_Pending"), message + " pending");
+        assertTrue(hasFalseFlag(instruction.get("Sensor"), "Miniwyvern_Swooping"), message + " active");
     }
 
-    private static JsonObject defendDispatch(JsonArray instructions) {
-        return instructions.asList().stream()
-                .filter(JsonElement::isJsonObject)
-                .map(JsonElement::getAsJsonObject)
-                .filter(instruction -> instruction.has("Instructions")
-                        && containsDefendStateInstruction(instruction.get("Instructions")))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("missing Miniwyvern Defend state dispatch"));
-    }
-
-    private static int topLevelIndex(JsonArray instructions, JsonObject expected) {
-        for (int index = 0; index < instructions.size(); index++) {
-            if (instructions.get(index) == expected) return index;
-        }
-        throw new AssertionError("instruction is not top-level");
-    }
-
-    private static JsonObject instructionUsingFlagAndMotion(
-            JsonArray instructions, String flagName, String bodyMotionType) {
-        for (JsonElement element : instructions) {
-            if (!element.isJsonObject()) continue;
-            JsonObject instruction = element.getAsJsonObject();
-            if (hasPositiveFlagSensor(instruction.get("Sensor"), flagName)
-                    && instruction.has("BodyMotion")
-                    && bodyMotionType.equals(string(instruction.getAsJsonObject("BodyMotion"), "Type"))) {
-                return instruction;
-            }
-        }
-        throw new AssertionError("missing top-level " + bodyMotionType + " instruction for " + flagName);
-    }
-
-    private static JsonObject instructionWithAction(JsonArray instructions, String type, String name) {
-        for (JsonElement element : instructions) {
-            if (element.isJsonObject() && findAction(element, type, name) != null) return element.getAsJsonObject();
-        }
-        throw new AssertionError("missing top-level instruction with " + type + " action for " + name);
-    }
-
-    private static boolean hasProjectileScheduler(JsonElement value) {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("TimerStart".equals(string(object, "Type"))
-                    && (AIM_TIMER.equals(string(object, "Name")) || COOLDOWN_TIMER.equals(string(object, "Name")))) return true;
-            for (JsonElement child : object.asMap().values()) if (hasProjectileScheduler(child)) return true;
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) if (hasProjectileScheduler(child)) return true;
-        }
-        return false;
-    }
-
-    private static int countTopLevelActions(JsonArray instructions, String type, String name) {
-        int count = 0;
-        for (JsonElement element : instructions) {
-            if (element.isJsonObject() && actionIndex(element.getAsJsonObject().getAsJsonArray("Actions"), type, name) >= 0) count++;
-        }
-        return count;
-    }
-
-    private static int actionIndex(JsonArray actions, String type, String name) {
-        if (actions == null) return -1;
-        for (int index = 0; index < actions.size(); index++) {
-            JsonObject action = actions.get(index).getAsJsonObject();
-            if (type.equals(string(action, "Type")) && name.equals(string(action, "Name"))) return index;
-        }
+    private static int indexWithSetFlag(JsonArray instructions, String name, boolean value) {
+        for (int i = 0; i < instructions.size(); i++) if (actionIndex(instructions.get(i).getAsJsonObject().getAsJsonArray("Actions"), "SetFlag", name, value) >= 0) return i;
         return -1;
     }
-
-    private static boolean hasCombatStateSensor(JsonElement value) {
-        if (value == null) return false;
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("State".equals(string(object, "Type")) && ".Combat".equals(string(object, "State"))) return true;
-            for (JsonElement child : object.asMap().values()) if (hasCombatStateSensor(child)) return true;
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) if (hasCombatStateSensor(child)) return true;
-        }
-        return false;
+    private static int indexWithAction(JsonArray instructions, String type, String name) {
+        for (int i = 0; i < instructions.size(); i++) if (actionIndex(instructions.get(i).getAsJsonObject().getAsJsonArray("Actions"), type, name, false) >= 0) return i;
+        return -1;
     }
-
-    private static JsonObject action(JsonElement value, String type, String name) {
-        JsonObject match = findAction(value, type, name);
-        if (match == null) throw new AssertionError("missing " + type + " action for " + name);
-        return match;
-    }
-
-    private static boolean hasAction(JsonElement value, String type, String name) {
-        return findAction(value, type, name) != null;
-    }
-
-    private static JsonObject findAction(JsonElement value, String type, String name) {
-        if (value == null) return null;
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if (type.equals(string(object, "Type")) && (name == null || name.equals(string(object, "Name")))) {
-                return object;
-            }
-            for (JsonElement child : object.asMap().values()) {
-                JsonObject match = findAction(child, type, name);
-                if (match != null) return match;
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) {
-                JsonObject match = findAction(child, type, name);
-                if (match != null) return match;
-            }
-        }
-        return null;
-    }
-
-    private static boolean hasSetFlag(JsonElement value, String name, boolean setTo) {
-        if (value == null) return false;
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("SetFlag".equals(string(object, "Type"))
-                    && name.equals(string(object, "Name"))
-                    && object.has("SetTo")
-                    && object.get("SetTo").getAsBoolean() == setTo) {
-                return true;
-            }
-            for (JsonElement child : object.asMap().values()) {
-                if (hasSetFlag(child, name, setTo)) return true;
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) {
-                if (hasSetFlag(child, name, setTo)) return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean hasStoppedTimerSensor(JsonElement value, String name) {
-        if (value == null) return false;
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("Timer".equals(string(object, "Type"))
-                    && name.equals(string(object, "Name"))
-                    && "Stopped".equals(string(object, "State"))) {
-                return true;
-            }
-            for (JsonElement child : object.asMap().values()) {
-                if (hasStoppedTimerSensor(child, name)) return true;
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) {
-                if (hasStoppedTimerSensor(child, name)) return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean hasPositiveFlagSensor(JsonElement value, String name) {
-        if (value == null) return false;
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("Flag".equals(string(object, "Type"))
-                    && name.equals(string(object, "Name"))
-                    && (!object.has("Set") || object.get("Set").getAsBoolean())) {
-                return true;
-            }
-            for (JsonElement child : object.asMap().values()) {
-                if (hasPositiveFlagSensor(child, name)) return true;
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) {
-                if (hasPositiveFlagSensor(child, name)) return true;
-            }
-        }
-        return false;
-    }
-
-    private static JsonObject projectileAttack(JsonElement value) {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("Attack".equals(string(object, "Type")) && object.has("AttackPauseRange")) return object;
-            for (JsonElement child : object.asMap().values()) {
-                try {
-                    return projectileAttack(child);
-                } catch (IllegalArgumentException ignored) {
-                    // Search the next child.
-                }
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) {
-                try {
-                    return projectileAttack(child);
-                } catch (IllegalArgumentException ignored) {
-                    // Search the next child.
-                }
-            }
-        }
-        throw new IllegalArgumentException("missing projectile Attack action");
-    }
-
-    private static Set<String> positiveTalentGates(JsonElement value) {
-        Set<String> talentIds = new HashSet<>();
-        collectTalentGates(value, false, talentIds);
-        return talentIds;
-    }
-
-    private static Set<String> excludedTalents(JsonElement value) {
-        Set<String> talentIds = new HashSet<>();
-        collectExcludedTalentGates(value, false, talentIds);
-        return talentIds;
-    }
-
-    private static void collectTalentGates(JsonElement value, boolean negated, Set<String> talentIds) {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("TameworkHasTalent".equals(string(object, "Type"))) {
-                if (!negated) talentIds.add(string(object, "TalentId"));
-                return;
-            }
-            boolean childNegated = negated ^ "Not".equals(string(object, "Type"));
-            for (JsonElement child : object.asMap().values()) collectTalentGates(child, childNegated, talentIds);
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) collectTalentGates(child, negated, talentIds);
-        }
-    }
-
-    private static void collectExcludedTalentGates(JsonElement value, boolean negated, Set<String> talentIds) {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            if ("TameworkHasTalent".equals(string(object, "Type"))) {
-                if (negated) talentIds.add(string(object, "TalentId"));
-                return;
-            }
-            boolean childNegated = negated ^ "Not".equals(string(object, "Type"));
-            for (JsonElement child : object.asMap().values()) collectExcludedTalentGates(child, childNegated, talentIds);
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) collectExcludedTalentGates(child, negated, talentIds);
-        }
-    }
-
-    private static Path rootPath(String rootId) {
-        return Path.of("Server", "Item", "RootInteractions", "NPCs", "HyDragon", "Wyvern_Mini", rootId + ".json");
-    }
-
-    private static Path interactionPath(String interactionId) {
-        return Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon", "Wyvern_Mini", interactionId + ".json");
-    }
-
-    private static Path projectilePath(String projectileId) {
-        return Path.of("Server", "Projectiles", "HyDragon", "Wyvern_Mini", projectileId + ".json");
-    }
-
-    private static String projectileIdForRoot(String rootId) throws IOException {
-        JsonArray interactions = load(rootPath(rootId)).getAsJsonArray("Interactions");
-        assertEquals(1, interactions.size(), rootId + " must select exactly one projectile interaction");
-        return string(load(interactionPath(interactions.get(0).getAsString())), "ProjectileId");
-    }
-
-    private static void assertRawOnly(JsonObject projectile, String description) {
-        String text = projectile.toString().toLowerCase(Locale.ROOT);
-        for (String forbidden : List.of("fire", "ice", "lightning", "nature", "toxic", "void")) {
-            assertFalse(text.contains(forbidden), description + " must remain raw-only: " + forbidden);
-        }
-        assertNoEffectOrStatusFields(projectile, description);
-    }
-
-    private static void assertRawOnlyInteractionChain(
-            String interactionId, String description, Set<String> visited) throws IOException {
-        if (!visited.add(interactionId)) return;
-        JsonObject interaction = load(interactionPath(interactionId));
-        assertNoEffectOrStatusFields(interaction, description);
-        assertRawOnlyInteractionProjectiles(interaction, description);
-        collectReferencedInteractions(interaction, visited, description);
-    }
-
-    private static void assertRawOnlyInteractionProjectiles(
-            JsonElement value, String description) throws IOException {
-        if (value.isJsonObject()) {
-            for (Map.Entry<String, JsonElement> entry : value.getAsJsonObject().asMap().entrySet()) {
-                JsonElement child = entry.getValue();
-                if (entry.getKey().equals("ProjectileId")
-                        && child.isJsonPrimitive() && child.getAsJsonPrimitive().isString()) {
-                    String projectileId = child.getAsString();
-                    Path projectile = projectilePath(projectileId);
-                    assertTrue(Files.isRegularFile(projectile),
-                            description + " must not launch an uninspected projectile: " + projectileId);
-                    assertRawOnly(load(projectile), description + " projectile");
-                } else {
-                    assertRawOnlyInteractionProjectiles(child, description);
-                }
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) {
-                assertRawOnlyInteractionProjectiles(child, description);
-            }
-        }
-    }
-
-    private static void collectReferencedInteractions(
-            JsonElement value, Set<String> visited, String description) throws IOException {
-        if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
-            String interactionId = value.getAsString();
-            if (!interactionId.matches("[A-Za-z0-9_-]+")) return;
-            Path interaction = interactionPath(interactionId);
-            if (Files.isRegularFile(interaction)) {
-                assertRawOnlyInteractionChain(interactionId, description + " chained interaction", visited);
-            }
-        } else if (value.isJsonObject()) {
-            for (JsonElement child : value.getAsJsonObject().asMap().values()) {
-                collectReferencedInteractions(child, visited, description);
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) {
-                collectReferencedInteractions(child, visited, description);
-            }
-        }
-    }
-
-    private static void assertNoEffectOrStatusFields(JsonElement value, String description) {
-        if (value.isJsonObject()) {
-            JsonObject object = value.getAsJsonObject();
-            assertFalse("ApplyEffect".equals(string(object, "Type"))
-                            || "ApplyEntityEffect".equals(string(object, "Type")),
-                    description + " must not apply an effect/status action");
-            for (Map.Entry<String, JsonElement> entry : object.asMap().entrySet()) {
-                String key = entry.getKey().toLowerCase(Locale.ROOT);
-                assertFalse(key.equals("effectid") || key.equals("entityeffectid")
-                                || key.contains("status"),
-                        description + " must not include elemental effect/status fields: " + entry.getKey());
-                assertNoEffectOrStatusFields(entry.getValue(), description);
-            }
-        } else if (value.isJsonArray()) {
-            for (JsonElement child : value.getAsJsonArray()) assertNoEffectOrStatusFields(child, description);
-        }
-    }
-
-    private static String string(JsonObject object, String name) {
-        return object.has(name) ? object.get(name).getAsString() : "";
-    }
-
-    private static JsonObject load(Path path) throws IOException {
-        return JsonParser.parseString(Files.readString(path)).getAsJsonObject();
-    }
+    private static JsonArray instructions() throws IOException { return load(COMPONENT).getAsJsonObject("Content").getAsJsonArray("Instructions"); }
+    private static JsonObject load(Path path) throws IOException { return JsonParser.parseString(Files.readString(path)).getAsJsonObject(); }
+    private static boolean containsTimerStart(JsonElement value, String name) { return contains(value, o -> "TimerStart".equals(string(o, "Type")) && name.equals(string(o, "Name"))); }
+    private static JsonObject action(JsonArray actions, String type, String name) { return actions.asList().stream().map(JsonElement::getAsJsonObject).filter(a -> type.equals(string(a, "Type")) && (name == null || name.equals(string(a, "Name")))).findFirst().orElseThrow(); }
+    private static int actionIndex(JsonArray actions, String type, String name, boolean set) { if (actions == null) return -1; for (int i=0;i<actions.size();i++) { JsonObject a=actions.get(i).getAsJsonObject(); if(type.equals(string(a,"Type")) && (name==null || name.equals(string(a,"Name"))) && (!"SetFlag".equals(type) || a.get("SetTo").getAsBoolean()==set)) return i; } return -1; }
+    private static boolean hasTalent(JsonElement value, String talent) { return contains(value, o -> "TameworkHasTalent".equals(string(o,"Type")) && talent.equals(string(o,"TalentId"))); }
+    private static boolean hasPositiveTalent(JsonElement value, String talent) { return containsPositiveTalent(value, talent, false); }
+    private static boolean containsPositiveTalent(JsonElement value, String talent, boolean negated) { if(value==null)return false; if(value.isJsonObject()){JsonObject o=value.getAsJsonObject(); if("TameworkHasTalent".equals(string(o,"Type"))) return !negated && talent.equals(string(o,"TalentId")); boolean childNegated=negated ^ "Not".equals(string(o,"Type")); for(JsonElement c:o.asMap().values())if(containsPositiveTalent(c,talent,childNegated))return true;}else if(value.isJsonArray())for(JsonElement c:value.getAsJsonArray())if(containsPositiveTalent(c,talent,negated))return true;return false; }
+    private static boolean hasNegatedTalent(JsonElement value, String talent) { return contains(value, o -> "Not".equals(string(o,"Type")) && hasTalent(o.get("Sensor"),talent)); }
+    private static boolean hasFalseFlag(JsonElement value, String flag) { return contains(value, o -> "Flag".equals(string(o,"Type")) && flag.equals(string(o,"Name")) && o.has("Set") && !o.get("Set").getAsBoolean()); }
+    private static boolean contains(JsonElement value, java.util.function.Predicate<JsonObject> predicate) { if(value==null)return false; if(value.isJsonObject()){JsonObject o=value.getAsJsonObject();if(predicate.test(o))return true;for(JsonElement c:o.asMap().values())if(contains(c,predicate))return true;}else if(value.isJsonArray())for(JsonElement c:value.getAsJsonArray())if(contains(c,predicate))return true;return false; }
+    private static List<String> talentIds(JsonElement value) { java.util.ArrayList<String> ids=new java.util.ArrayList<>(); collectTalents(value,ids); return ids; }
+    private static void collectTalents(JsonElement value, List<String> ids) { if(value==null)return; if(value.isJsonObject()){JsonObject o=value.getAsJsonObject();if("TameworkHasTalent".equals(string(o,"Type")))ids.add(string(o,"TalentId"));for(JsonElement c:o.asMap().values())collectTalents(c,ids);}else if(value.isJsonArray())for(JsonElement c:value.getAsJsonArray())collectTalents(c,ids); }
+    private static String type(JsonElement value) { return value != null && value.isJsonObject() ? string(value.getAsJsonObject(), "Type") : ""; }
+    private static String string(JsonObject object, String name) { return object != null && object.has(name) ? object.get(name).getAsString() : ""; }
 }
