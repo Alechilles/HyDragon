@@ -43,6 +43,20 @@ final class MiniwyvernProjectileStatusAssetTest {
         assertFalse(bondVoid.has("DamageResistance"));
     }
 
+    @Test
+    void authoredProjectileStatusModelVfxIdsResolveLocally() throws IOException {
+        for (String effectId : java.util.List.of(
+                "HyDragon_Miniwyvern_Toxic_Projectile_Weakness",
+                "HyDragon_Miniwyvern_Void_Projectile_Exposure",
+                "HyDragon_Miniwyvern_Void_Exposure")) {
+            String modelVfxId = load(effectId).getAsJsonObject("ApplicationEffects")
+                    .get("ModelVFXId").getAsString();
+            Path modelVfx = ROOT.resolve("Server/Entity/ModelVFX/" + modelVfxId + ".json");
+            assertTrue(Files.isRegularFile(modelVfx),
+                    effectId + " ModelVFXId must resolve to a bundled ModelVFX asset: " + modelVfxId);
+        }
+    }
+
     private static void assertMarker(JsonObject effect, double duration) {
         assertDuration(effect, duration);
         assertEquals("Overwrite", effect.get("OverlapBehavior").getAsString());
