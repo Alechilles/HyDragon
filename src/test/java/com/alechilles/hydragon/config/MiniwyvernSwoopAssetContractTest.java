@@ -161,13 +161,23 @@ final class MiniwyvernSwoopAssetContractTest {
                 + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json")
                 .getAsJsonObject("Content").getAsJsonArray("Instructions");
         java.util.List<JsonObject> entries = new java.util.ArrayList<>();
-        for (JsonElement instruction : instructions) {
-            JsonObject candidate = instruction.getAsJsonObject();
+        int lastEntryIndex = -1;
+        JsonObject readiness = null;
+        int readinessIndex = -1;
+        for (int index = 0; index < instructions.size(); index++) {
+            JsonObject candidate = instructions.get(index).getAsJsonObject();
             if (hasStateSensor(candidate.get("Sensor"), ".Combat")
                     && hasStoppedTimerSensor(candidate.get("Sensor"), "Miniwyvern_Swoop_Cooldown")
                     && actionIndex(candidate.getAsJsonArray("Actions"), "TimerStart", "Miniwyvern_Swoop_Cooldown") >= 0
                     && actionIndex(candidate.getAsJsonArray("Actions"), "TimerRestart", "Miniwyvern_Swoop_Cooldown") >= 0) {
                 entries.add(candidate);
+                lastEntryIndex = index;
+            }
+            if (hasStateSensor(candidate.get("Sensor"), ".Combat")
+                    && hasStoppedTimerSensor(candidate.get("Sensor"), "Miniwyvern_Swoop_Cooldown")
+                    && hasSetFlag(candidate.get("Actions"), "Miniwyvern_Swoop_Pending", true)) {
+                readiness = candidate;
+                readinessIndex = index;
             }
         }
         assertEquals(4, entries.size(), "exactly four mutually exclusive cooldown-entry profiles are required");
@@ -175,6 +185,10 @@ final class MiniwyvernSwoopAssetContractTest {
         assertCooldownEntry(entries, 20, 26, "RelentlessSwoop", "SwoopMastery");
         assertCooldownEntry(entries, 22, 30, "SwoopCadence", "SwoopMastery", "RelentlessSwoop");
         assertCooldownEntry(entries, 25, 35, null, "SwoopMastery", "RelentlessSwoop", "SwoopCadence");
+        assertTrue(readiness != null && readinessIndex > lastEntryIndex,
+                "cooldown readiness must remain after every combat-entry initializer");
+        assertTrue(hasDirectFlagTerm(readiness.get("Sensor"), "Miniwyvern_Aerial_Combat_Active", true),
+                "ordinary in-combat cooldown expiry must be consumed by readiness");
     }
 
     @Test
@@ -205,13 +219,36 @@ final class MiniwyvernSwoopAssetContractTest {
         for (String excluded : excludedTalents) {
             assertTrue(hasNegatedTalent(entry.get("Sensor"), excluded), "profile must exclude " + excluded);
         }
+        assertTrue(hasDirectFlagTerm(entry.get("Sensor"), "Miniwyvern_Aerial_Combat_Active", false),
+                "combat entry must require an inactive lifecycle");
         JsonArray actions = entry.getAsJsonArray("Actions");
+        int activate = actionIndex(actions, "SetFlag", "Miniwyvern_Aerial_Combat_Active");
         int start = actionIndex(actions, "TimerStart", "Miniwyvern_Swoop_Cooldown");
         int restart = actionIndex(actions, "TimerRestart", "Miniwyvern_Swoop_Cooldown");
-        assertTrue(start >= 0 && restart > start, "TimerStart must precede TimerRestart");
+        assertTrue(activate >= 0 && actions.get(activate).getAsJsonObject().get("SetTo").getAsBoolean(),
+                "combat entry must activate its lifecycle");
+        assertTrue(activate < start && restart > start,
+                "combat entry must activate before TimerStart then TimerRestart");
         JsonArray range = actions.get(start).getAsJsonObject().getAsJsonArray("StartValueRange");
         assertEquals(minimum, range.get(0).getAsInt());
         assertEquals(maximum, range.get(1).getAsInt());
+        JsonArray restartRange = actions.get(start).getAsJsonObject().getAsJsonArray("RestartValueRange");
+        assertEquals(minimum, restartRange.get(0).getAsInt());
+        assertEquals(maximum, restartRange.get(1).getAsInt());
+    }
+    private static boolean hasDirectFlagTerm(JsonElement value, String name, boolean set) {
+        if (value == null || !value.isJsonObject()) return false;
+        JsonObject sensor = value.getAsJsonObject();
+        if ("Flag".equals(type(sensor))) {
+            return name.equals(string(sensor, "Name"))
+                    && sensor.has("Set")
+                    && sensor.get("Set").getAsBoolean() == set;
+        }
+        if (!"And".equals(type(sensor)) || !sensor.has("Sensors")) return false;
+        for (JsonElement term : sensor.getAsJsonArray("Sensors")) {
+            if (term.isJsonObject() && hasDirectFlagTerm(term, name, set)) return true;
+        }
+        return false;
     }
     private static boolean hasNegatedState(JsonElement value, String state) {
         if (value == null) return false;

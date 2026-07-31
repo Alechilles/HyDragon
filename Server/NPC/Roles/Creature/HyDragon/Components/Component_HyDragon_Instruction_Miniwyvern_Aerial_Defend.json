@@ -267,7 +267,7 @@
         ]
       },
       {
-        "$Comment": "Combat entry initializes exactly one selected cooldown when neither active nor expired.",
+        "$Comment": "Combat entry initializes exactly one selected cooldown while the aerial combat lifecycle is inactive.",
         "Continue": true,
         "Sensor": {
           "Type": "And",
@@ -275,6 +275,11 @@
             {
               "Type": "State",
               "State": ".Combat"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Aerial_Combat_Active",
+              "Set": false
             },
             {
               "Type": "Timer",
@@ -311,6 +316,11 @@
             {
               "Type": "State",
               "State": ".Combat"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Aerial_Combat_Active",
+              "Set": false
             },
             {
               "Type": "Timer",
@@ -352,6 +362,11 @@
               "State": ".Combat"
             },
             {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Aerial_Combat_Active",
+              "Set": false
+            },
+            {
               "Type": "Timer",
               "Name": "Miniwyvern_Swoop_Cooldown",
               "State": "Stopped"
@@ -390,6 +405,11 @@
               "State": ".Combat"
             },
             {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Aerial_Combat_Active",
+              "Set": false
+            },
+            {
               "Type": "Timer",
               "Name": "Miniwyvern_Swoop_Cooldown",
               "State": "Stopped"
@@ -426,6 +446,11 @@
             {
               "Type": "State",
               "State": ".Combat"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Aerial_Combat_Active",
+              "Set": true
             },
             {
               "Type": "Timer",
