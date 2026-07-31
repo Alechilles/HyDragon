@@ -45,7 +45,7 @@
           "Interactions": [
             {
               "Type": "Simple",
-              "RunTime": 0.15
+              "RunTime": 0.5
             },
             {
               "Type": "Selector",
