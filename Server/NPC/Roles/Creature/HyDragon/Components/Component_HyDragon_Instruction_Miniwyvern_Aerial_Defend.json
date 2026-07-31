@@ -760,7 +760,7 @@
                   "Type": "Not",
                   "Sensor": {
                     "Type": "State",
-                    "State": "Defend"
+                    "State": ".Combat"
                   }
                 },
                 {
@@ -821,7 +821,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -917,7 +917,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1007,7 +1007,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1046,7 +1046,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1115,7 +1115,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1195,7 +1195,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1257,7 +1257,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1352,7 +1352,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1450,7 +1450,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1548,7 +1548,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1653,7 +1653,7 @@
           "Sensors": [
             {
               "Type": "State",
-              "State": "Defend"
+              "State": ".Combat"
             },
             {
               "Type": "Target",
@@ -1761,7 +1761,7 @@
       {
         "$Comment": "Mastery echo is the sole continuation allowed while a swoop is pending.",
         "Sensor": { "Type": "And", "Sensors": [
-          { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" },
+          { "Type": "State", "State": ".Combat" }, { "Type": "Target", "TargetSlot": "LockedTarget" },
           { "Type": "Flag", "Name": "AirborneMode" }, { "Type": "MotionController", "MotionController": "Fly" },
           { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }, { "Type": "Flag", "Name": "Miniwyvern_Swooping", "Set": false },
           { "Type": "TameworkHasTalent", "TalentId": "ProjectileMastery" }
@@ -1780,7 +1780,7 @@
       {
         "$Comment": "Pattern guided echo continues a protected two-phase volley.",
         "Sensor": { "Type": "And", "Sensors": [
-          { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "AirborneMode" }, { "Type": "MotionController", "MotionController": "Fly" },
+          { "Type": "State", "State": ".Combat" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "AirborneMode" }, { "Type": "MotionController", "MotionController": "Fly" },
           { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }, { "Type": "Flag", "Name": "Miniwyvern_Swooping", "Set": false },
           { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileMastery" } }
         ] }, "ActionsBlocking": true,
@@ -1793,7 +1793,7 @@
       {
         "$Comment": "Pattern standard echo continues a protected two-phase volley.",
         "Sensor": { "Type": "And", "Sensors": [
-          { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "AirborneMode" }, { "Type": "MotionController", "MotionController": "Fly" },
+          { "Type": "State", "State": ".Combat" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "AirborneMode" }, { "Type": "MotionController", "MotionController": "Fly" },
           { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }, { "Type": "Flag", "Name": "Miniwyvern_Swooping", "Set": false },
           { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileMastery" } }
         ] }, "ActionsBlocking": true,
@@ -2345,8 +2345,17 @@
       },
       {
         "Sensor": {
-          "Type": "State",
-          "State": ".Combat"
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            }
+          ]
         },
         "HeadMotion": {
           "Type": "Watch"

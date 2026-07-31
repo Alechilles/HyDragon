@@ -34,6 +34,18 @@ class BundledConfigAssetContractTest {
             "Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
 
     @Test
+    void companionPoliciesUseCurrentTopLevelSelectionFields() throws IOException {
+        for (String asset : List.of("HyDragonMiniwyvern.json", "HyDragonFullDragons.json")) {
+            Path path = Path.of("Server", "Tamework", "Companion", asset);
+            com.google.gson.JsonObject config = com.google.gson.JsonParser.parseString(Files.readString(path))
+                    .getAsJsonObject();
+            assertFalse(config.has("General"), path + " must not use the removed General wrapper");
+            assertTrue(config.get("Enabled").getAsBoolean(), path + " must remain enabled");
+            assertEquals(100, config.get("Priority").getAsInt(), path + " must retain its role-selection priority");
+        }
+    }
+
+    @Test
     void miniwyvernRoleSwapAssetsCoverEveryNonSelfDestinationAtExactCost() throws IOException {
         Map<String, String> essenceByForm = Map.of(
                 "Wild", "Draconic_Essence", "Nature", "Draconic_Essence_Nature",

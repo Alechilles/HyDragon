@@ -1369,8 +1369,8 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
             damage_step = parsed.get(hit_child_dir / f"{hit_child_id}.json")
             calculator = damage_step.get("DamageCalculator") if isinstance(damage_step, dict) else None
             actual_damage = calculator.get("BaseDamage", {}).get("Physical") if isinstance(calculator, dict) else None
-            if not isinstance(damage_step, dict) or set(damage_step) != {"Type", "Entity", "DamageCalculator", "Next", "Failed", "Blocked"} \
-                    or damage_step.get("Type") != "DamageEntity" or damage_step.get("Entity") != "Target" \
+            if not isinstance(damage_step, dict) or set(damage_step) != {"Type", "DamageCalculator", "Next", "Failed", "Blocked"} \
+                    or damage_step.get("Type") != "DamageEntity" \
                     or not isinstance(calculator, dict) or calculator != {"Type": "Absolute", "BaseDamage": {"Physical": damage}, "RandomPercentageModifier": 0} \
                     or actual_damage != damage:
                 fail(errors, f"Miniwyvern {form} {tier} has invalid hit damage")
