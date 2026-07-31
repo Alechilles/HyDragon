@@ -48,7 +48,7 @@ class DragonRosterAssetContractTest {
 
     @Test
     void companionAssetsRetainMovementWithoutOwningBondedLifecycle() throws Exception {
-        for (String file : List.of("HyDragonFullDragons.json", "HyDragonMiniwyvern.json")) {
+        for (String file : List.of("HyDragonFullDragons.json", "HyDragonMiniwyvern.json", "HyDragonNordicDrake.json")) {
             String config = read("Server/Tamework/Companion/" + file);
             assertTrue(config.contains("\"Enabled\": true"), file);
             assertTrue(config.contains("\"ReturnHomeTeleportDistance\""), file);
@@ -64,6 +64,17 @@ class DragonRosterAssetContractTest {
             assertFalse(config.contains("GameplayCooldownMs"), file);
             assertFalse(config.contains("InsufficientCostMessage"), file);
         }
+    }
+
+    @Test
+    void fullDragonRosterKeepsAllFiveRolesWhileCompanionConfigSeparatesNordicFlightCapability()
+            throws Exception {
+        String roster = read("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json");
+        for (String role : List.of("Tamed_NordicDrake", "Tamed_Hydra", "Tamed_RockDrakeT1",
+                "Tamed_RockDrakeT2", "Tamed_RockDrakeT3")) {
+            assertTrue(roster.contains("\"" + role + "\""), role);
+        }
+        assertTrue(Files.exists(ROOT.resolve("Server/Tamework/Companion/HyDragonNordicDrake.json")));
     }
 
     @Test

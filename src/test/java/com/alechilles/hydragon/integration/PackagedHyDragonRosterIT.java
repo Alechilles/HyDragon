@@ -125,13 +125,24 @@ final class PackagedHyDragonRosterIT {
             assertFalse(entries.contains(
                     "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json"));
 
-            for (String companion : List.of("HyDragonFullDragons", "HyDragonMiniwyvern")) {
+            for (String companion : List.of("HyDragonFullDragons", "HyDragonMiniwyvern", "HyDragonNordicDrake")) {
                 String config = text(hy, "Server/Tamework/Companion/" + companion + ".json");
                 assertContains(config, "\"ReturnHomeTeleportDistance\"");
                 assertFalse(config.contains("\"Travel\""));
                 assertFalse(config.contains("\"Summon\""));
                 assertFalse(config.contains("\"Revive\""));
             }
+
+            assertContains(text(hy, "Server/Tamework/Companion/HyDragonMiniwyvern.json"),
+                    "\"FlightToggle\": {", "\"Enabled\": true",
+                    "\"HookId\": \"HyDragon.Command.ToggleAirborneMode\"");
+            assertContains(text(hy, "Server/Tamework/Companion/HyDragonNordicDrake.json"),
+                    "\"FlightToggle\": {", "\"Enabled\": true",
+                    "\"HookId\": \"HyDragon.Command.ToggleAirborneMode\"");
+            String groundOnly = text(hy, "Server/Tamework/Companion/HyDragonFullDragons.json");
+            assertFalse(groundOnly.contains("FlightToggle"));
+            assertFalse(groundOnly.contains("AirborneMode"));
+            assertFalse(groundOnly.contains("HyDragon.Command.ToggleAirborneMode"));
 
             assertNotNull(hy.getEntry("Server/Item/Items/Ingredient/Wyvern_Egg.json"));
             assertNotNull(tw.getEntry(

@@ -76,6 +76,37 @@ final class DragonHornLocomotionAssetContractTest {
     }
 
     @Test
+    void companionFlightToggleCapabilityIsOptInForMiniwyvernsAndNordicDrakesOnly() throws IOException {
+        JsonObject miniwyvern = readJson("Server/Tamework/Companion/HyDragonMiniwyvern.json");
+        JsonObject nordic = readJson("Server/Tamework/Companion/HyDragonNordicDrake.json");
+        JsonObject groundOnly = readJson("Server/Tamework/Companion/HyDragonFullDragons.json");
+
+        assertEquals(List.of(
+                "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+                "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+                "Tamed_Wyvern_Mini_Ice"), roleIds(miniwyvern));
+        assertFlightToggle(miniwyvern);
+
+        assertEquals(List.of("Tamed_NordicDrake"), roleIds(nordic));
+        assertEquals(128.0, number(nordic, "Command.ReturnHomeTeleportDistance"));
+        assertEquals(32.0, number(nordic, "Command.ReturnHomePathDistanceBeforeTeleport"));
+        assertEquals(24.0, number(nordic, "Command.RecallSafeSpawnDistance"));
+        assertEquals(96.0, number(nordic, "Command.RecallForceRelocateDistance"));
+        assertEquals(-4.0, number(nordic, "Command.PlacementMinRelativeY"));
+        assertEquals(8.0, number(nordic, "Command.PlacementMaxRelativeY"));
+        assertFlightToggle(nordic);
+
+        assertEquals(List.of(
+                "Tamed_Hydra", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"),
+                roleIds(groundOnly));
+        String serializedGroundOnly = groundOnly.toString();
+        assertFalse(groundOnly.getAsJsonObject("Command").has("FlightToggle"));
+        assertFalse(serializedGroundOnly.contains("FlightToggle"));
+        assertFalse(serializedGroundOnly.contains("AirborneMode"));
+        assertFalse(serializedGroundOnly.contains("HyDragon.Command.ToggleAirborneMode"));
+    }
+
+    @Test
     void tamedDragonTemplatesUseTheSharedNativeAirborneModeTransition() throws IOException {
         JsonObject miniwyvern = readJson("Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json");
         JsonObject fullDragon = readJson("Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon_Tamed.json");
@@ -1012,6 +1043,25 @@ final class DragonHornLocomotionAssetContractTest {
                 .filter(command -> id.equals(command.get("Id").getAsString()))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("missing command " + id));
+    }
+
+    private static List<String> roleIds(JsonObject config) {
+        return config.getAsJsonArray("RoleIds").asList().stream()
+                .map(JsonElement::getAsString)
+                .toList();
+    }
+
+    private static double number(JsonObject object, String dottedPath) {
+        JsonElement current = object;
+        for (String segment : dottedPath.split("\\.")) current = current.getAsJsonObject().get(segment);
+        return current.getAsDouble();
+    }
+
+    private static void assertFlightToggle(JsonObject config) {
+        JsonObject toggle = config.getAsJsonObject("Command").getAsJsonObject("FlightToggle");
+        assertEquals(Set.of("Enabled", "HookId"), toggle.keySet());
+        assertTrue(toggle.get("Enabled").getAsBoolean());
+        assertEquals("HyDragon.Command.ToggleAirborneMode", toggle.get("HookId").getAsString());
     }
 
     private static JsonObject readJson(String relativePath) throws IOException {
