@@ -5,7 +5,7 @@
     "Description": "server.items.Revitalizing_Essence.description"
   },
   "Icon": "Icons/ItemsGenerated/Revitalizing_Essence.png",
-  "Texture": "Items/HyDragon/Revitalizing_Essence.png",
+  "Texture": "Items/HyDragon/Revitalizing_Essence/RevitalizeEssence.png",
   "Quality": "Rare",
   "Interactions": {
     "Secondary": {
@@ -29,7 +29,8 @@
     "TimeSeconds": 6
   },
   "Light": {
-    "Color": "#DC2626",
+    "Color": "#086a01",
     "Radius": 1
-  }
+  },
+  "Model": "Items/HyDragon/Revitalizing_Essence/RevitalizeEssence.blockymodel"
 }

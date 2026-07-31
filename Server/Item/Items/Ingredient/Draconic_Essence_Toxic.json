@@ -7,5 +7,6 @@
   "Light": {
     "Color": "#421",
     "Radius": 1
-  }
+  },
+  "Texture": "Items/HyDragon/Draconic_Essence_Toxic.png"
 }

@@ -94,7 +94,7 @@
         },
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Glide.blockyanim",
-          "Speed": 0.2,
+          "Speed": 1,
           "Looping": true,
           "Weight": 0.2
         }
