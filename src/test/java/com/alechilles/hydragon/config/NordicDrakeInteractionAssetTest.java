@@ -49,17 +49,20 @@ final class NordicDrakeInteractionAssetTest {
             throws IOException {
         JsonObject fireball = readInteraction("NordicDrake_Avatar_Fire_Ball");
         JsonArray steps = fireball.getAsJsonArray("Interactions");
-        JsonObject launch = steps.get(2).getAsJsonObject();
+        JsonObject launch = steps.get(0).getAsJsonObject();
         assertEquals("TameworkLaunchProjectile", launch.get("Type").getAsString());
         assertEquals(48.0, launch.get("LookTargetDistance").getAsDouble());
         assertFalse(launch.has("TargetSlot"));
         JsonObject launchOffset = launch.getAsJsonObject("LaunchPositionOffset");
         assertEquals(-1.0, launchOffset.get("Y").getAsDouble());
         assertEquals(-3.0, launchOffset.get("Z").getAsDouble());
+        assertFalse(fireball.toString().contains("PrepareShoot"));
+        assertFalse(fireball.toString().contains("ChargeShoot"));
 
         JsonObject flameBreath = readInteraction("NordicDrake_Avatar_Flying_Flame_Breath");
-        JsonObject effects = flameBreath.getAsJsonArray("Interactions")
-                .get(1).getAsJsonObject().getAsJsonArray("Interactions")
+        JsonArray flameBreathSteps = flameBreath.getAsJsonArray("Interactions");
+        assertEquals("Parallel", flameBreathSteps.get(0).getAsJsonObject().get("Type").getAsString());
+        JsonObject effects = flameBreathSteps.get(0).getAsJsonObject().getAsJsonArray("Interactions")
                 .get(0).getAsJsonObject().getAsJsonArray("Interactions")
                 .get(1).getAsJsonObject().getAsJsonObject("Effects");
         assertEquals(3.8, effects.getAsJsonArray("Particles").get(0).getAsJsonObject()
