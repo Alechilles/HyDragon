@@ -64,6 +64,7 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>manifest.json</include>
+                    <include>icon-256.png</include>
                 </includes>
             </resource>
             <resource>
