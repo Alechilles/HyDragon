@@ -1,11 +1,10 @@
 {
-  "Name": "server.effects.miniwyvernVoidExposure.name",
   "ApplicationEffects": {
-    "ModelVFXId": "HyDragon_Void_Debuff"
+    "ModelVFXId": "HyDragon_Toxic_Debuff"
   },
   "OverlapBehavior": "Overwrite",
   "RemovalBehavior": "Duration",
   "Infinite": false,
   "Debuff": true,
-  "Duration": 6.0
+  "Duration": 5.0
 }

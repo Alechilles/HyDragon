@@ -1,0 +1,16 @@
+{
+  "ApplicationEffects": {
+    "MovementEffects": {
+      "DisableForward": true,
+      "DisableBackward": true,
+      "DisableLeft": true,
+      "DisableRight": true
+    },
+    "Particles": [{ "SystemId": "NatureBeam" }]
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 0.6
+}

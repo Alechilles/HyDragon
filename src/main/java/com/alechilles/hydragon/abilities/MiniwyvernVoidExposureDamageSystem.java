@@ -13,18 +13,13 @@ import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** Reduces Toxic-weakened entities' outgoing damage during Hytale's pre-application filter phase. */
-public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem {
-    private static final String PROJECTILE_EFFECT_ID = "HyDragon_Miniwyvern_Toxic_Projectile_Weakness";
-    private final MiniwyvernOwnerAuraRegistry registry;
-
-    public MiniwyvernToxicWeaknessDamageSystem(MiniwyvernOwnerAuraRegistry registry) {
-        this.registry = Objects.requireNonNull(registry, "registry");
-    }
+/** Increases damage received by entities exposed to a Miniwyvern Void projectile or Bond aura. */
+public final class MiniwyvernVoidExposureDamageSystem extends DamageEventSystem {
+    private static final String BOND_EFFECT_ID = "HyDragon_Miniwyvern_Void_Exposure";
+    private static final String PROJECTILE_EFFECT_ID = "HyDragon_Miniwyvern_Void_Projectile_Exposure";
 
     @Nullable @Override public SystemGroup<EntityStore> getGroup() {
         return DamageModule.get().getFilterDamageGroup();
@@ -44,16 +39,12 @@ public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem
         boolean healing = damage.getCause() != null && "healing".equalsIgnoreCase(damage.getCause().getId());
         if (!shouldModify(damage.isCancelled(), damage.getAmount(), MiniwyvernOwnerAuraDamageSystem.isLiveRef(sourceRef),
                 sourceRef != null && sourceRef.equals(targetRef), blocked, healing)) return;
-        UUIDComponent identity = store.getComponent(sourceRef, UUIDComponent.getComponentType());
-        if (identity == null) return;
-        MiniwyvernOwnerAuraRegistry.ToxicWeakness weakness = registry.activeToxicWeakness(
-                identity.getUuid(), System.currentTimeMillis()).orElse(null);
-        EffectControllerComponent controller = store.getComponent(sourceRef, EffectControllerComponent.getComponentType());
+        EffectControllerComponent controller = chunk.getComponent(index, EffectControllerComponent.getComponentType());
         if (controller == null) return;
-        boolean bondActive = weakness != null && hasEffect(controller, weakness.effectId());
+        boolean bondActive = hasEffect(controller, BOND_EFFECT_ID);
         boolean projectileActive = hasEffect(controller, PROJECTILE_EFFECT_ID);
         if (!bondActive && !projectileActive) return;
-        damage.setAmount(reducedAmount(damage.getAmount(), bondActive, projectileActive));
+        damage.setAmount(increasedAmount(damage.getAmount(), bondActive, projectileActive));
     }
 
     static boolean shouldModify(boolean cancelled, float amount, boolean entityCaused, boolean self,
@@ -61,9 +52,9 @@ public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem
         return !cancelled && Float.isFinite(amount) && amount > 0.0F && entityCaused && !self && !blocked && !healing;
     }
 
-    static float reducedAmount(float amount, boolean bondActive, boolean projectileActive) {
+    static float increasedAmount(float amount, boolean bondActive, boolean projectileActive) {
         double fraction = bondActive ? 0.12D : projectileActive ? 0.10D : 0.0D;
-        return (float) (amount * (1.0D - fraction));
+        return (float) (amount * (1.0D + fraction));
     }
 
     private static boolean hasEffect(EffectControllerComponent controller, String effectId) {

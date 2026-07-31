@@ -1,0 +1,13 @@
+{
+  "ApplicationEffects": {
+    "AbilityEffects": {
+      "Disabled": ["Primary", "Secondary", "Ability1", "Ability2", "Ability3"]
+    },
+    "Particles": [{ "SystemId": "Lightning" }]
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 0.5
+}
