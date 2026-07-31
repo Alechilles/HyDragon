@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.alecstamework.api.TameworkApi;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -125,24 +128,27 @@ final class PackagedHyDragonRosterIT {
             assertFalse(entries.contains(
                     "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json"));
 
-            for (String companion : List.of("HyDragonFullDragons", "HyDragonMiniwyvern", "HyDragonNordicDrake")) {
-                String config = text(hy, "Server/Tamework/Companion/" + companion + ".json");
-                assertContains(config, "\"ReturnHomeTeleportDistance\"");
-                assertFalse(config.contains("\"Travel\""));
-                assertFalse(config.contains("\"Summon\""));
-                assertFalse(config.contains("\"Revive\""));
-            }
-
-            assertContains(text(hy, "Server/Tamework/Companion/HyDragonMiniwyvern.json"),
-                    "\"FlightToggle\": {", "\"Enabled\": true",
-                    "\"HookId\": \"HyDragon.Command.ToggleAirborneMode\"");
-            assertContains(text(hy, "Server/Tamework/Companion/HyDragonNordicDrake.json"),
-                    "\"FlightToggle\": {", "\"Enabled\": true",
-                    "\"HookId\": \"HyDragon.Command.ToggleAirborneMode\"");
-            String groundOnly = text(hy, "Server/Tamework/Companion/HyDragonFullDragons.json");
-            assertFalse(groundOnly.contains("FlightToggle"));
-            assertFalse(groundOnly.contains("AirborneMode"));
-            assertFalse(groundOnly.contains("HyDragon.Command.ToggleAirborneMode"));
+            JsonObject miniwyvern = json(hy, "Server/Tamework/Companion/HyDragonMiniwyvern.json");
+            JsonObject nordic = json(hy, "Server/Tamework/Companion/HyDragonNordicDrake.json");
+            JsonObject groundOnly = json(hy, "Server/Tamework/Companion/HyDragonFullDragons.json");
+            assertCompanionLifecycle(miniwyvern);
+            assertCompanionLifecycle(nordic);
+            assertCompanionLifecycle(groundOnly);
+            assertEquals(List.of(
+                    "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
+                    "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+                    "Tamed_Wyvern_Mini_Ice"), roleIds(miniwyvern));
+            assertFlightToggle(miniwyvern);
+            assertEquals(List.of("Tamed_NordicDrake"), roleIds(nordic));
+            assertFlightToggle(nordic);
+            assertEquals(List.of(
+                    "Tamed_Hydra", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"),
+                    roleIds(groundOnly));
+            String groundOnlyJson = groundOnly.toString();
+            assertFalse(groundOnly.getAsJsonObject("Command").has("FlightToggle"));
+            assertFalse(groundOnlyJson.contains("FlightToggle"));
+            assertFalse(groundOnlyJson.contains("AirborneMode"));
+            assertFalse(groundOnlyJson.contains("HyDragon.Command.ToggleAirborneMode"));
 
             assertNotNull(hy.getEntry("Server/Item/Items/Ingredient/Wyvern_Egg.json"));
             assertNotNull(tw.getEntry(
@@ -168,6 +174,31 @@ final class PackagedHyDragonRosterIT {
         try (var input = zip.getInputStream(entry)) {
             return new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
+    }
+
+    private static JsonObject json(ZipFile zip, String entryName) throws IOException {
+        return JsonParser.parseString(text(zip, entryName)).getAsJsonObject();
+    }
+
+    private static List<String> roleIds(JsonObject config) {
+        return config.getAsJsonArray("RoleIds").asList().stream()
+                .map(JsonElement::getAsString)
+                .toList();
+    }
+
+    private static void assertFlightToggle(JsonObject config) {
+        JsonObject toggle = config.getAsJsonObject("Command").getAsJsonObject("FlightToggle");
+        assertEquals(Set.of("Enabled", "HookId"), toggle.keySet());
+        assertTrue(toggle.get("Enabled").getAsBoolean());
+        assertEquals("HyDragon.Command.ToggleAirborneMode", toggle.get("HookId").getAsString());
+    }
+
+    private static void assertCompanionLifecycle(JsonObject config) {
+        JsonObject command = config.getAsJsonObject("Command");
+        assertTrue(command.has("ReturnHomeTeleportDistance"));
+        assertFalse(command.has("Travel"));
+        assertFalse(command.has("Summon"));
+        assertFalse(command.has("Revive"));
     }
 
     private static void assertContains(String text, String... fragments) {
