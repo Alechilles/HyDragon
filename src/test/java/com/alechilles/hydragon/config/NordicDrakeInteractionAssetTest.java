@@ -101,6 +101,17 @@ final class NordicDrakeInteractionAssetTest {
                 "Avatar_Flame_Breath_Roar.ogg");
     }
 
+    @Test
+    void avatarFlameBreathDelaysDamageUntilTheParticleStarts() throws IOException {
+        JsonObject flameBreath = readInteraction("NordicDrake_Avatar_Flying_Flame_Breath");
+        JsonArray damageSteps = flameBreath.getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                .getAsJsonArray("Interactions").get(1).getAsJsonObject().getAsJsonArray("Interactions");
+        JsonObject delay = damageSteps.get(0).getAsJsonObject();
+        assertEquals("Simple", delay.get("Type").getAsString());
+        assertEquals(0.15, delay.get("RunTime").getAsDouble());
+        assertEquals("Selector", damageSteps.get(1).getAsJsonObject().get("Type").getAsString());
+    }
+
     private static JsonObject findMount(JsonArray interactions) {
         for (var interaction : interactions) {
             JsonObject candidate = interaction.getAsJsonObject();
