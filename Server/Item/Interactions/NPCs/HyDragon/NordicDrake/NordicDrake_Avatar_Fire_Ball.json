@@ -24,7 +24,7 @@
       "ProjectileId": "NordicDrake_Dragon_Fire_Ball",
       "LaunchPositionOffset": {
         "X": 0.0,
-        "Y": 1.5,
+        "Y": -1.0,
         "Z": -3.0
       },
       "TrajectoryMode": "Direct",

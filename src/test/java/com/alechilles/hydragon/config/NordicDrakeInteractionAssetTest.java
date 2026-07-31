@@ -53,12 +53,22 @@ final class NordicDrakeInteractionAssetTest {
         assertEquals("TameworkLaunchProjectile", launch.get("Type").getAsString());
         assertEquals(48.0, launch.get("LookTargetDistance").getAsDouble());
         assertFalse(launch.has("TargetSlot"));
+        JsonObject launchOffset = launch.getAsJsonObject("LaunchPositionOffset");
+        assertEquals(-1.0, launchOffset.get("Y").getAsDouble());
+        assertEquals(-3.0, launchOffset.get("Z").getAsDouble());
 
-        String flameBreath = Files.readString(interactionPath("NordicDrake_Avatar_Flying_Flame_Breath"));
-        assertTrue(flameBreath.contains("\"Type\": \"Selector\""));
-        assertTrue(flameBreath.contains("\"NordicDrake_Flame_Breath_Damage\""));
-        assertFalse(flameBreath.contains("LockedTarget"));
-        assertFalse(flameBreath.contains("\"TargetSlot\""));
+        JsonObject flameBreath = readInteraction("NordicDrake_Avatar_Flying_Flame_Breath");
+        JsonObject effects = flameBreath.getAsJsonArray("Interactions")
+                .get(1).getAsJsonObject().getAsJsonArray("Interactions")
+                .get(0).getAsJsonObject().getAsJsonArray("Interactions")
+                .get(1).getAsJsonObject().getAsJsonObject("Effects");
+        assertEquals(-3.6, effects.getAsJsonArray("Particles").get(0).getAsJsonObject()
+                .getAsJsonObject("PositionOffset").get("Z").getAsDouble());
+        String flameBreathJson = flameBreath.toString();
+        assertTrue(flameBreathJson.contains("\"Type\":\"Selector\""));
+        assertTrue(flameBreathJson.contains("\"NordicDrake_Flame_Breath_Damage\""));
+        assertFalse(flameBreathJson.contains("LockedTarget"));
+        assertFalse(flameBreathJson.contains("\"TargetSlot\""));
     }
 
     private static JsonObject findMount(JsonArray interactions) {
