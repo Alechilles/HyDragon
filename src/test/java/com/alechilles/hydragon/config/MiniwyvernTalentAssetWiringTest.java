@@ -184,6 +184,18 @@ final class MiniwyvernTalentAssetWiringTest {
     }
 
     @Test
+    void projectileSchedulersHaveOneExclusiveGraphInTheAerialComponent() throws IOException {
+        JsonArray instructions = aerialInstructions();
+        assertEquals(1, countTopLevelActions(instructions, "TimerStart", AIM_TIMER),
+                "the talent variants must share one scheduler; no duplicate volley may remain");
+        for (String talentId : COMBAT_TALENTS) {
+            JsonObject scheduler = instructionForTalent(instructions, talentId);
+            assertTrue(containsDefendStateInstruction(scheduler) || hasCombatStateSensor(scheduler),
+                    talentId + " scheduler must stay within the aerial combat gate");
+        }
+    }
+
+    @Test
     void allFormsProvideOnlyGenericTalentBindingsAndWildCombatIsRawOnly() throws IOException {
         for (String form : ROLES) {
             JsonObject role = load(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini",
@@ -342,6 +354,35 @@ final class MiniwyvernTalentAssetWiringTest {
             if (element.isJsonObject() && findAction(element, type, name) != null) return element.getAsJsonObject();
         }
         throw new AssertionError("missing top-level instruction with " + type + " action for " + name);
+    }
+
+    private static int countTopLevelActions(JsonArray instructions, String type, String name) {
+        int count = 0;
+        for (JsonElement element : instructions) {
+            if (element.isJsonObject() && actionIndex(element.getAsJsonObject().getAsJsonArray("Actions"), type, name) >= 0) count++;
+        }
+        return count;
+    }
+
+    private static int actionIndex(JsonArray actions, String type, String name) {
+        if (actions == null) return -1;
+        for (int index = 0; index < actions.size(); index++) {
+            JsonObject action = actions.get(index).getAsJsonObject();
+            if (type.equals(string(action, "Type")) && name.equals(string(action, "Name"))) return index;
+        }
+        return -1;
+    }
+
+    private static boolean hasCombatStateSensor(JsonElement value) {
+        if (value == null) return false;
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("State".equals(string(object, "Type")) && ".Combat".equals(string(object, "State"))) return true;
+            for (JsonElement child : object.asMap().values()) if (hasCombatStateSensor(child)) return true;
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) if (hasCombatStateSensor(child)) return true;
+        }
+        return false;
     }
 
     private static JsonObject action(JsonElement value, String type, String name) {

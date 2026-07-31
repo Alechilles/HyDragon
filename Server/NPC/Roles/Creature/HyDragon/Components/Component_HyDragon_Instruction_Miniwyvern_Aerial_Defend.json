@@ -205,7 +205,10 @@
               "Type": "Timer",
               "Name": "Miniwyvern_Swoop_Cooldown",
               "State": "Stopped"
-            }
+            },
+            { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } },
+            { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "RelentlessSwoop" } },
+            { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopCadence" } }
           ]
         },
         "Actions": [
@@ -240,7 +243,9 @@
             {
               "Type": "TameworkHasTalent",
               "TalentId": "SwoopCadence"
-            }
+            },
+            { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } },
+            { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "RelentlessSwoop" } }
           ]
         },
         "Actions": [
@@ -275,7 +280,8 @@
             {
               "Type": "TameworkHasTalent",
               "TalentId": "RelentlessSwoop"
-            }
+            },
+            { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } }
           ]
         },
         "Actions": [
@@ -1652,112 +1658,6 @@
         ]
       },
       {
-        "$Comment": "Projectile scheduling remains centralized after swoop readiness.",
-        "Continue": true,
-        "Sensor": {
-          "Type": "And",
-          "Sensors": [
-            {
-              "Type": "State",
-              "State": ".Combat"
-            },
-            {
-              "Type": "TameworkHasTalent",
-              "TalentId": "DraconicProjectile"
-            },
-            {
-              "Type": "Flag",
-              "Name": "Miniwyvern_Swoop_Pending",
-              "Set": false
-            },
-            {
-              "Type": "Flag",
-              "Name": "Miniwyvern_Projectile_Aiming",
-              "Set": false
-            },
-            {
-              "Type": "Timer",
-              "Name": "Miniwyvern_Projectile_Cooldown",
-              "State": "Stopped"
-            }
-          ]
-        },
-        "Actions": [
-          {
-            "Type": "TimerStart",
-            "Name": "Miniwyvern_Projectile_Aim",
-            "StartValueRange": [
-              0.4,
-              0.7
-            ],
-            "RestartValueRange": [
-              0.4,
-              0.7
-            ]
-          },
-          {
-            "Type": "SetFlag",
-            "Name": "Miniwyvern_Projectile_Aiming",
-            "SetTo": true
-          }
-        ]
-      },
-      {
-        "Continue": true,
-        "Sensor": {
-          "Type": "And",
-          "Sensors": [
-            {
-              "Type": "State",
-              "State": ".Combat"
-            },
-            {
-              "Type": "Flag",
-              "Name": "Miniwyvern_Projectile_Aiming"
-            },
-            {
-              "Type": "Timer",
-              "Name": "Miniwyvern_Projectile_Aim",
-              "State": "Stopped"
-            }
-          ]
-        },
-        "ActionsBlocking": true,
-        "Actions": [
-          {
-            "Type": "Attack",
-            "Attack": {
-              "Compute": "TalentProjectileBase"
-            },
-            "AimingTimeRange": [
-              0.1,
-              0.2
-            ],
-            "AttackPauseRange": [
-              0,
-              0
-            ]
-          },
-          {
-            "Type": "TimerStart",
-            "Name": "Miniwyvern_Projectile_Cooldown",
-            "StartValueRange": [
-              5,
-              7
-            ],
-            "RestartValueRange": [
-              5,
-              7
-            ]
-          },
-          {
-            "Type": "SetFlag",
-            "Name": "Miniwyvern_Projectile_Aiming",
-            "SetTo": false
-          }
-        ]
-      },
-      {
         "Sensor": {
           "Type": "State",
           "State": ".Swoop"
@@ -1818,6 +1718,18 @@
                 {
                   "Type": "TameworkHasTalent",
                   "TalentId": "SwoopPrecision"
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" }
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": { "Type": "TameworkHasTalent", "TalentId": "RendingDive" }
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopFerocity" }
                 }
               ]
             },
@@ -1853,6 +1765,10 @@
                   25,
                   35
                 ]
+              },
+              {
+                "Type": "TimerRestart",
+                "Name": "Miniwyvern_Swoop_Cooldown"
               },
               {
                 "Type": "State",
@@ -1869,15 +1785,18 @@
           {
             "Continue": true,
             "Sensor": {
-              "Type": "Target",
-              "TargetSlot": "LockedTarget",
-              "Range": {
-                "Compute": "AttackDistance"
-              },
-              "Filters": [
+              "Type": "And",
+              "Sensors": [
                 {
-                  "Type": "LineOfSight"
-                }
+                  "Type": "Target",
+                  "TargetSlot": "LockedTarget",
+                  "Range": { "Compute": "AttackDistance" },
+                  "Filters": [{ "Type": "LineOfSight" }]
+                },
+                { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } },
+                { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "RendingDive" } },
+                { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopFerocity" } },
+                { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopPrecision" } }
               ]
             },
             "ActionsBlocking": true,
@@ -1914,9 +1833,62 @@
                 ]
               },
               {
+                "Type": "TimerRestart",
+                "Name": "Miniwyvern_Swoop_Cooldown"
+              },
+              {
                 "Type": "State",
                 "State": ".Recovery"
               }
+            ]
+          },
+          {
+            "$Comment": "Highest-owned swoop roots are selected before the default profile.",
+            "Continue": true,
+            "Sensor": { "Type": "And", "Sensors": [
+              { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AttackDistance" }, "Filters": [{ "Type": "LineOfSight" }] },
+              { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" }
+            ] },
+            "ActionsBlocking": true,
+            "Actions": [
+              { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Strike_Committed", "SetTo": true },
+              { "Type": "Attack", "Attack": { "Compute": "SwoopAttackMastery" }, "AimingTimeRange": [0, 0], "AttackPauseRange": [0, 0] },
+              { "Type": "TimerStart", "Name": "Miniwyvern_Swoop_Cooldown", "StartValueRange": [18, 24], "RestartValueRange": [18, 24] },
+              { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" },
+              { "Type": "State", "State": ".Recovery" }
+            ]
+          },
+          {
+            "Continue": true,
+            "Sensor": { "Type": "And", "Sensors": [
+              { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AttackDistance" }, "Filters": [{ "Type": "LineOfSight" }] },
+              { "Type": "TameworkHasTalent", "TalentId": "RendingDive" },
+              { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } }
+            ] },
+            "ActionsBlocking": true,
+            "Actions": [
+              { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Strike_Committed", "SetTo": true },
+              { "Type": "Attack", "Attack": { "Compute": "SwoopAttackRending" }, "AimingTimeRange": [0, 0], "AttackPauseRange": [0, 0] },
+              { "Type": "TimerStart", "Name": "Miniwyvern_Swoop_Cooldown", "StartValueRange": [20, 26], "RestartValueRange": [20, 26] },
+              { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" },
+              { "Type": "State", "State": ".Recovery" }
+            ]
+          },
+          {
+            "Continue": true,
+            "Sensor": { "Type": "And", "Sensors": [
+              { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AttackDistance" }, "Filters": [{ "Type": "LineOfSight" }] },
+              { "Type": "TameworkHasTalent", "TalentId": "SwoopFerocity" },
+              { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } },
+              { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "RendingDive" } }
+            ] },
+            "ActionsBlocking": true,
+            "Actions": [
+              { "Type": "SetFlag", "Name": "Miniwyvern_Swoop_Strike_Committed", "SetTo": true },
+              { "Type": "Attack", "Attack": { "Compute": "SwoopAttackFerocity" }, "AimingTimeRange": [0, 0], "AttackPauseRange": [0, 0] },
+              { "Type": "TimerStart", "Name": "Miniwyvern_Swoop_Cooldown", "StartValueRange": [25, 35], "RestartValueRange": [25, 35] },
+              { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" },
+              { "Type": "State", "State": ".Recovery" }
             ]
           },
           {
@@ -1939,6 +1911,10 @@
                 ]
               },
               {
+                "Type": "TimerRestart",
+                "Name": "Miniwyvern_Swoop_Cooldown"
+              },
+              {
                 "Type": "State",
                 "State": ".Recovery"
               }
@@ -1948,8 +1924,18 @@
       },
       {
         "Sensor": {
-          "Type": "State",
-          "State": ".Recovery"
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Recovery"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Recovery",
+              "State": "Stopped"
+            }
+          ]
         },
         "Actions": [
           {

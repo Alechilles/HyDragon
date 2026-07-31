@@ -594,16 +594,9 @@
                     "ViewRange": {
                       "Compute": "ViewRange"
                     },
-                    "Attack": {
-                      "Compute": "Attack"
-                    },
                     "AttackDistance": {
                       "Compute": "AttackDistance"
                     },
-                    "BitePauseRange": [
-                      8,
-                      12
-                    ],
                     "LoiterDistanceRange": [
                       8,
                       14
@@ -618,9 +611,6 @@
                       6
                     ],
                     "LoiterStopDistance": 2.5,
-                    "LoiterWeight": 9,
-                    "DiveWeight": 1,
-                    "DiveRelativeSpeed": 0.55,
                     "CombatBackOffDistanceRange": [
                       8,
                       14
