@@ -524,6 +524,10 @@
       "Value": false,
       "Description": "Whether Defend state behavior is enabled for this role."
     },
+    "UseNordicDrakeTamedCombat": {
+      "Value": false,
+      "Description": "Whether Defend hands a valid LockedTarget to the Nordic Drake combat component."
+    },
     "CanAggressive": {
       "Value": false,
       "Description": "Whether Defend state behavior is enabled for this role."
@@ -1407,6 +1411,26 @@
             "State": "Defend"
           },
           "Instructions": [
+            {
+              "Enabled": { "Compute": "UseNordicDrakeTamedCombat" },
+              "Sensor": {
+                "Type": "Target",
+                "TargetSlot": "LockedTarget"
+              },
+              "Instructions": [
+                {
+                  "Reference": "Component_HyDragon_Instruction_NordicDrake_Tamed_Combat",
+                  "Modify": {
+                    "HardLeashDistance": { "Compute": "HardLeashDistance" },
+                    "AlertedRange": { "Compute": "AlertedRange" },
+                    "ViewRange": { "Compute": "ViewRange" },
+                    "ViewSector": { "Compute": "ViewSector" },
+                    "HearingRange": { "Compute": "HearingRange" },
+                    "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" }
+                  }
+                }
+              ]
+            },
             {
               "Sensor": { "Type": "And", "Sensors": [
                 { "Type": "Flag", "Name": "AirborneMode", "Set": false },

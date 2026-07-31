@@ -1,0 +1,84 @@
+{
+  "Type": "Component",
+  "Class": "Instruction",
+  "DefaultState": ".Default",
+  "Parameters": {
+    "HardLeashDistance": { "Value": 30 },
+    "AlertedRange": { "Value": 28 },
+    "ViewRange": { "Value": 28 },
+    "ViewSector": { "Value": 180 },
+    "HearingRange": { "Value": 18 },
+    "AbsoluteDetectionRange": { "Value": 4 },
+    "MasterTargetSlot": { "Value": "MasterTarget" }
+  },
+  "Content": {
+    "Continue": true,
+    "Sensor": { "Type": "Any" },
+    "Instructions": [
+      {
+        "Sensor": {
+          "Type": "Not",
+          "Sensor": {
+            "Type": "Player",
+            "Range": { "Compute": "HardLeashDistance" }
+          }
+        },
+        "Actions": [
+          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+          { "Type": "ResetInstructions" }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "Target",
+          "TargetSlot": "LockedTarget",
+          "Filters": [ { "Type": "TameworkIsOwner" } ]
+        },
+        "Actions": [
+          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+          { "Type": "ResetInstructions" }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "Target",
+          "TargetSlot": "LockedTarget",
+          "Filters": [
+            {
+              "Type": "TameworkAttitudeFromTargetSlot",
+              "SourceTargetSlot": { "Compute": "MasterTargetSlot" },
+              "Attitudes": [ "Friendly" ],
+              "UseSelfWhenSourceMissing": false
+            }
+          ]
+        },
+        "Actions": [
+          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+          { "Type": "ResetInstructions" }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "Not",
+          "Sensor": {
+            "Reference": "Component_Sensor_Lost_Target_Detection",
+            "Modify": {
+              "ViewRange": { "Compute": "ViewRange" },
+              "ViewSector": { "Compute": "ViewSector" },
+              "HearingRange": { "Compute": "HearingRange" },
+              "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+              "TargetSlot": "LockedTarget"
+            }
+          }
+        },
+        "Actions": [
+          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+          { "Type": "ResetInstructions" }
+        ]
+      },
+      {
+        "Sensor": { "Type": "Any" }
+      }
+    ]
+  }
+}
