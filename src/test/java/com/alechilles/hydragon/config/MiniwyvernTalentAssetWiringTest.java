@@ -176,7 +176,7 @@ final class MiniwyvernTalentAssetWiringTest {
         List<JsonObject> duplicateProfiles = new java.util.ArrayList<>(attacks(instructions())); duplicateProfiles.add(duplicateProfiles.get(0));
         assertThrows(AssertionError.class, () -> assertProjectileInventory(duplicateProfiles));
 
-        JsonObject swappedEcho = echoes().get(0).deepCopy(); swappedEcho.getAsJsonArray("Actions").get(1).getAsJsonObject().getAsJsonObject("Attack").addProperty("Compute", "TalentProjectilePatternEcho");
+        JsonObject swappedEcho = echoes().get(0).deepCopy(); JsonArray swappedActions = swappedEcho.getAsJsonArray("Actions"); swappedActions.get(index(swappedActions, "Attack", null, false)).getAsJsonObject().getAsJsonObject("Attack").addProperty("Compute", "TalentProjectilePatternEcho");
         assertThrows(AssertionError.class, () -> assertEcho(swappedEcho));
     }
 
@@ -230,25 +230,25 @@ final class MiniwyvernTalentAssetWiringTest {
         assertDirectTimer(branch.get("Sensor"), "Miniwyvern_Projectile_Aim", "Stopped");
         assertDirectFlag(branch.get("Sensor"), "Miniwyvern_Swoop_Pending", false); assertDirectFlag(branch.get("Sensor"), "Miniwyvern_Swooping", false);
         assertTrue(branch.has("ActionsBlocking") && branch.get("ActionsBlocking").getAsBoolean());
-        JsonArray a = branch.getAsJsonArray("Actions"); assertEquals(3, a.size());
-        assertAction(a.get(0), "SetFlag", VOLLEY, true); assertAttack(a.get(1), attack(branch)); assertAction(a.get(2), "SetFlag", ECHO, true);
+        JsonArray a = branch.getAsJsonArray("Actions"); assertEquals(5, a.size());
+        assertAction(a.get(0), "SetFlag", VOLLEY, true); assertAttack(a.get(2), attack(branch)); assertAction(a.get(4), "SetFlag", ECHO, true);
     }
     private static void assertSingleShot(JsonObject branch) {
         assertTrue(branch.has("ActionsBlocking") && branch.get("ActionsBlocking").getAsBoolean());
-        JsonArray a = branch.getAsJsonArray("Actions"); assertEquals(4, a.size()); assertAttack(a.get(0), attack(branch));
+        JsonArray a = branch.getAsJsonArray("Actions"); assertEquals(6, a.size()); assertAttack(a.get(1), attack(branch));
         String cooldown = directPositiveTalents(branch.get("Sensor")).contains("ProjectileCadence") ? "[4,6]" : "[5,7]";
-        assertCooldown(a.get(1), cooldown); assertAction(a.get(2), "TimerRestart", "Miniwyvern_Projectile_Cooldown", false); assertAction(a.get(3), "SetFlag", AIMING, false);
+        assertCooldown(a.get(3), cooldown); assertAction(a.get(4), "TimerRestart", "Miniwyvern_Projectile_Cooldown", false); assertAction(a.get(5), "SetFlag", AIMING, false);
     }
     private static void assertEcho(JsonObject echo) {
         assertTrue(echo.has("ActionsBlocking") && echo.get("ActionsBlocking").getAsBoolean());
         for (String required : List.of("LockedTarget", "AirborneMode", "Fly")) assertDirectContext(echo.get("Sensor"), required);
         assertDirectFlag(echo.get("Sensor"), ECHO, true); assertDirectFlag(echo.get("Sensor"), "Miniwyvern_Swooping", false);
         assertFalse(directFlagPresent(echo.get("Sensor"), AIMING)); assertFalse(directFlagPresent(echo.get("Sensor"), VOLLEY));
-        JsonArray a = echo.getAsJsonArray("Actions"); assertEquals(7, a.size());
+        JsonArray a = echo.getAsJsonArray("Actions"); assertEquals(9, a.size());
         assertEquals("Timeout", type(a.get(0))); assertEquals(JsonParser.parseString("[0.3,0.3]"), a.get(0).getAsJsonObject().get("Delay"));
-        assertAttack(a.get(1), attack(echo)); assertCooldown(a.get(2), attack(echo).contains("Mastery") ? "[3,5]" : "[4,6]");
+        assertAttack(a.get(2), attack(echo)); assertCooldown(a.get(4), attack(echo).contains("Mastery") ? "[3,5]" : "[4,6]");
         assertEquals(directPositiveTalents(echo.get("Sensor")).contains("ProjectileMastery") ? "TalentProjectileMasteryEcho" : "TalentProjectilePatternEcho", attack(echo));
-        assertAction(a.get(3), "TimerRestart", "Miniwyvern_Projectile_Cooldown", false); assertAction(a.get(4), "SetFlag", VOLLEY, false); assertAction(a.get(5), "SetFlag", AIMING, false); assertAction(a.get(6), "SetFlag", ECHO, false);
+        assertAction(a.get(5), "TimerRestart", "Miniwyvern_Projectile_Cooldown", false); assertAction(a.get(6), "SetFlag", VOLLEY, false); assertAction(a.get(7), "SetFlag", AIMING, false); assertAction(a.get(8), "SetFlag", ECHO, false);
     }
     private static void assertForwarding(JsonObject modify) { assertEquals(Set.copyOf(ROOTS), modify.keySet().stream().filter(k -> k.startsWith("TalentProjectile")).collect(java.util.stream.Collectors.toSet())); for (String root : ROOTS) { assertTrue(modify.has(root)); assertEquals(root, modify.getAsJsonObject(root).get("Compute").getAsString()); } }
     private static void assertProjectileInventory(List<JsonObject> branches) {

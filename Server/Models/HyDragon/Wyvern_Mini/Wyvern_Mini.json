@@ -1,6 +1,6 @@
 {
   "Model": "NPC/HyDragon/Wyvern_Mini/Model/Wyvern_Mini.blockymodel",
-  "Texture": "NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Wild.png",
+  "Texture": "NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Normal.png",
   "EyeHeight": 0.75,
   "HitBox": {
     "Max": {
@@ -172,5 +172,10 @@
         }
       ]
     }
+  },
+  "IconProperties": {
+    "Scale": 1,
+    "Translation": [ 0, 0 ],
+    "Rotation": [ 26.4, -84.8, 0 ]
   }
 }

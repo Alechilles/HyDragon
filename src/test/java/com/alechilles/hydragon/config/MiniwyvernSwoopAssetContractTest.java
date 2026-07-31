@@ -115,8 +115,8 @@ final class MiniwyvernSwoopAssetContractTest {
         for (JsonObject attempt : attempts) {
             JsonArray actions = attempt.getAsJsonArray("Actions");
             int attack = actionIndex(actions, "Attack", null);
-            assertEquals("SetFlag", type(actions.get(attack - 1)));
-            assertEquals("Miniwyvern_Swoop_Strike_Committed", string(actions.get(attack - 1).getAsJsonObject(), "Name"));
+            int committed = actionIndex(actions, "SetFlag", "Miniwyvern_Swoop_Strike_Committed");
+            assertTrue(committed >= 0 && committed < attack, "the strike must commit before attack feedback begins");
             assertEquals(-1, actionIndex(actions, "TimerStart", "Miniwyvern_Swoop_Cooldown"),
                     "damage selection must not determine the cooldown band");
             assertEquals(-1, actionIndex(actions, "TimerRestart", "Miniwyvern_Swoop_Cooldown"),

@@ -3,12 +3,14 @@ package com.alechilles.hydragon.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +24,93 @@ final class MiniwyvernAttackFeedbackAssetTest {
                 "Projectile_01.ogg", "Projectile_02.ogg",
                 "Projectile_03.ogg", "Projectile_04.ogg"));
         assertPool("Bite", List.of("Bite_01.ogg", "Bite_02.ogg", "Bite_03.ogg"));
+    }
+
+    @Test
+    void everyAttackPlaysItsAnimationBeforeAndItsSoundAtDispatch() throws IOException {
+        JsonObject component = load("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
+        List<JsonArray> sequences = new ArrayList<>();
+        collectActionSequences(component, sequences);
+        int projectileCount = 0;
+        int biteCount = 0;
+        for (JsonArray actions : sequences) {
+            for (int index = 0; index < actions.size(); index++) {
+                JsonObject action = actions.get(index).getAsJsonObject();
+                if (!"Attack".equals(type(action))) {
+                    continue;
+                }
+                String attack = action.getAsJsonObject("Attack").get("Compute").getAsString();
+                if (attack.startsWith("TalentProjectile")) {
+                    assertFeedback(actions, index, "Shoot", "SFX_HyDragon_Miniwyvern_Projectile");
+                    projectileCount++;
+                } else if (attack.startsWith("SwoopAttack")) {
+                    assertFeedback(actions, index, "Bite", "SFX_HyDragon_Miniwyvern_Bite");
+                    biteCount++;
+                }
+            }
+        }
+        assertEquals(11, projectileCount, "every projectile talent branch and echo needs feedback");
+        assertEquals(4, biteCount, "every swoop damage profile needs feedback");
+    }
+
+    @Test
+    void miniwyvernModelPreservesTheUserAuthoredAttackAnimationsAndFlightTuning() throws IOException {
+        JsonObject model = load("Server/Models/HyDragon/Wyvern_Mini/Wyvern_Mini.json");
+        assertEquals(0.75, model.get("EyeHeight").getAsDouble(), 0.0);
+        JsonObject sets = model.getAsJsonObject("AnimationSets");
+        assertEquals("NPC/HyDragon/Wyvern_Mini/Animations/Bite.blockyanim",
+                sets.getAsJsonObject("Bite").getAsJsonArray("Animations").get(0)
+                        .getAsJsonObject().get("Animation").getAsString());
+        assertEquals("NPC/HyDragon/Wyvern_Mini/Animations/Shoot.blockyanim",
+                sets.getAsJsonObject("Shoot").getAsJsonArray("Animations").get(0)
+                        .getAsJsonObject().get("Animation").getAsString());
+        JsonArray fly = sets.getAsJsonObject("Fly").getAsJsonArray("Animations");
+        assertEquals(0.2, fly.get(0).getAsJsonObject().get("BlendingDuration").getAsDouble(), 0.0);
+        assertEquals(0.1, fly.get(1).getAsJsonObject().get("Weight").getAsDouble(), 0.0);
+        assertEquals(0.2, fly.get(1).getAsJsonObject().get("BlendingDuration").getAsDouble(), 0.0);
+    }
+
+    private static void assertFeedback(JsonArray actions, int attackIndex,
+            String animation, String soundEvent) {
+        assertTrue(attackIndex > 0 && attackIndex + 1 < actions.size(),
+                "attack feedback must be adjacent to dispatch");
+        JsonObject before = actions.get(attackIndex - 1).getAsJsonObject();
+        assertEquals("PlayAnimation", type(before));
+        assertEquals("Action", before.get("Slot").getAsString());
+        assertEquals(animation, before.get("Animation").getAsString());
+        JsonObject after = actions.get(attackIndex + 1).getAsJsonObject();
+        assertEquals("PlaySound", type(after));
+        assertEquals(soundEvent, after.get("SoundEventId").getAsString());
+    }
+
+    private static void collectActionSequences(JsonElement element, List<JsonArray> sequences) {
+        if (element == null || element.isJsonNull()) {
+            return;
+        }
+        if (element.isJsonArray()) {
+            for (JsonElement child : element.getAsJsonArray()) {
+                collectActionSequences(child, sequences);
+            }
+            return;
+        }
+        if (!element.isJsonObject()) {
+            return;
+        }
+        for (var entry : element.getAsJsonObject().entrySet()) {
+            if ("Actions".equals(entry.getKey()) && entry.getValue().isJsonArray()) {
+                sequences.add(entry.getValue().getAsJsonArray());
+            }
+            collectActionSequences(entry.getValue(), sequences);
+        }
+    }
+
+    private static String type(JsonObject object) {
+        return object.has("Type") ? object.get("Type").getAsString() : null;
+    }
+
+    private static JsonObject load(String relativePath) throws IOException {
+        return JsonParser.parseString(Files.readString(ROOT.resolve(relativePath))).getAsJsonObject();
     }
 
     private static void assertPool(String family, List<String> files) throws IOException {
