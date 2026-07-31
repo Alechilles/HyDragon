@@ -143,6 +143,30 @@
     "NameTranslationKey": {
       "Value": "server.npcRoles.Template.name",
       "Description": "Translation key for NPC name display"
+    },
+    "SwoopAttack": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite"
+    },
+    "SwoopAttackFerocity": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite_Ferocity"
+    },
+    "SwoopAttackRending": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite_Rending"
+    },
+    "SwoopAttackMastery": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite_Mastery"
+    },
+    "SwoopAltitudeRange": {
+      "Value": [
+        0,
+        2
+      ]
+    },
+    "SwoopApproachTimeout": {
+      "Value": [
+        6,
+        6
+      ]
     }
   },
   "IsMemory": {
@@ -222,49 +246,6 @@
       "$Comment": "Keep the Horn airborne mode controller transition global across every order.",
       "Continue": true,
       "Reference": "Component_HyDragon_Instruction_Airborne_Mode_Transition"
-    },
-    {
-      "$Comment": "Cancel a stale projectile line-up before ordinary state motion is selected.",
-      "Continue": true,
-      "Sensor": { "Type": "And", "Sensors": [
-        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
-        { "Type": "Or", "Sensors": [
-          { "Type": "Not", "Sensor": { "Type": "State", "State": "Defend" } },
-          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } }
-        ] }
-      ] },
-      "Actions": [
-        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false },
-        { "Type": "TimerStop", "Name": "Miniwyvern_Projectile_Aim" },
-        { "Type": "ResetInstructions" }
-      ]
-    },
-    {
-      "$Comment": "Start one visible line-up when the projectile cadence is ready.",
-      "Continue": true,
-      "Sensor": { "Type": "And", "Sensors": [
-        { "Type": "State", "State": "Defend" },
-        { "Type": "Target", "TargetSlot": "LockedTarget" },
-        { "Type": "TameworkHasTalent", "TalentId": "DraconicProjectile" },
-        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming", "Set": false },
-        { "Type": "Timer", "Name": "Miniwyvern_Projectile_Cooldown", "State": "Stopped" }
-      ] },
-      "Actions": [
-        { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Aim", "StartValueRange": [ 0.4, 0.7 ], "RestartValueRange": [ 0.4, 0.7 ] },
-        { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Aim" },
-        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": true }
-      ]
-    },
-    {
-      "$Comment": "First-match ownership: stop and turn with the aimed head until the shot sequence completes.",
-      "Continue": true,
-      "Sensor": { "Type": "And", "Sensors": [
-        { "Type": "State", "State": "Defend" },
-        { "Type": "Target", "TargetSlot": "LockedTarget" },
-        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }
-      ] },
-      "BodyMotion": { "Type": "MatchLook" },
-      "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
     },
     {
       "$Comment": "Keep owner-relative modes bounded and fail safe when their owner target is unavailable.",
@@ -381,8 +362,15 @@
               "Sensor": {
                 "Type": "And",
                 "Sensors": [
-                  { "Type": "Flag", "Name": "AirborneMode", "Set": false },
-                  { "Type": "MotionController", "MotionController": "Walk" }
+                  {
+                    "Type": "Flag",
+                    "Name": "AirborneMode",
+                    "Set": false
+                  },
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Walk"
+                  }
                 ]
               },
               "BodyMotion": {
@@ -396,8 +384,14 @@
               "Sensor": {
                 "Type": "And",
                 "Sensors": [
-                  { "Type": "Flag", "Name": "AirborneMode" },
-                  { "Type": "MotionController", "MotionController": "Fly" }
+                  {
+                    "Type": "Flag",
+                    "Name": "AirborneMode"
+                  },
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Fly"
+                  }
                 ]
               },
               "BodyMotion": {
@@ -420,38 +414,69 @@
               "Reference": "Component_Instruction_Clear_Status_Animation"
             },
             {
-              "Sensor": { "Type": "And", "Sensors": [
-                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
-                { "Type": "MotionController", "MotionController": "Walk" }
-              ] },
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Flag",
+                    "Name": "AirborneMode",
+                    "Set": false
+                  },
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Walk"
+                  }
+                ]
+              },
               "Instructions": [
-                { "Reference": "Component_Tamework_Instruction_Follow_Advanced", "Modify": {
-                  "MasterTargetSlot": "MasterTarget",
-                  "FollowDefaultSpotRange": 10,
-                  "FollowLockOnRange": 20,
-                  "FollowSeekSlowDownDistance": 8,
-                  "FollowSeekStopDistance": 6,
-                  "FollowScanRange": 16,
-                  "FollowMaintainDistanceRange": [ 5, 9 ]
-                } }
+                {
+                  "Reference": "Component_Tamework_Instruction_Follow_Advanced",
+                  "Modify": {
+                    "MasterTargetSlot": "MasterTarget",
+                    "FollowDefaultSpotRange": 10,
+                    "FollowLockOnRange": 20,
+                    "FollowSeekSlowDownDistance": 8,
+                    "FollowSeekStopDistance": 6,
+                    "FollowScanRange": 16,
+                    "FollowMaintainDistanceRange": [
+                      5,
+                      9
+                    ]
+                  }
+                }
               ]
             },
             {
-              "Sensor": { "Type": "And", "Sensors": [
-                { "Type": "Flag", "Name": "AirborneMode" },
-                { "Type": "MotionController", "MotionController": "Fly" }
-              ] },
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Flag",
+                    "Name": "AirborneMode"
+                  },
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Fly"
+                  }
+                ]
+              },
               "Instructions": [
-                { "Reference": "Component_Tamework_Instruction_Follow_Flying", "Modify": {
-                  "MasterTargetSlot": "MasterTarget",
-                  "FollowDesiredAltitudeRange": [ 4, 8 ],
-                  "FollowTeleportThresholdRange": 32,
-                  "FollowSeekSlowDownDistance": 10,
-                  "FollowSeekStopDistance": 6,
-                  "FollowSeekRelativeSpeed": 0.9,
-                  "FollowHoverRadius": 1.75,
-                  "FollowHoverRelativeSpeed": 0.12
-                } }
+                {
+                  "Reference": "Component_Tamework_Instruction_Follow_Flying",
+                  "Modify": {
+                    "MasterTargetSlot": "MasterTarget",
+                    "FollowDesiredAltitudeRange": [
+                      4,
+                      8
+                    ],
+                    "FollowTeleportThresholdRange": 32,
+                    "FollowSeekSlowDownDistance": 10,
+                    "FollowSeekStopDistance": 6,
+                    "FollowSeekRelativeSpeed": 0.9,
+                    "FollowHoverRadius": 1.75,
+                    "FollowHoverRelativeSpeed": 0.12
+                  }
+                }
               ]
             }
           ]
@@ -467,84 +492,174 @@
           },
           "Instructions": [
             {
-              "Sensor": { "Type": "And", "Sensors": [
-                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
-                { "Type": "MotionController", "MotionController": "Walk" }
-              ] },
-              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Defend", "Modify": {
-                "HardLeashDistance": {
-                  "Compute": "HardLeashDistance"
-                },
-                "AlertedRange": {
-                  "Compute": "ViewRange"
-                },
-                "ViewSector": {
-                  "Compute": "ViewSector"
-                },
-                "HearingRange": {
-                  "Compute": "HearingRange"
-                },
-                "AbsoluteDetectionRange": {
-                  "Compute": "AbsoluteDetectionRange"
-                },
-                "ViewRange": {
-                  "Compute": "ViewRange"
-                },
-                "Attack": {
-                  "Compute": "Attack"
-                },
-                "AttackDistance": {
-                  "Compute": "AttackDistance"
-                },
-                "AttackPauseRange": {
-                  "Compute": "AttackPauseRange"
-                },
-                "CombatAttackPreDelay": {
-                  "Compute": "CombatAttackPreDelay"
-                },
-                "CombatAttackPostDelay": {
-                  "Compute": "CombatAttackPostDelay"
-                },
-                "CombatBehaviorDistance": 8,
-                "CombatBackOffDistanceRange": [
-                  2.5,
-                  4
-                ],
-                "CombatStrafeWeight": 4,
-                "CombatDirectWeight": 8,
-                "CombatAlwaysMovingWeight": 8,
-                "ChaseRelativeSpeed": 0.9,
-                "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Advanced",
-                "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
-              } } ]
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Flag",
+                    "Name": "AirborneMode",
+                    "Set": false
+                  },
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Walk"
+                  }
+                ]
+              },
+              "Instructions": [
+                {
+                  "Reference": "Component_Tamework_Instruction_Defend",
+                  "Modify": {
+                    "HardLeashDistance": {
+                      "Compute": "HardLeashDistance"
+                    },
+                    "AlertedRange": {
+                      "Compute": "ViewRange"
+                    },
+                    "ViewSector": {
+                      "Compute": "ViewSector"
+                    },
+                    "HearingRange": {
+                      "Compute": "HearingRange"
+                    },
+                    "AbsoluteDetectionRange": {
+                      "Compute": "AbsoluteDetectionRange"
+                    },
+                    "ViewRange": {
+                      "Compute": "ViewRange"
+                    },
+                    "Attack": {
+                      "Compute": "Attack"
+                    },
+                    "AttackDistance": {
+                      "Compute": "AttackDistance"
+                    },
+                    "AttackPauseRange": {
+                      "Compute": "AttackPauseRange"
+                    },
+                    "CombatAttackPreDelay": {
+                      "Compute": "CombatAttackPreDelay"
+                    },
+                    "CombatAttackPostDelay": {
+                      "Compute": "CombatAttackPostDelay"
+                    },
+                    "CombatBehaviorDistance": 8,
+                    "CombatBackOffDistanceRange": [
+                      2.5,
+                      4
+                    ],
+                    "CombatStrafeWeight": 4,
+                    "CombatDirectWeight": 8,
+                    "CombatAlwaysMovingWeight": 8,
+                    "ChaseRelativeSpeed": 0.9,
+                    "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Advanced",
+                    "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
+                  }
+                }
+              ]
             },
             {
-              "Sensor": { "Type": "And", "Sensors": [
-                { "Type": "Flag", "Name": "AirborneMode" },
-                { "Type": "MotionController", "MotionController": "Fly" }
-              ] },
-              "Instructions": [ { "Reference": "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend", "Modify": {
-                "HardLeashDistance": { "Compute": "HardLeashDistance" },
-                "AlertedRange": { "Compute": "ViewRange" },
-                "ViewSector": { "Compute": "ViewSector" },
-                "HearingRange": { "Compute": "HearingRange" },
-                "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
-                "ViewRange": { "Compute": "ViewRange" },
-                "Attack": { "Compute": "Attack" },
-                "AttackDistance": { "Compute": "AttackDistance" },
-                "BitePauseRange": [ 8, 12 ],
-                "LoiterDistanceRange": [ 8, 14 ],
-                "LoiterAltitudeRange": [ 5, 9 ],
-                "LoiterRelativeSpeed": 0.28,
-                "LoiterRetargetTimeRange": [ 3, 6 ],
-                "LoiterStopDistance": 2.5,
-                "LoiterWeight": 9,
-                "DiveWeight": 1,
-                "DiveRelativeSpeed": 0.55,
-                "CombatBackOffDistanceRange": [ 8, 14 ],
-                "CombatBackOffDurationRange": [ 2, 4 ],
-                "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Flying"
-              } } ]
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Flag",
+                    "Name": "AirborneMode"
+                  },
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Fly"
+                  }
+                ]
+              },
+              "Instructions": [
+                {
+                  "Reference": "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend",
+                  "Modify": {
+                    "HardLeashDistance": {
+                      "Compute": "HardLeashDistance"
+                    },
+                    "AlertedRange": {
+                      "Compute": "ViewRange"
+                    },
+                    "ViewSector": {
+                      "Compute": "ViewSector"
+                    },
+                    "HearingRange": {
+                      "Compute": "HearingRange"
+                    },
+                    "AbsoluteDetectionRange": {
+                      "Compute": "AbsoluteDetectionRange"
+                    },
+                    "ViewRange": {
+                      "Compute": "ViewRange"
+                    },
+                    "Attack": {
+                      "Compute": "Attack"
+                    },
+                    "AttackDistance": {
+                      "Compute": "AttackDistance"
+                    },
+                    "BitePauseRange": [
+                      8,
+                      12
+                    ],
+                    "LoiterDistanceRange": [
+                      8,
+                      14
+                    ],
+                    "LoiterAltitudeRange": [
+                      5,
+                      9
+                    ],
+                    "LoiterRelativeSpeed": 0.28,
+                    "LoiterRetargetTimeRange": [
+                      3,
+                      6
+                    ],
+                    "LoiterStopDistance": 2.5,
+                    "LoiterWeight": 9,
+                    "DiveWeight": 1,
+                    "DiveRelativeSpeed": 0.55,
+                    "CombatBackOffDistanceRange": [
+                      8,
+                      14
+                    ],
+                    "CombatBackOffDurationRange": [
+                      2,
+                      4
+                    ],
+                    "DefendFollowMacroElement": "Component_Tamework_Instruction_Follow_Flying",
+                    "SwoopAttack": {
+                      "Compute": "SwoopAttack"
+                    },
+                    "SwoopAttackFerocity": {
+                      "Compute": "SwoopAttackFerocity"
+                    },
+                    "SwoopAttackRending": {
+                      "Compute": "SwoopAttackRending"
+                    },
+                    "SwoopAttackMastery": {
+                      "Compute": "SwoopAttackMastery"
+                    },
+                    "SwoopAltitudeRange": {
+                      "Compute": "SwoopAltitudeRange"
+                    },
+                    "SwoopApproachTimeout": {
+                      "Compute": "SwoopApproachTimeout"
+                    },
+                    "TalentProjectileBase": {
+                      "Compute": "TalentProjectileBase"
+                    },
+                    "TalentProjectileIntermediate": {
+                      "Compute": "TalentProjectileIntermediate"
+                    },
+                    "TalentProjectileApex": {
+                      "Compute": "TalentProjectileApex"
+                    }
+                  }
+                }
+              ]
             }
           ]
         },
@@ -558,132 +673,45 @@
               "Reference": "Component_Instruction_Clear_Status_Animation"
             },
             {
-              "Sensor": { "Type": "And", "Sensors": [
-                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
-                { "Type": "MotionController", "MotionController": "Walk" }
-              ] },
-              "BodyMotion": { "Type": "Nothing" }
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Flag",
+                    "Name": "AirborneMode",
+                    "Set": false
+                  },
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Walk"
+                  }
+                ]
+              },
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
             },
             {
-              "Sensor": { "Type": "And", "Sensors": [
-                { "Type": "Flag", "Name": "AirborneMode" },
-                { "Type": "MotionController", "MotionController": "Fly" }
-              ] },
-              "BodyMotion": { "Type": "Nothing" }
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Flag",
+                    "Name": "AirborneMode"
+                  },
+                  {
+                    "Type": "MotionController",
+                    "MotionController": "Fly"
+                  }
+                ]
+              },
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
             }
           ]
         }
       ]
-    },
-    {
-      "$Comment": "Each positive talent gate excludes every later combat variant, so exactly one owned variant can execute.",
-      "Continue": true,
-      "Sensor": { "Type": "And", "Sensors": [
-        { "Type": "State", "State": "Defend" },
-        { "Type": "Target", "TargetSlot": "LockedTarget" },
-        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
-        { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" },
-        { "Type": "TameworkHasTalent", "TalentId": "DraconicProjectile" },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileRange" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } }
-      ] },
-      "ActionsBlocking": true,
-      "Actions": [
-        { "Type": "Attack", "Attack": { "Compute": "TalentProjectileBase" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] },
-        { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 5, 7 ], "RestartValueRange": [ 5, 7 ] },
-        { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
-        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
-      ]
-    },
-    {
-      "Continue": true,
-      "Sensor": { "Type": "And", "Sensors": [
-        { "Type": "State", "State": "Defend" },
-        { "Type": "Target", "TargetSlot": "LockedTarget" },
-        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
-        { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" },
-        { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } },
-        { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } }
-      ] },
-      "ActionsBlocking": true,
-      "Actions": [
-        { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] },
-        { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 5, 7 ], "RestartValueRange": [ 5, 7 ] },
-        { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
-        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
-      ]
-    },
-    {
-      "Continue": true,
-      "Sensor": { "Type": "And", "Sensors": [
-        { "Type": "State", "State": "Defend" },
-        { "Type": "Target", "TargetSlot": "LockedTarget" },
-        { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
-        { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" },
-        { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" }
-      ] },
-      "ActionsBlocking": true,
-      "Actions": [
-        { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] },
-        { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 3, 5 ], "RestartValueRange": [ 3, 5 ] },
-        { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" },
-        { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false }
-      ]
-    },
-    {
-      "$Comment": "Range is an executable, mutually-exclusive projectile variant.",
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileRange" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 5, 7 ], "RestartValueRange": [ 5, 7 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
-    },
-    {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileCadence" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileForce" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 4, 6 ], "RestartValueRange": [ 4, 6 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
-    },
-    {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileGuidance" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileIntermediate" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 4, 6 ], "RestartValueRange": [ 4, 6 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
-    },
-    {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectileImpact" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 5, 7 ], "RestartValueRange": [ 5, 7 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
-    },
-    {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "ProjectilePattern" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 4, 6 ], "RestartValueRange": [ 4, 6 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
-    },
-    {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "DraconicAssault" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 3, 5 ], "RestartValueRange": [ 3, 5 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
-    },
-    {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultUtility" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" } }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 3, 5 ], "RestartValueRange": [ 3, 5 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
-    },
-    {
-      "Sensor": { "Type": "And", "Sensors": [ { "Type": "State", "State": "Defend" }, { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" }, { "Type": "Timer", "Name": "Miniwyvern_Projectile_Aim", "State": "Stopped" }, { "Type": "TameworkHasTalent", "TalentId": "AssaultMastery" }, { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "DraconicApex" } } ] },
-      "ActionsBlocking": true,
-      "Actions": [ { "Type": "Attack", "Attack": { "Compute": "TalentProjectileApex" }, "AimingTimeRange": [ 0.1, 0.2 ], "AttackPauseRange": [ 0, 0 ] }, { "Type": "TimerStart", "Name": "Miniwyvern_Projectile_Cooldown", "StartValueRange": [ 3, 5 ], "RestartValueRange": [ 3, 5 ] }, { "Type": "TimerRestart", "Name": "Miniwyvern_Projectile_Cooldown" }, { "Type": "SetFlag", "Name": "Miniwyvern_Projectile_Aiming", "SetTo": false } ]
     }
   ],
   "InteractionInstruction": {

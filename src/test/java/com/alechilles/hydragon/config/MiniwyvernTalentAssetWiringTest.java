@@ -27,6 +27,8 @@ final class MiniwyvernTalentAssetWiringTest {
             "SwoopPrecision", "RelentlessSwoop", "RendingDive", "SwoopMastery");
     private static final Path TEMPLATE = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon",
             "Templates", "Template_Wyvern_Mini_Flying_Tamed.json");
+    private static final Path AERIAL_COMPONENT = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon",
+            "Components", "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
     private static final List<String> ROLES = List.of("Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
     private static final List<String> COMBAT_TALENTS = List.of("DraconicProjectile", "ProjectileRange",
             "ProjectileCadence", "ProjectileForce", "ProjectileGuidance", "ProjectileImpact",
@@ -56,7 +58,9 @@ final class MiniwyvernTalentAssetWiringTest {
     @Test
     void templateContainsTalentGatedExecutableVariants() throws IOException {
         JsonObject template = load(TEMPLATE);
-        JsonArray instructions = template.getAsJsonArray("Instructions");
+        JsonArray instructions = aerialInstructions();
+        assertFalse(template.toString().contains("Miniwyvern_Projectile_"),
+                "projectile scheduling must be centralized in the aerial component");
 
         for (int index = 0; index < COMBAT_TALENTS.size(); index++) {
             String talentId = COMBAT_TALENTS.get(index);
@@ -91,7 +95,8 @@ final class MiniwyvernTalentAssetWiringTest {
 
     @Test
     void projectileCadenceUsesDeliberateRandomizedProgressionBands() throws IOException {
-        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        JsonArray instructions = aerialInstructions();
+        assertFalse(load(TEMPLATE).toString().contains("Miniwyvern_Projectile_"));
         Map<String, JsonElement> expected = Map.ofEntries(
                 Map.entry("DraconicProjectile", JsonParser.parseString("[5,7]")),
                 Map.entry("ProjectileRange", JsonParser.parseString("[5,7]")),
@@ -144,11 +149,12 @@ final class MiniwyvernTalentAssetWiringTest {
 
     @Test
     void dedicatedAimPhaseOwnsMotionBeforeOrdinaryDefendMovement() throws IOException {
-        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        JsonArray instructions = aerialInstructions();
         JsonObject aim = instructionUsingFlagAndMotion(instructions, AIM_FLAG, "MatchLook");
-        JsonObject defendDispatch = defendDispatch(instructions);
 
-        assertTrue(topLevelIndex(instructions, aim) < topLevelIndex(instructions, defendDispatch));
+        assertFalse(load(TEMPLATE).toString().contains("Miniwyvern_Projectile_"));
+        assertTrue(topLevelIndex(instructions, aim) > 0,
+                "the shared aim motion must execute after the swoop readiness setter");
         assertEquals(JsonParser.parseString("{\"Type\":\"MatchLook\"}"), aim.get("BodyMotion"));
         assertEquals(JsonParser.parseString(
                 "{\"Type\":\"Aim\",\"Spread\":0,\"HitProbability\":1,\"Deflection\":true}"),
@@ -157,13 +163,12 @@ final class MiniwyvernTalentAssetWiringTest {
 
     @Test
     void projectileAimSchedulerAndRecoveryAreExplicit() throws IOException {
-        JsonArray instructions = load(TEMPLATE).getAsJsonArray("Instructions");
+        JsonArray instructions = aerialInstructions();
         JsonObject scheduler = instructionWithAction(instructions, "TimerStart", AIM_TIMER);
         JsonObject recovery = instructionWithAction(instructions, "TimerStop", AIM_TIMER);
-        JsonObject defendDispatch = defendDispatch(instructions);
 
+        assertFalse(load(TEMPLATE).toString().contains("Miniwyvern_Projectile_"));
         assertTrue(topLevelIndex(instructions, recovery) < topLevelIndex(instructions, scheduler));
-        assertTrue(topLevelIndex(instructions, scheduler) < topLevelIndex(instructions, defendDispatch));
 
         JsonObject start = action(scheduler, "TimerStart", AIM_TIMER);
         assertEquals(JsonParser.parseString("[0.4,0.7]"), start.get("StartValueRange"));
@@ -295,6 +300,10 @@ final class MiniwyvernTalentAssetWiringTest {
             }
         }
         throw new AssertionError("missing executable gate for " + talentId);
+    }
+
+    private static JsonArray aerialInstructions() throws IOException {
+        return load(AERIAL_COMPONENT).getAsJsonObject("Content").getAsJsonArray("Instructions");
     }
 
     private static JsonObject defendDispatch(JsonArray instructions) {

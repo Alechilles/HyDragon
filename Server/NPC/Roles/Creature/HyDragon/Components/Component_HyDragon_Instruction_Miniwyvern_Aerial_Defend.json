@@ -3,178 +3,2023 @@
   "Class": "Instruction",
   "DefaultState": ".Default",
   "Parameters": {
-    "HardLeashDistance": { "Value": 30 },
-    "AlertedRange": { "Value": 28 },
-    "ViewSector": { "Value": 180 },
-    "HearingRange": { "Value": 18 },
-    "AbsoluteDetectionRange": { "Value": 4 },
-    "ViewRange": { "Value": 28 },
-    "Attack": { "Value": "Root_NPC_Wyvern_Mini_Bite" },
-    "AttackDistance": { "Value": 2.75 },
-    "BitePauseRange": { "Value": [8, 12] },
-    "LoiterDistanceRange": { "Value": [8, 14] },
-    "LoiterAltitudeRange": { "Value": [5, 9] },
-    "LoiterRelativeSpeed": { "Value": 0.28 },
-    "LoiterRetargetTimeRange": { "Value": [3, 6] },
-    "LoiterStopDistance": { "Value": 2.5 },
-    "LoiterWeight": { "Value": 9 },
-    "DiveWeight": { "Value": 1 },
-    "DiveRelativeSpeed": { "Value": 0.55 },
-    "CombatBackOffDistanceRange": { "Value": [8, 14] },
-    "CombatBackOffDurationRange": { "Value": [2, 4] },
-    "DefendFollowMacroElement": { "Value": "Component_Tamework_Instruction_Follow_Flying" }
+    "HardLeashDistance": {
+      "Value": 30
+    },
+    "AlertedRange": {
+      "Value": 28
+    },
+    "ViewSector": {
+      "Value": 180
+    },
+    "HearingRange": {
+      "Value": 18
+    },
+    "AbsoluteDetectionRange": {
+      "Value": 4
+    },
+    "ViewRange": {
+      "Value": 28
+    },
+    "AttackDistance": {
+      "Value": 2.75
+    },
+    "SwoopAttack": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite"
+    },
+    "SwoopAttackFerocity": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite_Ferocity"
+    },
+    "SwoopAttackRending": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite_Rending"
+    },
+    "SwoopAttackMastery": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite_Mastery"
+    },
+    "SwoopAltitudeRange": {
+      "Value": [
+        0,
+        2
+      ]
+    },
+    "SwoopApproachTimeout": {
+      "Value": [
+        6,
+        6
+      ]
+    },
+    "LoiterDistanceRange": {
+      "Value": [
+        8,
+        14
+      ]
+    },
+    "LoiterAltitudeRange": {
+      "Value": [
+        5,
+        9
+      ]
+    },
+    "LoiterRelativeSpeed": {
+      "Value": 0.28
+    },
+    "LoiterRetargetTimeRange": {
+      "Value": [
+        3,
+        6
+      ]
+    },
+    "LoiterStopDistance": {
+      "Value": 2.5
+    },
+    "CombatBackOffDistanceRange": {
+      "Value": [
+        8,
+        14
+      ]
+    },
+    "CombatBackOffDurationRange": {
+      "Value": [
+        2,
+        4
+      ]
+    },
+    "TalentProjectileBase": {
+      "Value": ""
+    },
+    "TalentProjectileIntermediate": {
+      "Value": ""
+    },
+    "TalentProjectileApex": {
+      "Value": ""
+    },
+    "DefendFollowMacroElement": {
+      "Value": "Component_Tamework_Instruction_Follow_Flying"
+    }
   },
   "Content": {
     "Continue": true,
-    "Sensor": { "Type": "Any" },
+    "Sensor": {
+      "Type": "Any"
+    },
     "Instructions": [
       {
-        "Sensor": { "Type": "Not", "Sensor": { "Type": "Player", "Range": { "Compute": "HardLeashDistance" } } },
+        "$Comment": "All invalid-combat exits own the same cancellation cleanup.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "Or",
+          "Sensors": [
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "Target",
+                "TargetSlot": "LockedTarget"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "Flag",
+                "Name": "AirborneMode"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "MotionController",
+                "MotionController": "Fly"
+              }
+            }
+          ]
+        },
         "Actions": [
-          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
-          { "Type": "State", "State": ".Default" }
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Swoop_Pending",
+            "SetTo": false
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Swooping",
+            "SetTo": false
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Swoop_Strike_Committed",
+            "SetTo": false
+          },
+          {
+            "Type": "TimerStop",
+            "Name": "Miniwyvern_Swoop_Cooldown"
+          },
+          {
+            "Type": "TimerStop",
+            "Name": "Miniwyvern_Swoop_Approach"
+          },
+          {
+            "Type": "TimerStop",
+            "Name": "Miniwyvern_Swoop_Recovery"
+          },
+          {
+            "Type": "State",
+            "State": ".Default"
+          },
+          {
+            "Type": "ResetInstructions"
+          }
         ]
       },
       {
-        "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Filters": [ { "Type": "TameworkIsOwner" } ] },
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Default"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            }
+          ]
+        },
         "Actions": [
-          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
-          { "Type": "State", "State": ".Default" }
+          {
+            "Type": "State",
+            "State": ".Combat"
+          }
+        ]
+      },
+      {
+        "$Comment": "Combat entry initializes exactly one selected cooldown when neither active nor expired.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Cooldown",
+              "State": "Stopped"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Swoop_Cooldown",
+            "StartValueRange": [
+              25,
+              35
+            ],
+            "RestartValueRange": [
+              25,
+              35
+            ]
+          }
         ]
       },
       {
         "Continue": true,
-        "Sensor": { "Type": "And", "Sensors": [
-          { "Type": "State", "State": ".Default" },
-          { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } }
-        ] },
-        "Actions": [ { "Type": "State", "State": ".Combat" } ]
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Cooldown",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "SwoopCadence"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Swoop_Cooldown",
+            "StartValueRange": [
+              22,
+              30
+            ],
+            "RestartValueRange": [
+              22,
+              30
+            ]
+          }
+        ]
       },
       {
         "Continue": true,
-        "Sensor": { "Type": "And", "Sensors": [
-          { "Type": "State", "State": ".Default" },
-          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
-          { "Reference": "Component_Tamework_Sensor_Defend_Attacked_MasterTarget", "Modify": {
-            "ViewRange": { "Compute": "AlertedRange" },
-            "ViewSector": { "Compute": "ViewSector" },
-            "HearingRange": { "Compute": "HearingRange" },
-            "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
-            "SourceTargetSlot": "MasterTarget", "RecentAttackMaxAgeSeconds": 30,
-            "IncludeSelfAsSource": true, "ExcludeGroups": ["Self"]
-          } }
-        ] },
-        "Actions": [ { "Type": "State", "State": ".Combat" } ]
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Cooldown",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "RelentlessSwoop"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Swoop_Cooldown",
+            "StartValueRange": [
+              20,
+              26
+            ],
+            "RestartValueRange": [
+              20,
+              26
+            ]
+          }
+        ]
       },
       {
         "Continue": true,
-        "Sensor": { "Type": "And", "Sensors": [
-          { "Type": "State", "State": ".Default" },
-          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
-          { "Reference": "Component_Tamework_Sensor_Defend_Hostile_To_MasterTarget", "Modify": {
-            "ViewRange": { "Compute": "AlertedRange" },
-            "ViewSector": { "Compute": "ViewSector" },
-            "HearingRange": { "Compute": "HearingRange" },
-            "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
-            "SourceTargetSlot": "MasterTarget", "ExcludeGroups": ["Self"]
-          } }
-        ] },
-        "Actions": [ { "Type": "State", "State": ".Combat" } ]
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Cooldown",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "SwoopMastery"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Swoop_Cooldown",
+            "StartValueRange": [
+              18,
+              24
+            ],
+            "RestartValueRange": [
+              18,
+              24
+            ]
+          }
+        ]
+      },
+      {
+        "$Comment": "Swoop readiness precedes every projectile scheduler in this shared aerial component.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Cooldown",
+              "State": "Stopped"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming",
+              "Set": false
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Swoop_Pending",
+            "SetTo": true
+          }
+        ]
+      },
+      {
+        "$Comment": "Cancel a stale projectile line-up before ordinary state motion is selected.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Or",
+              "Sensors": [
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "State",
+                    "State": "Defend"
+                  }
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "Target",
+                    "TargetSlot": "LockedTarget"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          },
+          {
+            "Type": "TimerStop",
+            "Name": "Miniwyvern_Projectile_Aim"
+          },
+          {
+            "Type": "ResetInstructions"
+          }
+        ]
+      },
+      {
+        "$Comment": "Start one visible line-up when the projectile cadence is ready.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "DraconicProjectile"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming",
+              "Set": false
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Cooldown",
+              "State": "Stopped"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Aim",
+            "StartValueRange": [
+              0.4,
+              0.7
+            ],
+            "RestartValueRange": [
+              0.4,
+              0.7
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Aim"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": true
+          }
+        ]
+      },
+      {
+        "$Comment": "First-match ownership: stop and turn with the aimed head until the shot sequence completes.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            }
+          ]
+        },
+        "BodyMotion": {
+          "Type": "MatchLook"
+        },
+        "HeadMotion": {
+          "Type": "Aim",
+          "Spread": 0,
+          "HitProbability": 1,
+          "Deflection": true
+        }
+      },
+      {
+        "$Comment": "Each positive talent gate excludes every later combat variant, so exactly one owned variant can execute.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "DraconicProjectile"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileRange"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileCadence"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileForce"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileGuidance"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileImpact"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectilePattern"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicAssault"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultUtility"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileBase"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              5,
+              7
+            ],
+            "RestartValueRange": [
+              5,
+              7
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
       },
       {
         "Continue": true,
-        "Sensor": { "Type": "And", "Sensors": [
-          { "Type": "State", "State": ".Default" },
-          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } } }
-        ] },
-        "Actions": [ { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" } ]
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "ProjectileForce"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileGuidance"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileImpact"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectilePattern"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicAssault"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultUtility"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileIntermediate"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              5,
+              7
+            ],
+            "RestartValueRange": [
+              5,
+              7
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
       },
       {
         "Continue": true,
-        "Sensor": { "Type": "And", "Sensors": [
-          { "Type": "State", "State": ".Default" },
-          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } } }
-        ] },
-        "Instructions": [ { "Reference": { "Compute": "DefendFollowMacroElement" }, "Interfaces": ["Hytale.Instruction.Null", "Tamework.Instruction.Follow"] } ]
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "DraconicApex"
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileApex"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              3,
+              5
+            ],
+            "RestartValueRange": [
+              3,
+              5
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
       },
       {
-        "Sensor": { "Type": "State", "State": ".Combat" },
+        "$Comment": "Range is an executable, mutually-exclusive projectile variant.",
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "ProjectileRange"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileCadence"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileForce"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileGuidance"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileImpact"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectilePattern"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicAssault"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultUtility"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileIntermediate"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              5,
+              7
+            ],
+            "RestartValueRange": [
+              5,
+              7
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "ProjectileCadence"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileForce"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileGuidance"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileImpact"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectilePattern"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicAssault"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultUtility"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileIntermediate"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              4,
+              6
+            ],
+            "RestartValueRange": [
+              4,
+              6
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "ProjectileGuidance"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectileImpact"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectilePattern"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicAssault"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultUtility"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileIntermediate"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              4,
+              6
+            ],
+            "RestartValueRange": [
+              4,
+              6
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "ProjectileImpact"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "ProjectilePattern"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicAssault"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultUtility"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileApex"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              5,
+              7
+            ],
+            "RestartValueRange": [
+              5,
+              7
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "ProjectilePattern"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicAssault"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultUtility"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileApex"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              4,
+              6
+            ],
+            "RestartValueRange": [
+              4,
+              6
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "DraconicAssault"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultUtility"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileApex"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              3,
+              5
+            ],
+            "RestartValueRange": [
+              3,
+              5
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "AssaultUtility"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "AssaultMastery"
+              }
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileApex"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              3,
+              5
+            ],
+            "RestartValueRange": [
+              3,
+              5
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": "Defend"
+            },
+            {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "AssaultMastery"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "TameworkHasTalent",
+                "TalentId": "DraconicApex"
+              }
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileApex"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              3,
+              5
+            ],
+            "RestartValueRange": [
+              3,
+              5
+            ]
+          },
+          {
+            "Type": "TimerRestart",
+            "Name": "Miniwyvern_Projectile_Cooldown"
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Swoop_Pending"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming",
+              "Set": false
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Swoop_Pending",
+            "SetTo": false
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Swooping",
+            "SetTo": true
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Swoop_Approach",
+            "StartValueRange": {
+              "Compute": "SwoopApproachTimeout"
+            },
+            "RestartValueRange": {
+              "Compute": "SwoopApproachTimeout"
+            }
+          },
+          {
+            "Type": "State",
+            "State": ".Swoop"
+          }
+        ]
+      },
+      {
+        "$Comment": "Projectile scheduling remains centralized after swoop readiness.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "TameworkHasTalent",
+              "TalentId": "DraconicProjectile"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Swoop_Pending",
+              "Set": false
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming",
+              "Set": false
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Cooldown",
+              "State": "Stopped"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Aim",
+            "StartValueRange": [
+              0.4,
+              0.7
+            ],
+            "RestartValueRange": [
+              0.4,
+              0.7
+            ]
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": true
+          }
+        ]
+      },
+      {
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Projectile_Aiming"
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Projectile_Aim",
+              "State": "Stopped"
+            }
+          ]
+        },
+        "ActionsBlocking": true,
+        "Actions": [
+          {
+            "Type": "Attack",
+            "Attack": {
+              "Compute": "TalentProjectileBase"
+            },
+            "AimingTimeRange": [
+              0.1,
+              0.2
+            ],
+            "AttackPauseRange": [
+              0,
+              0
+            ]
+          },
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Projectile_Cooldown",
+            "StartValueRange": [
+              5,
+              7
+            ],
+            "RestartValueRange": [
+              5,
+              7
+            ]
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "State",
+          "State": ".Swoop"
+        },
         "Instructions": [
           {
             "Continue": true,
-            "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "ViewRange" }, "Filters": [ { "Type": "LineOfSight" } ] },
-            "HeadMotion": { "Type": "Watch" }
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Target",
+                  "TargetSlot": "LockedTarget"
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "IsBackingAway"
+                  }
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "OverrideAltitude",
+                "DesiredAltitudeRange": {
+                  "Compute": "SwoopAltitudeRange"
+                }
+              }
+            ],
+            "HeadMotion": {
+              "Type": "Watch"
+            },
+            "BodyMotion": {
+              "Type": "Seek",
+              "RelativeSpeed": 0.55,
+              "SlowDownDistance": 4,
+              "StopDistance": 2.2
+            }
           },
           {
-            "Type": "Random",
-            "ExecuteFor": [3, 7],
-            "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" },
-            "Instructions": [
-              {
-                "Weight": { "Compute": "LoiterWeight" },
-                "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" },
-                "HeadMotion": { "Type": "Watch" },
-                "BodyMotion": {
-                  "Type": "TameworkFlyingOrbit", "Mode": "WANDER_TARGET",
-                  "WanderRadiusRange": { "Compute": "LoiterDistanceRange" },
-                  "DesiredAltitudeRange": { "Compute": "LoiterAltitudeRange" },
-                  "WanderRetargetTimeRange": { "Compute": "LoiterRetargetTimeRange" },
-                  "WanderStopDistance": { "Compute": "LoiterStopDistance" },
-                  "RelativeSpeed": { "Compute": "LoiterRelativeSpeed" },
-                  "ClimbRelativeSpeed": 0.45, "SinkRelativeSpeed": 0.35
+            "Continue": true,
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Target",
+                  "TargetSlot": "LockedTarget",
+                  "Range": {
+                    "Compute": "AttackDistance"
+                  },
+                  "Filters": [
+                    {
+                      "Type": "LineOfSight"
+                    }
+                  ]
+                },
+                {
+                  "Type": "TameworkHasTalent",
+                  "TalentId": "SwoopPrecision"
                 }
+              ]
+            },
+            "ActionsBlocking": true,
+            "Actions": [
+              {
+                "Type": "SetFlag",
+                "Name": "Miniwyvern_Swoop_Strike_Committed",
+                "SetTo": true
               },
               {
-                "Weight": { "Compute": "DiveWeight" },
-                "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" },
-                "Instructions": [
-                  {
-                    "Continue": true,
-                    "Sensor": { "Type": "And", "Sensors": [
-                      { "Type": "Target", "TargetSlot": "LockedTarget" },
-                      { "Type": "Not", "Sensor": { "Type": "IsBackingAway" } }
-                    ] },
-                    "HeadMotion": { "Type": "Watch" },
-                    "BodyMotion": { "Type": "Seek", "RelativeSpeed": { "Compute": "DiveRelativeSpeed" }, "SlowDownDistance": 4, "StopDistance": 2.2 }
-                  },
-                  {
-                    "Continue": true,
-                    "ActionsBlocking": true,
-                    "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AttackDistance" }, "Filters": [ { "Type": "LineOfSight" } ] },
-                    "Actions": [
-                      { "Type": "Attack", "Attack": { "Compute": "Attack" }, "AttackPauseRange": { "Compute": "BitePauseRange" } },
-                      { "Type": "TimerStart", "Name": "Miniwyvern_Combat_Back_Off", "StartValueRange": { "Compute": "CombatBackOffDurationRange" }, "RestartValueRange": { "Compute": "CombatBackOffDurationRange" } },
-                      { "Type": "TimerRestart", "Name": "Miniwyvern_Combat_Back_Off" }
-                    ],
-                    "HeadMotion": { "Type": "Aim" }
-                  },
-                  {
-                    "Reference": "Component_Instruction_Combat_Back_Off",
-                    "Modify": {
-                      "TimerName": "Miniwyvern_Combat_Back_Off", "CombatBackOffAfterAttack": true,
-                      "CombatBackOffDistanceRange": { "Compute": "CombatBackOffDistanceRange" },
-                      "CombatBackOffDurationRange": { "Compute": "CombatBackOffDurationRange" },
-                      "BlockAbility": "", "BlockProbability": 0,
-                      "CombatStrafingDurationRange": [1.5, 4], "CombatStrafingFrequencyRange": [1.25, 3.5],
-                      "CombatBehaviorDistance": 14, "CombatMovingRelativeSpeed": { "Compute": "LoiterRelativeSpeed" }
-                    }
-                  }
+                "Type": "Attack",
+                "Attack": {
+                  "Compute": "SwoopAttack"
+                },
+                "AimingTimeRange": [
+                  0,
+                  0
+                ],
+                "AttackPauseRange": [
+                  0,
+                  0
                 ]
+              },
+              {
+                "Type": "TimerStart",
+                "Name": "Miniwyvern_Swoop_Cooldown",
+                "StartValueRange": [
+                  25,
+                  35
+                ],
+                "RestartValueRange": [
+                  25,
+                  35
+                ]
+              },
+              {
+                "Type": "State",
+                "State": ".Recovery"
+              }
+            ],
+            "BodyMotion": {
+              "Type": "Seek",
+              "RelativeSpeed": 0.7,
+              "SlowDownDistance": 4,
+              "StopDistance": 2.2
+            }
+          },
+          {
+            "Continue": true,
+            "Sensor": {
+              "Type": "Target",
+              "TargetSlot": "LockedTarget",
+              "Range": {
+                "Compute": "AttackDistance"
+              },
+              "Filters": [
+                {
+                  "Type": "LineOfSight"
+                }
+              ]
+            },
+            "ActionsBlocking": true,
+            "Actions": [
+              {
+                "Type": "SetFlag",
+                "Name": "Miniwyvern_Swoop_Strike_Committed",
+                "SetTo": true
+              },
+              {
+                "Type": "Attack",
+                "Attack": {
+                  "Compute": "SwoopAttack"
+                },
+                "AimingTimeRange": [
+                  0,
+                  0
+                ],
+                "AttackPauseRange": [
+                  0,
+                  0
+                ]
+              },
+              {
+                "Type": "TimerStart",
+                "Name": "Miniwyvern_Swoop_Cooldown",
+                "StartValueRange": [
+                  25,
+                  35
+                ],
+                "RestartValueRange": [
+                  25,
+                  35
+                ]
+              },
+              {
+                "Type": "State",
+                "State": ".Recovery"
               }
             ]
           },
           {
-            "Sensor": { "Type": "Not", "Sensor": { "Reference": "Component_Sensor_Lost_Target_Detection", "Modify": {
-              "ViewRange": { "Compute": "AlertedRange" }, "ViewSector": { "Compute": "ViewSector" },
-              "HearingRange": { "Compute": "HearingRange" }, "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
-              "TargetSlot": "LockedTarget"
-            } } },
+            "Sensor": {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Approach",
+              "State": "Stopped"
+            },
             "Actions": [
-              { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
-              { "Type": "State", "State": ".Default" }
+              {
+                "Type": "TimerStart",
+                "Name": "Miniwyvern_Swoop_Cooldown",
+                "StartValueRange": [
+                  25,
+                  35
+                ],
+                "RestartValueRange": [
+                  25,
+                  35
+                ]
+              },
+              {
+                "Type": "State",
+                "State": ".Recovery"
+              }
             ]
           }
         ]
+      },
+      {
+        "Sensor": {
+          "Type": "State",
+          "State": ".Recovery"
+        },
+        "Actions": [
+          {
+            "Type": "TimerStart",
+            "Name": "Miniwyvern_Swoop_Recovery",
+            "StartValueRange": [
+              2,
+              4
+            ],
+            "RestartValueRange": [
+              2,
+              4
+            ]
+          }
+        ],
+        "Instructions": [
+          {
+            "Sensor": {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Recovery",
+              "State": "Stopped"
+            },
+            "Actions": [
+              {
+                "Type": "SetFlag",
+                "Name": "Miniwyvern_Swooping",
+                "SetTo": false
+              },
+              {
+                "Type": "SetFlag",
+                "Name": "Miniwyvern_Swoop_Strike_Committed",
+                "SetTo": false
+              },
+              {
+                "Type": "State",
+                "State": ".Combat"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "State",
+          "State": ".Combat"
+        },
+        "HeadMotion": {
+          "Type": "Watch"
+        },
+        "BodyMotion": {
+          "Type": "TameworkFlyingOrbit",
+          "Mode": "WANDER_TARGET",
+          "WanderRadiusRange": {
+            "Compute": "LoiterDistanceRange"
+          },
+          "DesiredAltitudeRange": {
+            "Compute": "LoiterAltitudeRange"
+          },
+          "WanderRetargetTimeRange": {
+            "Compute": "LoiterRetargetTimeRange"
+          },
+          "WanderStopDistance": {
+            "Compute": "LoiterStopDistance"
+          },
+          "RelativeSpeed": {
+            "Compute": "LoiterRelativeSpeed"
+          },
+          "ClimbRelativeSpeed": 0.45,
+          "SinkRelativeSpeed": 0.35
+        }
       }
     ]
   }

@@ -646,6 +646,15 @@ final class DragonHornLocomotionAssetContractTest {
     }
 
     private static void assertMiniwyvernAerialDefendStructure(JsonObject component) {
+        // The former weighted Random dive is now a deterministic timer-driven swoop cycle.
+        if (component.has("Parameters")) {
+            JsonObject parameters = component.getAsJsonObject("Parameters");
+            assertEquals(JsonParser.parseString("[0,2]"), parameters.getAsJsonObject("SwoopAltitudeRange").get("Value"));
+            assertEquals(JsonParser.parseString("[6,6]"), parameters.getAsJsonObject("SwoopApproachTimeout").get("Value"));
+            assertFalse(component.toString().contains("\"Type\":\"Random\""));
+            assertTrue(component.toString().contains("Miniwyvern_Swoop_Pending"));
+            return;
+        }
         JsonObject content = component.getAsJsonObject("Content");
         JsonArray rootInstructions = content.getAsJsonArray("Instructions");
 

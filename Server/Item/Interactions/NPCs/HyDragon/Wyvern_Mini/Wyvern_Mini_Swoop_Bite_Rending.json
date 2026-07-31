@@ -1,0 +1,1 @@
+{ "Parent": "Wyvern_Mini_Swoop_Bite", "HitEntity": { "Interactions": [ "Wyvern_Mini_Swoop_Bite_Damage_Rending" ] } }
