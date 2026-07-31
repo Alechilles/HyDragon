@@ -9,6 +9,7 @@
 - Nordic Drake progression: `Server/Tamework/Leveling/HyDragonNordicDrake.json` defines the level curve and XP sources, while `Server/Tamework/Talents/HyDragonNordicDrake.json` defines its role-scoped talent tree. Both configs target only `Tamed_NordicDrake`.
 - Fast-flight XP: qualified time is measured server-side while the mounted Avatar Flight controller is in fast flight. Awards are batched to the parked source companion, never calculated from distance, travel speed, client input, or idle time.
 - Failure behavior: Tamework hides the prompt and rejects activation when the config/model or required participant state is unavailable. Other HyDragon dragons retain their existing mounted-glide defaults.
+- Rider visual contract: `NordicDrake_AvatarFlight` namespaces the transformed mount root as `AF_Origin`; every copied root track uses `AF_Origin`, and no copied animation targets the player-standard `Origin`. The fake rider keeps the standard player skeleton so its skin, cosmetics, and full equipped armor remain attached to the rider and do not inherit the dragon's pitch or bank.
 - Validation cases: Nordic Drake assets parse with the integration enabled; the source and avatar-only models map all grounded crouch states to their matching crouch clips; Tamework without HyDragon continues to load because no HyDragon id is referenced by Tamework assets or Java.
 
 ## Compatibility matrix

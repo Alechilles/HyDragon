@@ -76,6 +76,7 @@
     "HideOwnerEquipment": true,
     "HideOwnerArmor": true,
     "HideOwnerHands": true,
-    "ShowRider": true
+    "ShowRider": true,
+    "IncludeAppearanceAttachments": true
   }
 }
