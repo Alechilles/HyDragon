@@ -1,6 +1,7 @@
 package com.alechilles.hydragon.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonArray;
@@ -68,11 +69,15 @@ final class MiniwyvernAttackFeedbackAssetTest {
         assertEquals("NPC/HyDragon/Wyvern_Mini/Animations/Bite.blockyanim",
                 bite.get("Animation").getAsString());
         assertEquals(0.4, bite.get("BlendingDuration").getAsDouble(), 0.0);
+        assertTrue(bite.has("Looping"), "Bite must explicitly override the model animation default");
+        assertFalse(bite.get("Looping").getAsBoolean(), "Bite must return to flight after one play");
         JsonObject shoot = sets.getAsJsonObject("Shoot").getAsJsonArray("Animations")
                 .get(0).getAsJsonObject();
         assertEquals("NPC/HyDragon/Wyvern_Mini/Animations/Shoot.blockyanim",
                 shoot.get("Animation").getAsString());
         assertEquals(0.4, shoot.get("BlendingDuration").getAsDouble(), 0.0);
+        assertTrue(shoot.has("Looping"), "Shoot must explicitly override the model animation default");
+        assertFalse(shoot.get("Looping").getAsBoolean(), "Shoot must return to flight after one play");
         JsonArray fly = sets.getAsJsonObject("Fly").getAsJsonArray("Animations");
         assertEquals(0.2, fly.get(0).getAsJsonObject().get("BlendingDuration").getAsDouble(), 0.0);
         assertEquals(0.1, fly.get(1).getAsJsonObject().get("Weight").getAsDouble(), 0.0);

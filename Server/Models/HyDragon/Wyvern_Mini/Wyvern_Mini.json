@@ -160,7 +160,8 @@
       "Animations": [
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Bite.blockyanim",
-          "BlendingDuration": 0.4
+          "BlendingDuration": 0.4,
+          "Looping": false
         }
       ]
     },
@@ -168,7 +169,8 @@
       "Animations": [
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Shoot.blockyanim",
-          "BlendingDuration": 0.4
+          "BlendingDuration": 0.4,
+          "Looping": false
         }
       ]
     }
