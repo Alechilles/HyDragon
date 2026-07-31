@@ -1,7 +1,7 @@
 {
   "Model": "NPC/HyDragon/Wyvern_Mini/Model/Wyvern_Mini.blockymodel",
   "Texture": "NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Wild.png",
-  "EyeHeight": 1.6,
+  "EyeHeight": 0.75,
   "HitBox": {
     "Max": {
       "X": 0.5,
@@ -90,13 +90,15 @@
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "Weight": 1
+          "Weight": 1,
+          "BlendingDuration": 0.2
         },
         {
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Glide.blockyanim",
           "Speed": 1,
           "Looping": true,
-          "Weight": 0.2
+          "Weight": 0.1,
+          "BlendingDuration": 0.2
         }
       ]
     },
@@ -151,6 +153,22 @@
           "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Landed.blockyanim",
           "Looping": false,
           "BlendingDuration": 0.1
+        }
+      ]
+    },
+    "Bite": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Bite.blockyanim",
+          "BlendingDuration": 0.4
+        }
+      ]
+    },
+    "Shoot": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Shoot.blockyanim",
+          "BlendingDuration": 0.4
         }
       ]
     }
