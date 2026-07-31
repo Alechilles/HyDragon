@@ -1969,10 +1969,6 @@
                   ]
                 },
                 {
-                  "Type": "TameworkHasTalent",
-                  "TalentId": "SwoopPrecision"
-                },
-                {
                   "Type": "Not",
                   "Sensor": {
                     "Type": "TameworkHasTalent",
@@ -2015,118 +2011,6 @@
                   0,
                   0
                 ]
-              },
-              {
-                "Type": "TimerStart",
-                "Name": "Miniwyvern_Swoop_Cooldown",
-                "StartValueRange": [
-                  25,
-                  35
-                ],
-                "RestartValueRange": [
-                  25,
-                  35
-                ]
-              },
-              {
-                "Type": "TimerRestart",
-                "Name": "Miniwyvern_Swoop_Cooldown"
-              },
-              {
-                "Type": "State",
-                "State": ".Recovery"
-              }
-            ],
-            "BodyMotion": {
-              "Type": "Seek",
-              "RelativeSpeed": 0.7,
-              "SlowDownDistance": 4,
-              "StopDistance": 2.2
-            }
-          },
-          {
-            "Continue": true,
-            "Sensor": {
-              "Type": "And",
-              "Sensors": [
-                {
-                  "Type": "Target",
-                  "TargetSlot": "LockedTarget",
-                  "Range": {
-                    "Compute": "AttackDistance"
-                  },
-                  "Filters": [
-                    {
-                      "Type": "LineOfSight"
-                    }
-                  ]
-                },
-                {
-                  "Type": "Not",
-                  "Sensor": {
-                    "Type": "TameworkHasTalent",
-                    "TalentId": "SwoopMastery"
-                  }
-                },
-                {
-                  "Type": "Not",
-                  "Sensor": {
-                    "Type": "TameworkHasTalent",
-                    "TalentId": "RendingDive"
-                  }
-                },
-                {
-                  "Type": "Not",
-                  "Sensor": {
-                    "Type": "TameworkHasTalent",
-                    "TalentId": "SwoopFerocity"
-                  }
-                },
-                {
-                  "Type": "Not",
-                  "Sensor": {
-                    "Type": "TameworkHasTalent",
-                    "TalentId": "SwoopPrecision"
-                  }
-                }
-              ]
-            },
-            "ActionsBlocking": true,
-            "Actions": [
-              {
-                "Type": "SetFlag",
-                "Name": "Miniwyvern_Swoop_Strike_Committed",
-                "SetTo": true
-              },
-              {
-                "Type": "Attack",
-                "Attack": {
-                  "Compute": "SwoopAttack"
-                },
-                "AimingTimeRange": [
-                  0,
-                  0
-                ],
-                "AttackPauseRange": [
-                  0,
-                  0
-                ]
-              },
-              {
-                "Type": "TimerStart",
-                "Name": "Miniwyvern_Swoop_Cooldown",
-                "StartValueRange": [
-                  25,
-                  35
-                ],
-                "RestartValueRange": [
-                  25,
-                  35
-                ]
-              },
-              {
-                "Type": "TimerRestart",
-                "Name": "Miniwyvern_Swoop_Cooldown"
               },
               {
                 "Type": "State",
@@ -2178,22 +2062,6 @@
                   0,
                   0
                 ]
-              },
-              {
-                "Type": "TimerStart",
-                "Name": "Miniwyvern_Swoop_Cooldown",
-                "StartValueRange": [
-                  18,
-                  24
-                ],
-                "RestartValueRange": [
-                  18,
-                  24
-                ]
-              },
-              {
-                "Type": "TimerRestart",
-                "Name": "Miniwyvern_Swoop_Cooldown"
               },
               {
                 "Type": "State",
@@ -2251,22 +2119,6 @@
                   0,
                   0
                 ]
-              },
-              {
-                "Type": "TimerStart",
-                "Name": "Miniwyvern_Swoop_Cooldown",
-                "StartValueRange": [
-                  20,
-                  26
-                ],
-                "RestartValueRange": [
-                  20,
-                  26
-                ]
-              },
-              {
-                "Type": "TimerRestart",
-                "Name": "Miniwyvern_Swoop_Cooldown"
               },
               {
                 "Type": "State",
@@ -2333,22 +2185,6 @@
                 ]
               },
               {
-                "Type": "TimerStart",
-                "Name": "Miniwyvern_Swoop_Cooldown",
-                "StartValueRange": [
-                  25,
-                  35
-                ],
-                "RestartValueRange": [
-                  25,
-                  35
-                ]
-              },
-              {
-                "Type": "TimerRestart",
-                "Name": "Miniwyvern_Swoop_Cooldown"
-              },
-              {
                 "Type": "State",
                 "State": ".Recovery"
               }
@@ -2362,27 +2198,69 @@
             },
             "Actions": [
               {
-                "Type": "TimerStart",
-                "Name": "Miniwyvern_Swoop_Cooldown",
-                "StartValueRange": [
-                  25,
-                  35
-                ],
-                "RestartValueRange": [
-                  25,
-                  35
-                ]
-              },
-              {
-                "Type": "TimerRestart",
-                "Name": "Miniwyvern_Swoop_Cooldown"
-              },
-              {
                 "Type": "State",
                 "State": ".Recovery"
               }
             ]
           }
+        ]
+      },
+      {
+        "$Comment": "Recovery commits the highest owned cooldown independently of the strike damage profile.",
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Recovery" },
+          { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started", "Set": false },
+          { "Type": "Timer", "Name": "Miniwyvern_Swoop_Cooldown", "State": "Stopped" },
+          { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" }
+        ] },
+        "Actions": [
+          { "Type": "TimerStart", "Name": "Miniwyvern_Swoop_Cooldown", "StartValueRange": [18, 24], "RestartValueRange": [18, 24] },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" }
+        ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Recovery" },
+          { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started", "Set": false },
+          { "Type": "Timer", "Name": "Miniwyvern_Swoop_Cooldown", "State": "Stopped" },
+          { "Type": "TameworkHasTalent", "TalentId": "RelentlessSwoop" },
+          { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } }
+        ] },
+        "Actions": [
+          { "Type": "TimerStart", "Name": "Miniwyvern_Swoop_Cooldown", "StartValueRange": [20, 26], "RestartValueRange": [20, 26] },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" }
+        ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Recovery" },
+          { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started", "Set": false },
+          { "Type": "Timer", "Name": "Miniwyvern_Swoop_Cooldown", "State": "Stopped" },
+          { "Type": "TameworkHasTalent", "TalentId": "SwoopCadence" },
+          { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } },
+          { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "RelentlessSwoop" } }
+        ] },
+        "Actions": [
+          { "Type": "TimerStart", "Name": "Miniwyvern_Swoop_Cooldown", "StartValueRange": [22, 30], "RestartValueRange": [22, 30] },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" }
+        ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Recovery" },
+          { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started", "Set": false },
+          { "Type": "Timer", "Name": "Miniwyvern_Swoop_Cooldown", "State": "Stopped" },
+          { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopMastery" } },
+          { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "RelentlessSwoop" } },
+          { "Type": "Not", "Sensor": { "Type": "TameworkHasTalent", "TalentId": "SwoopCadence" } }
+        ] },
+        "Actions": [
+          { "Type": "TimerStart", "Name": "Miniwyvern_Swoop_Cooldown", "StartValueRange": [25, 35], "RestartValueRange": [25, 35] },
+          { "Type": "TimerRestart", "Name": "Miniwyvern_Swoop_Cooldown" }
         ]
       },
       {

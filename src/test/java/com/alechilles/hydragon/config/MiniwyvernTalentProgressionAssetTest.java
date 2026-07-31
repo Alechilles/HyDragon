@@ -149,15 +149,15 @@ final class MiniwyvernTalentProgressionAssetTest {
         Map<String, String> entries = localeEntries("en-US");
         assertEquals(Map.of(
                 LOCALE_PREFIX + "swoop_ferocity.description",
-                "Unlock a 20-damage swoop with a 25-35 second cooldown.",
+                "Increase swoop damage from 16 to 20 with a 25-35 second cooldown.",
                 LOCALE_PREFIX + "swoop_cadence.description",
                 "Keep the 20-damage swoop and reduce its cooldown to 22-30 seconds.",
                 LOCALE_PREFIX + "swoop_precision.description",
-                "Increase swoop damage to 24 with a 25-35 second cooldown.",
+                "Increase swoop approach speed from 0.55 to 0.70 for a more reliable strike.",
                 LOCALE_PREFIX + "relentless_swoop.description",
                 "Keep the 20-damage swoop and reduce its cooldown to 20-26 seconds.",
                 LOCALE_PREFIX + "rending_dive.description",
-                "Increase swoop damage to 28 with a 25-35 second cooldown.",
+                "Increase swoop damage to 24 with a 25-35 second cooldown.",
                 LOCALE_PREFIX + "swoop_mastery.description",
                 "Master the swoop route for 28 damage and an 18-24 second cooldown."),
                 Map.of(

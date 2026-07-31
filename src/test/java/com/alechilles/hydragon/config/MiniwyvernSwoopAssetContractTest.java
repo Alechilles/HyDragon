@@ -61,21 +61,23 @@ final class MiniwyvernSwoopAssetContractTest {
     }
 
     @Test
-    void swoopAttemptsRestartTheSelectedCooldownAndUseExclusiveAttackProfiles() throws IOException {
+    void swoopStrikesUseFourDamageProfilesAndDeferCooldownCommitToRecovery() throws IOException {
         JsonArray instructions = load("Server/NPC/Roles/Creature/HyDragon/Components/"
                 + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json")
                 .getAsJsonObject("Content").getAsJsonArray("Instructions");
 
         java.util.List<JsonObject> attempts = new java.util.ArrayList<>();
         collectCommittedSwoopAttempts(instructions, attempts);
-        assertEquals(5, attempts.size(), "a swoop tick must expose one committed strike per exclusive profile");
+        assertEquals(4, attempts.size(), "a swoop tick must expose exactly four exclusive strike profiles");
         for (JsonObject attempt : attempts) {
             JsonArray actions = attempt.getAsJsonArray("Actions");
             int attack = actionIndex(actions, "Attack", null);
             assertEquals("SetFlag", type(actions.get(attack - 1)));
             assertEquals("Miniwyvern_Swoop_Strike_Committed", string(actions.get(attack - 1).getAsJsonObject(), "Name"));
-            assertTrue(actionIndexAfter(actions, attack, "TimerRestart", "Miniwyvern_Swoop_Cooldown") >= 0,
-                    "every committed strike must restart its expired cooldown");
+            assertEquals(-1, actionIndex(actions, "TimerStart", "Miniwyvern_Swoop_Cooldown"),
+                    "damage selection must not determine the cooldown band");
+            assertEquals(-1, actionIndex(actions, "TimerRestart", "Miniwyvern_Swoop_Cooldown"),
+                    "damage selection must not restart the cooldown");
             assertTrue(actionIndexAfter(actions, attack, "State", ".Recovery") >= 0,
                     "every committed strike must enter recovery");
         }
@@ -83,6 +85,47 @@ final class MiniwyvernSwoopAssetContractTest {
         assertExclusiveProfile(instructions, "SwoopMastery", "SwoopAttackMastery");
         assertExclusiveProfile(instructions, "RendingDive", "SwoopAttackRending", "SwoopMastery");
         assertExclusiveProfile(instructions, "SwoopFerocity", "SwoopAttackFerocity", "SwoopMastery", "RendingDive");
+        assertDefaultProfile(instructions, "SwoopAttack", "SwoopMastery", "RendingDive", "SwoopFerocity");
+        assertEquals(0, attempts.stream().filter(attempt -> hasTalent(attempt.get("Sensor"), "SwoopPrecision")).count(),
+                "Precision changes approach movement only; it cannot create a strike profile");
+    }
+
+    @Test
+    void recoveryCommitsTheHighestOwnedCooldownAfterStrikesAndTimeouts() throws IOException {
+        JsonArray instructions = load("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json")
+                .getAsJsonObject("Content").getAsJsonArray("Instructions");
+        java.util.List<JsonObject> recoveryCooldowns = new java.util.ArrayList<>();
+        int initializerIndex = -1;
+        for (int index = 0; index < instructions.size(); index++) {
+            JsonObject candidate = instructions.get(index).getAsJsonObject();
+            if (hasStateSensor(candidate.get("Sensor"), ".Recovery")
+                    && actionIndex(candidate.getAsJsonArray("Actions"), "TimerStart", "Miniwyvern_Swoop_Cooldown") >= 0) {
+                recoveryCooldowns.add(candidate);
+                assertTrue(hasFalseFlagSensor(candidate.get("Sensor"), "Miniwyvern_Swoop_Recovery_Started"));
+                assertTrue(hasStoppedTimerSensor(candidate.get("Sensor"), "Miniwyvern_Swoop_Cooldown"));
+            }
+            if (hasStateSensor(candidate.get("Sensor"), ".Recovery")
+                    && actionIndex(candidate.getAsJsonArray("Actions"), "TimerStart", "Miniwyvern_Swoop_Recovery") >= 0) {
+                initializerIndex = index;
+            }
+        }
+        assertEquals(4, recoveryCooldowns.size(), "Recovery needs exactly four independent cooldown selectors");
+        assertCooldownSelector(recoveryCooldowns, 18, 24, "SwoopMastery");
+        assertCooldownSelector(recoveryCooldowns, 20, 26, "RelentlessSwoop", "SwoopMastery");
+        assertCooldownSelector(recoveryCooldowns, 22, 30, "SwoopCadence", "SwoopMastery", "RelentlessSwoop");
+        assertCooldownSelector(recoveryCooldowns, 25, 35, null, "SwoopMastery", "RelentlessSwoop", "SwoopCadence");
+        assertTrue(initializerIndex > 0);
+        for (JsonObject selector : recoveryCooldowns) {
+            assertTrue(instructions.asList().indexOf(selector) < initializerIndex,
+                    "cooldown selection must precede recovery timer initialization");
+        }
+
+        JsonObject timeout = objectsWithAction(instructions, "State", ".Recovery").stream()
+                .filter(candidate -> hasStoppedTimerSensor(candidate.get("Sensor"), "Miniwyvern_Swoop_Approach"))
+                .findFirst().orElseThrow();
+        assertEquals(-1, actionIndex(timeout.getAsJsonArray("Actions"), "TimerStart", "Miniwyvern_Swoop_Cooldown"));
+        assertEquals(-1, actionIndex(timeout.getAsJsonArray("Actions"), "TimerRestart", "Miniwyvern_Swoop_Cooldown"));
     }
 
     @Test
@@ -241,6 +284,28 @@ final class MiniwyvernSwoopAssetContractTest {
         assertEquals(minimum, restartRange.get(0).getAsInt());
         assertEquals(maximum, restartRange.get(1).getAsInt());
     }
+    private static void assertCooldownSelector(java.util.List<JsonObject> selectors, int minimum, int maximum,
+            String requiredTalent, String... excludedTalents) {
+        JsonObject selector = selectors.stream()
+                .filter(candidate -> requiredTalent == null
+                        ? java.util.Arrays.stream(excludedTalents)
+                                .allMatch(talent -> hasNegatedTalent(candidate.get("Sensor"), talent))
+                        : hasPositiveTalent(candidate.get("Sensor"), requiredTalent))
+                .findFirst().orElseThrow(() -> new AssertionError("missing recovery cooldown " + minimum + "-" + maximum));
+        for (String excluded : excludedTalents) {
+            assertTrue(hasNegatedTalent(selector.get("Sensor"), excluded), "selector must exclude " + excluded);
+        }
+        JsonArray actions = selector.getAsJsonArray("Actions");
+        int start = actionIndex(actions, "TimerStart", "Miniwyvern_Swoop_Cooldown");
+        int restart = actionIndex(actions, "TimerRestart", "Miniwyvern_Swoop_Cooldown");
+        assertTrue(start >= 0 && restart > start, "selector must start then restart its cooldown");
+        JsonArray range = actions.get(start).getAsJsonObject().getAsJsonArray("StartValueRange");
+        assertEquals(minimum, range.get(0).getAsInt());
+        assertEquals(maximum, range.get(1).getAsInt());
+        JsonArray restartRange = actions.get(start).getAsJsonObject().getAsJsonArray("RestartValueRange");
+        assertEquals(minimum, restartRange.get(0).getAsInt());
+        assertEquals(maximum, restartRange.get(1).getAsInt());
+    }
     private static boolean hasDirectFlagTerm(JsonElement value, String name, boolean set) {
         if (value == null || !value.isJsonObject()) return false;
         JsonObject sensor = value.getAsJsonObject();
@@ -391,7 +456,7 @@ final class MiniwyvernSwoopAssetContractTest {
         }
         if (!value.isJsonObject()) return null;
         JsonObject object = value.getAsJsonObject();
-        if (hasAttackParameter(object, attackParameter)) return object;
+        if (hasDirectAttackParameter(object, attackParameter)) return object;
         for (JsonElement child : object.asMap().values()) {
             JsonObject match = instructionWithAttackParameter(child, attackParameter);
             if (match != null) return match;
@@ -437,6 +502,15 @@ final class MiniwyvernSwoopAssetContractTest {
         if ("Attack".equals(type(object)) && object.has("Attack")
                 && parameter.equals(string(object.getAsJsonObject("Attack"), "Compute"))) return true;
         for (JsonElement child : object.asMap().values()) if (hasAttackParameter(child, parameter)) return true;
+        return false;
+    }
+    private static boolean hasDirectAttackParameter(JsonObject object, String parameter) {
+        if (!object.has("Actions")) return false;
+        for (JsonElement action : object.getAsJsonArray("Actions")) {
+            JsonObject value = action.getAsJsonObject();
+            if ("Attack".equals(type(value)) && value.has("Attack")
+                    && parameter.equals(string(value.getAsJsonObject("Attack"), "Compute"))) return true;
+        }
         return false;
     }
 
