@@ -30,8 +30,6 @@ final class PackagedJarContractIT {
         assertTrue(entries.stream().anyMatch(name -> name.startsWith("Server/")));
         assertTrue(entries.contains("Common/Items/HyDragon/Draconic_Essence_Wind.png"),
                 "the Wind essence texture must ship with its item asset");
-        assertFalse(entries.contains("Server/Tamework/Companion/HyDragonNordicDrake.json"),
-                "deleted resources must not survive in the packaged JAR");
         assertFalse(entries.stream().anyMatch(name -> name.equals("HyDragon.zip") || name.startsWith("docs/")));
         assertFalse(entries.stream().anyMatch(name -> name.startsWith("target/") || name.startsWith(".idea/")));
         assertFalse(entries.stream().anyMatch(name -> name.contains("/Source/") || name.endsWith(".bbmodel")));

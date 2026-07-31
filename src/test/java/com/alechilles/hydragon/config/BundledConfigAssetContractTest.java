@@ -35,7 +35,10 @@ class BundledConfigAssetContractTest {
 
     @Test
     void companionPoliciesUseCurrentTopLevelSelectionFields() throws IOException {
-        for (String asset : List.of("HyDragonMiniwyvern.json", "HyDragonFullDragons.json")) {
+        for (String asset : List.of(
+                "HyDragonMiniwyvern.json",
+                "HyDragonNordicDrake.json",
+                "HyDragonFullDragons.json")) {
             Path path = Path.of("Server", "Tamework", "Companion", asset);
             com.google.gson.JsonObject config = com.google.gson.JsonParser.parseString(Files.readString(path))
                     .getAsJsonObject();
