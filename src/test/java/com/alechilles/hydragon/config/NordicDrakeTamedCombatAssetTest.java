@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +43,7 @@ final class NordicDrakeTamedCombatAssetTest {
         assertOwnerAndFriendlyRelease(component);
         assertLostTargetRelease(component);
         assertNoImplicitTargetSelection(component);
+        assertTaskOneShellStopsBeforeCombat(component);
     }
 
     private static JsonObject readJson(Path path) throws IOException {
@@ -156,10 +158,39 @@ final class NordicDrakeTamedCombatAssetTest {
     }
 
     private static void assertNoImplicitTargetSelection(JsonObject component) {
+        Set<String> forbiddenTypes = Set.of(
+                "SetTarget", "LockOnTarget", "LockOnInteractionTarget", "SelectTarget", "SelectBasicAttackTarget",
+                "CombatActionEvaluator", "SetMarkedTarget");
         assertEquals(0, objects(component, object -> {
             String type = string(object, "Type");
-            return "SetTarget".equals(type) || "LockOnTarget".equals(type) || "LockOnInteractionTarget".equals(type);
-        }).size());
+            return type != null && forbiddenTypes.contains(type);
+        }).size(),
+                "Task 1 must only consume the outer Defend LockedTarget, never select or mutate a target");
+        assertEquals(0, objects(component, object -> object.has("LockOnTarget")).size(),
+                "Task 1 must not enable the established LockOnTarget selector flag");
+        for (JsonObject sensor : objects(component, object -> "Target".equals(string(object, "Type")))) {
+            assertEquals("LockedTarget", string(sensor, "TargetSlot"),
+                    "every Task 1 entity-target sensor must explicitly observe LockedTarget");
+        }
+    }
+
+    private static void assertTaskOneShellStopsBeforeCombat(JsonObject component) {
+        List<JsonObject> children = directChildren(component);
+        assertEquals(5, children.size(), "Task 1 must contain exactly four safety exits and one terminal no-op");
+        assertEquals(JsonParser.parseString("""
+                {"Sensor":{"Type":"Any"}}
+                """).getAsJsonObject(), children.get(4),
+                "the fifth Task 1 child must be the exact terminal no-op");
+
+        Set<String> forbiddenTypes = Set.of(
+                "State", "BodyMotion", "Attack", "CombatActionEvaluator", "SelectTarget", "SelectBasicAttackTarget",
+                "SetMarkedTarget");
+        assertEquals(0, objects(component, object -> {
+            String type = string(object, "Type");
+            return object.has("BodyMotion") || object.has("Attack")
+                    || type != null && forbiddenTypes.contains(type);
+        }).size(),
+                "Task 1 must not add combat state, motion, or attack behavior before the later combat tasks");
     }
 
     private static List<JsonObject> directChildren(JsonObject component) {
