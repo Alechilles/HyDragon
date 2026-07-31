@@ -116,10 +116,11 @@ exit behavior. `AirborneMode` is the sole combat-mode selector.
 
 ## Role and Template Wiring
 
-`Tamed_NordicDrake` supplies the Nordic-only melee, bite, ground breath,
-fireball, volley, flying breath, movement, and timing parameters needed by the
-new component. Its current health, progression, interaction, mount,
-avatar-flight, breeding, memory, and command capability values remain
+`Tamed_NordicDrake` explicitly selects the Nordic-only component. The component
+owns its melee, bite, ground breath, fireball, volley, flying breath, movement,
+and timing parameters so the shared template does not expose Nordic tuning to
+unrelated descendants. The role's current health, progression, interaction,
+mount, avatar-flight, breeding, memory, and command capability values remain
 unchanged.
 
 The shared tamed dragon template remains usable by other full-dragon variants.
