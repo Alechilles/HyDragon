@@ -1,9 +1,7 @@
 {
   "Parent": "TwCompanionDefault",
-  "General": {
-    "Enabled": true,
-    "Priority": 100
-  },
+  "Enabled": true,
+  "Priority": 100,
   "RoleIds": [
     "Tamed_Hydra",
     "Tamed_RockDrakeT1",

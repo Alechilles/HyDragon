@@ -119,9 +119,11 @@ final class MiniwyvernProjectileBalanceAssetTest {
                 strings(hitRoot.getAsJsonArray("Interactions")));
         JsonObject damageInteraction = load(INTERACTION_ROOT.resolve("ProjectileHits")
                 .resolve("HyDragon_Miniwyvern_" + form + "_ProjectileHit_" + hitTier + ".json"));
-        assertEquals(Set.of("Type", "Entity", "DamageCalculator", "Next", "Failed", "Blocked"),
+        assertEquals(Set.of("Type", "DamageCalculator", "Next", "Failed", "Blocked"),
                 damageInteraction.keySet(), "DamageEntity must not contain extra nested behavior");
         assertEquals("DamageEntity", damageInteraction.get("Type").getAsString());
+        assertFalse(damageInteraction.has("Entity"),
+                "DamageEntity always damages the interaction target; Entity is not a supported 0.5.7 field");
         assertEquals(damage, damageInteraction.getAsJsonObject("DamageCalculator")
                 .getAsJsonObject("BaseDamage").get("Physical").getAsInt());
         assertEquals(0, damageInteraction.getAsJsonObject("DamageCalculator").get("RandomPercentageModifier").getAsInt());

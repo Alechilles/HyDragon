@@ -1,6 +1,5 @@
 {
   "Type": "DamageEntity",
-  "Entity": "Target",
   "DamageCalculator": {
     "Type": "Absolute",
     "BaseDamage": {
