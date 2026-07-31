@@ -104,6 +104,66 @@
     },
     "Instructions": [
       {
+        "Sensor": { "Type": "Not", "Sensor": { "Type": "Player", "Range": { "Compute": "HardLeashDistance" } } },
+        "Actions": [
+          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+          { "Type": "State", "State": ".Default" }
+        ]
+      },
+      {
+        "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Filters": [{ "Type": "TameworkIsOwner" }] },
+        "Actions": [
+          { "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" },
+          { "Type": "State", "State": ".Default" }
+        ]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } }
+        ] },
+        "Actions": [{ "Type": "State", "State": ".Combat" }]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
+          { "Reference": "Component_Tamework_Sensor_Defend_Attacked_MasterTarget", "Modify": {
+            "ViewRange": { "Compute": "AlertedRange" }, "ViewSector": { "Compute": "ViewSector" }, "HearingRange": { "Compute": "HearingRange" }, "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" }, "SourceTargetSlot": "MasterTarget", "RecentAttackMaxAgeSeconds": 30, "IncludeSelfAsSource": true, "ExcludeGroups": ["Self"]
+          } }
+        ] },
+        "Actions": [{ "Type": "State", "State": ".Combat" }]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
+          { "Reference": "Component_Tamework_Sensor_Defend_Hostile_To_MasterTarget", "Modify": {
+            "ViewRange": { "Compute": "AlertedRange" }, "ViewSector": { "Compute": "ViewSector" }, "HearingRange": { "Compute": "HearingRange" }, "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" }, "SourceTargetSlot": "MasterTarget", "ExcludeGroups": ["Self"]
+          } }
+        ] },
+        "Actions": [{ "Type": "State", "State": ".Combat" }]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } } }
+        ] },
+        "Actions": [{ "Type": "ReleaseTarget", "TargetSlot": "LockedTarget" }]
+      },
+      {
+        "Continue": true,
+        "Sensor": { "Type": "And", "Sensors": [
+          { "Type": "State", "State": ".Default" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AlertedRange" } } }
+        ] },
+        "Instructions": [{ "Reference": { "Compute": "DefendFollowMacroElement" }, "Interfaces": ["Hytale.Instruction.Null", "Tamework.Instruction.Follow"] }]
+      },
+      {
         "$Comment": "All invalid-combat exits own the same cancellation cleanup.",
         "Continue": true,
         "Sensor": {
@@ -149,6 +209,11 @@
             "SetTo": false
           },
           {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Projectile_Aiming",
+            "SetTo": false
+          },
+          {
             "Type": "TimerStop",
             "Name": "Miniwyvern_Swoop_Cooldown"
           },
@@ -159,6 +224,14 @@
           {
             "Type": "TimerStop",
             "Name": "Miniwyvern_Swoop_Recovery"
+          },
+          {
+            "Type": "TimerStop",
+            "Name": "Miniwyvern_Projectile_Aim"
+          },
+          {
+            "Type": "TimerStop",
+            "Name": "Miniwyvern_Projectile_Cooldown"
           },
           {
             "Type": "State",

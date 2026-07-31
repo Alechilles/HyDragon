@@ -59,7 +59,7 @@ final class MiniwyvernTalentAssetWiringTest {
     void templateContainsTalentGatedExecutableVariants() throws IOException {
         JsonObject template = load(TEMPLATE);
         JsonArray instructions = aerialInstructions();
-        assertFalse(template.toString().contains("Miniwyvern_Projectile_"),
+        assertFalse(hasProjectileScheduler(template),
                 "projectile scheduling must be centralized in the aerial component");
 
         for (int index = 0; index < COMBAT_TALENTS.size(); index++) {
@@ -96,7 +96,7 @@ final class MiniwyvernTalentAssetWiringTest {
     @Test
     void projectileCadenceUsesDeliberateRandomizedProgressionBands() throws IOException {
         JsonArray instructions = aerialInstructions();
-        assertFalse(load(TEMPLATE).toString().contains("Miniwyvern_Projectile_"));
+        assertFalse(hasProjectileScheduler(load(TEMPLATE)));
         Map<String, JsonElement> expected = Map.ofEntries(
                 Map.entry("DraconicProjectile", JsonParser.parseString("[5,7]")),
                 Map.entry("ProjectileRange", JsonParser.parseString("[5,7]")),
@@ -152,7 +152,7 @@ final class MiniwyvernTalentAssetWiringTest {
         JsonArray instructions = aerialInstructions();
         JsonObject aim = instructionUsingFlagAndMotion(instructions, AIM_FLAG, "MatchLook");
 
-        assertFalse(load(TEMPLATE).toString().contains("Miniwyvern_Projectile_"));
+        assertFalse(hasProjectileScheduler(load(TEMPLATE)));
         assertTrue(topLevelIndex(instructions, aim) > 0,
                 "the shared aim motion must execute after the swoop readiness setter");
         assertEquals(JsonParser.parseString("{\"Type\":\"MatchLook\"}"), aim.get("BodyMotion"));
@@ -167,7 +167,7 @@ final class MiniwyvernTalentAssetWiringTest {
         JsonObject scheduler = instructionWithAction(instructions, "TimerStart", AIM_TIMER);
         JsonObject recovery = instructionWithAction(instructions, "TimerStop", AIM_TIMER);
 
-        assertFalse(load(TEMPLATE).toString().contains("Miniwyvern_Projectile_"));
+        assertFalse(hasProjectileScheduler(load(TEMPLATE)));
         assertTrue(topLevelIndex(instructions, recovery) < topLevelIndex(instructions, scheduler));
 
         JsonObject start = action(scheduler, "TimerStart", AIM_TIMER);
@@ -354,6 +354,18 @@ final class MiniwyvernTalentAssetWiringTest {
             if (element.isJsonObject() && findAction(element, type, name) != null) return element.getAsJsonObject();
         }
         throw new AssertionError("missing top-level instruction with " + type + " action for " + name);
+    }
+
+    private static boolean hasProjectileScheduler(JsonElement value) {
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            if ("TimerStart".equals(string(object, "Type"))
+                    && (AIM_TIMER.equals(string(object, "Name")) || COOLDOWN_TIMER.equals(string(object, "Name")))) return true;
+            for (JsonElement child : object.asMap().values()) if (hasProjectileScheduler(child)) return true;
+        } else if (value.isJsonArray()) {
+            for (JsonElement child : value.getAsJsonArray()) if (hasProjectileScheduler(child)) return true;
+        }
+        return false;
     }
 
     private static int countTopLevelActions(JsonArray instructions, String type, String name) {
