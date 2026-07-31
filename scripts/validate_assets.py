@@ -1345,7 +1345,7 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
                     ("Parent", "Damage", "Splash", "BlockDamage", "Knockback", "Impact")):
                 fail(errors, f"Miniwyvern {form} {tier} is not self-contained and bounded")
             interactions = config.get("Interactions")
-            if not isinstance(interactions, dict):
+            if not isinstance(interactions, dict) or set(interactions) != {"ProjectileSpawn", "ProjectileHit", "ProjectileMiss"}:
                 fail(errors, f"Miniwyvern {form} {tier} has no interactions")
                 continue
             expected_hit_tier = {
@@ -1393,11 +1393,15 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
                 expected_next = {"Type": "Serial", "Interactions": [effect, remove]}
             if next_step != expected_next:
                 fail(errors, f"Miniwyvern {form} {tier} has an invalid accepted DamageEntity chain")
-            spawn = interactions.get("ProjectileSpawn", {})
+            spawn = interactions.get("ProjectileSpawn")
             spawn_steps = spawn.get("Interactions") if isinstance(spawn, dict) else None
-            miss = interactions.get("ProjectileMiss", {})
+            miss = interactions.get("ProjectileMiss")
             miss_steps = miss.get("Interactions") if isinstance(miss, dict) else None
-            if not isinstance(spawn_steps, list) or len(spawn_steps) != 2 \
+            if not isinstance(spawn, dict) or set(spawn) != {"Cooldown", "Interactions"} \
+                    or spawn.get("Cooldown") != {"Cooldown": 0} \
+                    or not isinstance(miss, dict) or set(miss) != {"Cooldown", "Interactions"} \
+                    or miss.get("Cooldown") != {"Cooldown": 0} \
+                    or not isinstance(spawn_steps, list) or len(spawn_steps) != 2 \
                     or spawn_steps[0] != {"Type": "Simple", "RunTime": timeout} \
                     or spawn_steps[1] != {"Type": "RemoveEntity", "Entity": "User"} \
                     or miss_steps != [{"Type": "RemoveEntity", "Entity": "User"}]:
@@ -1418,20 +1422,21 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
             root = parsed.get(root_root / f"Root_NPC_Wyvern_Mini_{form}_Projectile_{tier}.json")
             interaction = parsed.get(interaction_root / f"Wyvern_Mini_{form}_Projectile_{tier}.json")
             expected = f"Projectile_Config_HyDragon_Miniwyvern_{form}_{tier}"
-            if not isinstance(root, dict) or root.get("Tags", {}).get("Attack") != ["Ranged"] \
+            expected_root = {"Interactions": [f"Wyvern_Mini_{form}_Projectile_{tier}"], "Tags": {"Attack": ["Ranged"]}}
+            if root != expected_root \
                     or not isinstance(interaction, dict) or interaction != {"Type": "Projectile", "Config": expected}:
                 fail(errors, f"Miniwyvern {form} {tier} root does not resolve its modern projectile")
         for tier in ("Pattern", "Mastery"):
             root = parsed.get(root_root / f"Root_NPC_Wyvern_Mini_{form}_Projectile_{tier}.json")
             interaction = parsed.get(interaction_root / f"Wyvern_Mini_{form}_Projectile_{tier}.json")
             prefix = f"Projectile_Config_HyDragon_Miniwyvern_{form}_{tier}_"
-            steps = interaction.get("Interactions") if isinstance(interaction, dict) else None
-            if not isinstance(root, dict) or root.get("Tags", {}).get("Attack") != ["Ranged"] \
-                    or not isinstance(interaction, dict) or interaction.get("Type") != "Serial" \
-                    or not isinstance(steps, list) or len(steps) != 3 \
-                    or steps[0] != {"Type": "Projectile", "Config": prefix + "First"} \
-                    or steps[1] != {"Type": "Simple", "RunTime": 0.30} \
-                    or steps[2] != {"Type": "Projectile", "Config": prefix + "Echo"}:
+            expected_root = {"Interactions": [f"Wyvern_Mini_{form}_Projectile_{tier}"], "Tags": {"Attack": ["Ranged"]}}
+            expected_interaction = {"Type": "Serial", "Interactions": [
+                {"Type": "Projectile", "Config": prefix + "First"},
+                {"Type": "Simple", "RunTime": 0.30},
+                {"Type": "Projectile", "Config": prefix + "Echo"},
+            ]}
+            if root != expected_root or interaction != expected_interaction:
                 fail(errors, f"Miniwyvern {form} {tier} root is not the required two-shot serial")
 
 

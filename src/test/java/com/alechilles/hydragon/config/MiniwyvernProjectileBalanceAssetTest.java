@@ -72,23 +72,38 @@ final class MiniwyvernProjectileBalanceAssetTest {
 
     private static void assertRoot(String form, String tier, List<String> configs) throws IOException {
         JsonObject root = load(ROOT_ROOT.resolve("Root_NPC_Wyvern_Mini_" + form + "_Projectile_" + tier + ".json"));
+        String interactionId = "Wyvern_Mini_" + form + "_Projectile_" + tier;
+        assertEquals(Set.of("Interactions", "Tags"), root.keySet(), "root must not contain extra behavior");
+        assertEquals(Set.of("Attack"), root.getAsJsonObject("Tags").keySet(), "root tags must stay bounded");
         assertEquals(List.of("Ranged"), strings(root.getAsJsonObject("Tags").getAsJsonArray("Attack")));
-        JsonObject interaction = load(INTERACTION_ROOT.resolve("Wyvern_Mini_" + form + "_Projectile_" + tier + ".json"));
+        assertEquals(List.of(interactionId), strings(root.getAsJsonArray("Interactions")),
+                "root must resolve exactly its projectile child");
+        JsonObject interaction = load(INTERACTION_ROOT.resolve(interactionId + ".json"));
+        assertEquals(Set.of("Type", "Config"), interaction.keySet(), "projectile child must not contain extra behavior");
         assertEquals("Projectile", interaction.get("Type").getAsString());
         assertEquals(configs.getFirst(), interaction.get("Config").getAsString());
     }
 
     private static void assertSerialRoot(String form, String tier, String first, String echo) throws IOException {
         JsonObject root = load(ROOT_ROOT.resolve("Root_NPC_Wyvern_Mini_" + form + "_Projectile_" + tier + ".json"));
+        String interactionId = "Wyvern_Mini_" + form + "_Projectile_" + tier;
+        assertEquals(Set.of("Interactions", "Tags"), root.keySet(), "root must not contain extra behavior");
+        assertEquals(Set.of("Attack"), root.getAsJsonObject("Tags").keySet(), "root tags must stay bounded");
         assertEquals(List.of("Ranged"), strings(root.getAsJsonObject("Tags").getAsJsonArray("Attack")));
-        JsonObject serial = load(INTERACTION_ROOT.resolve("Wyvern_Mini_" + form + "_Projectile_" + tier + ".json"));
+        assertEquals(List.of(interactionId), strings(root.getAsJsonArray("Interactions")),
+                "root must resolve exactly its projectile child");
+        JsonObject serial = load(INTERACTION_ROOT.resolve(interactionId + ".json"));
+        assertEquals(Set.of("Type", "Interactions"), serial.keySet(), "serial child must not contain extra behavior");
         assertEquals("Serial", serial.get("Type").getAsString());
         JsonArray launches = serial.getAsJsonArray("Interactions");
         assertEquals(3, launches.size());
+        assertEquals(Set.of("Type", "Config"), launches.get(0).getAsJsonObject().keySet());
         assertEquals("Projectile", launches.get(0).getAsJsonObject().get("Type").getAsString());
         assertEquals(first, launches.get(0).getAsJsonObject().get("Config").getAsString());
+        assertEquals(Set.of("Type", "RunTime"), launches.get(1).getAsJsonObject().keySet());
         assertEquals("Simple", launches.get(1).getAsJsonObject().get("Type").getAsString());
         assertEquals(0.30, launches.get(1).getAsJsonObject().get("RunTime").getAsDouble());
+        assertEquals(Set.of("Type", "Config"), launches.get(2).getAsJsonObject().keySet());
         assertEquals("Projectile", launches.get(2).getAsJsonObject().get("Type").getAsString());
         assertEquals(echo, launches.get(2).getAsJsonObject().get("Config").getAsString());
     }
@@ -112,6 +127,8 @@ final class MiniwyvernProjectileBalanceAssetTest {
                 || config.has("Impact"), "forbidden projectile behavior in " + form + " " + tier);
 
         JsonObject interactions = config.getAsJsonObject("Interactions");
+        assertEquals(Set.of("ProjectileSpawn", "ProjectileHit", "ProjectileMiss"), interactions.keySet(),
+                "projectile interactions must not contain extra behavior");
         String hitRootId = "Root_HyDragon_Miniwyvern_" + form + "_ProjectileHit_" + hitTier;
         JsonElement hitReference = interactions.get("ProjectileHit");
         assertTrue(hitReference.isJsonPrimitive() && hitReference.getAsJsonPrimitive().isString(),
@@ -132,8 +149,18 @@ final class MiniwyvernProjectileBalanceAssetTest {
         assertTerminal(damageInteraction.getAsJsonObject("Failed"));
         assertTerminal(damageInteraction.getAsJsonObject("Blocked"));
         assertAcceptedChain(form, tier, damageInteraction.getAsJsonObject("Next"), status, first);
-        assertTerminal(interactions.getAsJsonObject("ProjectileMiss").getAsJsonArray("Interactions").get(0).getAsJsonObject());
-        JsonArray timeoutInteractions = interactions.getAsJsonObject("ProjectileSpawn").getAsJsonArray("Interactions");
+        JsonObject miss = interactions.getAsJsonObject("ProjectileMiss");
+        assertEquals(Set.of("Cooldown", "Interactions"), miss.keySet(), "miss wrapper must stay bounded");
+        assertEquals(Set.of("Cooldown"), miss.getAsJsonObject("Cooldown").keySet(), "miss cooldown must stay bounded");
+        assertEquals(0, miss.getAsJsonObject("Cooldown").get("Cooldown").getAsInt());
+        JsonArray missInteractions = miss.getAsJsonArray("Interactions");
+        assertEquals(1, missInteractions.size());
+        assertTerminal(missInteractions.get(0).getAsJsonObject());
+        JsonObject spawn = interactions.getAsJsonObject("ProjectileSpawn");
+        assertEquals(Set.of("Cooldown", "Interactions"), spawn.keySet(), "spawn wrapper must stay bounded");
+        assertEquals(Set.of("Cooldown"), spawn.getAsJsonObject("Cooldown").keySet(), "spawn cooldown must stay bounded");
+        assertEquals(0, spawn.getAsJsonObject("Cooldown").get("Cooldown").getAsInt());
+        JsonArray timeoutInteractions = spawn.getAsJsonArray("Interactions");
         assertEquals(2, timeoutInteractions.size());
         assertEquals("Simple", timeoutInteractions.get(0).getAsJsonObject().get("Type").getAsString());
         assertEquals(timeout, timeoutInteractions.get(0).getAsJsonObject().get("RunTime").getAsDouble());
