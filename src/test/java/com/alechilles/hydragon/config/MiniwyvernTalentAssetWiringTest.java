@@ -29,9 +29,10 @@ final class MiniwyvernTalentAssetWiringTest {
     @Test
     void everyAimSchedulerAndPhaseOneBranchHasTheExactSafeContract() throws IOException {
         JsonArray instructions = instructions();
+        assertReadinessBeforeSchedulers(instructions);
         List<JsonObject> schedulers = instructions.asList().stream().map(JsonElement::getAsJsonObject)
                 .filter(i -> hasAction(i, "TimerStart", "Miniwyvern_Projectile_Aim")).toList();
-        assertFalse(schedulers.isEmpty());
+        assertEquals(2, schedulers.size(), "exactly standard and guided aim schedulers are permitted");
         for (JsonObject scheduler : schedulers) assertSafeScheduler(scheduler);
 
         List<JsonObject> phaseOne = attacks(instructions).stream().filter(i -> Set.of("TalentProjectilePattern", "TalentProjectileMastery").contains(attack(i))).toList();
@@ -49,6 +50,7 @@ final class MiniwyvernTalentAssetWiringTest {
     @Test
     void profilesHaveDirectTalentGatesAndNoBranchMotion() throws IOException {
         List<JsonObject> branches = attacks(instructions());
+        assertProjectileInventory(branches);
         assertProfile(branches, "TalentProjectileMastery", "ProjectileMastery", Set.of("ProjectileMastery"), Set.of());
         assertProfile(branches, "TalentProjectilePattern", "ProjectilePattern", Set.of("ProjectilePattern", "ProjectileGuidance"), Set.of("ProjectileMastery"));
         assertProfile(branches, "TalentProjectilePattern", "ProjectilePattern", Set.of("ProjectilePattern"), Set.of("ProjectileGuidance", "ProjectileMastery"));
@@ -76,7 +78,9 @@ final class MiniwyvernTalentAssetWiringTest {
     @Test
     void bothCancellationBranchesHaveInvalidContextAndClearEchoBeforeReset() throws IOException {
         for (JsonObject asset : List.of(load(COMPONENT), load(TEMPLATE))) {
-            JsonObject cancel = cancellation(asset);
+            List<JsonObject> cancellations = cancellations(asset);
+            assertFalse(cancellations.isEmpty());
+            for (JsonObject cancel : cancellations) {
             assertTrue(directType(cancel.get("Sensor"), "Or") || (directType(cancel.get("Sensor"), "And") && directTerms(cancel.get("Sensor")).stream().anyMatch(t -> "Or".equals(string(t, "Type")))), "cancellation must directly test invalid context");
             JsonArray actions = cancel.getAsJsonArray("Actions");
             int echoOff = index(actions, "SetFlag", ECHO, false);
@@ -85,14 +89,25 @@ final class MiniwyvernTalentAssetWiringTest {
             assertTrue(index(actions, "SetFlag", AIMING, false) >= 0);
             assertTrue(index(actions, "SetFlag", VOLLEY, false) >= 0);
             assertTrue(index(actions, "TimerStop", "Miniwyvern_Projectile_Aim", false) >= 0);
+            }
         }
     }
 
     @Test
     void mutationProbesProveTheContractRejectsEachReviewDefect() throws IOException {
+        JsonArray readinessWithVolleyAlternative = instructions().deepCopy();
+        JsonObject readiness = readinessWithVolleyAlternative.asList().stream().map(JsonElement::getAsJsonObject)
+                .filter(i -> string(i, "$Comment").startsWith("Swoop readiness")).findFirst().orElseThrow();
+        JsonArray alternatives = directTerms(readiness.get("Sensor")).stream().filter(t -> "Or".equals(string(t, "Type"))).findFirst().orElseThrow().getAsJsonArray("Sensors");
+        alternatives.remove(1); alternatives.add(flag(VOLLEY, true));
+        assertThrows(AssertionError.class, () -> assertReadinessBeforeSchedulers(readinessWithVolleyAlternative));
+
         JsonObject template = load(TEMPLATE);
         JsonObject missingEcho = template.deepCopy(); componentModify(missingEcho).remove("TalentProjectilePatternEcho");
         assertThrows(AssertionError.class, () -> assertForwarding(componentModify(missingEcho)));
+
+        JsonObject extraApex = template.deepCopy(); componentModify(extraApex).add("TalentProjectileApex", new JsonObject());
+        assertThrows(AssertionError.class, () -> assertForwarding(componentModify(extraApex)));
 
         JsonObject crossForm = load(role("Fire")).getAsJsonObject("Modify").deepCopy();
         crossForm.addProperty("TalentProjectileBase", "Root_NPC_Wyvern_Mini_Ice_Projectile_Base");
@@ -113,11 +128,20 @@ final class MiniwyvernTalentAssetWiringTest {
         JsonObject earlyCleanup = echoes().get(0).deepCopy(); JsonArray echoActions = earlyCleanup.getAsJsonArray("Actions");
         JsonElement cleanup = echoActions.remove(echoActions.size() - 1); JsonArray reordered = new JsonArray(); reordered.add(cleanup); echoActions.forEach(reordered::add); earlyCleanup.add("Actions", reordered);
         assertThrows(AssertionError.class, () -> assertEcho(earlyCleanup));
+
+        List<JsonObject> duplicateProfiles = new java.util.ArrayList<>(attacks(instructions())); duplicateProfiles.add(duplicateProfiles.get(0));
+        assertThrows(AssertionError.class, () -> assertProjectileInventory(duplicateProfiles));
+
+        JsonObject swappedEcho = echoes().get(0).deepCopy(); swappedEcho.getAsJsonArray("Actions").get(1).getAsJsonObject().getAsJsonObject("Attack").addProperty("Compute", "TalentProjectilePatternEcho");
+        assertThrows(AssertionError.class, () -> assertEcho(swappedEcho));
     }
 
     private static void assertSafeScheduler(JsonObject scheduler) {
+        for (String required : List.of("Defend", "LockedTarget", "AirborneMode", "Fly")) assertDirectContext(scheduler.get("Sensor"), required);
         for (String flag : List.of("Miniwyvern_Swoop_Pending", "Miniwyvern_Swooping")) assertDirectFlag(scheduler.get("Sensor"), flag, false);
         assertDirectFlag(scheduler.get("Sensor"), AIMING, false);
+        assertDirectFlag(scheduler.get("Sensor"), VOLLEY, false);
+        assertDirectTimer(scheduler.get("Sensor"), "Miniwyvern_Projectile_Cooldown", "Stopped");
         assertFalse(scheduler.has("BodyMotion")); assertFalse(scheduler.has("HeadMotion"));
         assertFalse(scheduler.has("ActionsBlocking"));
         JsonArray a = scheduler.getAsJsonArray("Actions"); assertEquals(3, a.size());
@@ -125,7 +149,31 @@ final class MiniwyvernTalentAssetWiringTest {
         JsonElement range = a.get(0).getAsJsonObject().get("StartValueRange"); assertTrue(Set.of(JsonParser.parseString("[0.4,0.7]"), JsonParser.parseString("[0.55,0.85]")).contains(range)); assertEquals(range, a.get(0).getAsJsonObject().get("RestartValueRange"));
         assertAction(a.get(1), "TimerRestart", "Miniwyvern_Projectile_Aim", false); assertAction(a.get(2), "SetFlag", AIMING, true);
     }
+    private static void assertReadinessBeforeSchedulers(JsonArray instructions) {
+        int readinessIndex = -1;
+        for (int i = 0; i < instructions.size(); i++) {
+            JsonObject instruction = instructions.get(i).getAsJsonObject();
+            if (string(instruction, "$Comment").startsWith("Swoop readiness")) {
+                readinessIndex = i;
+                JsonObject sensor = instruction.getAsJsonObject("Sensor");
+                assertEquals("And", string(sensor, "Type"));
+                JsonObject readinessOr = directTerms(sensor).stream().filter(t -> "Or".equals(string(t, "Type"))).findFirst().orElseThrow();
+                JsonArray alternatives = readinessOr.getAsJsonArray("Sensors");
+                assertEquals(2, alternatives.size());
+                assertEquals(JsonParser.parseString("{\"Type\":\"Flag\",\"Name\":\"Miniwyvern_Projectile_Aiming\",\"Set\":false}"), alternatives.get(0));
+                assertEquals(JsonParser.parseString("{\"Type\":\"Flag\",\"Name\":\"Miniwyvern_Projectile_Echo_Pending\"}"), alternatives.get(1));
+                assertFalse(alternatives.asList().stream().anyMatch(t -> VOLLEY.equals(string(t.getAsJsonObject(), "Name"))));
+                break;
+            }
+        }
+        assertTrue(readinessIndex >= 0, "missing swoop readiness setter");
+        for (int i = 0; i < instructions.size(); i++) if (hasAction(instructions.get(i).getAsJsonObject(), "TimerStart", "Miniwyvern_Projectile_Aim")) assertTrue(readinessIndex < i, "readiness must precede every aim scheduler");
+    }
     private static void assertPhaseOne(JsonObject branch) {
+        for (String required : List.of("Defend", "LockedTarget", "AirborneMode", "Fly")) assertDirectContext(branch.get("Sensor"), required);
+        assertDirectFlag(branch.get("Sensor"), AIMING, true); assertDirectFlag(branch.get("Sensor"), VOLLEY, false); assertDirectFlag(branch.get("Sensor"), ECHO, false);
+        assertDirectTimer(branch.get("Sensor"), "Miniwyvern_Projectile_Aim", "Stopped");
+        assertDirectFlag(branch.get("Sensor"), "Miniwyvern_Swoop_Pending", false); assertDirectFlag(branch.get("Sensor"), "Miniwyvern_Swooping", false);
         assertTrue(branch.has("ActionsBlocking") && branch.get("ActionsBlocking").getAsBoolean());
         JsonArray a = branch.getAsJsonArray("Actions"); assertEquals(3, a.size());
         assertAction(a.get(0), "SetFlag", VOLLEY, true); assertAttack(a.get(1), attack(branch)); assertAction(a.get(2), "SetFlag", ECHO, true);
@@ -146,14 +194,21 @@ final class MiniwyvernTalentAssetWiringTest {
         assertAttack(a.get(1), attack(echo)); assertCooldown(a.get(2), attack(echo).contains("Mastery") ? "[3,5]" : "[4,6]");
         assertAction(a.get(3), "TimerRestart", "Miniwyvern_Projectile_Cooldown", false); assertAction(a.get(4), "SetFlag", VOLLEY, false); assertAction(a.get(5), "SetFlag", AIMING, false); assertAction(a.get(6), "SetFlag", ECHO, false);
     }
-    private static void assertForwarding(JsonObject modify) { for (String root : ROOTS) { assertTrue(modify.has(root)); assertEquals(root, modify.getAsJsonObject(root).get("Compute").getAsString()); } }
+    private static void assertForwarding(JsonObject modify) { assertEquals(Set.copyOf(ROOTS), modify.keySet().stream().filter(k -> k.startsWith("TalentProjectile")).collect(java.util.stream.Collectors.toSet())); for (String root : ROOTS) { assertTrue(modify.has(root)); assertEquals(root, modify.getAsJsonObject(root).get("Compute").getAsString()); } }
+    private static void assertProjectileInventory(List<JsonObject> branches) {
+        List<JsonObject> primary = branches.stream().filter(b -> !attack(b).endsWith("Echo")).toList();
+        List<JsonObject> echoes = branches.stream().filter(b -> attack(b).endsWith("Echo")).toList();
+        assertEquals(8, primary.size()); assertEquals(3, echoes.size());
+        assertEquals(8, primary.stream().map(b -> attack(b) + directPositiveTalents(b.get("Sensor")) + directNegatedTalents(b.get("Sensor"))).distinct().count());
+        assertEquals(3, echoes.stream().map(b -> attack(b) + directPositiveTalents(b.get("Sensor")) + directNegatedTalents(b.get("Sensor"))).distinct().count());
+    }
     private static void assertFormRoots(String form, JsonObject modify) { for (String root : ROOTS) assertEquals("Root_NPC_Wyvern_Mini_" + form + "_Projectile_" + root.substring("TalentProjectile".length()).replace("Echo", "_Echo"), modify.get(root).getAsString()); }
     private static void assertProfile(List<JsonObject> branches, String root, String required, Set<String> positive, Set<String> negative) { JsonObject branch = branches.stream().filter(i -> root.equals(attack(i))).filter(i -> directPositiveTalents(i.get("Sensor")).equals(positive)).findFirst().orElseThrow(); assertDirectTalent(branch.get("Sensor"), required, false); assertEquals(negative, directNegatedTalents(branch.get("Sensor"))); }
     private static List<JsonObject> attacks(JsonArray i) { return i.asList().stream().map(JsonElement::getAsJsonObject).filter(x -> hasAction(x, "Attack", null)).filter(x -> attack(x).startsWith("TalentProjectile")).toList(); }
     private static List<JsonObject> phaseOne() throws IOException { return attacks(instructions()).stream().filter(i -> !attack(i).endsWith("Echo") && Set.of("TalentProjectilePattern", "TalentProjectileMastery").contains(attack(i))).toList(); }
     private static List<JsonObject> echoes() throws IOException { return attacks(instructions()).stream().filter(i -> attack(i).endsWith("Echo")).toList(); }
     private static JsonObject componentModify(JsonObject template) { return find(template, o -> "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend".equals(string(o, "Reference"))).getAsJsonObject("Modify"); }
-    private static JsonObject cancellation(JsonObject asset) { return find(asset, o -> hasAction(o, "ResetInstructions", null)); }
+    private static List<JsonObject> cancellations(JsonObject asset) { return all(asset, o -> hasAction(o, "ResetInstructions", null)); }
     private static Path role(String form) { return Path.of("Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Tamed_Wyvern_Mini_" + form + ".json"); }
     private static JsonArray instructions() throws IOException { return load(COMPONENT).getAsJsonObject("Content").getAsJsonArray("Instructions"); }
     private static JsonObject load(Path p) throws IOException { return JsonParser.parseString(Files.readString(p)).getAsJsonObject(); }
@@ -163,6 +218,7 @@ final class MiniwyvernTalentAssetWiringTest {
     private static void assertCooldown(JsonElement a, String range) { assertAction(a, "TimerStart", "Miniwyvern_Projectile_Cooldown", false); assertEquals(JsonParser.parseString(range), a.getAsJsonObject().get("StartValueRange")); assertEquals(JsonParser.parseString(range), a.getAsJsonObject().get("RestartValueRange")); }
     private static void assertAction(JsonElement a, String t, String n, boolean set) { assertEquals(t, type(a)); if (n != null) assertEquals(n, string(a.getAsJsonObject(), "Name")); if ("SetFlag".equals(t)) assertEquals(set, a.getAsJsonObject().get("SetTo").getAsBoolean()); }
     private static int index(JsonArray a, String t, String n, boolean set) { for (int x=0;x<a.size();x++) { JsonObject o=a.get(x).getAsJsonObject(); if(t.equals(string(o,"Type")) && (n==null || n.equals(string(o,"Name"))) && (!"SetFlag".equals(t) || o.get("SetTo").getAsBoolean()==set)) return x; } return -1; }
+    private static JsonObject flag(String name, boolean set) { JsonObject flag = new JsonObject(); flag.addProperty("Type", "Flag"); flag.addProperty("Name", name); if (!set) flag.addProperty("Set", false); return flag; }
     private static boolean directType(JsonElement sensor, String wanted) { return sensor != null && sensor.isJsonObject() && wanted.equals(string(sensor.getAsJsonObject(), "Type")); }
     private static void assertDirectTalent(JsonElement sensor, String talent, boolean negated) { assertTrue(directTerms(sensor).stream().anyMatch(t -> negated ? "Not".equals(string(t,"Type")) && directType(t.get("Sensor"), "TameworkHasTalent") && talent.equals(string(t.getAsJsonObject("Sensor"), "TalentId")) : "TameworkHasTalent".equals(string(t,"Type")) && talent.equals(string(t,"TalentId")))); }
     private static Set<String> directPositiveTalents(JsonElement sensor) { return directTerms(sensor).stream().filter(t -> "TameworkHasTalent".equals(string(t,"Type"))).map(t -> string(t,"TalentId")).collect(java.util.stream.Collectors.toSet()); }
@@ -170,8 +226,11 @@ final class MiniwyvernTalentAssetWiringTest {
     private static void assertDirectFlag(JsonElement sensor, String flag, boolean value) { assertTrue(directTerms(sensor).stream().anyMatch(t -> "Flag".equals(string(t,"Type")) && flag.equals(string(t,"Name")) && (!t.has("Set") ? value : t.get("Set").getAsBoolean()==value))); }
     private static boolean directFlagPresent(JsonElement sensor, String flag) { return directTerms(sensor).stream().anyMatch(t -> "Flag".equals(string(t,"Type")) && flag.equals(string(t,"Name"))); }
     private static void assertDirectContext(JsonElement sensor, String wanted) { assertTrue(directTerms(sensor).stream().anyMatch(t -> wanted.equals(string(t,"State")) || wanted.equals(string(t,"TargetSlot")) || wanted.equals(string(t,"Name")) || wanted.equals(string(t,"MotionController")))); }
+    private static void assertDirectTimer(JsonElement sensor, String name, String state) { assertTrue(directTerms(sensor).stream().anyMatch(t -> "Timer".equals(string(t, "Type")) && name.equals(string(t, "Name")) && state.equals(string(t, "State")))); }
     private static List<JsonObject> directTerms(JsonElement sensor) { assertTrue(directType(sensor, "And")); return sensor.getAsJsonObject().getAsJsonArray("Sensors").asList().stream().map(JsonElement::getAsJsonObject).toList(); }
     private static JsonObject find(JsonElement e, java.util.function.Predicate<JsonObject> p) { if(e.isJsonObject()) { JsonObject o=e.getAsJsonObject(); if(p.test(o)) return o; for(JsonElement c:o.asMap().values()) try { return find(c,p); } catch(IllegalArgumentException ignored) {} } else if(e.isJsonArray()) for(JsonElement c:e.getAsJsonArray()) try { return find(c,p); } catch(IllegalArgumentException ignored) {} throw new IllegalArgumentException("not found"); }
+    private static List<JsonObject> all(JsonElement e, java.util.function.Predicate<JsonObject> p) { java.util.ArrayList<JsonObject> found = new java.util.ArrayList<>(); collect(e, p, found); return found; }
+    private static void collect(JsonElement e, java.util.function.Predicate<JsonObject> p, List<JsonObject> found) { if (e.isJsonObject()) { JsonObject o=e.getAsJsonObject(); if (p.test(o)) found.add(o); for (JsonElement c : o.asMap().values()) collect(c, p, found); } else if (e.isJsonArray()) for (JsonElement c : e.getAsJsonArray()) collect(c, p, found); }
     private static String type(JsonElement e) { return e != null && e.isJsonObject() ? string(e.getAsJsonObject(), "Type") : ""; }
     private static String string(JsonObject o, String n) { return o != null && o.has(n) ? o.get(n).getAsString() : ""; }
 }

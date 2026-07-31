@@ -720,7 +720,7 @@
           },
           {
             "Type": "Flag",
-            "Name": "Miniwyvern_Projectile_Volley_Active"
+            "Name": "Miniwyvern_Projectile_Echo_Pending"
           }
         ]
       }
@@ -828,6 +828,14 @@
               "TargetSlot": "LockedTarget"
             },
             {
+              "Type": "Flag",
+              "Name": "AirborneMode"
+            },
+            {
+              "Type": "MotionController",
+              "MotionController": "Fly"
+            },
+            {
               "Type": "TameworkHasTalent",
               "TalentId": "DraconicProjectile"
             },
@@ -914,6 +922,14 @@
             {
               "Type": "Target",
               "TargetSlot": "LockedTarget"
+            },
+            {
+              "Type": "Flag",
+              "Name": "AirborneMode"
+            },
+            {
+              "Type": "MotionController",
+              "MotionController": "Fly"
             },
             {
               "Type": "TameworkHasTalent",
@@ -1036,6 +1052,8 @@
               "Type": "Target",
               "TargetSlot": "LockedTarget"
             },
+            { "Type": "Flag", "Name": "AirborneMode" },
+            { "Type": "MotionController", "MotionController": "Fly" },
             {
               "Type": "Flag",
               "Name": "Miniwyvern_Projectile_Aiming"
@@ -1045,6 +1063,8 @@
               "Name": "Miniwyvern_Projectile_Aim",
               "State": "Stopped"
             },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active", "Set": false },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending", "Set": false },
             {
               "Type": "Flag",
               "Name": "Miniwyvern_Swoop_Pending",
@@ -1102,6 +1122,8 @@
               "Type": "Target",
               "TargetSlot": "LockedTarget"
             },
+            { "Type": "Flag", "Name": "AirborneMode" },
+            { "Type": "MotionController", "MotionController": "Fly" },
             {
               "Type": "Flag",
               "Name": "Miniwyvern_Projectile_Aiming"
@@ -1111,6 +1133,8 @@
               "Name": "Miniwyvern_Projectile_Aim",
               "State": "Stopped"
             },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active", "Set": false },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending", "Set": false },
             {
               "Type": "Flag",
               "Name": "Miniwyvern_Swoop_Pending",
@@ -1179,6 +1203,8 @@
               "Type": "Target",
               "TargetSlot": "LockedTarget"
             },
+            { "Type": "Flag", "Name": "AirborneMode" },
+            { "Type": "MotionController", "MotionController": "Fly" },
             {
               "Type": "Flag",
               "Name": "Miniwyvern_Projectile_Aiming"
@@ -1188,6 +1214,8 @@
               "Name": "Miniwyvern_Projectile_Aim",
               "State": "Stopped"
             },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active", "Set": false },
+            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending", "Set": false },
             {
               "Type": "Flag",
               "Name": "Miniwyvern_Swoop_Pending",
