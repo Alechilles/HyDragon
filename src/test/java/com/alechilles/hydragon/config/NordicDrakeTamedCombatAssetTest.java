@@ -29,7 +29,7 @@ final class NordicDrakeTamedCombatAssetTest {
     private static final Set<String> FORBIDDEN_IMPLICIT_COMBAT_TYPES = Set.of(
             "SetTarget", "LockOnTarget", "LockOnInteractionTarget", "SelectTarget", "SelectBasicAttackTarget",
             "CombatActionEvaluator", "SetMarkedTarget", "CombatAbility", "HasHostileTargetMemory",
-            "AddToHostileTargetMemory", "State", "BodyMotion", "Attack");
+            "AddToHostileTargetMemory");
 
     @Test
     void nordicCombatIsAnExclusiveLockedTargetTakeoverWithBoundedSafety() throws IOException {
@@ -47,7 +47,18 @@ final class NordicDrakeTamedCombatAssetTest {
         assertOwnerAndFriendlyRelease(component);
         assertLostTargetRelease(component);
         assertNoImplicitTargetSelection(component);
-        assertTaskOneShellStopsBeforeCombat(component);
+        assertTaskOneSafetyShellIsPreserved(component);
+    }
+
+    @Test
+    void nordicGroundCombatConsumesLockedTargetWithGroundedDirectAttacks() throws IOException {
+        JsonObject component = readJson(COMPONENT);
+
+        assertGroundedParameters(component);
+        JsonObject groundCombat = groundedCombat(component);
+        assertGroundedEntry(component);
+        assertGroundedMovement(groundCombat);
+        assertGroundedAttackChoice(groundCombat);
     }
 
     private static JsonObject readJson(Path path) throws IOException {
@@ -175,20 +186,176 @@ final class NordicDrakeTamedCombatAssetTest {
         }
     }
 
-    private static void assertTaskOneShellStopsBeforeCombat(JsonObject component) {
+    private static void assertTaskOneSafetyShellIsPreserved(JsonObject component) {
         List<JsonObject> children = directChildren(component);
-        assertEquals(5, children.size(), "Task 1 must contain exactly four safety exits and one terminal no-op");
-        assertEquals(JsonParser.parseString("""
-                {"Sensor":{"Type":"Any"}}
-                """).getAsJsonObject(), children.get(4),
-                "the fifth Task 1 child must be the exact terminal no-op");
+        assertTrue(children.size() >= 4, "the four Task 1 safety exits must remain first");
+        assertHardLeashRelease(component);
+        assertOwnerAndFriendlyRelease(component);
+        assertLostTargetRelease(component);
+    }
 
-        assertEquals(0, objects(component, object -> {
-            String type = string(object, "Type");
-            return object.has("BodyMotion") || object.has("Attack")
-                    || type != null && FORBIDDEN_IMPLICIT_COMBAT_TYPES.contains(type);
-        }).size(),
-                "Task 1 must not add combat state, motion, or attack behavior before the later combat tasks");
+    private static void assertGroundedParameters(JsonObject component) {
+        JsonObject parameters = component.getAsJsonObject("Parameters");
+        assertParameter(parameters, "GroundBasicAttack", "Root_NPC_NordicDrake_Attack");
+        assertParameter(parameters, "GroundBasicAttackDistance", 5.25);
+        assertParameter(parameters, "GroundBasicCooldownRange", List.of(1.5, 2.5));
+        assertParameter(parameters, "GroundBiteAttack", "Root_NPC_NordicDrake_Bite");
+        assertParameter(parameters, "GroundBiteDistance", 4.5);
+        assertParameter(parameters, "GroundBiteCooldownRange", List.of(10, 20));
+        assertParameter(parameters, "GroundBiteWeight", 3);
+        assertParameter(parameters, "GroundBreathAttack", "Root_NPC_NordicDrake_Flame_Breath");
+        assertParameter(parameters, "GroundBreathDistance", 9);
+        assertParameter(parameters, "GroundBreathCooldownRange", List.of(10, 20));
+        assertParameter(parameters, "GroundBreathWeight", 4);
+        assertParameter(parameters, "DesiredAttackDistanceRange", List.of(0.5, 5));
+        assertParameter(parameters, "CombatBehaviorDistance", 18);
+        assertParameter(parameters, "CombatMovingRelativeSpeed", 0.6);
+        assertParameter(parameters, "CombatBackwardsRelativeSpeed", 0.4);
+        assertParameter(parameters, "CombatRelativeTurnSpeed", 1.5);
+    }
+
+    private static void assertGroundedEntry(JsonObject component) {
+        JsonObject entry = objects(component, object -> objects(object, child ->
+                ".GroundCombat".equals(string(child, "State"))).size() == 1
+                && !".GroundCombat".equals(string(object, "State"))).stream()
+                .filter(object -> object.has("Sensor") && object.has("Actions"))
+                .findFirst().orElseThrow(() -> new AssertionError("missing grounded combat entry"));
+        assertGroundedContext(entry.getAsJsonObject("Sensor"));
+        assertEquals(List.of("State"), actionTypes(entry));
+        assertEquals(".GroundCombat", string(entry.getAsJsonArray("Actions").get(0).getAsJsonObject(), "State"));
+    }
+
+    private static JsonObject groundedCombat(JsonObject component) {
+        return objects(component, object -> object.has("Sensor") && object.has("Instructions")
+                && "State".equals(string(object.getAsJsonObject("Sensor"), "Type"))
+                && ".GroundCombat".equals(string(object.getAsJsonObject("Sensor"), "State"))).stream().findFirst()
+                .orElseThrow(() -> new AssertionError("missing .GroundCombat branch"));
+    }
+
+    private static void assertGroundedMovement(JsonObject groundCombat) {
+        JsonObject chase = objects(groundCombat, object -> object.has("Sensor") && object.has("Instructions")
+                && object.getAsJsonArray("Instructions").asList().stream().map(JsonElement::getAsJsonObject)
+                .anyMatch(child -> "Component_Tamework_Instruction_Intelligent_Chase".equals(string(child, "Reference"))))
+                .stream().findFirst()
+                .orElseThrow(() -> new AssertionError("missing grounded chase"));
+        assertGroundedContext(chase.getAsJsonObject("Sensor"));
+        JsonObject chaseModify = objects(chase, object -> "Component_Tamework_Instruction_Intelligent_Chase"
+                .equals(string(object, "Reference"))).get(0).getAsJsonObject("Modify");
+        assertEquals(Set.of("ViewRange", "HearingRange", "RelativeSpeed", "SlowDownDistance", "StopDistance"),
+                chaseModify.keySet());
+
+        JsonObject maintain = objects(groundCombat, object ->
+                "MaintainDistance".equals(string(object, "Type"))).stream().findFirst()
+                .orElseThrow(() -> new AssertionError("missing grounded MaintainDistance"));
+        assertEquals("DesiredAttackDistanceRange", string(maintain.getAsJsonObject("DesiredDistanceRange"), "Compute"));
+        assertEquals("CombatMovingRelativeSpeed", string(maintain.getAsJsonObject("RelativeForwardsSpeed"), "Compute"));
+        assertEquals("CombatBackwardsRelativeSpeed", string(maintain.getAsJsonObject("RelativeBackwardsSpeed"), "Compute"));
+    }
+
+    private static void assertGroundedAttackChoice(JsonObject groundCombat) {
+        List<JsonObject> attacks = objects(groundCombat, object -> object.has("Actions")
+                && actionTypes(object).contains("Attack"));
+        assertTrue(attacks.size() >= 5,
+                "ground combat must provide both-special random choices, direct one-special choices, and basic fallback");
+        JsonObject basic = attackBranch(attacks, "GroundBasicAttack");
+        JsonObject bite = attackBranch(attacks, "GroundBiteAttack");
+        JsonObject breath = attackBranch(attacks, "GroundBreathAttack");
+        assertGroundedAttackBranch(basic, "NordicDrake_Ground_Basic", false);
+        assertGroundedAttackBranch(bite, "NordicDrake_Ground_Bite", true);
+        assertGroundedAttackBranch(breath, "NordicDrake_Ground_Breath", true);
+        assertEquals(List.of(0.1, 0.2), numbers(action(basic, "Attack").getAsJsonArray("AimingTimeRange")));
+
+        JsonObject random = objects(groundCombat, object -> "Random".equals(string(object, "Type"))).stream()
+                .findFirst().orElseThrow(() -> new AssertionError("missing special attack random selector"));
+        List<JsonObject> selected = random.getAsJsonArray("Instructions").asList().stream()
+                .map(JsonElement::getAsJsonObject).toList();
+        assertEquals(2, selected.size());
+        assertEquals(3, selected.stream().filter(branch -> containsAttack(branch, "GroundBiteAttack"))
+                .findFirst().orElseThrow().get("Weight").getAsInt());
+        assertEquals(4, selected.stream().filter(branch -> containsAttack(branch, "GroundBreathAttack"))
+                .findFirst().orElseThrow().get("Weight").getAsInt());
+        assertEquals(2, objects(basic.getAsJsonObject("Sensor"), object -> "Not".equals(string(object, "Type"))
+                && objects(object, child -> "Flag".equals(string(child, "Type"))
+                && ("NordicDrake_Ground_Bite_Active".equals(string(child, "Name"))
+                || "NordicDrake_Ground_Breath_Active".equals(string(child, "Name")))).size() == 1).size(),
+                "basic fallback must be gated out while either selected special is executing");
+    }
+
+    private static void assertGroundedAttackBranch(JsonObject branch, String timer, boolean blocking) {
+        assertGroundedContext(branch.getAsJsonObject("Sensor"));
+        assertTrue(objects(branch.getAsJsonObject("Sensor"), object -> "State".equals(string(object, "Type"))
+                && ".GroundCombat".equals(string(object, "State"))).size() == 1);
+        assertEquals(1, objects(branch.getAsJsonObject("Sensor"), object -> "Timer".equals(string(object, "Type"))
+                && timer.equals(string(object, "Name")) && "Stopped".equals(string(object, "State"))).size());
+        assertEquals(blocking, branch.has("ActionsBlocking") && branch.get("ActionsBlocking").getAsBoolean());
+        assertEquals(timer, actionTypesAfterAttack(branch, "TimerStart").get(0).getAsJsonObject().get("Name").getAsString());
+        assertEquals(timer, actionTypesAfterAttack(branch, "TimerRestart").get(0).getAsJsonObject().get("Name").getAsString());
+        JsonObject aim = branch.getAsJsonObject("HeadMotion");
+        assertEquals("Aim", string(aim, "Type"));
+        assertEquals(0, aim.get("Spread").getAsInt());
+        assertEquals(1, aim.get("HitProbability").getAsInt());
+        assertTrue(aim.get("Deflection").getAsBoolean());
+        assertEquals("CombatRelativeTurnSpeed", string(aim.getAsJsonObject("RelativeTurnSpeed"), "Compute"));
+    }
+
+    private static JsonObject attackBranch(List<JsonObject> branches, String attack) {
+        return branches.stream().filter(branch -> containsAttack(branch, attack)).findFirst()
+                .orElseThrow(() -> new AssertionError("missing " + attack + " branch"));
+    }
+
+    private static boolean containsAttack(JsonObject branch, String attack) {
+        return objects(branch, object -> "Attack".equals(string(object, "Type"))
+                && attack.equals(string(object.getAsJsonObject("Attack"), "Compute"))).size() == 1;
+    }
+
+    private static JsonObject action(JsonObject branch, String type) {
+        return branch.getAsJsonArray("Actions").asList().stream().map(JsonElement::getAsJsonObject)
+                .filter(candidate -> type.equals(string(candidate, "Type"))).findFirst().orElseThrow();
+    }
+
+    private static List<String> actionTypes(JsonObject branch) {
+        return branch.getAsJsonArray("Actions").asList().stream().map(JsonElement::getAsJsonObject)
+                .map(action -> string(action, "Type")).toList();
+    }
+
+    private static List<String> actionTypesAfterAttack(JsonObject branch) {
+        List<String> actions = actionTypes(branch);
+        return actions.subList(actions.indexOf("Attack") + 1, actions.size());
+    }
+
+    private static List<JsonElement> actionTypesAfterAttack(JsonObject branch, String type) {
+        List<JsonElement> actions = branch.getAsJsonArray("Actions").asList();
+        int attackIndex = actionTypes(branch).indexOf("Attack");
+        return actions.subList(attackIndex + 1, actions.size()).stream()
+                .filter(action -> type.equals(string(action.getAsJsonObject(), "Type"))).toList();
+    }
+
+    private static void assertGroundedContext(JsonObject sensor) {
+        List<JsonObject> sensors = objects(sensor, object -> true);
+        assertTrue(sensors.stream().anyMatch(object -> "Target".equals(string(object, "Type"))
+                && "LockedTarget".equals(string(object, "TargetSlot"))));
+        assertTrue(sensors.stream().anyMatch(object -> "Flag".equals(string(object, "Type"))
+                && "AirborneMode".equals(string(object, "Name")) && object.has("Set")
+                && !object.get("Set").getAsBoolean()));
+        assertTrue(sensors.stream().anyMatch(object -> "MotionController".equals(string(object, "Type"))
+                && "Walk".equals(string(object, "MotionController"))));
+    }
+
+    private static void assertParameter(JsonObject parameters, String name, Object expected) {
+        assertTrue(parameters.has(name), "missing grounded parameter " + name);
+        JsonElement value = parameters.getAsJsonObject(name).get("Value");
+        if (expected instanceof List<?> expectedList) {
+            assertEquals(expectedList.stream().map(number -> ((Number) number).doubleValue()).toList(),
+                    numbers(value.getAsJsonArray()));
+        } else if (expected instanceof Number expectedNumber) {
+            assertEquals(expectedNumber.doubleValue(), value.getAsDouble());
+        } else {
+            assertEquals(expected, value.getAsString());
+        }
+    }
+
+    private static List<Double> numbers(JsonArray values) {
+        return values.asList().stream().map(JsonElement::getAsDouble).toList();
     }
 
     private static List<JsonObject> directChildren(JsonObject component) {
