@@ -687,7 +687,7 @@ final class NordicDrakeTamedCombatAssetTest {
         assertEquals(2, breaths.size());
         JsonObject basic = basics.get(0);
         basics.forEach(branch -> assertGroundedAttackBranch(branch, "GroundBasicAttack", "GroundBasicAttackDistance",
-                "GroundBasicCooldownRange", "NordicDrake_Ground_Basic", false));
+                "GroundBasicCooldownRange", "NordicDrake_Ground_Basic", true));
         bites.forEach(branch -> assertGroundedAttackBranch(branch, "GroundBiteAttack", "GroundBiteDistance",
                 "GroundBiteCooldownRange", "NordicDrake_Ground_Bite", true));
         breaths.forEach(branch -> assertGroundedAttackBranch(branch, "GroundBreathAttack", "GroundBreathDistance",
