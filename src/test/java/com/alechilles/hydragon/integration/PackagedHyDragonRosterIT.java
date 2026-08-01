@@ -142,7 +142,8 @@ final class PackagedHyDragonRosterIT {
             assertEquals(List.of("Tamed_NordicDrake"), roleIds(nordic));
             assertFlightToggle(nordic);
             assertEquals(List.of(
-                    "Tamed_Hydra", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"),
+                    "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2",
+                    "Tamed_RockDrakeT3"),
                     roleIds(groundOnly));
             String groundOnlyJson = groundOnly.toString();
             assertFalse(groundOnly.getAsJsonObject("Command").has("FlightToggle"));
