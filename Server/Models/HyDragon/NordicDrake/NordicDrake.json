@@ -1,7 +1,7 @@
 {
   "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake.blockymodel",
   "Texture": "NPC/HyDragon/NordicDrake/Model/OldOrange.png",
-  "EyeHeight": 4.3,
+  "EyeHeight": 1.5,
   "CrouchOffset": -0.1,
   "HitBox": {
     "Max": {
