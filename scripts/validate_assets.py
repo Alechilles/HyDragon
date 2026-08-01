@@ -679,7 +679,8 @@ def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors
         ],
         "HyDragonNordicDrake.json": ["Tamed_NordicDrake"],
         "HyDragonFullDragons.json": [
-            "Tamed_Hydra", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3",
+            "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2",
+            "Tamed_RockDrakeT3",
         ],
     }
     for filename, roles in expected_roles.items():
@@ -1238,7 +1239,7 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
         fail(errors, "Dragon Horn must not retain generic owner-family projection settings")
     allowed = config.get("AllowedRoles")
     required_roles = {
-        "Tamed_Hydra", "Tamed_NordicDrake", "Tamed_RockDrakeT1",
+        "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_NordicDrake", "Tamed_RockDrakeT1",
         "Tamed_RockDrakeT2", "Tamed_RockDrakeT3",
         "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
         "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
@@ -1268,8 +1269,8 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
             "MaximumActive": 1,
             "Timers": {"SessionDurationSeconds": 600,
                        "SummonCooldownSeconds": 300},
-            "AllowedRoles": {"Tamed_NordicDrake", "Tamed_Hydra", "Tamed_RockDrakeT1",
-                             "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"},
+            "AllowedRoles": {"Tamed_NordicDrake", "Tamed_Hydra", "Tamed_Hydra_Toxic",
+                             "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"},
             "Costs": [("Revitalizing_Essence", 2), ("Draconic_Essence", 4)],
             "Features": {"Capture": True, "Provision": False, "Summon": True,
                          "Dismiss": True, "Revive": True},

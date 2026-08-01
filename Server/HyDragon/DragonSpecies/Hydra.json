@@ -1,7 +1,10 @@
 {
   "Id": "hydragon:hydra",
-  "WildRoleIds": [ "Hydra" ],
-  "TamedRoleIdByWildRole": { "Hydra": "Tamed_Hydra" },
+  "WildRoleIds": [ "Hydra", "Hydra_Toxic" ],
+  "TamedRoleIdByWildRole": {
+    "Hydra": "Tamed_Hydra",
+    "Hydra_Toxic": "Tamed_Hydra_Toxic"
+  },
   "DifficultyId": "epic",
   "StatsAndBehaviorAssetIds": [ "CAE_Hydra", "Root_NPC_Hydra_Attack" ],
   "DropListId": "Drop_Hydra",
@@ -12,11 +15,14 @@
     "SpecialRequirementIds": []
   },
   "Spawn": {
-    "OrdinarySpawnAssetIds": [ "Spawns_Zone3_Glacial_HyDragon_Predator" ],
+    "OrdinarySpawnAssetIds": [
+      "Spawns_Zone3_Glacial_HyDragon_Predator",
+      "Spawns_Zone1_Swamps_HyDragon_Predator"
+    ],
     "PluginEncounterIds": []
   },
   "Presentation": {
     "LocalizationPrefix": "server.npcRoles.Hydra",
-    "ModelIds": [ "Hydra" ]
+    "ModelIds": [ "Hydra", "Hydra_Toxic" ]
   }
 }

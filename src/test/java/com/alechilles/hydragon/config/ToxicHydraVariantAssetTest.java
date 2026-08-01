@@ -197,6 +197,67 @@ class ToxicHydraVariantAssetTest {
         assertThrows(AssertionError.class, () -> assertFalseBooleanProperty(stringFalse, "RequireNewClick"));
     }
 
+    @Test
+    void toxicHydraIsAWeightOneDaytimeSwampPredator() throws Exception {
+        JsonObject spawn = json("Server/NPC/Spawn/World/Zone1/"
+                + "Spawns_Zone1_Swamps_HyDragon_Predator.json");
+        assertEquals(List.of("Env_Zone1_Swamps"), strings(spawn.getAsJsonArray("Environments")));
+        JsonObject npc = spawn.getAsJsonArray("NPCs").get(0).getAsJsonObject();
+        assertEquals(1, spawn.getAsJsonArray("NPCs").size());
+        assertEquals(1, npc.get("Weight").getAsInt());
+        assertEquals("Mud", npc.get("SpawnBlockSet").getAsString());
+        assertEquals("Hydra_Toxic", npc.get("Id").getAsString());
+        assertEquals(List.of(6, 18), ints(spawn.getAsJsonArray("DayTimeRange")));
+        assertEquals(List.of(0, 4), ints(spawn.getAsJsonArray("MoonPhaseRange")));
+        assertEquals(List.of(0.7, 0.85, 1.0, 1.15, 1.3),
+                doubles(spawn.getAsJsonArray("MoonPhaseWeightModifiers")));
+    }
+
+    @Test
+    void toxicHydraIsRegisteredAcrossSpeciesCaptureCompanionAndCommandAssets() throws Exception {
+        JsonObject species = json("Server/HyDragon/DragonSpecies/Hydra.json");
+        assertContainsExactlyOnce(species.getAsJsonArray("WildRoleIds"), "Hydra");
+        assertContainsExactlyOnce(species.getAsJsonArray("WildRoleIds"), "Hydra_Toxic");
+        assertEquals("Tamed_Hydra_Toxic", species.getAsJsonObject("TamedRoleIdByWildRole")
+                .get("Hydra_Toxic").getAsString());
+        assertContainsExactlyOnce(species.getAsJsonObject("Spawn")
+                .getAsJsonArray("OrdinarySpawnAssetIds"), "Spawns_Zone1_Swamps_HyDragon_Predator");
+        assertContainsExactlyOnce(species.getAsJsonObject("Presentation")
+                .getAsJsonArray("ModelIds"), "Hydra");
+        assertContainsExactlyOnce(species.getAsJsonObject("Presentation")
+                .getAsJsonArray("ModelIds"), "Hydra_Toxic");
+
+        assertContainsExactlyOnce(json("Server/Tamework/CapturePolicies/HyDragonHydra.json")
+                .getAsJsonArray("RoleIds"), "Hydra_Toxic");
+        assertContainsExactlyOnce(json("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json")
+                .getAsJsonArray("AllowedRoles"), "Tamed_Hydra_Toxic");
+        assertContainsExactlyOnce(json("Server/Tamework/Companion/HyDragonFullDragons.json")
+                .getAsJsonArray("RoleIds"), "Tamed_Hydra_Toxic");
+        assertContainsExactlyOnce(json("Server/Tamework/Breeding/HyDragonBondedCompanions.json")
+                .getAsJsonArray("RoleIds"), "Tamed_Hydra_Toxic");
+
+        JsonObject stone = json("Server/Tamework/Items/Spawners/HyDragonDraconicStone.json");
+        assertContainsExactlyOnce(stone.getAsJsonObject("AllowedRoles").getAsJsonArray("Allowlist"),
+                "Hydra_Toxic");
+        assertEquals("Tamed_Hydra_Toxic", stone.getAsJsonObject("Capture")
+                .getAsJsonObject("TamedRoleOverrides").get("Hydra_Toxic").getAsString());
+        assertContainsExactlyOnce(json("Server/Tamework/Items/Commands/HyDragonDragonHorn.json")
+                .getAsJsonObject("AllowedRoles").getAsJsonArray("Allowlist"), "Tamed_Hydra_Toxic");
+    }
+
+    @Test
+    void toxicHydraNamesAreLocalizedExactlyOnceInEveryCatalog() throws Exception {
+        for (LocaleExpectation locale : List.of(
+                new LocaleExpectation("en-US", "Toxic Hydra", "Bonded Toxic Hydra"),
+                new LocaleExpectation("de-DE", "Toxische Hydra", "Gebundene toxische Hydra"),
+                new LocaleExpectation("es-ES", "Hidra tóxica", "Hidra tóxica vinculada"),
+                new LocaleExpectation("fr-FR", "Hydre toxique", "Hydre toxique liée"),
+                new LocaleExpectation("pt-BR", "Hidra tóxica", "Hidra tóxica vinculada"))) {
+            assertLocaleEntryExactlyOnce(locale.locale(), "npcRoles.Hydra_Toxic.name", locale.wildName());
+            assertLocaleEntryExactlyOnce(locale.locale(), "npcRoles.Tamed_Hydra_Toxic.name", locale.tamedName());
+        }
+    }
+
     private static void assertLeaf(String leaf, String expected) throws IOException {
         JsonObject actual = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/" + leaf);
         assertFalse(actual.has("RunTime"), leaf + " must leave cadence to its caller");
@@ -341,11 +402,39 @@ class ToxicHydraVariantAssetTest {
         return json("Server/NPC/Roles/Creature/HyDragon/Hydra/" + role + ".json").deepCopy();
     }
 
+    private static List<String> strings(JsonArray values) {
+        return values.asList().stream().map(JsonElement::getAsString).toList();
+    }
+
+    private static List<Integer> ints(JsonArray values) {
+        return values.asList().stream().map(JsonElement::getAsInt).toList();
+    }
+
+    private static List<Double> doubles(JsonArray values) {
+        return values.asList().stream().map(JsonElement::getAsDouble).toList();
+    }
+
+    private static void assertContainsExactlyOnce(JsonArray values, String expected) {
+        assertEquals(1, strings(values).stream().filter(expected::equals).count(), expected);
+    }
+
+    private static void assertLocaleEntryExactlyOnce(String locale, String key, String value)
+            throws IOException {
+        List<String> matchingLines = Files.readAllLines(ROOT.resolve("Server/Languages")
+                        .resolve(locale).resolve("server.lang"), StandardCharsets.UTF_8)
+                .stream().filter(line -> line.startsWith(key + "=")).toList();
+        assertEquals(1, matchingLines.size(), locale + " " + key);
+        assertEquals(key + "=" + value, matchingLines.getFirst(), locale + " " + key);
+    }
+
     private static JsonObject json(String relativePath) throws IOException {
         return JsonParser.parseString(read(relativePath)).getAsJsonObject();
     }
 
     private static String read(String relativePath) throws IOException {
         return Files.readString(ROOT.resolve(relativePath), StandardCharsets.UTF_8);
+    }
+
+    private record LocaleExpectation(String locale, String wildName, String tamedName) {
     }
 }

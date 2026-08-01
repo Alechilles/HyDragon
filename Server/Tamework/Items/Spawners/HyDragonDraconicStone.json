@@ -5,6 +5,7 @@
     "Allowlist": [
       "NordicDrake",
       "Hydra",
+      "Hydra_Toxic",
       "RockDrakeT1",
       "RockDrakeT2",
       "RockDrakeT3"
@@ -22,6 +23,7 @@
     "TamedRoleOverrides": {
       "NordicDrake": "Tamed_NordicDrake",
       "Hydra": "Tamed_Hydra",
+      "Hydra_Toxic": "Tamed_Hydra_Toxic",
       "RockDrakeT1": "Tamed_RockDrakeT1",
       "RockDrakeT2": "Tamed_RockDrakeT2",
       "RockDrakeT3": "Tamed_RockDrakeT3"
