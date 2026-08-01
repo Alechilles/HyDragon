@@ -14,43 +14,49 @@
       "Type": "Replace",
       "DefaultOk": true,
       "Var": "Hydra_Ball_Charge_Effect",
-      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] },
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] }
+    },
+    {
+      "Type": "Simple",
       "RunTime": 1.0
     },
     {
       "Type": "Replace",
       "DefaultOk": true,
       "Var": "Hydra_Ball_Launch",
-      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] },
-      "RunTime": 0.0
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] }
     },
     {
       "Type": "Replace",
       "DefaultOk": true,
       "Var": "Hydra_Ball_Charge_Effect",
-      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] },
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] }
+    },
+    {
+      "Type": "Simple",
       "RunTime": 0.5
     },
     {
       "Type": "Replace",
       "DefaultOk": true,
       "Var": "Hydra_Ball_Launch",
-      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] },
-      "RunTime": 0.0
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] }
     },
     {
       "Type": "Replace",
       "DefaultOk": true,
       "Var": "Hydra_Ball_Charge_Effect",
-      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] },
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] }
+    },
+    {
+      "Type": "Simple",
       "RunTime": 0.5
     },
     {
       "Type": "Replace",
       "DefaultOk": true,
       "Var": "Hydra_Ball_Launch",
-      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] },
-      "RunTime": 0.0
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] }
     },
     {
       "Type": "Simple",

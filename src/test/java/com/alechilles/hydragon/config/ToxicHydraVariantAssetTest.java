@@ -88,37 +88,52 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
-    void sharedRangedChoreographyUsesElementVariablesWithoutTimingDrift() throws Exception {
+    void sharedRangedChoreographyKeepsCadenceOnBlockingSimpleSteps() throws Exception {
         JsonArray direct = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Ice_Ball.json")
                 .getAsJsonArray("Interactions");
-        assertEquals(8, direct.size());
+        assertEquals(11, direct.size());
         assertAnimation(direct.get(0).getAsJsonObject(), "PrepareShoot", 0.45);
         assertReplacement(direct.get(1).getAsJsonObject(), "Hydra_Ball_Charge_Effect",
-                "Hydra_Ice_Ball_Charge_Effect", 1.0);
-        assertReplacement(direct.get(2).getAsJsonObject(), "Hydra_Ball_Launch",
-                "Hydra_Ice_Ball_Launch", 0.0);
-        assertReplacement(direct.get(3).getAsJsonObject(), "Hydra_Ball_Charge_Effect",
-                "Hydra_Ice_Ball_Charge_Effect", 0.5);
-        assertReplacement(direct.get(4).getAsJsonObject(), "Hydra_Ball_Launch",
-                "Hydra_Ice_Ball_Launch", 0.0);
-        assertReplacement(direct.get(5).getAsJsonObject(), "Hydra_Ball_Charge_Effect",
-                "Hydra_Ice_Ball_Charge_Effect", 0.5);
+                "Hydra_Ice_Ball_Charge_Effect");
+        assertDelay(direct.get(2).getAsJsonObject(), 1.0);
+        assertReplacement(direct.get(3).getAsJsonObject(), "Hydra_Ball_Launch",
+                "Hydra_Ice_Ball_Launch");
+        assertReplacement(direct.get(4).getAsJsonObject(), "Hydra_Ball_Charge_Effect",
+                "Hydra_Ice_Ball_Charge_Effect");
+        assertDelay(direct.get(5).getAsJsonObject(), 0.5);
         assertReplacement(direct.get(6).getAsJsonObject(), "Hydra_Ball_Launch",
-                "Hydra_Ice_Ball_Launch", 0.0);
-        assertAnimation(direct.get(7).getAsJsonObject(), "FinishShoot", 0.5);
+                "Hydra_Ice_Ball_Launch");
+        assertReplacement(direct.get(7).getAsJsonObject(), "Hydra_Ball_Charge_Effect",
+                "Hydra_Ice_Ball_Charge_Effect");
+        assertDelay(direct.get(8).getAsJsonObject(), 0.5);
+        assertReplacement(direct.get(9).getAsJsonObject(), "Hydra_Ball_Launch",
+                "Hydra_Ice_Ball_Launch");
+        assertAnimation(direct.get(10).getAsJsonObject(), "FinishShoot", 0.5);
 
         JsonObject rainRoot = json("Server/Item/RootInteractions/NPCs/Creature/HyDragon/"
                 + "Root_NPC_Hydra_RainShoot_Barrage.json");
         assertFalseBooleanProperty(rainRoot, "RequireNewClick");
         JsonArray rain = rainRoot.getAsJsonArray("Interactions").get(0).getAsJsonObject()
                 .getAsJsonArray("Interactions");
-        assertEquals(40, rain.size());
+        assertEquals(60, rain.size());
         for (int shot = 0; shot < 20; shot++) {
-            assertReplacement(rain.get(shot * 2).getAsJsonObject(), "Hydra_Rain_Charge_Effect",
-                    "Hydra_Rain_Ice_Charge_Effect", 0.3);
-            assertReplacement(rain.get(shot * 2 + 1).getAsJsonObject(), "Hydra_Rain_Launch",
-                    "Hydra_Rain_Ice_Launch", 0.0);
+            assertReplacement(rain.get(shot * 3).getAsJsonObject(), "Hydra_Rain_Charge_Effect",
+                    "Hydra_Rain_Ice_Charge_Effect");
+            assertDelay(rain.get(shot * 3 + 1).getAsJsonObject(), 0.3);
+            assertReplacement(rain.get(shot * 3 + 2).getAsJsonObject(), "Hydra_Rain_Launch",
+                    "Hydra_Rain_Ice_Launch");
         }
+    }
+
+    @Test
+    void iceParentRolesExposeEveryOrdinaryToxicOverride() throws Exception {
+        assertPublicParameter("Hydra", "Appearance", "\"Hydra\"");
+        assertPublicParameter("Hydra", "FlockArray", "[\"Hydra\"]");
+        assertPublicParameter("Hydra", "MemoriesNameOverride", "\"Hydra\"");
+        assertPublicParameter("Hydra", "TameRoleChange", "\"Tamed_Hydra\"");
+        assertPublicParameter("Tamed_Hydra", "Appearance", "\"Hydra\"");
+        assertPublicParameter("Tamed_Hydra", "FlockArray", "[\"Tamed_Hydra\"]");
+        assertPublicParameter("Tamed_Hydra", "MemoriesNameOverride", "\"Hydra\"");
     }
 
     @Test
@@ -428,14 +443,30 @@ class ToxicHydraVariantAssetTest {
         assertEquals(runTime, interaction.get("RunTime").getAsDouble());
     }
 
-    private static void assertReplacement(JsonObject interaction, String variable, String leaf, double runTime) {
+    private static void assertReplacement(JsonObject interaction, String variable, String leaf) {
         assertEquals("Replace", interaction.get("Type").getAsString());
         assertTrue(interaction.get("DefaultOk").getAsBoolean());
         assertEquals(variable, interaction.get("Var").getAsString());
-        assertEquals(runTime, interaction.get("RunTime").getAsDouble());
+        assertFalse(interaction.has("RunTime"), "Replace executes its selected interaction immediately");
         JsonArray defaults = interaction.getAsJsonObject("DefaultValue").getAsJsonArray("Interactions");
         assertEquals(1, defaults.size());
         assertEquals(leaf, defaults.get(0).getAsString());
+    }
+
+    private static void assertDelay(JsonObject interaction, double runTime) {
+        assertEquals(Set.of("Type", "RunTime"), interaction.keySet());
+        assertEquals("Simple", interaction.get("Type").getAsString());
+        assertEquals(runTime, interaction.get("RunTime").getAsDouble());
+    }
+
+    private static void assertPublicParameter(String role, String parameter, String expectedValue)
+            throws IOException {
+        JsonObject root = json("Server/NPC/Roles/Creature/HyDragon/Hydra/" + role + ".json");
+        JsonObject declaration = root.getAsJsonObject("Parameters").getAsJsonObject(parameter);
+        assertNotNull(declaration, role + " must expose " + parameter + " to nested variants");
+        assertEquals(JsonParser.parseString(expectedValue), declaration.get("Value"));
+        assertEquals(JsonParser.parseString("{\"Compute\":\"" + parameter + "\"}"),
+                root.getAsJsonObject("Modify").get(parameter));
     }
 
     private static void assertVariableLeaf(JsonObject vars, String variable, String leaf) {

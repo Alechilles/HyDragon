@@ -11,7 +11,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -22,8 +25,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -33,7 +35,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -44,8 +49,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -55,7 +59,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -66,8 +73,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -77,7 +83,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -88,8 +97,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -99,7 +107,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -110,8 +121,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -121,7 +131,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -132,8 +145,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -143,7 +155,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -154,8 +169,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -165,7 +179,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -176,8 +193,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -187,7 +203,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -198,8 +217,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -209,7 +227,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -220,8 +241,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -231,7 +251,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -242,8 +265,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -253,7 +275,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -264,8 +289,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -275,7 +299,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -286,8 +313,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -297,7 +323,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -308,8 +337,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -319,7 +347,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -330,8 +361,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -341,7 +371,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -352,8 +385,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -363,7 +395,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -374,8 +409,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -385,7 +419,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -396,8 +433,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -407,7 +443,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -418,8 +457,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         },
         {
           "Type": "Replace",
@@ -429,7 +467,10 @@
             "Interactions": [
               "Hydra_Rain_Ice_Charge_Effect"
             ]
-          },
+          }
+        },
+        {
+          "Type": "Simple",
           "RunTime": 0.3
         },
         {
@@ -440,8 +481,7 @@
             "Interactions": [
               "Hydra_Rain_Ice_Launch"
             ]
-          },
-          "RunTime": 0
+          }
         }
       ]
     }

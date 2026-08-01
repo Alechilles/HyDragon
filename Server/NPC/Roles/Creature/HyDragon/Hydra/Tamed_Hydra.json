@@ -2,11 +2,13 @@
   "Type": "Variant",
   "Reference": "Template_HyDragon_Tamed",
   "Modify": {
-    "Appearance": "Hydra",
+    "Appearance": {
+      "Compute": "Appearance"
+    },
     "Weapons": [],
-    "FlockArray": [
-      "Tamed_Hydra"
-    ],
+    "FlockArray": {
+      "Compute": "FlockArray"
+    },
     "AttitudeGroup": "PredatorsBig",
     "WanderRadius": 8,
     "ViewRange": 36,
@@ -58,7 +60,9 @@
     "CanBreedPair": true,
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
-    "MemoriesNameOverride": "Hydra",
+    "MemoriesNameOverride": {
+      "Compute": "MemoriesNameOverride"
+    },
     "BreathesInWater": false,
     "_InteractionVars": {
       "Swipe_Left_Damage": {
@@ -137,6 +141,19 @@
     }
   },
   "Parameters": {
+    "Appearance": {
+      "Value": "Hydra",
+      "Description": "Model asset used for this tamed Hydra variant."
+    },
+    "FlockArray": {
+      "Value": ["Tamed_Hydra"],
+      "TypeHint": "String",
+      "Description": "NPC role IDs that can flock with this tamed Hydra variant."
+    },
+    "MemoriesNameOverride": {
+      "Value": "Hydra",
+      "Description": "Display name used for this tamed Hydra variant in Memories."
+    },
     "NameTranslationKey": {
       "Value": "server.npcRoles.Tamed_Hydra.name",
       "Description": "Translation key for NPC name display"

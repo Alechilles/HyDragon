@@ -2,11 +2,15 @@
   "Type": "Variant",
   "Reference": "Template_Hydra_Intelligent",
   "Modify": {
-    "Appearance": "Hydra",
+    "Appearance": {
+      "Compute": "Appearance"
+    },
     "Weapons": [],
     "OffHand": [],
     "NighttimeOffhandSlot": -1,
-    "FlockArray": ["Hydra"],
+    "FlockArray": {
+      "Compute": "FlockArray"
+    },
     "AttitudeGroup": "PredatorsBig",
     "WanderRadius": 8,
     "ViewRange": 36,
@@ -41,14 +45,18 @@
     "WakingPeriod": [0, 24],
     "MaxHealth": 800,
     "IsTameable": true,
-    "TameRoleChange": "Tamed_Hydra",
+    "TameRoleChange": {
+      "Compute": "TameRoleChange"
+    },
     "AttractiveItemSet": [],
     "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
     "TranquilizerSleepThresholdSeconds": 50,
     "InteractionConfigId": "HyDragonIntBeast",
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
-    "MemoriesNameOverride": "Hydra",
+    "MemoriesNameOverride": {
+      "Compute": "MemoriesNameOverride"
+    },
     "BreathesInWater": false,
     "_InteractionVars": {
       "Bite_Damage": {
@@ -155,6 +163,23 @@
     }
   },
   "Parameters": {
+    "Appearance": {
+      "Value": "Hydra",
+      "Description": "Model asset used for this Hydra variant."
+    },
+    "FlockArray": {
+      "Value": ["Hydra"],
+      "TypeHint": "String",
+      "Description": "NPC role IDs that can flock with this Hydra variant."
+    },
+    "MemoriesNameOverride": {
+      "Value": "Hydra",
+      "Description": "Display name used for this Hydra variant in Memories."
+    },
+    "TameRoleChange": {
+      "Value": "Tamed_Hydra",
+      "Description": "Role this Hydra variant changes into when tamed."
+    },
     "NameTranslationKey": {
       "Value": "server.npcRoles.Hydra.name",
       "Description": "Translation key for NPC name display"
