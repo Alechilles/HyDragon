@@ -132,8 +132,13 @@ final class MiniwyvernProjectileBalanceAssetTest {
         assertEquals("Parallel", hitInteraction.get("Type").getAsString());
         JsonArray hitBranches = hitInteraction.getAsJsonArray("Interactions");
         assertEquals(2, hitBranches.size(), "hit interaction must emit one sound and one damage branch");
-        assertImpactSound(hitBranches.get(0).getAsJsonObject(), IMPACT_EVENTS.get(form));
-        JsonObject damageInteraction = hitBranches.get(1).getAsJsonObject();
+        JsonObject soundBranch = hitBranches.get(0).getAsJsonObject();
+        assertEquals(Set.of("Interactions"), soundBranch.keySet());
+        assertImpactSound(soundBranch.getAsJsonArray("Interactions").get(0).getAsJsonObject(),
+                IMPACT_EVENTS.get(form));
+        JsonObject damageBranch = hitBranches.get(1).getAsJsonObject();
+        assertEquals(Set.of("Interactions"), damageBranch.keySet());
+        JsonObject damageInteraction = damageBranch.getAsJsonArray("Interactions").get(0).getAsJsonObject();
         assertEquals("DamageEntity", damageInteraction.get("Type").getAsString());
         assertFalse(damageInteraction.has("Entity"),
                 "DamageEntity always damages the interaction target; Entity is not a supported 0.5.7 field");

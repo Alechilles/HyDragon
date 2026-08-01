@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
@@ -83,9 +84,13 @@ final class MiniwyvernProjectileImpactAudioAssetTest {
         assertEquals("Parallel", interaction.get("Type").getAsString(), interactionId);
         JsonArray branches = interaction.getAsJsonArray("Interactions");
         assertEquals(2, branches.size(), interactionId + " must contain sound and damage branches");
-        assertSimpleWorldSound(branches.get(0).getAsJsonObject(), event,
+        JsonObject soundBranch = branches.get(0).getAsJsonObject();
+        assertEquals(Set.of("Interactions"), soundBranch.keySet(), interactionId);
+        assertSimpleWorldSound(soundBranch.getAsJsonArray("Interactions").get(0).getAsJsonObject(), event,
                 HIT_INTERACTIONS.resolve(interactionId + ".json"));
-        JsonObject damage = branches.get(1).getAsJsonObject();
+        JsonObject damageBranch = branches.get(1).getAsJsonObject();
+        assertEquals(Set.of("Interactions"), damageBranch.keySet(), interactionId);
+        JsonObject damage = damageBranch.getAsJsonArray("Interactions").get(0).getAsJsonObject();
         assertEquals("DamageEntity", damage.get("Type").getAsString(), interactionId);
         assertNoElementImpactSound(damage, interactionId);
     }

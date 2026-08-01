@@ -1424,10 +1424,14 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
                     or hit_step.get("Type") != "Parallel" \
                     or not isinstance(hit_step.get("Interactions"), list) \
                     or len(hit_step["Interactions"]) != 2 \
-                    or hit_step["Interactions"][0] != impact_sound:
+                    or hit_step["Interactions"][0] != {"Interactions": [impact_sound]} \
+                    or not isinstance(hit_step["Interactions"][1], dict) \
+                    or set(hit_step["Interactions"][1]) != {"Interactions"} \
+                    or not isinstance(hit_step["Interactions"][1]["Interactions"], list) \
+                    or len(hit_step["Interactions"][1]["Interactions"]) != 1:
                 fail(errors, f"Miniwyvern {form} {tier} has invalid hit impact audio")
                 continue
-            damage_step = hit_step["Interactions"][1]
+            damage_step = hit_step["Interactions"][1]["Interactions"][0]
             calculator = damage_step.get("DamageCalculator") if isinstance(damage_step, dict) else None
             actual_damage = calculator.get("BaseDamage", {}).get("Physical") if isinstance(calculator, dict) else None
             if not isinstance(damage_step, dict) or set(damage_step) != {"Type", "DamageCalculator", "Next", "Failed", "Blocked"} \
