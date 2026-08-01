@@ -30,6 +30,28 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
+    void toxicRoleContractRejectsUnexpectedNameAndRangedInteractionFields() throws Exception {
+        JsonObject wrongNameCompute = toxicRole("Hydra_Toxic");
+        wrongNameCompute.getAsJsonObject("Modify").getAsJsonObject("NameTranslationKey")
+                .addProperty("Compute", "WrongNameTranslationKey");
+        assertThrows(AssertionError.class,
+                () -> assertToxicRole(wrongNameCompute, "Hydra_Toxic", "Hydra", "Tamed_Hydra_Toxic"));
+
+        JsonObject extraRangedWrapperField = toxicRole("Hydra_Toxic");
+        extraRangedWrapperField.getAsJsonObject("Modify").getAsJsonObject("_InteractionVars")
+                .getAsJsonObject("Hydra_Ball_Launch").addProperty("Unexpected", true);
+        assertThrows(AssertionError.class,
+                () -> assertToxicRole(extraRangedWrapperField, "Hydra_Toxic", "Hydra", "Tamed_Hydra_Toxic"));
+
+        JsonObject extraRangedInteractionField = toxicRole("Hydra_Toxic");
+        extraRangedInteractionField.getAsJsonObject("Modify").getAsJsonObject("_InteractionVars")
+                .getAsJsonObject("Hydra_Rain_Launch").getAsJsonArray("Interactions")
+                .get(0).getAsJsonObject().addProperty("DamageCalculator", "unexpected");
+        assertThrows(AssertionError.class,
+                () -> assertToxicRole(extraRangedInteractionField, "Hydra_Toxic", "Hydra", "Tamed_Hydra_Toxic"));
+    }
+
+    @Test
     void toxicModelInheritsHydraAndOnlySelectsToxicTexture() throws Exception {
         JsonObject model = json("Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
         assertEquals("Hydra", model.get("Parent").getAsString());
@@ -183,7 +205,11 @@ class ToxicHydraVariantAssetTest {
 
     private static void assertToxicRole(String role, String reference, String tameRoleChange)
             throws IOException {
-        JsonObject root = json("Server/NPC/Roles/Creature/HyDragon/Hydra/" + role + ".json");
+        assertToxicRole(toxicRole(role), role, reference, tameRoleChange);
+    }
+
+    private static void assertToxicRole(
+            JsonObject root, String role, String reference, String tameRoleChange) {
         assertEquals("Variant", root.get("Type").getAsString());
         assertEquals(reference, root.get("Reference").getAsString());
         assertEquals(Set.of("Type", "Reference", "Modify", "Parameters"), root.keySet());
@@ -194,6 +220,9 @@ class ToxicHydraVariantAssetTest {
                 : Set.of("Appearance", "TameRoleChange", "_InteractionVars", "NameTranslationKey");
         assertEquals(expectedModifyKeys, modify.keySet());
         assertEquals("Hydra_Toxic", modify.get("Appearance").getAsString());
+        assertEquals(JsonParser.parseString("""
+                {"Compute":"NameTranslationKey"}
+                """).getAsJsonObject(), modify.getAsJsonObject("NameTranslationKey"));
         if (tameRoleChange == null) {
             assertFalse(modify.has("TameRoleChange"));
         } else {
@@ -299,9 +328,17 @@ class ToxicHydraVariantAssetTest {
     }
 
     private static void assertVariableLeaf(JsonObject vars, String variable, String leaf) {
-        JsonArray interactions = vars.getAsJsonObject(variable).getAsJsonArray("Interactions");
+        JsonObject wrapper = vars.getAsJsonObject(variable);
+        assertEquals(Set.of("Interactions"), wrapper.keySet());
+        JsonArray interactions = wrapper.getAsJsonArray("Interactions");
         assertEquals(1, interactions.size());
-        assertEquals(leaf, interactions.get(0).getAsJsonObject().get("Parent").getAsString());
+        JsonObject interaction = interactions.get(0).getAsJsonObject();
+        assertEquals(Set.of("Parent"), interaction.keySet());
+        assertEquals(leaf, interaction.get("Parent").getAsString());
+    }
+
+    private static JsonObject toxicRole(String role) throws IOException {
+        return json("Server/NPC/Roles/Creature/HyDragon/Hydra/" + role + ".json").deepCopy();
     }
 
     private static JsonObject json(String relativePath) throws IOException {
