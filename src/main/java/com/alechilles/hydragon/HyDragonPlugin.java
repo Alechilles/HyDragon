@@ -19,6 +19,7 @@ import com.alechilles.hydragon.config.DragonEncounterConfig;
 import com.alechilles.hydragon.config.DragonSpeciesConfig;
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.config.MiniwyvernArchetypeConfig;
+import com.alechilles.hydragon.combat.NordicDrakeChainingDataSystem;
 import com.alechilles.hydragon.diagnostics.HyDragonStatusCommand;
 import com.alechilles.hydragon.diagnostics.HyDragonPersistenceStatus;
 import com.alechilles.hydragon.diagnostics.HyDragonRefundClaimCommand;
@@ -80,6 +81,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         registerInteractionCodecs();
         // The persistent encounter marker and damage system must exist before any world loads.
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
+        getEntityStoreRegistry().registerSystem(new NordicDrakeChainingDataSystem());
         getEntityStoreRegistry().registerSystem(new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras));
         getEntityStoreRegistry().registerSystem(new MiniwyvernVoidExposureDamageSystem());
         MiniwyvernVoidEffectLifetimeSystem voidLifetime = new MiniwyvernVoidEffectLifetimeSystem();
