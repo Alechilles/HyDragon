@@ -3,7 +3,7 @@
   "Appearance": {
     "Compute": "Appearance"
   },
-  "StartState": "Idle",
+  "StartState": "Follow",
   "Parameters": {
     "Appearance": {
       "Value": "Wyvern_Mini",
