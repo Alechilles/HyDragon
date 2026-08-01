@@ -84,6 +84,8 @@ than with NPC decision timing.
 
 No new permanent regression tests will be added. Verification will use:
 
+- maintenance updates to existing assertions that encode the old spacing and
+  branch order, without introducing new test cases;
 - the existing focused Nordic Drake combat and interaction tests;
 - the repository asset validator and full Maven test suite;
 - exact-profile affected-scope asset validation; and
