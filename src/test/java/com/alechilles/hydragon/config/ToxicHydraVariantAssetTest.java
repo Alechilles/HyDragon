@@ -38,9 +38,12 @@ class ToxicHydraVariantAssetTest {
                 "Hydra_Ice_Ball_Launch", 0.0);
         assertAnimation(direct.get(7).getAsJsonObject(), "FinishShoot", 0.5);
 
-        JsonArray rain = json("Server/Item/RootInteractions/NPCs/Creature/HyDragon/"
-                + "Root_NPC_Hydra_RainShoot_Barrage.json")
-                .getAsJsonArray("Interactions").get(0).getAsJsonObject().getAsJsonArray("Interactions");
+        JsonObject rainRoot = json("Server/Item/RootInteractions/NPCs/Creature/HyDragon/"
+                + "Root_NPC_Hydra_RainShoot_Barrage.json");
+        assertTrue(rainRoot.has("RequireNewClick"));
+        assertFalse(rainRoot.get("RequireNewClick").getAsBoolean());
+        JsonArray rain = rainRoot.getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                .getAsJsonArray("Interactions");
         assertEquals(40, rain.size());
         for (int shot = 0; shot < 20; shot++) {
             assertReplacement(rain.get(shot * 2).getAsJsonObject(), "Hydra_Rain_Charge_Effect",
@@ -64,42 +67,24 @@ class ToxicHydraVariantAssetTest {
 
     @Test
     void iceLeafInteractionsRetainExistingProjectileBehavior() throws Exception {
-        JsonObject directCharge = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/"
-                + "Hydra_Ice_Ball_Charge_Effect.json");
-        assertEquals("Simple", directCharge.get("Type").getAsString());
-        assertFalse(directCharge.has("RunTime"));
-        assertEquals("ChargeShoot", directCharge.getAsJsonObject("Effects")
-                .get("ItemAnimationId").getAsString());
+        assertLeaf("Hydra_Ice_Ball_Charge_Effect.json", """
+                {"Type":"Simple","Effects":{"ItemPlayerAnimationsId":"Hydra_Default","ItemAnimationId":"ChargeShoot","Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Hydra_Ice_Ball_Charging","PositionOffset":{"Z":0}}]}}
+                """);
+        assertLeaf("Hydra_Ice_Ball_Launch.json", """
+                {"Type":"TameworkLaunchProjectile","Effects":{"WorldSoundEventId":"SFX_Staff_Ice_Shoot","LocalSoundEventId":"SFX_Staff_Ice_Shoot","Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Ice_Staff","DetachedFromModel":false,"PositionOffset":{},"Scale":1.5}]},"ProjectileId":"Hydra_Ice_Ball","TrajectoryMode":"Direct","TargetSlot":"CAETargetSlot","ImpactEffect":{"EffectId":"Chilled","Radius":3.0,"ExcludeSource":true},"Tags":{}}
+                """);
+        assertLeaf("Hydra_Rain_Ice_Charge_Effect.json", """
+                {"Type":"Simple","Effects":{"Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Hydra_Ice_Ball_Charging","PositionOffset":{"Z":0}}]}}
+                """);
+        assertLeaf("Hydra_Rain_Ice_Launch.json", """
+                {"Type":"TameworkLaunchProjectile","ProjectileId":"Hydra_Rain_Ice_Ball","LaunchPositionOffset":{"X":0.0,"Y":-1.0,"Z":-2.0},"RandomAroundSourceMinRadius":6.0,"RandomAroundSourceMaxRadius":15.0,"RandomAroundSourceVerticalOffset":0.0,"LingeringHazard":{"Radius":4.0,"DurationSeconds":6.0,"TickIntervalSeconds":1.0,"DamagePerTick":5.0,"ExcludeSource":true,"EffectId":"Chilled","SourceTypeId":"hydragon.rain_ice_hazard"},"Effects":{"WorldSoundEventId":"SFX_Staff_Ice_Shoot","LocalSoundEventId":"SFX_Staff_Ice_Shoot","Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Ice_Staff","DetachedFromModel":false,"PositionOffset":{},"Scale":1.5}]},"Tags":{}}
+                """);
+    }
 
-        JsonObject directLaunch = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/"
-                + "Hydra_Ice_Ball_Launch.json");
-        assertEquals("TameworkLaunchProjectile", directLaunch.get("Type").getAsString());
-        assertFalse(directLaunch.has("RunTime"));
-        assertEquals("Hydra_Ice_Ball", directLaunch.get("ProjectileId").getAsString());
-        assertEquals("Direct", directLaunch.get("TrajectoryMode").getAsString());
-        assertEquals("CAETargetSlot", directLaunch.get("TargetSlot").getAsString());
-        assertEquals(3.0, directLaunch.getAsJsonObject("ImpactEffect").get("Radius").getAsDouble());
-        assertTrue(directLaunch.getAsJsonObject("ImpactEffect").get("ExcludeSource").getAsBoolean());
-
-        JsonObject rainCharge = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/"
-                + "Hydra_Rain_Ice_Charge_Effect.json");
-        assertEquals("Simple", rainCharge.get("Type").getAsString());
-        assertFalse(rainCharge.has("RunTime"));
-
-        JsonObject rainLaunch = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/"
-                + "Hydra_Rain_Ice_Launch.json");
-        assertEquals("TameworkLaunchProjectile", rainLaunch.get("Type").getAsString());
-        assertFalse(rainLaunch.has("RunTime"));
-        assertEquals("Hydra_Rain_Ice_Ball", rainLaunch.get("ProjectileId").getAsString());
-        assertEquals(6.0, rainLaunch.get("RandomAroundSourceMinRadius").getAsDouble());
-        assertEquals(15.0, rainLaunch.get("RandomAroundSourceMaxRadius").getAsDouble());
-        JsonObject hazard = rainLaunch.getAsJsonObject("LingeringHazard");
-        assertEquals(4.0, hazard.get("Radius").getAsDouble());
-        assertEquals(6.0, hazard.get("DurationSeconds").getAsDouble());
-        assertEquals(1.0, hazard.get("TickIntervalSeconds").getAsDouble());
-        assertEquals(5.0, hazard.get("DamagePerTick").getAsDouble());
-        assertEquals("Chilled", hazard.get("EffectId").getAsString());
-        assertEquals("hydragon.rain_ice_hazard", hazard.get("SourceTypeId").getAsString());
+    private static void assertLeaf(String leaf, String expected) throws IOException {
+        JsonObject actual = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/" + leaf);
+        assertFalse(actual.has("RunTime"), leaf + " must leave cadence to its caller");
+        assertEquals(JsonParser.parseString(expected).getAsJsonObject(), actual, leaf);
     }
 
     private static void assertAnimation(JsonObject interaction, String animation, double runTime) {
