@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "duration": 52,
+  "duration": 40,
   "holdLastKeyframe": false,
   "nodeAnimations": {
     "Drag": {
@@ -11,12 +11,12 @@
           "interpolationType": "linear"
         },
         {
-          "time": 7,
+          "time": 5,
           "delta": {"x": 0, "y": -3, "z": 0},
           "interpolationType": "linear"
         },
         {
-          "time": 11,
+          "time": 8,
           "delta": {"x": 0, "y": 2.6, "z": 0},
           "interpolationType": "linear"
         }
@@ -28,7 +28,7 @@
           "interpolationType": "smooth"
         },
         {
-          "time": 14,
+          "time": 11,
           "delta": {"x": -0.02618, "y": 0, "z": 0, "w": 0.99966},
           "interpolationType": "smooth"
         }
@@ -52,12 +52,12 @@
           "interpolationType": "linear"
         },
         {
-          "time": 11,
+          "time": 8,
           "delta": {"x": -0.13052, "y": 0, "z": 0, "w": 0.99145},
           "interpolationType": "linear"
         },
         {
-          "time": 18,
+          "time": 14,
           "delta": {"x": -0.10887, "y": 0, "z": 0, "w": 0.99406},
           "interpolationType": "linear"
         }
@@ -75,27 +75,27 @@
           "interpolationType": "linear"
         },
         {
-          "time": 7,
+          "time": 5,
           "delta": {"x": 0, "y": 0, "z": 0.40275, "w": 0.91531},
           "interpolationType": "linear"
         },
         {
-          "time": 11,
+          "time": 8,
           "delta": {"x": 0, "y": 0, "z": -0.69151, "w": 0.72236},
           "interpolationType": "linear"
         },
         {
-          "time": 18,
+          "time": 14,
           "delta": {"x": 0, "y": 0, "z": -0.48099, "w": 0.87673},
           "interpolationType": "linear"
         },
         {
-          "time": 23,
+          "time": 18,
           "delta": {"x": 0, "y": 0, "z": -0.30071, "w": 0.95372},
           "interpolationType": "linear"
         },
         {
-          "time": 30,
+          "time": 23,
           "delta": {"x": -0.0214, "y": -0.00426, "z": 0.19504, "w": 0.98055},
           "interpolationType": "linear"
         }
@@ -113,27 +113,27 @@
           "interpolationType": "linear"
         },
         {
-          "time": 7,
+          "time": 5,
           "delta": {"x": 0, "y": 0, "z": -0.46175, "w": 0.88701},
           "interpolationType": "linear"
         },
         {
-          "time": 11,
+          "time": 8,
           "delta": {"x": 0, "y": 0, "z": 0.69151, "w": 0.72236},
           "interpolationType": "linear"
         },
         {
-          "time": 18,
+          "time": 14,
           "delta": {"x": 0, "y": 0, "z": 0.40275, "w": 0.91531},
           "interpolationType": "linear"
         },
         {
-          "time": 23,
+          "time": 18,
           "delta": {"x": 0, "y": 0, "z": 0.30071, "w": 0.95372},
           "interpolationType": "linear"
         },
         {
-          "time": 30,
+          "time": 23,
           "delta": {"x": 0, "y": 0, "z": -0.23769, "w": 0.97134},
           "interpolationType": "linear"
         }
@@ -156,17 +156,17 @@
           "interpolationType": "linear"
         },
         {
-          "time": 5,
+          "time": 4,
           "delta": {"x": 0.03926, "y": 0, "z": 0, "w": 0.99923},
           "interpolationType": "linear"
         },
         {
-          "time": 7,
+          "time": 5,
           "delta": {"x": 0.06976, "y": 0, "z": 0, "w": 0.99756},
           "interpolationType": "linear"
         },
         {
-          "time": 15,
+          "time": 12,
           "delta": {"x": -0.03489, "y": 0, "z": 0, "w": 0.99939},
           "interpolationType": "linear"
         }
@@ -184,27 +184,27 @@
           "interpolationType": "linear"
         },
         {
-          "time": 6,
+          "time": 5,
           "delta": {"x": -0.06105, "y": 0, "z": 0, "w": 0.99813},
           "interpolationType": "linear"
         },
         {
-          "time": 9,
+          "time": 7,
           "delta": {"x": -0.10018, "y": 0, "z": 0, "w": 0.99497},
           "interpolationType": "linear"
         },
         {
-          "time": 14,
+          "time": 11,
           "delta": {"x": -0.06104, "y": 0, "z": 0, "w": 0.99814},
           "interpolationType": "linear"
         },
         {
-          "time": 18,
+          "time": 14,
           "delta": {"x": -0.10852, "y": 0, "z": 0, "w": 0.99409},
           "interpolationType": "linear"
         },
         {
-          "time": 23,
+          "time": 18,
           "delta": {"x": -0.06976, "y": 0, "z": 0, "w": 0.99756},
           "interpolationType": "linear"
         }
@@ -222,7 +222,7 @@
           "interpolationType": "linear"
         },
         {
-          "time": 11,
+          "time": 8,
           "delta": {"x": -0.0654, "y": 0, "z": 0, "w": 0.99786},
           "interpolationType": "linear"
         }
@@ -235,7 +235,7 @@
       "position": [],
       "orientation": [
         {
-          "time": 13,
+          "time": 10,
           "delta": {"x": -0.01745, "y": 0, "z": 0, "w": 0.99985},
           "interpolationType": "linear"
         }
