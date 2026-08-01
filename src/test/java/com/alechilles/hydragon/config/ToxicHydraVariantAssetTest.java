@@ -2,6 +2,7 @@ package com.alechilles.hydragon.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonArray;
@@ -40,8 +41,7 @@ class ToxicHydraVariantAssetTest {
 
         JsonObject rainRoot = json("Server/Item/RootInteractions/NPCs/Creature/HyDragon/"
                 + "Root_NPC_Hydra_RainShoot_Barrage.json");
-        assertTrue(rainRoot.has("RequireNewClick"));
-        assertFalse(rainRoot.get("RequireNewClick").getAsBoolean());
+        assertFalseBooleanProperty(rainRoot, "RequireNewClick");
         JsonArray rain = rainRoot.getAsJsonArray("Interactions").get(0).getAsJsonObject()
                 .getAsJsonArray("Interactions");
         assertEquals(40, rain.size());
@@ -81,10 +81,26 @@ class ToxicHydraVariantAssetTest {
                 """);
     }
 
+    @Test
+    void requireNewClickRejectsCoercibleNonBooleanValues() {
+        JsonObject stringFalse = JsonParser.parseString("""
+                {"RequireNewClick":"false"}
+                """).getAsJsonObject();
+        assertThrows(AssertionError.class, () -> assertFalseBooleanProperty(stringFalse, "RequireNewClick"));
+    }
+
     private static void assertLeaf(String leaf, String expected) throws IOException {
         JsonObject actual = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/" + leaf);
         assertFalse(actual.has("RunTime"), leaf + " must leave cadence to its caller");
         assertEquals(JsonParser.parseString(expected).getAsJsonObject(), actual, leaf);
+    }
+
+    private static void assertFalseBooleanProperty(JsonObject object, String property) {
+        assertTrue(object.has(property));
+        JsonElement value = object.get(property);
+        assertTrue(value.isJsonPrimitive());
+        assertTrue(value.getAsJsonPrimitive().isBoolean());
+        assertFalse(value.getAsBoolean());
     }
 
     private static void assertAnimation(JsonObject interaction, String animation, double runTime) {
