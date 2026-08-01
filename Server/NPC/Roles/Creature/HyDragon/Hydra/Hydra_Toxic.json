@@ -4,6 +4,8 @@
   "Modify": {
     "Appearance": "Hydra_Toxic",
     "TameRoleChange": "Tamed_Hydra_Toxic",
+    "FlockArray": ["Hydra_Toxic"],
+    "MemoriesNameOverride": "Toxic Hydra",
     "_InteractionVars": {
       "Bite_Damage": {
         "Interactions": [

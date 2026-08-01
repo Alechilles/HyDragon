@@ -3,6 +3,8 @@
   "Reference": "Tamed_Hydra",
   "Modify": {
     "Appearance": "Hydra_Toxic",
+    "FlockArray": ["Tamed_Hydra_Toxic"],
+    "MemoriesNameOverride": "Toxic Hydra",
     "_InteractionVars": {
       "Bite_Damage": {
         "Interactions": [

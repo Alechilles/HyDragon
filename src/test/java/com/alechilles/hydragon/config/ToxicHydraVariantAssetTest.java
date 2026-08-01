@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class ToxicHydraVariantAssetTest {
@@ -61,8 +62,9 @@ class ToxicHydraVariantAssetTest {
     void toxicModelInheritsHydraAndOnlySelectsToxicTexture() throws Exception {
         JsonObject model = json("Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
         assertEquals("Hydra", model.get("Parent").getAsString());
-        assertEquals("Common/NPC/HyDragon/Hydra/Model/Toxic.png",
-                model.get("Texture").getAsString());
+        String texture = model.get("Texture").getAsString();
+        assertEquals("NPC/HyDragon/Hydra/Model/Toxic.png", texture);
+        assertTrue(Files.isRegularFile(ROOT.resolve("Common").resolve(texture)));
         assertEquals(Set.of("Parent", "Texture"), model.keySet());
     }
 
@@ -212,10 +214,24 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
-    void toxicHydraIsAWeightOneDaytimeSwampPredator() throws Exception {
-        JsonObject spawn = json("Server/NPC/Spawn/World/Zone1/"
-                + "Spawns_Zone1_Swamps_HyDragon_Predator.json");
+    void toxicHydraHasExactlyOneDaytimeSwampSpawnRegistration() throws Exception {
+        List<JsonObject> registrations;
+        try (Stream<Path> paths = Files.walk(ROOT.resolve("Server/NPC/Spawn/World"))) {
+            registrations = paths.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".json"))
+                    .map(ToxicHydraVariantAssetTest::parseSpawn)
+                    .filter(spawn -> spawn.has("NPCs"))
+                    .filter(spawn -> spawn.getAsJsonArray("NPCs").asList().stream()
+                            .map(JsonElement::getAsJsonObject)
+                            .anyMatch(npc -> "Hydra_Toxic".equals(npc.get("Id").getAsString())))
+                    .toList();
+        }
+        assertEquals(1, registrations.size());
+        JsonObject spawn = registrations.getFirst();
         assertEquals(List.of("Env_Zone1_Swamps"), strings(spawn.getAsJsonArray("Environments")));
+        assertFalse(strings(spawn.getAsJsonArray("Environments")).stream()
+                .anyMatch(environment -> environment.toLowerCase().contains("cave")
+                        && environment.toLowerCase().contains("swamp")));
         JsonObject npc = spawn.getAsJsonArray("NPCs").get(0).getAsJsonObject();
         assertEquals(1, spawn.getAsJsonArray("NPCs").size());
         assertEquals(1, npc.get("Weight").getAsInt());
@@ -309,10 +325,12 @@ class ToxicHydraVariantAssetTest {
 
         JsonObject modify = root.getAsJsonObject("Modify");
         Set<String> expectedModifyKeys = tameRoleChange == null
-                ? Set.of("Appearance", "_InteractionVars", "NameTranslationKey")
-                : Set.of("Appearance", "TameRoleChange", "_InteractionVars", "NameTranslationKey");
+                ? Set.of("Appearance", "FlockArray", "MemoriesNameOverride", "_InteractionVars", "NameTranslationKey")
+                : Set.of("Appearance", "TameRoleChange", "FlockArray", "MemoriesNameOverride", "_InteractionVars", "NameTranslationKey");
         assertEquals(expectedModifyKeys, modify.keySet());
         assertEquals("Hydra_Toxic", modify.get("Appearance").getAsString());
+        assertEquals(List.of(role), strings(modify.getAsJsonArray("FlockArray")));
+        assertEquals("Toxic Hydra", modify.get("MemoriesNameOverride").getAsString());
         assertEquals(JsonParser.parseString("""
                 {"Compute":"NameTranslationKey"}
                 """).getAsJsonObject(), modify.getAsJsonObject("NameTranslationKey"));
@@ -432,6 +450,14 @@ class ToxicHydraVariantAssetTest {
 
     private static JsonObject toxicRole(String role) throws IOException {
         return json("Server/NPC/Roles/Creature/HyDragon/Hydra/" + role + ".json").deepCopy();
+    }
+
+    private static JsonObject parseSpawn(Path path) {
+        try {
+            return parseJson(Files.readString(path, StandardCharsets.UTF_8));
+        } catch (IOException exception) {
+            throw new IllegalArgumentException("Cannot read spawn asset " + path, exception);
+        }
     }
 
     private static List<String> strings(JsonArray values) {
