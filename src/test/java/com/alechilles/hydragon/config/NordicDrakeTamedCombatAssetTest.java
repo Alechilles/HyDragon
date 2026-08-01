@@ -386,31 +386,33 @@ final class NordicDrakeTamedCombatAssetTest {
 
     private static void assertBlockedRecovery(JsonObject branch) {
         assertFalse(branch.has("Continue"), "blocked recovery must preempt normal aerial loiter");
-        assertAerialRecoveryContext(branch.getAsJsonObject("Sensor"));
-        assertEquals(1, objects(branch.getAsJsonObject("Sensor"), sensor -> "Eval".equals(string(sensor, "Type"))
-                && "blocked".equals(string(sensor, "Expression"))).size());
+        JsonArray sensors = assertAerialRecoveryContext(branch.getAsJsonObject("Sensor"));
+        assertEquals("Eval", string(sensors.get(3).getAsJsonObject(), "Type"));
+        assertEquals("blocked", string(sensors.get(3).getAsJsonObject(), "Expression"));
         assertRecoveryWander(branch.getAsJsonObject("BodyMotion"));
     }
 
     private static void assertNavigationRecovery(JsonObject branch) {
         assertFalse(branch.has("Continue"), "navigation recovery must preempt normal aerial loiter");
-        assertAerialRecoveryContext(branch.getAsJsonObject("Sensor"));
-        List<JsonObject> navigation = objects(branch.getAsJsonObject("Sensor"), sensor -> "Nav".equals(string(sensor, "Type")));
-        assertEquals(1, navigation.size());
-        assertEquals(List.of("Defer", "Blocked"), navigation.get(0).getAsJsonArray("NavStates").asList().stream()
+        JsonArray sensors = assertAerialRecoveryContext(branch.getAsJsonObject("Sensor"));
+        JsonObject navigation = sensors.get(3).getAsJsonObject();
+        assertEquals("Nav", string(navigation, "Type"));
+        assertEquals(List.of("Defer", "Blocked"), navigation.getAsJsonArray("NavStates").asList().stream()
                 .map(JsonElement::getAsString).toList());
-        assertEquals(2.0, navigation.get(0).get("ThrottleDuration").getAsDouble());
+        assertEquals(2.0, navigation.get("ThrottleDuration").getAsDouble());
         assertRecoveryWander(branch.getAsJsonObject("BodyMotion"));
     }
 
-    private static void assertAerialRecoveryContext(JsonObject sensor) {
-        assertEquals(1, objects(sensor, object -> "Target".equals(string(object, "Type"))
-                && "LockedTarget".equals(string(object, "TargetSlot"))).size());
-        assertEquals(1, objects(sensor, object -> "Flag".equals(string(object, "Type"))
-                && "AirborneMode".equals(string(object, "Name")) && object.has("Set")
-                && object.get("Set").getAsBoolean()).size());
-        assertEquals(1, objects(sensor, object -> "MotionController".equals(string(object, "Type"))
-                && "Fly".equals(string(object, "MotionController"))).size());
+    private static JsonArray assertAerialRecoveryContext(JsonObject sensor) {
+        assertEquals("And", string(sensor, "Type"));
+        JsonArray sensors = sensor.getAsJsonArray("Sensors");
+        assertEquals(4, sensors.size());
+        assertEquals("Target", string(sensors.get(0).getAsJsonObject(), "Type"));
+        assertEquals("LockedTarget", string(sensors.get(0).getAsJsonObject(), "TargetSlot"));
+        assertFlagSensor(sensors.get(1).getAsJsonObject(), "AirborneMode", true);
+        assertEquals("MotionController", string(sensors.get(2).getAsJsonObject(), "Type"));
+        assertEquals("Fly", string(sensors.get(2).getAsJsonObject(), "MotionController"));
+        return sensors;
     }
 
     private static void assertRecoveryWander(JsonObject motion) {
