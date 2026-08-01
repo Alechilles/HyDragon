@@ -20,10 +20,10 @@
               "ExtendTop": 1.6,
               "ExtendBottom": 1.6,
               "StartDistance": 3.12,
-              "EndDistance": 4.75,
+              "EndDistance": 5.32,
               "Length": 44.55,
               "RollOffset": -90,
-              "YawStartOffset": 2.66
+              "YawStartOffset": -4.43
             },
             "HitEntity": {
               "Interactions": [
