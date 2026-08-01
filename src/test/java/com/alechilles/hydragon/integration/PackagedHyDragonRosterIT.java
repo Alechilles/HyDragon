@@ -94,6 +94,31 @@ final class PackagedHyDragonRosterIT {
     }
 
     @Test
+    void packagedToxicHydraAssetsAreCompleteAndTextureResolves() throws Exception {
+        Path hydragon = packaged("hydragon.packaged.jar");
+        try (ZipFile zip = new ZipFile(hydragon.toFile())) {
+            for (String entry : List.of(
+                    "Server/NPC/Roles/Creature/HyDragon/Hydra/Hydra_Toxic.json",
+                    "Server/NPC/Roles/Creature/HyDragon/Hydra/Tamed_Hydra_Toxic.json",
+                    "Server/Projectiles/HyDragon/Hydra/Hydra_Toxic_Ball.json",
+                    "Server/Projectiles/HyDragon/Hydra/Hydra_Rain_Toxic_Ball.json",
+                    "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Ball_Charge_Effect.json",
+                    "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Ball_Launch.json",
+                    "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Toxic_Charge_Effect.json",
+                    "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Toxic_Launch.json",
+                    "Server/Models/HyDragon/Hydra/Hydra_Toxic.json",
+                    "Server/Models/Projectiles/HyDragon/Hydra_Toxic_Ball_Projectile.json",
+                    "Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_HyDragon_Predator.json")) {
+                assertNotNull(zip.getEntry(entry), () -> "missing packaged entry " + entry);
+            }
+            JsonObject model = json(zip, "Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
+            String texture = model.get("Texture").getAsString();
+            assertEquals("NPC/HyDragon/Hydra/Model/Toxic.png", texture);
+            assertNotNull(zip.getEntry("Common/" + texture));
+        }
+    }
+
+    @Test
     void packagedAssetsAndApiExposeSharedPoliciesAndBondedApi() throws Exception {
         Path hydragon = packaged("hydragon.packaged.jar");
         Path tamework = packaged("hydragon.tamework.jar");
@@ -142,7 +167,8 @@ final class PackagedHyDragonRosterIT {
             assertEquals(List.of("Tamed_NordicDrake"), roleIds(nordic));
             assertFlightToggle(nordic);
             assertEquals(List.of(
-                    "Tamed_Hydra", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"),
+                    "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2",
+                    "Tamed_RockDrakeT3"),
                     roleIds(groundOnly));
             String groundOnlyJson = groundOnly.toString();
             assertFalse(groundOnly.getAsJsonObject("Command").has("FlightToggle"));

@@ -1,0 +1,46 @@
+{
+  "Appearance": "Hydra_Toxic_Ball_Projectile",
+  "Radius": 1.6,
+  "Height": -1,
+  "HorizontalCenterShot": 0,
+  "DepthShot": 3,
+  "PitchAdjustShot": true,
+  "SticksVertically": true,
+  "MuzzleVelocity": 28,
+  "TerminalVelocity": 60,
+  "Gravity": 14,
+  "Damage": 18,
+  "DeathEffectsOnHit": true,
+  "TimeToLive": 10,
+  "DeadTimeMiss": 0,
+  "DeathParticles": {
+    "SystemId": "Effect_Poison",
+    "Scale": 2.0
+  },
+  "MissParticles": {
+    "SystemId": "Effect_Poison",
+    "Scale": 2.0
+  },
+  "ImpactSlowdown": 0,
+  "VerticalCenterShot": 0,
+  "HitParticles": {
+    "SystemId": "Impact_Poison",
+    "Scale": 2.0
+  },
+  "DeathSoundEventId": "SFX_Scarak_Seeker_Spitball_Death",
+  "ExplosionConfig": {
+    "DamageEntities": true,
+    "EntityDamageRadius": 5.0,
+    "EntityDamage": 10,
+    "Knockback": {
+      "Type": "Force",
+      "Force": 6,
+      "Direction": {
+        "Z": 0.35,
+        "Y": 1.25,
+        "X": 0.35
+      }
+    },
+    "DamageBlocks": true
+  }
+}

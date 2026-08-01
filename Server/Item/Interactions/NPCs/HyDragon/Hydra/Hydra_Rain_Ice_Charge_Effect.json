@@ -1,0 +1,15 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "Particles": [
+      {
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Origin_Projectile",
+        "SystemId": "Hydra_Ice_Ball_Charging",
+        "PositionOffset": {
+          "Z": 0
+        }
+      }
+    ]
+  }
+}

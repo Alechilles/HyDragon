@@ -1,0 +1,26 @@
+{
+  "Type": "TameworkLaunchProjectile",
+  "Effects": {
+    "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+    "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+    "Particles": [
+      {
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Origin_Projectile",
+        "SystemId": "Ice_Staff",
+        "DetachedFromModel": false,
+        "PositionOffset": {},
+        "Scale": 1.5
+      }
+    ]
+  },
+  "ProjectileId": "Hydra_Ice_Ball",
+  "TrajectoryMode": "Direct",
+  "TargetSlot": "CAETargetSlot",
+  "ImpactEffect": {
+    "EffectId": "Chilled",
+    "Radius": 3.0,
+    "ExcludeSource": true
+  },
+  "Tags": {}
+}

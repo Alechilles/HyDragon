@@ -1,0 +1,108 @@
+{
+  "Type": "Variant",
+  "Reference": "Tamed_Hydra",
+  "Modify": {
+    "Appearance": "Hydra_Toxic",
+    "FlockArray": ["Tamed_Hydra_Toxic"],
+    "MemoriesNameOverride": "Toxic Hydra",
+    "_InteractionVars": {
+      "Bite_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Bite_Damage",
+            "Next": {
+              "Type": "ApplyEffect",
+              "EffectId": "Poison_T1",
+              "Entity": "Target"
+            }
+          }
+        ]
+      },
+      "Swipe_Left_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Swipe_Left_Damage",
+            "Next": {
+              "Type": "ApplyEffect",
+              "EffectId": "Poison_T1",
+              "Entity": "Target"
+            }
+          }
+        ]
+      },
+      "Swipe_Right_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Swipe_Right_Damage",
+            "Next": {
+              "Type": "ApplyEffect",
+              "EffectId": "Poison_T1",
+              "Entity": "Target"
+            }
+          }
+        ]
+      },
+      "Stomp_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Stomp_Damage",
+            "Next": {
+              "Type": "ApplyEffect",
+              "EffectId": "Poison_T1",
+              "Entity": "Target"
+            }
+          }
+        ]
+      },
+      "Tail_Spin_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Tail_Spin_Damage",
+            "Next": {
+              "Type": "ApplyEffect",
+              "EffectId": "Poison_T1",
+              "Entity": "Target"
+            }
+          }
+        ]
+      },
+      "Hydra_Ball_Charge_Effect": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Toxic_Ball_Charge_Effect"
+          }
+        ]
+      },
+      "Hydra_Ball_Launch": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Toxic_Ball_Launch"
+          }
+        ]
+      },
+      "Hydra_Rain_Charge_Effect": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Rain_Toxic_Charge_Effect"
+          }
+        ]
+      },
+      "Hydra_Rain_Launch": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Rain_Toxic_Launch"
+          }
+        ]
+      }
+    },
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Tamed_Hydra_Toxic.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}

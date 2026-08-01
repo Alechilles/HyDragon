@@ -1,0 +1,36 @@
+{
+  "Type": "TameworkLaunchProjectile",
+  "ProjectileId": "Hydra_Rain_Toxic_Ball",
+  "LaunchPositionOffset": {
+    "X": 0.0,
+    "Y": -1.0,
+    "Z": -2.0
+  },
+  "RandomAroundSourceMinRadius": 6.0,
+  "RandomAroundSourceMaxRadius": 15.0,
+  "RandomAroundSourceVerticalOffset": 0.0,
+  "LingeringHazard": {
+    "Radius": 4.0,
+    "DurationSeconds": 6.0,
+    "TickIntervalSeconds": 1.0,
+    "DamagePerTick": 5.0,
+    "ExcludeSource": true,
+    "EffectId": "Poison_T1",
+    "SourceTypeId": "hydragon.rain_toxic_hazard"
+  },
+  "Effects": {
+    "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
+    "LocalSoundEventId": "SFX_Scarak_Spitball_Fire",
+    "Particles": [
+      {
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Origin_Projectile",
+        "SystemId": "Effect_Poison",
+        "DetachedFromModel": false,
+        "PositionOffset": {},
+        "Scale": 1.5
+      }
+    ]
+  },
+  "Tags": {}
+}

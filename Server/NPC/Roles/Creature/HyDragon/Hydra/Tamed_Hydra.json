@@ -102,6 +102,34 @@
             }
           }
         ]
+      },
+      "Hydra_Ball_Charge_Effect": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Ice_Ball_Charge_Effect"
+          }
+        ]
+      },
+      "Hydra_Ball_Launch": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Ice_Ball_Launch"
+          }
+        ]
+      },
+      "Hydra_Rain_Charge_Effect": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Rain_Ice_Charge_Effect"
+          }
+        ]
+      },
+      "Hydra_Rain_Launch": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Rain_Ice_Launch"
+          }
+        ]
       }
     },
     "NameTranslationKey": {

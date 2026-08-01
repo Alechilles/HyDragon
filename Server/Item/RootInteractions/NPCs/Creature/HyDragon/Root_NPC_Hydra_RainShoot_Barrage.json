@@ -4,1068 +4,447 @@
       "Type": "Serial",
       "Interactions": [
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         },
         {
-          "Type": "Simple",
-          "Effects": {
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Hydra_Ice_Ball_Charging",
-                "PositionOffset": {
-                  "Z": 0
-                }
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Charge_Effect",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Charge_Effect"
             ]
           },
           "RunTime": 0.3
         },
         {
-          "Type": "TameworkLaunchProjectile",
-          "RunTime": 0,
-          "ProjectileId": "Hydra_Rain_Ice_Ball",
-          "LaunchPositionOffset": {
-            "X": 0.0,
-            "Y": -1.0,
-            "Z": -2.0
-          },
-          "RandomAroundSourceMinRadius": 6.0,
-          "RandomAroundSourceMaxRadius": 15.0,
-          "RandomAroundSourceVerticalOffset": 0.0,
-          "LingeringHazard": {
-            "Radius": 4.0,
-            "DurationSeconds": 6.0,
-            "TickIntervalSeconds": 1.0,
-            "DamagePerTick": 5.0,
-            "ExcludeSource": true,
-            "EffectId": "Chilled",
-            "SourceTypeId": "hydragon.rain_ice_hazard"
-          },
-          "Effects": {
-            "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-            "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-            "Particles": [
-              {
-                "TargetEntityPart": "Entity",
-                "TargetNodeName": "Origin_Projectile",
-                "SystemId": "Ice_Staff",
-                "DetachedFromModel": false,
-                "PositionOffset": {},
-                "Scale": 1.5
-              }
+          "Type": "Replace",
+          "DefaultOk": true,
+          "Var": "Hydra_Rain_Launch",
+          "DefaultValue": {
+            "Interactions": [
+              "Hydra_Rain_Ice_Launch"
             ]
           },
-          "Tags": {}
+          "RunTime": 0
         }
       ]
     }
   ],
   "RequireNewClick": false
 }
-

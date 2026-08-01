@@ -4,6 +4,7 @@
   "Priority": 100,
   "RoleIds": [
     "Tamed_Hydra",
+    "Tamed_Hydra_Toxic",
     "Tamed_RockDrakeT1",
     "Tamed_RockDrakeT2",
     "Tamed_RockDrakeT3"
