@@ -1,10 +1,9 @@
 {
   "Type": "Abstract",
-  "Debug": "DisplayState",
   "Appearance": {
     "Compute": "Appearance"
   },
-  "StartState": "Follow",
+  "StartState": "Idle",
   "Parameters": {
     "Appearance": {
       "Value": "Wyvern_Mini",
@@ -364,22 +363,28 @@
       "Sensor": {
         "Type": "And",
         "Sensors": [
-          { "Type": "Or", "Sensors": [
-            { "Type": "Not", "Sensor": { "Type": "State", "State": "Defend" } },
-            { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
-            { "Type": "Flag", "Name": "AirborneMode", "Set": false },
-            { "Type": "Not", "Sensor": { "Type": "MotionController", "MotionController": "Fly" } }
-          ] },
-          { "Type": "Or", "Sensors": [
-            { "Type": "Flag", "Name": "Miniwyvern_Swoop_Pending" },
-            { "Type": "Flag", "Name": "Miniwyvern_Aerial_Combat_Active" },
-            { "Type": "Flag", "Name": "Miniwyvern_Swooping" },
-            { "Type": "Flag", "Name": "Miniwyvern_Swoop_Strike_Committed" },
-            { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started" },
-            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
-            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active" },
-            { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }
-          ] }
+          {
+            "Type": "Or",
+            "Sensors": [
+              { "Type": "Not", "Sensor": { "Type": "State", "State": "Defend" } },
+              { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
+              { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+              { "Type": "Not", "Sensor": { "Type": "MotionController", "MotionController": "Fly" } }
+            ]
+          },
+          {
+            "Type": "Or",
+            "Sensors": [
+              { "Type": "Flag", "Name": "Miniwyvern_Swoop_Pending" },
+              { "Type": "Flag", "Name": "Miniwyvern_Aerial_Combat_Active" },
+              { "Type": "Flag", "Name": "Miniwyvern_Swooping" },
+              { "Type": "Flag", "Name": "Miniwyvern_Swoop_Strike_Committed" },
+              { "Type": "Flag", "Name": "Miniwyvern_Swoop_Recovery_Started" },
+              { "Type": "Flag", "Name": "Miniwyvern_Projectile_Aiming" },
+              { "Type": "Flag", "Name": "Miniwyvern_Projectile_Volley_Active" },
+              { "Type": "Flag", "Name": "Miniwyvern_Projectile_Echo_Pending" }
+            ]
+          }
         ]
       },
       "Actions": [
