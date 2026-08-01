@@ -271,7 +271,7 @@ final class NordicDrakeTamedCombatAssetTest {
         assertParameter(parameters, "GroundBreathDistance", 9);
         assertParameter(parameters, "GroundBreathCooldownRange", List.of(10, 20));
         assertParameter(parameters, "GroundBreathWeight", 4);
-        assertParameter(parameters, "DesiredAttackDistanceRange", List.of(0.5, 5));
+        assertParameter(parameters, "DesiredAttackDistanceRange", List.of(3.5, 5));
         assertParameter(parameters, "CombatBehaviorDistance", 18);
         assertParameter(parameters, "CombatMovingRelativeSpeed", 0.6);
         assertParameter(parameters, "CombatBackwardsRelativeSpeed", 0.4);
@@ -636,13 +636,17 @@ final class NordicDrakeTamedCombatAssetTest {
     private static void assertGroundedMovement(JsonObject groundCombat) {
         List<JsonObject> children = groundCombat.getAsJsonArray("Instructions").asList().stream()
                 .map(JsonElement::getAsJsonObject).toList();
-        assertEquals(6, children.size(), "ground combat must retain its six ordered behavior branches");
-        assertTrue(isChaseBranch(children.get(0)));
-        assertTrue(isPositioningBranch(children.get(1)));
-        assertEquals("Random", string(children.get(2), "Type"));
-        assertTrue(containsAttack(children.get(3), "GroundBiteAttack"));
-        assertTrue(containsAttack(children.get(4), "GroundBreathAttack"));
-        assertTrue(containsAttack(children.get(5), "GroundBasicAttack"));
+        assertEquals(7, children.size(), "ground combat must retain its seven ordered behavior branches");
+        JsonObject tracking = children.get(0);
+        assertTrue(tracking.has("Continue") && tracking.get("Continue").getAsBoolean());
+        assertGroundedContext(tracking.getAsJsonObject("Sensor"));
+        assertEquals("Aim", string(tracking.getAsJsonObject("HeadMotion"), "Type"));
+        assertTrue(isChaseBranch(children.get(1)));
+        assertTrue(isPositioningBranch(children.get(2)));
+        assertTrue(containsAttack(children.get(3), "GroundBasicAttack"));
+        assertEquals("Random", string(children.get(4), "Type"));
+        assertTrue(containsAttack(children.get(5), "GroundBiteAttack"));
+        assertTrue(containsAttack(children.get(6), "GroundBreathAttack"));
         JsonObject chase = objects(groundCombat, object -> object.has("Sensor") && object.has("Instructions")
                 && object.getAsJsonArray("Instructions").asList().stream().map(JsonElement::getAsJsonObject)
                 .anyMatch(child -> "Component_Tamework_Instruction_Intelligent_Chase".equals(string(child, "Reference"))))
@@ -666,6 +670,7 @@ final class NordicDrakeTamedCombatAssetTest {
         assertEquals("DesiredAttackDistanceRange", string(maintainMotion.getAsJsonObject("DesiredDistanceRange"), "Compute"));
         assertEquals("CombatMovingRelativeSpeed", string(maintainMotion.getAsJsonObject("RelativeForwardsSpeed"), "Compute"));
         assertEquals("CombatBackwardsRelativeSpeed", string(maintainMotion.getAsJsonObject("RelativeBackwardsSpeed"), "Compute"));
+        assertEquals(0.2, maintainMotion.get("MoveThreshold").getAsDouble());
         assertTargetRange(maintain.getAsJsonObject("Sensor"), "CombatBehaviorDistance");
     }
 
@@ -689,9 +694,9 @@ final class NordicDrakeTamedCombatAssetTest {
                 "GroundBreathCooldownRange", "NordicDrake_Ground_Breath", true));
         List<JsonObject> children = groundCombat.getAsJsonArray("Instructions").asList().stream()
                 .map(JsonElement::getAsJsonObject).toList();
-        assertDirectSpecialAvailability(children.get(3), "NordicDrake_Ground_Bite", "GroundBiteDistance",
+        assertDirectSpecialAvailability(children.get(5), "NordicDrake_Ground_Bite", "GroundBiteDistance",
                 "NordicDrake_Ground_Breath", "GroundBreathDistance");
-        assertDirectSpecialAvailability(children.get(4), "NordicDrake_Ground_Breath", "GroundBreathDistance",
+        assertDirectSpecialAvailability(children.get(6), "NordicDrake_Ground_Breath", "GroundBreathDistance",
                 "NordicDrake_Ground_Bite", "GroundBiteDistance");
         assertEquals(List.of(0.1, 0.2), numbers(action(basic, "Attack").getAsJsonArray("AimingTimeRange")));
 
