@@ -10,13 +10,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.StringReader;
 import javax.imageio.ImageIO;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -198,6 +204,14 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
+    void jsonReaderRejectsDuplicateObjectKeysAtEveryNestingLevel() {
+        assertThrows(IllegalArgumentException.class,
+                () -> parseJson("{\"Hydra\":\"first\",\"Hydra\":\"second\"}"));
+        assertThrows(IllegalArgumentException.class,
+                () -> parseJson("{\"Hydra\":{\"Toxic\":\"first\",\"Toxic\":\"second\"}}"));
+    }
+
+    @Test
     void toxicHydraIsAWeightOneDaytimeSwampPredator() throws Exception {
         JsonObject spawn = json("Server/NPC/Spawn/World/Zone1/"
                 + "Spawns_Zone1_Swamps_HyDragon_Predator.json");
@@ -216,33 +230,51 @@ class ToxicHydraVariantAssetTest {
     @Test
     void toxicHydraIsRegisteredAcrossSpeciesCaptureCompanionAndCommandAssets() throws Exception {
         JsonObject species = json("Server/HyDragon/DragonSpecies/Hydra.json");
-        assertContainsExactlyOnce(species.getAsJsonArray("WildRoleIds"), "Hydra");
-        assertContainsExactlyOnce(species.getAsJsonArray("WildRoleIds"), "Hydra_Toxic");
-        assertEquals("Tamed_Hydra_Toxic", species.getAsJsonObject("TamedRoleIdByWildRole")
-                .get("Hydra_Toxic").getAsString());
-        assertContainsExactlyOnce(species.getAsJsonObject("Spawn")
-                .getAsJsonArray("OrdinarySpawnAssetIds"), "Spawns_Zone1_Swamps_HyDragon_Predator");
-        assertContainsExactlyOnce(species.getAsJsonObject("Presentation")
-                .getAsJsonArray("ModelIds"), "Hydra");
-        assertContainsExactlyOnce(species.getAsJsonObject("Presentation")
-                .getAsJsonArray("ModelIds"), "Hydra_Toxic");
+        assertEquals(List.of("Hydra", "Hydra_Toxic"), strings(species.getAsJsonArray("WildRoleIds")));
+        assertEquals(Map.of("Hydra", "Tamed_Hydra", "Hydra_Toxic", "Tamed_Hydra_Toxic"),
+                stringMap(species.getAsJsonObject("TamedRoleIdByWildRole")));
+        assertEquals(List.of("Spawns_Zone3_Glacial_HyDragon_Predator",
+                        "Spawns_Zone1_Swamps_HyDragon_Predator"),
+                strings(species.getAsJsonObject("Spawn").getAsJsonArray("OrdinarySpawnAssetIds")));
+        assertEquals(List.of("Hydra", "Hydra_Toxic"),
+                strings(species.getAsJsonObject("Presentation").getAsJsonArray("ModelIds")));
 
-        assertContainsExactlyOnce(json("Server/Tamework/CapturePolicies/HyDragonHydra.json")
-                .getAsJsonArray("RoleIds"), "Hydra_Toxic");
-        assertContainsExactlyOnce(json("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json")
-                .getAsJsonArray("AllowedRoles"), "Tamed_Hydra_Toxic");
-        assertContainsExactlyOnce(json("Server/Tamework/Companion/HyDragonFullDragons.json")
-                .getAsJsonArray("RoleIds"), "Tamed_Hydra_Toxic");
-        assertContainsExactlyOnce(json("Server/Tamework/Breeding/HyDragonBondedCompanions.json")
-                .getAsJsonArray("RoleIds"), "Tamed_Hydra_Toxic");
+        assertEquals(List.of("Hydra", "Hydra_Toxic"),
+                strings(json("Server/Tamework/CapturePolicies/HyDragonHydra.json")
+                        .getAsJsonArray("RoleIds")));
+        assertEquals(List.of("Tamed_NordicDrake", "Tamed_Hydra", "Tamed_Hydra_Toxic",
+                        "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"),
+                strings(json("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json")
+                        .getAsJsonArray("AllowedRoles")));
+        assertEquals(List.of("Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_RockDrakeT1",
+                        "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"),
+                strings(json("Server/Tamework/Companion/HyDragonFullDragons.json")
+                        .getAsJsonArray("RoleIds")));
+        assertEquals(List.of("Tamed_NordicDrake", "Tamed_Hydra", "Tamed_Hydra_Toxic",
+                        "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3",
+                        "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature",
+                        "Tamed_Wyvern_Mini_Toxic", "Tamed_Wyvern_Mini_Fire",
+                        "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+                        "Tamed_Wyvern_Mini_Ice"),
+                strings(json("Server/Tamework/Breeding/HyDragonBondedCompanions.json")
+                        .getAsJsonArray("RoleIds")));
 
         JsonObject stone = json("Server/Tamework/Items/Spawners/HyDragonDraconicStone.json");
-        assertContainsExactlyOnce(stone.getAsJsonObject("AllowedRoles").getAsJsonArray("Allowlist"),
-                "Hydra_Toxic");
-        assertEquals("Tamed_Hydra_Toxic", stone.getAsJsonObject("Capture")
-                .getAsJsonObject("TamedRoleOverrides").get("Hydra_Toxic").getAsString());
-        assertContainsExactlyOnce(json("Server/Tamework/Items/Commands/HyDragonDragonHorn.json")
-                .getAsJsonObject("AllowedRoles").getAsJsonArray("Allowlist"), "Tamed_Hydra_Toxic");
+        assertEquals(List.of("NordicDrake", "Hydra", "Hydra_Toxic", "RockDrakeT1", "RockDrakeT2",
+                        "RockDrakeT3"),
+                strings(stone.getAsJsonObject("AllowedRoles").getAsJsonArray("Allowlist")));
+        assertEquals(Map.of("NordicDrake", "Tamed_NordicDrake", "Hydra", "Tamed_Hydra",
+                        "Hydra_Toxic", "Tamed_Hydra_Toxic", "RockDrakeT1", "Tamed_RockDrakeT1",
+                        "RockDrakeT2", "Tamed_RockDrakeT2", "RockDrakeT3", "Tamed_RockDrakeT3"),
+                stringMap(stone.getAsJsonObject("Capture").getAsJsonObject("TamedRoleOverrides")));
+        assertEquals(List.of("Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_NordicDrake",
+                        "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3",
+                        "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature",
+                        "Tamed_Wyvern_Mini_Toxic", "Tamed_Wyvern_Mini_Fire",
+                        "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+                        "Tamed_Wyvern_Mini_Ice"),
+                strings(json("Server/Tamework/Items/Commands/HyDragonDragonHorn.json")
+                        .getAsJsonObject("AllowedRoles").getAsJsonArray("Allowlist")));
     }
 
     @Test
@@ -414,8 +446,10 @@ class ToxicHydraVariantAssetTest {
         return values.asList().stream().map(JsonElement::getAsDouble).toList();
     }
 
-    private static void assertContainsExactlyOnce(JsonArray values, String expected) {
-        assertEquals(1, strings(values).stream().filter(expected::equals).count(), expected);
+    private static Map<String, String> stringMap(JsonObject values) {
+        Map<String, String> result = new LinkedHashMap<>();
+        values.entrySet().forEach(entry -> result.put(entry.getKey(), entry.getValue().getAsString()));
+        return result;
     }
 
     private static void assertLocaleEntryExactlyOnce(String locale, String key, String value)
@@ -428,7 +462,40 @@ class ToxicHydraVariantAssetTest {
     }
 
     private static JsonObject json(String relativePath) throws IOException {
-        return JsonParser.parseString(read(relativePath)).getAsJsonObject();
+        return parseJson(read(relativePath));
+    }
+
+    private static JsonObject parseJson(String content) {
+        try (JsonReader reader = new JsonReader(new StringReader(content))) {
+            rejectDuplicateObjectKeys(reader);
+            if (reader.peek() != JsonToken.END_DOCUMENT) {
+                throw new IllegalArgumentException("JSON contains trailing content");
+            }
+        } catch (IOException exception) {
+            throw new IllegalArgumentException("Invalid JSON", exception);
+        }
+        return JsonParser.parseString(content).getAsJsonObject();
+    }
+
+    private static void rejectDuplicateObjectKeys(JsonReader reader) throws IOException {
+        switch (reader.peek()) {
+            case BEGIN_ARRAY -> {
+                reader.beginArray();
+                while (reader.hasNext()) rejectDuplicateObjectKeys(reader);
+                reader.endArray();
+            }
+            case BEGIN_OBJECT -> {
+                reader.beginObject();
+                Set<String> names = new HashSet<>();
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    if (!names.add(name)) throw new IllegalArgumentException("Duplicate JSON key: " + name);
+                    rejectDuplicateObjectKeys(reader);
+                }
+                reader.endObject();
+            }
+            default -> reader.skipValue();
+        }
     }
 
     private static String read(String relativePath) throws IOException {
