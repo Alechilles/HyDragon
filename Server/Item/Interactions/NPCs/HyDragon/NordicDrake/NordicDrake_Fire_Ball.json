@@ -14,7 +14,8 @@
       "Type": "Simple",
       "Effects": {
         "ItemPlayerAnimationsId": "NordicDrake_Default",
-        "ItemAnimationId": "ChargeShoot"
+        "ItemAnimationId": "ChargeShoot",
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Roar"
       },
       "RunTime": 0.8
     },
@@ -35,6 +36,13 @@
         "ExcludeSource": true
       },
       "Tags": {}
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch"
+      },
+      "RunTime": 0
     },
     {
       "Type": "Simple",

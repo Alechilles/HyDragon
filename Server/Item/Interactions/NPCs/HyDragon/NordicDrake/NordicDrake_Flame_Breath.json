@@ -24,6 +24,7 @@
               "Effects": {
                 "ItemPlayerAnimationsId": "NordicDrake_Default",
                 "ItemAnimationId": "ChargeShoot",
+                "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Flame_Breath_Roar",
                 "Particles": [
                   {
                     "TargetEntityPart": "Entity",
