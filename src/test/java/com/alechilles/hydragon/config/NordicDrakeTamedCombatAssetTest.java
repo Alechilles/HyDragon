@@ -555,8 +555,8 @@ final class NordicDrakeTamedCombatAssetTest {
     private static void assertApproachBindings(JsonObject motion) {
         assertEquals("TameworkFlyingOrbit", string(motion, "Type"));
         assertEquals("APPROACH", string(motion, "Mode"));
-        assertEquals(0, motion.get("ApproachStopDistance").getAsInt());
-        assertEquals(12, motion.get("ApproachSlowDownDistance").getAsInt());
+        assertEquals(0.0, motion.get("ApproachStopDistance").getAsDouble());
+        assertEquals(12.0, motion.get("ApproachSlowDownDistance").getAsDouble());
         assertEquals("AirBreathAttackRelativeSpeed", string(motion.getAsJsonObject("RelativeSpeed"), "Compute"));
         assertEquals("AirBreathAttackAltitudeRange", string(motion.getAsJsonObject("DesiredAltitudeRange"), "Compute"));
         assertEquals("AirCombatClimbRelativeSpeed", string(motion.getAsJsonObject("ClimbRelativeSpeed"), "Compute"));
