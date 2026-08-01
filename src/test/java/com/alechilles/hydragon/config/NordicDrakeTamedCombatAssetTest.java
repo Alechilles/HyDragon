@@ -66,8 +66,6 @@ final class NordicDrakeTamedCombatAssetTest {
         JsonObject component = readJson(COMPONENT);
         JsonObject parameters = component.getAsJsonObject("Parameters");
         List<JsonObject> roots = directChildren(component);
-        assertEquals("TimerStop", string(roots.get(4).getAsJsonArray("Actions").get(0).getAsJsonObject(), "Type"));
-        assertEquals(".AirRanged", string(roots.get(5).getAsJsonArray("Actions").get(0).getAsJsonObject(), "State"));
         assertFalse(parameters.has("AirCombatWanderMinMoveDistance"));
         assertFalse(parameters.has("AirCombatWanderTestsPerTick"));
         assertParameter(parameters, "AirFireballAttack", "Root_NPC_NordicDrake_Fire_Ball");
@@ -196,6 +194,8 @@ final class NordicDrakeTamedCombatAssetTest {
         JsonObject player = not.getAsJsonObject("Sensor");
         assertEquals("Player", string(player, "Type"));
         assertEquals("HardLeashDistance", string(player.getAsJsonObject("Range"), "Compute"));
+        assertEquals("TimerStop", string(branch.getAsJsonArray("Actions").get(0).getAsJsonObject(), "Type"),
+                "safety exits must clear aerial cooldowns before releasing a target");
         assertReleaseAndReset(branch);
     }
 
@@ -302,15 +302,17 @@ final class NordicDrakeTamedCombatAssetTest {
     }
 
     private static void assertAerialRootOrder(List<JsonObject> roots) {
-        assertEquals(13, roots.size());
-        assertEquals(List.of("TimerStop", "TimerStop", "TimerStop", "State", "ResetInstructions"), actionTypes(roots.get(4)));
-        assertEquals(List.of("State", "ResetInstructions"), actionTypes(roots.get(5)));
-        assertEquals(".AirRanged", string(roots.get(5).getAsJsonArray("Actions").get(0).getAsJsonObject(), "State"));
-        assertAerialStateOwner(roots.get(8), ".AirRanged");
-        assertAerialStateOwner(roots.get(9), ".AirVolley");
-        assertAerialStateOwner(roots.get(10), ".AirBreathIngress");
-        assertAerialStateOwner(roots.get(11), ".AirBreathPass");
-        assertAerialStateOwner(roots.get(12), ".AirRecovery");
+        assertEquals(14, roots.size());
+        assertEquals(List.of("TimerStop", "TimerStop", "TimerStop", "SetFlag", "State", "ResetInstructions"), actionTypes(roots.get(4)));
+        assertEquals("NordicDrake_Air_Reset_Pending", string(roots.get(5).getAsJsonObject("Sensor"), "Name"));
+        assertEquals(List.of("SetFlag", "ResetInstructions"), actionTypes(roots.get(5)));
+        assertEquals(List.of("State", "ResetInstructions"), actionTypes(roots.get(6)));
+        assertEquals(".AirRanged", string(roots.get(6).getAsJsonArray("Actions").get(0).getAsJsonObject(), "State"));
+        assertAerialStateOwner(roots.get(9), ".AirRanged");
+        assertAerialStateOwner(roots.get(10), ".AirVolley");
+        assertAerialStateOwner(roots.get(11), ".AirBreathIngress");
+        assertAerialStateOwner(roots.get(12), ".AirBreathPass");
+        assertAerialStateOwner(roots.get(13), ".AirRecovery");
     }
 
     private static void assertAerialStateOwner(JsonObject branch, String state) {
@@ -412,9 +414,19 @@ final class NordicDrakeTamedCombatAssetTest {
 
     private static void assertTransition(JsonObject branch, String state) {
         List<String> actions = actionTypes(branch);
-        assertEquals("State", actions.get(actions.size() - 2));
-        assertEquals("ResetInstructions", actions.get(actions.size() - 1));
-        assertEquals(state, string(branch.getAsJsonArray("Actions").get(actions.size() - 2).getAsJsonObject(), "State"));
+        if (branch.has("ActionsBlocking") && branch.get("ActionsBlocking").getAsBoolean()) {
+            assertEquals("SetFlag", actions.get(actions.size() - 2));
+            assertEquals("State", actions.get(actions.size() - 1));
+            JsonObject pending = branch.getAsJsonArray("Actions").get(actions.size() - 2).getAsJsonObject();
+            assertEquals("NordicDrake_Air_Reset_Pending", string(pending, "Name"));
+            assertFalse(pending.has("Set"));
+            assertTrue(pending.get("SetTo").getAsBoolean());
+            assertEquals(state, string(branch.getAsJsonArray("Actions").get(actions.size() - 1).getAsJsonObject(), "State"));
+        } else {
+            assertEquals("State", actions.get(actions.size() - 2));
+            assertEquals("ResetInstructions", actions.get(actions.size() - 1));
+            assertEquals(state, string(branch.getAsJsonArray("Actions").get(actions.size() - 2).getAsJsonObject(), "State"));
+        }
     }
 
     private static void assertAnyFallback(JsonObject branch, String state) {
@@ -661,7 +673,10 @@ final class NordicDrakeTamedCombatAssetTest {
     private static void assertReleaseAndReset(JsonObject branch) {
         List<String> actions = branch.getAsJsonArray("Actions").asList().stream()
                 .map(JsonElement::getAsJsonObject).map(action -> string(action, "Type")).toList();
-        assertEquals(List.of("ReleaseTarget", "ResetInstructions"), actions);
-        assertEquals("LockedTarget", string(branch.getAsJsonArray("Actions").get(0).getAsJsonObject(), "TargetSlot"));
+        assertEquals(List.of("TimerStop", "TimerStop", "TimerStop", "SetFlag", "State", "ReleaseTarget", "ResetInstructions"), actions);
+        assertFalse(branch.getAsJsonArray("Actions").get(3).getAsJsonObject().has("Set"));
+        assertFalse(!branch.getAsJsonArray("Actions").get(3).getAsJsonObject().has("SetTo")
+                || branch.getAsJsonArray("Actions").get(3).getAsJsonObject().get("SetTo").getAsBoolean());
+        assertEquals("LockedTarget", string(branch.getAsJsonArray("Actions").get(5).getAsJsonObject(), "TargetSlot"));
     }
 }
