@@ -2,6 +2,7 @@ package com.alechilles.hydragon.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -9,15 +10,52 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import javax.imageio.ImageIO;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class ToxicHydraVariantAssetTest {
     private static final Path ROOT = Path.of(".").toAbsolutePath().normalize();
+
+    @Test
+    void toxicRolesInheritIceRolesAndOverrideEveryElementSeam() throws Exception {
+        assertToxicRole("Hydra_Toxic", "Hydra", "Tamed_Hydra_Toxic");
+        assertToxicRole("Tamed_Hydra_Toxic", "Tamed_Hydra", null);
+    }
+
+    @Test
+    void toxicModelInheritsHydraAndOnlySelectsToxicTexture() throws Exception {
+        JsonObject model = json("Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
+        assertEquals("Hydra", model.get("Parent").getAsString());
+        assertEquals("Common/NPC/HyDragon/Hydra/Model/Toxic.png",
+                model.get("Texture").getAsString());
+        assertEquals(Set.of("Parent", "Texture"), model.keySet());
+    }
+
+    @Test
+    void toxicTexturePreservesIceDimensionsAndPerPixelAlpha() throws Exception {
+        BufferedImage ice = ImageIO.read(ROOT.resolve(
+                "Common/NPC/HyDragon/Hydra/Model/Ice.png").toFile());
+        BufferedImage toxic = ImageIO.read(ROOT.resolve(
+                "Common/NPC/HyDragon/Hydra/Model/Toxic.png").toFile());
+        assertNotNull(ice);
+        assertNotNull(toxic);
+        assertEquals(ice.getWidth(), toxic.getWidth());
+        assertEquals(ice.getHeight(), toxic.getHeight());
+        int alphaMismatches = 0;
+        for (int y = 0; y < ice.getHeight(); y++) {
+            for (int x = 0; x < ice.getWidth(); x++) {
+                if ((ice.getRGB(x, y) >>> 24) != (toxic.getRGB(x, y) >>> 24)) alphaMismatches++;
+            }
+        }
+        assertEquals(0, alphaMismatches, "Toxic recolor must preserve the complete UV alpha mask");
+    }
 
     @Test
     void sharedRangedChoreographyUsesElementVariablesWithoutTimingDrift() throws Exception {
@@ -141,6 +179,58 @@ class ToxicHydraVariantAssetTest {
         JsonObject actual = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/" + leaf);
         assertFalse(actual.has("RunTime"), leaf + " must leave cadence to its caller");
         assertEquals(JsonParser.parseString(expected).getAsJsonObject(), actual, leaf);
+    }
+
+    private static void assertToxicRole(String role, String reference, String tameRoleChange)
+            throws IOException {
+        JsonObject root = json("Server/NPC/Roles/Creature/HyDragon/Hydra/" + role + ".json");
+        assertEquals("Variant", root.get("Type").getAsString());
+        assertEquals(reference, root.get("Reference").getAsString());
+        assertEquals(Set.of("Type", "Reference", "Modify", "Parameters"), root.keySet());
+
+        JsonObject modify = root.getAsJsonObject("Modify");
+        Set<String> expectedModifyKeys = tameRoleChange == null
+                ? Set.of("Appearance", "_InteractionVars", "NameTranslationKey")
+                : Set.of("Appearance", "TameRoleChange", "_InteractionVars", "NameTranslationKey");
+        assertEquals(expectedModifyKeys, modify.keySet());
+        assertEquals("Hydra_Toxic", modify.get("Appearance").getAsString());
+        if (tameRoleChange == null) {
+            assertFalse(modify.has("TameRoleChange"));
+        } else {
+            assertEquals(tameRoleChange, modify.get("TameRoleChange").getAsString());
+        }
+
+        JsonObject vars = modify.getAsJsonObject("_InteractionVars");
+        assertEquals(Set.of(
+                "Bite_Damage", "Swipe_Left_Damage", "Swipe_Right_Damage", "Stomp_Damage",
+                "Tail_Spin_Damage", "Hydra_Ball_Charge_Effect", "Hydra_Ball_Launch",
+                "Hydra_Rain_Charge_Effect", "Hydra_Rain_Launch"), vars.keySet());
+        assertVariableLeaf(vars, "Hydra_Ball_Charge_Effect", "Hydra_Toxic_Ball_Charge_Effect");
+        assertVariableLeaf(vars, "Hydra_Ball_Launch", "Hydra_Toxic_Ball_Launch");
+        assertVariableLeaf(vars, "Hydra_Rain_Charge_Effect", "Hydra_Rain_Toxic_Charge_Effect");
+        assertVariableLeaf(vars, "Hydra_Rain_Launch", "Hydra_Rain_Toxic_Launch");
+        assertPoisonMelee(vars, "Bite_Damage", "Hydra_Bite_Damage");
+        assertPoisonMelee(vars, "Swipe_Left_Damage", "Hydra_Swipe_Left_Damage");
+        assertPoisonMelee(vars, "Swipe_Right_Damage", "Hydra_Swipe_Right_Damage");
+        assertPoisonMelee(vars, "Stomp_Damage", "Hydra_Stomp_Damage");
+        assertPoisonMelee(vars, "Tail_Spin_Damage", "Hydra_Tail_Spin_Damage");
+
+        assertEquals(Set.of("NameTranslationKey"), root.getAsJsonObject("Parameters").keySet());
+        assertEquals("server.npcRoles." + role + ".name", root.getAsJsonObject("Parameters")
+                .getAsJsonObject("NameTranslationKey").get("Value").getAsString());
+    }
+
+    private static void assertPoisonMelee(JsonObject vars, String variable, String parent) {
+        JsonArray interactions = vars.getAsJsonObject(variable).getAsJsonArray("Interactions");
+        assertEquals(1, interactions.size());
+        JsonObject interaction = interactions.get(0).getAsJsonObject();
+        assertEquals(Set.of("Parent", "Next"), interaction.keySet());
+        assertEquals(parent, interaction.get("Parent").getAsString());
+        JsonObject next = interaction.getAsJsonObject("Next");
+        assertEquals(Set.of("Type", "EffectId", "Entity"), next.keySet());
+        assertEquals("ApplyEffect", next.get("Type").getAsString());
+        assertEquals("Target", next.get("Entity").getAsString());
+        assertEquals("Poison_T1", next.get("EffectId").getAsString());
     }
 
     private static void assertProjectileParity(String icePath, String toxicPath) throws IOException {
