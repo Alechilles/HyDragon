@@ -12,7 +12,7 @@
     "MasterTargetSlot": { "Value": "MasterTarget" },
     "GroundBasicAttack": { "Value": "Root_NPC_NordicDrake_Attack" },
     "GroundBasicAttackDistance": { "Value": 5.25 },
-    "GroundBasicCooldownRange": { "Value": [1.5, 2.5] },
+    "GroundBasicAttackPauseRange": { "Value": [1.5, 2.5] },
     "GroundBiteAttack": { "Value": "Root_NPC_NordicDrake_Bite" },
     "GroundBiteDistance": { "Value": 4.5 },
     "GroundBiteCooldownRange": { "Value": [10, 20] },
@@ -206,27 +206,6 @@
             }
           },
           {
-            "Sensor": {
-              "Type": "And",
-              "Sensors": [
-                { "Type": "State", "State": ".GroundCombat" },
-                { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "GroundBasicAttackDistance" }, "Filters": [ { "Type": "LineOfSight" } ] },
-                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
-                { "Type": "MotionController", "MotionController": "Walk" },
-                { "Type": "Timer", "Name": "NordicDrake_Ground_Basic", "State": "Stopped" },
-                { "Type": "Not", "Sensor": { "Type": "Flag", "Name": "NordicDrake_Ground_Bite_Active" } },
-                { "Type": "Not", "Sensor": { "Type": "Flag", "Name": "NordicDrake_Ground_Breath_Active" } }
-              ]
-            },
-            "ActionsBlocking": true,
-            "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true, "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" } },
-            "Actions": [
-              { "Type": "Attack", "Attack": { "Compute": "GroundBasicAttack" }, "AimingTimeRange": [0.1, 0.2] },
-              { "Type": "TimerStart", "Name": "NordicDrake_Ground_Basic", "StartValueRange": { "Compute": "GroundBasicCooldownRange" }, "RestartValueRange": { "Compute": "GroundBasicCooldownRange" } },
-              { "Type": "TimerRestart", "Name": "NordicDrake_Ground_Basic" }
-            ]
-          },
-          {
             "Type": "Random",
             "Sensor": {
               "Type": "And",
@@ -342,6 +321,25 @@
               { "Type": "TimerStart", "Name": "NordicDrake_Ground_Breath", "StartValueRange": { "Compute": "GroundBreathCooldownRange" }, "RestartValueRange": { "Compute": "GroundBreathCooldownRange" } },
               { "Type": "TimerRestart", "Name": "NordicDrake_Ground_Breath" },
               { "Type": "SetFlag", "Name": "NordicDrake_Ground_Breath_Active", "SetTo": false }
+            ]
+          },
+          {
+            "Continue": true,
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                { "Type": "State", "State": ".GroundCombat" },
+                { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "GroundBasicAttackDistance" }, "Filters": [ { "Type": "LineOfSight" } ] },
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ]
+            },
+            "ActionsBlocking": true,
+            "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true, "RelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" } },
+            "Actions": [
+              { "Type": "Timeout", "Delay": [0.3, 0.3] },
+              { "Type": "Attack", "Attack": { "Compute": "GroundBasicAttack" }, "AimingTimeRange": [0.1, 0.2], "AttackPauseRange": { "Compute": "GroundBasicAttackPauseRange" } },
+              { "Type": "Timeout", "Delay": [0.4, 0.4] }
             ]
           }
         ]

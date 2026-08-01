@@ -262,7 +262,8 @@ final class NordicDrakeTamedCombatAssetTest {
         JsonObject parameters = component.getAsJsonObject("Parameters");
         assertParameter(parameters, "GroundBasicAttack", "Root_NPC_NordicDrake_Attack");
         assertParameter(parameters, "GroundBasicAttackDistance", 5.25);
-        assertParameter(parameters, "GroundBasicCooldownRange", List.of(1.5, 2.5));
+        assertParameter(parameters, "GroundBasicAttackPauseRange", List.of(1.5, 2.5));
+        assertFalse(parameters.has("GroundBasicCooldownRange"));
         assertParameter(parameters, "GroundBiteAttack", "Root_NPC_NordicDrake_Bite");
         assertParameter(parameters, "GroundBiteDistance", 4.5);
         assertParameter(parameters, "GroundBiteCooldownRange", List.of(10, 20));
@@ -643,10 +644,10 @@ final class NordicDrakeTamedCombatAssetTest {
         assertEquals("Aim", string(tracking.getAsJsonObject("HeadMotion"), "Type"));
         assertTrue(isChaseBranch(children.get(1)));
         assertTrue(isPositioningBranch(children.get(2)));
-        assertTrue(containsAttack(children.get(3), "GroundBasicAttack"));
-        assertEquals("Random", string(children.get(4), "Type"));
-        assertTrue(containsAttack(children.get(5), "GroundBiteAttack"));
-        assertTrue(containsAttack(children.get(6), "GroundBreathAttack"));
+        assertEquals("Random", string(children.get(3), "Type"));
+        assertTrue(containsAttack(children.get(4), "GroundBiteAttack"));
+        assertTrue(containsAttack(children.get(5), "GroundBreathAttack"));
+        assertTrue(containsAttack(children.get(6), "GroundBasicAttack"));
         JsonObject chase = objects(groundCombat, object -> object.has("Sensor") && object.has("Instructions")
                 && object.getAsJsonArray("Instructions").asList().stream().map(JsonElement::getAsJsonObject)
                 .anyMatch(child -> "Component_Tamework_Instruction_Intelligent_Chase".equals(string(child, "Reference"))))
@@ -686,19 +687,17 @@ final class NordicDrakeTamedCombatAssetTest {
         assertEquals(2, bites.size());
         assertEquals(2, breaths.size());
         JsonObject basic = basics.get(0);
-        basics.forEach(branch -> assertGroundedAttackBranch(branch, "GroundBasicAttack", "GroundBasicAttackDistance",
-                "GroundBasicCooldownRange", "NordicDrake_Ground_Basic", true));
+        assertVanillaBasicFallback(basic);
         bites.forEach(branch -> assertGroundedAttackBranch(branch, "GroundBiteAttack", "GroundBiteDistance",
                 "GroundBiteCooldownRange", "NordicDrake_Ground_Bite", true));
         breaths.forEach(branch -> assertGroundedAttackBranch(branch, "GroundBreathAttack", "GroundBreathDistance",
                 "GroundBreathCooldownRange", "NordicDrake_Ground_Breath", true));
         List<JsonObject> children = groundCombat.getAsJsonArray("Instructions").asList().stream()
                 .map(JsonElement::getAsJsonObject).toList();
-        assertDirectSpecialAvailability(children.get(5), "NordicDrake_Ground_Bite", "GroundBiteDistance",
+        assertDirectSpecialAvailability(children.get(4), "NordicDrake_Ground_Bite", "GroundBiteDistance",
                 "NordicDrake_Ground_Breath", "GroundBreathDistance");
-        assertDirectSpecialAvailability(children.get(6), "NordicDrake_Ground_Breath", "GroundBreathDistance",
+        assertDirectSpecialAvailability(children.get(5), "NordicDrake_Ground_Breath", "GroundBreathDistance",
                 "NordicDrake_Ground_Bite", "GroundBiteDistance");
-        assertEquals(List.of(0.1, 0.2), numbers(action(basic, "Attack").getAsJsonArray("AimingTimeRange")));
 
         JsonObject random = objects(groundCombat, object -> "Random".equals(string(object, "Type"))).stream()
                 .findFirst().orElseThrow(() -> new AssertionError("missing special attack random selector"));
@@ -714,11 +713,36 @@ final class NordicDrakeTamedCombatAssetTest {
         assertTimerStopped(random.getAsJsonObject("Sensor"), "NordicDrake_Ground_Breath");
         assertRangeAndLineOfSight(random.getAsJsonObject("Sensor"), "GroundBiteDistance");
         assertRangeAndLineOfSight(random.getAsJsonObject("Sensor"), "GroundBreathDistance");
-        assertEquals(2, objects(basic.getAsJsonObject("Sensor"), object -> "Not".equals(string(object, "Type"))
-                && objects(object, child -> "Flag".equals(string(child, "Type"))
-                && ("NordicDrake_Ground_Bite_Active".equals(string(child, "Name"))
-                || "NordicDrake_Ground_Breath_Active".equals(string(child, "Name")))).size() == 1).size(),
-                "basic fallback must be gated out while either selected special is executing");
+        assertTrue(children.indexOf(random) < children.indexOf(basic),
+                "special selection must precede the basic fallback");
+    }
+
+    private static void assertVanillaBasicFallback(JsonObject branch) {
+        assertTrue(branch.has("Continue") && branch.get("Continue").getAsBoolean());
+        assertGroundedContext(branch.getAsJsonObject("Sensor"));
+        assertTrue(objects(branch.getAsJsonObject("Sensor"), object -> "State".equals(string(object, "Type"))
+                && ".GroundCombat".equals(string(object, "State"))).size() == 1);
+        assertRangeAndLineOfSight(branch.getAsJsonObject("Sensor"), "GroundBasicAttackDistance");
+        assertTrue(branch.has("ActionsBlocking") && branch.get("ActionsBlocking").getAsBoolean());
+        assertGroundedAim(branch);
+
+        assertEquals(List.of("Timeout", "Attack", "Timeout"), actionTypes(branch));
+        JsonArray actions = branch.getAsJsonArray("Actions");
+        assertEquals(List.of(0.3, 0.3), numbers(actions.get(0).getAsJsonObject().getAsJsonArray("Delay")));
+        JsonObject attack = actions.get(1).getAsJsonObject();
+        assertEquals("GroundBasicAttack", string(attack.getAsJsonObject("Attack"), "Compute"));
+        assertEquals(List.of(0.1, 0.2), numbers(attack.getAsJsonArray("AimingTimeRange")));
+        assertEquals("GroundBasicAttackPauseRange", string(attack.getAsJsonObject("AttackPauseRange"), "Compute"));
+        assertEquals(List.of(0.4, 0.4), numbers(actions.get(2).getAsJsonObject().getAsJsonArray("Delay")));
+
+        assertEquals(0, objects(branch, object -> {
+            String type = string(object, "Type");
+            return type != null && type.startsWith("Timer")
+                    && "NordicDrake_Ground_Basic".equals(string(object, "Name"));
+        }).size(), "the basic fallback must use ActionAttack pause semantics, not a custom timer");
+        assertEquals(0, objects(branch, object -> "NordicDrake_Ground_Bite_Active".equals(string(object, "Name"))
+                || "NordicDrake_Ground_Breath_Active".equals(string(object, "Name"))).size(),
+                "the ordered fallback must not be gated by special-active flags");
     }
 
     private static void assertGroundedAttackBranch(
@@ -740,6 +764,10 @@ final class NordicDrakeTamedCombatAssetTest {
         JsonObject timerStart = timers.get(0);
         assertEquals(cooldown, string(timerStart.getAsJsonObject("StartValueRange"), "Compute"));
         assertEquals(cooldown, string(timerStart.getAsJsonObject("RestartValueRange"), "Compute"));
+        assertGroundedAim(branch);
+    }
+
+    private static void assertGroundedAim(JsonObject branch) {
         JsonObject aim = branch.getAsJsonObject("HeadMotion");
         assertEquals("Aim", string(aim, "Type"));
         assertEquals(0, aim.get("Spread").getAsInt());

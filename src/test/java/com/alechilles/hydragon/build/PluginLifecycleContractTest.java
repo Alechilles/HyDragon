@@ -1,5 +1,6 @@
 package com.alechilles.hydragon.build;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -77,6 +78,13 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("emitCapabilityDiagnostics();"));
         assertTrue(source.contains("TameworkCapabilityDiagnostics.evaluate(bridge.snapshot())"));
         assertTrue(source.contains("entry.present() ? Level.INFO : Level.WARNING"));
+    }
+
+    @Test
+    void npcRoleActivationOwnsChainingDataProvisioning() throws IOException {
+        assertFalse(pluginSource().contains("NordicDrakeChainingDataSystem"));
+        assertFalse(Files.exists(projectRoot.resolve(
+                "src/main/java/com/alechilles/hydragon/combat/NordicDrakeChainingDataSystem.java")));
     }
 
     @Test
