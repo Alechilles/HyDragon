@@ -54,6 +54,7 @@
     "CanFollow": true,
     "CanHold": true,
     "CanDefend": true,
+    "UseNordicDrakeTamedCombat": true,
     "CanAggressive": true,
     "CanAttackTarget": true,
     "CanMoveToLocation": true,
