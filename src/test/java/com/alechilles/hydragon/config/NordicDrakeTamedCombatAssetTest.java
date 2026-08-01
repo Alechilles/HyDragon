@@ -399,6 +399,7 @@ final class NordicDrakeTamedCombatAssetTest {
             assertEquals("Short", string(attack, "BallisticMode"));
             assertEquals(List.of(0.25, 1.0), numbers(attack.getAsJsonArray("AimingTimeRange")));
             assertEquals(List.of(10.0, 10.0), numbers(attack.getAsJsonArray("AttackPauseRange")));
+            assertFaceTargetBindings(volleys.get(i).getAsJsonObject("BodyMotion"));
             assertEquals(List.of(List.of(4.0, 4.0), List.of(5.8, 5.8), List.of(7.5, 7.5)).get(i),
                     numbers(actions.get(1).getAsJsonObject().getAsJsonArray("Delay")));
             assertBlockingTransition(volleys.get(i), ".AirVolley", ".AirRecovery");
@@ -413,6 +414,7 @@ final class NordicDrakeTamedCombatAssetTest {
         assertTargetFilters(children.get(0).getAsJsonObject("Sensor"), "AirBreathAttackDistance", "AirBreathAttackViewSector");
         assertTransition(children.get(0), ".AirBreathPass");
         assertEquals("APPROACH", string(children.get(1).getAsJsonObject("BodyMotion"), "Mode"));
+        assertApproachBindings(children.get(1).getAsJsonObject("BodyMotion"));
         assertEquals("AirBreathIngressTimeout", string(children.get(1).getAsJsonArray("Actions").get(0)
                 .getAsJsonObject().getAsJsonObject("Delay"), "Compute"));
         assertBlockingTransition(children.get(1), ".AirBreathIngress", ".AirRecovery");
@@ -430,6 +432,7 @@ final class NordicDrakeTamedCombatAssetTest {
         assertEquals(List.of(0.0, 0.0), numbers(attack.getAsJsonArray("AimingTimeRange")));
         assertEquals(List.of(8.0, 8.0), numbers(attack.getAsJsonArray("AttackPauseRange")));
         assertEquals("PASS_THROUGH_TARGET", string(children.get(1).getAsJsonObject("BodyMotion"), "Mode"));
+        assertPassThroughBindings(children.get(1).getAsJsonObject("BodyMotion"));
         assertEquals("AirBreathPassDuration", string(children.get(1).getAsJsonArray("Actions").get(0)
                 .getAsJsonObject().getAsJsonObject("Delay"), "Compute"));
         assertBlockingTransition(children.get(1), ".AirBreathPass", ".AirRecovery");
@@ -539,6 +542,36 @@ final class NordicDrakeTamedCombatAssetTest {
         assertEquals(altitude, string(motion.getAsJsonObject("DesiredAltitudeRange"), "Compute"));
         assertEquals(climb, string(motion.getAsJsonObject("ClimbRelativeSpeed"), "Compute"));
         assertEquals(sink, string(motion.getAsJsonObject("SinkRelativeSpeed"), "Compute"));
+    }
+
+    private static void assertFaceTargetBindings(JsonObject motion) {
+        assertEquals("TameworkFlyingOrbit", string(motion, "Type"));
+        assertEquals("FACE_TARGET", string(motion, "Mode"));
+        assertEquals("AirCombatAltitudeRange", string(motion.getAsJsonObject("DesiredAltitudeRange"), "Compute"));
+        assertEquals("AirCombatClimbRelativeSpeed", string(motion.getAsJsonObject("ClimbRelativeSpeed"), "Compute"));
+        assertEquals("AirCombatSinkRelativeSpeed", string(motion.getAsJsonObject("SinkRelativeSpeed"), "Compute"));
+    }
+
+    private static void assertApproachBindings(JsonObject motion) {
+        assertEquals("TameworkFlyingOrbit", string(motion, "Type"));
+        assertEquals("APPROACH", string(motion, "Mode"));
+        assertEquals(0, motion.get("ApproachStopDistance").getAsInt());
+        assertEquals(12, motion.get("ApproachSlowDownDistance").getAsInt());
+        assertEquals("AirBreathAttackRelativeSpeed", string(motion.getAsJsonObject("RelativeSpeed"), "Compute"));
+        assertEquals("AirBreathAttackAltitudeRange", string(motion.getAsJsonObject("DesiredAltitudeRange"), "Compute"));
+        assertEquals("AirCombatClimbRelativeSpeed", string(motion.getAsJsonObject("ClimbRelativeSpeed"), "Compute"));
+        assertEquals("AirCombatSinkRelativeSpeed", string(motion.getAsJsonObject("SinkRelativeSpeed"), "Compute"));
+    }
+
+    private static void assertPassThroughBindings(JsonObject motion) {
+        assertEquals("TameworkFlyingOrbit", string(motion, "Type"));
+        assertEquals("PASS_THROUGH_TARGET", string(motion, "Mode"));
+        assertEquals("AirBreathPassDistance", string(motion.getAsJsonObject("PassThroughDistance"), "Compute"));
+        assertEquals("AirBreathPassStopDistance", string(motion.getAsJsonObject("PassThroughStopDistance"), "Compute"));
+        assertEquals("AirBreathAttackRelativeSpeed", string(motion.getAsJsonObject("RelativeSpeed"), "Compute"));
+        assertEquals("AirBreathAttackAltitudeRange", string(motion.getAsJsonObject("DesiredAltitudeRange"), "Compute"));
+        assertEquals("AirCombatClimbRelativeSpeed", string(motion.getAsJsonObject("ClimbRelativeSpeed"), "Compute"));
+        assertEquals("AirCombatSinkRelativeSpeed", string(motion.getAsJsonObject("SinkRelativeSpeed"), "Compute"));
     }
 
     private static List<JsonObject> directInstructions(JsonObject branch) {
@@ -789,20 +822,36 @@ final class NordicDrakeTamedCombatAssetTest {
     }
 
     private static void assertReleaseAndReset(JsonObject branch) {
-        List<String> actions = branch.getAsJsonArray("Actions").asList().stream()
-                .map(JsonElement::getAsJsonObject).map(action -> string(action, "Type")).toList();
-        assertEquals(List.of("TimerStop", "TimerStop", "TimerStop", "SetFlag", "SetFlag", "State", "ReleaseTarget", "ResetInstructions"), actions);
-        assertFlagAction(branch.getAsJsonArray("Actions").get(3).getAsJsonObject(), "NordicDrake_Air_Reset_To_Recovery", false);
-        assertFlagAction(branch.getAsJsonArray("Actions").get(4).getAsJsonObject(), "NordicDrake_Air_Reset_To_Ranged", false);
-        assertEquals("LockedTarget", string(branch.getAsJsonArray("Actions").get(6).getAsJsonObject(), "TargetSlot"));
+        List<JsonObject> actions = branch.getAsJsonArray("Actions").asList().stream()
+                .map(JsonElement::getAsJsonObject).toList();
+        assertEquals(List.of("TimerStop", "TimerStop", "TimerStop", "SetFlag", "SetFlag", "State", "ReleaseTarget", "ResetInstructions"),
+                actions.stream().map(action -> string(action, "Type")).toList());
+        assertCleanupTimerStops(actions);
+        assertFlagAction(actions.get(3), "NordicDrake_Air_Reset_To_Recovery", false);
+        assertFlagAction(actions.get(4), "NordicDrake_Air_Reset_To_Ranged", false);
+        assertEquals(".Default", string(actions.get(5), "State"));
+        assertEquals("LockedTarget", string(actions.get(6), "TargetSlot"));
+        assertEquals("ResetInstructions", string(actions.get(7), "Type"));
     }
 
     private static void assertCancellationClearsBothResetFlags(JsonObject branch) {
         assertTrue(branch.get("Continue").getAsBoolean());
+        List<JsonObject> actions = branch.getAsJsonArray("Actions").asList().stream()
+                .map(JsonElement::getAsJsonObject).toList();
         assertEquals(List.of("TimerStop", "TimerStop", "TimerStop", "SetFlag", "SetFlag", "State", "ResetInstructions"),
-                actionTypes(branch));
-        assertFlagAction(branch.getAsJsonArray("Actions").get(3).getAsJsonObject(), "NordicDrake_Air_Reset_To_Recovery", false);
-        assertFlagAction(branch.getAsJsonArray("Actions").get(4).getAsJsonObject(), "NordicDrake_Air_Reset_To_Ranged", false);
+                actions.stream().map(action -> string(action, "Type")).toList());
+        assertCleanupTimerStops(actions);
+        assertFlagAction(actions.get(3), "NordicDrake_Air_Reset_To_Recovery", false);
+        assertFlagAction(actions.get(4), "NordicDrake_Air_Reset_To_Ranged", false);
+        assertEquals(".Default", string(actions.get(5), "State"));
+        assertEquals("ResetInstructions", string(actions.get(6), "Type"));
+        assertEquals(0, objects(branch, object -> "ReleaseTarget".equals(string(object, "Type"))).size(),
+                "aerial cancellation must leave LockedTarget ownership to Defend");
+    }
+
+    private static void assertCleanupTimerStops(List<JsonObject> actions) {
+        assertEquals(List.of("NordicDrake_Air_Fireball", "NordicDrake_Air_Volley", "NordicDrake_Air_Breath"),
+                actions.subList(0, 3).stream().map(action -> string(action, "Name")).toList());
     }
 
     private static void assertFlagSensor(JsonObject sensor, String name, boolean value) {
