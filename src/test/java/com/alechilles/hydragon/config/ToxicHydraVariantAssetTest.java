@@ -82,6 +82,78 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
+    void toxicProjectilesPreserveIceMechanicsAndReplaceOnlyElementPresentation() throws Exception {
+        assertProjectileParity(
+                "Server/Projectiles/HyDragon/Hydra/Hydra_Ice_Ball.json",
+                "Server/Projectiles/HyDragon/Hydra/Hydra_Toxic_Ball.json");
+        assertProjectileParity(
+                "Server/Projectiles/HyDragon/Hydra/Hydra_Rain_Ice_Ball.json",
+                "Server/Projectiles/HyDragon/Hydra/Hydra_Rain_Toxic_Ball.json");
+
+        for (String projectile : List.of(
+                "Server/Projectiles/HyDragon/Hydra/Hydra_Toxic_Ball.json",
+                "Server/Projectiles/HyDragon/Hydra/Hydra_Rain_Toxic_Ball.json")) {
+            assertEquals("Hydra_Toxic_Ball_Projectile", json(projectile).get("Appearance").getAsString());
+        }
+
+        JsonObject model = json("Server/Models/Projectiles/HyDragon/Hydra_Toxic_Ball_Projectile.json");
+        assertEquals("Items/Projectiles/Acid.blockymodel", model.get("Model").getAsString());
+        assertEquals("Items/Projectiles/Acid_Texture.png", model.get("Texture").getAsString());
+        assertEquals(JsonParser.parseString("""
+                {"Max":{"X":0.1,"Y":0.1,"Z":0.1},"Min":{"X":-0.1,"Y":-0.1,"Z":-0.1}}
+                """), model.get("HitBox"));
+        assertEquals(3, model.get("MinScale").getAsInt());
+        assertEquals(5, model.get("MaxScale").getAsInt());
+        JsonArray particles = model.getAsJsonArray("Particles");
+        assertEquals(1, particles.size());
+        assertEquals("Status_Poisoned", particles.get(0).getAsJsonObject().get("SystemId").getAsString());
+    }
+
+    @Test
+    void toxicLeavesUsePoisonT1AndCanonicalPoisonPresentation() throws Exception {
+        String direct = read("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Ball_Launch.json");
+        assertTrue(direct.contains("\"ProjectileId\": \"Hydra_Toxic_Ball\""));
+        assertTrue(direct.contains("\"EffectId\": \"Poison_T1\""));
+        assertTrue(direct.contains("\"Radius\": 3.0"));
+        assertTrue(direct.contains("\"ExcludeSource\": true"));
+        assertTrue(direct.contains("Effect_Poison"));
+        assertTrue(direct.contains("SFX_Scarak_Spitball_Fire"));
+
+        String rain = read("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Toxic_Launch.json");
+        for (String required : List.of(
+                "\"ProjectileId\": \"Hydra_Rain_Toxic_Ball\"",
+                "\"EffectId\": \"Poison_T1\"",
+                "\"SourceTypeId\": \"hydragon.rain_toxic_hazard\"",
+                "\"Radius\": 4.0", "\"DurationSeconds\": 6.0",
+                "\"TickIntervalSeconds\": 1.0", "\"DamagePerTick\": 5.0",
+                "Effect_Poison", "SFX_Scarak_Spitball_Fire")) {
+            assertTrue(rain.contains(required), required);
+        }
+
+        JsonObject iceHazard = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Ice_Launch.json")
+                .getAsJsonObject("LingeringHazard");
+        JsonObject toxicHazard = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Toxic_Launch.json")
+                .getAsJsonObject("LingeringHazard");
+        JsonObject expectedToxicHazard = iceHazard.deepCopy();
+        expectedToxicHazard.addProperty("EffectId", "Poison_T1");
+        expectedToxicHazard.addProperty("SourceTypeId", "hydragon.rain_toxic_hazard");
+        assertEquals(iceHazard.keySet(), toxicHazard.keySet());
+        assertEquals(expectedToxicHazard, toxicHazard);
+
+        assertChargeEffectLeaf("Hydra_Toxic_Ball_Charge_Effect.json");
+        assertChargeEffectLeaf("Hydra_Rain_Toxic_Charge_Effect.json");
+
+        for (String projectile : List.of(
+                "Server/Projectiles/HyDragon/Hydra/Hydra_Toxic_Ball.json",
+                "Server/Projectiles/HyDragon/Hydra/Hydra_Rain_Toxic_Ball.json")) {
+            String content = read(projectile);
+            assertTrue(content.contains("Effect_Poison"));
+            assertTrue(content.contains("Impact_Poison"));
+            assertTrue(content.contains("SFX_Scarak_Seeker_Spitball_Death"));
+        }
+    }
+
+    @Test
     void requireNewClickRejectsCoercibleNonBooleanValues() {
         JsonObject stringFalse = JsonParser.parseString("""
                 {"RequireNewClick":"false"}
@@ -93,6 +165,22 @@ class ToxicHydraVariantAssetTest {
         JsonObject actual = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/" + leaf);
         assertFalse(actual.has("RunTime"), leaf + " must leave cadence to its caller");
         assertEquals(JsonParser.parseString(expected).getAsJsonObject(), actual, leaf);
+    }
+
+    private static void assertProjectileParity(String icePath, String toxicPath) throws IOException {
+        JsonObject ice = json(icePath).deepCopy();
+        JsonObject toxic = json(toxicPath).deepCopy();
+        for (String presentationField : List.of(
+                "Appearance", "DeathParticles", "MissParticles", "HitParticles", "DeathSoundEventId")) {
+            ice.remove(presentationField);
+            toxic.remove(presentationField);
+        }
+        assertEquals(ice, toxic, toxicPath);
+    }
+
+    private static void assertChargeEffectLeaf(String leaf) throws IOException {
+        String content = read("Server/Item/Interactions/NPCs/HyDragon/Hydra/" + leaf);
+        assertTrue(content.contains("Effect_Poison"), leaf);
     }
 
     private static void assertFalseBooleanProperty(JsonObject object, String property) {

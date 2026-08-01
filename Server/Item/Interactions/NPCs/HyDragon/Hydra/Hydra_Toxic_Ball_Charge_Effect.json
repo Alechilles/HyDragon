@@ -1,0 +1,17 @@
+{
+  "Type": "Simple",
+  "Effects": {
+    "ItemPlayerAnimationsId": "Hydra_Default",
+    "ItemAnimationId": "ChargeShoot",
+    "Particles": [
+      {
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Origin_Projectile",
+        "SystemId": "Effect_Poison",
+        "PositionOffset": {
+          "Z": 0
+        }
+      }
+    ]
+  }
+}
