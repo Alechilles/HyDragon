@@ -11,139 +11,46 @@
       "RunTime": 0.45
     },
     {
-      "Type": "Simple",
-      "Effects": {
-        "ItemPlayerAnimationsId": "Hydra_Default",
-        "ItemAnimationId": "ChargeShoot",
-        "Particles": [
-          {
-            "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
-            "SystemId": "Hydra_Ice_Ball_Charging",
-            "PositionOffset": {
-              "Z": 0
-            }
-          }
-        ]
-      },
-      "RunTime": 1
+      "Type": "Replace",
+      "DefaultOk": true,
+      "Var": "Hydra_Ball_Charge_Effect",
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] },
+      "RunTime": 1.0
     },
     {
-      "Type": "TameworkLaunchProjectile",
-      "RunTime": 0,
-      "Effects": {
-        "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-        "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-        "Particles": [
-          {
-            "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
-            "SystemId": "Ice_Staff",
-            "DetachedFromModel": false,
-            "PositionOffset": {},
-            "Scale": 1.5
-          }
-        ]
-      },
-      "ProjectileId": "Hydra_Ice_Ball",
-      "TrajectoryMode": "Direct",
-      "TargetSlot": "CAETargetSlot",
-      "ImpactEffect": {
-        "EffectId": "Chilled",
-        "Radius": 3.0,
-        "ExcludeSource": true
-      },
-      "Tags": {}
+      "Type": "Replace",
+      "DefaultOk": true,
+      "Var": "Hydra_Ball_Launch",
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] },
+      "RunTime": 0.0
     },
     {
-      "Type": "Simple",
-      "Effects": {
-        "ItemPlayerAnimationsId": "Hydra_Default",
-        "ItemAnimationId": "ChargeShoot",
-        "Particles": [
-          {
-            "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
-            "SystemId": "Hydra_Ice_Ball_Charging",
-            "PositionOffset": {
-              "Z": 0
-            }
-          }
-        ]
-      },
+      "Type": "Replace",
+      "DefaultOk": true,
+      "Var": "Hydra_Ball_Charge_Effect",
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] },
       "RunTime": 0.5
     },
     {
-      "Type": "TameworkLaunchProjectile",
-      "RunTime": 0,
-      "Effects": {
-        "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-        "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-        "Particles": [
-          {
-            "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
-            "SystemId": "Ice_Staff",
-            "DetachedFromModel": false,
-            "PositionOffset": {},
-            "Scale": 1.5
-          }
-        ]
-      },
-      "ProjectileId": "Hydra_Ice_Ball",
-      "TrajectoryMode": "Direct",
-      "TargetSlot": "CAETargetSlot",
-      "ImpactEffect": {
-        "EffectId": "Chilled",
-        "Radius": 3.0,
-        "ExcludeSource": true
-      },
-      "Tags": {}
+      "Type": "Replace",
+      "DefaultOk": true,
+      "Var": "Hydra_Ball_Launch",
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] },
+      "RunTime": 0.0
     },
     {
-      "Type": "Simple",
-      "Effects": {
-        "ItemPlayerAnimationsId": "Hydra_Default",
-        "ItemAnimationId": "ChargeShoot",
-        "Particles": [
-          {
-            "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
-            "SystemId": "Hydra_Ice_Ball_Charging",
-            "PositionOffset": {
-              "Z": 0
-            }
-          }
-        ]
-      },
+      "Type": "Replace",
+      "DefaultOk": true,
+      "Var": "Hydra_Ball_Charge_Effect",
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Charge_Effect"] },
       "RunTime": 0.5
     },
     {
-      "Type": "TameworkLaunchProjectile",
-      "RunTime": 0,
-      "Effects": {
-        "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
-        "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
-        "Particles": [
-          {
-            "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
-            "SystemId": "Ice_Staff",
-            "DetachedFromModel": false,
-            "PositionOffset": {},
-            "Scale": 1.5
-          }
-        ]
-      },
-      "ProjectileId": "Hydra_Ice_Ball",
-      "TrajectoryMode": "Direct",
-      "TargetSlot": "CAETargetSlot",
-      "ImpactEffect": {
-        "EffectId": "Chilled",
-        "Radius": 3.0,
-        "ExcludeSource": true
-      },
-      "Tags": {}
+      "Type": "Replace",
+      "DefaultOk": true,
+      "Var": "Hydra_Ball_Launch",
+      "DefaultValue": { "Interactions": ["Hydra_Ice_Ball_Launch"] },
+      "RunTime": 0.0
     },
     {
       "Type": "Simple",

@@ -1,0 +1,36 @@
+{
+  "Type": "TameworkLaunchProjectile",
+  "ProjectileId": "Hydra_Rain_Ice_Ball",
+  "LaunchPositionOffset": {
+    "X": 0.0,
+    "Y": -1.0,
+    "Z": -2.0
+  },
+  "RandomAroundSourceMinRadius": 6.0,
+  "RandomAroundSourceMaxRadius": 15.0,
+  "RandomAroundSourceVerticalOffset": 0.0,
+  "LingeringHazard": {
+    "Radius": 4.0,
+    "DurationSeconds": 6.0,
+    "TickIntervalSeconds": 1.0,
+    "DamagePerTick": 5.0,
+    "ExcludeSource": true,
+    "EffectId": "Chilled",
+    "SourceTypeId": "hydragon.rain_ice_hazard"
+  },
+  "Effects": {
+    "WorldSoundEventId": "SFX_Staff_Ice_Shoot",
+    "LocalSoundEventId": "SFX_Staff_Ice_Shoot",
+    "Particles": [
+      {
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Origin_Projectile",
+        "SystemId": "Ice_Staff",
+        "DetachedFromModel": false,
+        "PositionOffset": {},
+        "Scale": 1.5
+      }
+    ]
+  },
+  "Tags": {}
+}
