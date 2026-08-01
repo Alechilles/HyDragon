@@ -65,6 +65,11 @@ final class NordicDrakeTamedCombatAssetTest {
     void nordicAerialCombatUsesTheApprovedLockedTargetFlightCycle() throws IOException {
         JsonObject component = readJson(COMPONENT);
         JsonObject parameters = component.getAsJsonObject("Parameters");
+        List<JsonObject> roots = directChildren(component);
+        assertEquals("TimerStop", string(roots.get(4).getAsJsonArray("Actions").get(0).getAsJsonObject(), "Type"));
+        assertEquals(".AirRanged", string(roots.get(5).getAsJsonArray("Actions").get(0).getAsJsonObject(), "State"));
+        assertFalse(parameters.has("AirCombatWanderMinMoveDistance"));
+        assertFalse(parameters.has("AirCombatWanderTestsPerTick"));
         assertParameter(parameters, "AirFireballAttack", "Root_NPC_NordicDrake_Fire_Ball");
         assertParameter(parameters, "AirFireballAttackDistance", 28);
         assertParameter(parameters, "AirFireballCooldownRange", List.of(1, 3));
@@ -94,6 +99,7 @@ final class NordicDrakeTamedCombatAssetTest {
         assertParameter(parameters, "AirCombatRecoveryRelativeSpeed", 1.1);
         assertParameter(parameters, "AirCombatRecoveryClimbRelativeSpeed", 1.5);
 
+        assertAerialRootOrder(roots);
         JsonObject ranged = aerialState(component, ".AirRanged");
         JsonObject volley = aerialState(component, ".AirVolley");
         JsonObject ingress = aerialState(component, ".AirBreathIngress");
@@ -105,17 +111,11 @@ final class NordicDrakeTamedCombatAssetTest {
         assertOrbitMode(ingress, "APPROACH");
         assertOrbitMode(pass, "PASS_THROUGH_TARGET");
         assertOrbitMode(recovery, "WANDER_TARGET");
-        assertTrue(containsAttack(ranged, "AirFireballAttack"));
-        assertTrue(containsAttack(volley, "AirVolleyAttack2"));
-        assertTrue(containsAttack(volley, "AirVolleyAttack3"));
-        assertTrue(containsAttack(volley, "AirVolleyAttack4"));
-        assertTrue(containsAttack(pass, "AirBreathAttack"));
-        assertTrue(objects(ranged, object -> "Timer".equals(string(object, "Type"))
-                && "NordicDrake_Air_Volley".equals(string(object, "Name"))
-                && "Stopped".equals(string(object, "State"))).size() >= 1);
-        assertTrue(objects(ranged, object -> "Timer".equals(string(object, "Type"))
-                && "NordicDrake_Air_Breath".equals(string(object, "Name"))
-                && "Stopped".equals(string(object, "State"))).size() >= 1);
+        assertAirRanged(ranged);
+        assertAirVolley(volley);
+        assertAirIngress(ingress);
+        assertAirPass(pass);
+        assertAirRecovery(recovery);
         assertEquals(0, objects(component, object -> string(object, "Type") != null
                 && (string(object, "Type").contains("CombatActionEvaluator")
                 || string(object, "Type").contains("HostileTargetMemory")
@@ -276,10 +276,11 @@ final class NordicDrakeTamedCombatAssetTest {
     }
 
     private static void assertGroundedEntry(JsonObject component) {
-        JsonObject entry = objects(component, object -> objects(object, child ->
-                ".GroundCombat".equals(string(child, "State"))).size() == 1
-                && !".GroundCombat".equals(string(object, "State"))).stream()
+        JsonObject entry = directChildren(component).stream()
                 .filter(object -> object.has("Sensor") && object.has("Actions"))
+                .filter(object -> actionTypes(object).equals(List.of("State")))
+                .filter(object -> ".GroundCombat".equals(string(
+                        object.getAsJsonArray("Actions").get(0).getAsJsonObject(), "State")))
                 .findFirst().orElseThrow(() -> new AssertionError("missing grounded combat entry"));
         assertGroundedContext(entry.getAsJsonObject("Sensor"));
         assertEquals(List.of("State"), actionTypes(entry));
@@ -298,6 +299,132 @@ final class NordicDrakeTamedCombatAssetTest {
                 && objects(object.getAsJsonObject("Sensor"), child -> "State".equals(string(child, "Type"))
                 && state.equals(string(child, "State"))).size() == 1).stream().findFirst()
                 .orElseThrow(() -> new AssertionError("missing " + state + " branch"));
+    }
+
+    private static void assertAerialRootOrder(List<JsonObject> roots) {
+        assertEquals(13, roots.size());
+        assertEquals(List.of("TimerStop", "TimerStop", "TimerStop", "State", "ResetInstructions"), actionTypes(roots.get(4)));
+        assertEquals(List.of("State", "ResetInstructions"), actionTypes(roots.get(5)));
+        assertEquals(".AirRanged", string(roots.get(5).getAsJsonArray("Actions").get(0).getAsJsonObject(), "State"));
+        assertAerialStateOwner(roots.get(8), ".AirRanged");
+        assertAerialStateOwner(roots.get(9), ".AirVolley");
+        assertAerialStateOwner(roots.get(10), ".AirBreathIngress");
+        assertAerialStateOwner(roots.get(11), ".AirBreathPass");
+        assertAerialStateOwner(roots.get(12), ".AirRecovery");
+    }
+
+    private static void assertAerialStateOwner(JsonObject branch, String state) {
+        JsonArray sensors = branch.getAsJsonObject("Sensor").getAsJsonArray("Sensors");
+        assertEquals(4, sensors.size());
+        assertEquals("State", string(sensors.get(0).getAsJsonObject(), "Type"));
+        assertEquals(state, string(sensors.get(0).getAsJsonObject(), "State"));
+        assertEquals("Target", string(sensors.get(1).getAsJsonObject(), "Type"));
+        assertEquals("LockedTarget", string(sensors.get(1).getAsJsonObject(), "TargetSlot"));
+        assertEquals("Flag", string(sensors.get(2).getAsJsonObject(), "Type"));
+        assertEquals("AirborneMode", string(sensors.get(2).getAsJsonObject(), "Name"));
+        assertTrue(sensors.get(2).getAsJsonObject().get("Set").getAsBoolean());
+        assertEquals("MotionController", string(sensors.get(3).getAsJsonObject(), "Type"));
+        assertEquals("Fly", string(sensors.get(3).getAsJsonObject(), "MotionController"));
+    }
+
+    private static void assertAirRanged(JsonObject state) {
+        List<JsonObject> children = directInstructions(state);
+        assertEquals(6, children.size());
+        assertTrue(children.get(0).get("Continue").getAsBoolean());
+        assertEquals("WANDER_TARGET", string(children.get(0).getAsJsonObject("BodyMotion"), "Mode"));
+        assertEquals("Random", string(children.get(1), "Type"));
+        List<JsonObject> choices = directInstructions(children.get(1));
+        assertEquals(2, choices.size());
+        assertEquals("AirBreathWeight", string(choices.get(0).getAsJsonObject("Weight"), "Compute"));
+        assertEquals("AirVolleyWeight", string(choices.get(1).getAsJsonObject("Weight"), "Compute"));
+        assertTransition(choices.get(0), ".AirBreathIngress");
+        assertTransition(choices.get(1), ".AirVolley");
+        assertTransition(children.get(2), ".AirBreathIngress");
+        assertTransition(children.get(3), ".AirVolley");
+        JsonObject fireball = children.get(4);
+        assertTrue(containsAttack(fireball, "AirFireballAttack"));
+        assertTargetRange(fireball.getAsJsonObject("Sensor"), "AirFireballAttackDistance");
+        assertEquals(0, objects(fireball.getAsJsonObject("Sensor"), sensor -> "Timer".equals(string(sensor, "Type"))
+                && "Running".equals(string(sensor, "State"))).size(),
+                "moving fireball must remain available whenever its own cooldown is stopped");
+        assertAnyFallback(children.get(5), ".AirRanged");
+    }
+
+    private static void assertAirVolley(JsonObject state) {
+        List<JsonObject> children = directInstructions(state);
+        assertEquals(2, children.size());
+        JsonObject random = children.get(0);
+        assertEquals("Random", string(random, "Type"));
+        List<JsonObject> volleys = directInstructions(random);
+        assertEquals(3, volleys.size());
+        for (int i = 0; i < volleys.size(); i++) {
+            assertEquals(1, volleys.get(i).get("Weight").getAsInt());
+            assertTargetRange(volleys.get(i).getAsJsonObject("Sensor"), "AirFireballAttackDistance");
+            JsonArray actions = volleys.get(i).getAsJsonArray("Actions");
+            JsonObject attack = actions.get(0).getAsJsonObject();
+            assertEquals("AirVolleyAttack" + (i + 2), string(attack.getAsJsonObject("Attack"), "Compute"));
+            assertEquals("Short", string(attack, "BallisticMode"));
+            assertEquals(List.of(0.25, 1.0), numbers(attack.getAsJsonArray("AimingTimeRange")));
+            assertEquals(List.of(10.0, 10.0), numbers(attack.getAsJsonArray("AttackPauseRange")));
+            assertEquals(List.of(List.of(4.0, 4.0), List.of(5.8, 5.8), List.of(7.5, 7.5)).get(i),
+                    numbers(actions.get(1).getAsJsonObject().getAsJsonArray("Delay")));
+            assertTransition(volleys.get(i), ".AirRecovery");
+        }
+        assertAnyFallback(children.get(1), ".AirRecovery");
+    }
+
+    private static void assertAirIngress(JsonObject state) {
+        List<JsonObject> children = directInstructions(state);
+        assertEquals(3, children.size());
+        assertTargetRange(children.get(0).getAsJsonObject("Sensor"), "AirBreathAttackDistance");
+        assertTransition(children.get(0), ".AirBreathPass");
+        assertEquals("APPROACH", string(children.get(1).getAsJsonObject("BodyMotion"), "Mode"));
+        assertEquals("AirBreathIngressTimeout", string(children.get(1).getAsJsonArray("Actions").get(0)
+                .getAsJsonObject().getAsJsonObject("Delay"), "Compute"));
+        assertTransition(children.get(1), ".AirRecovery");
+        assertAnyFallback(children.get(2), ".AirRecovery");
+    }
+
+    private static void assertAirPass(JsonObject state) {
+        List<JsonObject> children = directInstructions(state);
+        assertEquals(3, children.size());
+        assertTrue(children.get(0).get("Continue").getAsBoolean());
+        assertTrue(containsAttack(children.get(0), "AirBreathAttack"));
+        JsonObject attack = children.get(0).getAsJsonArray("Actions").get(0).getAsJsonObject();
+        assertEquals(List.of(0.0, 0.0), numbers(attack.getAsJsonArray("AimingTimeRange")));
+        assertEquals(List.of(8.0, 8.0), numbers(attack.getAsJsonArray("AttackPauseRange")));
+        assertEquals("PASS_THROUGH_TARGET", string(children.get(1).getAsJsonObject("BodyMotion"), "Mode"));
+        assertEquals("AirBreathPassDuration", string(children.get(1).getAsJsonArray("Actions").get(0)
+                .getAsJsonObject().getAsJsonObject("Delay"), "Compute"));
+        assertTransition(children.get(1), ".AirRecovery");
+        assertAnyFallback(children.get(2), ".AirRecovery");
+    }
+
+    private static void assertAirRecovery(JsonObject state) {
+        List<JsonObject> children = directInstructions(state);
+        assertEquals(2, children.size());
+        assertEquals("WANDER_TARGET", string(children.get(0).getAsJsonObject("BodyMotion"), "Mode"));
+        assertEquals("AirCombatRecoveryDuration", string(children.get(0).getAsJsonArray("Actions").get(0)
+                .getAsJsonObject().getAsJsonObject("Delay"), "Compute"));
+        assertTransition(children.get(0), ".AirRanged");
+        assertAnyFallback(children.get(1), ".AirRanged");
+    }
+
+    private static void assertTransition(JsonObject branch, String state) {
+        List<String> actions = actionTypes(branch);
+        assertEquals("State", actions.get(actions.size() - 2));
+        assertEquals("ResetInstructions", actions.get(actions.size() - 1));
+        assertEquals(state, string(branch.getAsJsonArray("Actions").get(actions.size() - 2).getAsJsonObject(), "State"));
+    }
+
+    private static void assertAnyFallback(JsonObject branch, String state) {
+        assertEquals("Any", string(branch.getAsJsonObject("Sensor"), "Type"));
+        assertTrue(branch.get("ActionsBlocking").getAsBoolean());
+        assertTransition(branch, state);
+    }
+
+    private static List<JsonObject> directInstructions(JsonObject branch) {
+        return branch.getAsJsonArray("Instructions").asList().stream().map(JsonElement::getAsJsonObject).toList();
     }
 
     private static void assertAerialContext(JsonObject state) {
