@@ -332,6 +332,26 @@
         ] },
         "Instructions": [
           {
+            "$Comment": "Recover from physical blockage without abandoning the locked aerial combat target.",
+            "Sensor": { "Type": "And", "Sensors": [
+              { "Type": "Target", "TargetSlot": "LockedTarget" },
+              { "Type": "Flag", "Name": "AirborneMode", "Set": true },
+              { "Type": "MotionController", "MotionController": "Fly" },
+              { "Type": "Eval", "Expression": "blocked" }
+            ] },
+            "BodyMotion": { "Type": "Wander", "MaxHeadingChange": 90, "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" } }
+          },
+          {
+            "$Comment": "Recover from deferred or blocked navigation without abandoning the locked aerial combat target.",
+            "Sensor": { "Type": "And", "Sensors": [
+              { "Type": "Target", "TargetSlot": "LockedTarget" },
+              { "Type": "Flag", "Name": "AirborneMode", "Set": true },
+              { "Type": "MotionController", "MotionController": "Fly" },
+              { "Type": "Nav", "NavStates": [ "Defer", "Blocked" ], "ThrottleDuration": 2 }
+            ] },
+            "BodyMotion": { "Type": "Wander", "MaxHeadingChange": 90, "RelativeSpeed": { "Compute": "AirCombatWanderRelativeSpeed" } }
+          },
+          {
             "Continue": true,
             "Sensor": { "Type": "And", "Sensors": [
               { "Type": "Target", "TargetSlot": "LockedTarget" }, { "Type": "Flag", "Name": "AirborneMode", "Set": true },
