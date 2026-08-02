@@ -30,6 +30,10 @@ other tamed Hydras retain their existing behavior.
 one for the toxic projectile volley and one for the bounded poison-spit flyby.
 They use player-safe root interactions and toxic visuals/effects only.
 
+The existing beast interaction configuration also includes `Tamed_Hydra_Toxic`,
+so its enabled Mount interaction appears alongside the pet and mode-cycle
+prompts.
+
 ## Architecture and Boundaries
 
 Hydra's wild and tamed roles inherit different templates from Nordic Drake, so
