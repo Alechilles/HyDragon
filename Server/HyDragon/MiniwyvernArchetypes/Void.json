@@ -1,7 +1,7 @@
 {
   "Id": "void",
   "RoleId": "Tamed_Wyvern_Mini_Void",
-  "RequiredTalentId": "EssenceBond",
+  "RequiredTalentId": "Miniwyvern_Void_UmbralBond",
   "ParticleAndSoundIds": [ "Void_Lightning", "SFX_Eye_Void_Attack_Blast" ],
   "PassiveEffects": [ "HyDragon_Miniwyvern_Void_Aura" ],
   "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Void_Exposure", "DurationSeconds": 6.0 },

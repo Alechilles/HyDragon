@@ -193,7 +193,26 @@ Expected visible result:
 
 Failure-specific evidence: record Egg/essence counts, profile card state/details, selected archetype, ability behavior before/after cycling, and extension-related status reason.
 
-### 9. Verify active full-dragon encounter eligibility
+### 9. Verify Miniwyvern role-tree reconciliation
+
+Action:
+
+1. Summon a Fire Miniwyvern, earn enough levels for talent points, and purchase at least one Bond and one Vigor talent.
+2. Attune it to Ice, then reopen the talent panel before purchasing an Ice talent.
+3. Confirm the spent total and purchased list are empty, while level and available point capacity are unchanged.
+4. Purchase a valid Ice allocation, then dismiss/store, summon, and relog; confirm that allocation remains.
+5. Attune to Wild and confirm its panel has only Combat and Vigor branches. Purchase one Wild Vigor talent and confirm its listed health, damage-reduction, or movement benefit applies.
+
+Expected visible result:
+
+- attuning to a role with a different talent config immediately clears only the incompatible allocation;
+- a valid allocation survives normal persistence boundaries;
+- Wild has no Bond branch or empty Bond placeholders; and
+- every displayed Vigor node states an observable supported stat benefit.
+
+Failure-specific evidence: record source and destination role IDs, config/tree name, level, available points, spent points, every purchased talent ID before and after the role change, and the exact displayed tooltip.
+
+### 10. Verify active full-dragon encounter eligibility
 
 Positive control:
 
@@ -216,7 +235,7 @@ The encounter is probabilistic and cooldown-controlled. Distinguish a denied eli
 
 Failure-specific evidence: record `/hydragon status`, environment/weather/Y, Talisman access, active card family/role/world, encounter cooldown, and server-log admission reason.
 
-### 10. Verify bounded diagnostics
+### 11. Verify bounded diagnostics
 
 Action:
 
@@ -256,4 +275,4 @@ Failure-specific evidence: preserve the command output, printed bundle path, bun
 
 ## Completion record
 
-Record each step as `PASS`, `FAIL`, or `NOT RUN`, with world name, installed JAR hashes, and timestamp. The bonded implementation is not accepted until all ten steps pass on the intended packaged pair. After any install or requested manual pass, pause the implementation goal and wait visibly for the tester's report.
+Record each step as `PASS`, `FAIL`, or `NOT RUN`, with world name, installed JAR hashes, and timestamp. The bonded implementation is not accepted until all eleven steps pass on the intended packaged pair. After any install or requested manual pass, pause the implementation goal and wait visibly for the tester's report.
