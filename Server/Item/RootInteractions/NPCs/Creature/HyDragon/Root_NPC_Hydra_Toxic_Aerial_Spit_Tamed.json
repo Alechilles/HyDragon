@@ -1,0 +1,11 @@
+{
+  "Interactions": [
+    "Hydra_Toxic_Aerial_Spit_Tamed"
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  },
+  "RequireNewClick": false
+}

@@ -528,6 +528,10 @@
       "Value": false,
       "Description": "Whether Defend hands a valid LockedTarget to the Nordic Drake combat component."
     },
+    "UseToxicHydraTamedCombat": {
+      "Value": false,
+      "Description": "Whether Defend hands a valid LockedTarget to the Toxic Hydra combat component."
+    },
     "CanAggressive": {
       "Value": false,
       "Description": "Whether Defend state behavior is enabled for this role."
@@ -1420,6 +1424,23 @@
               "Instructions": [
                 {
                   "Reference": "Component_HyDragon_Instruction_NordicDrake_Tamed_Combat",
+                  "Modify": {
+                    "HardLeashDistance": { "Compute": "HardLeashDistance" },
+                    "AlertedRange": { "Compute": "AlertedRange" },
+                    "ViewRange": { "Compute": "ViewRange" },
+                    "ViewSector": { "Compute": "ViewSector" },
+                    "HearingRange": { "Compute": "HearingRange" },
+                    "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" }
+                  }
+                }
+              ]
+            },
+            {
+              "Enabled": { "Compute": "UseToxicHydraTamedCombat" },
+              "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" },
+              "Instructions": [
+                {
+                  "Reference": "Component_HyDragon_Instruction_ToxicHydra_Tamed_Combat",
                   "Modify": {
                     "HardLeashDistance": { "Compute": "HardLeashDistance" },
                     "AlertedRange": { "Compute": "AlertedRange" },
