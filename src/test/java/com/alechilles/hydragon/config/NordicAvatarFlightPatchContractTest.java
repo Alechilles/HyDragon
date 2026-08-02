@@ -51,7 +51,7 @@ final class NordicAvatarFlightPatchContractTest {
                 "Server", "Tamework", "AvatarFlight", "HyDragonNordicDrake.json"))).getAsJsonObject();
         JsonObject abilities = config.getAsJsonObject("CombatAbilities");
 
-        assertEquals("Root_NPC_NordicDrake_Avatar_Fire_Ball",
+        assertEquals("Root_NPC_Tamed_NordicDrake_Avatar_Fire_Ball",
                 abilities.getAsJsonObject("Ability2").get("RootInteraction").getAsString());
         assertEquals("FIRE", abilities.getAsJsonObject("Ability2").get("Glyph").getAsString());
         assertEquals("Root_NPC_NordicDrake_Avatar_Flying_Flame_Breath",

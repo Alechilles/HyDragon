@@ -219,9 +219,11 @@ class ToxicHydraVariantAssetTest {
             JsonObject vars = json("Server/NPC/Roles/Creature/HyDragon/Hydra/" + role)
                     .getAsJsonObject("Modify").getAsJsonObject("_InteractionVars");
             assertVariableLeaf(vars, "Hydra_Ball_Charge_Effect", "Hydra_Ice_Ball_Charge_Effect");
-            assertVariableLeaf(vars, "Hydra_Ball_Launch", "Hydra_Ice_Ball_Launch");
+            assertVariableLeaf(vars, "Hydra_Ball_Launch", "Hydra_Ice_Ball_Launch",
+                    role.equals("Tamed_Hydra.json") ? Set.of("ProjectileId") : Set.of());
             assertVariableLeaf(vars, "Hydra_Rain_Charge_Effect", "Hydra_Rain_Ice_Charge_Effect");
-            assertVariableLeaf(vars, "Hydra_Rain_Launch", "Hydra_Rain_Ice_Launch");
+            assertVariableLeaf(vars, "Hydra_Rain_Launch", "Hydra_Rain_Ice_Launch",
+                    role.equals("Tamed_Hydra.json") ? Set.of("ProjectileId", "LingeringHazard") : Set.of());
         }
     }
 
@@ -509,31 +511,43 @@ class ToxicHydraVariantAssetTest {
                 "Tail_Spin_Damage", "Hydra_Ball_Charge_Effect", "Hydra_Ball_Launch",
                 "Hydra_Rain_Charge_Effect", "Hydra_Rain_Launch"), vars.keySet());
         assertVariableLeaf(vars, "Hydra_Ball_Charge_Effect", "Hydra_Toxic_Ball_Charge_Effect");
-        assertVariableLeaf(vars, "Hydra_Ball_Launch", "Hydra_Toxic_Ball_Launch");
+        boolean tamed = tameRoleChange == null;
+        assertVariableLeaf(vars, "Hydra_Ball_Launch", "Hydra_Toxic_Ball_Launch",
+                tamed ? Set.of("ProjectileId", "LingeringHazard") : Set.of());
         assertVariableLeaf(vars, "Hydra_Rain_Charge_Effect", "Hydra_Rain_Toxic_Charge_Effect");
-        assertVariableLeaf(vars, "Hydra_Rain_Launch", "Hydra_Rain_Toxic_Launch");
-        assertPoisonMelee(vars, "Bite_Damage", "Hydra_Bite_Damage");
-        assertPoisonMelee(vars, "Swipe_Left_Damage", "Hydra_Swipe_Left_Damage");
-        assertPoisonMelee(vars, "Swipe_Right_Damage", "Hydra_Swipe_Right_Damage");
-        assertPoisonMelee(vars, "Stomp_Damage", "Hydra_Stomp_Damage");
-        assertPoisonMelee(vars, "Tail_Spin_Damage", "Hydra_Tail_Spin_Damage");
+        assertVariableLeaf(vars, "Hydra_Rain_Launch", "Hydra_Rain_Toxic_Launch",
+                tamed ? Set.of("ProjectileId", "LingeringHazard") : Set.of());
+        assertPoisonMelee(vars, "Bite_Damage", "Hydra_Bite_Damage", tamed);
+        assertPoisonMelee(vars, "Swipe_Left_Damage", "Hydra_Swipe_Left_Damage", tamed);
+        assertPoisonMelee(vars, "Swipe_Right_Damage", "Hydra_Swipe_Right_Damage", tamed);
+        assertPoisonMelee(vars, "Stomp_Damage", "Hydra_Stomp_Damage", tamed);
+        assertPoisonMelee(vars, "Tail_Spin_Damage", "Hydra_Tail_Spin_Damage", tamed);
 
         assertEquals(Set.of("NameTranslationKey"), root.getAsJsonObject("Parameters").keySet());
         assertEquals("server.npcRoles." + role + ".name", root.getAsJsonObject("Parameters")
                 .getAsJsonObject("NameTranslationKey").get("Value").getAsString());
     }
 
-    private static void assertPoisonMelee(JsonObject vars, String variable, String parent) {
+    private static void assertPoisonMelee(JsonObject vars, String variable, String parent, boolean tamed) {
         JsonArray interactions = vars.getAsJsonObject(variable).getAsJsonArray("Interactions");
         assertEquals(1, interactions.size());
         JsonObject interaction = interactions.get(0).getAsJsonObject();
-        assertEquals(Set.of("Parent", "Next"), interaction.keySet());
+        assertEquals(tamed ? Set.of("Parent", "DamageCalculator", "Next") : Set.of("Parent", "Next"),
+                interaction.keySet());
         assertEquals(parent, interaction.get("Parent").getAsString());
+        if (tamed) {
+            assertEquals(32, interaction.getAsJsonObject("DamageCalculator")
+                    .getAsJsonObject("BaseDamage").get("Physical").getAsInt());
+        }
         JsonObject next = interaction.getAsJsonObject("Next");
         assertEquals(Set.of("Type", "EffectId", "Entity"), next.keySet());
         assertEquals("ApplyEffect", next.get("Type").getAsString());
         assertEquals("Target", next.get("Entity").getAsString());
         assertEquals("Poison_T1", next.get("EffectId").getAsString());
+    }
+
+    private static void assertPoisonMelee(JsonObject vars, String variable, String parent) {
+        assertPoisonMelee(vars, variable, parent, false);
     }
 
     private static void assertProjectileParity(String icePath, String toxicPath) throws IOException {
@@ -649,12 +663,18 @@ class ToxicHydraVariantAssetTest {
     }
 
     private static void assertVariableLeaf(JsonObject vars, String variable, String leaf) {
+        assertVariableLeaf(vars, variable, leaf, Set.of());
+    }
+
+    private static void assertVariableLeaf(JsonObject vars, String variable, String leaf, Set<String> extraFields) {
         JsonObject wrapper = vars.getAsJsonObject(variable);
         assertEquals(Set.of("Interactions"), wrapper.keySet());
         JsonArray interactions = wrapper.getAsJsonArray("Interactions");
         assertEquals(1, interactions.size());
         JsonObject interaction = interactions.get(0).getAsJsonObject();
-        assertEquals(Set.of("Parent"), interaction.keySet());
+        Set<String> expectedFields = new HashSet<>(extraFields);
+        expectedFields.add("Parent");
+        assertEquals(expectedFields, interaction.keySet());
         assertEquals(leaf, interaction.get("Parent").getAsString());
     }
 

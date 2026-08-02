@@ -10,6 +10,13 @@
         "Interactions": [
           {
             "Parent": "Hydra_Bite_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 32
+              },
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -22,6 +29,13 @@
         "Interactions": [
           {
             "Parent": "Hydra_Swipe_Left_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 32
+              },
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -34,6 +48,13 @@
         "Interactions": [
           {
             "Parent": "Hydra_Swipe_Right_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 32
+              },
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -46,6 +67,13 @@
         "Interactions": [
           {
             "Parent": "Hydra_Stomp_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 32
+              },
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -58,6 +86,13 @@
         "Interactions": [
           {
             "Parent": "Hydra_Tail_Spin_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 32
+              },
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -76,7 +111,17 @@
       "Hydra_Ball_Launch": {
         "Interactions": [
           {
-            "Parent": "Hydra_Toxic_Ball_Launch"
+            "Parent": "Hydra_Toxic_Ball_Launch",
+            "ProjectileId": "Tamed_Hydra_Toxic_Ball",
+            "LingeringHazard": {
+              "Radius": 2.0,
+              "DurationSeconds": 8.0,
+              "TickIntervalSeconds": 1.0,
+              "DamagePerTick": 2.0,
+              "ExcludeSource": true,
+              "EffectId": "Poison_T1",
+              "SourceTypeId": "hydragon.tamed_toxic_hydra_hazard"
+            }
           }
         ]
       },
@@ -90,7 +135,17 @@
       "Hydra_Rain_Launch": {
         "Interactions": [
           {
-            "Parent": "Hydra_Rain_Toxic_Launch"
+            "Parent": "Hydra_Rain_Toxic_Launch",
+            "ProjectileId": "Tamed_Hydra_Rain_Toxic_Ball",
+            "LingeringHazard": {
+              "Radius": 3.0,
+              "DurationSeconds": 8.0,
+              "TickIntervalSeconds": 1.0,
+              "DamagePerTick": 2.0,
+              "ExcludeSource": true,
+              "EffectId": "Poison_T1",
+              "SourceTypeId": "hydragon.tamed_toxic_hydra_rain_hazard"
+            }
           }
         ]
       }

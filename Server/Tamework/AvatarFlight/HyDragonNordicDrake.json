@@ -22,7 +22,7 @@
   },
   "CombatAbilities": {
     "Ability2": {
-      "RootInteraction": "Root_NPC_NordicDrake_Avatar_Fire_Ball",
+      "RootInteraction": "Root_NPC_Tamed_NordicDrake_Avatar_Fire_Ball",
       "Glyph": "FIRE"
     },
     "Ability3": {

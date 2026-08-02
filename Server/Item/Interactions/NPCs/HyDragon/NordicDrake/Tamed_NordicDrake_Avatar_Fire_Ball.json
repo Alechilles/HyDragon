@@ -1,0 +1,48 @@
+{
+  "Type": "Serial",
+  "$Comment": "Tamed Nordic Drake fireball keeps the player-safe cue and targeting flow at companion damage.",
+  "Interactions": [
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "ChargeShoot",
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Roar"
+      },
+      "RunTime": 0.35
+    },
+    {
+      "Type": "TameworkLaunchProjectile",
+      "RunTime": 0,
+      "ProjectileId": "Tamed_NordicDrake_Dragon_Fire_Ball",
+      "LaunchPositionOffset": {
+        "X": 0.0,
+        "Y": -1.0,
+        "Z": -3.0
+      },
+      "TrajectoryMode": "Direct",
+      "LookTargetDistance": 48.0,
+      "ImpactEffect": {
+        "EffectId": "Flame_Staff_Burn",
+        "Radius": 3,
+        "ExcludeSource": true
+      },
+      "Tags": {}
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch"
+      },
+      "RunTime": 0
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "NordicDrake_Default",
+        "ItemAnimationId": "FinishShoot"
+      },
+      "RunTime": 0.35
+    }
+  ]
+}

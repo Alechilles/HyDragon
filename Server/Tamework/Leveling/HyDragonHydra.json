@@ -1,0 +1,32 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": ["Tamed_Hydra", "Tamed_Hydra_Toxic"],
+  "Levels": { "MaxLevel": 30, "BaseXp": 165.0, "GrowthFactor": 1.09 },
+  "XpSources": {
+    "Feed": { "Enabled": false },
+    "Harvest": { "Enabled": false },
+    "Breeding": { "Enabled": false },
+    "Combat": {
+      "Enabled": true,
+      "DamageDealtXpPerPoint": 0.25,
+      "DamageTakenXpPerPoint": 0.1,
+      "MinimumDamageEvent": 2.0,
+      "AwardVsPlayers": false,
+      "AwardVsOwnedAllies": false
+    },
+    "Summoned": {
+      "Enabled": true,
+      "XpPerActiveSecond": 0.02,
+      "AwardIntervalSeconds": 10.0,
+      "MaxXpPerHour": 72.0
+    }
+  },
+  "StatGrowth": {
+    "Effects": [
+      { "EffectKey": "MaxHealthMultiplier", "PerLevel": 0.004 },
+      { "EffectKey": "DamageDealtMultiplier", "PerLevel": 0.002 }
+    ]
+  },
+  "TalentPoints": { "PointsPerLevel": 1 }
+}

@@ -1,0 +1,31 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": ["Tamed_Hydra", "Tamed_Hydra_Toxic"],
+  "Talents": [
+    {
+      "Id": "Hydra_RazorFangs", "DisplayName": "hydragon.talents.hydra.razor_fangs.name", "Description": "hydragon.talents.hydra.razor_fangs.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 1, "Branch": "hydragon.talents.hydra.branch.battle_instinct", "PointCost": 1, "MinLevel": 1,
+      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.025 }]
+    },
+    {
+      "Id": "Hydra_RelentlessAssault", "DisplayName": "hydragon.talents.hydra.relentless_assault.name", "Description": "hydragon.talents.hydra.relentless_assault.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 2, "Branch": "hydragon.talents.hydra.branch.battle_instinct", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["Hydra_RazorFangs"],
+      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04 }]
+    },
+    {
+      "Id": "Hydra_ThickScales", "DisplayName": "hydragon.talents.hydra.thick_scales.name", "Description": "hydragon.talents.hydra.thick_scales.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png", "Tier": 1, "Branch": "hydragon.talents.hydra.branch.scaleguard", "PointCost": 1, "MinLevel": 1,
+      "Effects": [{ "EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04 }]
+    },
+    {
+      "Id": "Hydra_GuardiansHide", "DisplayName": "hydragon.talents.hydra.guardians_hide.name", "Description": "hydragon.talents.hydra.guardians_hide.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png", "Tier": 2, "Branch": "hydragon.talents.hydra.branch.scaleguard", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["Hydra_ThickScales"],
+      "Effects": [{ "EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667 }]
+    },
+    {
+      "Id": "Hydra_EnduringHunt", "DisplayName": "hydragon.talents.hydra.enduring_hunt.name", "Description": "hydragon.talents.hydra.enduring_hunt.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png", "Tier": 1, "Branch": "hydragon.talents.hydra.branch.survivalist", "PointCost": 1, "MinLevel": 1,
+      "Effects": [{ "EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04 }]
+    },
+    {
+      "Id": "Hydra_PrimalFocus", "DisplayName": "hydragon.talents.hydra.primal_focus.name", "Description": "hydragon.talents.hydra.primal_focus.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 2, "Branch": "hydragon.talents.hydra.branch.survivalist", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["Hydra_EnduringHunt"],
+      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.03 }]
+    }
+  ]
+}
