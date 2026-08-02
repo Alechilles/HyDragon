@@ -66,7 +66,7 @@
     "LeashMinPlayerDistance": 15,
     "LeashTimer": [12, 16],
     "WakingPeriod": [0, 24],
-    "MaxHealth": 250,
+    "MaxHealth": 600,
     "IsTameable": true,
     "TameRoleChange": "Tamed_NordicDrake",
     "AttractiveItemSet": [],

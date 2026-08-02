@@ -45,7 +45,7 @@
       12,
       16
     ],
-    "MaxHealth": 400,
+    "MaxHealth": 250,
     "AttractiveItemSet": [],
     "InteractionConfigId": "HyDragonIntDragon",
     "MountMode": "TameworkAvatarFlight",

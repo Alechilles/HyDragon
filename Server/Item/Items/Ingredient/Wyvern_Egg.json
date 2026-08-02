@@ -9,19 +9,39 @@
   "Interactions": {
     "Primary": {
       "Interactions": [
-        { "Type": "HyDragonSoulBond" }
+        {
+          "Type": "HyDragonSoulBond"
+        }
       ]
+    },
+    "Secondary": {
+      "Type": "HyDragonSoulBond"
     }
   },
   "Recipe": {
     "Input": [
-      { "ItemId": "Draconic_Essence", "Quantity": 4 },
-      { "ItemId": "Draconic_Scale", "Quantity": 4 },
-      { "ItemId": "Draconic_Essence_Nature", "Quantity": 1 },
-      { "ItemId": "Draconic_Essence_Wind", "Quantity": 1 }
+      {
+        "ItemId": "Draconic_Essence",
+        "Quantity": 4
+      },
+      {
+        "ItemId": "Draconic_Scale",
+        "Quantity": 4
+      },
+      {
+        "ItemId": "Draconic_Essence_Nature",
+        "Quantity": 1
+      },
+      {
+        "ItemId": "Draconic_Essence_Wind",
+        "Quantity": 1
+      }
     ],
     "Output": [
-      { "ItemId": "Wyvern_Egg", "Quantity": 1 }
+      {
+        "ItemId": "Wyvern_Egg",
+        "Quantity": 1
+      }
     ],
     "BenchRequirement": [
       {
@@ -40,7 +60,9 @@
     "Translation": [ 2, -4 ],
     "Rotation": [ -21, 128, -8 ]
   },
-  "Tags": { "Type": [ "Tool" ] },
+  "Tags": {
+    "Type": [ "Tool" ]
+  },
   "Scale": 2,
   "MaxStack": 1,
   "ItemSoundSetId": "ISS_Items_Gems",
