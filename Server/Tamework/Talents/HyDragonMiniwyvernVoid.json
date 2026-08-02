@@ -9,7 +9,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralBond",
       "DisplayName": "Umbral Bond",
-      "Description": "Your Void Miniwyvern strengthens its owner’s exposure affinity.",
+      "Description": "Your hits increase target damage taken by 12% for 6 sec; your Void Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Essence Bond",
@@ -25,7 +25,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralFocus",
       "DisplayName": "Umbral Focus",
-      "Description": "Your Miniwyvern deals 3% more damage.",
+      "Description": "Your Void Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -44,7 +44,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralAttunement",
       "DisplayName": "Umbral Attunement",
-      "Description": "Your Miniwyvern gains 6% maximum health.",
+      "Description": "Your Void Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -63,7 +63,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralAmplification",
       "DisplayName": "Umbral Amplification",
-      "Description": "Your Miniwyvern deals 4% more damage.",
+      "Description": "Your Void Miniwyvern deals 4% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -82,7 +82,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralResonance",
       "DisplayName": "Umbral Resonance",
-      "Description": "Your Miniwyvern takes 4% less damage.",
+      "Description": "Your Void Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -101,7 +101,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralEfficiency",
       "DisplayName": "Umbral Efficiency",
-      "Description": "Your Miniwyvern deals 3% more damage.",
+      "Description": "Your Void Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -120,7 +120,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralHarmony",
       "DisplayName": "Umbral Harmony",
-      "Description": "Your Miniwyvern gains 5% movement speed.",
+      "Description": "Your Void Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -139,7 +139,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralMastery",
       "DisplayName": "Umbral Mastery",
-      "Description": "Your Miniwyvern deals 4% more damage.",
+      "Description": "Your Void Miniwyvern deals 4% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
       "Branch": "Essence Bond",
@@ -158,7 +158,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralAscendance",
       "DisplayName": "Umbral Ascendance",
-      "Description": "Completes the elemental bond and grants 6% maximum health.",
+      "Description": "Your Void Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
       "Branch": "Essence Bond",
@@ -178,7 +178,7 @@
     {
       "Id": "DraconicProjectile",
       "DisplayName": "Void Projectile Initiation",
-      "Description": "Unlocks the form's base projectile attack.",
+      "Description": "Void bolt: force 28, 4-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Combat",
@@ -194,7 +194,7 @@
     {
       "Id": "ProjectileRange",
       "DisplayName": "Void Long Reach",
-      "Description": "Uses the existing long-range projectile profile.",
+      "Description": "Void bolt: force 34, 5-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -213,7 +213,7 @@
     {
       "Id": "ProjectileCadence",
       "DisplayName": "Void Quick Cast",
-      "Description": "Uses the existing faster projectile cadence.",
+      "Description": "Void bolt every 4–6 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -232,7 +232,7 @@
     {
       "Id": "ProjectileGuidance",
       "DisplayName": "Void Guided Flight",
-      "Description": "Uses the existing guided projectile profile.",
+      "Description": "Aim Void bolts for 0.55–0.85 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -251,7 +251,7 @@
     {
       "Id": "ProjectilePattern",
       "DisplayName": "Void Split Flight",
-      "Description": "Uses the existing projectile pattern profile.",
+      "Description": "Two Void bolts 0.30 sec apart every 4–6 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -270,7 +270,7 @@
     {
       "Id": "ProjectileMastery",
       "DisplayName": "Void Projectile Mastery",
-      "Description": "Uses the existing mastery projectile profile.",
+      "Description": "Two Void bolts every 3–5 sec; force 40, 6-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Combat",
@@ -290,7 +290,7 @@
     {
       "Id": "SwoopFerocity",
       "DisplayName": "Void Swoop Ferocity",
-      "Description": "Uses the existing 20-damage swoop profile.",
+      "Description": "20-damage void swoop; 25–35 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Combat",
@@ -306,7 +306,7 @@
     {
       "Id": "SwoopCadence",
       "DisplayName": "Void Swoop Cadence",
-      "Description": "Uses the existing 22-30 second swoop cadence.",
+      "Description": "20-damage void swoop; 22–30 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -325,7 +325,7 @@
     {
       "Id": "SwoopPrecision",
       "DisplayName": "Void Swoop Precision",
-      "Description": "Uses the existing faster swoop approach profile.",
+      "Description": "Void swoop approach speed: 0.70.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -344,7 +344,7 @@
     {
       "Id": "RelentlessSwoop",
       "DisplayName": "Void Relentless Swoop",
-      "Description": "Uses the existing 20-26 second swoop cadence.",
+      "Description": "20-damage void swoop; 20–26 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -363,7 +363,7 @@
     {
       "Id": "RendingDive",
       "DisplayName": "Void Rending Dive",
-      "Description": "Uses the existing 24-damage swoop profile.",
+      "Description": "24-damage void swoop; 25–35 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -382,7 +382,7 @@
     {
       "Id": "SwoopMastery",
       "DisplayName": "Void Swoop Mastery",
-      "Description": "Uses the existing 28-damage mastery swoop profile.",
+      "Description": "28-damage void swoop; 18–24 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Combat",
@@ -402,7 +402,7 @@
     {
       "Id": "Miniwyvern_Void_VitalScales",
       "DisplayName": "Void Scales",
-      "Description": "Gain 5% maximum health.",
+      "Description": "Your Void Miniwyvern gains 5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
       "Branch": "Vigor",
@@ -417,8 +417,8 @@
     },
     {
       "Id": "Miniwyvern_Void_HardenedScales",
-      "DisplayName": "Void Scales Reinforcement",
-      "Description": "Gain 5% maximum health.",
+      "DisplayName": "Hardened Void Scales",
+      "Description": "Your Void Miniwyvern gains 5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
       "Branch": "Vigor",
@@ -436,8 +436,8 @@
     },
     {
       "Id": "Miniwyvern_Void_ElderScales",
-      "DisplayName": "Void Scales Maturity",
-      "Description": "Gain 8% maximum health.",
+      "DisplayName": "Elder Void Scales",
+      "Description": "Your Void Miniwyvern gains 8% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -455,8 +455,8 @@
     },
     {
       "Id": "Miniwyvern_Void_ScaleGuard",
-      "DisplayName": "Scale Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Void Guard",
+      "Description": "Your Void Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -474,8 +474,8 @@
     },
     {
       "Id": "Miniwyvern_Void_ScaleBulwark",
-      "DisplayName": "Scale Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Void Bulwark",
+      "Description": "Your Void Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -493,8 +493,8 @@
     },
     {
       "Id": "Miniwyvern_Void_SwiftWings",
-      "DisplayName": "Swift Wings",
-      "Description": "Gain 5% movement speed.",
+      "DisplayName": "Void Wings",
+      "Description": "Your Void Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -512,8 +512,8 @@
     },
     {
       "Id": "Miniwyvern_Void_SurvivalInstinct",
-      "DisplayName": "Survival Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Void Instinct",
+      "Description": "Your Void Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -531,8 +531,8 @@
     },
     {
       "Id": "Miniwyvern_Void_LastingScales",
-      "DisplayName": "Lasting Scales",
-      "Description": "Gain 6% maximum health.",
+      "DisplayName": "Lasting Void Scales",
+      "Description": "Your Void Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -550,8 +550,8 @@
     },
     {
       "Id": "Miniwyvern_Void_WyrmFortitude",
-      "DisplayName": "Wyrm Fortitude",
-      "Description": "Gain 5% movement speed.",
+      "DisplayName": "Void Fortitude",
+      "Description": "Your Void Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -569,8 +569,8 @@
     },
     {
       "Id": "Miniwyvern_Void_VigorAscendance",
-      "DisplayName": "Vigor Ascendance",
-      "Description": "Gain 6% maximum health and take 4% less damage.",
+      "DisplayName": "Void Vitality",
+      "Description": "Your Void Miniwyvern gains 6% maximum health and takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
       "Branch": "Vigor",

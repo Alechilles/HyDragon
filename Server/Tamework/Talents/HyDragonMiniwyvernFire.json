@@ -9,7 +9,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberBond",
       "DisplayName": "Ember Bond",
-      "Description": "Your Fire Miniwyvern strengthens its owner’s burn affinity.",
+      "Description": "Your hits burn for 2 damage each second for 4 sec; your Fire Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Essence Bond",
@@ -25,7 +25,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberFocus",
       "DisplayName": "Ember Focus",
-      "Description": "Your Miniwyvern deals 3% more damage.",
+      "Description": "Your Fire Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -44,7 +44,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberAttunement",
       "DisplayName": "Ember Attunement",
-      "Description": "Your Miniwyvern gains 6% maximum health.",
+      "Description": "Your Fire Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -63,7 +63,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberAmplification",
       "DisplayName": "Ember Amplification",
-      "Description": "Your Miniwyvern deals 4% more damage.",
+      "Description": "Your Fire Miniwyvern deals 4% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -82,7 +82,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberResonance",
       "DisplayName": "Ember Resonance",
-      "Description": "Your Miniwyvern takes 4% less damage.",
+      "Description": "Your Fire Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -101,7 +101,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberEfficiency",
       "DisplayName": "Ember Efficiency",
-      "Description": "Your Miniwyvern deals 3% more damage.",
+      "Description": "Your Fire Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -120,7 +120,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberHarmony",
       "DisplayName": "Ember Harmony",
-      "Description": "Your Miniwyvern gains 5% movement speed.",
+      "Description": "Your Fire Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -139,7 +139,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberMastery",
       "DisplayName": "Ember Mastery",
-      "Description": "Your Miniwyvern deals 4% more damage.",
+      "Description": "Your Fire Miniwyvern deals 4% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
       "Branch": "Essence Bond",
@@ -158,7 +158,7 @@
     {
       "Id": "Miniwyvern_Fire_EmberAscendance",
       "DisplayName": "Ember Ascendance",
-      "Description": "Completes the elemental bond and grants 6% maximum health.",
+      "Description": "Your Fire Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
       "Branch": "Essence Bond",
@@ -178,7 +178,7 @@
     {
       "Id": "DraconicProjectile",
       "DisplayName": "Fire Projectile Initiation",
-      "Description": "Unlocks the form's base projectile attack.",
+      "Description": "Fire bolt: force 28, 4-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Combat",
@@ -194,7 +194,7 @@
     {
       "Id": "ProjectileRange",
       "DisplayName": "Fire Long Reach",
-      "Description": "Uses the existing long-range projectile profile.",
+      "Description": "Fire bolt: force 34, 5-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -213,7 +213,7 @@
     {
       "Id": "ProjectileCadence",
       "DisplayName": "Fire Quick Cast",
-      "Description": "Uses the existing faster projectile cadence.",
+      "Description": "Fire bolt every 4–6 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -232,7 +232,7 @@
     {
       "Id": "ProjectileGuidance",
       "DisplayName": "Fire Guided Flight",
-      "Description": "Uses the existing guided projectile profile.",
+      "Description": "Aim Fire bolts for 0.55–0.85 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -251,7 +251,7 @@
     {
       "Id": "ProjectilePattern",
       "DisplayName": "Fire Split Flight",
-      "Description": "Uses the existing projectile pattern profile.",
+      "Description": "Two Fire bolts 0.30 sec apart every 4–6 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -270,7 +270,7 @@
     {
       "Id": "ProjectileMastery",
       "DisplayName": "Fire Projectile Mastery",
-      "Description": "Uses the existing mastery projectile profile.",
+      "Description": "Two Fire bolts every 3–5 sec; force 40, 6-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Combat",
@@ -290,7 +290,7 @@
     {
       "Id": "SwoopFerocity",
       "DisplayName": "Fire Swoop Ferocity",
-      "Description": "Uses the existing 20-damage swoop profile.",
+      "Description": "20-damage cinder swoop; 25–35 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Combat",
@@ -306,7 +306,7 @@
     {
       "Id": "SwoopCadence",
       "DisplayName": "Fire Swoop Cadence",
-      "Description": "Uses the existing 22-30 second swoop cadence.",
+      "Description": "20-damage cinder swoop; 22–30 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -325,7 +325,7 @@
     {
       "Id": "SwoopPrecision",
       "DisplayName": "Fire Swoop Precision",
-      "Description": "Uses the existing faster swoop approach profile.",
+      "Description": "Cinder swoop approach speed: 0.70.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -344,7 +344,7 @@
     {
       "Id": "RelentlessSwoop",
       "DisplayName": "Fire Relentless Swoop",
-      "Description": "Uses the existing 20-26 second swoop cadence.",
+      "Description": "20-damage cinder swoop; 20–26 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -363,7 +363,7 @@
     {
       "Id": "RendingDive",
       "DisplayName": "Fire Rending Dive",
-      "Description": "Uses the existing 24-damage swoop profile.",
+      "Description": "24-damage cinder swoop; 25–35 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -382,7 +382,7 @@
     {
       "Id": "SwoopMastery",
       "DisplayName": "Fire Swoop Mastery",
-      "Description": "Uses the existing 28-damage mastery swoop profile.",
+      "Description": "28-damage cinder swoop; 18–24 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Combat",
@@ -402,7 +402,7 @@
     {
       "Id": "Miniwyvern_Fire_VitalScales",
       "DisplayName": "Cinder Scales",
-      "Description": "Gain 5% maximum health.",
+      "Description": "Your Fire Miniwyvern gains 5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
       "Branch": "Vigor",
@@ -417,8 +417,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_HardenedScales",
-      "DisplayName": "Cinder Scales Reinforcement",
-      "Description": "Gain 5% maximum health.",
+      "DisplayName": "Hardened Cinder Scales",
+      "Description": "Your Fire Miniwyvern gains 5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
       "Branch": "Vigor",
@@ -436,8 +436,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_ElderScales",
-      "DisplayName": "Cinder Scales Maturity",
-      "Description": "Gain 8% maximum health.",
+      "DisplayName": "Elder Cinder Scales",
+      "Description": "Your Fire Miniwyvern gains 8% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -455,8 +455,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_ScaleGuard",
-      "DisplayName": "Scale Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Cinder Guard",
+      "Description": "Your Fire Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -474,8 +474,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_ScaleBulwark",
-      "DisplayName": "Scale Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Cinder Bulwark",
+      "Description": "Your Fire Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -493,8 +493,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_SwiftWings",
-      "DisplayName": "Swift Wings",
-      "Description": "Gain 5% movement speed.",
+      "DisplayName": "Cinder Wings",
+      "Description": "Your Fire Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -512,8 +512,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_SurvivalInstinct",
-      "DisplayName": "Survival Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Cinder Instinct",
+      "Description": "Your Fire Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -531,8 +531,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_LastingScales",
-      "DisplayName": "Lasting Scales",
-      "Description": "Gain 6% maximum health.",
+      "DisplayName": "Lasting Cinder Scales",
+      "Description": "Your Fire Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -550,8 +550,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_WyrmFortitude",
-      "DisplayName": "Wyrm Fortitude",
-      "Description": "Gain 5% movement speed.",
+      "DisplayName": "Cinder Fortitude",
+      "Description": "Your Fire Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -569,8 +569,8 @@
     },
     {
       "Id": "Miniwyvern_Fire_VigorAscendance",
-      "DisplayName": "Vigor Ascendance",
-      "Description": "Gain 6% maximum health and take 4% less damage.",
+      "DisplayName": "Cinder Vitality",
+      "Description": "Your Fire Miniwyvern gains 6% maximum health and takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
       "Branch": "Vigor",

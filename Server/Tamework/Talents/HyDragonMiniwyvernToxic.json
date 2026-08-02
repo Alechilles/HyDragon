@@ -9,7 +9,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomBond",
       "DisplayName": "Venom Bond",
-      "Description": "Your Toxic Miniwyvern strengthens its owner’s weakening affinity.",
+      "Description": "Your hits reduce target damage by 12% for 6 sec; your Toxic Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Essence Bond",
@@ -25,7 +25,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomFocus",
       "DisplayName": "Venom Focus",
-      "Description": "Your Miniwyvern deals 3% more damage.",
+      "Description": "Your Toxic Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -44,7 +44,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomAttunement",
       "DisplayName": "Venom Attunement",
-      "Description": "Your Miniwyvern gains 6% maximum health.",
+      "Description": "Your Toxic Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -63,7 +63,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomAmplification",
       "DisplayName": "Venom Amplification",
-      "Description": "Your Miniwyvern deals 4% more damage.",
+      "Description": "Your Toxic Miniwyvern deals 4% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -82,7 +82,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomResonance",
       "DisplayName": "Venom Resonance",
-      "Description": "Your Miniwyvern takes 4% less damage.",
+      "Description": "Your Toxic Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -101,7 +101,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomEfficiency",
       "DisplayName": "Venom Efficiency",
-      "Description": "Your Miniwyvern deals 3% more damage.",
+      "Description": "Your Toxic Miniwyvern deals 3% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -120,7 +120,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomHarmony",
       "DisplayName": "Venom Harmony",
-      "Description": "Your Miniwyvern gains 5% movement speed.",
+      "Description": "Your Toxic Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -139,7 +139,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomMastery",
       "DisplayName": "Venom Mastery",
-      "Description": "Your Miniwyvern deals 4% more damage.",
+      "Description": "Your Toxic Miniwyvern deals 4% more damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
       "Branch": "Essence Bond",
@@ -158,7 +158,7 @@
     {
       "Id": "Miniwyvern_Toxic_VenomAscendance",
       "DisplayName": "Venom Ascendance",
-      "Description": "Completes the elemental bond and grants 6% maximum health.",
+      "Description": "Your Toxic Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
       "Branch": "Essence Bond",
@@ -178,7 +178,7 @@
     {
       "Id": "DraconicProjectile",
       "DisplayName": "Toxic Projectile Initiation",
-      "Description": "Unlocks the form's base projectile attack.",
+      "Description": "Toxic bolt: force 28, 4-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Combat",
@@ -194,7 +194,7 @@
     {
       "Id": "ProjectileRange",
       "DisplayName": "Toxic Long Reach",
-      "Description": "Uses the existing long-range projectile profile.",
+      "Description": "Toxic bolt: force 34, 5-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -213,7 +213,7 @@
     {
       "Id": "ProjectileCadence",
       "DisplayName": "Toxic Quick Cast",
-      "Description": "Uses the existing faster projectile cadence.",
+      "Description": "Toxic bolt every 4–6 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -232,7 +232,7 @@
     {
       "Id": "ProjectileGuidance",
       "DisplayName": "Toxic Guided Flight",
-      "Description": "Uses the existing guided projectile profile.",
+      "Description": "Aim Toxic bolts for 0.55–0.85 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -251,7 +251,7 @@
     {
       "Id": "ProjectilePattern",
       "DisplayName": "Toxic Split Flight",
-      "Description": "Uses the existing projectile pattern profile.",
+      "Description": "Two Toxic bolts 0.30 sec apart every 4–6 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -270,7 +270,7 @@
     {
       "Id": "ProjectileMastery",
       "DisplayName": "Toxic Projectile Mastery",
-      "Description": "Uses the existing mastery projectile profile.",
+      "Description": "Two Toxic bolts every 3–5 sec; force 40, 6-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Combat",
@@ -290,7 +290,7 @@
     {
       "Id": "SwoopFerocity",
       "DisplayName": "Toxic Swoop Ferocity",
-      "Description": "Uses the existing 20-damage swoop profile.",
+      "Description": "20-damage venom swoop; 25–35 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Combat",
@@ -306,7 +306,7 @@
     {
       "Id": "SwoopCadence",
       "DisplayName": "Toxic Swoop Cadence",
-      "Description": "Uses the existing 22-30 second swoop cadence.",
+      "Description": "20-damage venom swoop; 22–30 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -325,7 +325,7 @@
     {
       "Id": "SwoopPrecision",
       "DisplayName": "Toxic Swoop Precision",
-      "Description": "Uses the existing faster swoop approach profile.",
+      "Description": "Venom swoop approach speed: 0.70.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -344,7 +344,7 @@
     {
       "Id": "RelentlessSwoop",
       "DisplayName": "Toxic Relentless Swoop",
-      "Description": "Uses the existing 20-26 second swoop cadence.",
+      "Description": "20-damage venom swoop; 20–26 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -363,7 +363,7 @@
     {
       "Id": "RendingDive",
       "DisplayName": "Toxic Rending Dive",
-      "Description": "Uses the existing 24-damage swoop profile.",
+      "Description": "24-damage venom swoop; 25–35 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -382,7 +382,7 @@
     {
       "Id": "SwoopMastery",
       "DisplayName": "Toxic Swoop Mastery",
-      "Description": "Uses the existing 28-damage mastery swoop profile.",
+      "Description": "28-damage venom swoop; 18–24 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Combat",
@@ -401,8 +401,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_VitalScales",
-      "DisplayName": "Venomhide",
-      "Description": "Gain 5% maximum health.",
+      "DisplayName": "Venom Scales",
+      "Description": "Your Toxic Miniwyvern gains 5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
       "Branch": "Vigor",
@@ -417,8 +417,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_HardenedScales",
-      "DisplayName": "Venomhide Reinforcement",
-      "Description": "Gain 5% maximum health.",
+      "DisplayName": "Hardened Venom Scales",
+      "Description": "Your Toxic Miniwyvern gains 5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
       "Branch": "Vigor",
@@ -436,8 +436,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_ElderScales",
-      "DisplayName": "Venomhide Maturity",
-      "Description": "Gain 8% maximum health.",
+      "DisplayName": "Elder Venom Scales",
+      "Description": "Your Toxic Miniwyvern gains 8% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -455,8 +455,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_ScaleGuard",
-      "DisplayName": "Scale Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Venom Guard",
+      "Description": "Your Toxic Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -474,8 +474,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_ScaleBulwark",
-      "DisplayName": "Scale Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Venom Bulwark",
+      "Description": "Your Toxic Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -493,8 +493,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_SwiftWings",
-      "DisplayName": "Swift Wings",
-      "Description": "Gain 5% movement speed.",
+      "DisplayName": "Venom Wings",
+      "Description": "Your Toxic Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -512,8 +512,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_SurvivalInstinct",
-      "DisplayName": "Survival Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Venom Instinct",
+      "Description": "Your Toxic Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -531,8 +531,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_LastingScales",
-      "DisplayName": "Lasting Scales",
-      "Description": "Gain 6% maximum health.",
+      "DisplayName": "Lasting Venom Scales",
+      "Description": "Your Toxic Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -550,8 +550,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_WyrmFortitude",
-      "DisplayName": "Wyrm Fortitude",
-      "Description": "Gain 5% movement speed.",
+      "DisplayName": "Venom Fortitude",
+      "Description": "Your Toxic Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -569,8 +569,8 @@
     },
     {
       "Id": "Miniwyvern_Toxic_VigorAscendance",
-      "DisplayName": "Vigor Ascendance",
-      "Description": "Gain 6% maximum health and take 4% less damage.",
+      "DisplayName": "Venom Vitality",
+      "Description": "Your Toxic Miniwyvern gains 6% maximum health and takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
       "Branch": "Vigor",

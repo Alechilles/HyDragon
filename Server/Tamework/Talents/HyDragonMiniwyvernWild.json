@@ -9,7 +9,7 @@
     {
       "Id": "DraconicProjectile",
       "DisplayName": "Wild Projectile Initiation",
-      "Description": "Unlocks the form's base projectile attack.",
+      "Description": "Wild bolt: force 28, 4-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Combat",
@@ -25,7 +25,7 @@
     {
       "Id": "ProjectileRange",
       "DisplayName": "Wild Long Reach",
-      "Description": "Uses the existing long-range projectile profile.",
+      "Description": "Wild bolt: force 34, 5-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -44,7 +44,7 @@
     {
       "Id": "ProjectileCadence",
       "DisplayName": "Wild Quick Cast",
-      "Description": "Uses the existing faster projectile cadence.",
+      "Description": "Wild bolt every 4–6 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -63,7 +63,7 @@
     {
       "Id": "ProjectileGuidance",
       "DisplayName": "Wild Guided Flight",
-      "Description": "Uses the existing guided projectile profile.",
+      "Description": "Aim Wild bolts for 0.55–0.85 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -82,7 +82,7 @@
     {
       "Id": "ProjectilePattern",
       "DisplayName": "Wild Split Flight",
-      "Description": "Uses the existing projectile pattern profile.",
+      "Description": "Two Wild bolts 0.30 sec apart every 4–6 sec.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -101,7 +101,7 @@
     {
       "Id": "ProjectileMastery",
       "DisplayName": "Wild Projectile Mastery",
-      "Description": "Uses the existing mastery projectile profile.",
+      "Description": "Two Wild bolts every 3–5 sec; force 40, 6-sec lifetime.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Combat",
@@ -121,7 +121,7 @@
     {
       "Id": "SwoopFerocity",
       "DisplayName": "Wild Swoop Ferocity",
-      "Description": "Uses the existing 20-damage swoop profile.",
+      "Description": "20-damage hunter swoop; 25–35 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Combat",
@@ -137,7 +137,7 @@
     {
       "Id": "SwoopCadence",
       "DisplayName": "Wild Swoop Cadence",
-      "Description": "Uses the existing 22-30 second swoop cadence.",
+      "Description": "20-damage hunter swoop; 22–30 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -156,7 +156,7 @@
     {
       "Id": "SwoopPrecision",
       "DisplayName": "Wild Swoop Precision",
-      "Description": "Uses the existing faster swoop approach profile.",
+      "Description": "Hunter swoop approach speed: 0.70.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Combat",
@@ -175,7 +175,7 @@
     {
       "Id": "RelentlessSwoop",
       "DisplayName": "Wild Relentless Swoop",
-      "Description": "Uses the existing 20-26 second swoop cadence.",
+      "Description": "20-damage hunter swoop; 20–26 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -194,7 +194,7 @@
     {
       "Id": "RendingDive",
       "DisplayName": "Wild Rending Dive",
-      "Description": "Uses the existing 24-damage swoop profile.",
+      "Description": "24-damage hunter swoop; 25–35 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Combat",
@@ -213,7 +213,7 @@
     {
       "Id": "SwoopMastery",
       "DisplayName": "Wild Swoop Mastery",
-      "Description": "Uses the existing 28-damage mastery swoop profile.",
+      "Description": "28-damage hunter swoop; 18–24 sec cooldown.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Combat",
@@ -233,7 +233,7 @@
     {
       "Id": "Miniwyvern_Wild_VitalScales",
       "DisplayName": "Hunter Scales",
-      "Description": "Gain 5% maximum health.",
+      "Description": "Your Wild Miniwyvern gains 5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
       "Branch": "Vigor",
@@ -248,8 +248,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_HardenedScales",
-      "DisplayName": "Hunter Scales Reinforcement",
-      "Description": "Gain 5% maximum health.",
+      "DisplayName": "Hardened Hunter Scales",
+      "Description": "Your Wild Miniwyvern gains 5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
       "Branch": "Vigor",
@@ -267,8 +267,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_ElderScales",
-      "DisplayName": "Hunter Scales Maturity",
-      "Description": "Gain 8% maximum health.",
+      "DisplayName": "Elder Hunter Scales",
+      "Description": "Your Wild Miniwyvern gains 8% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -286,8 +286,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_ScaleGuard",
-      "DisplayName": "Scale Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Hunter Guard",
+      "Description": "Your Wild Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -305,8 +305,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_ScaleBulwark",
-      "DisplayName": "Scale Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Hunter Bulwark",
+      "Description": "Your Wild Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -324,8 +324,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_SwiftWings",
-      "DisplayName": "Swift Wings",
-      "Description": "Gain 5% movement speed.",
+      "DisplayName": "Hunter Wings",
+      "Description": "Your Wild Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -343,8 +343,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_SurvivalInstinct",
-      "DisplayName": "Survival Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "Hunter Instinct",
+      "Description": "Your Wild Miniwyvern takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -362,8 +362,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_LastingScales",
-      "DisplayName": "Lasting Scales",
-      "Description": "Gain 6% maximum health.",
+      "DisplayName": "Lasting Hunter Scales",
+      "Description": "Your Wild Miniwyvern gains 6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -381,8 +381,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_WyrmFortitude",
-      "DisplayName": "Wyrm Fortitude",
-      "Description": "Gain 5% movement speed.",
+      "DisplayName": "Hunter Fortitude",
+      "Description": "Your Wild Miniwyvern gains 5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -400,8 +400,8 @@
     },
     {
       "Id": "Miniwyvern_Wild_VigorAscendance",
-      "DisplayName": "Vigor Ascendance",
-      "Description": "Gain 6% maximum health and take 4% less damage.",
+      "DisplayName": "Hunter Vitality",
+      "Description": "Your Wild Miniwyvern gains 6% maximum health and takes 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
       "Branch": "Vigor",
