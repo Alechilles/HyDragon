@@ -130,22 +130,27 @@ purchase every capstone.
 | Talent | Level | Cost | Requirement | Effect |
 | --- | ---: | ---: | --- | --- |
 | Ember Discipline | 1 | 2 | None | `DamageDealtMultiplier` `1.02` |
-| Furnace Heart | 8 | 2 | Ember Discipline | `DamageTakenMultiplier` `0.97` |
+| Furnace Heart | 8 | 2 | Ember Discipline | 3% less incoming damage (`DamageTakenMultiplier` toughness `1 / 0.97`) |
 | Scorching Momentum | 8 | 3 | Ember Discipline | `DamageDealtMultiplier` `1.035` |
 | Ruinous Breath | 16 | 4 | Scorching Momentum | `DamageDealtMultiplier` `1.045` |
 | Iron Talons | 16 | 3 | Furnace Heart | `MaxHealthMultiplier` `1.05` |
-| Jarl's Bane | 24 | 4 | Ruinous Breath and Iron Talons | Damage dealt `1.04`; damage taken `0.97` |
+| Jarl's Bane | 24 | 4 | Ruinous Breath and Iron Talons | Damage dealt `1.04`; 3% less incoming damage (toughness `1 / 0.97`) |
 
 ### Wyrmguard
 
 | Talent | Level | Cost | Requirement | Effect |
 | --- | ---: | ---: | --- | --- |
 | Runestone Hide | 1 | 1 | None | `MaxHealthMultiplier` `1.04` |
-| Glacier Scales | 7 | 2 | Runestone Hide | `DamageTakenMultiplier` `0.96` |
+| Glacier Scales | 7 | 2 | Runestone Hide | 4% less incoming damage (`DamageTakenMultiplier` toughness `1 / 0.96`) |
 | Long Vigil | 7 | 2 | Runestone Hide | `MaxHealthMultiplier` `1.04` |
 | Unyielding | 15 | 3 | Long Vigil | `MaxHealthMultiplier` `1.06` |
-| Sagascar | 15 | 3 | Glacier Scales | `DamageTakenMultiplier` `0.94` |
-| Northern Bulwark | 24 | 4 | Unyielding and Sagascar | Max health `1.05`; damage taken `0.96` |
+| Sagascar | 15 | 3 | Glacier Scales | 6% less incoming damage (toughness `1 / 0.94`) |
+| Northern Bulwark | 24 | 4 | Unyielding and Sagascar | Max health `1.05`; 4% less incoming damage (toughness `1 / 0.96`) |
+
+`DamageTakenMultiplier` is consumed by current Tamework as a toughness value:
+runtime incoming damage is divided by the composed multiplier. The reciprocal
+values above preserve the intended 3%, 4%, and 6% reductions instead of
+accidentally increasing incoming damage.
 
 ## Validation
 

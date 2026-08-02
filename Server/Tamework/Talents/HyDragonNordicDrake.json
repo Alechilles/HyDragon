@@ -100,7 +100,7 @@
       "PointCost": 2,
       "MinLevel": 8,
       "RequiresTalentIds": ["NordicDrake_EmberDiscipline"],
-      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.97}]
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}]
     },
     {
       "Id": "NordicDrake_ScorchingMomentum",
@@ -150,7 +150,7 @@
       "RequiresTalentIds": ["NordicDrake_RuinousBreath", "NordicDrake_IronTalons"],
       "Effects": [
         {"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04},
-        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.97}
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}
       ]
     },
     {
@@ -174,7 +174,7 @@
       "PointCost": 2,
       "MinLevel": 7,
       "RequiresTalentIds": ["NordicDrake_RunestoneHide"],
-      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.96}]
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}]
     },
     {
       "Id": "NordicDrake_LongVigil",
@@ -210,7 +210,7 @@
       "PointCost": 3,
       "MinLevel": 15,
       "RequiresTalentIds": ["NordicDrake_GlacierScales"],
-      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.94}]
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0638297872340425}]
     },
     {
       "Id": "NordicDrake_NorthernBulwark",
@@ -224,7 +224,7 @@
       "RequiresTalentIds": ["NordicDrake_Unyielding", "NordicDrake_Sagascar"],
       "Effects": [
         {"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05},
-        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 0.96}
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}
       ]
     }
   ]

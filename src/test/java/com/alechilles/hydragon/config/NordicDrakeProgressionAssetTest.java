@@ -156,7 +156,7 @@ final class NordicDrakeProgressionAssetTest {
         expected.put("NordicDrake_EmberDiscipline", talent(war, 2, 1, List.of(), Map.of(
                 "DamageDealtMultiplier", 1.02d)));
         expected.put("NordicDrake_FurnaceHeart", talent(war, 2, 8, List.of("NordicDrake_EmberDiscipline"), Map.of(
-                "DamageTakenMultiplier", 0.97d)));
+                "DamageTakenMultiplier", toughnessForReduction(0.03d))));
         expected.put("NordicDrake_ScorchingMomentum", talent(war, 3, 8, List.of("NordicDrake_EmberDiscipline"), Map.of(
                 "DamageDealtMultiplier", 1.035d)));
         expected.put("NordicDrake_RuinousBreath", talent(war, 4, 16, List.of("NordicDrake_ScorchingMomentum"), Map.of(
@@ -166,21 +166,21 @@ final class NordicDrakeProgressionAssetTest {
         expected.put("NordicDrake_JarlsBane", talent(war, 4, 24,
                 List.of("NordicDrake_RuinousBreath", "NordicDrake_IronTalons"), Map.of(
                         "DamageDealtMultiplier", 1.04d,
-                        "DamageTakenMultiplier", 0.97d)));
+                        "DamageTakenMultiplier", toughnessForReduction(0.03d))));
         expected.put("NordicDrake_RunestoneHide", talent(wyrmguard, 1, 1, List.of(), Map.of(
                 "MaxHealthMultiplier", 1.04d)));
         expected.put("NordicDrake_GlacierScales", talent(wyrmguard, 2, 7, List.of("NordicDrake_RunestoneHide"), Map.of(
-                "DamageTakenMultiplier", 0.96d)));
+                "DamageTakenMultiplier", toughnessForReduction(0.04d))));
         expected.put("NordicDrake_LongVigil", talent(wyrmguard, 2, 7, List.of("NordicDrake_RunestoneHide"), Map.of(
                 "MaxHealthMultiplier", 1.04d)));
         expected.put("NordicDrake_Unyielding", talent(wyrmguard, 3, 15, List.of("NordicDrake_LongVigil"), Map.of(
                 "MaxHealthMultiplier", 1.06d)));
         expected.put("NordicDrake_Sagascar", talent(wyrmguard, 3, 15, List.of("NordicDrake_GlacierScales"), Map.of(
-                "DamageTakenMultiplier", 0.94d)));
+                "DamageTakenMultiplier", toughnessForReduction(0.06d))));
         expected.put("NordicDrake_NorthernBulwark", talent(wyrmguard, 4, 24,
                 List.of("NordicDrake_Unyielding", "NordicDrake_Sagascar"), Map.of(
                         "MaxHealthMultiplier", 1.05d,
-                        "DamageTakenMultiplier", 0.96d)));
+                        "DamageTakenMultiplier", toughnessForReduction(0.04d))));
         return expected;
     }
 
@@ -222,6 +222,10 @@ final class NordicDrakeProgressionAssetTest {
     private static TalentExpectation talent(String branch, int cost, int level, List<String> requires,
                                              Map<String, Double> effects) {
         return new TalentExpectation(branch, cost, level, requires, effects);
+    }
+
+    private static double toughnessForReduction(double reduction) {
+        return 1.0d / (1.0d - reduction);
     }
 
     private static TalentTextExpectation text(String node) {
