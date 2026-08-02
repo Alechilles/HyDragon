@@ -14,10 +14,10 @@
   "TimeToLive": 6,
   "DeadTimeMiss": 0,
   "DeathParticles": {
-    "SystemId": "Effect_Poison"
+    "SystemId": "HyDragon_Hydra_Toxic_Cloud"
   },
   "MissParticles": {
-    "SystemId": "Effect_Poison"
+    "SystemId": "HyDragon_Hydra_Toxic_Cloud"
   },
   "ImpactSlowdown": 0,
   "VerticalCenterShot": 0,

@@ -314,12 +314,27 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
+    void toxicLingeringCloudsExpireAndApplyPoison() throws Exception {
+        JsonObject cloud = json("Server/Particles/HyDragon/Hydra/HyDragon_Hydra_Toxic_Cloud.particlesystem");
+        assertEquals("Effect_Poison", cloud.get("Parent").getAsString());
+        assertEquals(30.0, cloud.get("LifeSpan").getAsDouble());
+
+        JsonObject direct = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Ball_Launch.json");
+        assertLingeringHazard(direct, 3.0, "hydragon.toxic_hydra_hazard");
+
+        JsonObject rain = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Toxic_Launch.json");
+        assertLingeringHazard(rain, 4.0, "hydragon.rain_toxic_hazard");
+    }
+
+    @Test
     void toxicLeavesUsePoisonT1AndCanonicalPoisonPresentation() throws Exception {
         JsonObject direct = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Ball_Launch.json");
         JsonObject expectedDirect = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Ice_Ball_Launch.json")
                 .deepCopy();
         replaceLaunchPresentation(expectedDirect, "Hydra_Toxic_Ball");
         expectedDirect.getAsJsonObject("ImpactEffect").addProperty("EffectId", "Poison_T1");
+        expectedDirect.add("LingeringHazard", lingeringHazard(
+                3.0, "hydragon.toxic_hydra_hazard"));
         assertEquals(expectedDirect, direct);
         assertEquals("Poison_T1", direct.getAsJsonObject("ImpactEffect").get("EffectId").getAsString());
         assertEquals(3.0, direct.getAsJsonObject("ImpactEffect").get("Radius").getAsDouble());
@@ -330,6 +345,7 @@ class ToxicHydraVariantAssetTest {
                 .deepCopy();
         replaceLaunchPresentation(expectedRain, "Hydra_Rain_Toxic_Ball");
         JsonObject expectedToxicHazard = expectedRain.getAsJsonObject("LingeringHazard");
+        expectedToxicHazard.addProperty("DurationSeconds", 30.0);
         expectedToxicHazard.addProperty("EffectId", "Poison_T1");
         expectedToxicHazard.addProperty("SourceTypeId", "hydragon.rain_toxic_hazard");
         assertEquals(expectedRain, rain);
@@ -534,8 +550,8 @@ class ToxicHydraVariantAssetTest {
     private static void assertProjectilePresentation(JsonObject projectile, boolean rain) {
         assertEquals("Hydra_Toxic_Ball_Projectile", projectile.get("Appearance").getAsString());
         JsonObject effectPoison = JsonParser.parseString(rain
-                ? "{\"SystemId\":\"Effect_Poison\",\"Scale\":2.0}"
-                : "{\"SystemId\":\"Effect_Poison\"}").getAsJsonObject();
+                ? "{\"SystemId\":\"HyDragon_Hydra_Toxic_Cloud\",\"Scale\":2.0}"
+                : "{\"SystemId\":\"HyDragon_Hydra_Toxic_Cloud\"}").getAsJsonObject();
         JsonObject impactPoison = JsonParser.parseString(rain
                 ? "{\"SystemId\":\"Impact_Poison\",\"Scale\":2.0}"
                 : "{\"SystemId\":\"Impact_Poison\"}").getAsJsonObject();
@@ -543,6 +559,16 @@ class ToxicHydraVariantAssetTest {
         assertEquals(effectPoison, projectile.getAsJsonObject("MissParticles"));
         assertEquals(impactPoison, projectile.getAsJsonObject("HitParticles"));
         assertEquals("SFX_Scarak_Seeker_Spitball_Death", projectile.get("DeathSoundEventId").getAsString());
+    }
+
+    private static JsonObject lingeringHazard(double radius, String sourceTypeId) {
+        return JsonParser.parseString("""
+                {"Radius":%s,"DurationSeconds":30.0,"TickIntervalSeconds":1.0,"DamagePerTick":5.0,"ExcludeSource":true,"EffectId":"Poison_T1","SourceTypeId":"%s"}
+                """.formatted(radius, sourceTypeId)).getAsJsonObject();
+    }
+
+    private static void assertLingeringHazard(JsonObject launch, double radius, String sourceTypeId) {
+        assertEquals(lingeringHazard(radius, sourceTypeId), launch.getAsJsonObject("LingeringHazard"));
     }
 
     private static void replaceLaunchPresentation(JsonObject launch, String projectileId) {

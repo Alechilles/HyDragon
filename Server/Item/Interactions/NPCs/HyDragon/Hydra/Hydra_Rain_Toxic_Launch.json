@@ -11,7 +11,7 @@
   "RandomAroundSourceVerticalOffset": 0.0,
   "LingeringHazard": {
     "Radius": 4.0,
-    "DurationSeconds": 6.0,
+    "DurationSeconds": 30.0,
     "TickIntervalSeconds": 1.0,
     "DamagePerTick": 5.0,
     "ExcludeSource": true,
