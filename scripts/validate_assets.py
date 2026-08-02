@@ -1237,6 +1237,35 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
         fail(errors, "Dragon Horn must disable inherited generic link/toggle behavior")
     if "CommandFamilyId" in config or "ProjectRosterToItemMetadata" in config:
         fail(errors, "Dragon Horn must not retain generic owner-family projection settings")
+    expected_feedback = {
+        "Follow": "SFX_HyDragon_Dragon_Flute_SE_01",
+        "Hold": "SFX_HyDragon_Dragon_Flute_SE_09",
+        "Recall": "SFX_HyDragon_Dragon_Flute_SE_17",
+        "MoveToPing": "SFX_HyDragon_Dragon_Flute_SE_04",
+        "Defend": "SFX_HyDragon_Dragon_Flute_SE_11",
+        "AttackTarget": "SFX_HyDragon_Dragon_Flute_SE_07",
+        "Idle": "SFX_HyDragon_Dragon_Flute_SE_02",
+        "ToggleAirborneMode": "SFX_HyDragon_Dragon_Flute_SE_05",
+    }
+    commands = {
+        command.get("Id"): command
+        for command in config.get("CommandList", [])
+        if isinstance(command, dict)
+    }
+    for command_id, sound_event in expected_feedback.items():
+        feedback = commands.get(command_id, {}).get("Feedback")
+        if not isinstance(feedback, dict) or feedback.get("SoundEvent") != sound_event \
+                or "ParticleSystem" in feedback:
+            fail(errors, f"Dragon Horn {command_id} must use its flute sound without particles")
+            continue
+        suffix = sound_event.removeprefix("SFX_HyDragon_Dragon_Flute_")
+        sound_path = f"Sounds/Items/HyDragon/DragonFlute/HyDragon_Dragon_Flute_{suffix}.ogg"
+        event_path = ROOT / "Server/Audio/SoundEvents/SFX/Items/HyDragon/DragonFlute" / f"{sound_event}.json"
+        event = parsed.get(event_path)
+        if not isinstance(event, dict) or event.get("Layers", [{}])[0].get("Files") != [sound_path]:
+            fail(errors, f"Dragon Horn {command_id} flute sound event is missing or malformed")
+        if not (ROOT / "Common" / sound_path).is_file():
+            fail(errors, f"Dragon Horn {command_id} flute audio file is missing")
     allowed = config.get("AllowedRoles")
     required_roles = {
         "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_NordicDrake", "Tamed_RockDrakeT1",

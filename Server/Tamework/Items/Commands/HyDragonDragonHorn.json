@@ -34,8 +34,7 @@
       "Default": true,
       "Feedback": {
         "HudMessage": "tamework.commands.follow.hud",
-        "SoundEvent": "SFX_Creative_Play_Selection_Widget",
-        "ParticleSystem": "Follow"
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_01"
       },
       "Steps": [
         { "Type": "ClearTarget", "TargetSlot": "LockedTarget" },
@@ -48,8 +47,7 @@
       "DisplayName": "tamework.commands.hold.name",
       "Feedback": {
         "HudMessage": "tamework.commands.hold.hud",
-        "SoundEvent": "SFX_Creative_Play_Selection_Widget",
-        "ParticleSystem": "Hold"
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_09"
       },
       "Steps": [
         { "Type": "ClearTarget", "TargetSlot": "LockedTarget" },
@@ -61,8 +59,7 @@
       "DisplayName": "tamework.commands.recall.name",
       "Feedback": {
         "HudMessage": "tamework.commands.recall.hud",
-        "SoundEvent": "SFX_Creative_Play_Selection_Widget",
-        "ParticleSystem": "Poof_Small"
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_17"
       },
       "Steps": [
         {
@@ -78,8 +75,7 @@
       "DisplayName": "tamework.commands.moveToPing.name",
       "Feedback": {
         "HudMessage": "tamework.commands.moveToPing.hud",
-        "SoundEvent": "SFX_Creative_Play_Selection_Widget",
-        "ParticleSystem": "Alerted"
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_04"
       },
       "Steps": [
         { "Type": "MoveToPosition", "Source": "RaycastHit" }
@@ -90,8 +86,7 @@
       "DisplayName": "hydragon.commands.defend.name",
       "Feedback": {
         "HudMessage": "hydragon.commands.defend.hud",
-        "SoundEvent": "SFX_Creative_Play_Selection_Widget",
-        "ParticleSystem": "Defend"
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_11"
       },
       "Steps": [
         { "Type": "ClearTarget", "TargetSlot": "LockedTarget" },
@@ -104,8 +99,7 @@
       "DisplayName": "tamework.commands.attackTarget.name",
       "Feedback": {
         "HudMessage": "tamework.commands.attackTarget.hud",
-        "SoundEvent": "SFX_Creative_Play_Selection_Widget",
-        "ParticleSystem": "Defend"
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_07"
       },
       "Steps": [
         {
@@ -122,8 +116,7 @@
       "DisplayName": "tamework.commands.idle.name",
       "Feedback": {
         "HudMessage": "tamework.commands.idle.hud",
-        "SoundEvent": "SFX_Creative_Play_Selection_Widget",
-        "ParticleSystem": "Idle"
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_02"
       },
       "Steps": [
         { "Type": "ClearTarget", "TargetSlot": "LockedTarget" },
@@ -135,8 +128,7 @@
       "DisplayName": "hydragon.commands.toggleAirborneMode.name",
       "Feedback": {
         "HudMessage": "hydragon.commands.toggleAirborneMode.hud",
-        "SoundEvent": "SFX_Creative_Play_Selection_Widget",
-        "ParticleSystem": "Alerted"
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_05"
       },
       "Steps": [
         { "Type": "TriggerHook", "HookId": "HyDragon.Command.ToggleAirborneMode" }

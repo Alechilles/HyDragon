@@ -23,6 +23,15 @@ final class DragonHornLocomotionAssetContractTest {
     private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
     private static final List<String> COMMAND_IDS = List.of(
             "Follow", "Hold", "Recall", "MoveToPing", "Defend", "AttackTarget", "Idle", "ToggleAirborneMode");
+    private static final Map<String, String> HORN_COMMAND_SOUNDS = Map.of(
+            "Follow", "SFX_HyDragon_Dragon_Flute_SE_01",
+            "Hold", "SFX_HyDragon_Dragon_Flute_SE_09",
+            "Recall", "SFX_HyDragon_Dragon_Flute_SE_17",
+            "MoveToPing", "SFX_HyDragon_Dragon_Flute_SE_04",
+            "Defend", "SFX_HyDragon_Dragon_Flute_SE_11",
+            "AttackTarget", "SFX_HyDragon_Dragon_Flute_SE_07",
+            "Idle", "SFX_HyDragon_Dragon_Flute_SE_02",
+            "ToggleAirborneMode", "SFX_HyDragon_Dragon_Flute_SE_05");
     private static final Set<String> HORN_COMMAND_LANGUAGE_KEYS = Set.of(
             "hydragon.commands.defend.name",
             "hydragon.commands.defend.hud",
@@ -60,6 +69,8 @@ final class DragonHornLocomotionAssetContractTest {
                 .toList());
         assertFalse(commandIds(commands).contains("SetHome"));
         assertFalse(commandIds(commands).contains("ReturnHome"));
+        assertHornCommandFeedback(commands);
+        assertHornSoundAssets();
 
         JsonObject follow = command(commands, "Follow");
         assertTrue(follow.get("Default").getAsBoolean());
@@ -1005,6 +1016,28 @@ final class DragonHornLocomotionAssetContractTest {
                 .filter(command -> id.equals(command.get("Id").getAsString()))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("missing command " + id));
+    }
+
+    private static void assertHornCommandFeedback(JsonArray commands) {
+        for (Map.Entry<String, String> expected : HORN_COMMAND_SOUNDS.entrySet()) {
+            JsonObject feedback = command(commands, expected.getKey()).getAsJsonObject("Feedback");
+            assertEquals(expected.getValue(), feedback.get("SoundEvent").getAsString(), expected.getKey());
+            assertFalse(feedback.has("ParticleSystem"), expected.getKey() + " must not spawn particles");
+        }
+    }
+
+    private static void assertHornSoundAssets() throws IOException {
+        for (String soundId : HORN_COMMAND_SOUNDS.values()) {
+            String suffix = soundId.substring("SFX_HyDragon_Dragon_Flute_".length());
+            String relativeAudioPath = "Sounds/Items/HyDragon/DragonFlute/HyDragon_Dragon_Flute_" + suffix + ".ogg";
+            String eventRelativePath = "Server/Audio/SoundEvents/SFX/Items/HyDragon/DragonFlute/" + soundId + ".json";
+            JsonObject event = readJson(eventRelativePath);
+            assertEquals(relativeAudioPath,
+                    event.getAsJsonArray("Layers").get(0).getAsJsonObject()
+                            .getAsJsonArray("Files").get(0).getAsString(),
+                    soundId);
+            assertTrue(Files.isRegularFile(ROOT.resolve("Common").resolve(relativeAudioPath)), soundId);
+        }
     }
 
     private static List<String> roleIds(JsonObject config) {
