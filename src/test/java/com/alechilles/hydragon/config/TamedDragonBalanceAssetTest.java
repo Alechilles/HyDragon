@@ -110,6 +110,7 @@ final class TamedDragonBalanceAssetTest {
 
         assertTimerTalentCap("HyDragonNordicDrake.json");
         assertTimerTalentCap("HyDragonHydra.json");
+        assertTimerTalentCap("HyDragonRockDrake.json");
     }
 
     private static void assertProjectile(String relativePath, int damage, int explosionDamage) throws IOException {

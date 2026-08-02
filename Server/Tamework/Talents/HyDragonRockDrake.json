@@ -1,0 +1,47 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": ["Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"],
+  "Talents": [
+    {
+      "Id": "RockDrake_CrushingJaws", "DisplayName": "hydragon.talents.rock_drake.crushing_jaws.name", "Description": "hydragon.talents.rock_drake.crushing_jaws.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 1, "Branch": "hydragon.talents.rock_drake.branch.cragfighter", "PointCost": 1, "MinLevel": 1,
+      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.025 }]
+    },
+    {
+      "Id": "RockDrake_TectonicMomentum", "DisplayName": "hydragon.talents.rock_drake.tectonic_momentum.name", "Description": "hydragon.talents.rock_drake.tectonic_momentum.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 2, "Branch": "hydragon.talents.rock_drake.branch.cragfighter", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["RockDrake_CrushingJaws"],
+      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04 }]
+    },
+    {
+      "Id": "RockDrake_GraniteHide", "DisplayName": "hydragon.talents.rock_drake.granite_hide.name", "Description": "hydragon.talents.rock_drake.granite_hide.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png", "Tier": 1, "Branch": "hydragon.talents.rock_drake.branch.stonehide", "PointCost": 1, "MinLevel": 1,
+      "Effects": [{ "EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04 }]
+    },
+    {
+      "Id": "RockDrake_FortressScales", "DisplayName": "hydragon.talents.rock_drake.fortress_scales.name", "Description": "hydragon.talents.rock_drake.fortress_scales.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png", "Tier": 2, "Branch": "hydragon.talents.rock_drake.branch.stonehide", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["RockDrake_GraniteHide"],
+      "Effects": [{ "EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667 }]
+    },
+    {
+      "Id": "RockDrake_EnduringStride", "DisplayName": "hydragon.talents.rock_drake.enduring_stride.name", "Description": "hydragon.talents.rock_drake.enduring_stride.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png", "Tier": 1, "Branch": "hydragon.talents.rock_drake.branch.surefooted", "PointCost": 1, "MinLevel": 1,
+      "Effects": [{ "EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04 }]
+    },
+    {
+      "Id": "RockDrake_DeepStoneFocus", "DisplayName": "hydragon.talents.rock_drake.deep_stone_focus.name", "Description": "hydragon.talents.rock_drake.deep_stone_focus.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 2, "Branch": "hydragon.talents.rock_drake.branch.surefooted", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["RockDrake_EnduringStride"],
+      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.03 }]
+    },
+    {
+      "Id": "RockDrake_DragonboundPact", "DisplayName": "hydragon.talents.rock_drake.dragonbound_pact.name", "Description": "hydragon.talents.rock_drake.dragonbound_pact.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png", "Tier": 1, "Branch": "hydragon.talents.rock_drake.branch.summoners_pact", "PointCost": 1, "MinLevel": 1,
+      "Effects": [{ "EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.25 }]
+    },
+    {
+      "Id": "RockDrake_SwiftRecall", "DisplayName": "hydragon.talents.rock_drake.swift_recall.name", "Description": "hydragon.talents.rock_drake.swift_recall.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png", "Tier": 2, "Branch": "hydragon.talents.rock_drake.branch.summoners_pact", "PointCost": 2, "MinLevel": 8, "RequiresTalentIds": ["RockDrake_DragonboundPact"],
+      "Effects": [{ "EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.8 }]
+    },
+    {
+      "Id": "RockDrake_EternalWings", "DisplayName": "hydragon.talents.rock_drake.eternal_wings.name", "Description": "hydragon.talents.rock_drake.eternal_wings.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png", "Tier": 3, "Branch": "hydragon.talents.rock_drake.branch.summoners_pact", "PointCost": 3, "MinLevel": 16, "RequiresTalentIds": ["RockDrake_SwiftRecall"],
+      "Effects": [{ "EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.6 }]
+    },
+    {
+      "Id": "RockDrake_HornmastersCall", "DisplayName": "hydragon.talents.rock_drake.hornmasters_call.name", "Description": "hydragon.talents.rock_drake.hornmasters_call.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png", "Tier": 4, "Branch": "hydragon.talents.rock_drake.branch.summoners_pact", "PointCost": 4, "MinLevel": 24, "RequiresTalentIds": ["RockDrake_EternalWings"],
+      "Effects": [{ "EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.625 }]
+    }
+  ]
+}
