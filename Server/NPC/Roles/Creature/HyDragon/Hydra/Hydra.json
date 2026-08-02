@@ -43,7 +43,7 @@
     "LeashMinPlayerDistance": 15,
     "LeashTimer": [12, 16],
     "WakingPeriod": [0, 24],
-    "MaxHealth": 800,
+    "MaxHealth": 650,
     "IsTameable": true,
     "TameRoleChange": {
       "Compute": "TameRoleChange"

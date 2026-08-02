@@ -41,7 +41,7 @@
       12,
       16
     ],
-    "MaxHealth": 320,
+    "MaxHealth": 300,
     "AttractiveItemSet": [],
     "CanFollow": true,
     "CanHold": true,
@@ -77,7 +77,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 32
+                "Physical": 68
               },
               "RandomPercentageModifier": 0.1
             }
@@ -91,7 +91,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 32
+                "Physical": 68
               },
               "RandomPercentageModifier": 0.1
             }
@@ -105,7 +105,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 32
+                "Physical": 68
               },
               "RandomPercentageModifier": 0.1
             }
@@ -122,8 +122,7 @@
       "Hydra_Ball_Launch": {
         "Interactions": [
           {
-            "Parent": "Hydra_Ice_Ball_Launch",
-            "ProjectileId": "Tamed_Hydra_Ice_Ball"
+            "Parent": "Hydra_Ice_Ball_Launch"
           }
         ]
       },
@@ -137,45 +136,7 @@
       "Hydra_Rain_Launch": {
         "Interactions": [
           {
-            "Parent": "Hydra_Rain_Ice_Launch",
-            "ProjectileId": "Tamed_Hydra_Rain_Ice_Ball",
-            "LingeringHazard": {
-              "Radius": 3.0,
-              "DurationSeconds": 3.0,
-              "TickIntervalSeconds": 1.0,
-              "DamagePerTick": 3.0,
-              "ExcludeSource": true,
-              "EffectId": "Chilled",
-              "SourceTypeId": "hydragon.tamed_hydra_rain_ice_hazard"
-            }
-          }
-        ]
-      },
-      "Bite_Damage": {
-        "Interactions": [
-          {
-            "Parent": "Hydra_Bite_Damage",
-            "DamageCalculator": {
-              "Type": "Absolute",
-              "BaseDamage": {
-                "Physical": 32
-              },
-              "RandomPercentageModifier": 0.1
-            }
-          }
-        ]
-      },
-      "Tail_Spin_Damage": {
-        "Interactions": [
-          {
-            "Parent": "Hydra_Tail_Spin_Damage",
-            "DamageCalculator": {
-              "Type": "Absolute",
-              "BaseDamage": {
-                "Physical": 32
-              },
-              "RandomPercentageModifier": 0.1
-            }
+            "Parent": "Hydra_Rain_Ice_Launch"
           }
         ]
       }
