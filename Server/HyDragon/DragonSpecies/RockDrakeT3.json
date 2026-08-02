@@ -19,7 +19,7 @@
     "PluginEncounterIds": []
   },
   "Presentation": {
-    "LocalizationPrefix": "server.npcRoles.RockDrakeT3",
+    "LocalizationPrefix": "server.npcRoles.RockDrakeT3.name",
     "ModelIds": [ "RockDrakeT3" ]
   }
 }

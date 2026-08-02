@@ -43,7 +43,6 @@
     ],
     "MaxHealth": 400,
     "AttractiveItemSet": [],
-    "NeedsSeekConsumeAnimation": "",
     "CanFollow": true,
     "CanHold": true,
     "CanDefend": true,

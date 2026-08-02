@@ -90,6 +90,9 @@ effects.miniwyvernFireAura.name=Aura de Fuego
 effects.miniwyvernIceAura.name=Aura de Hielo
 effects.miniwyvernToxicAura.name=Aura Tóxica
 effects.miniwyvernVoidAura.name=Aura del Vacío
+effects.miniwyvernToxicWeakness.name=Debilidad tóxica
+
+items.HyDragon_Journal.name=Diario de HyDragon
 
 messages.capture.miniwyvernDenied=Los Miniwyvern solo pueden crearse mediante un Vínculo de Alma Dracónico.
 messages.capture.tranquilizerRequired=Primero hay que tranquilizar al dragón.

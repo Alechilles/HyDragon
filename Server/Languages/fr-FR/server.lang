@@ -90,6 +90,9 @@ effects.miniwyvernFireAura.name=Aura de Feu
 effects.miniwyvernIceAura.name=Aura de Glace
 effects.miniwyvernToxicAura.name=Aura Toxique
 effects.miniwyvernVoidAura.name=Aura du Néant
+effects.miniwyvernToxicWeakness.name=Faiblesse toxique
+
+items.HyDragon_Journal.name=Journal HyDragon
 
 messages.capture.miniwyvernDenied=Les Miniwyvernes ne peuvent être créés qu'avec un Lien d'Âme Draconique.
 messages.capture.tranquilizerRequired=Le dragon doit d'abord être tranquillisé.

@@ -22,7 +22,7 @@
     "PluginEncounterIds": []
   },
   "Presentation": {
-    "LocalizationPrefix": "server.npcRoles.Hydra",
+    "LocalizationPrefix": "server.npcRoles.Hydra.name",
     "ModelIds": [ "Hydra", "Hydra_Toxic" ]
   }
 }

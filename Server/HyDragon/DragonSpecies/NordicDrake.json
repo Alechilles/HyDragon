@@ -16,7 +16,7 @@
     "PluginEncounterIds": [ "hydragon:nordic_drake_high_altitude" ]
   },
   "Presentation": {
-    "LocalizationPrefix": "server.npcRoles.NordicDrake",
+    "LocalizationPrefix": "server.npcRoles.NordicDrake.name",
     "ModelIds": [ "NordicDrake", "NordicDrake_AvatarFlight" ]
   }
 }

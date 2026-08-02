@@ -20,13 +20,11 @@
     "CombatRelativeTurnSpeed": 1.5,
     "MaxHealth": 80,
     "IsTameable": false,
-    "TameRoleChange": "",
     "AttractiveItemSet": [
       "Food_Wildmeat_Raw",
       "Food_Chicken_Raw",
       "Food_Fish_Raw"
     ],
-    "InteractionConfigId": "",
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"
     }

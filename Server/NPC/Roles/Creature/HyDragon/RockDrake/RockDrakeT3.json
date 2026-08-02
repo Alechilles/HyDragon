@@ -57,7 +57,6 @@
       0,
       0.01
     ],
-    "BedBlockSet": "",
     "ConfusedTimeRange": [
       0.5,
       1
@@ -71,7 +70,6 @@
     "AttractiveItemSet": [],
     "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
     "TranquilizerSleepThresholdSeconds": 50,
-    "InteractionConfigId": "",
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
     "MemoriesNameOverride": "Frost Rock Drake",

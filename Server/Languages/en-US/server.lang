@@ -90,6 +90,9 @@ effects.miniwyvernFireAura.name=Fire Aura
 effects.miniwyvernIceAura.name=Ice Aura
 effects.miniwyvernToxicAura.name=Toxic Aura
 effects.miniwyvernVoidAura.name=Void Aura
+effects.miniwyvernToxicWeakness.name=Toxic Weakness
+
+items.HyDragon_Journal.name=HyDragon Journal
 
 messages.capture.miniwyvernDenied=Miniwyverns can only be created through a Draconic Soul Bond.
 messages.capture.tranquilizerRequired=The dragon must be tranquilized first.
