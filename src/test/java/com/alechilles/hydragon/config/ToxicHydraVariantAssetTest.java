@@ -39,6 +39,33 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
+    void hydraMeleeSelectorTuningIsSharedByIceAndToxicHydras() throws Exception {
+        assertSelector("Hydra_Bite", Map.of(
+                "ExtendTop", 1.6,
+                "ExtendBottom", 1.6,
+                "StartDistance", 3.12,
+                "EndDistance", 5.76));
+        assertSelector("Hydra_Swipe_Left", Map.of(
+                "ExtendTop", 2.0,
+                "ExtendBottom", 2.0,
+                "StartDistance", 4.14,
+                "EndDistance", 6.21));
+        assertSelector("Hydra_Swipe_Right", Map.of(
+                "ExtendTop", 2.0,
+                "ExtendBottom", 2.0,
+                "StartDistance", 4.14,
+                "EndDistance", 6.35));
+
+        for (String role : List.of("Hydra_Toxic", "Tamed_Hydra_Toxic")) {
+            JsonObject variables = toxicRole(role).getAsJsonObject("Modify")
+                    .getAsJsonObject("_InteractionVars");
+            assertEquals("Hydra_Bite_Damage", interactionParent(variables, "Bite_Damage"));
+            assertEquals("Hydra_Swipe_Left_Damage", interactionParent(variables, "Swipe_Left_Damage"));
+            assertEquals("Hydra_Swipe_Right_Damage", interactionParent(variables, "Swipe_Right_Damage"));
+        }
+    }
+
+    @Test
     void toxicRoleContractRejectsUnexpectedNameAndRangedInteractionFields() throws Exception {
         JsonObject wrongNameCompute = toxicRole("Hydra_Toxic");
         wrongNameCompute.getAsJsonObject("Modify").getAsJsonObject("NameTranslationKey")
@@ -970,6 +997,22 @@ class ToxicHydraVariantAssetTest {
         assertEquals(JsonParser.parseString(expectedValue), declaration.get("Value"));
         assertEquals(JsonParser.parseString("{\"Compute\":\"" + parameter + "\"}"),
                 root.getAsJsonObject("Modify").get(parameter));
+    }
+
+    private static void assertSelector(String interactionId, Map<String, Double> expected)
+            throws IOException {
+        JsonObject interaction = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/"
+                + interactionId + ".json");
+        JsonObject selector = interaction.getAsJsonObject("Next").getAsJsonArray("Interactions")
+                .get(0).getAsJsonObject().getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                .getAsJsonObject("Selector");
+        expected.forEach((property, value) ->
+                assertEquals(value, selector.get(property).getAsDouble(), interactionId + " " + property));
+    }
+
+    private static String interactionParent(JsonObject variables, String variable) {
+        return variables.getAsJsonObject(variable).getAsJsonArray("Interactions")
+                .get(0).getAsJsonObject().get("Parent").getAsString();
     }
 
     private static void assertVariableLeaf(JsonObject vars, String variable, String leaf) {

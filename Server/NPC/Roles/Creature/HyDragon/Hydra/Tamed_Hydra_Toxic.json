@@ -1,15 +1,72 @@
 {
   "Type": "Variant",
-  "Reference": "Tamed_Hydra",
+  "Reference": "Template_HyDragon_Dragon_Tamed",
   "Modify": {
     "Appearance": "Hydra_Toxic",
+    "Weapons": [],
     "FlockArray": ["Tamed_Hydra_Toxic"],
+    "AttitudeGroup": "PredatorsBig",
+    "WanderRadius": 8,
+    "ViewRange": 36,
+    "HearingRange": 24,
+    "DropList": "Empty",
+    "MaxSpeed": 7,
+    "Attack": "Root_NPC_Hydra_Attack",
+    "AttackDistance": 5,
+    "AttackPauseRange": [3, 4],
+    "CombatAttackPostDelay": [0.7, 0.7],
+    "TargetRange": 12,
+    "CombatBehaviorDistance": 19,
+    "CombatAlwaysMovingWeight": 10,
+    "RunThreshold": 0.3,
+    "KnockbackScale": 0.1,
+    "ClimbHeight": 2,
+    "MinJumpHeight": 1.5,
+    "AscentAnimationType": "Walk",
+    "ClimbSpeedMult": 1,
+    "ClimbSpeedPow": 1,
+    "ClimbSpeedConst": 5,
+    "DescendSpeedCompensation": 1,
+    "DescendFlatness": 0.9,
+    "DescentSteepness": 0.9,
+    "DescentBlending": 1.5,
+    "LeashDistance": 60,
+    "HardLeashDistance": 100,
+    "LeashMinPlayerDistance": 15,
+    "LeashTimer": [12, 16],
+    "MaxHealth": 300,
+    "AttractiveItemSet": [],
+    "InteractionConfigId": "HyDragonIntBeast",
+    "CanFollow": true,
+    "CanHold": true,
+    "CanDefend": true,
+    "CanAggressive": true,
+    "CanAttackTarget": true,
+    "CanMoveToLocation": true,
+    "CanReturnHome": true,
+    "CanRecall": true,
+    "CanSetHome": true,
+    "IsMountable": true,
+    "MountAnchorX": 0,
+    "MountAnchorY": 2.5,
+    "MountAnchorZ": 0,
+    "MountMode": "TameworkAvatarFlight",
+    "AvatarFlightConfig": "HyDragonToxicHydra",
+    "CanBreedPair": true,
+    "IsMemory": true,
+    "MemoriesCategory": "Reptile",
     "MemoriesNameOverride": "Toxic Hydra",
+    "BreathesInWater": false,
     "_InteractionVars": {
       "Bite_Damage": {
         "Interactions": [
           {
             "Parent": "Hydra_Bite_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {"Physical": 32},
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -22,6 +79,11 @@
         "Interactions": [
           {
             "Parent": "Hydra_Swipe_Left_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {"Physical": 32},
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -34,6 +96,11 @@
         "Interactions": [
           {
             "Parent": "Hydra_Swipe_Right_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {"Physical": 32},
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -46,6 +113,11 @@
         "Interactions": [
           {
             "Parent": "Hydra_Stomp_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {"Physical": 32},
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -58,6 +130,11 @@
         "Interactions": [
           {
             "Parent": "Hydra_Tail_Spin_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {"Physical": 32},
+              "RandomPercentageModifier": 0.1
+            },
             "Next": {
               "Type": "ApplyEffect",
               "EffectId": "Poison_T1",
@@ -76,7 +153,17 @@
       "Hydra_Ball_Launch": {
         "Interactions": [
           {
-            "Parent": "Hydra_Toxic_Ball_Launch"
+            "Parent": "Hydra_Toxic_Ball_Launch",
+            "ProjectileId": "Tamed_Hydra_Toxic_Ball",
+            "LingeringHazard": {
+              "Radius": 2.0,
+              "DurationSeconds": 8.0,
+              "TickIntervalSeconds": 1.0,
+              "DamagePerTick": 2.0,
+              "ExcludeSource": true,
+              "EffectId": "Poison_T1",
+              "SourceTypeId": "hydragon.tamed_toxic_hydra_hazard"
+            }
           }
         ]
       },
@@ -90,7 +177,17 @@
       "Hydra_Rain_Launch": {
         "Interactions": [
           {
-            "Parent": "Hydra_Rain_Toxic_Launch"
+            "Parent": "Hydra_Rain_Toxic_Launch",
+            "ProjectileId": "Tamed_Hydra_Rain_Toxic_Ball",
+            "LingeringHazard": {
+              "Radius": 3.0,
+              "DurationSeconds": 8.0,
+              "TickIntervalSeconds": 1.0,
+              "DamagePerTick": 2.0,
+              "ExcludeSource": true,
+              "EffectId": "Poison_T1",
+              "SourceTypeId": "hydragon.tamed_toxic_hydra_rain_hazard"
+            }
           }
         ]
       }
@@ -98,7 +195,7 @@
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"
     },
-    "MaxHealth": 300
+    "UseToxicHydraTamedCombat": true
   },
   "Parameters": {
     "NameTranslationKey": {
