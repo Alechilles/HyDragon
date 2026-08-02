@@ -149,6 +149,58 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
+    void toxicWildCombatEvaluatorSuppliesToxicVarsAtEveryAttackEntryPoint() throws Exception {
+        JsonObject toxicRole = toxicRole("Hydra_Toxic");
+        assertEquals("CAE_Hydra_Toxic", toxicRole.getAsJsonObject("Modify")
+                .get("_CombatConfig").getAsString());
+
+        JsonObject toxicConfig = json("Server/NPC/Balancing/CAE_Hydra_Toxic.json");
+        JsonObject evaluator = toxicConfig.getAsJsonObject("CombatActionEvaluator");
+        JsonObject actions = evaluator.getAsJsonObject("AvailableActions");
+
+        JsonObject meleeVars = actions.getAsJsonObject("MeleeAttack")
+                .getAsJsonObject("InteractionVars");
+        assertPoisonMelee(meleeVars, "Swipe_Left_Damage", "Hydra_Swipe_Left_Damage");
+        assertPoisonMelee(meleeVars, "Swipe_Right_Damage", "Hydra_Swipe_Right_Damage");
+        assertPoisonMelee(meleeVars, "Stomp_Damage", "Hydra_Stomp_Damage");
+        assertPoisonMelee(actions.getAsJsonObject("BiteAttack").getAsJsonObject("InteractionVars"),
+                "Bite_Damage", "Hydra_Bite_Damage");
+        assertPoisonMelee(actions.getAsJsonObject("TailSpinAttack").getAsJsonObject("InteractionVars"),
+                "Tail_Spin_Damage", "Hydra_Tail_Spin_Damage");
+
+        JsonObject rainVars = actions.getAsJsonObject("RainShootAttack")
+                .getAsJsonObject("InteractionVars");
+        assertVariableLeaf(rainVars, "Hydra_Rain_Charge_Effect", "Hydra_Rain_Toxic_Charge_Effect");
+        assertVariableLeaf(rainVars, "Hydra_Rain_Launch", "Hydra_Rain_Toxic_Launch");
+
+        JsonObject actionSets = evaluator.getAsJsonObject("ActionSets");
+        JsonObject defaultVars = actionSets.getAsJsonObject("Default")
+                .getAsJsonObject("BasicAttacks").getAsJsonObject("InteractionVars");
+        assertPoisonMelee(defaultVars, "Swipe_Left_Damage", "Hydra_Swipe_Left_Damage");
+        assertPoisonMelee(defaultVars, "Swipe_Right_Damage", "Hydra_Swipe_Right_Damage");
+        assertPoisonMelee(defaultVars, "Stomp_Damage", "Hydra_Stomp_Damage");
+
+        JsonObject rangedVars = actionSets.getAsJsonObject("Ranged")
+                .getAsJsonObject("BasicAttacks").getAsJsonObject("InteractionVars");
+        assertVariableLeaf(rangedVars, "Hydra_Ball_Charge_Effect", "Hydra_Toxic_Ball_Charge_Effect");
+        assertVariableLeaf(rangedVars, "Hydra_Ball_Launch", "Hydra_Toxic_Ball_Launch");
+
+        JsonObject behaviorParity = toxicConfig.deepCopy();
+        JsonObject parityEvaluator = behaviorParity.getAsJsonObject("CombatActionEvaluator");
+        JsonObject parityActions = parityEvaluator.getAsJsonObject("AvailableActions");
+        for (String action : List.of("MeleeAttack", "BiteAttack", "TailSpinAttack", "RainShootAttack")) {
+            parityActions.getAsJsonObject(action).remove("InteractionVars");
+        }
+        JsonObject paritySets = parityEvaluator.getAsJsonObject("ActionSets");
+        paritySets.getAsJsonObject("Default").getAsJsonObject("BasicAttacks")
+                .remove("InteractionVars");
+        paritySets.getAsJsonObject("Ranged").getAsJsonObject("BasicAttacks")
+                .remove("InteractionVars");
+        assertEquals(json("Server/NPC/Balancing/CAE_Hydra.json"), behaviorParity,
+                "Toxic evaluator must preserve Ice Hydra combat behavior");
+    }
+
+    @Test
     void iceLeafInteractionsRetainExistingProjectileBehavior() throws Exception {
         assertLeaf("Hydra_Ice_Ball_Charge_Effect.json", """
                 {"Type":"Simple","Effects":{"ItemPlayerAnimationsId":"Hydra_Default","ItemAnimationId":"ChargeShoot","Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Hydra_Ice_Ball_Charging","PositionOffset":{"Z":0}}]}}
@@ -341,7 +393,8 @@ class ToxicHydraVariantAssetTest {
         JsonObject modify = root.getAsJsonObject("Modify");
         Set<String> expectedModifyKeys = tameRoleChange == null
                 ? Set.of("Appearance", "FlockArray", "MemoriesNameOverride", "_InteractionVars", "NameTranslationKey")
-                : Set.of("Appearance", "TameRoleChange", "FlockArray", "MemoriesNameOverride", "_InteractionVars", "NameTranslationKey");
+                : Set.of("Appearance", "TameRoleChange", "FlockArray", "MemoriesNameOverride",
+                        "_CombatConfig", "_InteractionVars", "NameTranslationKey");
         assertEquals(expectedModifyKeys, modify.keySet());
         assertEquals("Hydra_Toxic", modify.get("Appearance").getAsString());
         assertEquals(List.of(role), strings(modify.getAsJsonArray("FlockArray")));
@@ -351,8 +404,10 @@ class ToxicHydraVariantAssetTest {
                 """).getAsJsonObject(), modify.getAsJsonObject("NameTranslationKey"));
         if (tameRoleChange == null) {
             assertFalse(modify.has("TameRoleChange"));
+            assertFalse(modify.has("_CombatConfig"));
         } else {
             assertEquals(tameRoleChange, modify.get("TameRoleChange").getAsString());
+            assertEquals("CAE_Hydra_Toxic", modify.get("_CombatConfig").getAsString());
         }
 
         JsonObject vars = modify.getAsJsonObject("_InteractionVars");

@@ -6,6 +6,7 @@
     "TameRoleChange": "Tamed_Hydra_Toxic",
     "FlockArray": ["Hydra_Toxic"],
     "MemoriesNameOverride": "Toxic Hydra",
+    "_CombatConfig": "CAE_Hydra_Toxic",
     "_InteractionVars": {
       "Bite_Damage": {
         "Interactions": [
