@@ -1,0 +1,11 @@
+{
+  "Interactions": [
+    "Hydra_Toxic_Avatar_Ball"
+  ],
+  "Tags": {
+    "Attack": [
+      "Ranged"
+    ]
+  },
+  "RequireNewClick": false
+}

@@ -23,6 +23,8 @@ final class NordicDrakeTamedCombatAssetTest {
             "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon_Tamed.json");
     private static final Path TAMED_NORDIC = ROOT.resolve(
             "Server/NPC/Roles/Creature/HyDragon/NordicDrake/Tamed_NordicDrake.json");
+    private static final Path TAMED_TOXIC = ROOT.resolve(
+            "Server/NPC/Roles/Creature/HyDragon/Hydra/Tamed_Hydra_Toxic.json");
     private static final Path COMPONENT = ROOT.resolve("Server/NPC/Roles/Creature/HyDragon/Components/"
             + "Component_HyDragon_Instruction_NordicDrake_Tamed_Combat.json");
     private static final Path ROLES = ROOT.resolve("Server/NPC/Roles/Creature/HyDragon");
@@ -43,6 +45,7 @@ final class NordicDrakeTamedCombatAssetTest {
                 .get("UseNordicDrakeTamedCombat").getAsBoolean());
         assertNordicTakeoverPrecedesGenericDefend(defendInstruction(template));
         assertOnlyNordicRoleOptsIn();
+        assertOnlyToxicRoleOptsIn();
         assertHardLeashRelease(component);
         assertOwnerAndFriendlyRelease(component);
         assertLostTargetRelease(component);
@@ -157,7 +160,7 @@ final class NordicDrakeTamedCombatAssetTest {
 
     private static void assertNordicTakeoverPrecedesGenericDefend(JsonObject defend) {
         JsonArray children = defend.getAsJsonArray("Instructions");
-        assertEquals(3, children.size(), "Defend must retain the Nordic takeover and both generic fallbacks");
+        assertEquals(4, children.size(), "Defend must retain Nordic, Toxic, and both generic fallbacks");
         JsonObject nordic = children.get(0).getAsJsonObject();
         assertFalse(nordic.has("Continue"), "Nordic takeover must block generic Defend fallbacks");
         assertEquals("UseNordicDrakeTamedCombat", string(nordic.getAsJsonObject("Enabled"), "Compute"));
@@ -165,7 +168,14 @@ final class NordicDrakeTamedCombatAssetTest {
         assertEquals("LockedTarget", string(nordic.getAsJsonObject("Sensor"), "TargetSlot"));
         assertTrue(objects(nordic, object -> "Component_HyDragon_Instruction_NordicDrake_Tamed_Combat"
                 .equals(string(object, "Reference"))).size() == 1);
-        assertTrue(children.asList().subList(1, children.size()).stream().map(JsonElement::getAsJsonObject)
+        JsonObject toxic = children.get(1).getAsJsonObject();
+        assertFalse(toxic.has("Continue"), "Toxic takeover must block generic Defend fallbacks");
+        assertEquals("UseToxicHydraTamedCombat", string(toxic.getAsJsonObject("Enabled"), "Compute"));
+        assertEquals("Target", string(toxic.getAsJsonObject("Sensor"), "Type"));
+        assertEquals("LockedTarget", string(toxic.getAsJsonObject("Sensor"), "TargetSlot"));
+        assertTrue(objects(toxic, object -> "Component_HyDragon_Instruction_ToxicHydra_Tamed_Combat"
+                .equals(string(object, "Reference"))).size() == 1);
+        assertTrue(children.asList().subList(2, children.size()).stream().map(JsonElement::getAsJsonObject)
                 .allMatch(NordicDrakeTamedCombatAssetTest::isGenericDefendFallback));
     }
 
@@ -187,6 +197,22 @@ final class NordicDrakeTamedCombatAssetTest {
                         }
                     }).toList();
             assertEquals(List.of(TAMED_NORDIC), optIns);
+        }
+    }
+
+    private static void assertOnlyToxicRoleOptsIn() throws IOException {
+        try (var paths = Files.walk(ROLES)) {
+            List<Path> optIns = paths.filter(path -> path.toString().endsWith(".json"))
+                    .filter(path -> {
+                        try {
+                            JsonObject json = readJson(path);
+                            return json.has("Modify") && json.getAsJsonObject("Modify").has("UseToxicHydraTamedCombat")
+                                    && json.getAsJsonObject("Modify").get("UseToxicHydraTamedCombat").getAsBoolean();
+                        } catch (IOException exception) {
+                            throw new IllegalStateException(exception);
+                        }
+                    }).toList();
+            assertEquals(List.of(TAMED_TOXIC), optIns);
         }
     }
 

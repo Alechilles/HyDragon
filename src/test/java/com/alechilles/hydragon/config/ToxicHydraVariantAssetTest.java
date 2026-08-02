@@ -19,11 +19,13 @@ import javax.imageio.ImageIO;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +34,8 @@ class ToxicHydraVariantAssetTest {
 
     @Test
     void toxicRolesInheritIceRolesAndOverrideEveryElementSeam() throws Exception {
-        assertToxicRole("Hydra_Toxic", "Hydra", "Tamed_Hydra_Toxic");
-        assertToxicRole("Tamed_Hydra_Toxic", "Tamed_Hydra", null);
+        assertToxicRole("Hydra_Toxic", "Template_HyDragon_Dragon", "Tamed_Hydra_Toxic");
+        assertToxicRole("Tamed_Hydra_Toxic", "Template_HyDragon_Dragon_Tamed", null);
     }
 
     @Test
@@ -42,20 +44,23 @@ class ToxicHydraVariantAssetTest {
         wrongNameCompute.getAsJsonObject("Modify").getAsJsonObject("NameTranslationKey")
                 .addProperty("Compute", "WrongNameTranslationKey");
         assertThrows(AssertionError.class,
-                () -> assertToxicRole(wrongNameCompute, "Hydra_Toxic", "Hydra", "Tamed_Hydra_Toxic"));
+                () -> assertToxicRole(wrongNameCompute, "Hydra_Toxic", "Template_HyDragon_Dragon",
+                        "Tamed_Hydra_Toxic"));
 
         JsonObject extraRangedWrapperField = toxicRole("Hydra_Toxic");
         extraRangedWrapperField.getAsJsonObject("Modify").getAsJsonObject("_InteractionVars")
                 .getAsJsonObject("Hydra_Ball_Launch").addProperty("Unexpected", true);
         assertThrows(AssertionError.class,
-                () -> assertToxicRole(extraRangedWrapperField, "Hydra_Toxic", "Hydra", "Tamed_Hydra_Toxic"));
+                () -> assertToxicRole(extraRangedWrapperField, "Hydra_Toxic", "Template_HyDragon_Dragon",
+                        "Tamed_Hydra_Toxic"));
 
         JsonObject extraRangedInteractionField = toxicRole("Hydra_Toxic");
         extraRangedInteractionField.getAsJsonObject("Modify").getAsJsonObject("_InteractionVars")
                 .getAsJsonObject("Hydra_Rain_Launch").getAsJsonArray("Interactions")
                 .get(0).getAsJsonObject().addProperty("DamageCalculator", "unexpected");
         assertThrows(AssertionError.class,
-                () -> assertToxicRole(extraRangedInteractionField, "Hydra_Toxic", "Hydra", "Tamed_Hydra_Toxic"));
+                () -> assertToxicRole(extraRangedInteractionField, "Hydra_Toxic", "Template_HyDragon_Dragon",
+                        "Tamed_Hydra_Toxic"));
     }
 
     @Test
@@ -98,7 +103,7 @@ class ToxicHydraVariantAssetTest {
         JsonObject wildModify = toxicRole("Hydra_Toxic").getAsJsonObject("Modify");
         assertFalse(wildModify.has("MountMode"));
         assertFalse(wildModify.has("AvatarFlightConfig"));
-        assertEquals("CAE_Hydra_Toxic", wildModify.get("_CombatConfig").getAsString());
+        assertEquals("CAE_Hydra_Toxic_Aerial", wildModify.get("_CombatConfig").getAsString());
 
         JsonObject patch = json(
                 "Server/Tamework/Patches/HyDragonRoles/Tamed_Hydra_Toxic_AvatarFlight.json");
@@ -114,7 +119,11 @@ class ToxicHydraVariantAssetTest {
         assertEquals("Hydra_Winged_AvatarFlight",
                 flight.getAsJsonObject("Model").get("ModelId").getAsString());
         assertTrue(flight.getAsJsonObject("Model").get("ApplyModel").getAsBoolean());
-        assertFalse(flight.has("CombatAbilities"), "Airborne Toxic abilities are deferred");
+        JsonObject abilities = flight.getAsJsonObject("CombatAbilities");
+        assertEquals("Root_NPC_Hydra_Toxic_Avatar_Ball",
+                abilities.getAsJsonObject("Ability2").get("Interaction").getAsString());
+        assertEquals("Root_NPC_Hydra_Toxic_Avatar_Spit",
+                abilities.getAsJsonObject("Ability3").get("Interaction").getAsString());
         assertEquals("FlyIdle", flight.getAsJsonObject("Animation")
                 .get("IdleAnimation").getAsString());
         assertEquals("Fly", flight.getAsJsonObject("Animation")
@@ -130,6 +139,93 @@ class ToxicHydraVariantAssetTest {
         Set<String> avatarNodes = modelNodeNames(avatarRuntime);
         assertTrue(avatarNodes.contains("AF_Origin"));
         assertFalse(avatarNodes.contains("Origin"));
+
+        JsonObject interaction = json("Server/Tamework/Interactions/HyDragonIntBeast.json");
+        assertEquals(List.of("Tamed_Hydra", "Tamed_Hydra_Toxic"),
+                strings(interaction.getAsJsonArray("RoleIds")));
+        JsonObject mount = interaction.getAsJsonArray("Interactions").get(0).getAsJsonObject();
+        assertEquals("Mount", mount.get("Type").getAsString());
+        assertTrue(mount.get("Enabled").getAsBoolean());
+    }
+
+    @Test
+    void toxicAerialCombatUsesToxicRoutesAndNeverTheRainBarrage() throws Exception {
+        JsonObject wild = toxicRole("Hydra_Toxic");
+        JsonObject modify = wild.getAsJsonObject("Modify");
+        assertEquals("Template_HyDragon_Dragon", wild.get("Reference").getAsString());
+        assertEquals("CAE_Hydra_Toxic_Aerial", modify.get("_CombatConfig").getAsString());
+        assertTrue(modify.get("UseHealthPhaseFlight").getAsBoolean());
+        assertEquals("Root_NPC_Hydra_Ice_Ball", modify.get("AirRangedAttack").getAsString());
+        assertEquals("Root_NPC_Hydra_Toxic_Aerial_Spit", modify.get("AirBreathAttack").getAsString());
+        assertEquals("Root_NPC_Hydra_Ice_Ball", modify.get("AirFireballVolley2").getAsString());
+        assertEquals("Root_NPC_Hydra_Ice_Ball", modify.get("AirFireballVolley3").getAsString());
+        assertEquals("Root_NPC_Hydra_Ice_Ball", modify.get("AirFireballVolley4").getAsString());
+
+        JsonObject config = json("Server/NPC/Balancing/CAE_Hydra_Toxic_Aerial.json");
+        JsonObject evaluator = config.getAsJsonObject("CombatActionEvaluator");
+        JsonObject actions = evaluator.getAsJsonObject("AvailableActions");
+        assertEquals("State", actions.getAsJsonObject("AirFireballVolley").get("Type").getAsString());
+        assertEquals("State", actions.getAsJsonObject("AirBreathRun").get("Type").getAsString());
+
+        JsonObject airRanged = evaluator.getAsJsonObject("ActionSets").getAsJsonObject("AirRanged");
+        assertEquals(List.of("Root_NPC_Hydra_Ice_Ball"),
+                strings(airRanged.getAsJsonObject("BasicAttacks").getAsJsonArray("Attacks")));
+        assertEquals(List.of("SelectTarget", "AirBreathRun", "AirFireballVolley"),
+                strings(airRanged.getAsJsonArray("Actions")));
+
+        assertNoRainReference(airRanged, "CAE_Hydra_Toxic_Aerial AirRanged");
+        assertWildAerialAction(actions.getAsJsonObject("AirFireballVolley"), "AirVolley");
+        assertWildAerialAction(actions.getAsJsonObject("AirBreathRun"), "AirBreathIngress");
+        assertWildRootClosure("Root_NPC_Hydra_Ice_Ball", "Hydra_Ice_Ball");
+        assertWildRootClosure("Root_NPC_Hydra_Toxic_Aerial_Spit", "Hydra_Toxic_Aerial_Spit");
+        assertNoForbiddenText("Server/NPC/Roles/Creature/HyDragon/Hydra/Hydra_Toxic.json", "NordicDrake");
+        assertNoForbiddenText("Server/NPC/Roles/Creature/HyDragon/Hydra/Hydra_Toxic.json", "Flame");
+        assertNoForbiddenText("Server/NPC/Balancing/CAE_Hydra_Toxic_Aerial.json", "NordicDrake");
+        assertNoForbiddenText("Server/NPC/Balancing/CAE_Hydra_Toxic_Aerial.json", "Flame");
+        assertToxicRootContract("Server/Item/RootInteractions/NPCs/Creature/HyDragon/"
+                + "Root_NPC_Hydra_Toxic_Aerial_Spit.json");
+    }
+
+    @Test
+    void tamedToxicHydraConsumesLockedTargetForToxicAerialCombat() throws Exception {
+        JsonObject role = toxicRole("Tamed_Hydra_Toxic");
+        assertEquals("Template_HyDragon_Dragon_Tamed", role.get("Reference").getAsString());
+        JsonObject modify = role.getAsJsonObject("Modify");
+        assertTrue(modify.get("UseToxicHydraTamedCombat").getAsBoolean());
+        assertFalse(modify.has("UseNordicDrakeTamedCombat"));
+        assertEquals("HyDragonIntBeast", modify.get("InteractionConfigId").getAsString());
+
+        JsonObject component = json("Server/NPC/Roles/Creature/HyDragon/Components/"
+                + "Component_HyDragon_Instruction_ToxicHydra_Tamed_Combat.json");
+        JsonObject parameters = component.getAsJsonObject("Parameters");
+        assertParameter(parameters, "AirFireballAttack", "Root_NPC_Hydra_Toxic_Aerial_Ball_Tamed");
+        assertParameter(parameters, "AirBreathAttack", "Root_NPC_Hydra_Toxic_Aerial_Spit_Tamed");
+        assertParameter(parameters, "AirVolleyAttack2", "Root_NPC_Hydra_Toxic_Aerial_Ball_Tamed");
+        assertParameter(parameters, "AirVolleyAttack3", "Root_NPC_Hydra_Toxic_Aerial_Ball_Tamed");
+        assertParameter(parameters, "AirVolleyAttack4", "Root_NPC_Hydra_Toxic_Aerial_Ball_Tamed");
+        for (String interaction : List.of(
+                "Hydra_Toxic_Aerial_Spit_Tamed.json",
+                "Hydra_Toxic_Avatar_Ball.json",
+                "Hydra_Toxic_Avatar_Spit.json")) {
+            assertToxicInteractionContract("Server/Item/Interactions/NPCs/HyDragon/Hydra/" + interaction);
+        }
+
+        assertToxicSafetyShell(component);
+        for (JsonObject sensor : objects(component, object -> "Target".equals(string(object, "Type")))) {
+            assertEquals("LockedTarget", string(sensor, "TargetSlot"));
+        }
+        assertEquals("WANDER_TARGET", toxicOrbitState(component, ".AirRanged"));
+        assertEquals("FACE_TARGET", toxicOrbitState(component, ".AirVolley"));
+        assertEquals("APPROACH", toxicOrbitState(component, ".AirBreathIngress"));
+        assertEquals("PASS_THROUGH_TARGET", toxicOrbitState(component, ".AirBreathPass"));
+        assertEquals("WANDER_TARGET", toxicOrbitState(component, ".AirRecovery"));
+        for (String root : List.of(
+                "Root_NPC_Hydra_Toxic_Aerial_Ball_Tamed.json",
+                "Root_NPC_Hydra_Toxic_Aerial_Spit_Tamed.json",
+                "Root_NPC_Hydra_Toxic_Avatar_Ball.json",
+                "Root_NPC_Hydra_Toxic_Avatar_Spit.json")) {
+            assertToxicRootContract("Server/Item/RootInteractions/NPCs/Creature/HyDragon/" + root);
+        }
     }
 
     @Test
@@ -230,7 +326,7 @@ class ToxicHydraVariantAssetTest {
     @Test
     void toxicWildCombatEvaluatorSuppliesToxicVarsAtEveryAttackEntryPoint() throws Exception {
         JsonObject toxicRole = toxicRole("Hydra_Toxic");
-        assertEquals("CAE_Hydra_Toxic", toxicRole.getAsJsonObject("Modify")
+        assertEquals("CAE_Hydra_Toxic_Aerial", toxicRole.getAsJsonObject("Modify")
                 .get("_CombatConfig").getAsString());
 
         JsonObject toxicConfig = json("Server/NPC/Balancing/CAE_Hydra_Toxic.json");
@@ -474,6 +570,220 @@ class ToxicHydraVariantAssetTest {
         assertEquals(JsonParser.parseString(expected).getAsJsonObject(), actual, leaf);
     }
 
+    private static void assertNoRainReference(JsonElement asset, String description) {
+        assertFalse(asset.toString().contains("Root_NPC_Hydra_RainShoot"), description
+                + " must not route through the rain barrage");
+    }
+
+    private static void assertNoForbiddenText(String relativePath, String forbidden) throws IOException {
+        assertFalse(read(relativePath).contains(forbidden), relativePath + " must not contain " + forbidden);
+    }
+
+    private static void assertWildAerialAction(JsonObject action, String subState) {
+        assertEquals("State", action.get("Type").getAsString());
+        assertEquals("Combat", action.get("State").getAsString());
+        assertEquals(subState, action.get("SubState").getAsString());
+        assertNoRainReference(action, "Toxic aerial " + subState + " state action");
+        assertFalse(action.toString().contains("NordicDrake"), subState + " must not use NordicDrake");
+        assertFalse(action.toString().contains("Flame"), subState + " must not use Flame");
+    }
+
+    private static void assertWildRootClosure(String rootId, String expectedInteraction) throws Exception {
+        String rootPath = "Server/Item/RootInteractions/NPCs/Creature/HyDragon/" + rootId + ".json";
+        JsonObject root = json(rootPath);
+        assertNoForbiddenText(rootPath, "Root_NPC_Hydra_RainShoot");
+        assertNoForbiddenText(rootPath, "NordicDrake");
+        assertNoForbiddenText(rootPath, "Flame");
+        assertEquals(List.of(expectedInteraction), strings(root.getAsJsonArray("Interactions")));
+        assertFalse(root.getAsJsonObject("Tags").getAsJsonArray("Attack").asList().isEmpty());
+        assertFalse(root.get("RequireNewClick").getAsBoolean());
+
+        Set<String> pending = new java.util.LinkedHashSet<>();
+        pending.add(expectedInteraction);
+        Set<String> visited = new HashSet<>();
+        while (!pending.isEmpty()) {
+            String interactionId = pending.iterator().next();
+            pending.remove(interactionId);
+            if (!visited.add(interactionId)) continue;
+            String interactionPath = "Server/Item/Interactions/NPCs/HyDragon/Hydra/"
+                    + interactionId + ".json";
+            JsonObject interaction = json(interactionPath);
+            assertNoForbiddenText(interactionPath, "Root_NPC_Hydra_RainShoot");
+            assertNoForbiddenText(interactionPath, "NordicDrake");
+            assertNoForbiddenText(interactionPath, "Flame");
+            collectInteractionReferences(interaction, pending);
+            if (interactionId.equals(expectedInteraction)) {
+                if (rootId.equals("Root_NPC_Hydra_Ice_Ball")) {
+                    assertEquals("Serial", interaction.get("Type").getAsString());
+                    assertEquals(11, interaction.getAsJsonArray("Interactions").size());
+                    assertTrue(interaction.toString().contains("Hydra_Ice_Ball_Charge_Effect"));
+                    assertTrue(interaction.toString().contains("Hydra_Ice_Ball_Launch"));
+                } else {
+                    assertEquals("TameworkLaunchProjectile", interaction.get("Type").getAsString());
+                    assertEquals("Hydra_Toxic_Ball", interaction.get("ProjectileId").getAsString());
+                    assertEquals("Direct", interaction.get("TrajectoryMode").getAsString());
+                    assertEquals("CAETargetSlot", interaction.get("TargetSlot").getAsString());
+                    assertEquals("Poison_T1", interaction.getAsJsonObject("ImpactEffect")
+                            .get("EffectId").getAsString());
+                }
+            }
+        }
+    }
+
+    private static void collectInteractionReferences(JsonElement node, Set<String> references) {
+        if (node.isJsonObject()) {
+            for (Map.Entry<String, JsonElement> entry : node.getAsJsonObject().entrySet()) {
+                if (entry.getKey().equals("Interactions") || entry.getKey().equals("DefaultValue")) {
+                    collectInteractionReferences(entry.getValue(), references);
+                }
+            }
+        } else if (node.isJsonArray()) {
+            for (JsonElement child : node.getAsJsonArray()) {
+                if (child.isJsonPrimitive() && child.getAsJsonPrimitive().isString()) {
+                    references.add(child.getAsString());
+                } else {
+                    collectInteractionReferences(child, references);
+                }
+            }
+        }
+    }
+
+    private static void assertToxicRootContract(String relativePath) throws IOException {
+        assertTrue(Files.isRegularFile(ROOT.resolve(relativePath)), relativePath + " must exist");
+        json(relativePath);
+        assertNoForbiddenText(relativePath, "Root_NPC_Hydra_RainShoot");
+        assertNoForbiddenText(relativePath, "NordicDrake");
+        assertNoForbiddenText(relativePath, "Flame");
+    }
+
+    private static void assertToxicInteractionContract(String relativePath) throws IOException {
+        assertTrue(Files.isRegularFile(ROOT.resolve(relativePath)), relativePath + " must exist");
+        json(relativePath);
+        assertNoForbiddenText(relativePath, "Root_NPC_Hydra_RainShoot");
+        assertNoForbiddenText(relativePath, "NordicDrake");
+        assertNoForbiddenText(relativePath, "Flame");
+    }
+
+    private static void assertParameter(JsonObject parameters, String name, Object expected) {
+        assertTrue(parameters.has(name), "missing Toxic aerial parameter " + name);
+        JsonElement value = parameters.getAsJsonObject(name).get("Value");
+        if (expected instanceof List<?> expectedList) {
+            assertEquals(expectedList.stream().map(number -> ((Number) number).doubleValue()).toList(),
+                    numbers(value.getAsJsonArray()));
+        } else if (expected instanceof Number expectedNumber) {
+            assertEquals(expectedNumber.doubleValue(), value.getAsDouble());
+        } else {
+            assertEquals(expected, value.getAsString());
+        }
+    }
+
+    private static void assertToxicSafetyShell(JsonObject component) {
+        List<JsonObject> children = directChildren(component);
+        assertTrue(children.size() >= 4, "Toxic safety exits must remain first");
+        assertToxicHardLeashRelease(children.get(0));
+
+        JsonObject owner = children.get(1);
+        JsonObject ownerSensor = owner.getAsJsonObject("Sensor");
+        assertEquals("Target", string(ownerSensor, "Type"));
+        assertEquals("LockedTarget", string(ownerSensor, "TargetSlot"));
+        assertEquals(1, objects(ownerSensor, object -> "TameworkIsOwner".equals(string(object, "Type"))).size());
+        assertToxicReleaseAndReset(owner);
+
+        JsonObject friendly = children.get(2);
+        JsonObject friendlySensor = friendly.getAsJsonObject("Sensor");
+        assertEquals("Target", string(friendlySensor, "Type"));
+        assertEquals("LockedTarget", string(friendlySensor, "TargetSlot"));
+        JsonObject attitude = objects(friendlySensor, object ->
+                "TameworkAttitudeFromTargetSlot".equals(string(object, "Type"))).stream().findFirst()
+                .orElseThrow(() -> new AssertionError("missing friendly target filter"));
+        assertEquals("MasterTargetSlot", string(attitude.getAsJsonObject("SourceTargetSlot"), "Compute"));
+        assertEquals("Friendly", attitude.getAsJsonArray("Attitudes").get(0).getAsString());
+        assertFalse(attitude.get("UseSelfWhenSourceMissing").getAsBoolean());
+        assertToxicReleaseAndReset(friendly);
+
+        JsonObject lost = children.get(3);
+        JsonObject not = lost.getAsJsonObject("Sensor");
+        assertEquals("Not", string(not, "Type"));
+        JsonObject lostSensor = not.getAsJsonObject("Sensor");
+        assertEquals("Component_Sensor_Lost_Target_Detection", string(lostSensor, "Reference"));
+        JsonObject lostModify = lostSensor.getAsJsonObject("Modify");
+        for (String parameter : List.of("ViewRange", "ViewSector", "HearingRange", "AbsoluteDetectionRange")) {
+            assertEquals(parameter, string(lostModify.getAsJsonObject(parameter), "Compute"));
+        }
+        assertEquals("LockedTarget", string(lostModify, "TargetSlot"));
+        assertToxicReleaseAndReset(lost);
+
+        assertEquals(0, objects(component, object -> {
+            String type = string(object, "Type");
+            return type != null && Set.of("SetTarget", "LockOnTarget", "LockOnInteractionTarget", "SelectTarget",
+                    "SelectBasicAttackTarget", "CombatActionEvaluator", "SetMarkedTarget", "CombatAbility",
+                    "HasHostileTargetMemory", "AddToHostileTargetMemory").contains(type);
+        }).size(), "Toxic combat must only consume the outer Defend LockedTarget");
+        assertEquals(0, objects(component, object -> object.has("LockOnTarget")).size());
+    }
+
+    private static void assertToxicHardLeashRelease(JsonObject branch) {
+        JsonObject not = branch.getAsJsonObject("Sensor");
+        assertEquals("Not", string(not, "Type"));
+        JsonObject player = not.getAsJsonObject("Sensor");
+        assertEquals("Player", string(player, "Type"));
+        assertEquals("HardLeashDistance", string(player.getAsJsonObject("Range"), "Compute"));
+        assertEquals("TimerStop", string(branch.getAsJsonArray("Actions").get(0).getAsJsonObject(), "Type"));
+        assertToxicReleaseAndReset(branch);
+    }
+
+    private static void assertToxicReleaseAndReset(JsonObject branch) {
+        List<JsonObject> actions = branch.getAsJsonArray("Actions").asList().stream()
+                .map(JsonElement::getAsJsonObject).toList();
+        assertEquals(List.of("TimerStop", "TimerStop", "TimerStop", "SetFlag", "SetFlag", "State",
+                "ReleaseTarget", "ResetInstructions"), actions.stream().map(action -> string(action, "Type")).toList());
+        assertEquals(List.of("ToxicHydra_Air_Fireball", "ToxicHydra_Air_Volley", "ToxicHydra_Air_Breath"),
+                actions.subList(0, 3).stream().map(action -> string(action, "Name")).toList());
+        assertToxicFlagAction(actions.get(3), "ToxicHydra_Air_Reset_To_Recovery", false);
+        assertToxicFlagAction(actions.get(4), "ToxicHydra_Air_Reset_To_Ranged", false);
+        assertEquals(".Default", string(actions.get(5), "State"));
+        assertEquals("LockedTarget", string(actions.get(6), "TargetSlot"));
+    }
+
+    private static void assertToxicFlagAction(JsonObject action, String name, boolean value) {
+        assertEquals("SetFlag", string(action, "Type"));
+        assertEquals(name, string(action, "Name"));
+        assertFalse(action.has("Set"));
+        assertEquals(value, action.get("SetTo").getAsBoolean());
+    }
+
+    private static String toxicOrbitState(JsonObject component, String state) {
+        JsonObject branch = objects(component, object -> object.has("Sensor") && object.has("Instructions")
+                && objects(object.getAsJsonObject("Sensor"), sensor -> "State".equals(string(sensor, "Type"))
+                && state.equals(string(sensor, "State"))).size() == 1).stream().findFirst()
+                .orElseThrow(() -> new AssertionError("missing " + state + " state"));
+        return objects(branch, object -> "TameworkFlyingOrbit".equals(string(object, "Type"))).stream()
+                .map(object -> string(object, "Mode")).filter(mode -> mode != null).findFirst()
+                .orElseThrow(() -> new AssertionError("missing orbit mode for " + state));
+    }
+
+    private static List<JsonObject> objects(JsonElement node, Predicate<JsonObject> predicate) {
+        List<JsonObject> matches = new ArrayList<>();
+        collectObjects(node, predicate, matches);
+        return matches;
+    }
+
+    private static void collectObjects(JsonElement node, Predicate<JsonObject> predicate,
+            List<JsonObject> matches) {
+        if (node.isJsonObject()) {
+            JsonObject object = node.getAsJsonObject();
+            if (predicate.test(object)) matches.add(object);
+            object.entrySet().forEach(entry -> collectObjects(entry.getValue(), predicate, matches));
+        } else if (node.isJsonArray()) {
+            node.getAsJsonArray().forEach(child -> collectObjects(child, predicate, matches));
+        }
+    }
+
+    private static String string(JsonObject object, String member) {
+        return object.has(member) && object.get(member).isJsonPrimitive()
+                ? object.get(member).getAsString() : null;
+    }
+
     private static void assertToxicRole(String role, String reference, String tameRoleChange)
             throws IOException {
         assertToxicRole(toxicRole(role), role, reference, tameRoleChange);
@@ -486,11 +796,11 @@ class ToxicHydraVariantAssetTest {
         assertEquals(Set.of("Type", "Reference", "Modify", "Parameters"), root.keySet());
 
         JsonObject modify = root.getAsJsonObject("Modify");
-        Set<String> expectedModifyKeys = tameRoleChange == null
+        Set<String> requiredModifyKeys = tameRoleChange == null
                 ? Set.of("Appearance", "FlockArray", "MemoriesNameOverride", "_InteractionVars", "NameTranslationKey")
                 : Set.of("Appearance", "TameRoleChange", "FlockArray", "MemoriesNameOverride",
                         "_CombatConfig", "_InteractionVars", "NameTranslationKey");
-        assertEquals(expectedModifyKeys, modify.keySet());
+        assertTrue(modify.keySet().containsAll(requiredModifyKeys));
         assertEquals("Hydra_Toxic", modify.get("Appearance").getAsString());
         assertEquals(List.of(role), strings(modify.getAsJsonArray("FlockArray")));
         assertEquals("Toxic Hydra", modify.get("MemoriesNameOverride").getAsString());
@@ -502,7 +812,7 @@ class ToxicHydraVariantAssetTest {
             assertFalse(modify.has("_CombatConfig"));
         } else {
             assertEquals(tameRoleChange, modify.get("TameRoleChange").getAsString());
-            assertEquals("CAE_Hydra_Toxic", modify.get("_CombatConfig").getAsString());
+            assertEquals("CAE_Hydra_Toxic_Aerial", modify.get("_CombatConfig").getAsString());
         }
 
         JsonObject vars = modify.getAsJsonObject("_InteractionVars");
@@ -700,6 +1010,18 @@ class ToxicHydraVariantAssetTest {
 
     private static List<Double> doubles(JsonArray values) {
         return values.asList().stream().map(JsonElement::getAsDouble).toList();
+    }
+
+    private static List<Double> numbers(JsonArray values) {
+        return values.asList().stream().map(JsonElement::getAsDouble).toList();
+    }
+
+    private static List<JsonObject> directChildren(JsonObject component) {
+        JsonObject content = component.getAsJsonObject("Content");
+        assertTrue(content.get("Continue").getAsBoolean());
+        assertEquals("Any", string(content.getAsJsonObject("Sensor"), "Type"));
+        return content.getAsJsonArray("Instructions").asList().stream()
+                .map(JsonElement::getAsJsonObject).toList();
     }
 
     private static Map<String, String> stringMap(JsonObject values) {

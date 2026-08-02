@@ -1,10 +1,73 @@
 {
   "Type": "Variant",
-  "Reference": "Tamed_Hydra",
+  "Reference": "Template_HyDragon_Dragon_Tamed",
   "Modify": {
     "Appearance": "Hydra_Toxic",
-    "FlockArray": ["Tamed_Hydra_Toxic"],
+    "Weapons": [],
+    "FlockArray": [
+      "Tamed_Hydra_Toxic"
+    ],
+    "AttitudeGroup": "PredatorsBig",
+    "WanderRadius": 8,
+    "ViewRange": 36,
+    "HearingRange": 24,
+    "DropList": "Empty",
+    "MaxSpeed": 7,
+    "Attack": "Root_NPC_Hydra_Attack",
+    "AttackDistance": 5,
+    "AttackPauseRange": [
+      3,
+      4
+    ],
+    "CombatAttackPostDelay": [
+      0.7,
+      0.7
+    ],
+    "TargetRange": 12,
+    "CombatBehaviorDistance": 19,
+    "CombatAlwaysMovingWeight": 10,
+    "RunThreshold": 0.3,
+    "KnockbackScale": 0.1,
+    "ClimbHeight": 2,
+    "MinJumpHeight": 1.5,
+    "AscentAnimationType": "Walk",
+    "ClimbSpeedMult": 1,
+    "ClimbSpeedPow": 1,
+    "ClimbSpeedConst": 5,
+    "DescendSpeedCompensation": 1,
+    "DescendFlatness": 0.9,
+    "DescentSteepness": 0.9,
+    "DescentBlending": 1.5,
+    "LeashDistance": 60,
+    "HardLeashDistance": 100,
+    "LeashMinPlayerDistance": 15,
+    "LeashTimer": [
+      12,
+      16
+    ],
+    "MaxHealth": 400,
+    "AttractiveItemSet": [],
+    "InteractionConfigId": "HyDragonIntBeast",
+    "CanFollow": true,
+    "CanHold": true,
+    "CanDefend": true,
+    "CanAggressive": true,
+    "CanAttackTarget": true,
+    "CanMoveToLocation": true,
+    "CanReturnHome": true,
+    "CanRecall": true,
+    "CanSetHome": true,
+    "IsMountable": true,
+    "MountAnchorX": 0,
+    "MountAnchorY": 2.5,
+    "MountAnchorZ": 0,
+    "MountMode": "TameworkAvatarFlight",
+    "AvatarFlightConfig": "HyDragonToxicHydra",
+    "CanBreedPair": true,
+    "IsMemory": true,
+    "MemoriesCategory": "Reptile",
     "MemoriesNameOverride": "Toxic Hydra",
+    "BreathesInWater": false,
     "_InteractionVars": {
       "Bite_Damage": {
         "Interactions": [
@@ -152,7 +215,8 @@
     },
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"
-    }
+    },
+    "UseToxicHydraTamedCombat": true
   },
   "Parameters": {
     "NameTranslationKey": {
