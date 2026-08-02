@@ -1,6 +1,6 @@
 # Miniwyvern Form-Specific Talent Trees Design
 
-**Status:** Approved for implementation planning  
+**Status:** Approved for implementation planning
 **Date:** 2026-08-02
 
 ## Purpose
