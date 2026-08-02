@@ -18,17 +18,18 @@ a role change or a later tree redesign.
 
 ## Scope
 
-- Six elemental Miniwyvern roles receive separate 29-node, 52-point trees:
+- Six elemental Miniwyvern roles receive separate 31-node, 52-point trees:
   Fire, Ice, Lightning, Nature, Toxic, and Void.
-- Each elemental tree keeps the existing topology: nine Bond nodes, ten Combat
+- Each elemental tree keeps the existing topology: nine Bond nodes, twelve Combat
   nodes, and ten Vigor nodes, with the current tier, point-cost, and minimum
   level pacing.
-- Wild receives a separate 20-node, 37-point tree containing only its existing
-  ten Combat nodes and the redesigned ten-node Vigor branch. Wild has no Bond
+- Wild receives a separate 22-node, 37-point tree containing only its existing
+  twelve Combat nodes and the redesigned ten-node Vigor branch. Wild has no Bond
   branch in this release.
-- Every tree has its own stable, form-prefixed talent IDs, names, descriptions,
-  icon choices, and effect values. Talent IDs may not be reused across form
-  trees.
+- Bond and Vigor talents have stable, form-prefixed IDs. Combat retains its
+  stable shared IDs so the existing role-driven projectile and swoop instruction
+  gates continue to select the same assets; names and descriptions are
+  form-specific.
 - Projectile and swoop mechanics remain mechanically unchanged. Their form
   trees only give them accurate themed names and exact descriptions of the
   already-wired projectile/root-interaction behavior.
@@ -99,10 +100,10 @@ case of that resolver, not a separate new ability type.
 
 ## Combat branch
 
-Combat preserves the current ten-node projectile and swoop topology and its
-existing asset-driven attacks. Each form's nodes use its own talent IDs, so the
-existing `TameworkHasTalent` gates and root-interaction selections are rewritten
-to reference the active form's tree.
+Combat preserves the current twelve-node projectile and swoop topology and its
+existing asset-driven attacks. Combat IDs remain stable across the role-scoped
+trees, so the existing `TameworkHasTalent` gates and root-interaction selections
+remain unchanged.
 
 The content work is names and player-facing accuracy, not new combat behavior:
 

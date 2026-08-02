@@ -1,0 +1,594 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "AllocationRevision": 1,
+  "RoleIds": [
+    "Tamed_Wyvern_Mini_Ice"
+  ],
+  "Talents": [
+    {
+      "Id": "Miniwyvern_Ice_RimeBond",
+      "DisplayName": "Rime Bond",
+      "Description": "Your Ice Miniwyvern strengthens its owner’s slowing affinity.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 2,
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.03
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_RimeFocus",
+      "DisplayName": "Rime Focus",
+      "Description": "Your Miniwyvern deals 3% more damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 4,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_RimeBond"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.03
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_RimeAttunement",
+      "DisplayName": "Rime Attunement",
+      "Description": "Your Miniwyvern gains 6% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 6,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_RimeBond"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_RimeAmplification",
+      "DisplayName": "Rime Amplification",
+      "Description": "Your Miniwyvern deals 4% more damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Essence Bond",
+      "PointCost": 2,
+      "MinLevel": 9,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_RimeFocus"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.04
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_RimeResonance",
+      "DisplayName": "Rime Resonance",
+      "Description": "Your Miniwyvern takes 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Essence Bond",
+      "PointCost": 2,
+      "MinLevel": 11,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_RimeAttunement"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_RimeEfficiency",
+      "DisplayName": "Rime Efficiency",
+      "Description": "Your Miniwyvern deals 3% more damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 14,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_RimeAmplification"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.03
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_RimeHarmony",
+      "DisplayName": "Rime Harmony",
+      "Description": "Your Miniwyvern gains 5% movement speed.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 17,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_RimeResonance"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MoveSpeedMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_RimeMastery",
+      "DisplayName": "Rime Mastery",
+      "Description": "Your Miniwyvern deals 4% more damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 5,
+      "Branch": "Essence Bond",
+      "PointCost": 2,
+      "MinLevel": 20,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_RimeEfficiency"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.04
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_RimeAscendance",
+      "DisplayName": "Rime Ascendance",
+      "Description": "Completes the elemental bond and grants 6% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 6,
+      "Branch": "Essence Bond",
+      "PointCost": 4,
+      "MinLevel": 26,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_RimeMastery",
+        "Miniwyvern_Ice_RimeHarmony"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        }
+      ]
+    },
+    {
+      "Id": "DraconicProjectile",
+      "DisplayName": "Ice Projectile Initiation",
+      "Description": "Unlocks the form's base projectile attack.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 3,
+      "Effects": [
+        {
+          "EffectKey": "DraconicProjectile",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectileRange",
+      "DisplayName": "Ice Long Reach",
+      "Description": "Uses the existing long-range projectile profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 5,
+      "RequiresTalentIds": [
+        "DraconicProjectile"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectileRange",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectileCadence",
+      "DisplayName": "Ice Quick Cast",
+      "Description": "Uses the existing faster projectile cadence.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 5,
+      "RequiresTalentIds": [
+        "DraconicProjectile"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectileCadence",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectileGuidance",
+      "DisplayName": "Ice Guided Flight",
+      "Description": "Uses the existing guided projectile profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Combat",
+      "PointCost": 2,
+      "MinLevel": 9,
+      "RequiresTalentIds": [
+        "ProjectileRange"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectileGuidance",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectilePattern",
+      "DisplayName": "Ice Split Flight",
+      "Description": "Uses the existing projectile pattern profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Combat",
+      "PointCost": 2,
+      "MinLevel": 11,
+      "RequiresTalentIds": [
+        "ProjectileCadence"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectilePattern",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectileMastery",
+      "DisplayName": "Ice Projectile Mastery",
+      "Description": "Uses the existing mastery projectile profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "Combat",
+      "PointCost": 3,
+      "MinLevel": 14,
+      "RequiresTalentIds": [
+        "ProjectileGuidance",
+        "ProjectilePattern"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectileMastery",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "SwoopFerocity",
+      "DisplayName": "Ice Swoop Ferocity",
+      "Description": "Uses the existing 20-damage swoop profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 3,
+      "Effects": [
+        {
+          "EffectKey": "SwoopFerocity",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "SwoopCadence",
+      "DisplayName": "Ice Swoop Cadence",
+      "Description": "Uses the existing 22-30 second swoop cadence.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 5,
+      "RequiresTalentIds": [
+        "SwoopFerocity"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SwoopCadence",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "SwoopPrecision",
+      "DisplayName": "Ice Swoop Precision",
+      "Description": "Uses the existing faster swoop approach profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 5,
+      "RequiresTalentIds": [
+        "SwoopFerocity"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SwoopPrecision",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "RelentlessSwoop",
+      "DisplayName": "Ice Relentless Swoop",
+      "Description": "Uses the existing 20-26 second swoop cadence.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Combat",
+      "PointCost": 2,
+      "MinLevel": 9,
+      "RequiresTalentIds": [
+        "SwoopCadence"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "RelentlessSwoop",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "RendingDive",
+      "DisplayName": "Ice Rending Dive",
+      "Description": "Uses the existing 24-damage swoop profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Combat",
+      "PointCost": 2,
+      "MinLevel": 11,
+      "RequiresTalentIds": [
+        "SwoopPrecision"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "RendingDive",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "SwoopMastery",
+      "DisplayName": "Ice Swoop Mastery",
+      "Description": "Uses the existing 28-damage mastery swoop profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "Combat",
+      "PointCost": 3,
+      "MinLevel": 14,
+      "RequiresTalentIds": [
+        "RelentlessSwoop",
+        "RendingDive"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SwoopMastery",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_VitalScales",
+      "DisplayName": "Frost Scales",
+      "Description": "Gain 5% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 1,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 2,
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_HardenedScales",
+      "DisplayName": "Frost Scales Reinforcement",
+      "Description": "Gain 5% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 2,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 4,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_VitalScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_ElderScales",
+      "DisplayName": "Frost Scales Maturity",
+      "Description": "Gain 8% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "Vigor",
+      "PointCost": 2,
+      "MinLevel": 7,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_HardenedScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.08
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_ScaleGuard",
+      "DisplayName": "Scale Guard",
+      "Description": "Take 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 8,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_ElderScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_ScaleBulwark",
+      "DisplayName": "Scale Bulwark",
+      "Description": "Take 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "Vigor",
+      "PointCost": 2,
+      "MinLevel": 11,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_ScaleGuard"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_SwiftWings",
+      "DisplayName": "Swift Wings",
+      "Description": "Gain 5% movement speed.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 12,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_ScaleBulwark"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MoveSpeedMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_SurvivalInstinct",
+      "DisplayName": "Survival Instinct",
+      "Description": "Take 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 5,
+      "Branch": "Vigor",
+      "PointCost": 2,
+      "MinLevel": 15,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_SwiftWings"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_LastingScales",
+      "DisplayName": "Lasting Scales",
+      "Description": "Gain 6% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 5,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 17,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_SurvivalInstinct"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_WyrmFortitude",
+      "DisplayName": "Wyrm Fortitude",
+      "Description": "Gain 5% movement speed.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 5,
+      "Branch": "Vigor",
+      "PointCost": 2,
+      "MinLevel": 20,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_LastingScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MoveSpeedMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Ice_VigorAscendance",
+      "DisplayName": "Vigor Ascendance",
+      "Description": "Gain 6% maximum health and take 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 6,
+      "Branch": "Vigor",
+      "PointCost": 4,
+      "MinLevel": 25,
+      "RequiresTalentIds": [
+        "Miniwyvern_Ice_WyrmFortitude"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        },
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    }
+  ]
+}

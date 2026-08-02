@@ -4,15 +4,15 @@
 
 **Goal:** Give every elemental Miniwyvern a truthful role-specific talent tree, leave Wild Bond-free, and safely refund incompatible allocations on role/tree changes.
 
-**Architecture:** Tamework owns a generic reconciliation operation that validates a persisted allocation against the tree selected by the current progression role. HyDragon supplies seven role-scoped talent assets, rekeys the existing asset-gated combat path, and replaces the one-flag owner passive with a data-driven elemental Bond tier resolver. The Vigor branch uses Tamework's already-consumed health, damage-taken, and movement-speed multipliers.
+**Architecture:** Tamework owns a generic reconciliation operation that validates a persisted allocation against the tree selected by the current progression role. HyDragon supplies seven role-scoped talent assets, retains stable combat gate IDs and gives them form-specific copy, and uses existing owner-passive gating plus companion effects for Bond. The Vigor branch uses Tamework's already-consumed health, damage-taken, and movement-speed multipliers.
 
-**Tech Stack:** Java 25, Tamework 3.x source at `../alecstamework`, Hytale JSON assets, JUnit 5, Gradle.
+**Tech Stack:** Java 25, Tamework 3.x source, Hytale JSON assets, JUnit 5, Maven.
 
 ## Global Constraints
 
 - Preserve Miniwyvern level, XP, earned point capacity, bonded identity, and role-swap lifecycle state; only an incompatible talent allocation resets.
 - An enabled current role with no resolved talent config must preserve an existing allocation rather than clear it.
-- Elemental talent IDs are unique and form-prefixed; Wild has no Bond nodes.
+- Bond and Vigor talent IDs are form-prefixed; stable Combat IDs preserve existing attack gates. Wild has no Bond nodes.
 - Preserve the existing projectile and swoop mechanics; change only their form-specific identifiers and player-facing copy.
 - Use only the proven Vigor effects `MaxHealthMultiplier`, `DamageTakenMultiplier`, and `MoveSpeedMultiplier`.
 - Bond introduces no kill triggers, shields, chains, thresholds, lifesteal, or new projectile behavior.
@@ -136,12 +136,12 @@ Commit: `git add src/main/java/com/alechilles/alecstamework/npc/progression/Comp
 - Modify: `src/test/java/com/alechilles/hydragon/config/MiniwyvernTalentProgressionAssetTest.java`
 
 **Interfaces:**
-- Consumes: the current 29-node topology and Task 1's `AllocationRevision` field.
+- Consumes: the current 31-node topology and Task 1's `AllocationRevision` field.
 - Produces: exactly one role-scoped config per Miniwyvern role, each declaring `AllocationRevision: 1`.
 
 - [ ] **Step 1: Replace the asset test with per-role expectations**
 
-Assert seven assets, one matching `RoleIds` entry each, unique IDs across all assets, six elemental configs with 29 nodes/52 points, and Wild with 20 nodes/37 points. Assert every Vigor node has at least one of `MaxHealthMultiplier`, `DamageTakenMultiplier`, or `MoveSpeedMultiplier`.
+Assert seven assets, one matching `RoleIds` entry each, unique IDs across all assets, six elemental configs with 31 nodes/52 points, and Wild with 22 nodes/37 points. Assert every Vigor node has at least one of `MaxHealthMultiplier`, `DamageTakenMultiplier`, or `MoveSpeedMultiplier`.
 
 - [ ] **Step 2: Run the focused test to verify failure**
 

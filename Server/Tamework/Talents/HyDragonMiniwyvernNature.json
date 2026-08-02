@@ -1,0 +1,594 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "AllocationRevision": 1,
+  "RoleIds": [
+    "Tamed_Wyvern_Mini_Nature"
+  ],
+  "Talents": [
+    {
+      "Id": "Miniwyvern_Nature_VerdantBond",
+      "DisplayName": "Verdant Bond",
+      "Description": "Your Nature Miniwyvern strengthens its owner’s regeneration affinity.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 2,
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.03
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VerdantFocus",
+      "DisplayName": "Verdant Focus",
+      "Description": "Your Miniwyvern deals 3% more damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 4,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VerdantBond"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.03
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VerdantAttunement",
+      "DisplayName": "Verdant Attunement",
+      "Description": "Your Miniwyvern gains 6% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 6,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VerdantBond"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VerdantAmplification",
+      "DisplayName": "Verdant Amplification",
+      "Description": "Your Miniwyvern deals 4% more damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Essence Bond",
+      "PointCost": 2,
+      "MinLevel": 9,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VerdantFocus"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.04
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VerdantResonance",
+      "DisplayName": "Verdant Resonance",
+      "Description": "Your Miniwyvern takes 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Essence Bond",
+      "PointCost": 2,
+      "MinLevel": 11,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VerdantAttunement"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VerdantEfficiency",
+      "DisplayName": "Verdant Efficiency",
+      "Description": "Your Miniwyvern deals 3% more damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 14,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VerdantAmplification"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.03
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VerdantHarmony",
+      "DisplayName": "Verdant Harmony",
+      "Description": "Your Miniwyvern gains 5% movement speed.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "Essence Bond",
+      "PointCost": 1,
+      "MinLevel": 17,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VerdantResonance"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MoveSpeedMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VerdantMastery",
+      "DisplayName": "Verdant Mastery",
+      "Description": "Your Miniwyvern deals 4% more damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 5,
+      "Branch": "Essence Bond",
+      "PointCost": 2,
+      "MinLevel": 20,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VerdantEfficiency"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.04
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VerdantAscendance",
+      "DisplayName": "Verdant Ascendance",
+      "Description": "Completes the elemental bond and grants 6% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 6,
+      "Branch": "Essence Bond",
+      "PointCost": 4,
+      "MinLevel": 26,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VerdantMastery",
+        "Miniwyvern_Nature_VerdantHarmony"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        }
+      ]
+    },
+    {
+      "Id": "DraconicProjectile",
+      "DisplayName": "Nature Projectile Initiation",
+      "Description": "Unlocks the form's base projectile attack.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 3,
+      "Effects": [
+        {
+          "EffectKey": "DraconicProjectile",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectileRange",
+      "DisplayName": "Nature Long Reach",
+      "Description": "Uses the existing long-range projectile profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 5,
+      "RequiresTalentIds": [
+        "DraconicProjectile"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectileRange",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectileCadence",
+      "DisplayName": "Nature Quick Cast",
+      "Description": "Uses the existing faster projectile cadence.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 5,
+      "RequiresTalentIds": [
+        "DraconicProjectile"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectileCadence",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectileGuidance",
+      "DisplayName": "Nature Guided Flight",
+      "Description": "Uses the existing guided projectile profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Combat",
+      "PointCost": 2,
+      "MinLevel": 9,
+      "RequiresTalentIds": [
+        "ProjectileRange"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectileGuidance",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectilePattern",
+      "DisplayName": "Nature Split Flight",
+      "Description": "Uses the existing projectile pattern profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Combat",
+      "PointCost": 2,
+      "MinLevel": 11,
+      "RequiresTalentIds": [
+        "ProjectileCadence"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectilePattern",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "ProjectileMastery",
+      "DisplayName": "Nature Projectile Mastery",
+      "Description": "Uses the existing mastery projectile profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "Combat",
+      "PointCost": 3,
+      "MinLevel": 14,
+      "RequiresTalentIds": [
+        "ProjectileGuidance",
+        "ProjectilePattern"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "ProjectileMastery",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "SwoopFerocity",
+      "DisplayName": "Nature Swoop Ferocity",
+      "Description": "Uses the existing 20-damage swoop profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 3,
+      "Effects": [
+        {
+          "EffectKey": "SwoopFerocity",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "SwoopCadence",
+      "DisplayName": "Nature Swoop Cadence",
+      "Description": "Uses the existing 22-30 second swoop cadence.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 5,
+      "RequiresTalentIds": [
+        "SwoopFerocity"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SwoopCadence",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "SwoopPrecision",
+      "DisplayName": "Nature Swoop Precision",
+      "Description": "Uses the existing faster swoop approach profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "Combat",
+      "PointCost": 1,
+      "MinLevel": 5,
+      "RequiresTalentIds": [
+        "SwoopFerocity"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SwoopPrecision",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "RelentlessSwoop",
+      "DisplayName": "Nature Relentless Swoop",
+      "Description": "Uses the existing 20-26 second swoop cadence.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Combat",
+      "PointCost": 2,
+      "MinLevel": 9,
+      "RequiresTalentIds": [
+        "SwoopCadence"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "RelentlessSwoop",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "RendingDive",
+      "DisplayName": "Nature Rending Dive",
+      "Description": "Uses the existing 24-damage swoop profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "Combat",
+      "PointCost": 2,
+      "MinLevel": 11,
+      "RequiresTalentIds": [
+        "SwoopPrecision"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "RendingDive",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "SwoopMastery",
+      "DisplayName": "Nature Swoop Mastery",
+      "Description": "Uses the existing 28-damage mastery swoop profile.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "Combat",
+      "PointCost": 3,
+      "MinLevel": 14,
+      "RequiresTalentIds": [
+        "RelentlessSwoop",
+        "RendingDive"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SwoopMastery",
+          "Multiplier": 1
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VitalScales",
+      "DisplayName": "Bark Scales",
+      "Description": "Gain 5% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 1,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 2,
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_HardenedScales",
+      "DisplayName": "Bark Scales Reinforcement",
+      "Description": "Gain 5% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 2,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 4,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_VitalScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_ElderScales",
+      "DisplayName": "Bark Scales Maturity",
+      "Description": "Gain 8% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "Vigor",
+      "PointCost": 2,
+      "MinLevel": 7,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_HardenedScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.08
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_ScaleGuard",
+      "DisplayName": "Scale Guard",
+      "Description": "Take 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 8,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_ElderScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_ScaleBulwark",
+      "DisplayName": "Scale Bulwark",
+      "Description": "Take 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "Vigor",
+      "PointCost": 2,
+      "MinLevel": 11,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_ScaleGuard"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_SwiftWings",
+      "DisplayName": "Swift Wings",
+      "Description": "Gain 5% movement speed.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 12,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_ScaleBulwark"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MoveSpeedMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_SurvivalInstinct",
+      "DisplayName": "Survival Instinct",
+      "Description": "Take 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 5,
+      "Branch": "Vigor",
+      "PointCost": 2,
+      "MinLevel": 15,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_SwiftWings"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_LastingScales",
+      "DisplayName": "Lasting Scales",
+      "Description": "Gain 6% maximum health.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 5,
+      "Branch": "Vigor",
+      "PointCost": 1,
+      "MinLevel": 17,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_SurvivalInstinct"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_WyrmFortitude",
+      "DisplayName": "Wyrm Fortitude",
+      "Description": "Gain 5% movement speed.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 5,
+      "Branch": "Vigor",
+      "PointCost": 2,
+      "MinLevel": 20,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_LastingScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MoveSpeedMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "Miniwyvern_Nature_VigorAscendance",
+      "DisplayName": "Vigor Ascendance",
+      "Description": "Gain 6% maximum health and take 4% less damage.",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 6,
+      "Branch": "Vigor",
+      "PointCost": 4,
+      "MinLevel": 25,
+      "RequiresTalentIds": [
+        "Miniwyvern_Nature_WyrmFortitude"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        },
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    }
+  ]
+}
