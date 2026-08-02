@@ -7,7 +7,28 @@
     "Tamed_RockDrakeT3"
   ],
   "Interactions": [
-    { "Type": "Mount", "Enabled": true },
+    {
+      "Type": "Mount",
+      "Enabled": true,
+      "RequireCrouching": true
+    },
+    {
+      "Type": "Feed",
+      "Enabled": true,
+      "UseLovedItems": false,
+      "ItemsInHand": [
+        { "Item": "Revitalizing_Essence", "Heal": 60 }
+      ],
+      "Requires": {
+        "All": {
+          "PlayerIsOwner": true
+        }
+      },
+      "Effects": {
+        "PlaySound": { "SoundEvent": "SFX_Fen_Stalker_Eat", "Volume": 0.3, "Pitch": 2 },
+        "SpawnParticles": { "ParticleSystem": "Effect_Heal", "Color": "#fe6969", "Offset": [0, 0.8, 0], "AttachTarget": "Entity" }
+      }
+    },
     {
       "Type": "ModeCycle",
       "Enabled": true,

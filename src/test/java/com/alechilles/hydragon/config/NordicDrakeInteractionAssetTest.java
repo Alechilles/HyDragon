@@ -23,6 +23,8 @@ final class NordicDrakeInteractionAssetTest {
         JsonObject interactionConfig = JsonParser.parseString(Files.readString(INTERACTION_PATH)).getAsJsonObject();
         JsonObject mount = findMount(interactionConfig.getAsJsonArray("Interactions"));
 
+        assertTrue(mount.get("RequireCrouching").getAsBoolean());
+
         JsonObject requirements = mount.getAsJsonObject("Requires");
         assertNotNull(requirements);
         JsonObject allRequirements = requirements.getAsJsonObject("All");
