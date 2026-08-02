@@ -193,6 +193,7 @@ class ToxicHydraVariantAssetTest {
         JsonObject modify = role.getAsJsonObject("Modify");
         assertTrue(modify.get("UseToxicHydraTamedCombat").getAsBoolean());
         assertFalse(modify.has("UseNordicDrakeTamedCombat"));
+        assertEquals("HyDragonIntBeast", modify.get("InteractionConfigId").getAsString());
 
         JsonObject component = json("Server/NPC/Roles/Creature/HyDragon/Components/"
                 + "Component_HyDragon_Instruction_ToxicHydra_Tamed_Combat.json");

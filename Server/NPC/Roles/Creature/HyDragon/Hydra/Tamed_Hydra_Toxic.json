@@ -47,6 +47,7 @@
     ],
     "MaxHealth": 400,
     "AttractiveItemSet": [],
+    "InteractionConfigId": "HyDragonIntBeast",
     "CanFollow": true,
     "CanHold": true,
     "CanDefend": true,
