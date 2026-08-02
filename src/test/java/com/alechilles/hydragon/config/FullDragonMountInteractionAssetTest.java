@@ -70,10 +70,7 @@ final class FullDragonMountInteractionAssetTest {
         assertEquals(cycle, modeCycle.getAsJsonArray("Cycle").asList().stream()
                 .map(JsonElement::getAsJsonObject)
                 .map(entry -> entry.get("State").getAsString()).toList());
-        for (int index = 3; index < interactions.size(); index++) {
-            assertEquals("Custom", interactions.get(index).getAsJsonObject().get("Type").getAsString(),
-                    file + " must not let ordinary F be claimed before ModeCycle");
-        }
+        assertEquals(3, interactions.size(), file + " must not retain unreachable ordinary-F interactions");
     }
 
     private static JsonObject json(Path path) throws IOException {
