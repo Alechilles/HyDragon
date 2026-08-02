@@ -1188,17 +1188,15 @@
           },
           "Instructions": [
             {
-              "Reference": "Component_Tamework_Instruction_Follow_Advanced",
+              "Reference": "Component_HyDragon_Instruction_Follow_Large",
               "Modify": {
                 "MasterTargetSlot": "MasterTarget",
-                "FollowDefaultSpotRange": 10,
-                "FollowLockOnRange": 20,
-                "FollowSeekSlowDownDistance": 8,
-                "FollowSeekStopDistance": 6,
-                "FollowScanRange": 16,
+                "FollowTeleportThresholdRange": 96,
+                "FollowSeekSlowDownDistance": 32,
+                "FollowSeekStopDistance": 16,
                 "FollowMaintainDistanceRange": [
-                  5,
-                  9
+                  16,
+                  24
                 ]
               }
             }
@@ -1289,6 +1287,7 @@
                 "ChaseRelativeSpeed": {
                   "Compute": "ChaseRelativeSpeed"
                 },
+                "DefendFollowMacroElement": "Component_HyDragon_Instruction_Follow_Large",
                 "AdditionalCombatBehaviorMacroElement": {
                   "Compute": "AdditionalCombatBehaviorMacroElement"
                 }

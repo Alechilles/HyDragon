@@ -527,10 +527,11 @@
                       4,
                       8
                     ],
-                    "FollowTeleportThresholdRange": 32,
-                    "FollowSeekSlowDownDistance": 10,
-                    "FollowSeekStopDistance": 6,
-                    "FollowSeekRelativeSpeed": 0.9,
+                    "FollowTeleportThresholdRange": 96,
+                    "FollowOrbitRadiusRange": [16, 24],
+                    "FollowOrbitRetargetTimeRange": [3, 6],
+                    "FollowOrbitStopDistance": 3,
+                    "FollowOrbitRelativeSpeed": 0.65,
                     "FollowHoverRadius": 1.75,
                     "FollowHoverRelativeSpeed": 0.12
                   }

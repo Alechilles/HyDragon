@@ -214,7 +214,7 @@ final class DragonHornLocomotionAssetContractTest {
 
         JsonObject follow = stateBehavior(fullDragon, "Follow");
         assertExactlyTwoDirectModeBranches(follow);
-        assertModeBranch(follow, false, "Walk", null, "Component_Tamework_Instruction_Follow_Advanced");
+        assertModeBranch(follow, false, "Walk", null, "Component_HyDragon_Instruction_Follow_Large");
         assertModeBranch(follow, true, "Fly", null, "Component_Tamework_Instruction_Follow_Flying");
         assertAerialFollowTuning(follow);
 
@@ -222,7 +222,7 @@ final class DragonHornLocomotionAssetContractTest {
         assertExactlyTwoDirectModeBranches(defend);
         assertModeBranch(defend, false, "Walk", null, "Component_Tamework_Instruction_Defend");
         assertModeBranch(defend, true, "Fly", null, "Component_Tamework_Instruction_Defend");
-        assertNoDefendFollowMacro(defend, false);
+        assertDefendFollowMacro(defend, false, "Component_HyDragon_Instruction_Follow_Large");
         assertDefendFollowMacro(defend, true, "Component_Tamework_Instruction_Follow_Flying");
         assertFullDragonDefendTuning(defend, false);
         assertFullDragonDefendTuning(defend, true);
@@ -644,10 +644,11 @@ final class DragonHornLocomotionAssetContractTest {
         JsonObject modify = reference.getAsJsonObject("Modify");
         assertEquals("MasterTarget", string(modify, "MasterTargetSlot"));
         assertEquals(JsonParser.parseString("[4,8]"), modify.get("FollowDesiredAltitudeRange"));
-        assertEquals(JsonParser.parseString("32"), modify.get("FollowTeleportThresholdRange"));
-        assertEquals(JsonParser.parseString("10"), modify.get("FollowSeekSlowDownDistance"));
-        assertEquals(JsonParser.parseString("6"), modify.get("FollowSeekStopDistance"));
-        assertEquals(JsonParser.parseString("0.9"), modify.get("FollowSeekRelativeSpeed"));
+        assertEquals(JsonParser.parseString("96"), modify.get("FollowTeleportThresholdRange"));
+        assertEquals(JsonParser.parseString("[16,24]"), modify.get("FollowOrbitRadiusRange"));
+        assertEquals(JsonParser.parseString("[3,6]"), modify.get("FollowOrbitRetargetTimeRange"));
+        assertEquals(JsonParser.parseString("3"), modify.get("FollowOrbitStopDistance"));
+        assertEquals(JsonParser.parseString("0.65"), modify.get("FollowOrbitRelativeSpeed"));
         assertEquals(JsonParser.parseString("1.75"), modify.get("FollowHoverRadius"));
         assertEquals(JsonParser.parseString("0.12"), modify.get("FollowHoverRelativeSpeed"));
     }

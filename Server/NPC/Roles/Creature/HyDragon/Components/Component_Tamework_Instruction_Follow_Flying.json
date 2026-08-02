@@ -1,5 +1,5 @@
 {
-  "$Comment": "Flying follow behavior for aerial companions. Designed to mirror Tamework component naming so it can be upstreamed later.",
+  "$Comment": "Flying follow behavior for aerial dragon companions. Designed to mirror Tamework component naming so it can be upstreamed later.",
   "Type": "Component",
   "Class": "Instruction",
   "Interface": "Tamework.Instruction.Follow",
@@ -16,20 +16,24 @@
       "Description": "Preferred altitude range to maintain while following."
     },
     "FollowTeleportThresholdRange": {
-      "Value": 32,
+      "Value": 96,
       "Description": "Distance beyond which teleport fallback is used instead of normal flight catch-up."
     },
-    "FollowSeekSlowDownDistance": {
-      "Value": 10,
-      "Description": "Distance from the owner where flight catch-up begins to slow down."
+    "FollowOrbitRadiusRange": {
+      "Value": [16, 24],
+      "Description": "Wander orbit radius range maintained around the owner."
     },
-    "FollowSeekStopDistance": {
-      "Value": 6,
-      "Description": "Distance from the owner considered close enough for flying follow."
+    "FollowOrbitRetargetTimeRange": {
+      "Value": [3, 6],
+      "Description": "Delay range between choosing new orbit points around the owner."
     },
-    "FollowSeekRelativeSpeed": {
-      "Value": 0.9,
-      "Description": "Relative speed used while flying toward the owner."
+    "FollowOrbitStopDistance": {
+      "Value": 3,
+      "Description": "Distance from a selected orbit point considered reached."
+    },
+    "FollowOrbitRelativeSpeed": {
+      "Value": 0.65,
+      "Description": "Relative speed used while wandering around the owner."
     },
     "FollowHoverRadius": {
       "Value": 1.75,
@@ -41,7 +45,7 @@
     }
   },
   "Content": {
-    "$Comment": "Take off when grounded, fly back to the owner when separated, and hover loosely when already nearby.",
+    "$Comment": "Take off when grounded, orbit the owner while airborne, and teleport only after a large separation.",
     "Continue": true,
     "Sensor": {
       "Type": "Any"
@@ -124,7 +128,7 @@
         }
       },
       {
-        "$Comment": "Fly back toward the owner until within the desired follow distance.",
+        "$Comment": "Wander through a broad orbit around the owner instead of directly seeking their position.",
         "Continue": true,
         "Sensor": {
           "Type": "And",
@@ -141,18 +145,6 @@
               "Range": {
                 "Compute": "FollowTeleportThresholdRange"
               }
-            },
-            {
-              "Type": "Not",
-              "Sensor": {
-                "Type": "Target",
-                "TargetSlot": {
-                  "Compute": "MasterTargetSlot"
-                },
-                "Range": {
-                  "Compute": "FollowSeekStopDistance + 0.35"
-                }
-              }
             }
           ]
         },
@@ -160,49 +152,22 @@
           "Type": "Watch"
         },
         "BodyMotion": {
-          "Type": "Seek",
-          "SlowDownDistance": {
-            "Compute": "FollowSeekSlowDownDistance"
+          "Type": "TameworkFlyingOrbit",
+          "Mode": "WANDER_TARGET",
+          "WanderRadiusRange": {
+            "Compute": "FollowOrbitRadiusRange"
           },
-          "StopDistance": {
-            "Compute": "FollowSeekStopDistance"
+          "WanderRetargetTimeRange": {
+            "Compute": "FollowOrbitRetargetTimeRange"
           },
-          "RelativeSpeed": {
-            "Compute": "FollowSeekRelativeSpeed"
-          }
-        }
-      },
-      {
-        "$Comment": "Hover loosely when already close to the owner.",
-        "Continue": true,
-        "Sensor": {
-          "Type": "And",
-          "Sensors": [
-            {
-              "Type": "MotionController",
-              "MotionController": "Fly"
-            },
-            {
-              "Type": "Target",
-              "TargetSlot": {
-                "Compute": "MasterTargetSlot"
-              },
-              "Range": {
-                "Compute": "FollowSeekStopDistance + 0.35"
-              }
-            }
-          ]
-        },
-        "HeadMotion": {
-          "Type": "Watch"
-        },
-        "BodyMotion": {
-          "Type": "WanderInCircle",
-          "Radius": {
-            "Compute": "FollowHoverRadius"
+          "WanderStopDistance": {
+            "Compute": "FollowOrbitStopDistance"
           },
           "RelativeSpeed": {
-            "Compute": "FollowHoverRelativeSpeed"
+            "Compute": "FollowOrbitRelativeSpeed"
+          },
+          "DesiredAltitudeRange": {
+            "Compute": "FollowDesiredAltitudeRange"
           }
         }
       },
