@@ -27,7 +27,7 @@ class DragonRosterAssetContractTest {
         String full = read("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json");
         String mini = read("Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json");
 
-        assertPolicy(full, "hydragon:full_dragons", 0, 1, 600, 300,
+        assertPolicy(full, "hydragon:full_dragons", 0, 1, 300, 1800,
                 List.of("Revitalizing_Essence:2", "Draconic_Essence:4"));
         assertPolicy(mini, "hydragon:soulbound_mini", 1, 1, null, null,
                 List.of("Revitalizing_Essence:1", "Draconic_Essence:2"));

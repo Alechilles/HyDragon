@@ -69,14 +69,14 @@ final class NordicDrakeProgressionAssetTest {
     }
 
     @Test
-    void talentTreeHasAllApprovedNodesAndNoCooldownTalent() throws IOException {
+    void talentTreeHasAllApprovedNodesIncludingTheSummonTimerLine() throws IOException {
         JsonObject talentConfig = loadJson(TALENTS_PATH);
         assertTrue(talentConfig.get("Enabled").getAsBoolean());
         assertEquals(100, talentConfig.get("Priority").getAsInt());
         assertEquals(List.of("Tamed_NordicDrake"), strings(talentConfig.getAsJsonArray("RoleIds")));
 
         Map<String, JsonObject> talents = talentsById(talentConfig.getAsJsonArray("Talents"));
-        assertEquals(18, talents.size());
+        assertEquals(22, talents.size());
         assertEquals(expectedTalents().keySet(), talents.keySet());
         for (Map.Entry<String, TalentExpectation> entry : expectedTalents().entrySet()) {
             JsonObject talent = talents.get(entry.getKey());
@@ -106,8 +106,9 @@ final class NordicDrakeProgressionAssetTest {
                 "AvatarFlightForwardBoostCostMultiplier",
                 "AvatarFlightForwardBoostImpulseMultiplier",
                 "AvatarFlightGlideSinkMultiplier",
-                "AvatarFlightClimbLiftMultiplier")));
-        assertFalse(effectKeys.stream().anyMatch(key -> key.toLowerCase(java.util.Locale.ROOT).contains("cooldown")));
+                "AvatarFlightClimbLiftMultiplier",
+                "SummonSessionDurationMultiplier",
+                "SummonCooldownMultiplier")));
     }
 
     @Test
@@ -138,6 +139,7 @@ final class NordicDrakeProgressionAssetTest {
         String aerial = "hydragon.talents.nordic_drake.branch.aerial_mastery";
         String war = "hydragon.talents.nordic_drake.branch.war_drake";
         String wyrmguard = "hydragon.talents.nordic_drake.branch.wyrmguard";
+        String summoner = "hydragon.talents.nordic_drake.branch.summoners_pact";
         Map<String, TalentExpectation> expected = new LinkedHashMap<>();
         expected.put("NordicDrake_NorthwindResolve", talent(aerial, 1, 1, List.of(), Map.of(
                 "AvatarFlightVigourCapacityMultiplier", 1.15d)));
@@ -181,6 +183,17 @@ final class NordicDrakeProgressionAssetTest {
                 List.of("NordicDrake_Unyielding", "NordicDrake_Sagascar"), Map.of(
                         "MaxHealthMultiplier", 1.05d,
                         "DamageTakenMultiplier", toughnessForReduction(0.04d))));
+        expected.put("NordicDrake_DragonboundPact", talent(summoner, 1, 1, List.of(), Map.of(
+                "SummonSessionDurationMultiplier", 1.25d)));
+        expected.put("NordicDrake_SwiftRecall", talent(summoner, 2, 8,
+                List.of("NordicDrake_DragonboundPact"), Map.of(
+                        "SummonCooldownMultiplier", 0.8d)));
+        expected.put("NordicDrake_EternalWings", talent(summoner, 3, 16,
+                List.of("NordicDrake_SwiftRecall"), Map.of(
+                        "SummonSessionDurationMultiplier", 1.6d)));
+        expected.put("NordicDrake_HornmastersCall", talent(summoner, 4, 24,
+                List.of("NordicDrake_EternalWings"), Map.of(
+                        "SummonCooldownMultiplier", 0.625d)));
         return expected;
     }
 
@@ -204,6 +217,10 @@ final class NordicDrakeProgressionAssetTest {
         expected.put("NordicDrake_Unyielding", text("unyielding"));
         expected.put("NordicDrake_Sagascar", text("sagascar"));
         expected.put("NordicDrake_NorthernBulwark", text("northern_bulwark"));
+        expected.put("NordicDrake_DragonboundPact", text("dragonbound_pact"));
+        expected.put("NordicDrake_SwiftRecall", text("swift_recall"));
+        expected.put("NordicDrake_EternalWings", text("eternal_wings"));
+        expected.put("NordicDrake_HornmastersCall", text("hornmasters_call"));
         return expected;
     }
 
@@ -211,7 +228,8 @@ final class NordicDrakeProgressionAssetTest {
         Set<String> expected = new java.util.LinkedHashSet<>(Set.of(
                 "hydragon.talents.nordic_drake.branch.aerial_mastery",
                 "hydragon.talents.nordic_drake.branch.war_drake",
-                "hydragon.talents.nordic_drake.branch.wyrmguard"));
+                "hydragon.talents.nordic_drake.branch.wyrmguard",
+                "hydragon.talents.nordic_drake.branch.summoners_pact"));
         for (TalentTextExpectation text : expectedTalentText().values()) {
             expected.add(text.displayName());
             expected.add(text.description());

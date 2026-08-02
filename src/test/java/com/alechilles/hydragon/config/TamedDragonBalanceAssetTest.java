@@ -81,11 +81,13 @@ final class TamedDragonBalanceAssetTest {
 
         JsonArray talents = json(Path.of("Server", "Tamework", "Talents", "HyDragonHydra.json"))
                 .getAsJsonArray("Talents");
-        assertEquals(6, talents.size());
+        assertEquals(10, talents.size());
         Set<String> ids = talents.asList().stream().map(JsonElement::getAsJsonObject)
                 .map(talent -> talent.get("Id").getAsString()).collect(java.util.stream.Collectors.toSet());
         assertEquals(Set.of("Hydra_RazorFangs", "Hydra_RelentlessAssault", "Hydra_ThickScales",
-                "Hydra_GuardiansHide", "Hydra_EnduringHunt", "Hydra_PrimalFocus"), ids);
+                "Hydra_GuardiansHide", "Hydra_EnduringHunt", "Hydra_PrimalFocus",
+                "Hydra_DragonboundPact", "Hydra_SwiftRecall", "Hydra_EternalWings",
+                "Hydra_HornmastersCall"), ids);
 
         for (String locale : LOCALES) {
             Map<String, String> entries = localeEntries(locale);
@@ -96,6 +98,18 @@ final class TamedDragonBalanceAssetTest {
                 assertTrue(entries.containsKey(talent.get("Description").getAsString()), locale + " description translation");
             }
         }
+    }
+
+    @Test
+    void dragonSummonsStartAtFiveMinutesAndTimerTalentsReachTheTenAndFifteenMinuteCaps()
+            throws IOException {
+        JsonObject roster = json(Path.of("Server", "Tamework", "BondedCompanions", "Rosters",
+                "HyDragonFullDragons.json"));
+        assertEquals(300L, roster.get("SessionDurationSeconds").getAsLong());
+        assertEquals(1_800L, roster.get("SummonCooldownSeconds").getAsLong());
+
+        assertTimerTalentCap("HyDragonNordicDrake.json");
+        assertTimerTalentCap("HyDragonHydra.json");
     }
 
     private static void assertProjectile(String relativePath, int damage, int explosionDamage) throws IOException {
@@ -130,6 +144,31 @@ final class TamedDragonBalanceAssetTest {
                 .map(JsonElement::getAsJsonObject)
                 .filter(effect -> effectKey.equals(effect.get("EffectKey").getAsString())).findFirst().orElseThrow()
                 .get("PerLevel").getAsDouble();
+    }
+
+    private static void assertTimerTalentCap(String file) throws IOException {
+        JsonArray talents = json(Path.of("Server", "Tamework", "Talents", file))
+                .getAsJsonArray("Talents");
+        double durationMultiplier = effectProduct(talents, "SummonSessionDurationMultiplier");
+        double cooldownMultiplier = effectProduct(talents, "SummonCooldownMultiplier");
+        assertEquals(2.0, durationMultiplier, 0.000_001, file + " duration multiplier");
+        assertEquals(0.5, cooldownMultiplier, 0.000_001, file + " cooldown multiplier");
+        assertEquals(600L, Math.round(300L * durationMultiplier), file + " active duration");
+        assertEquals(900L, Math.round(1_800L * cooldownMultiplier), file + " cooldown");
+    }
+
+    private static double effectProduct(JsonArray talents, String effectKey) {
+        double product = 1.0;
+        for (JsonElement talentElement : talents) {
+            for (JsonElement effectElement : talentElement.getAsJsonObject()
+                    .getAsJsonArray("Effects")) {
+                JsonObject effect = effectElement.getAsJsonObject();
+                if (effectKey.equals(effect.get("EffectKey").getAsString())) {
+                    product *= effect.get("Multiplier").getAsDouble();
+                }
+            }
+        }
+        return product;
     }
 
     private static JsonObject json(Path path) throws IOException {

@@ -226,6 +226,53 @@
         {"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05},
         {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}
       ]
+    },
+    {
+      "Id": "NordicDrake_DragonboundPact",
+      "DisplayName": "hydragon.talents.nordic_drake.dragonbound_pact.name",
+      "Description": "hydragon.talents.nordic_drake.dragonbound_pact.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
+      "PointCost": 1,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.25}]
+    },
+    {
+      "Id": "NordicDrake_SwiftRecall",
+      "DisplayName": "hydragon.talents.nordic_drake.swift_recall.name",
+      "Description": "hydragon.talents.nordic_drake.swift_recall.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
+      "PointCost": 2,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["NordicDrake_DragonboundPact"],
+      "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.8}]
+    },
+    {
+      "Id": "NordicDrake_EternalWings",
+      "DisplayName": "hydragon.talents.nordic_drake.eternal_wings.name",
+      "Description": "hydragon.talents.nordic_drake.eternal_wings.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
+      "PointCost": 3,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["NordicDrake_SwiftRecall"],
+      "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.6}]
+    },
+    {
+      "Id": "NordicDrake_HornmastersCall",
+      "DisplayName": "hydragon.talents.nordic_drake.hornmasters_call.name",
+      "Description": "hydragon.talents.nordic_drake.hornmasters_call.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["NordicDrake_EternalWings"],
+      "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.625}]
     }
   ]
 }

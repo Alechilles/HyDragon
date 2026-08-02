@@ -1296,8 +1296,8 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         "HyDragonFullDragons.json": {
             "FamilyId": "hydragon:full_dragons", "MaximumOwned": 0,
             "MaximumActive": 1,
-            "Timers": {"SessionDurationSeconds": 600,
-                       "SummonCooldownSeconds": 300},
+            "Timers": {"SessionDurationSeconds": 300,
+                       "SummonCooldownSeconds": 1800},
             "AllowedRoles": {"Tamed_NordicDrake", "Tamed_Hydra", "Tamed_Hydra_Toxic",
                              "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"},
             "Costs": [("Revitalizing_Essence", 2), ("Draconic_Essence", 4)],

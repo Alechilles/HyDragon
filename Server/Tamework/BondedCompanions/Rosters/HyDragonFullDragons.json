@@ -12,8 +12,8 @@
   ],
   "MaximumOwned": 0,
   "MaximumActive": 1,
-  "SessionDurationSeconds": 600,
-  "SummonCooldownSeconds": 300,
+  "SessionDurationSeconds": 300,
+  "SummonCooldownSeconds": 1800,
   "SummonAuraEffectId": "HyDragon_DragonStone_SummonAura",
   "RevivePrice": {
     "Costs": [
