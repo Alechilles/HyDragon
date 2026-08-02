@@ -59,13 +59,77 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
-    void toxicModelInheritsHydraAndOnlySelectsToxicTexture() throws Exception {
-        JsonObject model = json("Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
-        assertEquals("Hydra", model.get("Parent").getAsString());
-        String texture = model.get("Texture").getAsString();
-        assertEquals("NPC/HyDragon/Hydra/Model/Toxic.png", texture);
+    void toxicModelUsesWingedHydraRuntimePresentation() throws Exception {
+        Path runtimeModel = ROOT.resolve(
+                "Common/NPC/HyDragon/Hydra_Winged/Model/Hydra_Winged.blockymodel");
+        assertTrue(Files.isRegularFile(runtimeModel), "Winged Hydra export must use the runtime asset name");
+
+        JsonObject toxicModel = json("Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
+        assertEquals(JsonParser.parseString("""
+                {"Parent":"Hydra_Winged"}
+                """).getAsJsonObject(), toxicModel);
+
+        JsonObject wingedModel = json("Server/Models/HyDragon/Hydra_Winged/Hydra_Winged.json");
+        assertEquals("NPC/HyDragon/Hydra_Winged/Model/Hydra_Winged.blockymodel",
+                wingedModel.get("Model").getAsString());
+        String texture = wingedModel.get("Texture").getAsString();
+        assertEquals("NPC/HyDragon/Hydra_Winged/Model/texture.png", texture);
         assertTrue(Files.isRegularFile(ROOT.resolve("Common").resolve(texture)));
-        assertEquals(Set.of("Parent", "Texture"), model.keySet());
+
+        JsonObject animationSets = wingedModel.getAsJsonObject("AnimationSets");
+        assertAnimationPath(animationSets, "Idle", "Animation/Default/Idle.blockyanim");
+        assertAnimationPath(animationSets, "LeftSwipe", "Animation/Attacks/Swipe_Left.blockyanim");
+        assertAnimationPath(animationSets, "Rainshoot", "Animation/Rainshoot.blockyanim");
+        assertAnimationPath(animationSets, "FlyIdle", "Animation/Fly/Fly_Idle.blockyanim");
+        assertAnimationPath(animationSets, "Fly", "Animation/Fly/Fly.blockyanim");
+        assertAnimationPath(animationSets, "FlyFast", "Animation/Fly/Fly_Fast.blockyanim");
+
+        JsonObject exported = json("Common/NPC/HyDragon/Hydra_Winged/Model/Hydra_Winged.blockymodel");
+        assertEquals("character", exported.get("format").getAsString());
+        assertTrue(modelNodeNames(exported).contains("Origin"));
+    }
+
+    @Test
+    void onlyTamedToxicHydraEnablesDedicatedAvatarFlight() throws Exception {
+        Path patchPath = ROOT.resolve(
+                "Server/Tamework/Patches/HyDragonRoles/Tamed_Hydra_Toxic_AvatarFlight.json");
+        assertTrue(Files.isRegularFile(patchPath), "Tamed Toxic Hydra needs avatar-flight role wiring");
+
+        JsonObject wildModify = toxicRole("Hydra_Toxic").getAsJsonObject("Modify");
+        assertFalse(wildModify.has("MountMode"));
+        assertFalse(wildModify.has("AvatarFlightConfig"));
+        assertEquals("CAE_Hydra_Toxic", wildModify.get("_CombatConfig").getAsString());
+
+        JsonObject patch = json(
+                "Server/Tamework/Patches/HyDragonRoles/Tamed_Hydra_Toxic_AvatarFlight.json");
+        assertEquals("Server/NPC/Roles/Creature/HyDragon/Hydra/Tamed_Hydra_Toxic.json",
+                patch.get("Target").getAsString());
+        JsonObject patchValue = patch.getAsJsonArray("Operations").get(0).getAsJsonObject()
+                .getAsJsonObject("Value");
+        assertEquals("TameworkAvatarFlight", patchValue.get("MountMode").getAsString());
+        assertEquals("HyDragonToxicHydra", patchValue.get("AvatarFlightConfig").getAsString());
+
+        JsonObject flight = json("Server/Tamework/AvatarFlight/HyDragonToxicHydra.json");
+        assertTrue(flight.get("Enabled").getAsBoolean());
+        assertEquals("Hydra_Winged_AvatarFlight",
+                flight.getAsJsonObject("Model").get("ModelId").getAsString());
+        assertTrue(flight.getAsJsonObject("Model").get("ApplyModel").getAsBoolean());
+        assertFalse(flight.has("CombatAbilities"), "Airborne Toxic abilities are deferred");
+        assertEquals("FlyIdle", flight.getAsJsonObject("Animation")
+                .get("IdleAnimation").getAsString());
+        assertEquals("Fly", flight.getAsJsonObject("Animation")
+                .get("FlightAnimation").getAsString());
+        assertEquals("FlyFast", flight.getAsJsonObject("Animation")
+                .get("FastFlightAnimation").getAsString());
+
+        JsonObject avatarModel = json(
+                "Server/Models/HyDragon/Hydra_Winged/Hydra_Winged_AvatarFlight.json");
+        String avatarRuntimePath = avatarModel.get("Model").getAsString();
+        assertTrue(Files.isRegularFile(ROOT.resolve("Common").resolve(avatarRuntimePath)));
+        JsonObject avatarRuntime = json("Common/" + avatarRuntimePath);
+        Set<String> avatarNodes = modelNodeNames(avatarRuntime);
+        assertTrue(avatarNodes.contains("AF_Origin"));
+        assertFalse(avatarNodes.contains("Origin"));
     }
 
     @Test
@@ -506,6 +570,27 @@ class ToxicHydraVariantAssetTest {
         JsonArray defaults = interaction.getAsJsonObject("DefaultValue").getAsJsonArray("Interactions");
         assertEquals(1, defaults.size());
         assertEquals(leaf, defaults.get(0).getAsString());
+    }
+
+    private static void assertAnimationPath(JsonObject animationSets, String animationSet, String suffix) {
+        String path = animationSets.getAsJsonObject(animationSet).getAsJsonArray("Animations")
+                .get(0).getAsJsonObject().get("Animation").getAsString();
+        assertEquals("NPC/HyDragon/Hydra_Winged/" + suffix, path);
+        assertTrue(Files.isRegularFile(ROOT.resolve("Common").resolve(path)), path);
+    }
+
+    private static Set<String> modelNodeNames(JsonObject model) {
+        Set<String> names = new HashSet<>();
+        collectModelNodeNames(model.getAsJsonArray("nodes"), names);
+        return names;
+    }
+
+    private static void collectModelNodeNames(JsonArray nodes, Set<String> names) {
+        for (JsonElement element : nodes) {
+            JsonObject node = element.getAsJsonObject();
+            names.add(node.get("name").getAsString());
+            if (node.has("children")) collectModelNodeNames(node.getAsJsonArray("children"), names);
+        }
     }
 
     private static void assertDelay(JsonObject interaction, double runTime) {

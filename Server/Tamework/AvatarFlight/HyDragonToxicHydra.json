@@ -1,0 +1,56 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "Model": {
+    "ApplyModel": true,
+    "ModelId": "Hydra_Winged_AvatarFlight",
+    "Scale": 1.0,
+    "CameraPositionOffset": {
+      "X": 1.0,
+      "Y": 0.0,
+      "Z": 8.0
+    },
+    "EyeHeight": 3.6
+  },
+  "Audio": {
+    "IdleFlightFlapSoundEvent": "SFX_Tamework_AvatarFlight_Wing_Flap_Footstep",
+    "IdleFlightFlapIntervalMs": 2000.0,
+    "FlightFlapSoundEvent": "SFX_Tamework_AvatarFlight_Wing_Flap_Footstep",
+    "FlightFlapIntervalMs": 1000.0
+  },
+  "Animation": {
+    "IdleAnimation": "FlyIdle",
+    "FlightAnimation": "Fly",
+    "FastFlightAnimation": "FlyFast",
+    "PoseAnimationsEnabled": true,
+    "PitchPoseSlot": "Status",
+    "RollPoseSlot": "Status",
+    "PitchUpPoseAnimation": "TameworkPitchUp",
+    "PitchDownPoseAnimation": "TameworkPitchDown",
+    "BankLeftPoseAnimation": "TameworkBankLeft",
+    "BankRightPoseAnimation": "TameworkBankRight",
+    "PitchUpBankLeftPoseAnimation": "TameworkPitchUpBankLeft",
+    "PitchUpBankRightPoseAnimation": "TameworkPitchUpBankRight",
+    "PitchDownBankLeftPoseAnimation": "TameworkPitchDownBankLeft",
+    "PitchDownBankRightPoseAnimation": "TameworkPitchDownBankRight",
+    "PitchPoseThresholdDegrees": 6.0,
+    "RollPoseThresholdDegrees": 4.0,
+    "PoseResendIntervalMs": 150.0,
+    "SuppressStatusAnimation": true,
+    "SuppressEmoteAnimation": true
+  },
+  "AbilityAnimation": {
+    "Slot": "Movement",
+    "UpwardBoostAnimation": "FlyIdle",
+    "ForwardBoostAnimation": "FlyFast",
+    "AirbrakeAnimation": "FlyIdle"
+  },
+  "RiderVisual": {
+    "HideOwnerEquipment": true,
+    "HideOwnerArmor": true,
+    "HideOwnerHands": true,
+    "ShowRider": true,
+    "IncludeAppearanceAttachments": true,
+    "SeatOffsetY": 2.5
+  }
+}

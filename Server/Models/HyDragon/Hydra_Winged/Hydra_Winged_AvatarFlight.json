@@ -1,0 +1,487 @@
+{
+  "Parent": "Hydra",
+  "Model": "NPC/HyDragon/Hydra_Winged/Model/Hydra_Winged_AvatarFlight.blockymodel",
+  "Texture": "NPC/HyDragon/Hydra_Winged/Model/texture.png",
+  "AnimationSets": {
+    "Idle": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Idle.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "IdlePassive": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/AvatarFlight/Idle2.blockyanim",
+          "Looping": false,
+          "Speed": 0.15
+        }
+      ],
+      "NextAnimationDelay": {
+        "Min": 2,
+        "Max": 8
+      }
+    },
+    "Spawn": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Spawn.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0
+        }
+      ]
+    },
+    "Walk": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Walk.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk"
+        }
+      ]
+    },
+    "WalkPassive": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Walk.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk"
+        }
+      ]
+    },
+    "WalkBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Walk_Backward.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk"
+        }
+      ]
+    },
+    "Run": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Run.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk",
+          "Looping": true,
+          "Speed": 0.7
+        }
+      ]
+    },
+    "Sprint": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Run.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk",
+          "Looping": true,
+          "Speed": 0.7
+        }
+      ]
+    },
+    "StepRun": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Run.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk",
+          "Looping": true,
+          "Speed": 0.7
+        }
+      ]
+    },
+    "StepSprint": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Run.blockyanim",
+          "SoundEventId": "SFX_Rex_Walk",
+          "Looping": true,
+          "Speed": 0.7
+        }
+      ]
+    },
+    "Crouch": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Crouch.blockyanim",
+          "BlendingDuration": 0.1
+        }
+      ]
+    },
+    "CrouchWalk": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Crouch_Walk.blockyanim",
+          "BlendingDuration": 0.1
+        }
+      ]
+    },
+    "CrouchWalkBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Crouch_Walk_Backward.blockyanim",
+          "BlendingDuration": 0.1
+        }
+      ]
+    },
+    "Jump": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Jump.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "Speed": 0.8
+        }
+      ]
+    },
+    "JumpWalk": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Jump.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "Speed": 0.8
+        }
+      ]
+    },
+    "JumpRun": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Jump_Far.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "Speed": 0.8
+        }
+      ]
+    },
+    "JumpSprint": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Jump_Far.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "Speed": 0.8
+        }
+      ]
+    },
+    "Fall": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Fall.blockyanim",
+          "BlendingDuration": 0.4,
+          "Speed": 0.7
+        }
+      ]
+    },
+    "FallFar": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Fall.blockyanim",
+          "BlendingDuration": 0.4,
+          "Speed": 0.6
+        }
+      ]
+    },
+    "Alerted": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Alerted.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "SoundEventId": "SFX_Rex_Alerted"
+        }
+      ]
+    },
+    "Laydown": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Laydown.blockyanim",
+          "Looping": false,
+          "Speed": 0.5
+        }
+      ]
+    },
+    "Sleep": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Sleep.blockyanim",
+          "Speed": 0.25
+        }
+      ]
+    },
+    "Wake": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Wake.blockyanim",
+          "Looping": false,
+          "Speed": 0.8
+        }
+      ]
+    },
+    "Hurt": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Damage/AvatarFlight/Hurt.blockyanim",
+          "Looping": false,
+          "BlendingDuration": 0.1,
+          "SoundEventId": "SFX_Rex_Hurt"
+        }
+      ]
+    },
+    "Death": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Damage/AvatarFlight/Death.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "SwimIdle": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Idle.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "Swim": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim.blockyanim",
+          "Speed": 0.8
+        }
+      ]
+    },
+    "SwimBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Backward.blockyanim",
+          "Speed": 0.8
+        }
+      ]
+    },
+    "SwimFast": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Fast.blockyanim",
+          "Speed": 0.9
+        }
+      ]
+    },
+    "SwimJump": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Jump.blockyanim",
+          "Looping": false,
+          "Speed": 0.7
+        }
+      ]
+    },
+    "SwimFloat": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Idle.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "SwimSink": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Jump.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "SwimDive": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim.blockyanim",
+          "Speed": 0.8
+        }
+      ]
+    },
+    "SwimDiveBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Backward.blockyanim",
+          "Speed": 0.8
+        }
+      ]
+    },
+    "SwimDiveFast": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Fast.blockyanim",
+          "Speed": 0.9
+        }
+      ]
+    },
+    "FluidIdle": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Idle.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "FluidWalk": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "FluidWalkBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Backward.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "FluidRun": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Swim/AvatarFlight/Swim_Fast.blockyanim",
+          "Speed": 0.6
+        }
+      ]
+    },
+    "LeftSwipe": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Attacks/AvatarFlight/Swipe_Left.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "RightSwipe": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Attacks/AvatarFlight/Swipe_Right.blockyanim",
+          "Looping": false,
+          "SoundEventId": "SFX_Bear_Grizzly_Attack"
+        }
+      ]
+    },
+    "Stomp": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Attacks/AvatarFlight/Stomp.blockyanim",
+          "Looping": false,
+          "SoundEventId": "SFX_Golem_Frost_Stomp"
+        }
+      ]
+    },
+    "Rainshoot": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/AvatarFlight/Rainshoot.blockyanim",
+          "Looping": false,
+          "Speed": 0.5
+        }
+      ],
+      "NextAnimationDelay": {
+        "Min": 1,
+        "Max": 1
+      }
+    },
+    "Bite": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/AvatarFlight/Bite.blockyanim",
+          "Looping": false,
+          "SoundEventId": "SFX_Rex_Bite"
+        }
+      ]
+    },
+    "BasicShoot": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/AvatarFlight/BasicShoot.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "PrepareShoot": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/AvatarFlight/PrepareShoot.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "ChargeShoot": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/AvatarFlight/ChargeShoot.blockyanim",
+          "Looping": true
+        }
+      ]
+    },
+    "TailSpin": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/AvatarFlight/Tail_Spin.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "Eat": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Flavor/AvatarFlight/Eat.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "Roar": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Flavor/AvatarFlight/Roar.blockyanim",
+          "Looping": false,
+          "SoundEventId": "SFX_Rex_Alerted"
+        }
+      ]
+    },
+    "Search": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Flavor/AvatarFlight/Search.blockyanim",
+          "Looping": false
+        }
+      ]
+    },
+    "FlyIdle": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Fly/AvatarFlight/Fly_Idle.blockyanim",
+          "Looping": true
+        }
+      ]
+    },
+    "Fly": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Fly/AvatarFlight/Fly.blockyanim",
+          "Looping": true
+        }
+      ]
+    },
+    "FlyFast": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Fly/AvatarFlight/Fly_Fast.blockyanim",
+          "Looping": true
+        }
+      ]
+    },
+    "FlyBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Fly/AvatarFlight/Fly_Backward.blockyanim",
+          "Looping": true
+        }
+      ]
+    }
+  }
+}
