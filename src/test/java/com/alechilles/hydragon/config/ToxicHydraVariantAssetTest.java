@@ -201,6 +201,19 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
+    void tamedHydraPublishesAvatarFlightParametersThroughBothRoleLayers() throws Exception {
+        JsonObject templateParameters = json(
+                "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Tamed.json")
+                .getAsJsonObject("Parameters");
+        for (String parameter : List.of("MountMode", "AvatarFlightConfig")) {
+            JsonObject declaration = templateParameters.getAsJsonObject(parameter);
+            assertNotNull(declaration, "Template_HyDragon_Tamed must declare " + parameter);
+            assertEquals("", declaration.get("Value").getAsString());
+            assertPublicParameter("Tamed_Hydra", parameter, "\"\"");
+        }
+    }
+
+    @Test
     void iceRolesProvideAllFourRangedDefaults() throws Exception {
         for (String role : List.of("Hydra.json", "Tamed_Hydra.json")) {
             JsonObject vars = json("Server/NPC/Roles/Creature/HyDragon/Hydra/" + role)

@@ -56,6 +56,12 @@
     "MountAnchorX": 0,
     "MountAnchorY": 2.5,
     "MountAnchorZ": 0,
+    "MountMode": {
+      "Compute": "MountMode"
+    },
+    "AvatarFlightConfig": {
+      "Compute": "AvatarFlightConfig"
+    },
     "CanBreedPair": true,
     "IsMemory": true,
     "MemoriesCategory": "Reptile",
@@ -152,6 +158,14 @@
     "MemoriesNameOverride": {
       "Value": "Hydra",
       "Description": "Display name used for this tamed Hydra variant in Memories."
+    },
+    "MountMode": {
+      "Value": "",
+      "Description": "Tamework mount controller override. Empty preserves native mounting."
+    },
+    "AvatarFlightConfig": {
+      "Value": "",
+      "Description": "TwAvatarFlightConfig asset id used when MountMode is TameworkAvatarFlight."
     },
     "NameTranslationKey": {
       "Value": "server.npcRoles.Tamed_Hydra.name",

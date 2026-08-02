@@ -571,6 +571,14 @@
     },
     "MountMovementConfig": {
       "Value": "Mount"
+    },
+    "MountMode": {
+      "Value": "",
+      "Description": "Set to TameworkRide, TameworkMountedGlide, or TameworkAvatarFlight to select a Tamework mount controller. Leave empty for native mounting."
+    },
+    "AvatarFlightConfig": {
+      "Value": "",
+      "Description": "TwAvatarFlightConfig asset id used when MountMode is TameworkAvatarFlight."
     }
   },
   "IsMemory": {
