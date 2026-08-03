@@ -55,9 +55,9 @@ items.Wyvern_Egg.name=Mysterious Egg
 items.Wyvern_Egg.description=A mysterious, <color is="#b060ff">rare</color> egg.\n\n<color is="#e8edf5">Left-click</color> to hatch.
 items.Draconic_Altar.name=Draconic Altar
 items.Draconic_Altar.description=A ritual workbench for Draconic Stones, Soul Bonds, and companion restoration.
-items.Draconic_Altar.bench.categories.stones.name=Draconic Stones
-items.Draconic_Altar.bench.categories.bonding.name=Soul Bonding
-items.Draconic_Altar.bench.categories.restoration.name=Restoration
+items.Draconic_Altar.bench.categories.stones.name=Capture
+items.Draconic_Altar.bench.categories.bonding.name=Bonding
+items.Draconic_Altar.bench.categories.restoration.name=Essence
 items.Drake_Egg.name=Drake Egg
 items.Drake_Egg.description=A rare decorative dragon egg. Its true purpose remains uncertain.
 

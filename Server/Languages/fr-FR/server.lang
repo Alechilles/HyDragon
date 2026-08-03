@@ -55,9 +55,9 @@ items.Wyvern_Egg.name=Œuf de Wyverne
 items.Wyvern_Egg.description=Un œuf rare qui crée votre unique lien d'âme à vie avec un Miniwyverne.
 items.Draconic_Altar.name=Autel Draconique
 items.Draconic_Altar.description=Un établi rituel pour les Pierres Draconiques, les liens d'âme et la restauration des compagnons.
-items.Draconic_Altar.bench.categories.stones.name=Pierres Draconiques
-items.Draconic_Altar.bench.categories.bonding.name=Lien d'Âme
-items.Draconic_Altar.bench.categories.restoration.name=Restauration
+items.Draconic_Altar.bench.categories.stones.name=Capture
+items.Draconic_Altar.bench.categories.bonding.name=Lien
+items.Draconic_Altar.bench.categories.restoration.name=Essence
 items.Drake_Egg.name=Œuf de Drake
 items.Drake_Egg.description=Un rare œuf de dragon décoratif. Sa véritable fonction reste incertaine.
 

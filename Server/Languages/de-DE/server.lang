@@ -55,9 +55,9 @@ items.Wyvern_Egg.name=Wyvern-Ei
 items.Wyvern_Egg.description=Ein seltenes Ei, das deine einmalige lebenslange Seelenbindung mit einem Miniwyvern erschafft.
 items.Draconic_Altar.name=Drakonischer Altar
 items.Draconic_Altar.description=Eine Ritualwerkbank für Drachensteine, Seelenbindungen und die Wiederherstellung von Gefährten.
-items.Draconic_Altar.bench.categories.stones.name=Drachensteine
-items.Draconic_Altar.bench.categories.bonding.name=Seelenbindung
-items.Draconic_Altar.bench.categories.restoration.name=Wiederherstellung
+items.Draconic_Altar.bench.categories.stones.name=Fang
+items.Draconic_Altar.bench.categories.bonding.name=Bindung
+items.Draconic_Altar.bench.categories.restoration.name=Essenz
 items.Drake_Egg.name=Drakenei
 items.Drake_Egg.description=Ein seltenes dekoratives Drachenei. Sein wahrer Zweck bleibt ungewiss.
 

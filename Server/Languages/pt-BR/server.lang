@@ -55,9 +55,9 @@ items.Wyvern_Egg.name=Ovo de Wyvern
 items.Wyvern_Egg.description=Um ovo raro que cria seu único vínculo de alma vitalício com um Miniwyvern.
 items.Draconic_Altar.name=Altar Dracônico
 items.Draconic_Altar.description=Uma bancada ritual para Pedras Dracônicas, vínculos de alma e restauração de companheiros.
-items.Draconic_Altar.bench.categories.stones.name=Pedras Dracônicas
-items.Draconic_Altar.bench.categories.bonding.name=Vínculo de Alma
-items.Draconic_Altar.bench.categories.restoration.name=Restauração
+items.Draconic_Altar.bench.categories.stones.name=Captura
+items.Draconic_Altar.bench.categories.bonding.name=Vínculo
+items.Draconic_Altar.bench.categories.restoration.name=Essência
 items.Drake_Egg.name=Ovo de Draco
 items.Drake_Egg.description=Um raro ovo decorativo de dragão. Seu verdadeiro propósito ainda é incerto.
 
