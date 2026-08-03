@@ -166,7 +166,7 @@ public final class MiniwyvernArchetypeConfig
         }
         errors.addAll(validatePassiveModifiers(normalized));
         if (ownerAttackAura != null) errors.addAll(ownerAttackAura.validate());
-        if (essenceBondAura != null) errors.addAll(essenceBondAura.validate());
+        if (essenceBondAura != null) errors.addAll(essenceBondAura.validate(normalized));
         return List.copyOf(errors);
     }
 
@@ -186,7 +186,7 @@ public final class MiniwyvernArchetypeConfig
     public static final class EssenceBondAura {
         Upgrade[] upgrades = EMPTY_UPGRADES;
 
-        private List<String> validate() {
+        private List<String> validate(String archetypeId) {
             List<String> errors = new ArrayList<>();
             Set<String> talentIds = new HashSet<>();
             if (upgrades == null) {
@@ -205,7 +205,7 @@ public final class MiniwyvernArchetypeConfig
                 } else if (!talentIds.add(talentId.toLowerCase(Locale.ROOT))) {
                     errors.add("EssenceBondAura.Upgrades contains duplicate " + talentId);
                 }
-                for (String error : upgrade.validate()) {
+                for (String error : upgrade.validate(archetypeId)) {
                     errors.add("EssenceBondAura.Upgrades[" + index + "]." + error);
                 }
             }
@@ -240,7 +240,7 @@ public final class MiniwyvernArchetypeConfig
         Double siphonMaximumHealthFraction;
         Long siphonCooldownMs;
 
-        private List<String> validate() {
+        private List<String> validate(String archetypeId) {
             List<String> errors = new ArrayList<>();
             if (!blank(semantic) && !KNOWN_SEMANTICS.contains(normalize(semantic))) {
                 errors.add("Semantic is unknown: " + trim(semantic));
@@ -266,11 +266,23 @@ public final class MiniwyvernArchetypeConfig
                 errors.add("SpeedBurstMultiplier is required when SpeedBurstDurationSeconds is configured");
             }
             validatePositiveLong(errors, "SiphonCooldownMs", siphonCooldownMs);
-            if (siphonMaximumHealthFraction != null && siphonCooldownMs == null) {
+            if (siphonMaximumHealthFraction != null && siphonMaximumHealthFraction > 0.0D
+                    && siphonCooldownMs == null) {
                 errors.add("SiphonCooldownMs is required when SiphonMaximumHealthFraction is configured");
             }
             if (siphonCooldownMs != null && siphonMaximumHealthFraction == null) {
                 errors.add("SiphonMaximumHealthFraction is required when SiphonCooldownMs is configured");
+            }
+            if (siphonMaximumHealthFraction != null && siphonMaximumHealthFraction > 0.0D) {
+                if (!"void".equals(archetypeId)) {
+                    errors.add("SiphonMaximumHealthFraction is only valid for void");
+                }
+                if (siphonMaximumHealthFraction > 0.01D) {
+                    errors.add("SiphonMaximumHealthFraction must not exceed 0.01");
+                }
+                if (siphonCooldownMs != null && siphonCooldownMs < 3_000L) {
+                    errors.add("SiphonCooldownMs must be at least 3000 for a siphon");
+                }
             }
             return errors;
         }
@@ -307,30 +319,49 @@ public final class MiniwyvernArchetypeConfig
         public String getTalentId() { return trim(talentId); }
         @Nullable public String getSemantic() { return blank(semantic) ? null : trim(semantic); }
         @Nullable public String getTargetEffectId() { return blank(targetEffectId) ? null : trim(targetEffectId); }
+        @Nullable public Double getTargetDurationSecondsOverride() { return targetDurationSeconds; }
         public double getTargetDurationSeconds() { return targetDurationSeconds == null ? 0.0D : targetDurationSeconds; }
+        @Nullable public Double getTargetOutgoingDamageReductionFractionOverride() {
+            if (targetOutgoingDamageReductionFraction != null) return targetOutgoingDamageReductionFraction;
+            if (targetDamageReductionFraction != null) return targetDamageReductionFraction;
+            return damageReductionFraction;
+        }
         public double getTargetOutgoingDamageReductionFraction() {
             if (targetOutgoingDamageReductionFraction != null) return targetOutgoingDamageReductionFraction;
             if (targetDamageReductionFraction != null) return targetDamageReductionFraction;
             return damageReductionFraction == null ? 0.0D : damageReductionFraction;
         }
+        @Nullable public Double getTargetDamageTakenFractionOverride() { return targetDamageTakenFraction; }
         public double getTargetDamageTakenFraction() {
             return targetDamageTakenFraction == null ? 0.0D : targetDamageTakenFraction;
+        }
+        @Nullable public Double getOwnerDamageToAffectedFractionOverride() {
+            return ownerDamageToAffectedFraction;
         }
         public double getOwnerDamageToAffectedFraction() {
             return ownerDamageToAffectedFraction == null ? 0.0D : ownerDamageToAffectedFraction;
         }
         @Nullable public String getWardEffectId() { return blank(wardEffectId) ? null : trim(wardEffectId); }
+        @Nullable public Double getConditionalWardDamageReductionFractionOverride() {
+            return conditionalWardDamageReductionFraction;
+        }
         public double getConditionalWardDamageReductionFraction() {
             return conditionalWardDamageReductionFraction == null
                     ? 0.0D : conditionalWardDamageReductionFraction;
         }
+        @Nullable public Double getSpeedBurstMultiplierOverride() { return speedBurstMultiplier; }
         public double getSpeedBurstMultiplier() { return speedBurstMultiplier == null ? 0.0D : speedBurstMultiplier; }
+        @Nullable public Double getSpeedBurstDurationSecondsOverride() { return speedBurstDurationSeconds; }
         public double getSpeedBurstDurationSeconds() {
             return speedBurstDurationSeconds == null ? 0.0D : speedBurstDurationSeconds;
+        }
+        @Nullable public Double getSiphonMaximumHealthFractionOverride() {
+            return siphonMaximumHealthFraction;
         }
         public double getSiphonMaximumHealthFraction() {
             return siphonMaximumHealthFraction == null ? 0.0D : siphonMaximumHealthFraction;
         }
+        @Nullable public Long getSiphonCooldownMsOverride() { return siphonCooldownMs; }
         public long getSiphonCooldownMs() { return siphonCooldownMs == null ? 0L : siphonCooldownMs; }
     }
 
@@ -361,6 +392,7 @@ public final class MiniwyvernArchetypeConfig
         @Nullable public String getEffectId() { return blank(effectId) ? null : effectId.trim(); }
         public double getDurationSeconds() { return durationSeconds; }
         @Nullable public Double getDamageReductionFraction() { return damageReductionFraction; }
+        @Nullable public Double getTargetDamageTakenFractionOverride() { return targetDamageTakenFraction; }
         public double getTargetDamageTakenFraction() {
             return targetDamageTakenFraction == null ? 0.0D : targetDamageTakenFraction;
         }

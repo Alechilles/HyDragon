@@ -28,13 +28,37 @@ class MiniwyvernOwnerAuraRegistryTest {
     }
 
     @Test
-    void rejectsInvalidOrNonElementalOwnerAuraDefinitions() {
+    void acceptsPlayerOnlyFormsWithoutTargetHitEffectsAndRejectsInvalidDefinitions() {
         MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
 
-        assertFalse(registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "lightning", "boon", 4.0D, null));
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "lightning", "", 0.0D, null));
+        MiniwyvernOwnerAuraRegistry.Aura lightning = registry.activeFor(OWNER).orElseThrow();
+        assertEquals("", lightning.effectId());
+        assertEquals(0.0D, lightning.durationSeconds());
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "nature", "", 0.0D, null));
+        registry.clear();
         assertFalse(registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "fire", "burn", 0.0D, null));
         assertFalse(registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "toxic", "weakness", 6.0D, 1.0D));
+        assertFalse(registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "fire", "burn", 4.0D,
+                null, 0.0D, 0.0D, null, 0.0D, 0.02D, 3_000L));
+        assertFalse(registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "void", "exposure", 6.0D,
+                null, 0.0D, 0.0D, null, 0.0D, 0.01D, 2_999L));
         assertTrue(registry.activeFor(OWNER).isEmpty());
+    }
+
+    @Test
+    void retainsExpandedAuraFields() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(), "void", "exposure", 6.0D,
+                null, 0.22D, 0.10D, "RiftWard", 0.05D, 0.01D, 3_000L));
+
+        MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(OWNER).orElseThrow();
+        assertEquals(0.22D, aura.targetDamageTakenFraction());
+        assertEquals(0.10D, aura.ownerDamageToAffectedFraction());
+        assertEquals("RiftWard", aura.wardEffectId());
+        assertEquals(0.05D, aura.conditionalWardDamageReductionFraction());
+        assertEquals(0.01D, aura.siphonMaximumHealthFraction());
+        assertEquals(3_000L, aura.siphonCooldownMs());
     }
 
     @Test

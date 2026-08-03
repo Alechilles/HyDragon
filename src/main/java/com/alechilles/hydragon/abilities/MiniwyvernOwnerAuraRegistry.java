@@ -9,7 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /** Ephemeral, live-projection owner-hit aura state. This is not form persistence or authority. */
 public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
-    private static final Set<String> ELEMENTAL_FORMS = Set.of("fire", "ice", "void", "toxic");
+    private static final Set<String> ELEMENTAL_FORMS =
+            Set.of("fire", "ice", "void", "toxic", "lightning", "nature");
+    private static final Set<String> PLAYER_ONLY_FORMS = Set.of("lightning", "nature");
     private final ConcurrentHashMap<UUID, Aura> active = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, ToxicWeakness> toxicWeaknesses = new ConcurrentHashMap<>();
 
@@ -26,21 +28,24 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                           double ownerDamageToAffectedFraction, String wardEffectId,
                           double conditionalWardDamageReductionFraction,
                           double siphonMaximumHealthFraction, long siphonCooldownMs) {
+        String normalizedForm = normalize(formId);
+        boolean playerOnly = PLAYER_ONLY_FORMS.contains(normalizedForm);
+        boolean targetEffectMissing = blank(effectId);
         if (ownerUuid == null || npcUuid == null || blank(profileId) || blank(leaseId)
-                || !ELEMENTAL_FORMS.contains(normalize(formId)) || blank(effectId)
-                || !Double.isFinite(durationSeconds) || durationSeconds <= 0.0D
+                || !ELEMENTAL_FORMS.contains(normalizedForm)
+                || !Double.isFinite(durationSeconds) || durationSeconds < 0.0D
+                || (!playerOnly && (targetEffectMissing || durationSeconds <= 0.0D))
+                || (playerOnly && !targetEffectMissing && durationSeconds <= 0.0D)
                 || (damageReductionFraction != null && (!Double.isFinite(damageReductionFraction)
-                || damageReductionFraction <= 0.0D || damageReductionFraction >= 1.0D))
+                || damageReductionFraction < 0.0D || damageReductionFraction >= 1.0D))
                 || !validFraction(targetDamageTakenFraction)
                 || !validFraction(ownerDamageToAffectedFraction)
                 || !validFraction(conditionalWardDamageReductionFraction)
-                || !validFraction(siphonMaximumHealthFraction)
-                || siphonCooldownMs < 0L
-                || (siphonMaximumHealthFraction > 0.0D && siphonCooldownMs <= 0L)) {
+                || !validSiphon(normalizedForm, siphonMaximumHealthFraction, siphonCooldownMs)) {
             return false;
         }
         active.put(ownerUuid, new Aura(ownerUuid, profileId.trim(), leaseId.trim(), npcUuid,
-                normalize(formId), effectId.trim(), durationSeconds,
+                normalizedForm, targetEffectMissing ? "" : effectId.trim(), durationSeconds,
                 damageReductionFraction == null ? 0.0D : damageReductionFraction,
                 targetDamageTakenFraction, ownerDamageToAffectedFraction,
                 blank(wardEffectId) ? null : wardEffectId.trim(),
@@ -110,5 +115,11 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
 
     private static boolean validFraction(double value) {
         return Double.isFinite(value) && value >= 0.0D && value < 1.0D;
+    }
+
+    private static boolean validSiphon(String formId, double fraction, long cooldownMs) {
+        if (!validFraction(fraction) || cooldownMs < 0L) return false;
+        if (fraction <= 0.0D) return true;
+        return "void".equals(formId) && fraction <= 0.01D && cooldownMs >= 3_000L;
     }
 }

@@ -162,6 +162,94 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
+    void rootOnlyFireAndVoidKeepExpandedStateDefaults() throws Exception {
+        MemoryRepository fireStates = new MemoryRepository();
+        FakeWorld fireWorld = new FakeWorld(fireStates);
+        MiniwyvernOwnerAuraRegistry fireAuras = new MiniwyvernOwnerAuraRegistry();
+        MiniwyvernArchetypeConfig fire = fireConfig();
+        assertTrue(new MiniwyvernAbilityService(fireStates, fireAuras).tick(
+                context(), Map.of("fire", fire), fireWorld, 1_000L).ready());
+        MiniwyvernOwnerAuraRegistry.Aura fireAura = fireAuras.activeFor(OWNER).orElseThrow();
+        assertEquals(4.0D, fireAura.durationSeconds());
+        assertEquals(0.0D, fireAura.targetDamageTakenFraction());
+        assertEquals(0.0D, fireAura.ownerDamageToAffectedFraction());
+        assertEquals(0.0D, fireAura.siphonMaximumHealthFraction());
+        assertEquals(0L, fireAura.siphonCooldownMs());
+
+        MemoryRepository voidStates = new MemoryRepository();
+        FakeWorld voidWorld = new FakeWorld(voidStates);
+        voidWorld.roleId = "Tamed_Wyvern_Mini_Void";
+        MiniwyvernOwnerAuraRegistry voidAuras = new MiniwyvernOwnerAuraRegistry();
+        MiniwyvernArchetypeConfig voidConfig = voidRootConfig();
+        assertTrue(new MiniwyvernAbilityService(voidStates, voidAuras).tick(
+                context(), Map.of("void", voidConfig), voidWorld, 1_000L).ready());
+        MiniwyvernOwnerAuraRegistry.Aura voidAura = voidAuras.activeFor(OWNER).orElseThrow();
+        assertEquals(6.0D, voidAura.durationSeconds());
+        assertEquals(0.12D, voidAura.targetDamageTakenFraction());
+        assertEquals(0.0D, voidAura.ownerDamageToAffectedFraction());
+        assertEquals(0.0D, voidAura.siphonMaximumHealthFraction());
+        assertEquals(0L, voidAura.siphonCooldownMs());
+    }
+
+    @Test
+    void playerOnlyLightningAndNatureStillPublishLiveAuraState() throws Exception {
+        MemoryRepository lightningStates = new MemoryRepository();
+        FakeWorld lightningWorld = new FakeWorld(lightningStates);
+        lightningWorld.roleId = "Tamed_Wyvern_Mini_Lightning";
+        MiniwyvernOwnerAuraRegistry lightningAuras = new MiniwyvernOwnerAuraRegistry();
+        assertTrue(new MiniwyvernAbilityService(lightningStates, lightningAuras).tick(
+                context(), Map.of("lightning", lightningConfig()), lightningWorld, 1_000L).ready());
+        MiniwyvernOwnerAuraRegistry.Aura lightning = lightningAuras.activeFor(OWNER).orElseThrow();
+        assertEquals("", lightning.effectId());
+        assertEquals(0.0D, lightning.durationSeconds());
+
+        MemoryRepository natureStates = new MemoryRepository();
+        FakeWorld natureWorld = new FakeWorld(natureStates);
+        natureWorld.roleId = "Tamed_Wyvern_Mini_Nature";
+        MiniwyvernOwnerAuraRegistry natureAuras = new MiniwyvernOwnerAuraRegistry();
+        assertTrue(new MiniwyvernAbilityService(natureStates, natureAuras).tick(
+                context(), Map.of("nature", natureConfig()), natureWorld, 1_000L).ready());
+        MiniwyvernOwnerAuraRegistry.Aura nature = natureAuras.activeFor(OWNER).orElseThrow();
+        assertEquals("", nature.effectId());
+        assertEquals(0.0D, nature.durationSeconds());
+    }
+
+    @Test
+    void laterPurchasedUpgradeCanExplicitlyResetAnEarlierValue() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.purchasedTalents.add("EssenceBond");
+        world.purchasedTalents.add("FirePressure");
+        world.purchasedTalents.add("FireReset");
+        MiniwyvernArchetypeConfig config = fireConfigWithZeroResetUpgrade();
+        MiniwyvernOwnerAuraRegistry auras = new MiniwyvernOwnerAuraRegistry();
+
+        assertTrue(new MiniwyvernAbilityService(states, auras).tick(
+                context(), Map.of("fire", config), world, 1_000L).ready());
+        MiniwyvernOwnerAuraRegistry.Aura aura = auras.activeFor(OWNER).orElseThrow();
+        assertEquals(0.0D, aura.ownerDamageToAffectedFraction());
+        assertEquals(0.0D, aura.targetDamageTakenFraction());
+    }
+
+    @Test
+    void invalidConfigClearsAnExistingAura() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        MiniwyvernOwnerAuraRegistry auras = new MiniwyvernOwnerAuraRegistry();
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states, auras);
+        MiniwyvernArchetypeConfig valid = fireConfig();
+        assertTrue(service.tick(context(), Map.of("fire", valid), world, 1_000L).ready());
+        assertTrue(auras.activeFor(OWNER).isPresent());
+
+        MiniwyvernArchetypeConfig invalid = fireConfigWithInvalidSiphon();
+        MiniwyvernAbilityService.TickResult result = service.tick(
+                context(), Map.of("fire", invalid), world, 2_000L);
+        assertFalse(result.ready());
+        assertEquals("role-config-invalid", result.reason());
+        assertTrue(auras.activeFor(OWNER).isEmpty());
+    }
+
+    @Test
     void derivesVoidCapstoneSiphonValues() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
@@ -189,6 +277,7 @@ class MiniwyvernAbilityServiceTest {
         MiniwyvernArchetypeConfig.Upgrade first = construct(MiniwyvernArchetypeConfig.Upgrade.class);
         MiniwyvernArchetypeConfig.Upgrade duplicate = construct(MiniwyvernArchetypeConfig.Upgrade.class);
         set(first, "talentId", "FirePressure");
+        set(first, "semantic", "Mystery");
         set(duplicate, "talentId", " FirePressure ");
         set(duplicate, "ownerDamageToAffectedFraction", Double.NaN);
         set(essenceBondAura, "upgrades", new MiniwyvernArchetypeConfig.Upgrade[] { first, duplicate });
@@ -197,10 +286,27 @@ class MiniwyvernAbilityServiceTest {
         List<String> errors = config.validate();
         assertTrue(errors.stream().anyMatch(error -> error.contains("duplicate")), errors.toString());
         assertTrue(errors.stream().anyMatch(error -> error.contains("finite")), errors.toString());
+        assertTrue(errors.stream().anyMatch(error -> error.contains("unknown")), errors.toString());
 
         set(duplicate, "ownerDamageToAffectedFraction", 1.0D);
         errors = config.validate();
         assertTrue(errors.stream().anyMatch(error -> error.contains("fraction")), errors.toString());
+
+        MiniwyvernArchetypeConfig invalidSiphon = fireConfigWithInvalidSiphon();
+        assertTrue(invalidSiphon.validate().stream()
+                .anyMatch(error -> error.contains("only valid for void")), invalidSiphon.validate().toString());
+
+        MiniwyvernArchetypeConfig.EssenceBondAura voidAura = construct(
+                MiniwyvernArchetypeConfig.EssenceBondAura.class);
+        MiniwyvernArchetypeConfig.Upgrade badCooldown = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        set(badCooldown, "talentId", "VoidSiphon");
+        set(badCooldown, "siphonMaximumHealthFraction", 0.01D);
+        set(badCooldown, "siphonCooldownMs", 2_999L);
+        set(voidAura, "upgrades", new MiniwyvernArchetypeConfig.Upgrade[] { badCooldown });
+        MiniwyvernArchetypeConfig voidConfig = voidRootConfig();
+        set(voidConfig, "essenceBondAura", voidAura);
+        assertTrue(voidConfig.validate().stream()
+                .anyMatch(error -> error.contains("at least 3000")), voidConfig.validate().toString());
     }
 
     private static MiniwyvernAbilityService.ProfileContext context() {
@@ -226,6 +332,57 @@ class MiniwyvernAbilityServiceTest {
         set(config, "passiveModifiers", Map.of(
                 "RegenerationTickSeconds", 2.0D, "MaximumHealFractionPerTick", 0.01D));
         assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig lightningConfig() throws Exception {
+        MiniwyvernArchetypeConfig config = base("lightning", "Tamed_Wyvern_Mini_Lightning");
+        set(config, "requiredTalentId", "EssenceBond");
+        set(config, "passiveEffects", new String[] { "HyDragon_Miniwyvern_Lightning_Boon" });
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig voidRootConfig() throws Exception {
+        MiniwyvernArchetypeConfig config = base("void", "Tamed_Wyvern_Mini_Void");
+        set(config, "requiredTalentId", "EssenceBond");
+        MiniwyvernArchetypeConfig.OwnerAttackAura root = construct(
+                MiniwyvernArchetypeConfig.OwnerAttackAura.class);
+        set(root, "effectId", "test-void-owner-aura");
+        set(root, "durationSeconds", 6.0D);
+        set(config, "ownerAttackAura", root);
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig fireConfigWithZeroResetUpgrade() throws Exception {
+        MiniwyvernArchetypeConfig config = fireConfig();
+        MiniwyvernArchetypeConfig.EssenceBondAura aura = construct(
+                MiniwyvernArchetypeConfig.EssenceBondAura.class);
+        MiniwyvernArchetypeConfig.Upgrade pressure = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        MiniwyvernArchetypeConfig.Upgrade reset = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        set(pressure, "talentId", "FirePressure");
+        set(pressure, "ownerDamageToAffectedFraction", 0.05D);
+        set(pressure, "targetDamageTakenFraction", 0.20D);
+        set(reset, "talentId", "FireReset");
+        set(reset, "ownerDamageToAffectedFraction", 0.0D);
+        set(reset, "targetDamageTakenFraction", 0.0D);
+        set(aura, "upgrades", new MiniwyvernArchetypeConfig.Upgrade[] { pressure, reset });
+        set(config, "essenceBondAura", aura);
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig fireConfigWithInvalidSiphon() throws Exception {
+        MiniwyvernArchetypeConfig config = fireConfig();
+        MiniwyvernArchetypeConfig.EssenceBondAura aura = construct(
+                MiniwyvernArchetypeConfig.EssenceBondAura.class);
+        MiniwyvernArchetypeConfig.Upgrade invalid = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        set(invalid, "talentId", "FireSiphon");
+        set(invalid, "siphonMaximumHealthFraction", 0.02D);
+        set(invalid, "siphonCooldownMs", 3_000L);
+        set(aura, "upgrades", new MiniwyvernArchetypeConfig.Upgrade[] { invalid });
+        set(config, "essenceBondAura", aura);
         return config;
     }
 

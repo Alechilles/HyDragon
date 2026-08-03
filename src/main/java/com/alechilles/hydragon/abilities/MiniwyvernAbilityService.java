@@ -342,20 +342,21 @@ public final class MiniwyvernAbilityService {
             MiniwyvernArchetypeConfig config,
             MiniwyvernAbilityWorld world,
             boolean requiredTalentPurchased) {
+        String formId = config.getId();
         MiniwyvernArchetypeConfig.OwnerAttackAura aura = config.getOwnerAttackAura();
-        if (!requiredTalentPurchased || aura == null || aura.getEffectId() == null) {
+        boolean playerOnlyForm = formId.equals("lightning") || formId.equals("nature");
+        if (!requiredTalentPurchased || (aura == null && !playerOnlyForm)) {
             ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
             return;
         }
 
-        String effectId = aura.getEffectId();
-        double durationSeconds = aura.getDurationSeconds();
-        double damageReductionFraction = aura.getDamageReductionFraction() == null
-                ? 0.0D : aura.getDamageReductionFraction();
+        String effectId = aura == null || aura.getEffectId() == null ? "" : aura.getEffectId();
+        double durationSeconds = aura == null ? 0.0D : aura.getDurationSeconds();
+        Double damageReductionFraction = aura == null ? null : aura.getDamageReductionFraction();
         // Void's retained root aura has always increased damage taken by 12%; its original
         // configuration predates the explicit field, so preserve that baseline when absent.
-        double targetDamageTakenFraction = aura.getTargetDamageTakenFraction();
-        if (targetDamageTakenFraction <= 0.0D && "void".equals(config.getId())) {
+        double targetDamageTakenFraction = aura == null ? 0.0D : aura.getTargetDamageTakenFraction();
+        if (aura != null && aura.getTargetDamageTakenFractionOverride() == null && "void".equals(formId)) {
             targetDamageTakenFraction = 0.12D;
         }
         double ownerDamageToAffectedFraction = 0.0D;
@@ -370,33 +371,33 @@ public final class MiniwyvernAbilityService {
                 if (upgrade == null || upgrade.getTalentId().isEmpty()
                         || !world.hasPurchasedTalent(upgrade.getTalentId())) continue;
                 if (upgrade.getTargetEffectId() != null) effectId = upgrade.getTargetEffectId();
-                if (upgrade.getTargetDurationSeconds() > 0.0D) {
-                    durationSeconds = upgrade.getTargetDurationSeconds();
+                if (upgrade.getTargetDurationSecondsOverride() != null) {
+                    durationSeconds = upgrade.getTargetDurationSecondsOverride();
                 }
-                if (upgrade.getTargetOutgoingDamageReductionFraction() > 0.0D) {
-                    damageReductionFraction = upgrade.getTargetOutgoingDamageReductionFraction();
+                if (upgrade.getTargetOutgoingDamageReductionFractionOverride() != null) {
+                    damageReductionFraction = upgrade.getTargetOutgoingDamageReductionFractionOverride();
                 }
-                if (upgrade.getTargetDamageTakenFraction() > 0.0D) {
-                    targetDamageTakenFraction = upgrade.getTargetDamageTakenFraction();
+                if (upgrade.getTargetDamageTakenFractionOverride() != null) {
+                    targetDamageTakenFraction = upgrade.getTargetDamageTakenFractionOverride();
                 }
-                if (upgrade.getOwnerDamageToAffectedFraction() > 0.0D) {
-                    ownerDamageToAffectedFraction = upgrade.getOwnerDamageToAffectedFraction();
+                if (upgrade.getOwnerDamageToAffectedFractionOverride() != null) {
+                    ownerDamageToAffectedFraction = upgrade.getOwnerDamageToAffectedFractionOverride();
                 }
                 if (upgrade.getWardEffectId() != null) wardEffectId = upgrade.getWardEffectId();
-                if (upgrade.getConditionalWardDamageReductionFraction() > 0.0D) {
+                if (upgrade.getConditionalWardDamageReductionFractionOverride() != null) {
                     conditionalWardDamageReductionFraction =
-                            upgrade.getConditionalWardDamageReductionFraction();
+                            upgrade.getConditionalWardDamageReductionFractionOverride();
                 }
-                if (upgrade.getSiphonMaximumHealthFraction() > 0.0D) {
-                    siphonMaximumHealthFraction = upgrade.getSiphonMaximumHealthFraction();
-                    siphonCooldownMs = upgrade.getSiphonCooldownMs();
+                if (upgrade.getSiphonMaximumHealthFractionOverride() != null) {
+                    siphonMaximumHealthFraction = upgrade.getSiphonMaximumHealthFractionOverride();
+                    siphonCooldownMs = siphonMaximumHealthFraction > 0.0D
+                            ? upgrade.getSiphonCooldownMs() : 0L;
                 }
             }
         }
         if (!ownerAuras.update(
                 context.ownerUuid(), context.profileId(), context.npcUuid().toString(), context.npcUuid(),
-                config.getId(), effectId, durationSeconds,
-                damageReductionFraction > 0.0D ? damageReductionFraction : null,
+                formId, effectId, durationSeconds, damageReductionFraction,
                 targetDamageTakenFraction, ownerDamageToAffectedFraction, wardEffectId,
                 conditionalWardDamageReductionFraction, siphonMaximumHealthFraction, siphonCooldownMs)) {
             ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
