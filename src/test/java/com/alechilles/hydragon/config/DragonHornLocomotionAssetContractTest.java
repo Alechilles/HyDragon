@@ -171,16 +171,19 @@ final class DragonHornLocomotionAssetContractTest {
 
         JsonObject follow = stateBehavior(miniwyvern, "Follow");
         assertExactlyTwoDirectModeBranches(follow);
-        assertModeBranch(follow, false, "Walk", null, "Component_Tamework_Instruction_Follow_Advanced");
-        assertModeBranch(follow, true, "Fly", null, "Component_Tamework_Instruction_Follow_Flying");
-        assertAerialFollowTuning(follow);
+        assertModeBranch(follow, false, "Walk", null, "Component_HyDragon_Instruction_Follow_Miniwyvern_Ground");
+        assertModeBranch(follow, true, "Fly", null, "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying");
+        assertFollowWrapper("Component_HyDragon_Instruction_Follow_Miniwyvern_Ground.json",
+                "Component_Tamework_Instruction_Follow_Advanced", "FollowSeekRange", 45);
+        assertFollowWrapper("Component_HyDragon_Instruction_Follow_Miniwyvern_Flying.json",
+                "Component_Tamework_Instruction_Follow_Flying", "FollowTeleportThresholdRange", 45);
 
         JsonObject defend = stateBehavior(miniwyvern, "Defend");
         assertExactlyTwoDirectModeBranches(defend);
         assertModeBranch(defend, false, "Walk", null, "Component_Tamework_Instruction_Defend");
         assertModeBranch(defend, true, "Fly", null,
                 "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend");
-        assertDefendFollowMacro(defend, false, "Component_Tamework_Instruction_Follow_Advanced");
+        assertDefendFollowMacro(defend, false, "Component_HyDragon_Instruction_Follow_Miniwyvern_Ground");
         assertGroundedDefendTuning(defend);
         assertAerialDefendTuning(defend);
 
@@ -644,13 +647,27 @@ final class DragonHornLocomotionAssetContractTest {
         JsonObject modify = reference.getAsJsonObject("Modify");
         assertEquals("MasterTarget", string(modify, "MasterTargetSlot"));
         assertEquals(JsonParser.parseString("[4,8]"), modify.get("FollowDesiredAltitudeRange"));
-        assertEquals(JsonParser.parseString("96"), modify.get("FollowTeleportThresholdRange"));
+        assertEquals(JsonParser.parseString("60"), modify.get("FollowTeleportThresholdRange"));
         assertEquals(JsonParser.parseString("[16,24]"), modify.get("FollowOrbitRadiusRange"));
         assertEquals(JsonParser.parseString("[3,6]"), modify.get("FollowOrbitRetargetTimeRange"));
         assertEquals(JsonParser.parseString("3"), modify.get("FollowOrbitStopDistance"));
         assertEquals(JsonParser.parseString("0.65"), modify.get("FollowOrbitRelativeSpeed"));
         assertEquals(JsonParser.parseString("1.75"), modify.get("FollowHoverRadius"));
         assertEquals(JsonParser.parseString("0.12"), modify.get("FollowHoverRelativeSpeed"));
+    }
+
+    private static void assertFollowWrapper(
+            String componentFile,
+            String expectedReference,
+            String thresholdField,
+            int expectedThreshold) throws IOException {
+        JsonObject component = readJson("Server/NPC/Roles/Creature/HyDragon/Components/" + componentFile);
+        JsonObject nestedReference = component.getAsJsonObject("Content")
+                .getAsJsonArray("Instructions")
+                .get(0).getAsJsonObject();
+        assertEquals(expectedReference, string(nestedReference, "Reference"));
+        assertEquals(JsonParser.parseString(Integer.toString(expectedThreshold)),
+                nestedReference.getAsJsonObject("Modify").get(thresholdField));
     }
 
     private static void assertGroundedDefendTuning(JsonObject defend) {
@@ -701,7 +718,7 @@ final class DragonHornLocomotionAssetContractTest {
         assertEquals(JsonParser.parseString("[2,4]"), modify.get("CombatBackOffDurationRange"));
         assertFalse(modify.has("BitePauseRange"));
         assertFalse(modify.has("Attack"));
-        assertEquals("Component_Tamework_Instruction_Follow_Flying",
+        assertEquals("Component_HyDragon_Instruction_Follow_Miniwyvern_Flying",
                 string(modify, "DefendFollowMacroElement"));
 
         JsonObject component = readJson("Server/NPC/Roles/Creature/HyDragon/Components/"

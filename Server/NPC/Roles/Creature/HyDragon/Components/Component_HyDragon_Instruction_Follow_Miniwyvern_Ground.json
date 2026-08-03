@@ -1,0 +1,25 @@
+{
+  "$Comment": "Miniwyvern ground follow wrapper with a 45-block teleport recovery threshold.",
+  "Type": "Component",
+  "Class": "Instruction",
+  "Interface": "Tamework.Instruction.Follow",
+  "Content": {
+    "Continue": true,
+    "Sensor": { "Type": "Any" },
+    "Instructions": [
+      {
+        "Reference": "Component_Tamework_Instruction_Follow_Advanced",
+        "Modify": {
+          "MasterTargetSlot": "MasterTarget",
+          "FollowDefaultSpotRange": 10,
+          "FollowLockOnRange": 60,
+          "FollowSeekRange": 45,
+          "FollowSeekSlowDownDistance": 8,
+          "FollowSeekStopDistance": 6,
+          "FollowScanRange": 16,
+          "FollowMaintainDistanceRange": [5, 9]
+        }
+      }
+    ]
+  }
+}

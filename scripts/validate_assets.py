@@ -536,7 +536,7 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
     """Validate the Soul Bond companion's complete role/config reference graph."""
     wild_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
     template_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
-    follow_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Components/Component_Tamework_Instruction_Follow_Flying.json"
+    follow_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Components/Component_HyDragon_Instruction_Follow_Miniwyvern_Flying.json"
     companion_path = ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json"
     root_bite_path = ROOT / "Server/Item/RootInteractions/NPCs/Creature/HyDragon/Root_NPC_Wyvern_Mini_Bite.json"
     bite_path = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite.json"
@@ -637,7 +637,7 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
     if missing_states:
         fail(errors, f"Miniwyvern tamed template has no wiring for states: {', '.join(missing_states)}")
     for reference in (
-        "Component_Tamework_Instruction_Follow_Flying",
+        "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying",
         "Component_Tamework_Instruction_Defend",
     ):
         if reference not in serialized_template:
@@ -647,7 +647,7 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
             fail(errors, f"Miniwyvern target-safety wiring is missing: {safety_token}")
 
     if not isinstance(follow, dict) or follow.get("Type") != "Component" or follow.get("Class") != "Instruction":
-        fail(errors, "Component_Tamework_Instruction_Follow_Flying does not resolve to an instruction component")
+        fail(errors, "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying does not resolve to an instruction component")
     elif follow.get("Interface") != "Tamework.Instruction.Follow":
         fail(errors, "flying follow component must implement Tamework.Instruction.Follow")
 

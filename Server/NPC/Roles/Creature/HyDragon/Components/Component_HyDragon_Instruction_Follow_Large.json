@@ -5,7 +5,7 @@
   "Interface": "Tamework.Instruction.Follow",
   "Parameters": {
     "MasterTargetSlot": { "Value": "MasterTarget", "Description": "Target slot used to track the owner/master." },
-    "FollowTeleportThresholdRange": { "Value": 96, "Description": "Distance beyond which the dragon teleports back to its owner." },
+    "FollowTeleportThresholdRange": { "Value": 60, "Description": "Distance beyond which the dragon teleports back to its owner." },
     "FollowSeekSlowDownDistance": { "Value": 32, "Description": "Distance from the owner where the dragon begins slowing down." },
     "FollowSeekStopDistance": { "Value": 16, "Description": "Minimum separation maintained while catching up to the owner." },
     "FollowMaintainDistanceRange": { "Value": [16, 24], "Description": "Preferred separation maintained while following the owner." },

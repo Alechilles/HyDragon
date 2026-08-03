@@ -1191,7 +1191,7 @@
               "Reference": "Component_HyDragon_Instruction_Follow_Large",
               "Modify": {
                 "MasterTargetSlot": "MasterTarget",
-                "FollowTeleportThresholdRange": 96,
+                "FollowTeleportThresholdRange": 60,
                 "FollowSeekSlowDownDistance": 32,
                 "FollowSeekStopDistance": 16,
                 "FollowMaintainDistanceRange": [
