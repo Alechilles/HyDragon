@@ -1,5 +1,6 @@
 package com.alechilles.hydragon.integration;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,11 +39,13 @@ class DraconicAltarAssetContractTest {
         String altar = read("Server/Item/Items/Bench/Draconic_Altar.json");
         String resourceType = read("Server/Item/ResourceTypes/HyDragon_DraconicEssences.json");
 
-        assertTrue(altar.contains("\"Icon\": \"Icons/ItemsGenerated/Draconic_Stone.png\""));
-        assertTrue(altar.contains("\"Icon\": \"Icons/ItemsGenerated/Drake_Egg.png\""));
-        assertTrue(altar.contains("\"Icon\": \"Icons/ResourceTypes/HyDragon_DraconicEssences.png\""));
+        assertTrue(altar.contains("\"Icon\": \"Icons/CraftingCategories/HyDragon/Draconic_Stone.png\""));
+        assertTrue(altar.contains("\"Icon\": \"Icons/CraftingCategories/HyDragon/Drake_Egg.png\""));
+        assertTrue(altar.contains("\"Icon\": \"Icons/CraftingCategories/HyDragon/Draconic_Essences.png\""));
         assertTrue(resourceType.contains("\"Icon\": \"Icons/ResourceTypes/HyDragon_DraconicEssences.png\""));
-        assertTrue(Files.exists(ROOT.resolve("Common/Icons/ResourceTypes/HyDragon_DraconicEssences.png")));
+        assertArrayEquals(icon("ItemsGenerated/Draconic_Stone.png"), categoryIcon("Draconic_Stone.png"));
+        assertArrayEquals(icon("ItemsGenerated/Drake_Egg.png"), categoryIcon("Drake_Egg.png"));
+        assertArrayEquals(icon("ResourceTypes/HyDragon_DraconicEssences.png"), categoryIcon("Draconic_Essences.png"));
 
         for (String locale : new String[] {"de-DE", "en-US", "es-ES", "fr-FR", "pt-BR"}) {
             assertTrue(read("Server/Languages/" + locale + "/server.lang")
@@ -56,5 +59,13 @@ class DraconicAltarAssetContractTest {
 
     private static String read(String relative) throws Exception {
         return Files.readString(ROOT.resolve(relative)).replace("\r\n", "\n");
+    }
+
+    private static byte[] icon(String relative) throws Exception {
+        return Files.readAllBytes(ROOT.resolve("Common/Icons").resolve(relative));
+    }
+
+    private static byte[] categoryIcon(String name) throws Exception {
+        return icon("CraftingCategories/HyDragon/" + name);
     }
 }
