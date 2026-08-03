@@ -160,12 +160,32 @@ class ToxicHydraVariantAssetTest {
 
         JsonObject avatarModel = json(
                 "Server/Models/HyDragon/Hydra_Winged/Hydra_Winged_AvatarFlight.json");
+        JsonObject avatarAnimationSets = avatarModel.getAsJsonObject("AnimationSets");
+        assertAnimationPath(avatarAnimationSets,
+                flight.getAsJsonObject("Animation").get("IdleAnimation").getAsString(),
+                "Animation/Fly/AvatarFlight/Fly_Idle.blockyanim");
+        assertAnimationPath(avatarAnimationSets,
+                flight.getAsJsonObject("Animation").get("FlightAnimation").getAsString(),
+                "Animation/Fly/AvatarFlight/Fly.blockyanim");
+        assertAnimationPath(avatarAnimationSets,
+                flight.getAsJsonObject("Animation").get("FastFlightAnimation").getAsString(),
+                "Animation/Fly/AvatarFlight/Fly_Fast.blockyanim");
         String avatarRuntimePath = avatarModel.get("Model").getAsString();
         assertTrue(Files.isRegularFile(ROOT.resolve("Common").resolve(avatarRuntimePath)));
         JsonObject avatarRuntime = json("Common/" + avatarRuntimePath);
         Set<String> avatarNodes = modelNodeNames(avatarRuntime);
         assertTrue(avatarNodes.contains("AF_Origin"));
         assertFalse(avatarNodes.contains("Origin"));
+        Path avatarAnimationDirectory = ROOT.resolve("Common/NPC/HyDragon/Hydra_Winged/Animation");
+        List<Path> avatarAnimations;
+        try (Stream<Path> paths = Files.walk(avatarAnimationDirectory)) {
+            avatarAnimations = paths.filter(path -> path.toString().contains("AvatarFlight"))
+                    .filter(path -> path.getFileName().toString().endsWith(".blockyanim")).toList();
+        }
+        assertFalse(avatarAnimations.isEmpty());
+        for (Path animation : avatarAnimations) {
+            assertAvatarTracksUseDeclaredNodes(animation, avatarNodes);
+        }
 
         JsonObject interaction = json("Server/Tamework/Interactions/HyDragonIntBeast.json");
         assertEquals(List.of("Tamed_Hydra", "Tamed_Hydra_Toxic"),
@@ -964,6 +984,16 @@ class ToxicHydraVariantAssetTest {
             JsonObject node = element.getAsJsonObject();
             names.add(node.get("name").getAsString());
             if (node.has("children")) collectModelNodeNames(node.getAsJsonArray("children"), names);
+        }
+    }
+
+    private static void assertAvatarTracksUseDeclaredNodes(Path animation, Set<String> avatarNodes)
+            throws IOException {
+        JsonObject data = parseJson(Files.readString(animation, StandardCharsets.UTF_8));
+        for (String node : data.getAsJsonObject("nodeAnimations").keySet()) {
+            if (node.startsWith("AF_")) {
+                assertTrue(avatarNodes.contains(node), animation + " targets missing avatar bone " + node);
+            }
         }
     }
 

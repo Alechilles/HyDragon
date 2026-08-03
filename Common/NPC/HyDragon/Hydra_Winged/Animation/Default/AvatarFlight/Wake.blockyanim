@@ -610,7 +610,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Tail": {
+    "Tail": {
       "position": [],
       "orientation": [
         {
@@ -726,7 +726,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_R-Ear": {
+    "R-Ear": {
       "position": [],
       "orientation": [
         {
@@ -880,7 +880,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Jaw": {
+    "Jaw": {
       "position": [],
       "orientation": [
         {
@@ -1014,7 +1014,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_L-Eyelid": {
+    "L-Eyelid": {
       "position": [
         {
           "time": 0,
@@ -1113,7 +1113,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_R-Eyelid": {
+    "R-Eyelid": {
       "position": [
         {
           "time": 0,
@@ -1212,7 +1212,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_L-Ear": {
+    "L-Ear": {
       "position": [],
       "orientation": [
         {

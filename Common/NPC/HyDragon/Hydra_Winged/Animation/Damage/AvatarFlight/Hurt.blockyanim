@@ -367,7 +367,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Tail": {
+    "Tail": {
       "position": [],
       "orientation": [
         {
@@ -395,7 +395,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_L-Eyebrow": {
+    "L-Eyebrow": {
       "position": [
         {
           "time": 0,
@@ -442,7 +442,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_R-Eyebrow": {
+    "R-Eyebrow": {
       "position": [
         {
           "time": 0,
@@ -489,7 +489,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_R-Ear": {
+    "R-Ear": {
       "position": [],
       "orientation": [
         {
@@ -517,7 +517,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_L-Ear": {
+    "L-Ear": {
       "position": [],
       "orientation": [
         {
@@ -573,7 +573,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Jaw": {
+    "Jaw": {
       "position": [],
       "orientation": [
         {
@@ -677,7 +677,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_R-Eyelid": {
+    "R-Eyelid": {
       "position": [
         {
           "time": 0,
@@ -758,7 +758,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_L-Eyelid": {
+    "L-Eyelid": {
       "position": [
         {
           "time": 0,
@@ -839,7 +839,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Head2": {
+    "Head2": {
       "position": [],
       "orientation": [
         {
@@ -867,7 +867,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Jaw2": {
+    "Jaw2": {
       "position": [],
       "orientation": [
         {
@@ -895,7 +895,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Head3": {
+    "Head3": {
       "position": [],
       "orientation": [
         {
@@ -923,7 +923,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Jaw3": {
+    "Jaw3": {
       "position": [],
       "orientation": [
         {
@@ -951,7 +951,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_R-Wing2": {
+    "R-Wing2": {
       "position": [],
       "orientation": [
         {
@@ -979,7 +979,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_L-Wing2": {
+    "L-Wing2": {
       "position": [],
       "orientation": [
         {

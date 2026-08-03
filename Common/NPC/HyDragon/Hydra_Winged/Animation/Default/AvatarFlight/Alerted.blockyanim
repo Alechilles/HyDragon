@@ -487,7 +487,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_L-Ear": {
+    "L-Ear": {
       "position": [],
       "orientation": [
         {
@@ -525,7 +525,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_R-Ear": {
+    "R-Ear": {
       "position": [],
       "orientation": [
         {
@@ -563,7 +563,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Tail": {
+    "Tail": {
       "position": [],
       "orientation": [
         {
@@ -601,7 +601,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_R-Eyebrow": {
+    "R-Eyebrow": {
       "position": [
         {
           "time": 0,
@@ -627,7 +627,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_L-Eyebrow": {
+    "L-Eyebrow": {
       "position": [
         {
           "time": 0,
@@ -719,7 +719,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Jaw": {
+    "Jaw": {
       "position": [],
       "orientation": [
         {
@@ -813,7 +813,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Neck4": {
+    "Neck4": {
       "position": [],
       "orientation": [
         {
@@ -841,7 +841,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Head2": {
+    "Head2": {
       "position": [],
       "orientation": [
         {
@@ -869,7 +869,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Jaw2": {
+    "Jaw2": {
       "position": [],
       "orientation": [
         {
@@ -897,7 +897,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Neck6": {
+    "Neck6": {
       "position": [],
       "orientation": [
         {
@@ -925,7 +925,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Head3": {
+    "Head3": {
       "position": [],
       "orientation": [
         {
@@ -953,7 +953,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "AF_Jaw3": {
+    "Jaw3": {
       "position": [],
       "orientation": [
         {
