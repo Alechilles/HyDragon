@@ -43,8 +43,8 @@
     "CanSetHome": true,
     "IsMountable": true,
     "MountAnchorX": 0,
-    "MountAnchorY": 1.8,
-    "MountAnchorZ": 0.4,
+    "MountAnchorY": 2,
+    "MountAnchorZ": -0.8,
     "NameTranslationKey": { "Compute": "NameTranslationKey" }
   },
   "Parameters": {
