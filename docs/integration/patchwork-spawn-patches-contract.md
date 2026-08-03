@@ -2,7 +2,7 @@
 
 ## Purpose
 
-HyDragon adds dragon roles to existing base-game spawn pools without replacing the pools. Patchwork is the required integration layer for those changes.
+HyDragon adds Nordic and Rock Drake roles to existing base-game spawn pools without replacing the pools. Patchwork is the required integration layer for those changes. Hydra uses two uniquely named `WorldNPCSpawn` assets so its lunar tuning remains independent.
 
 ## Version and load contract
 
@@ -12,11 +12,13 @@ HyDragon adds dragon roles to existing base-game spawn pools without replacing t
 
 ## Exposed integration surface
 
-The only surface is `Server/Patchwork/Patches/HyDragon/*.json`.
+The Patchwork surface is `Server/Patchwork/Patches/HyDragon/*.json`.
 
 - Each patch targets an existing base-game `WorldNPCSpawn` or `BeaconNPCSpawn` asset.
 - Each operation uses `Insert` at `/NPCs` with an `Existing` role-ID guard.
 - Patches append roles only; they do not replace arrays, remove entries, or modify top-level pool conditions owned by the target asset.
+
+The two Hydra assets under `Server/NPC/Spawn/World` are not patches and must remain uniquely named; they do not mutate a base-game spawn asset.
 
 ## Ownership
 

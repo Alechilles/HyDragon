@@ -486,19 +486,17 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
-    void toxicHydraUsesOneGuardedSwampPatchRegistration() throws Exception {
-        JsonObject patch = json("Server/Patchwork/Patches/HyDragon/ToxicHydra_Zone1_Swamps_Predator.json");
-        assertEquals("Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_Predator.json",
-                patch.get("Target").getAsString());
-        JsonObject operation = patch.getAsJsonArray("Operations").get(0).getAsJsonObject();
-        assertEquals("Insert", operation.get("Op").getAsString());
-        assertEquals("/NPCs", operation.get("Path").getAsString());
-        assertEquals("End", operation.get("Position").getAsString());
-        assertEquals("Hydra_Toxic", operation.getAsJsonObject("Existing").get("Id").getAsString());
-        JsonObject npc = operation.getAsJsonObject("Value");
+    void toxicHydraHasOneAllDayNewMoonSwampSpawnRegistration() throws Exception {
+        JsonObject spawn = json("Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_HyDragon_Predator.json");
+        assertEquals(List.of("Env_Zone1_Swamps"), strings(spawn.getAsJsonArray("Environments")));
+        assertFalse(spawn.has("DayTimeRange"));
+        JsonObject npc = spawn.getAsJsonArray("NPCs").get(0).getAsJsonObject();
+        assertEquals(1, spawn.getAsJsonArray("NPCs").size());
         assertEquals(1, npc.get("Weight").getAsInt());
         assertEquals("Mud", npc.get("SpawnBlockSet").getAsString());
         assertEquals("Hydra_Toxic", npc.get("Id").getAsString());
+        assertEquals(List.of(1.0, 1.0, 1.0, 1.0, 2.0),
+                doubles(spawn.getAsJsonArray("MoonPhaseWeightModifiers")));
     }
 
     @Test
@@ -507,8 +505,8 @@ class ToxicHydraVariantAssetTest {
         assertEquals(List.of("Hydra", "Hydra_Toxic"), strings(species.getAsJsonArray("WildRoleIds")));
         assertEquals(Map.of("Hydra", "Tamed_Hydra", "Hydra_Toxic", "Tamed_Hydra_Toxic"),
                 stringMap(species.getAsJsonObject("TamedRoleIdByWildRole")));
-        assertEquals(List.of("Spawns_Zone3_Glacial_Predator",
-                        "Spawns_Zone1_Swamps_Predator"),
+        assertEquals(List.of("Spawns_Zone3_Glacial_HyDragon_Predator",
+                        "Spawns_Zone1_Swamps_HyDragon_Predator"),
                 strings(species.getAsJsonObject("Spawn").getAsJsonArray("OrdinarySpawnAssetIds")));
         assertEquals(List.of("Hydra", "Hydra_Toxic"),
                 strings(species.getAsJsonObject("Presentation").getAsJsonArray("ModelIds")));

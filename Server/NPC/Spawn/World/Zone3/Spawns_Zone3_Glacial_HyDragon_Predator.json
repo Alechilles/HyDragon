@@ -1,0 +1,11 @@
+{
+  "Environments": [ "Env_Zone3_Glacial" ],
+  "NPCs": [
+    {
+      "Weight": 1,
+      "SpawnBlockSet": "IceAndSnow",
+      "Id": "Hydra"
+    }
+  ],
+  "MoonPhaseWeightModifiers": [ 2, 1, 1, 1, 1 ]
+}

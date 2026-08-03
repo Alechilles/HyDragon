@@ -85,12 +85,12 @@ WORKSHOP_056_PATCH_TARGETS = {
         "Env_Zone2_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
     "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier3/Zone3_Cave_Glacial_Aggro.json": (
         "Env_Zone3_Caves_Glacial", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_Predator.json": (
-        "Env_Zone1_Swamps", set()),
-    "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Glacial_Predator.json": (
-        "Env_Zone3_Glacial", set()),
     "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Outlander.json": (
         "Env_Zone3_Outlander", set()),
+}
+HYDRA_INDEPENDENT_WORLD_SPAWNS = {
+    "Spawns_Zone3_Glacial_HyDragon_Predator": ("Hydra", "Env_Zone3_Glacial", "IceAndSnow", [2, 1, 1, 1, 1]),
+    "Spawns_Zone1_Swamps_HyDragon_Predator": ("Hydra_Toxic", "Env_Zone1_Swamps", "Mud", [1, 1, 1, 1, 2]),
 }
 
 
@@ -723,6 +723,16 @@ def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[
         spawn = species.get("Spawn")
         ordinary_ids = spawn.get("OrdinarySpawnAssetIds", []) if isinstance(spawn, dict) else []
         for asset_id in ordinary_ids:
+            local_paths = list((ROOT / "Server/NPC/Spawn/World").rglob(f"{asset_id}.json"))
+            if local_paths:
+                inserted_roles = {
+                    entry.get("Id")
+                    for local_path in local_paths
+                    for entry in parsed.get(local_path, {}).get("NPCs", [])
+                    if isinstance(entry, dict)
+                }
+                if inserted_roles.intersection(wild_roles):
+                    continue
             patches = [patch_root / f"{asset_id}.json"]
             patches.extend(
                 path for path in patch_root.glob("*.json")
@@ -828,8 +838,23 @@ def validate_static_spawn_contracts(
 ) -> None:
     """Validate authored spawns plus base patches against Workshop's 0.5.6 contracts."""
     world_root = ROOT / "Server/NPC/Spawn/World"
-    if world_root.exists() and any(world_root.rglob("*.json")):
-        fail(errors, "HyDragon must not ship standalone Server/NPC/Spawn assets; use Patchwork additions")
+    local_spawn_ids: set[str] = set()
+    for path in sorted(world_root.rglob("*.json")):
+        local_spawn_ids.add(path.stem)
+        validate_spawn_shape(parsed.get(path), "WorldNPCSpawn", path.relative_to(ROOT).as_posix(), known_assets, errors)
+        expected = HYDRA_INDEPENDENT_WORLD_SPAWNS.get(path.stem)
+        if expected is None:
+            fail(errors, f"{path.relative_to(ROOT)} is not an approved independent Hydra spawn asset")
+            continue
+        role_id, environment, block_set, moon_weights = expected
+        data = parsed.get(path)
+        npcs = data.get("NPCs", []) if isinstance(data, dict) else []
+        if not isinstance(data, dict) \
+                or data.get("Environments") != [environment] \
+                or data.get("DayTimeRange") is not None \
+                or data.get("MoonPhaseWeightModifiers") != moon_weights \
+                or npcs != [{"Weight": 1, "SpawnBlockSet": block_set, "Id": role_id}]:
+            fail(errors, f"{path.relative_to(ROOT)} must remain the configured all-day lunar Hydra spawn")
 
     patch_root = HYDRAGON_SPAWN_PATCH_ROOT
     patch_ids: set[str] = set()
@@ -907,7 +932,7 @@ def validate_static_spawn_contracts(
         validate_spawn_shape(merged, asset_type, f"{context} effective target", known_assets, errors)
 
     species_root = ROOT / "Server/HyDragon/DragonSpecies"
-    available_routes = target_stems | patch_ids
+    available_routes = local_spawn_ids | target_stems | patch_ids
     for path in sorted(species_root.glob("*.json")):
         species = parsed.get(path)
         spawn = species.get("Spawn") if isinstance(species, dict) else None
@@ -1024,8 +1049,6 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
         fail(errors, "Rock Drake tier drop-list IDs must be distinct")
 
     expected_spawn_insertions = {
-        "Hydra_Zone3_Glacial_Predator.json": ("Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Glacial_Predator.json", "Hydra"),
-        "ToxicHydra_Zone1_Swamps_Predator.json": ("Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_Predator.json", "Hydra_Toxic"),
         "NordicDrake_Zone3_Outlander.json": ("Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Outlander.json", "NordicDrake"),
     }
     for filename, (target, role_id) in expected_spawn_insertions.items():
