@@ -9,7 +9,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeBond",
       "DisplayName": "Rime Bond",
-      "Description": "Your hits slow targets by 20% for 4 sec; your Ice Miniwyvern deals 3% more damage.",
+      "Description": "Your hits slow targets by 20% for 4 sec; +3% companion damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Essence Bond",
@@ -25,7 +25,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeFocus",
       "DisplayName": "Rime Focus",
-      "Description": "Your Ice Miniwyvern deals 3% more damage.",
+      "Description": "+3% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -44,7 +44,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeAttunement",
       "DisplayName": "Rime Attunement",
-      "Description": "Your Ice Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -63,7 +63,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeAmplification",
       "DisplayName": "Rime Amplification",
-      "Description": "Your Ice Miniwyvern deals 4% more damage.",
+      "Description": "+4% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -82,7 +82,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeResonance",
       "DisplayName": "Rime Resonance",
-      "Description": "Your Ice Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -101,7 +101,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeEfficiency",
       "DisplayName": "Rime Efficiency",
-      "Description": "Your Ice Miniwyvern deals 3% more damage.",
+      "Description": "+3% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -120,7 +120,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeHarmony",
       "DisplayName": "Rime Harmony",
-      "Description": "Your Ice Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -139,7 +139,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeMastery",
       "DisplayName": "Rime Mastery",
-      "Description": "Your Ice Miniwyvern deals 4% more damage.",
+      "Description": "+4% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
       "Branch": "Essence Bond",
@@ -158,7 +158,7 @@
     {
       "Id": "Miniwyvern_Ice_RimeAscendance",
       "DisplayName": "Rime Ascendance",
-      "Description": "Your Ice Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
       "Branch": "Essence Bond",
@@ -402,7 +402,7 @@
     {
       "Id": "Miniwyvern_Ice_VitalScales",
       "DisplayName": "Frost Scales",
-      "Description": "Your Ice Miniwyvern gains 5% maximum health.",
+      "Description": "+5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
       "Branch": "Vigor",
@@ -418,7 +418,7 @@
     {
       "Id": "Miniwyvern_Ice_HardenedScales",
       "DisplayName": "Hardened Frost Scales",
-      "Description": "Your Ice Miniwyvern gains 5% maximum health.",
+      "Description": "+5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
       "Branch": "Vigor",
@@ -437,7 +437,7 @@
     {
       "Id": "Miniwyvern_Ice_ElderScales",
       "DisplayName": "Elder Frost Scales",
-      "Description": "Your Ice Miniwyvern gains 8% maximum health.",
+      "Description": "+8% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -456,7 +456,7 @@
     {
       "Id": "Miniwyvern_Ice_ScaleGuard",
       "DisplayName": "Frost Guard",
-      "Description": "Your Ice Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -475,7 +475,7 @@
     {
       "Id": "Miniwyvern_Ice_ScaleBulwark",
       "DisplayName": "Frost Bulwark",
-      "Description": "Your Ice Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -494,7 +494,7 @@
     {
       "Id": "Miniwyvern_Ice_SwiftWings",
       "DisplayName": "Frost Wings",
-      "Description": "Your Ice Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -513,7 +513,7 @@
     {
       "Id": "Miniwyvern_Ice_SurvivalInstinct",
       "DisplayName": "Frost Instinct",
-      "Description": "Your Ice Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -532,7 +532,7 @@
     {
       "Id": "Miniwyvern_Ice_LastingScales",
       "DisplayName": "Lasting Frost Scales",
-      "Description": "Your Ice Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -551,7 +551,7 @@
     {
       "Id": "Miniwyvern_Ice_WyrmFortitude",
       "DisplayName": "Frost Fortitude",
-      "Description": "Your Ice Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -570,7 +570,7 @@
     {
       "Id": "Miniwyvern_Ice_VigorAscendance",
       "DisplayName": "Frost Vitality",
-      "Description": "Your Ice Miniwyvern gains 6% maximum health and takes 4% less damage.",
+      "Description": "+6% maximum health; take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
       "Branch": "Vigor",

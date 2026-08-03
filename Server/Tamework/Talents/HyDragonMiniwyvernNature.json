@@ -9,7 +9,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantBond",
       "DisplayName": "Verdant Bond",
-      "Description": "Heal 1% of maximum health every 2 sec; your Nature Miniwyvern deals 3% more damage.",
+      "Description": "Heal 1% maximum health every 2 sec; +3% companion damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Essence Bond",
@@ -25,7 +25,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantFocus",
       "DisplayName": "Verdant Focus",
-      "Description": "Your Nature Miniwyvern deals 3% more damage.",
+      "Description": "+3% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -44,7 +44,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantAttunement",
       "DisplayName": "Verdant Attunement",
-      "Description": "Your Nature Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -63,7 +63,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantAmplification",
       "DisplayName": "Verdant Amplification",
-      "Description": "Your Nature Miniwyvern deals 4% more damage.",
+      "Description": "+4% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -82,7 +82,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantResonance",
       "DisplayName": "Verdant Resonance",
-      "Description": "Your Nature Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -101,7 +101,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantEfficiency",
       "DisplayName": "Verdant Efficiency",
-      "Description": "Your Nature Miniwyvern deals 3% more damage.",
+      "Description": "+3% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -120,7 +120,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantHarmony",
       "DisplayName": "Verdant Harmony",
-      "Description": "Your Nature Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -139,7 +139,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantMastery",
       "DisplayName": "Verdant Mastery",
-      "Description": "Your Nature Miniwyvern deals 4% more damage.",
+      "Description": "+4% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
       "Branch": "Essence Bond",
@@ -158,7 +158,7 @@
     {
       "Id": "Miniwyvern_Nature_VerdantAscendance",
       "DisplayName": "Verdant Ascendance",
-      "Description": "Your Nature Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
       "Branch": "Essence Bond",
@@ -402,7 +402,7 @@
     {
       "Id": "Miniwyvern_Nature_VitalScales",
       "DisplayName": "Bark Scales",
-      "Description": "Your Nature Miniwyvern gains 5% maximum health.",
+      "Description": "+5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
       "Branch": "Vigor",
@@ -418,7 +418,7 @@
     {
       "Id": "Miniwyvern_Nature_HardenedScales",
       "DisplayName": "Hardened Bark Scales",
-      "Description": "Your Nature Miniwyvern gains 5% maximum health.",
+      "Description": "+5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
       "Branch": "Vigor",
@@ -437,7 +437,7 @@
     {
       "Id": "Miniwyvern_Nature_ElderScales",
       "DisplayName": "Elder Bark Scales",
-      "Description": "Your Nature Miniwyvern gains 8% maximum health.",
+      "Description": "+8% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -456,7 +456,7 @@
     {
       "Id": "Miniwyvern_Nature_ScaleGuard",
       "DisplayName": "Bark Guard",
-      "Description": "Your Nature Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -475,7 +475,7 @@
     {
       "Id": "Miniwyvern_Nature_ScaleBulwark",
       "DisplayName": "Bark Bulwark",
-      "Description": "Your Nature Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -494,7 +494,7 @@
     {
       "Id": "Miniwyvern_Nature_SwiftWings",
       "DisplayName": "Bark Wings",
-      "Description": "Your Nature Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -513,7 +513,7 @@
     {
       "Id": "Miniwyvern_Nature_SurvivalInstinct",
       "DisplayName": "Bark Instinct",
-      "Description": "Your Nature Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -532,7 +532,7 @@
     {
       "Id": "Miniwyvern_Nature_LastingScales",
       "DisplayName": "Lasting Bark Scales",
-      "Description": "Your Nature Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -551,7 +551,7 @@
     {
       "Id": "Miniwyvern_Nature_WyrmFortitude",
       "DisplayName": "Bark Fortitude",
-      "Description": "Your Nature Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -570,7 +570,7 @@
     {
       "Id": "Miniwyvern_Nature_VigorAscendance",
       "DisplayName": "Bark Vitality",
-      "Description": "Your Nature Miniwyvern gains 6% maximum health and takes 4% less damage.",
+      "Description": "+6% maximum health; take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
       "Branch": "Vigor",

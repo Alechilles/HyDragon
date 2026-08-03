@@ -9,7 +9,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormBond",
       "DisplayName": "Storm Bond",
-      "Description": "You gain 15% horizontal speed; your Lightning Miniwyvern deals 3% more damage.",
+      "Description": "Gain 15% horizontal speed; +3% companion damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Essence Bond",
@@ -25,7 +25,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormFocus",
       "DisplayName": "Storm Focus",
-      "Description": "Your Lightning Miniwyvern deals 3% more damage.",
+      "Description": "+3% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -44,7 +44,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormAttunement",
       "DisplayName": "Storm Attunement",
-      "Description": "Your Lightning Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -63,7 +63,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormAmplification",
       "DisplayName": "Storm Amplification",
-      "Description": "Your Lightning Miniwyvern deals 4% more damage.",
+      "Description": "+4% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -82,7 +82,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormResonance",
       "DisplayName": "Storm Resonance",
-      "Description": "Your Lightning Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -101,7 +101,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormEfficiency",
       "DisplayName": "Storm Efficiency",
-      "Description": "Your Lightning Miniwyvern deals 3% more damage.",
+      "Description": "+3% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -120,7 +120,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormHarmony",
       "DisplayName": "Storm Harmony",
-      "Description": "Your Lightning Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -139,7 +139,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormMastery",
       "DisplayName": "Storm Mastery",
-      "Description": "Your Lightning Miniwyvern deals 4% more damage.",
+      "Description": "+4% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
       "Branch": "Essence Bond",
@@ -158,7 +158,7 @@
     {
       "Id": "Miniwyvern_Lightning_StormAscendance",
       "DisplayName": "Storm Ascendance",
-      "Description": "Your Lightning Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
       "Branch": "Essence Bond",
@@ -402,7 +402,7 @@
     {
       "Id": "Miniwyvern_Lightning_VitalScales",
       "DisplayName": "Storm Scales",
-      "Description": "Your Lightning Miniwyvern gains 5% maximum health.",
+      "Description": "+5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
       "Branch": "Vigor",
@@ -418,7 +418,7 @@
     {
       "Id": "Miniwyvern_Lightning_HardenedScales",
       "DisplayName": "Hardened Storm Scales",
-      "Description": "Your Lightning Miniwyvern gains 5% maximum health.",
+      "Description": "+5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
       "Branch": "Vigor",
@@ -437,7 +437,7 @@
     {
       "Id": "Miniwyvern_Lightning_ElderScales",
       "DisplayName": "Elder Storm Scales",
-      "Description": "Your Lightning Miniwyvern gains 8% maximum health.",
+      "Description": "+8% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -456,7 +456,7 @@
     {
       "Id": "Miniwyvern_Lightning_ScaleGuard",
       "DisplayName": "Storm Guard",
-      "Description": "Your Lightning Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -475,7 +475,7 @@
     {
       "Id": "Miniwyvern_Lightning_ScaleBulwark",
       "DisplayName": "Storm Bulwark",
-      "Description": "Your Lightning Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -494,7 +494,7 @@
     {
       "Id": "Miniwyvern_Lightning_SwiftWings",
       "DisplayName": "Storm Wings",
-      "Description": "Your Lightning Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -513,7 +513,7 @@
     {
       "Id": "Miniwyvern_Lightning_SurvivalInstinct",
       "DisplayName": "Storm Instinct",
-      "Description": "Your Lightning Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -532,7 +532,7 @@
     {
       "Id": "Miniwyvern_Lightning_LastingScales",
       "DisplayName": "Lasting Storm Scales",
-      "Description": "Your Lightning Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -551,7 +551,7 @@
     {
       "Id": "Miniwyvern_Lightning_WyrmFortitude",
       "DisplayName": "Storm Fortitude",
-      "Description": "Your Lightning Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -570,7 +570,7 @@
     {
       "Id": "Miniwyvern_Lightning_VigorAscendance",
       "DisplayName": "Storm Vitality",
-      "Description": "Your Lightning Miniwyvern gains 6% maximum health and takes 4% less damage.",
+      "Description": "+6% maximum health; take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
       "Branch": "Vigor",

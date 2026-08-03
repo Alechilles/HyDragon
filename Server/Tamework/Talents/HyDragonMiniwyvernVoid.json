@@ -9,7 +9,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralBond",
       "DisplayName": "Umbral Bond",
-      "Description": "Your hits increase target damage taken by 12% for 6 sec; your Void Miniwyvern deals 3% more damage.",
+      "Description": "Your hits increase target damage taken by 12% for 6 sec; +3% companion damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "Essence Bond",
@@ -25,7 +25,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralFocus",
       "DisplayName": "Umbral Focus",
-      "Description": "Your Void Miniwyvern deals 3% more damage.",
+      "Description": "+3% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -44,7 +44,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralAttunement",
       "DisplayName": "Umbral Attunement",
-      "Description": "Your Void Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
       "Branch": "Essence Bond",
@@ -63,7 +63,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralAmplification",
       "DisplayName": "Umbral Amplification",
-      "Description": "Your Void Miniwyvern deals 4% more damage.",
+      "Description": "+4% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -82,7 +82,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralResonance",
       "DisplayName": "Umbral Resonance",
-      "Description": "Your Void Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
       "Branch": "Essence Bond",
@@ -101,7 +101,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralEfficiency",
       "DisplayName": "Umbral Efficiency",
-      "Description": "Your Void Miniwyvern deals 3% more damage.",
+      "Description": "+3% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -120,7 +120,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralHarmony",
       "DisplayName": "Umbral Harmony",
-      "Description": "Your Void Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
       "Branch": "Essence Bond",
@@ -139,7 +139,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralMastery",
       "DisplayName": "Umbral Mastery",
-      "Description": "Your Void Miniwyvern deals 4% more damage.",
+      "Description": "+4% damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
       "Branch": "Essence Bond",
@@ -158,7 +158,7 @@
     {
       "Id": "Miniwyvern_Void_UmbralAscendance",
       "DisplayName": "Umbral Ascendance",
-      "Description": "Your Void Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
       "Branch": "Essence Bond",
@@ -402,7 +402,7 @@
     {
       "Id": "Miniwyvern_Void_VitalScales",
       "DisplayName": "Void Scales",
-      "Description": "Your Void Miniwyvern gains 5% maximum health.",
+      "Description": "+5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
       "Branch": "Vigor",
@@ -418,7 +418,7 @@
     {
       "Id": "Miniwyvern_Void_HardenedScales",
       "DisplayName": "Hardened Void Scales",
-      "Description": "Your Void Miniwyvern gains 5% maximum health.",
+      "Description": "+5% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
       "Branch": "Vigor",
@@ -437,7 +437,7 @@
     {
       "Id": "Miniwyvern_Void_ElderScales",
       "DisplayName": "Elder Void Scales",
-      "Description": "Your Void Miniwyvern gains 8% maximum health.",
+      "Description": "+8% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -456,7 +456,7 @@
     {
       "Id": "Miniwyvern_Void_ScaleGuard",
       "DisplayName": "Void Guard",
-      "Description": "Your Void Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
       "Branch": "Vigor",
@@ -475,7 +475,7 @@
     {
       "Id": "Miniwyvern_Void_ScaleBulwark",
       "DisplayName": "Void Bulwark",
-      "Description": "Your Void Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -494,7 +494,7 @@
     {
       "Id": "Miniwyvern_Void_SwiftWings",
       "DisplayName": "Void Wings",
-      "Description": "Your Void Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
       "Branch": "Vigor",
@@ -513,7 +513,7 @@
     {
       "Id": "Miniwyvern_Void_SurvivalInstinct",
       "DisplayName": "Void Instinct",
-      "Description": "Your Void Miniwyvern takes 4% less damage.",
+      "Description": "Take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -532,7 +532,7 @@
     {
       "Id": "Miniwyvern_Void_LastingScales",
       "DisplayName": "Lasting Void Scales",
-      "Description": "Your Void Miniwyvern gains 6% maximum health.",
+      "Description": "+6% maximum health.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -551,7 +551,7 @@
     {
       "Id": "Miniwyvern_Void_WyrmFortitude",
       "DisplayName": "Void Fortitude",
-      "Description": "Your Void Miniwyvern gains 5% movement speed.",
+      "Description": "+5% movement speed.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
       "Branch": "Vigor",
@@ -570,7 +570,7 @@
     {
       "Id": "Miniwyvern_Void_VigorAscendance",
       "DisplayName": "Void Vitality",
-      "Description": "Your Void Miniwyvern gains 6% maximum health and takes 4% less damage.",
+      "Description": "+6% maximum health; take 4% less damage.",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
       "Branch": "Vigor",
