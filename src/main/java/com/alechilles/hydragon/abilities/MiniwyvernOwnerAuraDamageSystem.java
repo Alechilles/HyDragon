@@ -41,7 +41,7 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
         UUIDComponent ownerIdentity = store.getComponent(ownerRef, UUIDComponent.getComponentType());
         if (player == null || !player.isValid() || ownerIdentity == null) return;
         MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(ownerIdentity.getUuid()).orElse(null);
-        if (aura == null || !shouldApply(ownerIdentity.getUuid(), true,
+        if (aura == null || !hasTargetEffect(aura) || !shouldApply(ownerIdentity.getUuid(), true,
                 damage.isCancelled(), damage.getAmount())) return;
         UUIDComponent targetIdentity = store.getComponent(target, UUIDComponent.getComponentType());
         if (targetIdentity == null) return;
@@ -50,7 +50,12 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
 
     boolean shouldApply(java.util.UUID ownerUuid, boolean playerSource, boolean cancelled, float amount) {
         return ownerUuid != null && playerSource && !cancelled && Float.isFinite(amount)
-                && amount > 0.0F && registry.activeFor(ownerUuid).isPresent();
+                && amount > 0.0F
+                && registry.activeFor(ownerUuid).map(MiniwyvernOwnerAuraDamageSystem::hasTargetEffect).orElse(false);
+    }
+
+    static boolean hasTargetEffect(@Nullable MiniwyvernOwnerAuraRegistry.Aura aura) {
+        return aura != null && aura.effectId() != null && !aura.effectId().isBlank();
     }
 
     static boolean isLiveRef(@Nullable Ref<EntityStore> ref) { return ref != null && ref.isValid(); }

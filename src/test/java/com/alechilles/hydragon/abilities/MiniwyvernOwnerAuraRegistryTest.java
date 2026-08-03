@@ -62,6 +62,20 @@ class MiniwyvernOwnerAuraRegistryTest {
     }
 
     @Test
+    void rejectsEveryInvalidExpandedFractionAndWardText() {
+        assertFalse(new MiniwyvernOwnerAuraRegistry().update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "void", "exposure", 6.0D, null, 1.0D, 0.0D, null, 0.0D, 0.0D, 0L));
+        assertFalse(new MiniwyvernOwnerAuraRegistry().update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "void", "exposure", 6.0D, null, 0.0D, Double.NaN, null, 0.0D, 0.0D, 0L));
+        assertFalse(new MiniwyvernOwnerAuraRegistry().update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "void", "exposure", 6.0D, null, 0.0D, 0.0D, null, -0.01D, 0.0D, 0L));
+        assertFalse(new MiniwyvernOwnerAuraRegistry().update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "void", "exposure", 6.0D, null, 0.0D, 0.0D, " ", 0.0D, 0.0D, 0L));
+        assertTrue(new MiniwyvernOwnerAuraRegistry().update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "void", "exposure", 6.0D, null, 0.0D, 0.0D, null, 0.0D, 0.0D, 0L));
+    }
+
+    @Test
     void retainsDataDefinedToxicWeaknessOnlyForItsAuthoredDuration() {
         MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
         UUID target = UUID.randomUUID();
