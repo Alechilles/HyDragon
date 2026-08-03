@@ -1,6 +1,25 @@
 {
   "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake_AvatarFlight.blockymodel",
   "Texture": "NPC/HyDragon/NordicDrake/Model/OldOrange.png",
+  "RandomAttachmentSets": {
+    "Skin": {
+      "GreenBalls": {
+        "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake_AvatarFlight.blockymodel",
+        "Texture": "NPC/HyDragon/NordicDrake/Model/GreenBalls.png",
+        "Weight": 1
+      },
+      "OldOrange": {
+        "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake_AvatarFlight.blockymodel",
+        "Texture": "NPC/HyDragon/NordicDrake/Model/OldOrange.png",
+        "Weight": 1
+      },
+      "Cobalt": {
+        "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake_AvatarFlight.blockymodel",
+        "Texture": "NPC/HyDragon/NordicDrake/Model/Cobalt.png",
+        "Weight": 1
+      }
+    }
+  },
   "EyeHeight": 3.0,
   "CrouchOffset": -0.1,
   "HitBox": {
