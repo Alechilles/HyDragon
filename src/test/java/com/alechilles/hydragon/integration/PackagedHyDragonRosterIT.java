@@ -108,7 +108,7 @@ final class PackagedHyDragonRosterIT {
                     "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Toxic_Launch.json",
                     "Server/Models/HyDragon/Hydra/Hydra_Toxic.json",
                     "Server/Models/Projectiles/HyDragon/Hydra_Toxic_Ball_Projectile.json",
-                    "Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_HyDragon_Predator.json")) {
+                    "Server/Patchwork/Patches/HyDragon/ToxicHydra_Zone1_Swamps_Predator.json")) {
                 assertNotNull(zip.getEntry(entry), () -> "missing packaged entry " + entry);
             }
             JsonObject model = json(zip, "Server/Models/HyDragon/Hydra/Hydra_Toxic.json");

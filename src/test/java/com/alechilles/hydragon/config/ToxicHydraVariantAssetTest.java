@@ -486,33 +486,19 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
-    void toxicHydraHasExactlyOneDaytimeSwampSpawnRegistration() throws Exception {
-        List<JsonObject> registrations;
-        try (Stream<Path> paths = Files.walk(ROOT.resolve("Server/NPC/Spawn/World"))) {
-            registrations = paths.filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith(".json"))
-                    .map(ToxicHydraVariantAssetTest::parseSpawn)
-                    .filter(spawn -> spawn.has("NPCs"))
-                    .filter(spawn -> spawn.getAsJsonArray("NPCs").asList().stream()
-                            .map(JsonElement::getAsJsonObject)
-                            .anyMatch(npc -> "Hydra_Toxic".equals(npc.get("Id").getAsString())))
-                    .toList();
-        }
-        assertEquals(1, registrations.size());
-        JsonObject spawn = registrations.getFirst();
-        assertEquals(List.of("Env_Zone1_Swamps"), strings(spawn.getAsJsonArray("Environments")));
-        assertFalse(strings(spawn.getAsJsonArray("Environments")).stream()
-                .anyMatch(environment -> environment.toLowerCase().contains("cave")
-                        && environment.toLowerCase().contains("swamp")));
-        JsonObject npc = spawn.getAsJsonArray("NPCs").get(0).getAsJsonObject();
-        assertEquals(1, spawn.getAsJsonArray("NPCs").size());
+    void toxicHydraUsesOneGuardedSwampPatchRegistration() throws Exception {
+        JsonObject patch = json("Server/Patchwork/Patches/HyDragon/ToxicHydra_Zone1_Swamps_Predator.json");
+        assertEquals("Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_Predator.json",
+                patch.get("Target").getAsString());
+        JsonObject operation = patch.getAsJsonArray("Operations").get(0).getAsJsonObject();
+        assertEquals("Insert", operation.get("Op").getAsString());
+        assertEquals("/NPCs", operation.get("Path").getAsString());
+        assertEquals("End", operation.get("Position").getAsString());
+        assertEquals("Hydra_Toxic", operation.getAsJsonObject("Existing").get("Id").getAsString());
+        JsonObject npc = operation.getAsJsonObject("Value");
         assertEquals(1, npc.get("Weight").getAsInt());
         assertEquals("Mud", npc.get("SpawnBlockSet").getAsString());
         assertEquals("Hydra_Toxic", npc.get("Id").getAsString());
-        assertEquals(List.of(6, 18), ints(spawn.getAsJsonArray("DayTimeRange")));
-        assertEquals(List.of(0, 4), ints(spawn.getAsJsonArray("MoonPhaseRange")));
-        assertEquals(List.of(0.7, 0.85, 1.0, 1.15, 1.3),
-                doubles(spawn.getAsJsonArray("MoonPhaseWeightModifiers")));
     }
 
     @Test
@@ -521,8 +507,8 @@ class ToxicHydraVariantAssetTest {
         assertEquals(List.of("Hydra", "Hydra_Toxic"), strings(species.getAsJsonArray("WildRoleIds")));
         assertEquals(Map.of("Hydra", "Tamed_Hydra", "Hydra_Toxic", "Tamed_Hydra_Toxic"),
                 stringMap(species.getAsJsonObject("TamedRoleIdByWildRole")));
-        assertEquals(List.of("Spawns_Zone3_Glacial_HyDragon_Predator",
-                        "Spawns_Zone1_Swamps_HyDragon_Predator"),
+        assertEquals(List.of("Spawns_Zone3_Glacial_Predator",
+                        "Spawns_Zone1_Swamps_Predator"),
                 strings(species.getAsJsonObject("Spawn").getAsJsonArray("OrdinarySpawnAssetIds")));
         assertEquals(List.of("Hydra", "Hydra_Toxic"),
                 strings(species.getAsJsonObject("Presentation").getAsJsonArray("ModelIds")));

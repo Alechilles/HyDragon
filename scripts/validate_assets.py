@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-HYDRAGON_PATCH_ROOT = ROOT.parent / "Patchwork/standalone/src/main/resources/Server/Patchwork/Patches/HyDragon"
+HYDRAGON_SPAWN_PATCH_ROOT = ROOT / "Server/Patchwork/Patches/HyDragon"
 ASSET_ROOTS = (ROOT / "Common", ROOT / "Server")
 JSON_SUFFIXES = {".json", ".particlesystem", ".particlespawner", ".blockymodel", ".blockyanim"}
 LOCALES = ("en-US", "pt-BR", "de-DE", "fr-FR", "es-ES")
@@ -85,6 +85,12 @@ WORKSHOP_056_PATCH_TARGETS = {
         "Env_Zone2_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
     "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier3/Zone3_Cave_Glacial_Aggro.json": (
         "Env_Zone3_Caves_Glacial", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_Predator.json": (
+        "Env_Zone1_Swamps", set()),
+    "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Glacial_Predator.json": (
+        "Env_Zone3_Glacial", set()),
+    "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Outlander.json": (
+        "Env_Zone3_Outlander", set()),
 }
 
 
@@ -119,7 +125,7 @@ def load_json_assets(errors: list[str]) -> dict[Path, object]:
                 parsed[path] = json.loads(path.read_text(encoding="utf-8-sig"))
             except (OSError, UnicodeError, json.JSONDecodeError) as exc:
                 fail(errors, f"invalid JSON: {path.relative_to(ROOT)}: {exc}")
-    for path in HYDRAGON_PATCH_ROOT.rglob("*.json"):
+    for path in HYDRAGON_SPAWN_PATCH_ROOT.rglob("*.json"):
         try:
             parsed[path] = json.loads(path.read_text(encoding="utf-8-sig"))
         except (OSError, UnicodeError, json.JSONDecodeError) as exc:
@@ -317,7 +323,6 @@ def require_files(errors: list[str]) -> None:
         "Server/Tamework/Companion/HyDragonNordicDrake.json",
         "Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json",
         "Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json",
-        "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json",
         "Server/Tamework/CapturePolicies/HyDragonHydra.json",
         "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json",
         "Server/Tamework/CapturePolicies/HyDragonRockDrakeT1.json",
@@ -343,8 +348,6 @@ def require_files(errors: list[str]) -> None:
     for relative in required:
         if not (ROOT / relative).is_file():
             fail(errors, f"missing required asset: {relative}")
-    if not (HYDRAGON_PATCH_ROOT / "Roles/Tamed_NordicDrake_AvatarFlight.json").is_file():
-        fail(errors, "missing required centralized HyDragon avatar-flight patch")
 
 
 def validate_capture_configs(parsed: dict[Path, object], errors: list[str]) -> None:
@@ -711,7 +714,7 @@ def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors
 
 def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[str]) -> None:
     species_root = ROOT / "Server/HyDragon/DragonSpecies"
-    patch_root = HYDRAGON_PATCH_ROOT
+    patch_root = HYDRAGON_SPAWN_PATCH_ROOT
     for species_path in sorted(species_root.glob("*.json")):
         species = parsed.get(species_path)
         if not isinstance(species, dict):
@@ -720,18 +723,25 @@ def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[
         spawn = species.get("Spawn")
         ordinary_ids = spawn.get("OrdinarySpawnAssetIds", []) if isinstance(spawn, dict) else []
         for asset_id in ordinary_ids:
-            patch_path = patch_root / f"{asset_id}.json"
-            if not patch_path.is_file():
-                continue
-            patch = parsed.get(patch_path)
-            operations = patch.get("Operations", []) if isinstance(patch, dict) else []
-            inserted_roles = {
-                operation.get("Value", {}).get("Id")
-                for operation in operations
-                if isinstance(operation, dict) and isinstance(operation.get("Value"), dict)
-            }
-            if not inserted_roles.intersection(wild_roles):
-                fail(errors, f"spawn patch {patch_path.relative_to(HYDRAGON_PATCH_ROOT)} inserts {sorted(inserted_roles)} but species declares {sorted(wild_roles)}")
+            patches = [patch_root / f"{asset_id}.json"]
+            patches.extend(
+                path for path in patch_root.glob("*.json")
+                if isinstance(parsed.get(path), dict)
+                and Path(str(parsed[path].get("Target", ""))).stem == asset_id
+            )
+            matched = False
+            for patch_path in patches:
+                patch = parsed.get(patch_path)
+                operations = patch.get("Operations", []) if isinstance(patch, dict) else []
+                inserted_roles = {
+                    operation.get("Value", {}).get("Id")
+                    for operation in operations
+                    if isinstance(operation, dict) and isinstance(operation.get("Value"), dict)
+                }
+                if inserted_roles.intersection(wild_roles):
+                    matched = True
+            if not matched:
+                fail(errors, f"{species_path.relative_to(ROOT)} has no Patchwork spawn insertion for {asset_id}")
 
 
 def validate_range(value: object, size: int, minimum: float, maximum: float) -> bool:
@@ -818,16 +828,15 @@ def validate_static_spawn_contracts(
 ) -> None:
     """Validate authored spawns plus base patches against Workshop's 0.5.6 contracts."""
     world_root = ROOT / "Server/NPC/Spawn/World"
-    local_spawn_ids: set[str] = set()
-    for path in sorted(world_root.rglob("*.json")):
-        local_spawn_ids.add(path.stem)
-        validate_spawn_shape(parsed.get(path), "WorldNPCSpawn", path.relative_to(ROOT).as_posix(), known_assets, errors)
+    if world_root.exists() and any(world_root.rglob("*.json")):
+        fail(errors, "HyDragon must not ship standalone Server/NPC/Spawn assets; use Patchwork additions")
 
-    patch_root = HYDRAGON_PATCH_ROOT
+    patch_root = HYDRAGON_SPAWN_PATCH_ROOT
     patch_ids: set[str] = set()
+    target_stems: set[str] = set()
     for path in sorted(patch_root.glob("*.json")):
         data = parsed.get(path)
-        context = path.relative_to(HYDRAGON_PATCH_ROOT).as_posix()
+        context = path.relative_to(HYDRAGON_SPAWN_PATCH_ROOT).as_posix()
         if not isinstance(data, dict):
             continue
         if set(data) - {"Id", "Target", "Priority", "Enabled", "When", "Operations"}:
@@ -843,6 +852,7 @@ def validate_static_spawn_contracts(
         if target not in WORKSHOP_056_PATCH_TARGETS:
             fail(errors, f"{context} target is not in the verified Workshop 0.5.6 manifest: {target}")
             continue
+        target_stems.add(Path(str(target)).stem)
         if base_root is None:
             continue
         target_path = base_root / str(target)
@@ -888,12 +898,16 @@ def validate_static_spawn_contracts(
                 continue
             value = operation.get("Value")
             validate_role_spawn(value, f"{operation_context}.Value", known_assets, errors)
+            existing = operation.get("Existing")
+            if not isinstance(existing, dict) or existing.get("Id") != (value or {}).get("Id"):
+                fail(errors, f"{operation_context} must guard insertion with the inserted role Id")
             if isinstance(value, dict):
                 merged["NPCs"].append(value)
-        validate_spawn_shape(merged, "BeaconNPCSpawn", f"{context} effective target", known_assets, errors)
+        asset_type = "BeaconNPCSpawn" if "/Beacons/" in str(target) else "WorldNPCSpawn"
+        validate_spawn_shape(merged, asset_type, f"{context} effective target", known_assets, errors)
 
     species_root = ROOT / "Server/HyDragon/DragonSpecies"
-    available_routes = local_spawn_ids | patch_ids
+    available_routes = target_stems | patch_ids
     for path in sorted(species_root.glob("*.json")):
         species = parsed.get(path)
         spawn = species.get("Spawn") if isinstance(species, dict) else None
@@ -1009,12 +1023,25 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
     if len(set(expected_drop_ids)) != 3:
         fail(errors, "Rock Drake tier drop-list IDs must be distinct")
 
-    hydra_spawn_path = ROOT / "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Glacial_HyDragon_Predator.json"
-    hydra_spawn = parsed.get(hydra_spawn_path)
-    if not isinstance(hydra_spawn, dict) or hydra_spawn.get("MoonPhaseRange") is None \
-            or hydra_spawn.get("MoonPhaseWeightModifiers") is None:
-        fail(errors, f"{hydra_spawn_path.relative_to(ROOT)} must author moon range and weight tuning")
-    altitude_patch_path = HYDRAGON_PATCH_ROOT / "RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
+    expected_spawn_insertions = {
+        "Hydra_Zone3_Glacial_Predator.json": ("Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Glacial_Predator.json", "Hydra"),
+        "ToxicHydra_Zone1_Swamps_Predator.json": ("Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_Predator.json", "Hydra_Toxic"),
+        "NordicDrake_Zone3_Outlander.json": ("Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Outlander.json", "NordicDrake"),
+    }
+    for filename, (target, role_id) in expected_spawn_insertions.items():
+        patch = parsed.get(HYDRAGON_SPAWN_PATCH_ROOT / filename)
+        operations = patch.get("Operations", []) if isinstance(patch, dict) else []
+        if not isinstance(patch, dict) or patch.get("Target") != target or not any(
+            isinstance(operation, dict)
+            and operation.get("Op") == "Insert"
+            and operation.get("Path") == "/NPCs"
+            and operation.get("Existing") == {"Id": role_id}
+            and operation.get("Value", {}).get("Id") == role_id
+            for operation in operations
+        ):
+            fail(errors, f"{filename} must append {role_id} to {target}")
+
+    altitude_patch_path = HYDRAGON_SPAWN_PATCH_ROOT / "RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
     altitude_patch = parsed.get(altitude_patch_path)
     operations = altitude_patch.get("Operations", []) if isinstance(altitude_patch, dict) else []
     if not any(
@@ -1024,23 +1051,7 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
         and validate_range(operation.get("Value"), 2, -4096, 4096)
         for operation in operations
     ):
-        fail(errors, f"{altitude_patch_path.relative_to(HYDRAGON_PATCH_ROOT)} must author a valid BeaconNPCSpawn YRange")
-
-    flight_patch_path = HYDRAGON_PATCH_ROOT / "Roles/Tamed_NordicDrake_AvatarFlight.json"
-    flight_patch = parsed.get(flight_patch_path)
-    flight_operations = flight_patch.get("Operations", []) if isinstance(flight_patch, dict) else []
-    expected_flight_values = {
-        "MountMode": "TameworkAvatarFlight",
-        "AvatarFlightConfig": "HyDragonNordicDrake",
-    }
-    if not any(
-        isinstance(operation, dict)
-        and operation.get("Op") == "Merge"
-        and operation.get("Path") == "/Modify"
-        and operation.get("Value") == expected_flight_values
-        for operation in flight_operations
-    ):
-        fail(errors, "Nordic Drake must receive Tamework avatar-flight role wiring through its clean patch asset")
+        fail(errors, f"{altitude_patch_path.relative_to(HYDRAGON_SPAWN_PATCH_ROOT)} must author a valid BeaconNPCSpawn YRange")
     avatar_config = parsed.get(ROOT / "Server/Tamework/AvatarFlight/HyDragonNordicDrake.json")
     model = avatar_config.get("Model") if isinstance(avatar_config, dict) else None
     if not isinstance(avatar_config, dict) or avatar_config.get("Enabled") is not True \
@@ -1050,11 +1061,14 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
     mount = nordic_species.get("Mount") if isinstance(nordic_species, dict) else None
     if mount != {"Mode": "AVATAR_FLIGHT", "AvatarFlightConfigId": "HyDragonNordicDrake"}:
         fail(errors, "Nordic Drake species must select the HyDragonNordicDrake avatar-flight config")
-    encounter = parsed.get(ROOT / "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json")
-    eligibility = encounter.get("PlayerEligibility") if isinstance(encounter, dict) else None
-    if not isinstance(eligibility, dict) \
-            or eligibility.get("RequiredItemId") != "Tamework_Flightmasters_Talisman":
-        fail(errors, "Nordic Drake flight eligibility must use only Tamework's Flightmaster's Talisman")
+    nordic_spawn = nordic_species.get("Spawn") if isinstance(nordic_species, dict) else None
+    if not isinstance(nordic_spawn, dict) \
+            or nordic_spawn.get("OrdinarySpawnAssetIds") != ["Spawns_Zone3_Outlander"] \
+            or nordic_spawn.get("PluginEncounterIds") != []:
+        fail(errors, "Nordic Drake must use only the Zone 3 Outlander ordinary spawn route")
+    nordic_policy = parsed.get(ROOT / "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json")
+    if not isinstance(nordic_policy, dict) or nordic_policy.get("Requirements", []) != []:
+        fail(errors, "Nordic Drake capture policy must not require an encounter phase")
     interaction = parsed.get(ROOT / "Server/Tamework/Interactions/HyDragonIntDragon.json")
     interaction_entries = interaction.get("Interactions", []) if isinstance(interaction, dict) else []
     if not any(isinstance(entry, dict) and entry.get("Type") == "Mount" and entry.get("Enabled") is True
@@ -1388,10 +1402,8 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
     for obsolete in ("HyDragonFullDragons.json", "HyDragonSoulboundMiniwyvern.json"):
         if (population_root / obsolete).exists():
             fail(errors, f"obsolete generic population policy remains: {obsolete}")
-    encounter = parsed.get(ROOT / "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json")
-    eligibility = encounter.get("PlayerEligibility") if isinstance(encounter, dict) else None
-    if isinstance(eligibility, dict) and "ActiveCompanionGroup" in eligibility:
-        fail(errors, "Nordic encounter must not retain obsolete ActiveCompanionGroup evidence")
+    if (ROOT / "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json").exists():
+        fail(errors, "Nordic Drake must not retain a Java-controlled encounter asset")
 
     essence_path = ROOT / "Server/Item/Items/Ingredient/Revitalizing_Essence.json"
     essence = parsed.get(essence_path)

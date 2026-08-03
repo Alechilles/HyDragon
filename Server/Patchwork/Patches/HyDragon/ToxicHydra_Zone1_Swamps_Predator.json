@@ -1,0 +1,20 @@
+{
+  "Id": "HyDragon_ToxicHydra_Zone1_Swamps_Predator",
+  "Target": "Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_Predator.json",
+  "Priority": 0,
+  "Enabled": true,
+  "Operations": [
+    {
+      "Id": "append-toxic-hydra",
+      "Op": "Insert",
+      "Path": "/NPCs",
+      "Position": "End",
+      "Existing": { "Id": "Hydra_Toxic" },
+      "Value": {
+        "Weight": 1,
+        "SpawnBlockSet": "Mud",
+        "Id": "Hydra_Toxic"
+      }
+    }
+  ]
+}

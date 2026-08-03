@@ -82,13 +82,13 @@ class DragonRosterAssetContractTest {
     }
 
     @Test
-    void obsoleteGenericPopulationGroupsAndEncounterFieldAreAbsent() throws Exception {
+    void obsoleteGenericPopulationGroupsAndNordicEncounterAreAbsent() throws Exception {
         assertFalse(Files.exists(ROOT.resolve(
                 "Server/Tamework/PopulationGroups/HyDragonFullDragons.json")));
         assertFalse(Files.exists(ROOT.resolve(
                 "Server/Tamework/PopulationGroups/HyDragonSoulboundMiniwyvern.json")));
-        assertFalse(read("Server/HyDragon/Encounters/NordicDrakeHighAltitude.json")
-                .contains("ActiveCompanionGroup"));
+        assertFalse(Files.exists(ROOT.resolve(
+                "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json")));
     }
 
     @Test

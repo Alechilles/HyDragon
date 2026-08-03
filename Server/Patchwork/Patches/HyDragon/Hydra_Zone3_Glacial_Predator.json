@@ -1,0 +1,20 @@
+{
+  "Id": "HyDragon_Hydra_Zone3_Glacial_Predator",
+  "Target": "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Glacial_Predator.json",
+  "Priority": 0,
+  "Enabled": true,
+  "Operations": [
+    {
+      "Id": "append-hydra",
+      "Op": "Insert",
+      "Path": "/NPCs",
+      "Position": "End",
+      "Existing": { "Id": "Hydra" },
+      "Value": {
+        "Weight": 1,
+        "SpawnBlockSet": "IceAndSnow",
+        "Id": "Hydra"
+      }
+    }
+  ]
+}

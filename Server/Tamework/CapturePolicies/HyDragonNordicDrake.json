@@ -2,9 +2,6 @@
   "Enabled": true,
   "Priority": 100,
   "RoleIds": [ "NordicDrake" ],
-  "Requirements": [
-    { "Id": "hydragon:special_encounter_capture_ready", "Param": "grounded_phase" }
-  ],
   "Difficulty": {
     "MinimumPower": 0,
     "Resistance": 0.14,

@@ -9,11 +9,11 @@
   "Capture": {
     "Resistance": 0.25,
     "MinimumStoneTier": 4,
-    "SpecialRequirementIds": [ "hydragon:special_encounter_capture_ready" ]
+    "SpecialRequirementIds": []
   },
   "Spawn": {
-    "OrdinarySpawnAssetIds": [],
-    "PluginEncounterIds": [ "hydragon:nordic_drake_high_altitude" ]
+    "OrdinarySpawnAssetIds": [ "Spawns_Zone3_Outlander" ],
+    "PluginEncounterIds": []
   },
   "Presentation": {
     "LocalizationPrefix": "server.npcRoles.NordicDrake.name",
