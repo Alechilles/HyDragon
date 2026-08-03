@@ -20,25 +20,27 @@
       },
       {
         "TalentId": "Miniwyvern_Lightning_StormAttunement",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Lightning_Ward",
+        "WardDamageReductionFraction": 0.05
+      },
+      {
+        "TalentId": "Miniwyvern_Lightning_StormAmplification",
         "Semantic": "targeteffect",
         "TargetEffectId": "HyDragon_Miniwyvern_Lightning_Boon_25",
         "TargetDurationSeconds": 8
       },
       {
-        "TalentId": "Miniwyvern_Lightning_StormAmplification",
-        "Semantic": "speedburst",
-        "SpeedBurstMultiplier": 1.1,
-        "SpeedBurstDurationSeconds": 3
-      },
-      {
         "TalentId": "Miniwyvern_Lightning_StormResonance",
         "Semantic": "ward",
-        "WardEffectId": "HyDragon_Miniwyvern_Lightning_Ward"
+        "WardEffectId": "HyDragon_Miniwyvern_Lightning_Ward_8",
+        "WardDamageReductionFraction": 0.08
       },
       {
         "TalentId": "Miniwyvern_Lightning_StormEfficiency",
-        "Semantic": "ward",
-        "WardEffectId": "HyDragon_Miniwyvern_Lightning_Ward_8"
+        "Semantic": "speedburst",
+        "SpeedBurstMultiplier": 1.1,
+        "SpeedBurstDurationSeconds": 3
       },
       {
         "TalentId": "Miniwyvern_Lightning_StormHarmony",
@@ -50,7 +52,8 @@
         "Semantic": "targeteffect",
         "TargetEffectId": "HyDragon_Miniwyvern_Lightning_Boon_30",
         "TargetDurationSeconds": 8,
-        "WardEffectId": "HyDragon_Miniwyvern_Lightning_Ward_12"
+        "WardEffectId": "HyDragon_Miniwyvern_Lightning_Ward_12",
+        "WardDamageReductionFraction": 0.12
       },
       {
         "TalentId": "Miniwyvern_Lightning_StormAscendance",
@@ -59,7 +62,8 @@
         "TargetDurationSeconds": 8,
         "SpeedBurstMultiplier": 1.15,
         "SpeedBurstDurationSeconds": 4,
-        "WardEffectId": "HyDragon_Miniwyvern_Lightning_Ward_15"
+        "WardEffectId": "HyDragon_Miniwyvern_Lightning_Ward_15",
+        "WardDamageReductionFraction": 0.15
       }
     ]
   }

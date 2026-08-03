@@ -5,19 +5,5 @@
   "RemovalBehavior": "Duration",
   "Infinite": false,
   "Debuff": false,
-  "Duration": 8,
-  "DamageResistance": {
-    "Physical": [
-      {
-        "CalculationType": "Percent",
-        "Amount": 0.12
-      }
-    ],
-    "Projectile": [
-      {
-        "CalculationType": "Percent",
-        "Amount": 0.12
-      }
-    ]
-  }
+  "Duration": 8
 }

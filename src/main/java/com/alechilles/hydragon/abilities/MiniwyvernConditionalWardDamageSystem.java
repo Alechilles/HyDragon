@@ -21,7 +21,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** Applies Fire, Nature, and Toxic conditional owner damage reduction. */
+/** Applies Fire, Nature, Toxic conditional, and Lightning static owner damage reduction. */
 public final class MiniwyvernConditionalWardDamageSystem extends DamageEventSystem {
     private final MiniwyvernOwnerAuraRegistry registry;
 

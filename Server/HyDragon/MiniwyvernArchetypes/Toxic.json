@@ -24,24 +24,24 @@
       },
       {
         "TalentId": "Miniwyvern_Toxic_VenomAttunement",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward"
+      },
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomAmplification",
         "Semantic": "targeteffect",
         "TargetEffectId": "HyDragon_Miniwyvern_Toxic_Weakness_15_8",
         "TargetDurationSeconds": 8
       },
       {
-        "TalentId": "Miniwyvern_Toxic_VenomAmplification",
-        "Semantic": "ownerdamagetoaffected",
-        "OwnerDamageToAffectedFraction": 0.05
-      },
-      {
         "TalentId": "Miniwyvern_Toxic_VenomResonance",
         "Semantic": "ward",
-        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward"
+        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward_12"
       },
       {
         "TalentId": "Miniwyvern_Toxic_VenomEfficiency",
-        "Semantic": "ward",
-        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward_12"
+        "Semantic": "ownerdamagetoaffected",
+        "OwnerDamageToAffectedFraction": 0.05
       },
       {
         "TalentId": "Miniwyvern_Toxic_VenomHarmony",

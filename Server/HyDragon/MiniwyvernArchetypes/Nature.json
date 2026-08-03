@@ -21,25 +21,25 @@
       },
       {
         "TalentId": "Miniwyvern_Nature_VerdantAttunement",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward"
+      },
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantAmplification",
         "Semantic": "targeteffect",
         "TargetEffectId": "HyDragon_Miniwyvern_Nature_Regeneration_20",
         "TargetDurationSeconds": 10
       },
       {
-        "TalentId": "Miniwyvern_Nature_VerdantAmplification",
-        "Semantic": "speedburst",
-        "SpeedBurstMultiplier": 1.05,
-        "SpeedBurstDurationSeconds": 2
-      },
-      {
         "TalentId": "Miniwyvern_Nature_VerdantResonance",
         "Semantic": "ward",
-        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward"
+        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward_12"
       },
       {
         "TalentId": "Miniwyvern_Nature_VerdantEfficiency",
-        "Semantic": "ward",
-        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward_12"
+        "Semantic": "speedburst",
+        "SpeedBurstMultiplier": 1.05,
+        "SpeedBurstDurationSeconds": 2
       },
       {
         "TalentId": "Miniwyvern_Nature_VerdantHarmony",

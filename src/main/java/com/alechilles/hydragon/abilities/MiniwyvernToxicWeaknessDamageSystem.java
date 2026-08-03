@@ -17,7 +17,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** Reduces Toxic-weakened entities' outgoing damage during Hytale's pre-application filter phase. */
+/** Reduces weakened/slow-marked entities' outgoing damage during Hytale's pre-application filter phase. */
 public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem {
     private static final String PROJECTILE_EFFECT_ID = "HyDragon_Miniwyvern_Toxic_Projectile_Weakness";
     private final MiniwyvernOwnerAuraRegistry registry;
@@ -46,12 +46,15 @@ public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem
                 sourceRef != null && sourceRef.equals(targetRef), blocked, healing)) return;
         UUIDComponent identity = store.getComponent(sourceRef, UUIDComponent.getComponentType());
         if (identity == null) return;
-        MiniwyvernOwnerAuraRegistry.ToxicWeakness weakness = registry.activeToxicWeakness(
-                identity.getUuid(), System.currentTimeMillis()).orElse(null);
+        long nowMs = System.currentTimeMillis();
+        var weaknesses = registry.activeToxicWeaknesses(identity.getUuid(), nowMs);
         EffectControllerComponent controller = store.getComponent(sourceRef, EffectControllerComponent.getComponentType());
         if (controller == null) return;
-        double bondFraction = weakness != null && hasEffect(controller, weakness.effectId())
-                ? weakness.damageReductionFraction() : 0.0D;
+        double bondFraction = weaknesses.stream()
+                .filter(weakness -> hasEffect(controller, weakness.effectId()))
+                .mapToDouble(MiniwyvernOwnerAuraRegistry.ToxicWeakness::damageReductionFraction)
+                .max()
+                .orElse(0.0D);
         boolean projectileActive = hasEffect(controller, PROJECTILE_EFFECT_ID);
         if (bondFraction <= 0.0D && !projectileActive) return;
         damage.setAmount(reducedAmount(damage.getAmount(), bondFraction, projectileActive));

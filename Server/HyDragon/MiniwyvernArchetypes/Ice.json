@@ -24,24 +24,24 @@
       },
       {
         "TalentId": "Miniwyvern_Ice_RimeAttunement",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward"
+      },
+      {
+        "TalentId": "Miniwyvern_Ice_RimeAmplification",
         "Semantic": "targeteffect",
         "TargetEffectId": "HyDragon_Miniwyvern_Ice_Slow_25_5",
         "TargetDurationSeconds": 5
       },
       {
-        "TalentId": "Miniwyvern_Ice_RimeAmplification",
-        "Semantic": "targetoutgoingdamagereduction",
-        "TargetOutgoingDamageReductionFraction": 0.08
-      },
-      {
         "TalentId": "Miniwyvern_Ice_RimeResonance",
         "Semantic": "ward",
-        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward"
+        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward_12"
       },
       {
         "TalentId": "Miniwyvern_Ice_RimeEfficiency",
-        "Semantic": "ward",
-        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward_12"
+        "Semantic": "targetoutgoingdamagereduction",
+        "TargetOutgoingDamageReductionFraction": 0.08
       },
       {
         "TalentId": "Miniwyvern_Ice_RimeHarmony",

@@ -275,11 +275,16 @@ class BundledConfigAssetContractTest {
             JsonArray upgrades = aura.getAsJsonArray("Upgrades");
             assertEquals(8, upgrades.size(), form + " must declare eight upgrade tiers");
             Set<String> talentIds = new HashSet<>();
+            Map<String, JsonObject> byTalentSuffix = new HashMap<>();
             for (var element : upgrades) {
                 JsonObject upgrade = element.getAsJsonObject();
                 String talentId = upgrade.get("TalentId").getAsString();
                 assertTrue(talentId.startsWith("Miniwyvern_" + form + "_"), talentId);
                 assertTrue(talentIds.add(talentId), form + " repeats " + talentId);
+                for (String suffix : List.of("Focus", "Attunement", "Amplification", "Resonance",
+                        "Efficiency", "Harmony", "Mastery", "Ascendance")) {
+                    if (talentId.endsWith(suffix)) byTalentSuffix.put(suffix, upgrade);
+                }
                 for (String field : List.of("TargetEffectId", "WardEffectId")) {
                     if (!upgrade.has(field)) continue;
                     String effectId = upgrade.get(field).getAsString();
@@ -289,12 +294,27 @@ class BundledConfigAssetContractTest {
                     assertTrue(effect.has("Name"), effectId + " must retain a localized status name");
                 }
             }
+            for (String suffix : List.of("Attunement", "Resonance")) {
+                JsonObject upgrade = byTalentSuffix.get(suffix);
+                assertEquals("ward", upgrade.get("Semantic").getAsString(),
+                        form + " " + suffix + " must be a Ward payload");
+                assertTrue(upgrade.has("WardEffectId"), form + " " + suffix + " must select a Ward effect");
+            }
+            JsonObject harmony = byTalentSuffix.get("Harmony");
+            assertTrue(Set.of("ward", "conditionalward", "siphon")
+                            .contains(harmony.get("Semantic").getAsString()),
+                    form + " Harmony must remain on the Ward branch");
+            assertTrue(harmony.has("WardEffectId"), form + " Harmony must select a Ward effect");
+            for (String suffix : List.of("Focus", "Amplification", "Efficiency")) {
+                JsonObject upgrade = byTalentSuffix.get(suffix);
+                assertFalse("ward".equals(upgrade.get("Semantic").getAsString()),
+                        form + " " + suffix + " must remain on the pressure branch");
+            }
         }
     }
 
     @Test
-    void lightningWardUsesOnlyDocumentedDamageCauses() throws IOException {
-        Set<String> expectedCauses = Set.of("Physical", "Projectile");
+    void lightningWardUsesRuntimeGeneralReductionInsteadOfDamageResistanceClaims() throws IOException {
         for (String asset : List.of(
                 "HyDragon_Miniwyvern_Lightning_Ward.json",
                 "HyDragon_Miniwyvern_Lightning_Ward_8.json",
@@ -303,8 +323,22 @@ class BundledConfigAssetContractTest {
                 "HyDragon_Miniwyvern_Lightning_Ward_15.json")) {
             Path path = Path.of("Server", "Entity", "Effects", "Status", asset);
             JsonObject status = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
-            assertEquals(expectedCauses, status.getAsJsonObject("DamageResistance").keySet(),
-                    path + " must scope resistance to documented causes");
+            assertFalse(status.has("DamageResistance"),
+                    path + " must not claim cause-scoped resistance for general Static Ward reduction");
+        }
+        JsonObject lightning = JsonParser.parseString(Files.readString(
+                Path.of("Server", "HyDragon", "MiniwyvernArchetypes", "Lightning.json"))).getAsJsonObject();
+        JsonArray upgrades = lightning.getAsJsonObject("EssenceBondAura").getAsJsonArray("Upgrades");
+        Map<String, Double> expected = Map.of("Attunement", 0.05D, "Resonance", 0.08D,
+                "Mastery", 0.12D, "Ascendance", 0.15D);
+        for (var element : upgrades) {
+            JsonObject upgrade = element.getAsJsonObject();
+            String suffix = upgrade.get("TalentId").getAsString();
+            suffix = expected.keySet().stream().filter(suffix::endsWith).findFirst().orElse("");
+            if (expected.containsKey(suffix)) {
+                assertEquals(expected.get(suffix), upgrade.get("WardDamageReductionFraction").getAsDouble(),
+                        "Lightning " + suffix + " must carry the runtime general reduction");
+            }
         }
     }
 

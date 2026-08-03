@@ -77,6 +77,19 @@ class MiniwyvernOwnerAuraRegistryTest {
     }
 
     @Test
+    void retainsLightningStaticWardReductionAsASeparateGeneralRuntimeModifier() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "lightning", "", 0.0D, null, 0.0D, 0.0D,
+                "StaticWard", 0.0D, 0.0D, 0L,
+                "StormBoon", 0.0D, 0.0D, 0.0D, 0.08D));
+
+        MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(OWNER).orElseThrow();
+        assertEquals(0.08D, aura.wardDamageReductionFraction());
+        assertTrue(registry.conditionalWardActive(OWNER, false, false, 1_000L));
+    }
+
+    @Test
     void invokesClearHooksForEphemeralOwnerState() throws Exception {
         MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
         int[] clears = {0};
@@ -196,6 +209,27 @@ class MiniwyvernOwnerAuraRegistryTest {
         assertEquals(0.20D, registry.activeTargetAura(target, "toxic-effect", 6_999L)
                 .orElseThrow().targetOutgoingDamageReductionFraction());
         assertEquals(0.20D, registry.activeToxicWeakness(target, 6_999L).orElseThrow()
+                .damageReductionFraction());
+    }
+
+    @Test
+    void keepsOverlappingIceAndToxicReductionsAndFallsBackWhenTheStrongerOneExpires() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        UUID target = UUID.randomUUID();
+
+        assertTrue(registry.update(OWNER, "ice-profile", "ice-lease", UUID.randomUUID(),
+                "ice", "slow", 4.0D, 0.08D, 0.0D, 0.0D,
+                null, 0.0D, 0.0D, 0L));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 8.0D, 1_000L);
+
+        assertTrue(registry.update(OWNER_TWO, "toxic-profile", "toxic-lease", UUID.randomUUID(),
+                "toxic", "weakness", 6.0D, 0.15D));
+        registry.recordTargetAura(target, registry.activeFor(OWNER_TWO).orElseThrow(), 4.0D, 1_000L);
+
+        assertEquals(2, registry.activeToxicWeaknesses(target, 1_001L).size());
+        assertEquals(0.15D, registry.activeToxicWeakness(target, 1_001L).orElseThrow()
+                .damageReductionFraction());
+        assertEquals(0.08D, registry.activeToxicWeakness(target, 5_001L).orElseThrow()
                 .damageReductionFraction());
     }
 

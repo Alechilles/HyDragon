@@ -77,6 +77,9 @@ public final class MiniwyvernArchetypeConfig
             .<Double>append(new KeyedCodec<>("ConditionalWardDamageReductionFraction", Codec.DOUBLE),
                     (upgrade, value) -> upgrade.conditionalWardDamageReductionFraction = value,
                     upgrade -> upgrade.conditionalWardDamageReductionFraction).add()
+            .<Double>append(new KeyedCodec<>("WardDamageReductionFraction", Codec.DOUBLE),
+                    (upgrade, value) -> upgrade.wardDamageReductionFraction = value,
+                    upgrade -> upgrade.wardDamageReductionFraction).add()
             .<Double>append(new KeyedCodec<>("SpeedBurstMultiplier", Codec.DOUBLE),
                     (upgrade, value) -> upgrade.speedBurstMultiplier = value,
                     upgrade -> upgrade.speedBurstMultiplier).add()
@@ -235,6 +238,7 @@ public final class MiniwyvernArchetypeConfig
         Double ownerDamageToAffectedFraction;
         String wardEffectId;
         Double conditionalWardDamageReductionFraction;
+        Double wardDamageReductionFraction;
         Double speedBurstMultiplier;
         Double speedBurstDurationSeconds;
         Double siphonMaximumHealthFraction;
@@ -256,6 +260,7 @@ public final class MiniwyvernArchetypeConfig
             }
             validateFraction(errors, "ConditionalWardDamageReductionFraction",
                     conditionalWardDamageReductionFraction);
+            validateFraction(errors, "WardDamageReductionFraction", wardDamageReductionFraction);
             validateFraction(errors, "SiphonMaximumHealthFraction", siphonMaximumHealthFraction);
             if (speedBurstMultiplier != null
                     && (!Double.isFinite(speedBurstMultiplier) || speedBurstMultiplier <= 0.0D)) {
@@ -351,6 +356,12 @@ public final class MiniwyvernArchetypeConfig
         public double getConditionalWardDamageReductionFraction() {
             return conditionalWardDamageReductionFraction == null
                     ? 0.0D : conditionalWardDamageReductionFraction;
+        }
+        @Nullable public Double getWardDamageReductionFractionOverride() {
+            return wardDamageReductionFraction;
+        }
+        public double getWardDamageReductionFraction() {
+            return wardDamageReductionFraction == null ? 0.0D : wardDamageReductionFraction;
         }
         @Nullable public Double getSpeedBurstMultiplierOverride() { return speedBurstMultiplier; }
         public double getSpeedBurstMultiplier() { return speedBurstMultiplier == null ? 0.0D : speedBurstMultiplier; }

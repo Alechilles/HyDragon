@@ -482,6 +482,7 @@ public final class MiniwyvernAbilityService {
         double ownerDamageToAffectedFraction = 0.0D;
         String wardEffectId = null;
         double conditionalWardDamageReductionFraction = 0.0D;
+        double wardDamageReductionFraction = 0.0D;
         double siphonMaximumHealthFraction = 0.0D;
         long siphonCooldownMs = 0L;
         String ownerEffectId = playerOnlyForm
@@ -527,6 +528,9 @@ public final class MiniwyvernAbilityService {
                     conditionalWardDamageReductionFraction =
                             upgrade.getConditionalWardDamageReductionFractionOverride();
                 }
+                if (upgrade.getWardDamageReductionFractionOverride() != null) {
+                    wardDamageReductionFraction = upgrade.getWardDamageReductionFractionOverride();
+                }
                 if (upgrade.getSiphonMaximumHealthFractionOverride() != null) {
                     siphonMaximumHealthFraction = upgrade.getSiphonMaximumHealthFractionOverride();
                     siphonCooldownMs = siphonMaximumHealthFraction > 0.0D
@@ -546,7 +550,7 @@ public final class MiniwyvernAbilityService {
                 targetDamageTakenFraction, ownerDamageToAffectedFraction, wardEffectId,
                 conditionalWardDamageReductionFraction, siphonMaximumHealthFraction, siphonCooldownMs,
                 ownerEffectId, ownerRegenerationFraction,
-                speedBurstMultiplier, speedBurstDurationSeconds)) {
+                speedBurstMultiplier, speedBurstDurationSeconds, wardDamageReductionFraction)) {
             removeWard(context.ownerUuid(), previous, world);
             removeSpeedBurstEffects(context.ownerUuid(), context.profileId(),
                     previous == null ? formId : previous.formId(), world);

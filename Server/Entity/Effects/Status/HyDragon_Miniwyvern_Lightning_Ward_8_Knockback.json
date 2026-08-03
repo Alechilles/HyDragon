@@ -6,20 +6,6 @@
   "Infinite": false,
   "Debuff": false,
   "Duration": 8,
-  "DamageResistance": {
-    "Physical": [
-      {
-        "CalculationType": "Percent",
-        "Amount": 0.08
-      }
-    ],
-    "Projectile": [
-      {
-        "CalculationType": "Percent",
-        "Amount": 0.08
-      }
-    ]
-  },
   "ApplicationEffects": {
     "KnockbackMultiplier": 0.8
   }
