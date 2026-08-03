@@ -54,8 +54,8 @@
     "CanSetHome": true,
     "IsMountable": true,
     "MountAnchorX": 0,
-    "MountAnchorY": 2.5,
-    "MountAnchorZ": 0.6,
+    "MountAnchorY": 3,
+    "MountAnchorZ": -1,
     "MountMode": {
       "Compute": "MountMode"
     },
@@ -157,7 +157,7 @@
             "Parent": "Hydra_Bite_Damage",
             "DamageCalculator": {
               "Type": "Absolute",
-              "BaseDamage": {"Physical": 16},
+              "BaseDamage": { "Physical": 16 },
               "RandomPercentageModifier": 0.1
             }
           }
@@ -169,7 +169,7 @@
             "Parent": "Hydra_Tail_Spin_Damage",
             "DamageCalculator": {
               "Type": "Absolute",
-              "BaseDamage": {"Physical": 16},
+              "BaseDamage": { "Physical": 16 },
               "RandomPercentageModifier": 0.1
             }
           }
