@@ -1,7 +1,5 @@
 {
-  "Environments": [
-    "Env_Zone3_Glacial"
-  ],
+  "Environments": [ "Env_Zone3_Glacial" ],
   "NPCs": [
     {
       "Weight": 1,
@@ -9,19 +7,5 @@
       "Id": "Hydra"
     }
   ],
-  "DayTimeRange": [
-    6,
-    18
-  ],
-  "MoonPhaseRange": [
-    0,
-    4
-  ],
-  "MoonPhaseWeightModifiers": [
-    0.7,
-    0.85,
-    1.0,
-    1.15,
-    1.3
-  ]
+  "MoonPhaseWeightModifiers": [ 2, 1, 1, 1, 1 ]
 }

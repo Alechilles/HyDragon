@@ -1,11 +1,11 @@
 # Dragon Content, Crafting, Spawning, and Encounter Specification
 
 Status: Source implementation and repository validation complete; packaged/live verification pending
-Base-game target: Hytale `>=0.5.6 <0.6.0`; exact public `0.5.6` Workshop-profile validation remains pending
+Base-game target: Hytale `>=0.5.7 <0.6.0`; exact public `0.5.7` Workshop-profile validation remains pending
 
 ## 1. Purpose and boundaries
 
-This specification completes HyDragon's content layer and separates ordinary asset-driven content from encounters that require Java orchestration. It covers materials, the Draconic Altar, recipes, the current dragon roster, difficulty metadata, static spawning, mounts, and special multi-stage encounters.
+This specification completes HyDragon's content layer. It covers materials, the Draconic Altar, recipes, the current dragon roster, difficulty metadata, static spawning, and mounts. Most v1 dragon spawning is asset-driven through additive Patchwork patches; Hydra uses dedicated world-spawn assets for independent lunar tuning.
 
 Capture spending, the shared bonded Dragon Horn, and paid revival are defined in [Draconic capture, Dragon Horn, and revival](capture-summoning-maintenance.md). Miniwyvern content is defined in [Wyvern Egg, Soul Bond, and Miniwyvern](soul-bond-miniwyvern.md). Runtime boundaries follow [Plugin architecture](plugin-architecture.md) and the local [HyDragon - Tamework bonded integration contract](../integration/tamework-bonded-companions-contract.md).
 
@@ -15,8 +15,8 @@ The current source/asset split uses these base-game asset contracts:
 
 - `CraftingRecipe` supports `Input`, `Output`, `BenchRequirement`, and `TimeSeconds`. The Draconic Altar and its recipes are therefore asset/config work.
 - `WorldNPCSpawn` supports weighted NPC entries, `Environments`, `DayTimeRange`, `MoonPhaseRange`, `LightRanges`, and `MoonPhaseWeightModifiers`. Ordinary biome/region/time/light/moon/rarity spawning is asset/config work.
-- `BeaconNPCSpawn` in the currently referenced runtime/source contract adds player-distance, `YRange`, spawn cooldown/radius, and state controls. It can support localized height- or proximity-based spawning, but the inspected contract does not express weather or an owned-companion prerequisite; exact `0.5.6` profile confirmation remains pending.
-- Weather gates, checking whether a player has a confirmed active bonded avatar-flight dragon, and a multi-phase aerial-to-ground capture sequence therefore require the HyDragon plugin.
+- `BeaconNPCSpawn` adds player-distance, `YRange`, spawn cooldown/radius, and state controls. Rock Drake cave additions use it where appropriate.
+- Patchwork `Insert` operations append HyDragon roles to existing spawn pools and use an `Existing` guard, so HyDragon does not replace base-game or other-mod NPC arrays.
 
 The plugin must not replace static spawning or crafting that these asset systems already express. The local schema catalog available during the bonded-companion pass did not expose an exact public `0.5.6` profile, so exact-profile validation remains an explicit packaging gate rather than a completed claim in this document.
 
@@ -41,11 +41,9 @@ The plugin must not replace static spawning or crafting that these asset systems
 ### Spawning and special encounters
 
 - **HYD-CONT-011:** Ordinary spawns MUST use `WorldNPCSpawn`/`BeaconNPCSpawn` assets for supported environment, weight, time, moon, light, altitude/proximity, radius, cooldown, and state conditions.
-- **HYD-CONT-012:** Weather gates, player progression/ownership gates, random rare-event admission, and multi-stage behavior MUST use plugin-controlled encounter definitions rather than undocumented spawn-asset fields.
-- **HYD-CONT-013:** HyDragon MUST support a special high-altitude encounter whose admission verifies the eligible player has an active, rideable avatar-flight dragon and access to Tamework's Flightmaster's Talisman.
-- **HYD-CONT-014:** The high-altitude encounter MUST begin as an aerial confrontation, require a configured lure/stagger sequence before the target becomes grounded, and open capture eligibility only after the grounded condition is authoritative.
-- **HYD-CONT-015:** Plugin-controlled encounters MUST enforce per-region/global concurrency, player-safe placement, deterministic ownership/credit, cleanup, retry cooldown, and restart reconciliation without duplicating or silently deleting a target.
-- **HYD-CONT-016:** Content assets, domain configs, and all static/dynamic spawn paths MUST pass schema/reference validation and the acceptance criteria in section 12 before release.
+- **HYD-CONT-012:** Every v1 dragon spawn addition other than the independently tuned Hydra variants MUST be an additive Patchwork patch of an existing `WorldNPCSpawn` or `BeaconNPCSpawn` target. It MUST NOT replace an NPC array. Hydra may use a uniquely named `WorldNPCSpawn` asset to own its time and moon tuning without mutating another pool.
+- **HYD-CONT-013:** Nordic Drake MUST be an uncommon ordinary spawn in the Zone 3 Outlander forest pool, with no Java-controlled encounter, owner gate, or special capture requirement.
+- **HYD-CONT-014:** Content assets, domain configs, and all static spawn paths MUST pass schema/reference validation and the acceptance criteria in section 11 before release.
 
 ### Localization and naming
 
@@ -56,7 +54,7 @@ The plugin must not replace static spawning or crafting that these asset systems
 | Content | Implemented state | Release verification focus |
 | --- | --- | --- |
 | Hydra | Wild/tamed roles, species data, combat, drops, capture mapping, ordinary spawn, and ground-mount policy | Mount behavior, drop balance, and spawn conditions in game |
-| Nordic Drake | Wild/tamed roles, species data, combat, capture mapping, encounter coverage, and `TameworkAvatarFlight` config | Avatar flight using only Tamework's Flightmaster's Talisman |
+| Nordic Drake | Wild/tamed roles, species data, combat, capture mapping, Zone 3 Outlander spawn, and `TameworkAvatarFlight` config | Avatar flight using only Tamework's Flightmaster's Talisman |
 | Rock Drake T1/T2/T3 | Wild/tamed roles, capture declarations, commands, cave spawning, mount policy, and tier metadata | Tier balance, commands, spawning, and mounting in game |
 | Miniwyvern | Stored bonded Soul Bond provisioning, seven archetypes, production wild spawning disabled, and ordinary capture denied | Once-only entitlement, bonded family limits, extension continuity, and ability safety |
 | Draconic Stones | Iron, Thorium, Cobalt, Adamantium, and Ancient tiers with altar-only recipes | Tier eligibility, probability, consume-on-roll behavior, durable stored capture, and cooldown |
@@ -185,79 +183,16 @@ Use asset spawning wherever possible:
 
 | Species | Initial ordinary spawn target | Asset mechanism |
 | --- | --- | --- |
-| Hydra | Zone 3 glacial environment, configured daytime/rarity | Preserve and normalize existing `WorldNPCSpawn` asset |
+| Hydra | Zone 3 glacial and Zone 1 swamps | Dedicated all-day `WorldNPCSpawn` assets; Ice Hydra is 2x weight on full moon, Toxic Hydra on new moon |
 | Rock Drake T1 | Zone 1 cave forests | Preserve current patch/weighted spawn |
 | Rock Drake T2 | Zone 2 volcanic caves | Preserve current patch/weighted spawn |
 | Rock Drake T3 | Zone 2 volcanic and Zone 3 glacial caves | Preserve current patches/weights |
-| Nordic Drake | Rare high-altitude/cold ordinary spawn only if it does not conflict with its special encounter | New `WorldNPCSpawn` or `BeaconNPCSpawn` definition |
+| Nordic Drake | Zone 3 Outlander forest pool | Additive Patchwork `WorldNPCSpawn` patch, weight 0.7058824 (15% with the current base pool) |
 | Miniwyvern | None | Soul Bond only |
 
-Spawn assets may vary weight by difficulty/rarity and supported moon/light conditions. Do not create a Java polling spawner for conditions already represented by `WorldNPCSpawn` or `BeaconNPCSpawn`.
+Spawn assets may vary weight by difficulty/rarity and supported moon/light conditions. The v1 patches intentionally inherit their target pool's top-level conditions: an individual inserted NPC cannot safely carry a different `DayTimeRange` or moon modifier without changing the other NPCs in that pool. Do not create a Java polling spawner for conditions already represented by `WorldNPCSpawn` or `BeaconNPCSpawn`.
 
-## 9. Plugin-controlled encounter model
-
-`Server/HyDragon/Encounters/*.json` describes only requirements outside the currently referenced spawn contracts:
-
-```text
-Id
-Enabled
-TargetSpeciesId
-RegionsAndAltitude
-WeatherPredicate
-TimePredicate                 optional; prefer spawn assets for ordinary cases
-PlayerEligibility:
-  requiredMountMode
-  requiredItemId
-Admission:
-  chance
-  evaluationCooldown
-  perRegionLimit
-  globalLimit
-Phases[]
-Grounding:
-  buildupSourceIds
-  threshold
-  groundedState/effect
-  captureWindowSeconds
-CleanupAndCooldown
-```
-
-### Encounter lifecycle
-
-```mermaid
-stateDiagram-v2
-    [*] --> DORMANT
-    DORMANT --> ADMITTED: weather + region + player + rarity pass
-    ADMITTED --> AERIAL: safe spawn commits
-    AERIAL --> GROUNDING: configured lure/stagger accumulates
-    GROUNDING --> AERIAL: buildup expires / conditions fail safely
-    GROUNDING --> GROUNDED_CAPTURE_WINDOW: threshold commits
-    GROUNDED_CAPTURE_WINDOW --> RESOLVED: capture / defeat / completion
-    AERIAL --> CLEANUP: timeout / invalid world / no eligible player
-    GROUNDED_CAPTURE_WINDOW --> CLEANUP: timeout / invalid target
-    CLEANUP --> COOLDOWN
-    RESOLVED --> COOLDOWN
-    COOLDOWN --> DORMANT: cooldown expires
-```
-
-Capture attempts during `AERIAL` or `GROUNDING` fail the named special
-eligibility requirement before a random roll. On `GROUNDED_CAPTURE_WINDOW`,
-ordinary tranquilizer and tier requirements still apply; grounding does not
-guarantee capture.
-
-### High-altitude encounter eligibility
-
-At admission time, at least one credited player must:
-
-- own a profile in roster `hydragon:dragon_horn` and family `hydragon:full_dragons`;
-- have that profile in `ACTIVE` with an exact live bonded lease in the candidate world;
-- have a tamed role whose species declares `AVATAR_FLIGHT`;
-- possess/access Tamework's Flightmaster's Talisman under the current avatar-flight contract;
-- be in the configured world/region/altitude envelope and satisfy encounter cooldown.
-
-Eligibility is rechecked before spawn and at critical phase transitions. Losing temporary eligibility does not instantly delete the target; the encounter definition supplies a grace/cleanup policy.
-
-## 10. Mount and flight content
+## 9. Mount and flight content
 
 The species definition determines mounting; role assets implement it:
 
@@ -267,48 +202,42 @@ The species definition determines mounting; role assets implement it:
 
 Hydra's ground-mount declaration and tamed-role interaction are aligned in the implementation. The Nordic Drake avatar-flight integration remains the reference and release verification tests it with the Flightmaster's Talisman.
 
-## 11. Failure safety and persistence
+## 10. Spawn compatibility
 
-- Encounter admission is serialized per region key and rechecks limits immediately before spawning.
-- A spawned special target receives one encounter ID. Restart recovery reattaches to that target when possible; it does not spawn a replacement until absence is authoritative.
-- If state is ambiguous, the encounter enters cleanup/reconciliation and blocks another admission in that region.
-- Despawn/cleanup must not remove a dragon after Tamework has committed its stored bonded capture.
-- Capture and encounter completion are idempotent by encounter ID and exact bonded capture evidence. A missed event is recovered by owner, shared roster, and source NPC UUID rather than generic profile/population evidence.
-- Invalid weather/player-service data fails closed for dynamic encounters without affecting ordinary spawn assets.
-- Config reload never mutates an active encounter definition in place. Existing instances finish using an immutable snapshot or enter a documented safe cleanup state.
+- Patchwork is a required HyDragon dependency. If it is absent or outside `>=1.1.0 <2.0.0`, HyDragon is rejected at startup instead of silently omitting dragon spawns.
+- Every operation has an `Existing` guard and appends to `/NPCs`; it neither removes nor replaces existing pool entries.
+- The Nordic Drake has no dynamic encounter asset or capture special requirement. It remains a standard tranquilize-and-capture target once spawned.
 
-## 12. Acceptance criteria
+## 11. Acceptance criteria
 
 - Asset validation finds every required item, icon/model, recipe input, drop reference, species role, tamed mapping, effect, projectile, and localization key.
 - Canonical-ID validation finds no untranslated replaced asset ID, alias, or compatibility shim; all recipe/drop/config/model/texture/icon/localization references resolve directly to the English canonical IDs.
 - Only the Draconic Altar lists recipes for the five stones, Revitalizing Essence, and Soul Bond after the pre-release content update; crafting consumes/produces the configured quantities once.
 - The release artifact contains Fire, Ice, and Lightning—not Igne, Cryo, or Storm—as the canonical essence IDs, and no runtime conversion code exists for the unreleased names.
 - The five `server.lang` catalogs have identical key sets and placeholder signatures, load without parser errors, and show reviewed English, Brazilian Portuguese, German, French, and Spanish values for every HyDragon player-facing string.
-- Hydra and each Rock Drake tier spawn only in their configured supported ordinary conditions; Nordic's selected spawn/encounter path is discoverable; Miniwyvern never appears through production spawning.
+- Hydra and each Rock Drake tier spawn only in their configured ordinary pools; Nordic Drake appears through the Zone 3 Outlander pool; Miniwyvern never appears through production spawning.
 - Every capture-eligible wild role resolves to one valid tamed role and species capture record.
 - Ground mounts do not require the Flightmaster's Talisman; every avatar-flight mount does, and no external flight-mod item is queried.
 - `WorldNPCSpawn`/`BeaconNPCSpawn` tests cover environment/weight/time/moon/light/altitude/proximity fields without plugin duplication.
-- Dynamic tests cover weather false/true, no flying dragon, wrong mount type, missing talisman, concurrency limit, unsafe placement, restart in every phase, and config reload mid-encounter.
-- The aerial target cannot be captured before the grounded phase; grounding
-  retains tranquilizer and minimum-tier requirements.
-- Capture at the cleanup boundary produces one captured profile and no subsequent encounter despawn or replacement.
+- Patch validation confirms every non-Hydra spawn operation is an `Insert` into `/NPCs`, guarded by the inserted role ID. The two uniquely named Hydra world-spawn assets are validated separately for their all-day lunar tuning.
+- Nordic Drake has no plugin encounter configuration or capture-special requirement.
 
-## 13. Implemented sequence
+## 12. Implemented sequence
 
 1. Igne/Cryo/Storm development assets and references were replaced directly by Fire/Ice/Lightning, without aliases, shims, or persisted-data readers.
 2. Five complete localization catalogs use the same canonical English localization keys.
 3. Generic, Water, Wind, and Revitalizing item assets and semantic mappings are present.
 4. The Draconic Altar owns the Draconic Stone, Soul Bond, and revitalization recipes instead of `Arcanebench`.
-5. Hydra and Rock Drake spawn data is represented by the documented species records while preserving intended conditions.
+5. Rock Drake spawn data is represented by additive Patchwork entries in documented base-game pools; Hydra uses dedicated all-day world-spawn assets with independent lunar weight tuning.
 6. Tamed Rock Drake roles and their capture mappings are present together.
-7. Nordic Drake encounter coverage and avatar-flight behavior use the implemented species and Tamework integration data.
+7. Nordic Drake appears as an uncommon Zone 3 Outlander forest spawn and retains its avatar-flight behavior.
 8. Miniwyvern is excluded from capture configs and production spawning; Soul Bond is its exclusive creation path.
 9. Ground-mount declarations and interactions are represented consistently in species configuration.
 10. Nordic flight uses Tamework's Flightmaster's Talisman; no third-party flight dependency is declared or documented.
 
 No release artifact may retain a reference to a replaced pre-release identifier. Broken references fail validation rather than being handled by a runtime compatibility path.
 
-## 14. Implemented dependency map
+## 13. Implemented dependency map
 
 | Phase | Asset/config work | Plugin/runtime work | Dependency |
 | --- | --- | --- | --- |
@@ -316,5 +245,5 @@ No release artifact may retain a reference to a replaced pre-release identifier.
 | D1 | Draconic Altar and recipes | None beyond validation | Current Hytale `CraftingRecipe` contract; exact `0.5.6` profile validation pending |
 | D2 | Complete tamed roles, commands, drops, ordinary spawns | Species repository | Tamework 3.0.0 capture policy and bonded companion capability |
 | D3 | Ground/avatar-flight content and verification | Talisman capability/status messaging | Tamework avatar flight |
-| D4 | Special encounter assets/effects | Encounter admission/state machine/recovery | [HyDragon - Tamework bonded integration contract](../integration/tamework-bonded-companions-contract.md) |
+| D4 | Additive Patchwork spawn assets | None | [Patchwork spawn-patch contract](../integration/patchwork-spawn-patches-contract.md) |
 | D5 | Balance and polish | Telemetry/diagnostics-driven tuning | D0-D4 |

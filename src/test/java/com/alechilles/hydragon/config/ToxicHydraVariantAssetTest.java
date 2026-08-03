@@ -499,32 +499,16 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
-    void toxicHydraHasExactlyOneDaytimeSwampSpawnRegistration() throws Exception {
-        List<JsonObject> registrations;
-        try (Stream<Path> paths = Files.walk(ROOT.resolve("Server/NPC/Spawn/World"))) {
-            registrations = paths.filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith(".json"))
-                    .map(ToxicHydraVariantAssetTest::parseSpawn)
-                    .filter(spawn -> spawn.has("NPCs"))
-                    .filter(spawn -> spawn.getAsJsonArray("NPCs").asList().stream()
-                            .map(JsonElement::getAsJsonObject)
-                            .anyMatch(npc -> "Hydra_Toxic".equals(npc.get("Id").getAsString())))
-                    .toList();
-        }
-        assertEquals(1, registrations.size());
-        JsonObject spawn = registrations.getFirst();
+    void toxicHydraHasOneAllDayNewMoonSwampSpawnRegistration() throws Exception {
+        JsonObject spawn = json("Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_HyDragon_Predator.json");
         assertEquals(List.of("Env_Zone1_Swamps"), strings(spawn.getAsJsonArray("Environments")));
-        assertFalse(strings(spawn.getAsJsonArray("Environments")).stream()
-                .anyMatch(environment -> environment.toLowerCase().contains("cave")
-                        && environment.toLowerCase().contains("swamp")));
+        assertFalse(spawn.has("DayTimeRange"));
         JsonObject npc = spawn.getAsJsonArray("NPCs").get(0).getAsJsonObject();
         assertEquals(1, spawn.getAsJsonArray("NPCs").size());
         assertEquals(1, npc.get("Weight").getAsInt());
         assertEquals("Mud", npc.get("SpawnBlockSet").getAsString());
         assertEquals("Hydra_Toxic", npc.get("Id").getAsString());
-        assertEquals(List.of(6, 18), ints(spawn.getAsJsonArray("DayTimeRange")));
-        assertEquals(List.of(0, 4), ints(spawn.getAsJsonArray("MoonPhaseRange")));
-        assertEquals(List.of(0.7, 0.85, 1.0, 1.15, 1.3),
+        assertEquals(List.of(1.0, 1.0, 1.0, 1.0, 2.0),
                 doubles(spawn.getAsJsonArray("MoonPhaseWeightModifiers")));
     }
 

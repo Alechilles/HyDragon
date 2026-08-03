@@ -67,7 +67,7 @@ The shared spawner policy accepts these wild roles and maps them to their tamed 
 - `RockDrakeT2` -> `Tamed_RockDrakeT2`
 - `RockDrakeT3` -> `Tamed_RockDrakeT3`
 
-Miniwyvern roles are deliberately absent. Capture also requires a registered `HyDragon_Dragon_Horn`, valid range/world context, the tranquilized effect, policy capacity, and any species-specific requirement such as the Nordic Drake grounded encounter phase.
+Miniwyvern roles are deliberately absent. Capture also requires a registered `HyDragon_Dragon_Horn`, valid range/world context, the tranquilized effect, and policy capacity. Nordic Drake uses the same ordinary capture path as every other full dragon.
 
 ### 4.3 State and transaction
 
