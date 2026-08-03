@@ -59,6 +59,14 @@
         }
       ]
     },
+    "WalkBackward": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Walk_Backward.blockyanim",
+          "Speed": 0.7
+        }
+      ]
+    },
     "Run": {
       "Animations": [
         {
@@ -79,7 +87,7 @@
     "FlyIdle": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly.blockyanim",
+          "Animation": "NPC/HyDragon/Wyvern_Mini/Animations/Fly_Idle.blockyanim",
           "Speed": 0.8
         }
       ]

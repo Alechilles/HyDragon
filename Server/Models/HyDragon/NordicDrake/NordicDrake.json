@@ -79,7 +79,7 @@
     "WalkBackward": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Walk.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Walk_Backward.blockyanim",
           "SoundEventId": "SFX_Rex_Walk"
         }
       ]
@@ -313,7 +313,7 @@
     "Swim": {
       "Animations": [
         {
-          "Animation": "NPC/HyDragon/NordicDrake/Animations/Idle.blockyanim",
+          "Animation": "NPC/HyDragon/NordicDrake/Animations/Swim.blockyanim",
           "Speed": 0.8
         }
       ]
