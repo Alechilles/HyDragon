@@ -12,9 +12,9 @@ import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffec
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
-import com.hypixel.hytale.server.core.modules.entitystats.EntityStatsSystems;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.npc.NPCPlugin;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -37,7 +37,7 @@ public final class TranquilizedHealthFreezeSystem extends EntityTickingSystem<En
     @Nonnull
     @Override
     public Set<Dependency<EntityStore>> getDependencies() {
-        return Set.of(new SystemDependency<>(Order.AFTER, EntityStatsSystems.Regenerate.class));
+        return Set.of(new SystemDependency<>(Order.AFTER, NPCPlugin.NPCEntityRegenerateStatsSystem.class));
     }
 
     @Override
