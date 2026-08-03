@@ -1,0 +1,50 @@
+{
+  "Name": "server.effects.miniwyvernLightningBoon.name",
+  "StatusEffectIcon": "Icons/StatusEffects/HyDragon/Miniwyvern_Lightning_Aura.png",
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 8,
+  "DamageResistance": {
+    "Physical": [
+      {
+        "CalculationType": "Percent",
+        "Amount": 0.08
+      }
+    ],
+    "Fire": [
+      {
+        "CalculationType": "Percent",
+        "Amount": 0.08
+      }
+    ],
+    "Ice": [
+      {
+        "CalculationType": "Percent",
+        "Amount": 0.08
+      }
+    ],
+    "Poison": [
+      {
+        "CalculationType": "Percent",
+        "Amount": 0.08
+      }
+    ],
+    "Elemental": [
+      {
+        "CalculationType": "Percent",
+        "Amount": 0.08
+      }
+    ],
+    "Void": [
+      {
+        "CalculationType": "Percent",
+        "Amount": 0.08
+      }
+    ]
+  },
+  "ApplicationEffects": {
+    "KnockbackMultiplier": 0.8
+  }
+}

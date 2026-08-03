@@ -1,0 +1,8 @@
+{
+  "Name": "server.effects.miniwyvernVoidExposure.name",
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 10
+}

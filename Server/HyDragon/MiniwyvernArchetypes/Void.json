@@ -2,8 +2,72 @@
   "Id": "void",
   "RoleId": "Tamed_Wyvern_Mini_Void",
   "RequiredTalentId": "Miniwyvern_Void_UmbralBond",
-  "ParticleAndSoundIds": [ "Void_Lightning", "SFX_Eye_Void_Attack_Blast" ],
-  "PassiveEffects": [ "HyDragon_Miniwyvern_Void_Aura" ],
-  "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Void_Exposure", "DurationSeconds": 6.0 },
-  "FallbackBehavior": "BASIC_BITE"
+  "ParticleAndSoundIds": [
+    "Void_Lightning",
+    "SFX_Eye_Void_Attack_Blast"
+  ],
+  "PassiveEffects": [
+    "HyDragon_Miniwyvern_Void_Aura"
+  ],
+  "OwnerAttackAura": {
+    "EffectId": "HyDragon_Miniwyvern_Void_Exposure",
+    "DurationSeconds": 6
+  },
+  "FallbackBehavior": "BASIC_BITE",
+  "EssenceBondAura": {
+    "Upgrades": [
+      {
+        "TalentId": "Miniwyvern_Void_UmbralFocus",
+        "Semantic": "targetdamagetaken",
+        "TargetDamageTakenFraction": 0.15
+      },
+      {
+        "TalentId": "Miniwyvern_Void_UmbralAttunement",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Void_Exposure_15_8",
+        "TargetDurationSeconds": 8
+      },
+      {
+        "TalentId": "Miniwyvern_Void_UmbralAmplification",
+        "Semantic": "ownerdamagetoaffected",
+        "OwnerDamageToAffectedFraction": 0.05
+      },
+      {
+        "TalentId": "Miniwyvern_Void_UmbralResonance",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Void_Ward"
+      },
+      {
+        "TalentId": "Miniwyvern_Void_UmbralEfficiency",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Void_Ward_12"
+      },
+      {
+        "TalentId": "Miniwyvern_Void_UmbralHarmony",
+        "Semantic": "siphon",
+        "WardEffectId": "HyDragon_Miniwyvern_Void_Ward_12_Siphon",
+        "SiphonMaximumHealthFraction": 0.005,
+        "SiphonCooldownMs": 3000
+      },
+      {
+        "TalentId": "Miniwyvern_Void_UmbralMastery",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Void_Exposure_18_8",
+        "TargetDurationSeconds": 8,
+        "TargetDamageTakenFraction": 0.18,
+        "WardEffectId": "HyDragon_Miniwyvern_Void_Ward_18"
+      },
+      {
+        "TalentId": "Miniwyvern_Void_UmbralAscendance",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Void_Exposure_22_10",
+        "TargetDurationSeconds": 10,
+        "TargetDamageTakenFraction": 0.22,
+        "OwnerDamageToAffectedFraction": 0.1,
+        "WardEffectId": "HyDragon_Miniwyvern_Void_Ward_25",
+        "SiphonMaximumHealthFraction": 0.01,
+        "SiphonCooldownMs": 3000
+      }
+    ]
+  }
 }

@@ -2,8 +2,68 @@
   "Id": "ice",
   "RoleId": "Tamed_Wyvern_Mini_Ice",
   "RequiredTalentId": "Miniwyvern_Ice_RimeBond",
-  "ParticleAndSoundIds": [ "Hydra_Rain_Impact_Ice", "SFX_Staff_Ice_Shoot" ],
-  "PassiveEffects": [ "HyDragon_Miniwyvern_Ice_Aura" ],
-  "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Ice_Slow", "DurationSeconds": 4.0 },
-  "FallbackBehavior": "BASIC_BITE"
+  "ParticleAndSoundIds": [
+    "Hydra_Rain_Impact_Ice",
+    "SFX_Staff_Ice_Shoot"
+  ],
+  "PassiveEffects": [
+    "HyDragon_Miniwyvern_Ice_Aura"
+  ],
+  "OwnerAttackAura": {
+    "EffectId": "HyDragon_Miniwyvern_Ice_Slow",
+    "DurationSeconds": 4
+  },
+  "FallbackBehavior": "BASIC_BITE",
+  "EssenceBondAura": {
+    "Upgrades": [
+      {
+        "TalentId": "Miniwyvern_Ice_RimeFocus",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Ice_Slow_25_4",
+        "TargetDurationSeconds": 4
+      },
+      {
+        "TalentId": "Miniwyvern_Ice_RimeAttunement",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Ice_Slow_25_5",
+        "TargetDurationSeconds": 5
+      },
+      {
+        "TalentId": "Miniwyvern_Ice_RimeAmplification",
+        "Semantic": "targetoutgoingdamagereduction",
+        "TargetOutgoingDamageReductionFraction": 0.08
+      },
+      {
+        "TalentId": "Miniwyvern_Ice_RimeResonance",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward"
+      },
+      {
+        "TalentId": "Miniwyvern_Ice_RimeEfficiency",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward_12"
+      },
+      {
+        "TalentId": "Miniwyvern_Ice_RimeHarmony",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward_12_Speed"
+      },
+      {
+        "TalentId": "Miniwyvern_Ice_RimeMastery",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Ice_Slow_30_5",
+        "TargetDurationSeconds": 5,
+        "TargetOutgoingDamageReductionFraction": 0.08,
+        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward_18"
+      },
+      {
+        "TalentId": "Miniwyvern_Ice_RimeAscendance",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Ice_Slow_35_6",
+        "TargetDurationSeconds": 6,
+        "TargetOutgoingDamageReductionFraction": 0.12,
+        "WardEffectId": "HyDragon_Miniwyvern_Ice_Ward_25"
+      }
+    ]
+  }
 }

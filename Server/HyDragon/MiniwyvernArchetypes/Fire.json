@@ -2,8 +2,68 @@
   "Id": "fire",
   "RoleId": "Tamed_Wyvern_Mini_Fire",
   "RequiredTalentId": "Miniwyvern_Fire_EmberBond",
-  "ParticleAndSoundIds": [ "Effect_Fire", "SFX_Effect_Burn_World" ],
-  "PassiveEffects": [ "HyDragon_Miniwyvern_Fire_Aura" ],
-  "OwnerAttackAura": { "EffectId": "HyDragon_Miniwyvern_Fire_Burn", "DurationSeconds": 4.0 },
-  "FallbackBehavior": "BASIC_BITE"
+  "ParticleAndSoundIds": [
+    "Effect_Fire",
+    "SFX_Effect_Burn_World"
+  ],
+  "PassiveEffects": [
+    "HyDragon_Miniwyvern_Fire_Aura"
+  ],
+  "OwnerAttackAura": {
+    "EffectId": "HyDragon_Miniwyvern_Fire_Burn",
+    "DurationSeconds": 4
+  },
+  "FallbackBehavior": "BASIC_BITE",
+  "EssenceBondAura": {
+    "Upgrades": [
+      {
+        "TalentId": "Miniwyvern_Fire_EmberFocus",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Fire_Burn_5",
+        "TargetDurationSeconds": 5
+      },
+      {
+        "TalentId": "Miniwyvern_Fire_EmberAttunement",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Fire_Burn_3",
+        "TargetDurationSeconds": 5
+      },
+      {
+        "TalentId": "Miniwyvern_Fire_EmberAmplification",
+        "Semantic": "ownerdamagetoaffected",
+        "OwnerDamageToAffectedFraction": 0.05
+      },
+      {
+        "TalentId": "Miniwyvern_Fire_EmberResonance",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Fire_Ward"
+      },
+      {
+        "TalentId": "Miniwyvern_Fire_EmberEfficiency",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Fire_Ward_12"
+      },
+      {
+        "TalentId": "Miniwyvern_Fire_EmberHarmony",
+        "Semantic": "conditionalward",
+        "WardEffectId": "HyDragon_Miniwyvern_Fire_Ward_12_Conditional",
+        "ConditionalWardDamageReductionFraction": 0.05
+      },
+      {
+        "TalentId": "Miniwyvern_Fire_EmberMastery",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Fire_Burn_6",
+        "TargetDurationSeconds": 6,
+        "WardEffectId": "HyDragon_Miniwyvern_Fire_Ward_18"
+      },
+      {
+        "TalentId": "Miniwyvern_Fire_EmberAscendance",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Fire_Burn_4",
+        "TargetDurationSeconds": 6,
+        "OwnerDamageToAffectedFraction": 0.1,
+        "WardEffectId": "HyDragon_Miniwyvern_Fire_Ward_25"
+      }
+    ]
+  }
 }

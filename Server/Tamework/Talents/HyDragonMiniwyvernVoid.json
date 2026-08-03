@@ -8,180 +8,126 @@
   "Talents": [
     {
       "Id": "Miniwyvern_Void_UmbralBond",
-      "DisplayName": "Umbral Bond",
-      "Description": "Your hits increase target damage taken by 12% for 6 sec; +3% companion damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_bond.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_bond.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 1,
-      "MinLevel": 2,
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
-      ]
+      "MinLevel": 2
     },
     {
       "Id": "Miniwyvern_Void_UmbralFocus",
-      "DisplayName": "Umbral Focus",
-      "Description": "+3% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_focus.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_focus.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
         "Miniwyvern_Void_UmbralBond"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Void_UmbralAttunement",
-      "DisplayName": "Umbral Attunement",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_attunement.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_attunement.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 6,
       "RequiresTalentIds": [
         "Miniwyvern_Void_UmbralBond"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MaxHealthMultiplier",
-          "Multiplier": 1.06
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Void_UmbralAmplification",
-      "DisplayName": "Umbral Amplification",
-      "Description": "+4% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_amplification.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_amplification.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
         "Miniwyvern_Void_UmbralFocus"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.04
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Void_UmbralResonance",
-      "DisplayName": "Umbral Resonance",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_resonance.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_resonance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
         "Miniwyvern_Void_UmbralAttunement"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageTakenMultiplier",
-          "Multiplier": 1.0416666666666667
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Void_UmbralEfficiency",
-      "DisplayName": "Umbral Efficiency",
-      "Description": "+3% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_efficiency.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_efficiency.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 14,
       "RequiresTalentIds": [
         "Miniwyvern_Void_UmbralAmplification"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Void_UmbralHarmony",
-      "DisplayName": "Umbral Harmony",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_harmony.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_harmony.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
         "Miniwyvern_Void_UmbralResonance"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MoveSpeedMultiplier",
-          "Multiplier": 1.05
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Void_UmbralMastery",
-      "DisplayName": "Umbral Mastery",
-      "Description": "+4% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
-        "Miniwyvern_Void_UmbralEfficiency"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.04
-        }
+        "Miniwyvern_Void_UmbralEfficiency",
+        "Miniwyvern_Void_UmbralHarmony"
       ]
     },
     {
       "Id": "Miniwyvern_Void_UmbralAscendance",
-      "DisplayName": "Umbral Ascendance",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.umbral_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.void.umbral_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.essence_bond",
       "PointCost": 4,
       "MinLevel": 26,
       "RequiresTalentIds": [
-        "Miniwyvern_Void_UmbralMastery",
-        "Miniwyvern_Void_UmbralHarmony"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MaxHealthMultiplier",
-          "Multiplier": 1.06
-        }
+        "Miniwyvern_Void_UmbralMastery"
       ]
     },
     {
       "Id": "DraconicProjectile",
-      "DisplayName": "Void Projectile Initiation",
-      "Description": "Void bolt: force 28, 4-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.draconic_projectile.name",
+      "Description": "hydragon.talents.miniwyvern.void.draconic_projectile.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -193,11 +139,11 @@
     },
     {
       "Id": "ProjectileRange",
-      "DisplayName": "Void Long Reach",
-      "Description": "Void bolt: force 34, 5-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.projectile_range.name",
+      "Description": "hydragon.talents.miniwyvern.void.projectile_range.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -212,11 +158,11 @@
     },
     {
       "Id": "ProjectileCadence",
-      "DisplayName": "Void Quick Cast",
-      "Description": "Void bolt every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.projectile_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.void.projectile_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -231,11 +177,11 @@
     },
     {
       "Id": "ProjectileGuidance",
-      "DisplayName": "Void Guided Flight",
-      "Description": "Aim Void bolts for 0.55–0.85 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.projectile_guidance.name",
+      "Description": "hydragon.talents.miniwyvern.void.projectile_guidance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -250,11 +196,11 @@
     },
     {
       "Id": "ProjectilePattern",
-      "DisplayName": "Void Split Flight",
-      "Description": "Two Void bolts 0.30 sec apart every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.projectile_pattern.name",
+      "Description": "hydragon.talents.miniwyvern.void.projectile_pattern.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -269,11 +215,11 @@
     },
     {
       "Id": "ProjectileMastery",
-      "DisplayName": "Void Projectile Mastery",
-      "Description": "Two Void bolts every 3–5 sec; force 40, 6-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.projectile_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.void.projectile_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -289,11 +235,11 @@
     },
     {
       "Id": "SwoopFerocity",
-      "DisplayName": "Void Swoop Ferocity",
-      "Description": "20-damage void swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.swoop_ferocity.name",
+      "Description": "hydragon.talents.miniwyvern.void.swoop_ferocity.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -305,11 +251,11 @@
     },
     {
       "Id": "SwoopCadence",
-      "DisplayName": "Void Swoop Cadence",
-      "Description": "20-damage void swoop; 22–30 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.swoop_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.void.swoop_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -324,11 +270,11 @@
     },
     {
       "Id": "SwoopPrecision",
-      "DisplayName": "Void Swoop Precision",
-      "Description": "Void swoop approach speed: 0.70.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.swoop_precision.name",
+      "Description": "hydragon.talents.miniwyvern.void.swoop_precision.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -343,11 +289,11 @@
     },
     {
       "Id": "RelentlessSwoop",
-      "DisplayName": "Void Relentless Swoop",
-      "Description": "20-damage void swoop; 20–26 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.relentless_swoop.name",
+      "Description": "hydragon.talents.miniwyvern.void.relentless_swoop.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -362,11 +308,11 @@
     },
     {
       "Id": "RendingDive",
-      "DisplayName": "Void Rending Dive",
-      "Description": "24-damage void swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.rending_dive.name",
+      "Description": "hydragon.talents.miniwyvern.void.rending_dive.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -381,11 +327,11 @@
     },
     {
       "Id": "SwoopMastery",
-      "DisplayName": "Void Swoop Mastery",
-      "Description": "28-damage void swoop; 18–24 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.swoop_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.void.swoop_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -401,11 +347,11 @@
     },
     {
       "Id": "Miniwyvern_Void_VitalScales",
-      "DisplayName": "Void Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.vital_scales.name",
+      "Description": "hydragon.talents.miniwyvern.void.vital_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 1,
       "MinLevel": 2,
       "Effects": [
@@ -417,11 +363,11 @@
     },
     {
       "Id": "Miniwyvern_Void_HardenedScales",
-      "DisplayName": "Hardened Void Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.hardened_scales.name",
+      "Description": "hydragon.talents.miniwyvern.void.hardened_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
@@ -436,11 +382,11 @@
     },
     {
       "Id": "Miniwyvern_Void_ElderScales",
-      "DisplayName": "Elder Void Scales",
-      "Description": "+8% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.elder_scales.name",
+      "Description": "hydragon.talents.miniwyvern.void.elder_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 2,
       "MinLevel": 7,
       "RequiresTalentIds": [
@@ -455,11 +401,11 @@
     },
     {
       "Id": "Miniwyvern_Void_ScaleGuard",
-      "DisplayName": "Void Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.scale_guard.name",
+      "Description": "hydragon.talents.miniwyvern.void.scale_guard.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 1,
       "MinLevel": 8,
       "RequiresTalentIds": [
@@ -474,11 +420,11 @@
     },
     {
       "Id": "Miniwyvern_Void_ScaleBulwark",
-      "DisplayName": "Void Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.scale_bulwark.name",
+      "Description": "hydragon.talents.miniwyvern.void.scale_bulwark.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -493,11 +439,11 @@
     },
     {
       "Id": "Miniwyvern_Void_SwiftWings",
-      "DisplayName": "Void Wings",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.swift_wings.name",
+      "Description": "hydragon.talents.miniwyvern.void.swift_wings.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 1,
       "MinLevel": 12,
       "RequiresTalentIds": [
@@ -512,11 +458,11 @@
     },
     {
       "Id": "Miniwyvern_Void_SurvivalInstinct",
-      "DisplayName": "Void Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.survival_instinct.name",
+      "Description": "hydragon.talents.miniwyvern.void.survival_instinct.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 2,
       "MinLevel": 15,
       "RequiresTalentIds": [
@@ -531,11 +477,11 @@
     },
     {
       "Id": "Miniwyvern_Void_LastingScales",
-      "DisplayName": "Lasting Void Scales",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.lasting_scales.name",
+      "Description": "hydragon.talents.miniwyvern.void.lasting_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
@@ -550,11 +496,11 @@
     },
     {
       "Id": "Miniwyvern_Void_WyrmFortitude",
-      "DisplayName": "Void Fortitude",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.wyrm_fortitude.name",
+      "Description": "hydragon.talents.miniwyvern.void.wyrm_fortitude.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
@@ -569,11 +515,11 @@
     },
     {
       "Id": "Miniwyvern_Void_VigorAscendance",
-      "DisplayName": "Void Vitality",
-      "Description": "+6% maximum health; take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.void.vigor_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.void.vigor_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.void.branch.vigor",
       "PointCost": 4,
       "MinLevel": 25,
       "RequiresTalentIds": [

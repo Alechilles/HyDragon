@@ -40,10 +40,10 @@ final class MiniwyvernTalentProgressionAssetTest {
             assertEquals(form.hasBond() ? 31 : 22, talents.size(), form.name());
             assertEquals(form.hasBond() ? 52 : 37, totalCost(talents), form.name());
 
-            long bondCount = countBranch(talents, "Essence Bond");
+            long bondCount = countBranch(talents, form, "essence_bond");
             assertEquals(form.hasBond() ? 9 : 0, bondCount, form.name());
-            assertEquals(12, countBranch(talents, "Combat"), form.name());
-            assertEquals(10, countBranch(talents, "Vigor"), form.name());
+            assertEquals(12, countBranch(talents, form, "combat"), form.name());
+            assertEquals(10, countBranch(talents, form, "vigor"), form.name());
         }
     }
 
@@ -56,13 +56,20 @@ final class MiniwyvernTalentProgressionAssetTest {
                 JsonObject talent = element.getAsJsonObject();
                 String id = talent.get("Id").getAsString();
                 String branch = talent.get("Branch").getAsString();
+                String keyPrefix = "hydragon.talents.miniwyvern." + form.name().toLowerCase() + ".";
+                assertTrue(talent.get("DisplayName").getAsString().startsWith(keyPrefix), id);
+                assertTrue(talent.get("Description").getAsString().startsWith(keyPrefix), id);
+                assertTrue(branch.startsWith(keyPrefix + "branch."), id);
                 assertFalse(talent.get("DisplayName").getAsString().contains("Not implemented"), id);
                 assertFalse(talent.get("Description").getAsString().contains("Not implemented"), id);
-                if (!branch.equals("Combat")) {
+                if (!branch.endsWith(".combat")) {
                     assertTrue(id.startsWith("Miniwyvern_" + form.name() + "_"), id);
                     assertTrue(scopedIds.add(id), "duplicate form-scoped talent " + id);
                 }
-                if (branch.equals("Vigor")) {
+                if (branch.endsWith(".essence_bond")) {
+                    assertFalse(talent.has("Effects"), id + " must be data-driven by its archetype aura");
+                }
+                if (branch.endsWith(".vigor")) {
                     for (JsonElement effect : talent.getAsJsonArray("Effects")) {
                         String key = effect.getAsJsonObject().get("EffectKey").getAsString();
                         assertTrue(Set.of("MaxHealthMultiplier", "DamageTakenMultiplier", "MoveSpeedMultiplier")
@@ -70,6 +77,19 @@ final class MiniwyvernTalentProgressionAssetTest {
                     }
                 }
             }
+        }
+    }
+
+    @Test
+    void elementalEssenceBondTreesKeepBothTierFourEndpointsBeforeTheCapstone() throws IOException {
+        for (Form form : FORMS.stream().filter(Form::hasBond).toList()) {
+            JsonArray talents = load(form).getAsJsonArray("Talents");
+            JsonObject mastery = findTalent(talents, "Mastery");
+            JsonObject ascendance = findTalent(talents, "Ascendance");
+            assertEquals(Set.of(idFor(form, "Efficiency"), idFor(form, "Harmony")),
+                    requires(mastery), form.name() + " convergence must require both tier-four endpoints");
+            assertEquals(Set.of(mastery.get("Id").getAsString()), requires(ascendance),
+                    form.name() + " capstone must require convergence");
         }
     }
 
@@ -86,14 +106,47 @@ final class MiniwyvernTalentProgressionAssetTest {
         return total;
     }
 
-    private static long countBranch(JsonArray talents, String branch) {
+    private static long countBranch(JsonArray talents, Form form, String branch) {
         long count = 0;
+        String expected = "hydragon.talents.miniwyvern." + form.name().toLowerCase() + ".branch." + branch;
         for (JsonElement element : talents) {
-            if (branch.equals(element.getAsJsonObject().get("Branch").getAsString())) {
+            if (expected.equals(element.getAsJsonObject().get("Branch").getAsString())) {
                 count++;
             }
         }
         return count;
+    }
+
+    private static JsonObject findTalent(JsonArray talents, String suffix) {
+        for (JsonElement element : talents) {
+            JsonObject talent = element.getAsJsonObject();
+            if (talent.get("Branch").getAsString().endsWith(".essence_bond")
+                    && talent.get("Id").getAsString().endsWith(suffix)) return talent;
+        }
+        throw new AssertionError("Missing Essence Bond talent ending in " + suffix);
+    }
+
+    private static Set<String> requires(JsonObject talent) {
+        if (!talent.has("RequiresTalentIds")) return Set.of();
+        Set<String> ids = new LinkedHashSet<>();
+        for (JsonElement element : talent.getAsJsonArray("RequiresTalentIds")) ids.add(element.getAsString());
+        return ids;
+    }
+
+    private static String idFor(Form form, String suffix) {
+        return "Miniwyvern_" + form.name() + "_" + switch (suffix) {
+            case "Efficiency" -> form.name().equals("Fire") ? "EmberEfficiency" :
+                    form.name().equals("Ice") ? "RimeEfficiency" :
+                    form.name().equals("Lightning") ? "StormEfficiency" :
+                    form.name().equals("Nature") ? "VerdantEfficiency" :
+                    form.name().equals("Toxic") ? "VenomEfficiency" : "UmbralEfficiency";
+            case "Harmony" -> form.name().equals("Fire") ? "EmberHarmony" :
+                    form.name().equals("Ice") ? "RimeHarmony" :
+                    form.name().equals("Lightning") ? "StormHarmony" :
+                    form.name().equals("Nature") ? "VerdantHarmony" :
+                    form.name().equals("Toxic") ? "VenomHarmony" : "UmbralHarmony";
+            default -> throw new IllegalArgumentException(suffix);
+        };
     }
 
     private static List<String> strings(JsonArray values) {

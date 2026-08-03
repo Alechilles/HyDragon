@@ -8,11 +8,11 @@
   "Talents": [
     {
       "Id": "DraconicProjectile",
-      "DisplayName": "Wild Projectile Initiation",
-      "Description": "Wild bolt: force 28, 4-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.draconic_projectile.name",
+      "Description": "hydragon.talents.miniwyvern.wild.draconic_projectile.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -24,11 +24,11 @@
     },
     {
       "Id": "ProjectileRange",
-      "DisplayName": "Wild Long Reach",
-      "Description": "Wild bolt: force 34, 5-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.projectile_range.name",
+      "Description": "hydragon.talents.miniwyvern.wild.projectile_range.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -43,11 +43,11 @@
     },
     {
       "Id": "ProjectileCadence",
-      "DisplayName": "Wild Quick Cast",
-      "Description": "Wild bolt every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.projectile_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.wild.projectile_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -62,11 +62,11 @@
     },
     {
       "Id": "ProjectileGuidance",
-      "DisplayName": "Wild Guided Flight",
-      "Description": "Aim Wild bolts for 0.55–0.85 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.projectile_guidance.name",
+      "Description": "hydragon.talents.miniwyvern.wild.projectile_guidance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -81,11 +81,11 @@
     },
     {
       "Id": "ProjectilePattern",
-      "DisplayName": "Wild Split Flight",
-      "Description": "Two Wild bolts 0.30 sec apart every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.projectile_pattern.name",
+      "Description": "hydragon.talents.miniwyvern.wild.projectile_pattern.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -100,11 +100,11 @@
     },
     {
       "Id": "ProjectileMastery",
-      "DisplayName": "Wild Projectile Mastery",
-      "Description": "Two Wild bolts every 3–5 sec; force 40, 6-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.projectile_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.wild.projectile_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -120,11 +120,11 @@
     },
     {
       "Id": "SwoopFerocity",
-      "DisplayName": "Wild Swoop Ferocity",
-      "Description": "20-damage hunter swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.swoop_ferocity.name",
+      "Description": "hydragon.talents.miniwyvern.wild.swoop_ferocity.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -136,11 +136,11 @@
     },
     {
       "Id": "SwoopCadence",
-      "DisplayName": "Wild Swoop Cadence",
-      "Description": "20-damage hunter swoop; 22–30 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.swoop_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.wild.swoop_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -155,11 +155,11 @@
     },
     {
       "Id": "SwoopPrecision",
-      "DisplayName": "Wild Swoop Precision",
-      "Description": "Hunter swoop approach speed: 0.70.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.swoop_precision.name",
+      "Description": "hydragon.talents.miniwyvern.wild.swoop_precision.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -174,11 +174,11 @@
     },
     {
       "Id": "RelentlessSwoop",
-      "DisplayName": "Wild Relentless Swoop",
-      "Description": "20-damage hunter swoop; 20–26 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.relentless_swoop.name",
+      "Description": "hydragon.talents.miniwyvern.wild.relentless_swoop.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -193,11 +193,11 @@
     },
     {
       "Id": "RendingDive",
-      "DisplayName": "Wild Rending Dive",
-      "Description": "24-damage hunter swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.rending_dive.name",
+      "Description": "hydragon.talents.miniwyvern.wild.rending_dive.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -212,11 +212,11 @@
     },
     {
       "Id": "SwoopMastery",
-      "DisplayName": "Wild Swoop Mastery",
-      "Description": "28-damage hunter swoop; 18–24 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.swoop_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.wild.swoop_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -232,11 +232,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_VitalScales",
-      "DisplayName": "Hunter Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.vital_scales.name",
+      "Description": "hydragon.talents.miniwyvern.wild.vital_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 1,
       "MinLevel": 2,
       "Effects": [
@@ -248,11 +248,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_HardenedScales",
-      "DisplayName": "Hardened Hunter Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.hardened_scales.name",
+      "Description": "hydragon.talents.miniwyvern.wild.hardened_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
@@ -267,11 +267,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_ElderScales",
-      "DisplayName": "Elder Hunter Scales",
-      "Description": "+8% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.elder_scales.name",
+      "Description": "hydragon.talents.miniwyvern.wild.elder_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 2,
       "MinLevel": 7,
       "RequiresTalentIds": [
@@ -286,11 +286,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_ScaleGuard",
-      "DisplayName": "Hunter Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.scale_guard.name",
+      "Description": "hydragon.talents.miniwyvern.wild.scale_guard.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 1,
       "MinLevel": 8,
       "RequiresTalentIds": [
@@ -305,11 +305,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_ScaleBulwark",
-      "DisplayName": "Hunter Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.scale_bulwark.name",
+      "Description": "hydragon.talents.miniwyvern.wild.scale_bulwark.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -324,11 +324,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_SwiftWings",
-      "DisplayName": "Hunter Wings",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.swift_wings.name",
+      "Description": "hydragon.talents.miniwyvern.wild.swift_wings.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 1,
       "MinLevel": 12,
       "RequiresTalentIds": [
@@ -343,11 +343,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_SurvivalInstinct",
-      "DisplayName": "Hunter Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.survival_instinct.name",
+      "Description": "hydragon.talents.miniwyvern.wild.survival_instinct.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 2,
       "MinLevel": 15,
       "RequiresTalentIds": [
@@ -362,11 +362,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_LastingScales",
-      "DisplayName": "Lasting Hunter Scales",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.lasting_scales.name",
+      "Description": "hydragon.talents.miniwyvern.wild.lasting_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
@@ -381,11 +381,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_WyrmFortitude",
-      "DisplayName": "Hunter Fortitude",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.wyrm_fortitude.name",
+      "Description": "hydragon.talents.miniwyvern.wild.wyrm_fortitude.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
@@ -400,11 +400,11 @@
     },
     {
       "Id": "Miniwyvern_Wild_VigorAscendance",
-      "DisplayName": "Hunter Vitality",
-      "Description": "+6% maximum health; take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.wild.vigor_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.wild.vigor_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.wild.branch.vigor",
       "PointCost": 4,
       "MinLevel": 25,
       "RequiresTalentIds": [
