@@ -327,3 +327,4 @@ hydragon.talents.rock_drake.eternal_wings.name=Alas Eternas
 hydragon.talents.rock_drake.eternal_wings.description=Aumenta un 60% la duración de la invocación; con Pacto Draconico suma un 100%.
 hydragon.talents.rock_drake.hornmasters_call.name=Llamada del Maestro del Cuerno
 hydragon.talents.rock_drake.hornmasters_call.description=Reduce un 37,5% el tiempo de reutilización de la invocación; con Retorno Rápido suma un 50%.
+resourceType.HyDragon_DraconicEssences.name=Cualquier esencia dracónica

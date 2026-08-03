@@ -327,3 +327,4 @@ hydragon.talents.rock_drake.eternal_wings.name=Ailes éternelles
 hydragon.talents.rock_drake.eternal_wings.description=Augmente la durée d'invocation de 60 % ; avec Pacte draconique, le total atteint 100 %.
 hydragon.talents.rock_drake.hornmasters_call.name=Appel du maître du cor
 hydragon.talents.rock_drake.hornmasters_call.description=Réduit le temps de recharge d'invocation de 37,5 % ; avec Rappel rapide, le total atteint 50 %.
+resourceType.HyDragon_DraconicEssences.name=N'importe quelle essence draconique

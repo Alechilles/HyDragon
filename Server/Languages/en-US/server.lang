@@ -327,3 +327,4 @@ hydragon.talents.rock_drake.eternal_wings.name=Eternal Wings
 hydragon.talents.rock_drake.eternal_wings.description=Increase summon duration by 60%, stacking with Dragonbound Pact for 100% total.
 hydragon.talents.rock_drake.hornmasters_call.name=Hornmaster's Call
 hydragon.talents.rock_drake.hornmasters_call.description=Reduce summon cooldown by 37.5%, stacking with Swift Recall for 50% total.
+resourceType.HyDragon_DraconicEssences.name=Any Draconic Essence
