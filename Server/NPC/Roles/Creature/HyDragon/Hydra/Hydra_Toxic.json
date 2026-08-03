@@ -12,7 +12,6 @@
     "WanderRadius": 8,
     "ViewRange": 36,
     "HearingRange": 24,
-    "SleepHearingRange": 8,
     "DropList": "Drop_Hydra",
     "MaxSpeed": 7,
     "FlightSpeed": 9,
