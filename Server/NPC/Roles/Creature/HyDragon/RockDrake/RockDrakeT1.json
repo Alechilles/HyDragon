@@ -13,7 +13,6 @@
     "WanderRadius": 3,
     "ViewRange": 10,
     "HearingRange": 12,
-    "SleepHearingRange": 4,
     "AbsoluteDetectionRange": 4,
     "AlertedRange": 24,
     "AlertedTime": [
