@@ -40,25 +40,6 @@
           "children": [
             {
               "id": "3",
-              "name": "MountAnchor",
-              "position": {"x": 5.5037, "y": 69.02712, "z": 131.54899},
-              "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
-              "shape": {
-                "type": "none",
-                "offset": {"x": 0, "y": 0, "z": 0},
-                "stretch": {"x": 1, "y": 1, "z": 1},
-                "settings": {
-                  "isPiece": false
-                },
-                "textureLayout": {},
-                "unwrapMode": "custom",
-                "visible": true,
-                "doubleSided": false,
-                "shadingMode": "flat"
-              }
-            },
-            {
-              "id": "4",
               "name": "cube--C1",
               "position": {"x": -4.4963, "y": 3.02712, "z": 13.54899},
               "orientation": {"x": -0.0205, "y": 0.00746, "z": 0.34194, "w": 0.93947},
@@ -110,7 +91,7 @@
               }
             },
             {
-              "id": "5",
+              "id": "4",
               "name": "AF_Belly",
               "position": {"x": 2.94556, "y": -1.09598, "z": -68.15515},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
@@ -129,7 +110,7 @@
               },
               "children": [
                 {
-                  "id": "6",
+                  "id": "5",
                   "name": "cube--C1",
                   "position": {"x": -7.44186, "y": -8.8769, "z": 121.70414},
                   "orientation": {"x": -0.0205, "y": 0.00746, "z": 0.34194, "w": 0.93947},
@@ -181,7 +162,7 @@
                   }
                 },
                 {
-                  "id": "7",
+                  "id": "6",
                   "name": "AF_Chest",
                   "position": {"x": 0, "y": 15, "z": 38},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
@@ -199,6 +180,25 @@
                     "shadingMode": "flat"
                   },
                   "children": [
+                    {
+                      "id": "7",
+                      "name": "MountAnchor",
+                      "position": {"x": 2.55814, "y": 55.1231, "z": 161.70414},
+                      "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
+                      "shape": {
+                        "type": "none",
+                        "offset": {"x": 0, "y": 0, "z": 0},
+                        "stretch": {"x": 1, "y": 1, "z": 1},
+                        "settings": {
+                          "isPiece": false
+                        },
+                        "textureLayout": {},
+                        "unwrapMode": "custom",
+                        "visible": true,
+                        "doubleSided": false,
+                        "shadingMode": "flat"
+                      }
+                    },
                     {
                       "id": "8",
                       "name": "cube--C1",
