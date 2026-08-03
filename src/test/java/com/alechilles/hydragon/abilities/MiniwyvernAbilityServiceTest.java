@@ -270,6 +270,30 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
+    void replacesAChangedWardAndRemovesItsSourceOnDeactivation() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        MiniwyvernOwnerAuraRegistry auras = new MiniwyvernOwnerAuraRegistry();
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states, auras);
+        MiniwyvernArchetypeConfig config = fireConfigWithWardUpgrades();
+        world.purchasedTalents.add("FireWardOne");
+
+        assertTrue(service.tick(context(), Map.of("fire", config), world, 1_000L).ready());
+        assertEquals(List.of("hydragon:mini:profile-1:fire:ward"), world.ownerEffectSources);
+        assertEquals(List.of("FlameWardOne"), world.ownerEffectIds);
+
+        world.purchasedTalents.add("FireCapstone");
+        assertTrue(service.tick(context(), Map.of("fire", config), world, 2_000L).ready());
+        assertEquals(List.of("hydragon:mini:profile-1:fire:ward",
+                "hydragon:mini:profile-1:fire:ward"), world.ownerEffectSources);
+        assertEquals(List.of("FlameWardOne", "FlameWardCapstone"), world.ownerEffectIds);
+        assertEquals(List.of("FlameWardOne"), world.removedOwnerEffectIds);
+
+        service.deactivate(context(), Map.of("fire", config), world, 3_000L);
+        assertEquals(List.of("FlameWardOne", "FlameWardCapstone"), world.removedOwnerEffectIds);
+    }
+
+    @Test
     void invalidEssenceBondUpgradeDefinitionsFailValidation() throws Exception {
         MiniwyvernArchetypeConfig config = fireConfig();
         MiniwyvernArchetypeConfig.EssenceBondAura essenceBondAura = construct(
@@ -428,6 +452,22 @@ class MiniwyvernAbilityServiceTest {
         return config;
     }
 
+    private static MiniwyvernArchetypeConfig fireConfigWithWardUpgrades() throws Exception {
+        MiniwyvernArchetypeConfig config = fireConfig();
+        MiniwyvernArchetypeConfig.EssenceBondAura aura = construct(
+                MiniwyvernArchetypeConfig.EssenceBondAura.class);
+        MiniwyvernArchetypeConfig.Upgrade wardOne = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        MiniwyvernArchetypeConfig.Upgrade capstone = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        set(wardOne, "talentId", "FireWardOne");
+        set(wardOne, "wardEffectId", "FlameWardOne");
+        set(capstone, "talentId", "FireCapstone");
+        set(capstone, "wardEffectId", "FlameWardCapstone");
+        set(aura, "upgrades", new MiniwyvernArchetypeConfig.Upgrade[] { wardOne, capstone });
+        set(config, "essenceBondAura", aura);
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
     private static MiniwyvernArchetypeConfig base(String id, String roleId) throws Exception {
         MiniwyvernArchetypeConfig config = construct(MiniwyvernArchetypeConfig.class);
         set(config, "id", id);
@@ -475,6 +515,9 @@ class MiniwyvernAbilityServiceTest {
         int enemyEffects;
         int removedEffects;
         int ownerModifierRemovals;
+        final List<String> ownerEffectSources = new java.util.ArrayList<>();
+        final List<String> ownerEffectIds = new java.util.ArrayList<>();
+        final List<String> removedOwnerEffectIds = new java.util.ArrayList<>();
         int projectiles;
         int damageApplications;
         int heals;
@@ -497,6 +540,16 @@ class MiniwyvernAbilityServiceTest {
         }
         @Override public boolean removeEffect(UUID entityUuid, String sourceKey, String effectId) {
             removedEffects++;
+            return true;
+        }
+        @Override public boolean applyOwnerEffect(
+                UUID ownerUuid, String sourceKey, String effectId, double durationSeconds) {
+            ownerEffectSources.add(sourceKey);
+            ownerEffectIds.add(effectId);
+            return true;
+        }
+        @Override public boolean removeOwnerEffect(UUID ownerUuid, String sourceKey, String effectId) {
+            removedOwnerEffectIds.add(effectId);
             return true;
         }
         @Override public boolean supportsOwnerModifiers(Map<String, Double> modifiers) { return true; }

@@ -17,6 +17,7 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
     private final ConcurrentHashMap<UUID, Aura> active = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, ToxicWeakness> toxicWeaknesses = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<TargetAuraKey, TargetAura> targetAuras = new ConcurrentHashMap<>();
+    private final Set<Runnable> clearHooks = ConcurrentHashMap.newKeySet();
 
     public boolean update(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
                           String formId, String effectId, double durationSeconds,
@@ -150,10 +151,24 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         return List.copyOf(projections);
     }
 
+    /** Registers an ephemeral-state cleanup hook, returning a handle that unregisters it. */
+    AutoCloseable addClearHook(Runnable hook) {
+        Objects.requireNonNull(hook, "hook");
+        clearHooks.add(hook);
+        return () -> clearHooks.remove(hook);
+    }
+
     public void clear() {
         active.clear();
         toxicWeaknesses.clear();
         targetAuras.clear();
+        for (Runnable hook : clearHooks) {
+            try {
+                hook.run();
+            } catch (RuntimeException ignored) {
+                // Cleanup hooks are best-effort and must not prevent registry convergence.
+            }
+        }
     }
 
     @Override public void close() { clear(); }

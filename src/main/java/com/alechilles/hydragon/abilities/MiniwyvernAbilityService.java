@@ -20,6 +20,7 @@ import java.util.UUID;
  */
 public final class MiniwyvernAbilityService {
     private static final String SOURCE_PREFIX = "hydragon:mini:";
+    private static final String WARD_ABILITY_ID = "ward";
     private static final long ICE_TARGET_RETENTION_MS = 60_000L;
     private final MiniwyvernAbilityStateRepository states;
     private final MiniwyvernOwnerAuraRegistry ownerAuras;
@@ -122,6 +123,8 @@ public final class MiniwyvernAbilityService {
         Objects.requireNonNull(archetypes, "archetypes");
         Objects.requireNonNull(world, "world");
         if (!world.isWorldThread()) return TickResult.denied("not-world-thread");
+        MiniwyvernOwnerAuraRegistry.Aura activeAura = ownerAuras.activeFor(context.ownerUuid()).orElse(null);
+        removeWard(context.ownerUuid(), activeAura, world);
         ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
@@ -345,7 +348,9 @@ public final class MiniwyvernAbilityService {
         String formId = config.getId();
         MiniwyvernArchetypeConfig.OwnerAttackAura aura = config.getOwnerAttackAura();
         boolean playerOnlyForm = formId.equals("lightning") || formId.equals("nature");
+        MiniwyvernOwnerAuraRegistry.Aura previous = ownerAuras.activeFor(context.ownerUuid()).orElse(null);
         if (!requiredTalentPurchased || (aura == null && !playerOnlyForm)) {
+            removeWard(context.ownerUuid(), previous, world);
             ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
             return;
         }
@@ -400,8 +405,45 @@ public final class MiniwyvernAbilityService {
                 formId, effectId, durationSeconds, damageReductionFraction,
                 targetDamageTakenFraction, ownerDamageToAffectedFraction, wardEffectId,
                 conditionalWardDamageReductionFraction, siphonMaximumHealthFraction, siphonCooldownMs)) {
+            removeWard(context.ownerUuid(), previous, world);
             ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
+            return;
         }
+        MiniwyvernOwnerAuraRegistry.Aura current = ownerAuras.activeFor(context.ownerUuid()).orElse(null);
+        replaceWard(context.ownerUuid(), previous, current, world);
+    }
+
+    private static void replaceWard(
+            UUID ownerUuid,
+            MiniwyvernOwnerAuraRegistry.Aura previous,
+            MiniwyvernOwnerAuraRegistry.Aura current,
+            MiniwyvernAbilityWorld world) {
+        String previousEffect = previous == null ? null : previous.wardEffectId();
+        String currentEffect = current == null ? null : current.wardEffectId();
+        String previousSource = wardSource(previous);
+        String currentSource = wardSource(current);
+        if (previousEffect != null
+                && (!Objects.equals(previousSource, currentSource)
+                || !Objects.equals(previousEffect, currentEffect))) {
+            world.removeOwnerEffect(ownerUuid, previousSource, previousEffect);
+        }
+        if (currentEffect != null && currentSource != null && current != null) {
+            world.applyOwnerEffect(ownerUuid, currentSource, currentEffect, current.durationSeconds());
+        }
+    }
+
+    private static void removeWard(
+            UUID ownerUuid,
+            MiniwyvernOwnerAuraRegistry.Aura aura,
+            MiniwyvernAbilityWorld world) {
+        if (aura == null || aura.wardEffectId() == null) return;
+        String source = wardSource(aura);
+        if (source != null) world.removeOwnerEffect(ownerUuid, source, aura.wardEffectId());
+    }
+
+    private static String wardSource(MiniwyvernOwnerAuraRegistry.Aura aura) {
+        return aura == null || aura.wardEffectId() == null
+                ? null : sourceKey(aura.profileId(), aura.formId(), WARD_ABILITY_ID);
     }
 
     private static boolean requiredTalentPurchased(

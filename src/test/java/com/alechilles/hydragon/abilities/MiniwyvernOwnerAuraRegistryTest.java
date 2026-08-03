@@ -62,6 +62,19 @@ class MiniwyvernOwnerAuraRegistryTest {
     }
 
     @Test
+    void invokesClearHooksForEphemeralOwnerState() throws Exception {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        int[] clears = {0};
+        AutoCloseable hook = registry.addClearHook(() -> clears[0]++);
+
+        registry.clear();
+        assertEquals(1, clears[0]);
+        hook.close();
+        registry.clear();
+        assertEquals(1, clears[0]);
+    }
+
+    @Test
     void rejectsEveryInvalidExpandedFractionAndWardText() {
         assertFalse(new MiniwyvernOwnerAuraRegistry().update(OWNER, "profile", "lease", UUID.randomUUID(),
                 "void", "exposure", 6.0D, null, 1.0D, 0.0D, null, 0.0D, 0.0D, 0L));
