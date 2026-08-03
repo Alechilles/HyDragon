@@ -32,7 +32,7 @@ public final class MiniwyvernOwnerAuraEffectQueue {
 
     void submit(String worldName, UUID targetUuid, MiniwyvernOwnerAuraRegistry.Aura aura) {
         Objects.requireNonNull(aura, "aura");
-        RequestKey key = new RequestKey(worldName, targetUuid, aura.effectId());
+        RequestKey key = RequestKey.forAura(worldName, targetUuid, aura);
         long nowNanos = nanoTime.getAsLong();
         long readyAtNanos = nowNanos + delayNanos;
         pending.compute(key, (ignored, current) -> {
@@ -47,7 +47,7 @@ public final class MiniwyvernOwnerAuraEffectQueue {
     /** Queues a fresh Add for the cycle after a COMPLETE removal was replicated. */
     void submitAfterRemoval(String worldName, UUID targetUuid, MiniwyvernOwnerAuraRegistry.Aura aura) {
         Objects.requireNonNull(aura, "aura");
-        RequestKey key = new RequestKey(worldName, targetUuid, aura.effectId());
+        RequestKey key = RequestKey.forAura(worldName, targetUuid, aura);
         reapplications.put(key, new PendingAura(aura, nanoTime.getAsLong(), true));
     }
 
@@ -116,11 +116,21 @@ public final class MiniwyvernOwnerAuraEffectQueue {
         return normalized;
     }
 
-    private record RequestKey(String worldName, UUID targetUuid, String effectId) {
+    private record RequestKey(String worldName, UUID targetUuid, String effectId,
+                              UUID ownerUuid, String profileId, String leaseId) {
         private RequestKey {
             worldName = requireText(worldName, "worldName");
             Objects.requireNonNull(targetUuid, "targetUuid");
             effectId = requireText(effectId, "effectId");
+            Objects.requireNonNull(ownerUuid, "ownerUuid");
+            profileId = requireText(profileId, "profileId");
+            leaseId = requireText(leaseId, "leaseId");
+        }
+
+        private static RequestKey forAura(
+                String worldName, UUID targetUuid, MiniwyvernOwnerAuraRegistry.Aura aura) {
+            return new RequestKey(worldName, targetUuid, aura.effectId(), aura.ownerUuid(),
+                    aura.profileId(), aura.leaseId());
         }
     }
 
