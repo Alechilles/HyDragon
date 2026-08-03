@@ -13,7 +13,7 @@
   "MaximumOwned": 0,
   "MaximumActive": 1,
   "SessionDurationSeconds": 300,
-  "SummonCooldownSeconds": 300,
+  "SummonCooldownSeconds": 1800,
   "SummonAuraEffectId": "HyDragon_DragonStone_SummonAura",
   "RevivePriceByRole": [
     { "RoleId": "Tamed_NordicDrake", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Ice", "Quantity": 2 } ] },
