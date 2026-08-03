@@ -13,31 +13,7 @@
         "Amount": 0.12
       }
     ],
-    "Fire": [
-      {
-        "CalculationType": "Percent",
-        "Amount": 0.12
-      }
-    ],
-    "Ice": [
-      {
-        "CalculationType": "Percent",
-        "Amount": 0.12
-      }
-    ],
-    "Poison": [
-      {
-        "CalculationType": "Percent",
-        "Amount": 0.12
-      }
-    ],
-    "Elemental": [
-      {
-        "CalculationType": "Percent",
-        "Amount": 0.12
-      }
-    ],
-    "Void": [
+    "Projectile": [
       {
         "CalculationType": "Percent",
         "Amount": 0.12

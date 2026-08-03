@@ -293,6 +293,22 @@ class BundledConfigAssetContractTest {
     }
 
     @Test
+    void lightningWardUsesOnlyDocumentedDamageCauses() throws IOException {
+        Set<String> expectedCauses = Set.of("Physical", "Projectile");
+        for (String asset : List.of(
+                "HyDragon_Miniwyvern_Lightning_Ward.json",
+                "HyDragon_Miniwyvern_Lightning_Ward_8.json",
+                "HyDragon_Miniwyvern_Lightning_Ward_8_Knockback.json",
+                "HyDragon_Miniwyvern_Lightning_Ward_12.json",
+                "HyDragon_Miniwyvern_Lightning_Ward_15.json")) {
+            Path path = Path.of("Server", "Entity", "Effects", "Status", asset);
+            JsonObject status = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
+            assertEquals(expectedCauses, status.getAsJsonObject("DamageResistance").keySet(),
+                    path + " must scope resistance to documented causes");
+        }
+    }
+
+    @Test
     void miniwyvernTalentKeysArePresentInEveryServerLocale() throws IOException {
         Set<String> requiredKeys = new HashSet<>();
         for (String form : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "Wild")) {

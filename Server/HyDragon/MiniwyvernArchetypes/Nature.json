@@ -2,9 +2,7 @@
   "Id": "nature",
   "RoleId": "Tamed_Wyvern_Mini_Nature",
   "RequiredTalentId": "Miniwyvern_Nature_VerdantBond",
-  "ParticleAndSoundIds": [
-    "HyDragon_Miniwyvern_Nature_HealingMist"
-  ],
+  "ParticleAndSoundIds": [ "HyDragon_Miniwyvern_Nature_HealingMist" ],
   "PassiveEffects": [
     "HyDragon_Miniwyvern_Nature_Regeneration"
   ],
