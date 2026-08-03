@@ -50,10 +50,16 @@ public final class MiniwyvernVoidExposureDamageSystem extends DamageEventSystem 
         EffectControllerComponent controller = chunk.getComponent(index, EffectControllerComponent.getComponentType());
         if (controller == null) return;
         UUIDComponent targetIdentity = chunk.getComponent(index, UUIDComponent.getComponentType());
-        MiniwyvernOwnerAuraRegistry.TargetAura targetAura = targetIdentity == null ? null
-                : registry.activeTargetAura(targetIdentity.getUuid(), System.currentTimeMillis()).orElse(null);
-        double bondFraction = targetAura != null && hasEffect(controller, targetAura.effectId())
-                ? targetAura.targetDamageTakenFraction() : 0.0D;
+        double bondFraction = 0.0D;
+        if (targetIdentity != null) {
+            for (MiniwyvernOwnerAuraRegistry.TargetAura targetAura
+                    : registry.activeTargetAuras(targetIdentity.getUuid(), System.currentTimeMillis())) {
+                if (targetAura.targetDamageTakenFraction() > bondFraction
+                        && hasEffect(controller, targetAura.effectId())) {
+                    bondFraction = targetAura.targetDamageTakenFraction();
+                }
+            }
+        }
         boolean projectileActive = hasEffect(controller, PROJECTILE_EFFECT_ID);
         if (bondFraction <= 0.0D && !projectileActive) return;
         damage.setAmount(increasedAmount(damage.getAmount(), bondFraction, projectileActive));

@@ -107,4 +107,48 @@ class MiniwyvernOwnerAuraRegistryTest {
                 .damageReductionFraction());
         assertTrue(registry.activeTargetAura(target, 7_000L).isEmpty());
     }
+
+    @Test
+    void retainsToxicProjectionWhenVoidIsAppliedAfterIt() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        UUID target = UUID.randomUUID();
+
+        assertTrue(registry.update(OWNER, "profile", "toxic-lease", UUID.randomUUID(),
+                "toxic", "toxic-effect", 6.0D, 0.20D));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 1_000L);
+        assertTrue(registry.update(OWNER, "profile", "void-lease", UUID.randomUUID(),
+                "void", "void-effect", 6.0D, null, 0.22D, 0.0D,
+                null, 0.0D, 0.0D, 0L));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 1_000L);
+
+        assertEquals(2, registry.activeTargetAuras(target, 6_999L).size());
+        assertEquals(0.20D, registry.activeTargetAura(target, "toxic-effect", 6_999L)
+                .orElseThrow().targetOutgoingDamageReductionFraction());
+        assertEquals(0.22D, registry.activeTargetAura(target, "void-effect", 6_999L)
+                .orElseThrow().targetDamageTakenFraction());
+        assertEquals(0.20D, registry.activeToxicWeakness(target, 6_999L).orElseThrow()
+                .damageReductionFraction());
+    }
+
+    @Test
+    void retainsVoidProjectionWhenToxicIsAppliedAfterIt() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        UUID target = UUID.randomUUID();
+
+        assertTrue(registry.update(OWNER, "profile", "void-lease", UUID.randomUUID(),
+                "void", "void-effect", 6.0D, null, 0.22D, 0.0D,
+                null, 0.0D, 0.0D, 0L));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 1_000L);
+        assertTrue(registry.update(OWNER, "profile", "toxic-lease", UUID.randomUUID(),
+                "toxic", "toxic-effect", 6.0D, 0.20D));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 1_000L);
+
+        assertEquals(2, registry.activeTargetAuras(target, 6_999L).size());
+        assertEquals(0.22D, registry.activeTargetAura(target, "void-effect", 6_999L)
+                .orElseThrow().targetDamageTakenFraction());
+        assertEquals(0.20D, registry.activeTargetAura(target, "toxic-effect", 6_999L)
+                .orElseThrow().targetOutgoingDamageReductionFraction());
+        assertEquals(0.20D, registry.activeToxicWeakness(target, 6_999L).orElseThrow()
+                .damageReductionFraction());
+    }
 }

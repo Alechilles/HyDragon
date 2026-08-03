@@ -251,6 +251,9 @@ public final class MiniwyvernArchetypeConfig
             validateFraction(errors, "DamageReductionFraction", damageReductionFraction);
             validateFraction(errors, "TargetDamageTakenFraction", targetDamageTakenFraction);
             validateFraction(errors, "OwnerDamageToAffectedFraction", ownerDamageToAffectedFraction);
+            if (wardEffectId != null && blank(wardEffectId)) {
+                errors.add("WardEffectId must not be blank when configured");
+            }
             validateFraction(errors, "ConditionalWardDamageReductionFraction",
                     conditionalWardDamageReductionFraction);
             validateFraction(errors, "SiphonMaximumHealthFraction", siphonMaximumHealthFraction);

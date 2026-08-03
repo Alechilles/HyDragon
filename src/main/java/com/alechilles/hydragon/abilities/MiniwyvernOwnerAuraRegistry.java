@@ -3,6 +3,8 @@ package com.alechilles.hydragon.abilities;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +16,7 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
     private static final Set<String> PLAYER_ONLY_FORMS = Set.of("lightning", "nature");
     private final ConcurrentHashMap<UUID, Aura> active = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, ToxicWeakness> toxicWeaknesses = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<UUID, TargetAura> targetAuras = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<TargetAuraKey, TargetAura> targetAuras = new ConcurrentHashMap<>();
 
     public boolean update(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
                           String formId, String effectId, double durationSeconds,
@@ -99,22 +101,53 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         TargetAura projection = new TargetAura(
                 aura.formId(), aura.effectId().trim(), aura.targetOutgoingDamageReductionFraction(),
                 aura.targetDamageTakenFraction(), aura.ownerDamageToAffectedFraction(), expiresAtMs);
-        targetAuras.put(targetUuid, projection);
+        targetAuras.put(new TargetAuraKey(targetUuid, projection.effectId()), projection);
         if (projection.targetOutgoingDamageReductionFraction() > 0.0D) {
             recordToxicWeakness(targetUuid, projection.effectId(),
                     projection.targetOutgoingDamageReductionFraction(), durationSeconds, nowMs);
-        } else {
-            toxicWeaknesses.remove(targetUuid);
+        } else if ("toxic".equals(projection.formId())) {
+            ToxicWeakness current = toxicWeaknesses.get(targetUuid);
+            if (current != null && current.effectId().equals(projection.effectId())) {
+                toxicWeaknesses.remove(targetUuid, current);
+            }
         }
     }
 
     public Optional<TargetAura> activeTargetAura(UUID targetUuid, long nowMs) {
-        TargetAura projection = targetAuras.get(targetUuid);
+        TargetAura selected = null;
+        for (TargetAura projection : activeTargetAuras(targetUuid, nowMs)) {
+            if (selected == null || projection.expiresAtMs() > selected.expiresAtMs()) {
+                selected = projection;
+            }
+        }
+        return Optional.ofNullable(selected);
+    }
+
+    public Optional<TargetAura> activeTargetAura(UUID targetUuid, String effectId, long nowMs) {
+        if (targetUuid == null || blank(effectId)) return Optional.empty();
+        TargetAuraKey key = new TargetAuraKey(targetUuid, effectId.trim());
+        TargetAura projection = targetAuras.get(key);
         if (projection == null || projection.expiresAtMs() <= nowMs) {
-            if (projection != null) targetAuras.remove(targetUuid, projection);
+            if (projection != null) targetAuras.remove(key, projection);
             return Optional.empty();
         }
         return Optional.of(projection);
+    }
+
+    public List<TargetAura> activeTargetAuras(UUID targetUuid, long nowMs) {
+        if (targetUuid == null) return List.of();
+        List<TargetAura> projections = new ArrayList<>();
+        for (var entry : targetAuras.entrySet()) {
+            TargetAuraKey key = entry.getKey();
+            if (!targetUuid.equals(key.targetUuid())) continue;
+            TargetAura projection = entry.getValue();
+            if (projection.expiresAtMs() <= nowMs) {
+                targetAuras.remove(key, projection);
+            } else {
+                projections.add(projection);
+            }
+        }
+        return List.copyOf(projections);
     }
 
     public void clear() {
@@ -149,6 +182,8 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                              double targetDamageTakenFraction,
                              double ownerDamageToAffectedFraction,
                              long expiresAtMs) { }
+
+    private record TargetAuraKey(UUID targetUuid, String effectId) { }
 
     private static boolean blank(String value) { return value == null || value.isBlank(); }
     private static String normalize(String value) { return value == null ? "" : value.trim().toLowerCase(Locale.ROOT); }
