@@ -12,7 +12,6 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-HYDRAGON_PATCH_ROOT = ROOT.parent / "Patchwork/standalone/src/main/resources/Server/Patchwork/Patches/HyDragon"
 ASSET_ROOTS = (ROOT / "Common", ROOT / "Server")
 JSON_SUFFIXES = {".json", ".particlesystem", ".particlespawner", ".blockymodel", ".blockyanim"}
 LOCALES = ("en-US", "pt-BR", "de-DE", "fr-FR", "es-ES")
@@ -119,11 +118,6 @@ def load_json_assets(errors: list[str]) -> dict[Path, object]:
                 parsed[path] = json.loads(path.read_text(encoding="utf-8-sig"))
             except (OSError, UnicodeError, json.JSONDecodeError) as exc:
                 fail(errors, f"invalid JSON: {path.relative_to(ROOT)}: {exc}")
-    for path in HYDRAGON_PATCH_ROOT.rglob("*.json"):
-        try:
-            parsed[path] = json.loads(path.read_text(encoding="utf-8-sig"))
-        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-            fail(errors, f"invalid centralized HyDragon patch: {path}: {exc}")
     return parsed
 
 
@@ -317,6 +311,7 @@ def require_files(errors: list[str]) -> None:
         "Server/Tamework/Companion/HyDragonNordicDrake.json",
         "Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json",
         "Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json",
+        "Server/Patchwork/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json",
         "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json",
         "Server/Tamework/CapturePolicies/HyDragonHydra.json",
         "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json",
@@ -343,8 +338,6 @@ def require_files(errors: list[str]) -> None:
     for relative in required:
         if not (ROOT / relative).is_file():
             fail(errors, f"missing required asset: {relative}")
-    if not (HYDRAGON_PATCH_ROOT / "Roles/Tamed_NordicDrake_AvatarFlight.json").is_file():
-        fail(errors, "missing required centralized HyDragon avatar-flight patch")
 
 
 def validate_capture_configs(parsed: dict[Path, object], errors: list[str]) -> None:
@@ -711,7 +704,7 @@ def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors
 
 def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[str]) -> None:
     species_root = ROOT / "Server/HyDragon/DragonSpecies"
-    patch_root = HYDRAGON_PATCH_ROOT
+    patch_root = ROOT / "Server/Patchwork/Patches/HyDragon"
     for species_path in sorted(species_root.glob("*.json")):
         species = parsed.get(species_path)
         if not isinstance(species, dict):
@@ -731,7 +724,7 @@ def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[
                 if isinstance(operation, dict) and isinstance(operation.get("Value"), dict)
             }
             if not inserted_roles.intersection(wild_roles):
-                fail(errors, f"spawn patch {patch_path.relative_to(HYDRAGON_PATCH_ROOT)} inserts {sorted(inserted_roles)} but species declares {sorted(wild_roles)}")
+                fail(errors, f"spawn patch {patch_path.relative_to(ROOT)} inserts {sorted(inserted_roles)} but species declares {sorted(wild_roles)}")
 
 
 def validate_range(value: object, size: int, minimum: float, maximum: float) -> bool:
@@ -823,14 +816,14 @@ def validate_static_spawn_contracts(
         local_spawn_ids.add(path.stem)
         validate_spawn_shape(parsed.get(path), "WorldNPCSpawn", path.relative_to(ROOT).as_posix(), known_assets, errors)
 
-    patch_root = HYDRAGON_PATCH_ROOT
+    patch_root = ROOT / "Server/Patchwork/Patches/HyDragon"
     patch_ids: set[str] = set()
     for path in sorted(patch_root.glob("*.json")):
         data = parsed.get(path)
-        context = path.relative_to(HYDRAGON_PATCH_ROOT).as_posix()
+        context = path.relative_to(ROOT).as_posix()
         if not isinstance(data, dict):
             continue
-        if set(data) - {"Id", "Target", "Priority", "Enabled", "When", "Operations"}:
+        if set(data) - {"Id", "Target", "Priority", "Enabled", "Operations"}:
             fail(errors, f"{context} has unsupported patch fields")
         patch_id = data.get("Id")
         if not isinstance(patch_id, str) or not patch_id:
@@ -1014,7 +1007,7 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
     if not isinstance(hydra_spawn, dict) or hydra_spawn.get("MoonPhaseRange") is None \
             or hydra_spawn.get("MoonPhaseWeightModifiers") is None:
         fail(errors, f"{hydra_spawn_path.relative_to(ROOT)} must author moon range and weight tuning")
-    altitude_patch_path = HYDRAGON_PATCH_ROOT / "RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
+    altitude_patch_path = ROOT / "Server/Patchwork/Patches/HyDragon/RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
     altitude_patch = parsed.get(altitude_patch_path)
     operations = altitude_patch.get("Operations", []) if isinstance(altitude_patch, dict) else []
     if not any(
@@ -1024,9 +1017,9 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
         and validate_range(operation.get("Value"), 2, -4096, 4096)
         for operation in operations
     ):
-        fail(errors, f"{altitude_patch_path.relative_to(HYDRAGON_PATCH_ROOT)} must author a valid BeaconNPCSpawn YRange")
+        fail(errors, f"{altitude_patch_path.relative_to(ROOT)} must author a valid BeaconNPCSpawn YRange")
 
-    flight_patch_path = HYDRAGON_PATCH_ROOT / "Roles/Tamed_NordicDrake_AvatarFlight.json"
+    flight_patch_path = ROOT / "Server/Patchwork/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json"
     flight_patch = parsed.get(flight_patch_path)
     flight_operations = flight_patch.get("Operations", []) if isinstance(flight_patch, dict) else []
     expected_flight_values = {

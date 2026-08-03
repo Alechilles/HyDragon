@@ -123,10 +123,23 @@ class ToxicHydraVariantAssetTest {
 
     @Test
     void onlyTamedToxicHydraEnablesDedicatedAvatarFlight() throws Exception {
+        Path patchPath = ROOT.resolve(
+                "Server/Patchwork/Patches/HyDragonRoles/Tamed_Hydra_Toxic_AvatarFlight.json");
+        assertTrue(Files.isRegularFile(patchPath), "Tamed Toxic Hydra needs avatar-flight role wiring");
+
         JsonObject wildModify = toxicRole("Hydra_Toxic").getAsJsonObject("Modify");
         assertFalse(wildModify.has("MountMode"));
         assertFalse(wildModify.has("AvatarFlightConfig"));
         assertEquals("CAE_Hydra_Toxic_Aerial", wildModify.get("_CombatConfig").getAsString());
+
+        JsonObject patch = json(
+                "Server/Patchwork/Patches/HyDragonRoles/Tamed_Hydra_Toxic_AvatarFlight.json");
+        assertEquals("Server/NPC/Roles/Creature/HyDragon/Hydra/Tamed_Hydra_Toxic.json",
+                patch.get("Target").getAsString());
+        JsonObject patchValue = patch.getAsJsonArray("Operations").get(0).getAsJsonObject()
+                .getAsJsonObject("Value");
+        assertEquals("TameworkAvatarFlight", patchValue.get("MountMode").getAsString());
+        assertEquals("HyDragonToxicHydra", patchValue.get("AvatarFlightConfig").getAsString());
 
         JsonObject flight = json("Server/Tamework/AvatarFlight/HyDragonToxicHydra.json");
         assertTrue(flight.get("Enabled").getAsBoolean());
