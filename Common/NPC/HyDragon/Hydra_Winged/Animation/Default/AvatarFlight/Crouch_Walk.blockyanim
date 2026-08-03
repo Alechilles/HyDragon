@@ -691,7 +691,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Neck-Hair-R": {
+    "AF_Neck-Hair-R": {
       "position": [],
       "orientation": [
         {
@@ -719,7 +719,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Neck-Hair-L": {
+    "AF_Neck-Hair-L": {
       "position": [],
       "orientation": [
         {
@@ -747,7 +747,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Chest-Hair": {
+    "AF_Chest-Hair": {
       "position": [],
       "orientation": [
         {
@@ -795,7 +795,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Neck-Hair-Bot": {
+    "AF_Neck-Hair-Bot": {
       "position": [],
       "orientation": [
         {
@@ -843,7 +843,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Jaw": {
+    "AF_Jaw": {
       "position": [],
       "orientation": [
         {
@@ -891,7 +891,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Head-Hair-R": {
+    "AF_Head-Hair-R": {
       "position": [],
       "orientation": [
         {
@@ -939,7 +939,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Head-Hair-L": {
+    "AF_Head-Hair-L": {
       "position": [],
       "orientation": [
         {
@@ -987,7 +987,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Tail": {
+    "AF_Tail": {
       "position": [],
       "orientation": [
         {
@@ -1035,7 +1035,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "L-Ear": {
+    "AF_L-Ear": {
       "position": [],
       "orientation": [
         {
@@ -1083,7 +1083,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "R-Ear": {
+    "AF_R-Ear": {
       "position": [],
       "orientation": [
         {
@@ -1131,7 +1131,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Neck-Hair-Top": {
+    "AF_Neck-Hair-Top": {
       "position": [],
       "orientation": [
         {
@@ -1179,7 +1179,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Back-Hair": {
+    "AF_Back-Hair": {
       "position": [],
       "orientation": [
         {

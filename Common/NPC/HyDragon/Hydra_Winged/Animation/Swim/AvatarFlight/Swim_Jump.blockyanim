@@ -376,7 +376,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Jaw": {
+    "AF_Jaw": {
       "position": [],
       "orientation": [
         {
@@ -404,7 +404,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "L-Ear": {
+    "AF_L-Ear": {
       "position": [],
       "orientation": [
         {
@@ -432,7 +432,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "R-Ear": {
+    "AF_R-Ear": {
       "position": [],
       "orientation": [
         {
@@ -460,7 +460,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "L-Ear2": {
+    "AF_L-Ear2": {
       "position": [],
       "orientation": [
         {
@@ -488,7 +488,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "R-Ear2": {
+    "AF_R-Ear2": {
       "position": [],
       "orientation": [
         {
@@ -600,7 +600,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "R-Heel": {
+    "AF_R-Heel": {
       "position": [],
       "orientation": [
         {
@@ -618,7 +618,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "L-Heel": {
+    "AF_L-Heel": {
       "position": [],
       "orientation": [
         {
@@ -646,7 +646,7 @@
       "shapeVisible": [],
       "shapeUvOffset": []
     },
-    "Tail": {
+    "AF_Tail": {
       "position": [],
       "orientation": [
         {
