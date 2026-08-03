@@ -33,6 +33,7 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         boolean targetEffectMissing = blank(effectId);
         if (ownerUuid == null || npcUuid == null || blank(profileId) || blank(leaseId)
                 || !ELEMENTAL_FORMS.contains(normalizedForm)
+                || (wardEffectId != null && blank(wardEffectId))
                 || !Double.isFinite(durationSeconds) || durationSeconds < 0.0D
                 || (!playerOnly && (targetEffectMissing || durationSeconds <= 0.0D))
                 || (playerOnly && !targetEffectMissing && durationSeconds <= 0.0D)
