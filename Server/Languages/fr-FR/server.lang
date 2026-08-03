@@ -42,15 +42,15 @@ items.Draconic_Essence_Void.description=Une essence sombre extraite de dragons l
 items.Revitalizing_Essence.name=Essence Revitalisante
 items.Revitalizing_Essence.description=Un concentré réparateur utilisé comme composant configurable pour ranimer un compagnon tombé.
 items.Draconic_Stone.name=Pierre Draconique en Fer
-items.Draconic_Stone.description=Une tentative de capture consommable en fer pour un dragon adulte affaibli et tranquillisé.
+items.Draconic_Stone.description=Un focalisateur de fer enchanté <color is="#e8edf5">simple</color> pour capturer les dragons.\n\n- Maintenez le clic gauche pour canaliser\n- Consommé à l'utilisation
 items.Draconic_Stone_Thorium.name=Pierre Draconique en Thorium
-items.Draconic_Stone_Thorium.description=Une tentative de capture consommable plus fiable, forgée en thorium.
+items.Draconic_Stone_Thorium.description=Un focalisateur de thorium enchanté <color is="#62d957">fiable</color> pour capturer les dragons.\n\n- Maintenez le clic gauche pour canaliser\n- Consommé à l'utilisation
 items.Draconic_Stone_Cobalt.name=Pierre Draconique en Cobalt
-items.Draconic_Stone_Cobalt.description=Une puissante tentative de capture consommable, forgée en cobalt.
+items.Draconic_Stone_Cobalt.description=Un focalisateur de cobalt enchanté <color is="#50a8ff">puissant</color> pour capturer les dragons.\n\n- Maintenez le clic gauche pour canaliser\n- Consommé à l'utilisation
 items.Draconic_Stone_Adamantium.name=Pierre Draconique en Adamantium
-items.Draconic_Stone_Adamantium.description=Une tentative de capture consommable très fiable, forgée en adamantite.
+items.Draconic_Stone_Adamantium.description=Un focalisateur d'adamantite enchanté <color is="#b060ff">puissant</color> pour capturer les dragons.\n\n- Maintenez le clic gauche pour canaliser\n- Consommé à l'utilisation
 items.Draconic_Stone_Ancient.name=Pierre Draconique Antique
-items.Draconic_Stone_Ancient.description=Une tentative de capture en mithril qui garantit la capture lorsque toutes les autres conditions sont remplies.
+items.Draconic_Stone_Ancient.description=Un focalisateur de mithril enchanté <color is="#f3b34c">sans égal</color> pour capturer les dragons.\n\n- Maintenez le clic gauche pour canaliser\n- Consommé à l'utilisation
 items.Wyvern_Egg.name=Œuf de Wyverne
 items.Wyvern_Egg.description=Un œuf rare qui crée votre unique lien d'âme à vie avec un Miniwyverne.
 items.Draconic_Altar.name=Autel Draconique

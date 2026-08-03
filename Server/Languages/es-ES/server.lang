@@ -42,15 +42,15 @@ items.Draconic_Essence_Void.description=Esencia sombría obtenida de dragones af
 items.Revitalizing_Essence.name=Esencia Revitalizante
 items.Revitalizing_Essence.description=Un concentrado restaurador que se usa como componente configurable para revivir a un compañero caído.
 items.Draconic_Stone.name=Piedra Dracónica de Hierro
-items.Draconic_Stone.description=Un intento de captura consumible de hierro para un dragón adulto debilitado y tranquilizado.
+items.Draconic_Stone.description=Un <color is="#e8edf5">simple</color> foco de hierro encantado para capturar dragones.\n\n- Mantén pulsado el clic izquierdo para canalizar\n- Se consume al usarlo
 items.Draconic_Stone_Thorium.name=Piedra Dracónica de Torio
-items.Draconic_Stone_Thorium.description=Un intento de captura consumible más fiable forjado con torio.
+items.Draconic_Stone_Thorium.description=Un <color is="#62d957">fiable</color> foco de torio encantado para capturar dragones.\n\n- Mantén pulsado el clic izquierdo para canalizar\n- Se consume al usarlo
 items.Draconic_Stone_Cobalt.name=Piedra Dracónica de Cobalto
-items.Draconic_Stone_Cobalt.description=Un potente intento de captura consumible forjado con cobalto.
+items.Draconic_Stone_Cobalt.description=Un <color is="#50a8ff">potente</color> foco de cobalto encantado para capturar dragones.\n\n- Mantén pulsado el clic izquierdo para canalizar\n- Se consume al usarlo
 items.Draconic_Stone_Adamantium.name=Piedra Dracónica de Adamantio
-items.Draconic_Stone_Adamantium.description=Un intento de captura consumible muy fiable forjado con adamantita.
+items.Draconic_Stone_Adamantium.description=Un <color is="#b060ff">poderoso</color> foco de adamantita encantado para capturar dragones.\n\n- Mantén pulsado el clic izquierdo para canalizar\n- Se consume al usarlo
 items.Draconic_Stone_Ancient.name=Piedra Dracónica Ancestral
-items.Draconic_Stone_Ancient.description=Un intento de captura de mithril que garantiza la captura cuando se cumplen los demás requisitos.
+items.Draconic_Stone_Ancient.description=Un <color is="#f3b34c">inigualable</color> foco de mithril encantado para capturar dragones.\n\n- Mantén pulsado el clic izquierdo para canalizar\n- Se consume al usarlo
 items.Wyvern_Egg.name=Huevo de Wyvern
 items.Wyvern_Egg.description=Un huevo raro que crea tu único vínculo de alma de por vida con un Miniwyvern.
 items.Draconic_Altar.name=Altar Dracónico
