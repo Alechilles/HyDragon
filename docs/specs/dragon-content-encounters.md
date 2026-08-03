@@ -187,7 +187,7 @@ Use asset spawning wherever possible:
 | Rock Drake T1 | Zone 1 cave forests | Preserve current patch/weighted spawn |
 | Rock Drake T2 | Zone 2 volcanic caves | Preserve current patch/weighted spawn |
 | Rock Drake T3 | Zone 2 volcanic and Zone 3 glacial caves | Preserve current patches/weights |
-| Nordic Drake | Zone 3 Outlander forest pool | Additive Patchwork `WorldNPCSpawn` patch, weight 1 |
+| Nordic Drake | Zone 3 Outlander forest pool | Additive Patchwork `WorldNPCSpawn` patch, weight 0.7058824 (15% with the current base pool) |
 | Miniwyvern | None | Soul Bond only |
 
 Spawn assets may vary weight by difficulty/rarity and supported moon/light conditions. The v1 patches intentionally inherit their target pool's top-level conditions: an individual inserted NPC cannot safely carry a different `DayTimeRange` or moon modifier without changing the other NPCs in that pool. Do not create a Java polling spawner for conditions already represented by `WorldNPCSpawn` or `BeaconNPCSpawn`.
