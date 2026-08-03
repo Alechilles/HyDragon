@@ -12,7 +12,7 @@
     "Input": [
       { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 3 },
       {
-        "ItemId": "Wood_Azure_Trunk",
+        "ResourceTypeId": "Wood_Azure",
         "Quantity": 10
       }
     ],

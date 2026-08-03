@@ -1239,12 +1239,12 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
     recipe = item.get("Recipe") if isinstance(item, dict) else None
     inputs = recipe.get("Input") if isinstance(recipe, dict) else None
     horn_costs = [
-        (entry.get("ItemId"), entry.get("Quantity"))
+        (entry.get("ItemId"), entry.get("ResourceTypeId"), entry.get("Quantity"))
         for entry in inputs
         if isinstance(entry, dict)
     ] if isinstance(inputs, list) else None
-    if horn_costs != [("Ingredient_Bar_Thorium", 3), ("Wood_Azure_Trunk", 10)]:
-        fail(errors, "Dragon Horn must cost 3 Thorium Bars and 10 Azure Wood Trunks")
+    if horn_costs != [("Ingredient_Bar_Thorium", None, 3), (None, "Wood_Azure", 10)]:
+        fail(errors, "Dragon Horn must cost 3 Thorium Bars and 10 Azure Wood resource-type items")
     if config.get("BondedRosterId") != "hydragon:dragon_horn" \
             or config.get("RosterStorage") != "BondedCompanions":
         fail(errors, "Dragon Horn must use the shared bonded-companion roster")
