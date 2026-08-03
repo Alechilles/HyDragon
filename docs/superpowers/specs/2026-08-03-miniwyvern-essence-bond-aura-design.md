@@ -20,6 +20,8 @@ All nodes cost the existing Essence Bond point costs and retain the tree's exist
 
 Talent IDs remain stable where possible; their display names, descriptions, dependencies, and no-longer-applicable generic Tamework effects are replaced. Descriptions state only the current form's exact player-aura or enemy-aura result and values. No tooltip refers to other forms or says that an effect is unimplemented.
 
+Every Miniwyvern talent uses localization keys rather than literal English text. The full Miniwyvern set (Fire, Ice, Lightning, Nature, Toxic, Void, and Wild; Essence Bond, Combat, and Vigor) has a name and description in every currently supported server language: `en-US`, `de-DE`, `es-ES`, `fr-FR`, and `pt-BR`. The six elemental Essence Bond trees receive newly authored form-specific translations; the unchanged Combat and Vigor effects retain their exact existing mechanics in localized copy.
+
 ## Form effects
 
 ### Fire — offensive

@@ -15,6 +15,7 @@
 - No Essence Bond node grants generic Miniwyvern combat, health, or movement statistics.
 - Tier 5 requires both tier-4 endpoints; tier 6 requires tier 5.
 - Every tooltip is form-specific, includes exact values, and never says `Not implemented`.
+- Every Miniwyvern talent, including unchanged Combat and Vigor nodes, must use language keys with a name and description in `en-US`, `de-DE`, `es-ES`, `fr-FR`, and `pt-BR`.
 - Fire and Toxic never heal. Void heals 0.5% maximum health at most once per 3 seconds, increased to 1% by capstone on that same cooldown.
 - Use Git Bash and leave no stale Java/Maven processes.
 
@@ -193,6 +194,8 @@ git commit -m "Feat: add Miniwyvern ward and Void siphon auras"
 - Modify: `Server/HyDragon/MiniwyvernArchetypes/{Fire,Ice,Lightning,Nature,Toxic,Void}.json`
 - Create: `Server/Entity/Effects/Status/HyDragon_Miniwyvern_*_Ward.json` and distinct tiered status assets required by the authored data.
 - Modify: `Server/Tamework/Talents/HyDragonMiniwyvern{Fire,Ice,Lightning,Nature,Toxic,Void}.json`
+- Modify: `Server/Tamework/Talents/HyDragonMiniwyvernWild.json`
+- Modify: `Server/Languages/{en-US,de-DE,es-ES,fr-FR,pt-BR}/server.lang`
 - Test: `src/test/java/com/alechilles/hydragon/config/BundledConfigAssetContractTest.java`
 - Test: `src/test/java/com/alechilles/hydragon/config/MiniwyvernTalentProgressionAssetTest.java`
 
@@ -202,7 +205,7 @@ git commit -m "Feat: add Miniwyvern ward and Void siphon auras"
 
 - [ ] **Step 1: Write failing asset tests**
 
-Require the six archetypes to retain root IDs/durations, contain eight valid upgrades, and reference existing effect assets. Require each tree to retain nine Essence Bond nodes and 52 total points, have no generic effect entries, and make capstone require both tier-4 endpoints:
+Require the six archetypes to retain root IDs/durations, contain eight valid upgrades, and reference existing effect assets. Require each tree to retain nine Essence Bond nodes and 52 total points, have no generic effect entries, and make capstone require both tier-4 endpoints. Add an asset contract that loads all five `server.lang` files and asserts every `DisplayName` and `Description` key from every Miniwyvern talent tree exists and has a nonblank value in every language:
 
 ```java
 assertTrue(essenceBondEffects(talents).isEmpty(), form.name());
@@ -219,7 +222,7 @@ Expected: FAIL because trees contain generic companion effects and assets have n
 
 Populate Fire, Ice, Lightning, Nature, Toxic, and Void values from `docs/superpowers/specs/2026-08-03-miniwyvern-essence-bond-aura-design.md`. Author Wards using documented resistance categories/percentages and leave base root effects unchanged.
 
-For every current form, remove all `Effects` from Essence Bond nodes, replace their names/descriptions with exact form-only aura copy, and impose:
+For every Miniwyvern tree (including Wild), replace literal `DisplayName`, `Description`, and branch text with stable `hydragon.talents.miniwyvern.<form>.<talent>.{name,description}` localization keys. Add complete nonblank translations to `en-US`, `de-DE`, `es-ES`, `fr-FR`, and `pt-BR`. For every current elemental form, remove all `Effects` from Essence Bond nodes, replace their names/descriptions with exact form-only aura copy, and impose:
 
 ```text
 root -> pressure-1 -> pressure-2 -> pressure-3
@@ -238,8 +241,8 @@ Expected: PASS with complete, form-specific, internally consistent Essence Bond 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add Server/HyDragon/MiniwyvernArchetypes Server/Entity/Effects/Status Server/Tamework/Talents/HyDragonMiniwyvernFire.json Server/Tamework/Talents/HyDragonMiniwyvernIce.json Server/Tamework/Talents/HyDragonMiniwyvernLightning.json Server/Tamework/Talents/HyDragonMiniwyvernNature.json Server/Tamework/Talents/HyDragonMiniwyvernToxic.json Server/Tamework/Talents/HyDragonMiniwyvernVoid.json src/test/java/com/alechilles/hydragon/config/BundledConfigAssetContractTest.java src/test/java/com/alechilles/hydragon/config/MiniwyvernTalentProgressionAssetTest.java
-git commit -m "Feat: author Miniwyvern Essence Bond aura trees"
+git add Server/HyDragon/MiniwyvernArchetypes Server/Entity/Effects/Status Server/Tamework/Talents/HyDragonMiniwyvernFire.json Server/Tamework/Talents/HyDragonMiniwyvernIce.json Server/Tamework/Talents/HyDragonMiniwyvernLightning.json Server/Tamework/Talents/HyDragonMiniwyvernNature.json Server/Tamework/Talents/HyDragonMiniwyvernToxic.json Server/Tamework/Talents/HyDragonMiniwyvernVoid.json Server/Tamework/Talents/HyDragonMiniwyvernWild.json Server/Languages src/test/java/com/alechilles/hydragon/config/BundledConfigAssetContractTest.java src/test/java/com/alechilles/hydragon/config/MiniwyvernTalentProgressionAssetTest.java
+git commit -m "Feat: author localized Miniwyvern aura trees"
 ```
 
 ### Task 5: Verify and package
