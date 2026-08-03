@@ -55,7 +55,7 @@
     "IsMountable": true,
     "MountAnchorX": 0,
     "MountAnchorY": 2.5,
-    "MountAnchorZ": 0,
+    "MountAnchorZ": 0.6,
     "MountMode": {
       "Compute": "MountMode"
     },

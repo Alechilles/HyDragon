@@ -44,7 +44,7 @@
     "IsMountable": true,
     "MountAnchorX": 0,
     "MountAnchorY": 1.8,
-    "MountAnchorZ": 0,
+    "MountAnchorZ": 0.4,
     "NameTranslationKey": { "Compute": "NameTranslationKey" }
   },
   "Parameters": {

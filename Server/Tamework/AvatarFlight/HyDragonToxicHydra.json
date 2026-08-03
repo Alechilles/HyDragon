@@ -61,6 +61,7 @@
     "HideOwnerHands": true,
     "ShowRider": true,
     "IncludeAppearanceAttachments": true,
-    "SeatOffsetY": 2.5
+    "SeatOffsetY": 2.5,
+    "SeatOffsetZ": 0.6
   }
 }
