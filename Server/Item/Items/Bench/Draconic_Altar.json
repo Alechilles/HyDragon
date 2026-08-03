@@ -40,17 +40,17 @@
       "Categories": [
         {
           "Id": "Draconic_Altar_Stones",
-          "Icon": "Icons/ItemsGenerated/Draconic_Stone.png",
+          "Icon": "Icons/CraftingCategories/Workbench/Processing.png",
           "Name": "server.items.Draconic_Altar.bench.categories.stones.name"
         },
         {
           "Id": "Draconic_Altar_Bonding",
-          "Icon": "Icons/ItemsGenerated/Drake_Egg.png",
+          "Icon": "Icons/CraftingCategories/Arcane/Bench_Memories.png",
           "Name": "server.items.Draconic_Altar.bench.categories.bonding.name"
         },
         {
           "Id": "Draconic_Altar_Restoration",
-          "Icon": "Icons/ResourceTypes/HyDragon_DraconicEssences.png",
+          "Icon": "Icons/CraftingCategories/Alchemy/Potions.png",
           "Name": "server.items.Draconic_Altar.bench.categories.restoration.name"
         }
       ],
