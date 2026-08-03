@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /** Ephemeral, live-projection owner-hit aura state. This is not form persistence or authority. */
 public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
@@ -18,6 +19,7 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
     private final ConcurrentHashMap<UUID, ToxicWeakness> toxicWeaknesses = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<TargetAuraKey, TargetAura> targetAuras = new ConcurrentHashMap<>();
     private final Set<Runnable> clearHooks = ConcurrentHashMap.newKeySet();
+    private final Set<Consumer<UUID>> ownerClearHooks = ConcurrentHashMap.newKeySet();
 
     public boolean update(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
                           String formId, String effectId, double durationSeconds,
@@ -68,7 +70,9 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         Aura current = active.get(ownerUuid);
         if (current == null || !current.profileId().equals(profileId.trim())
                 || (!blank(leaseId) && !current.leaseId().equals(leaseId.trim()))) return false;
-        return active.remove(ownerUuid, current);
+        boolean removed = active.remove(ownerUuid, current);
+        if (removed) notifyOwnerClear(ownerUuid);
+        return removed;
     }
 
     public boolean clear(UUID ownerUuid, String profileId) { return clear(ownerUuid, profileId, null); }
@@ -158,13 +162,32 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         return () -> clearHooks.remove(hook);
     }
 
+    /** Registers a hook for a matching per-owner lease clear. */
+    AutoCloseable addOwnerClearHook(Consumer<UUID> hook) {
+        Objects.requireNonNull(hook, "hook");
+        ownerClearHooks.add(hook);
+        return () -> ownerClearHooks.remove(hook);
+    }
+
     public void clear() {
+        Set<UUID> owners = Set.copyOf(active.keySet());
         active.clear();
         toxicWeaknesses.clear();
         targetAuras.clear();
+        for (UUID ownerUuid : owners) notifyOwnerClear(ownerUuid);
         for (Runnable hook : clearHooks) {
             try {
                 hook.run();
+            } catch (RuntimeException ignored) {
+                // Cleanup hooks are best-effort and must not prevent registry convergence.
+            }
+        }
+    }
+
+    private void notifyOwnerClear(UUID ownerUuid) {
+        for (Consumer<UUID> hook : ownerClearHooks) {
+            try {
+                hook.accept(ownerUuid);
             } catch (RuntimeException ignored) {
                 // Cleanup hooks are best-effort and must not prevent registry convergence.
             }

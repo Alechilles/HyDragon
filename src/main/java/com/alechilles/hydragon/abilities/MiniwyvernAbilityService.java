@@ -119,12 +119,25 @@ public final class MiniwyvernAbilityService {
             Map<String, MiniwyvernArchetypeConfig> archetypes,
             MiniwyvernAbilityWorld world,
             long nowMs) {
+        return deactivate(context, archetypes, world, nowMs, captureWard(context.ownerUuid()));
+    }
+
+    /**
+     * Removes tracked effects when lifecycle state changes, using a ward identity captured before
+     * a world-thread callback was queued. The callback must not depend on the live aura registry,
+     * because shutdown may clear that registry before this world-thread work runs.
+     */
+    TickResult deactivate(
+            ProfileContext context,
+            Map<String, MiniwyvernArchetypeConfig> archetypes,
+            MiniwyvernAbilityWorld world,
+            long nowMs,
+            WardCleanup wardCleanup) {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(archetypes, "archetypes");
         Objects.requireNonNull(world, "world");
         if (!world.isWorldThread()) return TickResult.denied("not-world-thread");
-        MiniwyvernOwnerAuraRegistry.Aura activeAura = ownerAuras.activeFor(context.ownerUuid()).orElse(null);
-        removeWard(context.ownerUuid(), activeAura, world);
+        removeWard(wardCleanup, world);
         ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
@@ -340,6 +353,14 @@ public final class MiniwyvernAbilityService {
     /** Clears ephemeral owner-hit state even when the world projection is already gone. */
     public void clearOwnerAuras() { ownerAuras.clear(); }
 
+    /** Captures source-owned Ward identity before scheduling world-thread cleanup. */
+    WardCleanup captureWard(UUID ownerUuid) {
+        MiniwyvernOwnerAuraRegistry.Aura aura = ownerAuras.activeFor(ownerUuid).orElse(null);
+        if (aura == null || aura.wardEffectId() == null) return null;
+        String source = wardSource(aura);
+        return source == null ? null : new WardCleanup(ownerUuid, source, aura.wardEffectId());
+    }
+
     private void synchronizeOwnerAttackAura(
             ProfileContext context,
             MiniwyvernArchetypeConfig config,
@@ -441,9 +462,23 @@ public final class MiniwyvernAbilityService {
         if (source != null) world.removeOwnerEffect(ownerUuid, source, aura.wardEffectId());
     }
 
+    private static void removeWard(WardCleanup wardCleanup, MiniwyvernAbilityWorld world) {
+        if (wardCleanup == null) return;
+        world.removeOwnerEffect(
+                wardCleanup.ownerUuid(), wardCleanup.sourceKey(), wardCleanup.effectId());
+    }
+
     private static String wardSource(MiniwyvernOwnerAuraRegistry.Aura aura) {
         return aura == null || aura.wardEffectId() == null
                 ? null : sourceKey(aura.profileId(), aura.formId(), WARD_ABILITY_ID);
+    }
+
+    record WardCleanup(UUID ownerUuid, String sourceKey, String effectId) {
+        WardCleanup {
+            Objects.requireNonNull(ownerUuid, "ownerUuid");
+            sourceKey = requiredText(sourceKey, "sourceKey");
+            effectId = requiredText(effectId, "effectId");
+        }
     }
 
     private static boolean requiredTalentPurchased(

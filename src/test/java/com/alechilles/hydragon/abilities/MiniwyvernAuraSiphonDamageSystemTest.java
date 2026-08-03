@@ -34,6 +34,24 @@ class MiniwyvernAuraSiphonDamageSystemTest {
     }
 
     @Test
+    void clearsOnlyTheOwnerCooldownWhenItsLeaseIsClearedAndReactivated() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        MiniwyvernAuraSiphonDamageSystem system = new MiniwyvernAuraSiphonDamageSystem(registry);
+        assertTrue(registry.update(OWNER, "profile", "lease-one", NPC,
+                "void", "exposure", 6.0D, null,
+                0.0D, 0.0D, "RiftWard", 0.0D, 0.01D, 3_000L));
+        MiniwyvernOwnerAuraRegistry.Aura first = registry.activeFor(OWNER).orElseThrow();
+
+        assertTrue(system.trySiphon(OWNER, first, 1_000L));
+        assertTrue(registry.clear(OWNER, "profile", "lease-one"));
+        assertTrue(registry.update(OWNER, "profile", "lease-two", NPC,
+                "void", "exposure", 6.0D, null,
+                0.0D, 0.0D, "RiftWard", 0.0D, 0.01D, 3_000L));
+
+        assertTrue(system.trySiphon(OWNER, registry.activeFor(OWNER).orElseThrow(), 1_001L));
+    }
+
+    @Test
     void fireAndToxicAurasHaveNoSiphonFraction() {
         MiniwyvernAuraSiphonDamageSystem system =
                 new MiniwyvernAuraSiphonDamageSystem(new MiniwyvernOwnerAuraRegistry());

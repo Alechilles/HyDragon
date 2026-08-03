@@ -29,6 +29,7 @@ public final class MiniwyvernAuraSiphonDamageSystem extends DamageEventSystem im
     private final ConcurrentHashMap<UUID, Long> cooldownUntil = new ConcurrentHashMap<>();
     private final LongSupplier clock;
     private final AutoCloseable registryClearHook;
+    private final AutoCloseable registryOwnerClearHook;
 
     public MiniwyvernAuraSiphonDamageSystem(MiniwyvernOwnerAuraRegistry registry) {
         this(registry, System::currentTimeMillis);
@@ -39,6 +40,7 @@ public final class MiniwyvernAuraSiphonDamageSystem extends DamageEventSystem im
         this.registry = Objects.requireNonNull(registry, "registry");
         this.clock = Objects.requireNonNull(clock, "clock");
         this.registryClearHook = registry.addClearHook(cooldownUntil::clear);
+        this.registryOwnerClearHook = registry.addOwnerClearHook(cooldownUntil::remove);
     }
 
     @Nullable
@@ -163,6 +165,11 @@ public final class MiniwyvernAuraSiphonDamageSystem extends DamageEventSystem im
         clear();
         try {
             registryClearHook.close();
+        } catch (Exception ignored) {
+            // Hook cleanup is best-effort during plugin shutdown.
+        }
+        try {
+            registryOwnerClearHook.close();
         } catch (Exception ignored) {
             // Hook cleanup is best-effort during plugin shutdown.
         }
