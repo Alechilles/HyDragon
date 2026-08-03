@@ -10,8 +10,8 @@
   "Recipe": {
     "Input": [
       { "ItemId": "Ingredient_Bar_Cobalt", "Quantity": 4 },
-      { "ItemId": "Draconic_Scale", "Quantity": 6 },
-      { "ItemId": "Draconic_Essence", "Quantity": 3 }
+      { "ItemId": "Draconic_Scale", "Quantity": 7 },
+      { "ItemId": "Draconic_Essence", "Quantity": 7 }
     ],
     "Output": [
       { "ItemId": "Draconic_Stone_Cobalt", "Quantity": 1 }

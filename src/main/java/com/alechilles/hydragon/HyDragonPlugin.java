@@ -25,6 +25,7 @@ import com.alechilles.hydragon.diagnostics.HyDragonRefundClaimCommand;
 import com.alechilles.hydragon.encounters.DynamicEncounterRuntime;
 import com.alechilles.hydragon.encounters.HyDragonEncounterRegistrationFacade;
 import com.alechilles.hydragon.encounters.HyDragonEncounterServerRuntime;
+import com.alechilles.hydragon.encounters.TranquilizedHealthFreezeSystem;
 import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
@@ -81,6 +82,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         // The persistent encounter marker and damage system must exist before any world loads.
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
         getEntityStoreRegistry().registerSystem(new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras));
+        getEntityStoreRegistry().registerSystem(new TranquilizedHealthFreezeSystem());
         getEntityStoreRegistry().registerSystem(new MiniwyvernVoidExposureDamageSystem());
         MiniwyvernVoidEffectLifetimeSystem voidLifetime = new MiniwyvernVoidEffectLifetimeSystem();
         MiniwyvernOwnerAuraEffectQueue ownerAuraEffects = new MiniwyvernOwnerAuraEffectQueue();

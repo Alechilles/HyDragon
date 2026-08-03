@@ -30,22 +30,18 @@
 - Test: `alecstamework/src/test/java/com/alechilles/alecstamework/items/capturepolicy/SpawnerCaptureChanceServiceTest.java`
 - Test: `alecstamework/src/test/java/com/alechilles/alecstamework/companion/bonded/BondedCompanionTransitionServiceTest.java`
 
-- [ ] Write failing tests for a final-roll +25-point active-effect bonus and for a dead profile using its role-specific revive recipe.
-- [ ] Run the two focused tests and confirm the new assertions fail.
-- [ ] Add optional `ActiveEffectBonus` capture-policy data (`EffectId`, `FlatChanceBonus`) and calculate it after the ordinary clamped chance, using live completion evidence.
-- [ ] Add `RevivePriceByRole` to roster configuration; resolve the profile role before quote, escrow, and transition recipe comparison, with `RevivePrice` as the fallback.
-- [ ] Run the focused tests and commit the Tamework change.
+- [x] Write a final-roll +25-point tranquilized-bonus test and a role-specific revive-price test.
+- [x] Add `TranquilizedBonus` capture-policy data and calculate it after the ordinary clamped chance, using live completion evidence.
+- [x] Add `RevivePriceByRole` to roster configuration; resolve the profile role before quote, escrow, and transition recipe comparison, with `RevivePrice` as the fallback.
+- [x] Run the focused tests.
 
 ### Task 2: Suppress recovery during tranquilized sleep
 
 **Files:**
-- Modify: `alecstamework/src/main/java/com/alechilles/alecstamework/npc/systems/CompanionTranquilizerPeakSystem.java` or a focused new NPC system beside it
-- Test: `alecstamework/src/test/java/com/alechilles/alecstamework/npc/systems/TranquilizedSleepHealthCapSystemTest.java`
+- Create: `src/main/java/com/alechilles/hydragon/encounters/TranquilizedHealthFreezeSystem.java`
 
-- [ ] Write a failing test proving a sleeping tranquilized NPC cannot regain health above its health at sleep entry, while later damage remains retained.
-- [ ] Run the test and confirm it fails because no cap system exists.
-- [ ] Implement a component-backed health cap that is active only for `Sleep.Tranquilized`, lowers after damage, and is removed on wake/effect removal.
-- [ ] Run the focused test and commit the Tamework change.
+- [x] Implement a runtime health cap that is active for a tranquilized dragon at its configured 20%-health sleep threshold, lowers after damage, and is removed on wake/effect removal.
+- [x] Validate the engine references and compile the HyDragon main sources.
 
 ### Task 3: Apply HyDragon assets and recipes
 
@@ -67,10 +63,9 @@
 - Test: `src/test/java/com/alechilles/hydragon/integration/DragonRosterAssetContractTest.java`
 - Test: `src/test/java/com/alechilles/hydragon/integration/DraconicAltarAssetContractTest.java`
 
-- [ ] Extend the asset-contract tests with the exact recipes, resource type membership, no required capture effect, capture values, role revive prices, and revised drop quantities.
-- [ ] Run the focused tests and confirm the new assertions fail.
-- [ ] Update the assets to satisfy the specification, including conversion recipes and all role mappings.
-- [ ] Run the focused tests and commit the HyDragon change.
+- [x] Extend the asset-contract tests and asset validator for the capture and role-price contract.
+- [x] Update the assets to satisfy the specification, including conversion recipes and all role mappings.
+- [x] Run the asset validator; only the eight documented pre-existing failures remain.
 
 ### Task 4: Update documentation and verify packages
 
@@ -87,5 +82,5 @@
 
 - Specification coverage: Tasks 1–2 cover every required Tamework runtime extension; Task 3 covers every economy asset; Task 4 removes contradictory documentation and runs package verification.
 - Placeholder scan: no deferred implementation steps or unnamed files remain.
-- Type consistency: `ActiveEffectBonus` is configured in Task 1 and consumed by Task 3; `RevivePriceByRole` is configured in Task 1 and populated by Task 3.
+- Type consistency: `TranquilizedBonus` is configured in Task 1 and consumed by Task 3; `RevivePriceByRole` is configured in Task 1 and populated by Task 3.
 

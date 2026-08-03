@@ -27,10 +27,14 @@ class DragonRosterAssetContractTest {
         String full = read("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json");
         String mini = read("Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json");
 
-        assertPolicy(full, "hydragon:full_dragons", 0, 1, 300, 1800,
-                List.of("Revitalizing_Essence:2", "Draconic_Essence:4"));
-        assertPolicy(mini, "hydragon:soulbound_mini", 1, 1, null, null,
-                List.of("Revitalizing_Essence:1", "Draconic_Essence:2"));
+        assertPolicy(full, "hydragon:full_dragons", 0, 1, 300, 1800);
+        assertPolicy(mini, "hydragon:soulbound_mini", 1, 1, null, null);
+        assertTrue(full.contains("\"RevivePriceByRole\""));
+        assertTrue(full.contains("\"Tamed_Hydra_Toxic\""));
+        assertTrue(full.contains("\"Draconic_Essence_Toxic\", \"Quantity\": 2"));
+        assertTrue(mini.contains("\"RevivePriceByRole\""));
+        assertTrue(mini.contains("\"Tamed_Wyvern_Mini_Wild\""));
+        assertTrue(mini.contains("\"Draconic_Essence\", \"Quantity\": 1"));
         assertTrue(full.contains("\"Tamed_NordicDrake\""));
         assertTrue(full.contains("\"Tamed_Hydra\""));
         assertTrue(full.contains("\"Tamed_RockDrakeT3\""));
@@ -140,8 +144,7 @@ class DragonRosterAssetContractTest {
             int maximumOwned,
             int maximumActive,
             Integer sessionSeconds,
-            Integer cooldownSeconds,
-            List<String> expectedCosts
+            Integer cooldownSeconds
     ) {
         assertTrue(json.contains("\"RosterId\": \"hydragon:dragon_horn\""));
         assertTrue(json.contains("\"FamilyId\": \"" + familyId + "\""));
@@ -149,11 +152,7 @@ class DragonRosterAssetContractTest {
         assertTrue(json.contains("\"MaximumActive\": " + maximumActive));
         assertTimer(json, "SessionDurationSeconds", sessionSeconds);
         assertTimer(json, "SummonCooldownSeconds", cooldownSeconds);
-        assertTrue(json.contains("\"RevivePrice\""));
-        Matcher costs = COST.matcher(json);
-        List<String> actual = new java.util.ArrayList<>();
-        while (costs.find()) actual.add(costs.group(1) + ":" + costs.group(2));
-        assertEquals(expectedCosts, actual);
+        assertTrue(json.contains("\"RevivePriceByRole\""));
     }
 
     private static void assertTimer(String json, String field, Integer seconds) {

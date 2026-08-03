@@ -1,70 +1,10 @@
 {
-  "Container": {
-    "Type": "Multiple",
-    "Containers": [
-      {
-        "Type": "Single",
-        "Weight": 100,
-        "Item": {
-          "ItemId": "Draconic_Scale",
-          "QuantityMin": 4,
-          "QuantityMax": 7
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 100,
-        "Item": {
-          "ItemId": "Draconic_Essence",
-          "QuantityMin": 2,
-          "QuantityMax": 4
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 40,
-        "Item": {
-          "ItemId": "Draconic_Essence_Ice",
-          "QuantityMin": 2,
-          "QuantityMax": 4
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 35,
-        "Item": {
-          "ItemId": "Draconic_Essence_Lightning",
-          "QuantityMin": 2,
-          "QuantityMax": 3
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 25,
-        "Item": {
-          "ItemId": "Draconic_Essence_Wind",
-          "QuantityMin": 1,
-          "QuantityMax": 3
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 10,
-        "Item": {
-          "ItemId": "Draconic_Essence_Void",
-          "QuantityMin": 1,
-          "QuantityMax": 1
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 6,
-        "Item": {
-          "ItemId": "Drake_Egg",
-          "QuantityMin": 1,
-          "QuantityMax": 1
-        }
-      }
-    ]
-  }
+  "Container": { "Type": "Multiple", "Containers": [
+    { "Type": "Single", "Weight": 100, "Item": { "ItemId": "Draconic_Scale", "QuantityMin": 6, "QuantityMax": 8 } },
+    { "Type": "Single", "Weight": 100, "Item": { "ItemId": "Draconic_Essence", "QuantityMin": 6, "QuantityMax": 8 } },
+    { "Type": "Single", "Weight": 100, "Item": { "ItemId": "Draconic_Essence_Ice", "QuantityMin": 4, "QuantityMax": 5 } },
+    { "Type": "Single", "Weight": 100, "Item": { "ItemId": "Draconic_Essence_Wind", "QuantityMin": 2, "QuantityMax": 3 } },
+    { "Type": "Single", "Weight": 10, "Item": { "ItemId": "Draconic_Essence_Void", "QuantityMin": 1, "QuantityMax": 1 } },
+    { "Type": "Single", "Weight": 6, "Item": { "ItemId": "Drake_Egg", "QuantityMin": 1, "QuantityMax": 1 } }
+  ] }
 }

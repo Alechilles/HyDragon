@@ -10,9 +10,7 @@
   "Quality": "Epic",
   "Recipe": {
     "Input": [
-      { "ItemId": "Ingredient_Bar_Cobalt", "Quantity": 3 },
-      { "ItemId": "Draconic_Scale", "Quantity": 10 },
-      { "ItemId": "Draconic_Essence", "Quantity": 10 },
+      { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 3 },
       {
         "ItemId": "Wood_Azure",
         "Quantity": 10

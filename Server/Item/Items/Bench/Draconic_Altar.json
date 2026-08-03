@@ -8,16 +8,15 @@
   "Recipe": {
     "TimeSeconds": 6,
     "Input": [
-      { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 10 },
-      { "ItemId": "Draconic_Scale", "Quantity": 8 },
-      { "ItemId": "Draconic_Essence", "Quantity": 4 }
+      { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 8 },
+      { "ItemId": "Rubble_Stone", "Quantity": 12 }
     ],
     "BenchRequirement": [
       {
         "Id": "Workbench",
         "Type": "Crafting",
         "Categories": [ "Workbench_Crafting" ],
-        "RequiredTierLevel": 2
+        "RequiredTierLevel": 1
       }
     ]
   },

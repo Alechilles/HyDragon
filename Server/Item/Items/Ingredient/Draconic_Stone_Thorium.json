@@ -10,8 +10,8 @@
   "Recipe": {
     "Input": [
       { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 4 },
-      { "ItemId": "Draconic_Scale", "Quantity": 4 },
-      { "ItemId": "Draconic_Essence", "Quantity": 2 }
+      { "ItemId": "Draconic_Scale", "Quantity": 5 },
+      { "ItemId": "Draconic_Essence", "Quantity": 5 }
     ],
     "Output": [
       { "ItemId": "Draconic_Stone_Thorium", "Quantity": 1 }

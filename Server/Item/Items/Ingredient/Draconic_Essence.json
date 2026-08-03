@@ -9,5 +9,6 @@
   "Light": {
     "Color": "#446688",
     "Radius": 1
-  }
+  },
+  "ResourceTypes": [ { "Id": "HyDragon_DraconicEssences", "Quantity": 1 } ]
 }

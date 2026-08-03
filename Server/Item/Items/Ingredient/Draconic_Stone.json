@@ -46,9 +46,8 @@
   "Recipe": {
     "Input": [
       { "ItemId": "Ingredient_Bar_Iron", "Quantity": 4 },
-      { "ItemId": "Draconic_Scale", "Quantity": 2 },
-      { "ItemId": "Draconic_Essence_Ice", "Quantity": 1 },
-      { "ItemId": "Draconic_Essence_Nature", "Quantity": 1 }
+      { "ItemId": "Draconic_Scale", "Quantity": 3 },
+      { "ItemId": "Draconic_Essence", "Quantity": 3 }
     ],
     "Output": [
       { "ItemId": "Draconic_Stone", "Quantity": 1 }

@@ -3,10 +3,11 @@
   "Priority": 100,
   "RoleIds": [ "RockDrakeT2" ],
   "Difficulty": {
-    "MinimumPower": 2,
-    "Resistance": 0.10,
+    "MinimumPower": 0,
+    "Resistance": 0.05,
     "ChanceMultiplier": 0.85,
-    "MissingHealthBonus": 0.20,
+    "MissingHealthBonus": 0.32,
+    "TranquilizedBonus": 0.25,
     "GuaranteedAtPower": 5
   }
 }

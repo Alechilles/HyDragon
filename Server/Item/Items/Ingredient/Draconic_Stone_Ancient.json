@@ -9,10 +9,10 @@
   "Texture": "Items/HyDragon/Draconic_Stone_Ancient.png",
   "Recipe": {
     "Input": [
-      { "ItemId": "Ingredient_Bar_Mithril", "Quantity": 4 },
-      { "ItemId": "Draconic_Scale", "Quantity": 12 },
-      { "ItemId": "Draconic_Essence", "Quantity": 6 },
-      { "ItemId": "Draconic_Essence_Void", "Quantity": 2 }
+      { "ItemId": "Ingredient_Bar_Adamantite", "Quantity": 12 },
+      { "ItemId": "Draconic_Scale", "Quantity": 20 },
+      { "ItemId": "Draconic_Essence", "Quantity": 20 },
+      { "ItemId": "Draconic_Essence_Void", "Quantity": 6 }
     ],
     "Output": [
       { "ItemId": "Draconic_Stone_Ancient", "Quantity": 1 }

@@ -5,6 +5,13 @@
     "Description": "server.items.Draconic_Essence_Wind.description"
   },
   "Icon": "Icons/ItemsGenerated/Draconic_Essence_Wind.png",
+  "ResourceTypes": [ { "Id": "HyDragon_DraconicEssences", "Quantity": 1 } ],
+  "Recipe": {
+    "Input": [ { "ItemId": "Draconic_Essence", "Quantity": 2 }, { "ItemId": "Ingredient_Feathers_Blue", "Quantity": 16 } ],
+    "Output": [ { "ItemId": "Draconic_Essence_Wind", "Quantity": 1 } ],
+    "BenchRequirement": [ { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Restoration" ] } ],
+    "TimeSeconds": 3
+  },
   "Texture": "Items/HyDragon/Draconic_Essence_Wind.png",
   "Light": {
     "Color": "#6EE7B7",

@@ -1,61 +1,10 @@
 {
-  "Container": {
-    "Type": "Multiple",
-    "Containers": [
-      {
-        "Type": "Single",
-        "Weight": 100.0,
-        "Item": {
-          "ItemId": "Draconic_Scale",
-          "QuantityMin": 4,
-          "QuantityMax": 7
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 100.0,
-        "Item": {
-          "ItemId": "Draconic_Essence",
-          "QuantityMin": 1,
-          "QuantityMax": 3
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 55.0,
-        "Item": {
-          "ItemId": "Draconic_Essence_Ice",
-          "QuantityMin": 2,
-          "QuantityMax": 4
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 45.0,
-        "Item": {
-          "ItemId": "Draconic_Essence_Earth",
-          "QuantityMin": 1,
-          "QuantityMax": 3
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 8.0,
-        "Item": {
-          "ItemId": "Draconic_Essence_Void",
-          "QuantityMin": 1,
-          "QuantityMax": 1
-        }
-      },
-      {
-        "Type": "Single",
-        "Weight": 6.0,
-        "Item": {
-          "ItemId": "Drake_Egg",
-          "QuantityMin": 1,
-          "QuantityMax": 1
-        }
-      }
-    ]
-  }
+  "Container": { "Type": "Multiple", "Containers": [
+    { "Type": "Single", "Weight": 100, "Item": { "ItemId": "Draconic_Scale", "QuantityMin": 5, "QuantityMax": 6 } },
+    { "Type": "Single", "Weight": 100, "Item": { "ItemId": "Draconic_Essence", "QuantityMin": 5, "QuantityMax": 6 } },
+    { "Type": "Single", "Weight": 100, "Item": { "ItemId": "Draconic_Essence_Ice", "QuantityMin": 3, "QuantityMax": 4 } },
+    { "Type": "Single", "Weight": 100, "Item": { "ItemId": "Draconic_Essence_Earth", "QuantityMin": 2, "QuantityMax": 3 } },
+    { "Type": "Single", "Weight": 8, "Item": { "ItemId": "Draconic_Essence_Void", "QuantityMin": 1, "QuantityMax": 1 } },
+    { "Type": "Single", "Weight": 6, "Item": { "ItemId": "Drake_Egg", "QuantityMin": 1, "QuantityMax": 1 } }
+  ] }
 }

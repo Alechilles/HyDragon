@@ -15,12 +15,14 @@
   "SessionDurationSeconds": 300,
   "SummonCooldownSeconds": 1800,
   "SummonAuraEffectId": "HyDragon_DragonStone_SummonAura",
-  "RevivePrice": {
-    "Costs": [
-      { "ItemId": "Revitalizing_Essence", "Quantity": 2 },
-      { "ItemId": "Draconic_Essence", "Quantity": 4 }
-    ]
-  },
+  "RevivePriceByRole": [
+    { "RoleId": "Tamed_NordicDrake", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Ice", "Quantity": 2 } ] },
+    { "RoleId": "Tamed_Hydra", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Ice", "Quantity": 2 } ] },
+    { "RoleId": "Tamed_Hydra_Toxic", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Toxic", "Quantity": 2 } ] },
+    { "RoleId": "Tamed_RockDrakeT1", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Nature", "Quantity": 2 } ] },
+    { "RoleId": "Tamed_RockDrakeT2", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Nature", "Quantity": 2 } ] },
+    { "RoleId": "Tamed_RockDrakeT3", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Nature", "Quantity": 2 } ] }
+  ],
   "Features": {
     "Capture": true,
     "Provision": false,

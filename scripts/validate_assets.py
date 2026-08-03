@@ -1307,7 +1307,14 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
                        "SummonCooldownSeconds": 1800},
             "AllowedRoles": {"Tamed_NordicDrake", "Tamed_Hydra", "Tamed_Hydra_Toxic",
                              "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"},
-            "Costs": [("Revitalizing_Essence", 2), ("Draconic_Essence", 4)],
+            "RoleCosts": {
+                "Tamed_NordicDrake": [("Revitalizing_Essence", 2), ("Draconic_Essence_Ice", 2)],
+                "Tamed_Hydra": [("Revitalizing_Essence", 2), ("Draconic_Essence_Ice", 2)],
+                "Tamed_Hydra_Toxic": [("Revitalizing_Essence", 2), ("Draconic_Essence_Toxic", 2)],
+                "Tamed_RockDrakeT1": [("Revitalizing_Essence", 2), ("Draconic_Essence_Nature", 2)],
+                "Tamed_RockDrakeT2": [("Revitalizing_Essence", 2), ("Draconic_Essence_Nature", 2)],
+                "Tamed_RockDrakeT3": [("Revitalizing_Essence", 2), ("Draconic_Essence_Nature", 2)],
+            },
             "Features": {"Capture": True, "Provision": False, "Summon": True,
                          "Dismiss": True, "Revive": True},
         },
@@ -1318,7 +1325,15 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
             "AbsentTimers": {"SessionDurationSeconds",
                              "SummonCooldownSeconds"},
             "AllowedRoles": {"Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic", "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning", "Tamed_Wyvern_Mini_Ice"},
-            "Costs": [("Revitalizing_Essence", 1), ("Draconic_Essence", 2)],
+            "RoleCosts": {
+                "Tamed_Wyvern_Mini_Wild": [("Revitalizing_Essence", 1), ("Draconic_Essence", 1)],
+                "Tamed_Wyvern_Mini_Nature": [("Revitalizing_Essence", 1), ("Draconic_Essence_Nature", 1)],
+                "Tamed_Wyvern_Mini_Toxic": [("Revitalizing_Essence", 1), ("Draconic_Essence_Toxic", 1)],
+                "Tamed_Wyvern_Mini_Fire": [("Revitalizing_Essence", 1), ("Draconic_Essence_Fire", 1)],
+                "Tamed_Wyvern_Mini_Void": [("Revitalizing_Essence", 1), ("Draconic_Essence_Void", 1)],
+                "Tamed_Wyvern_Mini_Lightning": [("Revitalizing_Essence", 1), ("Draconic_Essence_Lightning", 1)],
+                "Tamed_Wyvern_Mini_Ice": [("Revitalizing_Essence", 1), ("Draconic_Essence_Ice", 1)],
+            },
             "Features": {"Capture": False, "Provision": True, "Summon": True,
                          "Dismiss": True, "Revive": True},
         },
@@ -1342,12 +1357,21 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         if data.get("RosterId") != "hydragon:dragon_horn" \
                 or set(data.get("AllowedRoles", [])) != expected["AllowedRoles"]:
             fail(errors, f"{path.relative_to(ROOT)} has invalid roster/role authority")
-        costs = data.get("RevivePrice", {}).get("Costs")
-        actual_costs = [(entry.get("ItemId"), entry.get("Quantity"))
-                        for entry in costs] if isinstance(costs, list) \
-            and all(isinstance(entry, dict) for entry in costs) else None
-        if actual_costs != expected["Costs"]:
-            fail(errors, f"{path.relative_to(ROOT)} has invalid ordered revive recipe")
+        role_prices = data.get("RevivePriceByRole")
+        actual_role_costs = {}
+        if isinstance(role_prices, list):
+            for entry in role_prices:
+                if not isinstance(entry, dict) or not isinstance(entry.get("Costs"), list):
+                    actual_role_costs = None
+                    break
+                actual_role_costs[entry.get("RoleId")] = [
+                    (cost.get("ItemId"), cost.get("Quantity")) for cost in entry["Costs"]
+                    if isinstance(cost, dict)
+                ]
+        else:
+            actual_role_costs = None
+        if actual_role_costs != expected["RoleCosts"] or "RevivePrice" in data:
+            fail(errors, f"{path.relative_to(ROOT)} has invalid role-specific revive recipe")
         if data.get("Features") != expected["Features"]:
             fail(errors, f"{path.relative_to(ROOT)} has invalid bonded feature policy")
 

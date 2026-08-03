@@ -39,4 +39,11 @@
   "MaxStack": 100,
   "ItemSoundSetId": "ISS_Items_Gems",
   "DropOnDeath": true
+  ,"ResourceTypes": [ { "Id": "HyDragon_DraconicEssences", "Quantity": 1 } ],
+  "Recipe": {
+    "Input": [ { "ItemId": "Draconic_Essence", "Quantity": 2 }, { "ItemId": "Ingredient_Void_Essence", "Quantity": 8 } ],
+    "Output": [ { "ItemId": "Draconic_Essence_Void", "Quantity": 1 } ],
+    "BenchRequirement": [ { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Restoration" ] } ],
+    "TimeSeconds": 3
+  }
 }

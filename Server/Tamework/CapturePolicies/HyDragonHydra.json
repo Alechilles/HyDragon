@@ -3,10 +3,11 @@
   "Priority": 100,
   "RoleIds": [ "Hydra", "Hydra_Toxic" ],
   "Difficulty": {
-    "MinimumPower": 3,
-    "Resistance": 0.20,
+    "MinimumPower": 0,
+    "Resistance": 0.11,
     "ChanceMultiplier": 0.70,
     "MissingHealthBonus": 0.25,
+    "TranquilizedBonus": 0.25,
     "GuaranteedAtPower": 5
   }
 }

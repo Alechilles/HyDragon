@@ -10,9 +10,8 @@
   "Recipe": {
     "Input": [
       { "ItemId": "Ingredient_Bar_Adamantite", "Quantity": 4 },
-      { "ItemId": "Draconic_Scale", "Quantity": 8 },
-      { "ItemId": "Draconic_Essence", "Quantity": 4 },
-      { "ItemId": "Draconic_Essence_Fire", "Quantity": 1 }
+      { "ItemId": "Draconic_Scale", "Quantity": 10 },
+      { "ItemId": "Draconic_Essence", "Quantity": 10 }
     ],
     "Output": [
       { "ItemId": "Draconic_Stone_Adamantium", "Quantity": 1 }
