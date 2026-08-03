@@ -16,16 +16,36 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
     public boolean update(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
                           String formId, String effectId, double durationSeconds,
                           Double damageReductionFraction) {
+        return update(ownerUuid, profileId, leaseId, npcUuid, formId, effectId, durationSeconds,
+                damageReductionFraction, 0.0D, 0.0D, null, 0.0D, 0.0D, 0L);
+    }
+
+    public boolean update(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
+                          String formId, String effectId, double durationSeconds,
+                          Double damageReductionFraction, double targetDamageTakenFraction,
+                          double ownerDamageToAffectedFraction, String wardEffectId,
+                          double conditionalWardDamageReductionFraction,
+                          double siphonMaximumHealthFraction, long siphonCooldownMs) {
         if (ownerUuid == null || npcUuid == null || blank(profileId) || blank(leaseId)
                 || !ELEMENTAL_FORMS.contains(normalize(formId)) || blank(effectId)
                 || !Double.isFinite(durationSeconds) || durationSeconds <= 0.0D
                 || (damageReductionFraction != null && (!Double.isFinite(damageReductionFraction)
-                || damageReductionFraction <= 0.0D || damageReductionFraction >= 1.0D))) {
+                || damageReductionFraction <= 0.0D || damageReductionFraction >= 1.0D))
+                || !validFraction(targetDamageTakenFraction)
+                || !validFraction(ownerDamageToAffectedFraction)
+                || !validFraction(conditionalWardDamageReductionFraction)
+                || !validFraction(siphonMaximumHealthFraction)
+                || siphonCooldownMs < 0L
+                || (siphonMaximumHealthFraction > 0.0D && siphonCooldownMs <= 0L)) {
             return false;
         }
         active.put(ownerUuid, new Aura(ownerUuid, profileId.trim(), leaseId.trim(), npcUuid,
                 normalize(formId), effectId.trim(), durationSeconds,
-                damageReductionFraction == null ? 0.0D : damageReductionFraction));
+                damageReductionFraction == null ? 0.0D : damageReductionFraction,
+                targetDamageTakenFraction, ownerDamageToAffectedFraction,
+                blank(wardEffectId) ? null : wardEffectId.trim(),
+                conditionalWardDamageReductionFraction, siphonMaximumHealthFraction,
+                siphonCooldownMs));
         return true;
     }
 
@@ -67,11 +87,28 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
 
     public record Aura(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
                        String formId, String effectId, double durationSeconds,
-                       double damageReductionFraction) {
+                       double damageReductionFraction, double targetDamageTakenFraction,
+                       double ownerDamageToAffectedFraction, String wardEffectId,
+                       double conditionalWardDamageReductionFraction,
+                       double siphonMaximumHealthFraction, long siphonCooldownMs) {
         public Aura { Objects.requireNonNull(ownerUuid); Objects.requireNonNull(npcUuid); }
+
+        public Aura(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
+                    String formId, String effectId, double durationSeconds,
+                    double damageReductionFraction) {
+            this(ownerUuid, profileId, leaseId, npcUuid, formId, effectId, durationSeconds,
+                    damageReductionFraction, 0.0D, 0.0D, null, 0.0D, 0.0D, 0L);
+        }
+
+        /** Explicit name for the target's outgoing-damage reduction value. */
+        public double targetOutgoingDamageReductionFraction() { return damageReductionFraction; }
     }
     public record ToxicWeakness(String effectId, double damageReductionFraction, long expiresAtMs) { }
 
     private static boolean blank(String value) { return value == null || value.isBlank(); }
     private static String normalize(String value) { return value == null ? "" : value.trim().toLowerCase(Locale.ROOT); }
+
+    private static boolean validFraction(double value) {
+        return Double.isFinite(value) && value >= 0.0D && value < 1.0D;
+    }
 }
