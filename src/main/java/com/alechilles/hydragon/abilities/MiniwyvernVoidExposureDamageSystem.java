@@ -18,8 +18,16 @@ import javax.annotation.Nullable;
 
 /** Increases damage received by entities exposed to a Miniwyvern Void projectile or Bond aura. */
 public final class MiniwyvernVoidExposureDamageSystem extends DamageEventSystem {
-    private static final String BOND_EFFECT_ID = "HyDragon_Miniwyvern_Void_Exposure";
     private static final String PROJECTILE_EFFECT_ID = "HyDragon_Miniwyvern_Void_Projectile_Exposure";
+    private final MiniwyvernOwnerAuraRegistry registry;
+
+    public MiniwyvernVoidExposureDamageSystem() {
+        this(new MiniwyvernOwnerAuraRegistry());
+    }
+
+    public MiniwyvernVoidExposureDamageSystem(MiniwyvernOwnerAuraRegistry registry) {
+        this.registry = java.util.Objects.requireNonNull(registry, "registry");
+    }
 
     @Nullable @Override public SystemGroup<EntityStore> getGroup() {
         return DamageModule.get().getFilterDamageGroup();
@@ -41,10 +49,14 @@ public final class MiniwyvernVoidExposureDamageSystem extends DamageEventSystem 
                 sourceRef != null && sourceRef.equals(targetRef), blocked, healing)) return;
         EffectControllerComponent controller = chunk.getComponent(index, EffectControllerComponent.getComponentType());
         if (controller == null) return;
-        boolean bondActive = hasEffect(controller, BOND_EFFECT_ID);
+        UUIDComponent targetIdentity = chunk.getComponent(index, UUIDComponent.getComponentType());
+        MiniwyvernOwnerAuraRegistry.TargetAura targetAura = targetIdentity == null ? null
+                : registry.activeTargetAura(targetIdentity.getUuid(), System.currentTimeMillis()).orElse(null);
+        double bondFraction = targetAura != null && hasEffect(controller, targetAura.effectId())
+                ? targetAura.targetDamageTakenFraction() : 0.0D;
         boolean projectileActive = hasEffect(controller, PROJECTILE_EFFECT_ID);
-        if (!bondActive && !projectileActive) return;
-        damage.setAmount(increasedAmount(damage.getAmount(), bondActive, projectileActive));
+        if (bondFraction <= 0.0D && !projectileActive) return;
+        damage.setAmount(increasedAmount(damage.getAmount(), bondFraction, projectileActive));
     }
 
     static boolean shouldModify(boolean cancelled, float amount, boolean entityCaused, boolean self,
@@ -53,8 +65,21 @@ public final class MiniwyvernVoidExposureDamageSystem extends DamageEventSystem 
     }
 
     static float increasedAmount(float amount, boolean bondActive, boolean projectileActive) {
-        double fraction = bondActive ? 0.12D : projectileActive ? 0.10D : 0.0D;
+        return increasedAmount(amount, bondActive ? 0.12D : 0.0D, projectileActive);
+    }
+
+    static float increasedAmount(float amount, double bondFraction) {
+        return increasedAmount(amount, bondFraction, false);
+    }
+
+    static float increasedAmount(float amount, double bondFraction, boolean projectileActive) {
+        double fraction = validFraction(bondFraction)
+                ? bondFraction : projectileActive ? 0.10D : 0.0D;
         return (float) (amount * (1.0D + fraction));
+    }
+
+    private static boolean validFraction(double fraction) {
+        return Double.isFinite(fraction) && fraction > 0.0D && fraction < 1.0D;
     }
 
     private static boolean hasEffect(EffectControllerComponent controller, String effectId) {

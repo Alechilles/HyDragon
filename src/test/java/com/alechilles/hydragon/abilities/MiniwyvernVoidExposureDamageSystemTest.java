@@ -9,6 +9,9 @@ class MiniwyvernVoidExposureDamageSystemTest {
     void usesTheStrongestActiveVoidExposureWithoutStacking() {
         assertEquals(110.0F, MiniwyvernVoidExposureDamageSystem.increasedAmount(100.0F, false, true));
         assertEquals(112.0F, MiniwyvernVoidExposureDamageSystem.increasedAmount(100.0F, true, true));
+        assertEquals(122.0F, MiniwyvernVoidExposureDamageSystem.increasedAmount(100.0F, 0.22D));
+        assertEquals(115.0F, MiniwyvernVoidExposureDamageSystem.increasedAmount(100.0F, 0.15D));
+        assertEquals(110.0F, MiniwyvernVoidExposureDamageSystem.increasedAmount(100.0F, 0.0D, true));
         assertEquals(100.0F, MiniwyvernVoidExposureDamageSystem.increasedAmount(100.0F, false, false));
     }
 

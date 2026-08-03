@@ -14,6 +14,7 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
     private static final Set<String> PLAYER_ONLY_FORMS = Set.of("lightning", "nature");
     private final ConcurrentHashMap<UUID, Aura> active = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, ToxicWeakness> toxicWeaknesses = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, TargetAura> targetAuras = new ConcurrentHashMap<>();
 
     public boolean update(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
                           String formId, String effectId, double durationSeconds,
@@ -73,9 +74,9 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                                     long nowMs) {
         if (targetUuid == null || blank(effectId) || !Double.isFinite(fraction) || fraction <= 0.0D
                 || fraction >= 1.0D || !Double.isFinite(durationSeconds) || durationSeconds <= 0.0D) return;
-        long durationMs = Math.max(1L, Math.round(durationSeconds * 1_000.0D));
+        long durationMs = durationMillis(durationSeconds);
         toxicWeaknesses.put(targetUuid, new ToxicWeakness(effectId.trim(), fraction,
-                nowMs > Long.MAX_VALUE - durationMs ? Long.MAX_VALUE : nowMs + durationMs));
+                expiryAt(nowMs, durationMs)));
     }
 
     public Optional<ToxicWeakness> activeToxicWeakness(UUID targetUuid, long nowMs) {
@@ -87,7 +88,40 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         return Optional.of(weakness);
     }
 
-    public void clear() { active.clear(); toxicWeaknesses.clear(); }
+    /** Records the live target-side projection of a successfully applied owner aura effect. */
+    public void recordTargetAura(UUID targetUuid, Aura aura, double durationSeconds, long nowMs) {
+        if (targetUuid == null || aura == null || blank(aura.effectId())
+                || !Double.isFinite(durationSeconds) || durationSeconds <= 0.0D
+                || !validFraction(aura.targetOutgoingDamageReductionFraction())
+                || !validFraction(aura.targetDamageTakenFraction())
+                || !validFraction(aura.ownerDamageToAffectedFraction())) return;
+        long expiresAtMs = expiryAt(nowMs, durationMillis(durationSeconds));
+        TargetAura projection = new TargetAura(
+                aura.formId(), aura.effectId().trim(), aura.targetOutgoingDamageReductionFraction(),
+                aura.targetDamageTakenFraction(), aura.ownerDamageToAffectedFraction(), expiresAtMs);
+        targetAuras.put(targetUuid, projection);
+        if (projection.targetOutgoingDamageReductionFraction() > 0.0D) {
+            recordToxicWeakness(targetUuid, projection.effectId(),
+                    projection.targetOutgoingDamageReductionFraction(), durationSeconds, nowMs);
+        } else {
+            toxicWeaknesses.remove(targetUuid);
+        }
+    }
+
+    public Optional<TargetAura> activeTargetAura(UUID targetUuid, long nowMs) {
+        TargetAura projection = targetAuras.get(targetUuid);
+        if (projection == null || projection.expiresAtMs() <= nowMs) {
+            if (projection != null) targetAuras.remove(targetUuid, projection);
+            return Optional.empty();
+        }
+        return Optional.of(projection);
+    }
+
+    public void clear() {
+        active.clear();
+        toxicWeaknesses.clear();
+        targetAuras.clear();
+    }
 
     @Override public void close() { clear(); }
 
@@ -110,6 +144,11 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         public double targetOutgoingDamageReductionFraction() { return damageReductionFraction; }
     }
     public record ToxicWeakness(String effectId, double damageReductionFraction, long expiresAtMs) { }
+    public record TargetAura(String formId, String effectId,
+                             double targetOutgoingDamageReductionFraction,
+                             double targetDamageTakenFraction,
+                             double ownerDamageToAffectedFraction,
+                             long expiresAtMs) { }
 
     private static boolean blank(String value) { return value == null || value.isBlank(); }
     private static String normalize(String value) { return value == null ? "" : value.trim().toLowerCase(Locale.ROOT); }
@@ -122,5 +161,15 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         if (!validFraction(fraction) || cooldownMs < 0L) return false;
         if (fraction <= 0.0D) return true;
         return "void".equals(formId) && fraction <= 0.01D && cooldownMs >= 3_000L;
+    }
+
+    private static long durationMillis(double durationSeconds) {
+        double millis = durationSeconds * 1_000.0D;
+        if (!Double.isFinite(millis) || millis >= Long.MAX_VALUE) return Long.MAX_VALUE;
+        return Math.max(1L, Math.round(millis));
+    }
+
+    private static long expiryAt(long nowMs, long durationMs) {
+        return nowMs > Long.MAX_VALUE - durationMs ? Long.MAX_VALUE : nowMs + durationMs;
     }
 }

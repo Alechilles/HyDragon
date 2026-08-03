@@ -144,9 +144,8 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
         if (applied && "void".equals(aura.formId())) {
             voidLifetime.observe(targetUuid);
         }
-        if (applied && aura.damageReductionFraction() > 0.0D) {
-            registry.recordToxicWeakness(targetUuid, aura.effectId(), aura.damageReductionFraction(),
-                    effect.getDuration(), System.currentTimeMillis());
+        if (applied) {
+            registry.recordTargetAura(targetUuid, aura, effect.getDuration(), System.currentTimeMillis());
         }
     }
 

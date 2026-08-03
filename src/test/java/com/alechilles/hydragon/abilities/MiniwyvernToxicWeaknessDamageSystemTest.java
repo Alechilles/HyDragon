@@ -9,6 +9,9 @@ class MiniwyvernToxicWeaknessDamageSystemTest {
     void usesTheStrongestActiveToxicReductionWithoutStacking() {
         assertEquals(90.0F, MiniwyvernToxicWeaknessDamageSystem.reducedAmount(100.0F, false, true));
         assertEquals(88.0F, MiniwyvernToxicWeaknessDamageSystem.reducedAmount(100.0F, true, true));
+        assertEquals(80.0F, MiniwyvernToxicWeaknessDamageSystem.reducedAmount(100.0F, 0.20D));
+        assertEquals(78.0F, MiniwyvernToxicWeaknessDamageSystem.reducedAmount(100.0F, 0.22D));
+        assertEquals(90.0F, MiniwyvernToxicWeaknessDamageSystem.reducedAmount(100.0F, 0.0D, true));
         assertEquals(100.0F, MiniwyvernToxicWeaknessDamageSystem.reducedAmount(100.0F, false, false));
     }
 

@@ -4,6 +4,7 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.abilities.HyDragonAbilityRegistrationFacade;
 import com.alechilles.hydragon.abilities.HytaleMiniwyvernAbilityWorldDispatcher;
 import com.alechilles.hydragon.abilities.MiniwyvernAbilityRuntime;
+import com.alechilles.hydragon.abilities.MiniwyvernAuraMarkedTargetDamageSystem;
 import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraDamageSystem;
 import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraEffectQueue;
 import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraEffectSystem;
@@ -83,7 +84,9 @@ public final class HyDragonPlugin extends JavaPlugin {
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
         getEntityStoreRegistry().registerSystem(new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras));
         getEntityStoreRegistry().registerSystem(new TranquilizedHealthFreezeSystem());
-        getEntityStoreRegistry().registerSystem(new MiniwyvernVoidExposureDamageSystem());
+        getEntityStoreRegistry().registerSystem(new MiniwyvernVoidExposureDamageSystem(miniwyvernOwnerAuras));
+        getEntityStoreRegistry().registerSystem(
+                new MiniwyvernAuraMarkedTargetDamageSystem(miniwyvernOwnerAuras));
         MiniwyvernVoidEffectLifetimeSystem voidLifetime = new MiniwyvernVoidEffectLifetimeSystem();
         MiniwyvernOwnerAuraEffectQueue ownerAuraEffects = new MiniwyvernOwnerAuraEffectQueue();
         MiniwyvernVoidEffectReplicationProbe voidReplication = new MiniwyvernVoidEffectReplicationProbe();

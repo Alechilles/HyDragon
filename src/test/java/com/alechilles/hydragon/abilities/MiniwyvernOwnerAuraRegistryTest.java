@@ -85,4 +85,26 @@ class MiniwyvernOwnerAuraRegistryTest {
         assertEquals(0.12D, registry.activeToxicWeakness(target, 6_999L).orElseThrow().damageReductionFraction());
         assertTrue(registry.activeToxicWeakness(target, 7_000L).isEmpty());
     }
+
+    @Test
+    void recordsExpandedTargetProjectionForItsAppliedEffectDuration() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        UUID target = UUID.randomUUID();
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "void", "exposure", 10.0D, 0.20D, 0.22D, 0.10D,
+                null, 0.0D, 0.0D, 0L));
+
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 1_000L);
+
+        MiniwyvernOwnerAuraRegistry.TargetAura projection =
+                registry.activeTargetAura(target, 6_999L).orElseThrow();
+        assertEquals("exposure", projection.effectId());
+        assertEquals(0.20D, projection.targetOutgoingDamageReductionFraction());
+        assertEquals(0.22D, projection.targetDamageTakenFraction());
+        assertEquals(0.10D, projection.ownerDamageToAffectedFraction());
+        assertEquals(7_000L, projection.expiresAtMs());
+        assertEquals(0.20D, registry.activeToxicWeakness(target, 6_999L).orElseThrow()
+                .damageReductionFraction());
+        assertTrue(registry.activeTargetAura(target, 7_000L).isEmpty());
+    }
 }
