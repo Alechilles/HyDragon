@@ -26,6 +26,11 @@
       "MaxXpPerHour": 30.0
     }
   },
-  "StatGrowth": { "Effects": [] },
+  "StatGrowth": {
+    "Effects": [
+      { "EffectKey": "MaxHealthMultiplier", "PerLevel": 0.034482758620689655 },
+      { "EffectKey": "DamageDealtMultiplier", "PerLevel": 0.034482758620689655 }
+    ]
+  },
   "TalentPoints": { "PointsPerLevel": 1 }
 }

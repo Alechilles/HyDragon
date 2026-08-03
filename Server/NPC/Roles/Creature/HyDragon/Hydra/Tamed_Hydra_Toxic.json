@@ -34,7 +34,7 @@
     "HardLeashDistance": 100,
     "LeashMinPlayerDistance": 15,
     "LeashTimer": [12, 16],
-    "MaxHealth": 300,
+    "MaxHealth": 150,
     "AttractiveItemSet": [],
     "InteractionConfigId": "HyDragonIntBeast",
     "CanFollow": true,
@@ -64,7 +64,7 @@
             "Parent": "Hydra_Bite_Damage",
             "DamageCalculator": {
               "Type": "Absolute",
-              "BaseDamage": {"Physical": 32},
+              "BaseDamage": {"Physical": 16},
               "RandomPercentageModifier": 0.1
             },
             "Next": {
@@ -81,7 +81,7 @@
             "Parent": "Hydra_Swipe_Left_Damage",
             "DamageCalculator": {
               "Type": "Absolute",
-              "BaseDamage": {"Physical": 32},
+              "BaseDamage": {"Physical": 16},
               "RandomPercentageModifier": 0.1
             },
             "Next": {
@@ -98,7 +98,7 @@
             "Parent": "Hydra_Swipe_Right_Damage",
             "DamageCalculator": {
               "Type": "Absolute",
-              "BaseDamage": {"Physical": 32},
+              "BaseDamage": {"Physical": 16},
               "RandomPercentageModifier": 0.1
             },
             "Next": {
@@ -115,7 +115,7 @@
             "Parent": "Hydra_Stomp_Damage",
             "DamageCalculator": {
               "Type": "Absolute",
-              "BaseDamage": {"Physical": 32},
+              "BaseDamage": {"Physical": 16},
               "RandomPercentageModifier": 0.1
             },
             "Next": {
@@ -132,7 +132,7 @@
             "Parent": "Hydra_Tail_Spin_Damage",
             "DamageCalculator": {
               "Type": "Absolute",
-              "BaseDamage": {"Physical": 32},
+              "BaseDamage": {"Physical": 16},
               "RandomPercentageModifier": 0.1
             },
             "Next": {
@@ -159,7 +159,7 @@
               "Radius": 2.0,
               "DurationSeconds": 8.0,
               "TickIntervalSeconds": 1.0,
-              "DamagePerTick": 2.0,
+              "DamagePerTick": 1.0,
               "ExcludeSource": true,
               "EffectId": "Poison_T1",
               "SourceTypeId": "hydragon.tamed_toxic_hydra_hazard"
@@ -183,7 +183,7 @@
               "Radius": 3.0,
               "DurationSeconds": 8.0,
               "TickIntervalSeconds": 1.0,
-              "DamagePerTick": 2.0,
+              "DamagePerTick": 1.0,
               "ExcludeSource": true,
               "EffectId": "Poison_T1",
               "SourceTypeId": "hydragon.tamed_toxic_hydra_rain_hazard"

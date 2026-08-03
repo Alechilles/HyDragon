@@ -30,37 +30,38 @@ final class TamedDragonBalanceAssetTest {
         JsonObject toxicHydra = json(ROLE_ROOT.resolve("Hydra/Tamed_Hydra_Toxic.json"));
 
         assertEquals(600, wildNordic.getAsJsonObject("Modify").get("MaxHealth").getAsInt());
-        assertEquals(220, tamedNordic.getAsJsonObject("Modify").get("MaxHealth").getAsInt());
-        assertEquals(800, wildHydra.getAsJsonObject("Modify").get("MaxHealth").getAsInt());
-        assertEquals(320, tamedHydra.getAsJsonObject("Modify").get("MaxHealth").getAsInt());
+        assertEquals(100, tamedNordic.getAsJsonObject("Modify").get("MaxHealth").getAsInt());
+        assertEquals(650, wildHydra.getAsJsonObject("Modify").get("MaxHealth").getAsInt());
+        assertEquals(150, tamedHydra.getAsJsonObject("Modify").get("MaxHealth").getAsInt());
 
+        for (String variable : List.of("Swipe_Left_Damage", "Swipe_Right_Damage", "Stomp_Damage")) {
+            assertEquals(34, physicalDamage(tamedNordic, variable), "Nordic " + variable);
+        }
         for (String variable : List.of("Bite_Damage", "Swipe_Left_Damage", "Swipe_Right_Damage",
                 "Stomp_Damage", "Tail_Spin_Damage")) {
-            assertEquals(32, physicalDamage(tamedNordic, variable), "Nordic " + variable);
-            assertEquals(32, physicalDamage(tamedHydra, variable), "Hydra " + variable);
-            assertEquals(32, physicalDamage(toxicHydra, variable), "Toxic Hydra " + variable);
+            assertEquals(16, physicalDamage(tamedHydra, variable), "Hydra " + variable);
+            assertEquals(16, physicalDamage(toxicHydra, variable), "Toxic Hydra " + variable);
         }
-        assertEquals(10, elementalDamage(tamedNordic, "Flame_Breath_Damage", "Fire"));
     }
 
     @Test
     void tamedProjectilesAndLingeringHazardsUseTheCompanionDamageProfile() throws IOException {
-        assertProjectile("NordicDrake/Tamed_NordicDrake_Dragon_Fire_Ball.json", 18, 9);
-        assertProjectile("Hydra/Tamed_Hydra_Ice_Ball.json", 22, 11);
-        assertProjectile("Hydra/Tamed_Hydra_Toxic_Ball.json", 22, 11);
-        assertProjectile("Hydra/Tamed_Hydra_Rain_Ice_Ball.json", 10, 5);
-        assertProjectile("Hydra/Tamed_Hydra_Rain_Toxic_Ball.json", 10, 5);
+        assertProjectile("NordicDrake/Tamed_NordicDrake_Dragon_Fire_Ball.json", 9, 4.5);
+        assertProjectile("Hydra/Tamed_Hydra_Ice_Ball.json", 11, 5.5);
+        assertProjectile("Hydra/Tamed_Hydra_Toxic_Ball.json", 11, 5.5);
+        assertProjectile("Hydra/Tamed_Hydra_Rain_Ice_Ball.json", 5, 2.5);
+        assertProjectile("Hydra/Tamed_Hydra_Rain_Toxic_Ball.json", 5, 2.5);
 
         JsonObject tamedHydra = json(ROLE_ROOT.resolve("Hydra/Tamed_Hydra.json"));
         assertLaunch(tamedHydra, "Hydra_Ball_Launch", "Tamed_Hydra_Ice_Ball", null);
         assertLaunch(tamedHydra, "Hydra_Rain_Launch", "Tamed_Hydra_Rain_Ice_Ball",
-                new Hazard(3.0, 3.0, 3.0));
+                new Hazard(3.0, 3.0, 1.5));
 
         JsonObject toxicHydra = json(ROLE_ROOT.resolve("Hydra/Tamed_Hydra_Toxic.json"));
         assertLaunch(toxicHydra, "Hydra_Ball_Launch", "Tamed_Hydra_Toxic_Ball",
-                new Hazard(2.0, 8.0, 2.0));
+                new Hazard(2.0, 8.0, 1.0));
         assertLaunch(toxicHydra, "Hydra_Rain_Launch", "Tamed_Hydra_Rain_Toxic_Ball",
-                new Hazard(3.0, 8.0, 2.0));
+                new Hazard(3.0, 8.0, 1.0));
 
         JsonObject flight = json(Path.of("Server", "Tamework", "AvatarFlight", "HyDragonNordicDrake.json"));
         assertEquals("Root_NPC_Tamed_NordicDrake_Avatar_Fire_Ball", flight
@@ -75,8 +76,8 @@ final class TamedDragonBalanceAssetTest {
         JsonObject leveling = json(Path.of("Server", "Tamework", "Leveling", "HyDragonHydra.json"));
         assertEquals(List.of("Tamed_Hydra", "Tamed_Hydra_Toxic"), strings(leveling.getAsJsonArray("RoleIds")));
         assertEquals(30, leveling.getAsJsonObject("Levels").get("MaxLevel").getAsInt());
-        assertEquals(0.004, growth(leveling, "MaxHealthMultiplier"));
-        assertEquals(0.002, growth(leveling, "DamageDealtMultiplier"));
+        assertEquals(0.042482758620689655, growth(leveling, "MaxHealthMultiplier"));
+        assertEquals(0.038482758620689655, growth(leveling, "DamageDealtMultiplier"));
         assertTrue(leveling.getAsJsonObject("XpSources").getAsJsonObject("Summoned").get("Enabled").getAsBoolean());
 
         JsonArray talents = json(Path.of("Server", "Tamework", "Talents", "HyDragonHydra.json"))
@@ -113,10 +114,32 @@ final class TamedDragonBalanceAssetTest {
         assertTimerTalentCap("HyDragonRockDrake.json");
     }
 
-    private static void assertProjectile(String relativePath, int damage, int explosionDamage) throws IOException {
+    @Test
+    void miniwyvernsAndRockDrakesStartAtHalfStrengthAndRecoverTheirCurrentCap() throws IOException {
+        JsonObject miniLeveling = json(Path.of("Server", "Tamework", "Leveling", "HyDragonMiniwyvern.json"));
+        assertEquals(0.034482758620689655, growth(miniLeveling, "MaxHealthMultiplier"));
+        assertEquals(0.034482758620689655, growth(miniLeveling, "DamageDealtMultiplier"));
+        for (String form : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "Wild")) {
+            JsonObject role = json(ROLE_ROOT.resolve("Wyvern_Mini/Tamed_Wyvern_Mini_" + form + ".json"));
+            assertEquals(40, role.getAsJsonObject("Modify").get("MaxHealth").getAsInt(), form);
+            assertEquals(8, physicalDamage(role, "Bite_Damage"), form);
+        }
+
+        JsonObject rockLeveling = json(Path.of("Server", "Tamework", "Leveling", "HyDragonRockDrake.json"));
+        assertEquals(0.042482758620689655, growth(rockLeveling, "MaxHealthMultiplier"));
+        assertEquals(0.038482758620689655, growth(rockLeveling, "DamageDealtMultiplier"));
+        for (Map.Entry<String, Integer> expectedHealth : Map.of(
+                "T1", 130, "T2", 180, "T3", 230).entrySet()) {
+            JsonObject role = json(ROLE_ROOT.resolve("RockDrake/Tamed_RockDrake" + expectedHealth.getKey() + ".json"));
+            assertEquals(expectedHealth.getValue().intValue(), role.getAsJsonObject("Modify").get("MaxHealth").getAsInt());
+            assertEquals(17, physicalDamage(role, "Stomp_Damage"));
+        }
+    }
+
+    private static void assertProjectile(String relativePath, double damage, double explosionDamage) throws IOException {
         JsonObject projectile = json(PROJECTILE_ROOT.resolve(relativePath));
-        assertEquals(damage, projectile.get("Damage").getAsInt());
-        assertEquals(explosionDamage, projectile.getAsJsonObject("ExplosionConfig").get("EntityDamage").getAsInt());
+        assertEquals(damage, projectile.get("Damage").getAsDouble());
+        assertEquals(explosionDamage, projectile.getAsJsonObject("ExplosionConfig").get("EntityDamage").getAsDouble());
     }
 
     private static void assertLaunch(JsonObject role, String variable, String projectileId, Hazard hazard) {

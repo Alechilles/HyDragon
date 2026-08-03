@@ -63,8 +63,8 @@ final class NordicDrakeProgressionAssetTest {
         assertDouble(9.0d, flight.get("MaxXpPerMinute").getAsDouble());
 
         assertGrowthEffects(leveling.getAsJsonObject("StatGrowth").getAsJsonArray("Effects"), Map.of(
-                "MaxHealthMultiplier", 0.004d,
-                "DamageDealtMultiplier", 0.002d));
+                "MaxHealthMultiplier", 0.042482758620689655d,
+                "DamageDealtMultiplier", 0.038482758620689655d));
         assertEquals(1, leveling.getAsJsonObject("TalentPoints").get("PointsPerLevel").getAsInt());
     }
 

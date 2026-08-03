@@ -38,11 +38,11 @@
     "Effects": [
       {
         "EffectKey": "MaxHealthMultiplier",
-        "PerLevel": 0.004
+        "PerLevel": 0.042482758620689655
       },
       {
         "EffectKey": "DamageDealtMultiplier",
-        "PerLevel": 0.002
+        "PerLevel": 0.038482758620689655
       }
     ]
   },

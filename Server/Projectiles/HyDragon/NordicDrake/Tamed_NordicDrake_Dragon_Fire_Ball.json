@@ -16,7 +16,7 @@
     "SystemId": "Impact_Explosion",
     "Scale": 2.4
   },
-  "Damage": 18,
+  "Damage": 9,
   "MissParticles": {
     "SystemId": "Impact_Explosion",
     "Scale": 1.8
@@ -31,7 +31,7 @@
     "DamageEntities": true,
     "DamageBlocks": true,
     "EntityDamageRadius": 3,
-    "EntityDamage": 9,
+    "EntityDamage": 4.5,
     "Knockback": {
       "Type": "Force",
       "Force": 6,

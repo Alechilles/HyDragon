@@ -1,5 +1,50 @@
 {
-  "Type": "Variant", "Reference": "Template_Wyvern_Mini_Flying_Tamed",
-  "Modify": { "Appearance": "Wyvern_Mini_Nature", "DropList": "Empty", "WanderRadius": 10, "ViewRange": 28, "HearingRange": 18, "GroundSpeed": 3.5, "FlightSpeed": 12, "MaxHealth": 80, "Attack": "Root_NPC_Wyvern_Mini_Bite", "AttackDistance": 2.75, "CanFollow": true, "CanHold": true, "CanDefend": true, "CanAttackTarget": true, "IsMountable": false, "AttractiveItemSet": ["Food_Wildmeat_Raw", "Food_Chicken_Raw", "Food_Fish_Raw"], "InteractionConfigId": "HyDragonIntWyvernMini_Nature", "TalentProjectileBase": "Root_NPC_Wyvern_Mini_Nature_Projectile_Base", "TalentProjectileIntermediate": "Root_NPC_Wyvern_Mini_Nature_Projectile_Intermediate", "TalentProjectilePattern": "Root_NPC_Wyvern_Mini_Nature_Projectile_Pattern", "TalentProjectilePatternEcho": "Root_NPC_Wyvern_Mini_Nature_Projectile_Pattern_Echo", "TalentProjectileMastery": "Root_NPC_Wyvern_Mini_Nature_Projectile_Mastery", "TalentProjectileMasteryEcho": "Root_NPC_Wyvern_Mini_Nature_Projectile_Mastery_Echo", "NameTranslationKey": { "Compute": "NameTranslationKey" } },
-  "Parameters": { "NameTranslationKey": { "Value": "server.npcRoles.Tamed_Wyvern_Mini.name", "Description": "Translation key for NPC name display" } }
+    "Type": "Variant",
+    "Reference": "Template_Wyvern_Mini_Flying_Tamed",
+    "Modify": {
+        "Appearance": "Wyvern_Mini_Nature",
+        "DropList": "Empty",
+        "WanderRadius": 10,
+        "ViewRange": 28,
+        "HearingRange": 18,
+        "GroundSpeed": 3.5,
+        "FlightSpeed": 12,
+    "MaxHealth": 40,
+    "_InteractionVars": {
+      "Bite_Damage": {
+        "Interactions": [{
+          "Parent": "Wyvern_Mini_Bite_Damage",
+          "DamageCalculator": { "Type": "Absolute", "BaseDamage": { "Physical": 8 }, "RandomPercentageModifier": 0.1 }
+        }]
+      }
+    },
+        "Attack": "Root_NPC_Wyvern_Mini_Bite",
+        "AttackDistance": 2.75,
+        "CanFollow": true,
+        "CanHold": true,
+        "CanDefend": true,
+        "CanAttackTarget": true,
+        "IsMountable": false,
+        "AttractiveItemSet": [
+            "Food_Wildmeat_Raw",
+            "Food_Chicken_Raw",
+            "Food_Fish_Raw"
+        ],
+        "InteractionConfigId": "HyDragonIntWyvernMini_Nature",
+        "TalentProjectileBase": "Root_NPC_Wyvern_Mini_Nature_Projectile_Base",
+        "TalentProjectileIntermediate": "Root_NPC_Wyvern_Mini_Nature_Projectile_Intermediate",
+        "TalentProjectilePattern": "Root_NPC_Wyvern_Mini_Nature_Projectile_Pattern",
+        "TalentProjectilePatternEcho": "Root_NPC_Wyvern_Mini_Nature_Projectile_Pattern_Echo",
+        "TalentProjectileMastery": "Root_NPC_Wyvern_Mini_Nature_Projectile_Mastery",
+        "TalentProjectileMasteryEcho": "Root_NPC_Wyvern_Mini_Nature_Projectile_Mastery_Echo",
+        "NameTranslationKey": {
+            "Compute": "NameTranslationKey"
+        }
+    },
+    "Parameters": {
+        "NameTranslationKey": {
+            "Value": "server.npcRoles.Tamed_Wyvern_Mini.name",
+            "Description": "Translation key for NPC name display"
+        }
+    }
 }

@@ -17,7 +17,21 @@
     "CombatBehaviorDistance": 14,
     "KnockbackScale": 0.1,
     "ClimbHeight": 2,
-    "MaxHealth": 260,
+    "MaxHealth": 130,
+    "_InteractionVars": {
+      "Stomp_Damage": {
+        "Interactions": [
+          {
+            "Parent": "RockDrake_Stomp_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": { "Physical": 17 },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      }
+    },
     "CanFollow": true,
     "CanHold": true,
     "CanDefend": true,

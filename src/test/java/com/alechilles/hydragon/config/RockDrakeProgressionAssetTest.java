@@ -31,6 +31,8 @@ final class RockDrakeProgressionAssetTest {
         assertEquals(1.09, leveling.getAsJsonObject("Levels").get("GrowthFactor").getAsDouble());
         assertTrue(leveling.getAsJsonObject("XpSources").getAsJsonObject("Combat").get("Enabled").getAsBoolean());
         assertTrue(leveling.getAsJsonObject("XpSources").getAsJsonObject("Summoned").get("Enabled").getAsBoolean());
+        assertEquals(0.042482758620689655, growth(leveling, "MaxHealthMultiplier"));
+        assertEquals(0.038482758620689655, growth(leveling, "DamageDealtMultiplier"));
         assertEquals(1, leveling.getAsJsonObject("TalentPoints").get("PointsPerLevel").getAsInt());
     }
 
@@ -73,6 +75,13 @@ final class RockDrakeProgressionAssetTest {
 
     private static List<String> strings(JsonArray array) {
         return array.asList().stream().map(JsonElement::getAsString).toList();
+    }
+
+    private static double growth(JsonObject leveling, String effectKey) {
+        return leveling.getAsJsonObject("StatGrowth").getAsJsonArray("Effects").asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(effect -> effectKey.equals(effect.get("EffectKey").getAsString()))
+                .findFirst().orElseThrow().get("PerLevel").getAsDouble();
     }
 
     private static Map<String, String> localeEntries(String locale) throws IOException {
