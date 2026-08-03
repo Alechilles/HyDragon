@@ -62,8 +62,8 @@
   "Texture": "Items/HyDragon/Draconic_Stone.png",
   "PlayerAnimationsId": "Item",
   "IconProperties": {
-    "Scale": 1.2,
-    "Translation": [ 3, -2 ],
+    "Scale": 0.3142857,
+    "Translation": [ 0, 0 ],
     "Rotation": [ 12, -160, -21 ]
   },
   "Tags": { "Type": [ "Tool" ] },

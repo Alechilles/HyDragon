@@ -14,8 +14,8 @@
     { "Id": "HyDragon_DraconicEssences", "Quantity": 1 }
   ],
   "IconProperties": {
-    "Scale": 2.3,
-    "Translation": [ 3, -3 ],
+    "Scale": 0.55,
+    "Translation": [ 0, 0 ],
     "Rotation": [ 9, 2, 0 ]
   }
 }

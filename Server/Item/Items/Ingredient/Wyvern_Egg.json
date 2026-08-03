@@ -80,8 +80,8 @@
   "Texture": "Items/HyDragon/Drake_Egg.png",
   "PlayerAnimationsId": "Item",
   "IconProperties": {
-    "Scale": 1,
-    "Translation": [ 2, -4 ],
+    "Scale": 0.275,
+    "Translation": [ 0, 0 ],
     "Rotation": [ -21, 128, -8 ]
   },
   "Tags": {

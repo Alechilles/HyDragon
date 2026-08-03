@@ -26,8 +26,8 @@
   },
   "Texture": "Items/HyDragon/Draconic_Essence_Toxic.png",
   "IconProperties": {
-    "Scale": 2.3,
-    "Translation": [ 3, -3 ],
+    "Scale": 0.55,
+    "Translation": [ 0, 0 ],
     "Rotation": [ 9, 2, 0 ]
   },
   "Icon": "Icons/ItemsGenerated/Draconic_Essence_Toxic.png",
