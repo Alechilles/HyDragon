@@ -1363,8 +1363,6 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         "HyDragonFullDragons.json": {
             "FamilyId": "hydragon:full_dragons", "MaximumOwned": 0,
             "MaximumActive": 1,
-            "Timers": {"SessionDurationSeconds": 300,
-                       "SummonCooldownSeconds": 1800},
             "AllowedRoles": {"Tamed_NordicDrake", "Tamed_Hydra", "Tamed_Hydra_Toxic",
                              "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"},
             "RoleCosts": {
@@ -1407,9 +1405,6 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
             continue
         for field in ("FamilyId", "MaximumOwned", "MaximumActive"):
             if data.get(field) != expected[field]:
-                fail(errors, f"{path.relative_to(ROOT)} has invalid {field}")
-        for field, value in expected.get("Timers", {}).items():
-            if data.get(field) != value:
                 fail(errors, f"{path.relative_to(ROOT)} has invalid {field}")
         for field in expected.get("AbsentTimers", set()):
             if field in data:

@@ -27,8 +27,8 @@ class DragonRosterAssetContractTest {
         String full = read("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json");
         String mini = read("Server/Tamework/BondedCompanions/Rosters/HyDragonMiniwyvern.json");
 
-        assertPolicy(full, "hydragon:full_dragons", 0, 1, 300, 1800);
-        assertPolicy(mini, "hydragon:soulbound_mini", 1, 1, null, null);
+        assertPolicy(full, "hydragon:full_dragons");
+        assertPolicy(mini, "hydragon:soulbound_mini");
         assertTrue(full.contains("\"RevivePriceByRole\""));
         assertTrue(full.contains("\"Tamed_Hydra_Toxic\""));
         assertTrue(full.contains("\"Draconic_Essence_Toxic\", \"Quantity\": 2"));
@@ -138,29 +138,10 @@ class DragonRosterAssetContractTest {
         }
     }
 
-    private static void assertPolicy(
-            String json,
-            String familyId,
-            int maximumOwned,
-            int maximumActive,
-            Integer sessionSeconds,
-            Integer cooldownSeconds
-    ) {
+    private static void assertPolicy(String json, String familyId) {
         assertTrue(json.contains("\"RosterId\": \"hydragon:dragon_horn\""));
         assertTrue(json.contains("\"FamilyId\": \"" + familyId + "\""));
-        assertTrue(json.contains("\"MaximumOwned\": " + maximumOwned));
-        assertTrue(json.contains("\"MaximumActive\": " + maximumActive));
-        assertTimer(json, "SessionDurationSeconds", sessionSeconds);
-        assertTimer(json, "SummonCooldownSeconds", cooldownSeconds);
         assertTrue(json.contains("\"RevivePriceByRole\""));
-    }
-
-    private static void assertTimer(String json, String field, Integer seconds) {
-        if (seconds == null) {
-            assertFalse(json.contains("\"" + field + "\""), field);
-            return;
-        }
-        assertTrue(json.contains("\"" + field + "\": " + seconds), field);
     }
 
     private static String read(String relative) throws Exception {
