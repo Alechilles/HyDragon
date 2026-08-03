@@ -17,7 +17,7 @@
           "FollowSeekSlowDownDistance": 8,
           "FollowSeekStopDistance": 6,
           "FollowScanRange": 16,
-          "FollowMaintainDistanceRange": [5, 9]
+          "FollowMaintainDistanceRange": [ 5, 9 ]
         }
       }
     ]

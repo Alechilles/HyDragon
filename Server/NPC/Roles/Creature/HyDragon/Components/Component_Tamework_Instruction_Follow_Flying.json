@@ -16,7 +16,7 @@
       "Description": "Preferred altitude range to maintain while following."
     },
     "FollowTeleportThresholdRange": {
-      "Value": 60,
+      "Value": 40,
       "Description": "Distance beyond which teleport fallback is used instead of normal flight catch-up."
     },
     "FollowOrbitRadiusRange": {
