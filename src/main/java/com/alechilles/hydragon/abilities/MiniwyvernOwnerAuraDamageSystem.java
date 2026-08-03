@@ -41,17 +41,29 @@ public final class MiniwyvernOwnerAuraDamageSystem extends DamageEventSystem {
         UUIDComponent ownerIdentity = store.getComponent(ownerRef, UUIDComponent.getComponentType());
         if (player == null || !player.isValid() || ownerIdentity == null) return;
         MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(ownerIdentity.getUuid()).orElse(null);
-        if (aura == null || !hasTargetEffect(aura) || !shouldApply(ownerIdentity.getUuid(), true,
-                damage.isCancelled(), damage.getAmount())) return;
+        if (aura == null || !shouldApplyDamage(damage, ownerRef, target)) return;
         UUIDComponent targetIdentity = store.getComponent(target, UUIDComponent.getComponentType());
-        if (targetIdentity == null) return;
-        effectQueue.submit(store.getExternalData().getWorld().getName(), targetIdentity.getUuid(), aura);
+        if (targetIdentity != null && hasTargetEffect(aura)) {
+            effectQueue.submit(store.getExternalData().getWorld().getName(), targetIdentity.getUuid(), aura);
+        }
+        if ("lightning".equals(aura.formId()) && aura.speedBurstMultiplier() > 0.0D) {
+            registry.recordSpeedBurst(ownerIdentity.getUuid());
+        }
     }
 
     boolean shouldApply(java.util.UUID ownerUuid, boolean playerSource, boolean cancelled, float amount) {
         return ownerUuid != null && playerSource && !cancelled && Float.isFinite(amount)
                 && amount > 0.0F
                 && registry.activeFor(ownerUuid).map(MiniwyvernOwnerAuraDamageSystem::hasTargetEffect).orElse(false);
+    }
+
+    private boolean shouldApplyDamage(
+            Damage damage, Ref<EntityStore> ownerRef, Ref<EntityStore> targetRef) {
+        boolean blocked = Boolean.TRUE.equals(damage.getIfPresentMetaObject(Damage.BLOCKED));
+        boolean healing = damage.getCause() != null
+                && "healing".equalsIgnoreCase(damage.getCause().getId());
+        return !damage.isCancelled() && Float.isFinite(damage.getAmount()) && damage.getAmount() > 0.0F
+                && isLiveRef(ownerRef) && !ownerRef.equals(targetRef) && !blocked && !healing;
     }
 
     static boolean hasTargetEffect(@Nullable MiniwyvernOwnerAuraRegistry.Aura aura) {

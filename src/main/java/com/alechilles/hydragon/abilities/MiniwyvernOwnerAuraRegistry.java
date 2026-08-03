@@ -18,6 +18,8 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
     private final ConcurrentHashMap<UUID, Aura> active = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, ToxicWeakness> toxicWeaknesses = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<TargetAuraKey, TargetAura> targetAuras = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, Long> fireConditionalWardUntil = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, Boolean> pendingSpeedBursts = new ConcurrentHashMap<>();
     private final Set<Runnable> clearHooks = ConcurrentHashMap.newKeySet();
     private final Set<Consumer<UUID>> ownerClearHooks = ConcurrentHashMap.newKeySet();
 
@@ -34,22 +36,55 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                           double ownerDamageToAffectedFraction, String wardEffectId,
                           double conditionalWardDamageReductionFraction,
                           double siphonMaximumHealthFraction, long siphonCooldownMs) {
+        return update(ownerUuid, profileId, leaseId, npcUuid, formId, effectId, durationSeconds,
+                damageReductionFraction, targetDamageTakenFraction, ownerDamageToAffectedFraction,
+                wardEffectId, conditionalWardDamageReductionFraction,
+                siphonMaximumHealthFraction, siphonCooldownMs,
+                null, 0.0D, 0.0D, 0.0D);
+    }
+
+    public boolean update(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
+                          String formId, String effectId, double durationSeconds,
+                          Double damageReductionFraction, double targetDamageTakenFraction,
+                          double ownerDamageToAffectedFraction, String wardEffectId,
+                          double conditionalWardDamageReductionFraction,
+                          double siphonMaximumHealthFraction, long siphonCooldownMs,
+                          String ownerEffectId, double ownerRegenerationFraction,
+                          double speedBurstMultiplier, double speedBurstDurationSeconds) {
         String normalizedForm = normalize(formId);
         boolean playerOnly = PLAYER_ONLY_FORMS.contains(normalizedForm);
         boolean targetEffectMissing = blank(effectId);
+        boolean ownerEffectMissing = blank(ownerEffectId);
+        boolean speedBurstMissing = speedBurstMultiplier == 0.0D && speedBurstDurationSeconds == 0.0D;
+        boolean speedBurstInvalid = !Double.isFinite(speedBurstMultiplier)
+                || !Double.isFinite(speedBurstDurationSeconds)
+                || speedBurstMultiplier < 0.0D || speedBurstDurationSeconds < 0.0D;
         if (ownerUuid == null || npcUuid == null || blank(profileId) || blank(leaseId)
                 || !ELEMENTAL_FORMS.contains(normalizedForm)
                 || (wardEffectId != null && blank(wardEffectId))
+                || (!ownerEffectMissing && !playerOnly)
                 || !Double.isFinite(durationSeconds) || durationSeconds < 0.0D
                 || (!playerOnly && (targetEffectMissing || durationSeconds <= 0.0D))
-                || (playerOnly && !targetEffectMissing && durationSeconds <= 0.0D)
+                || (playerOnly && !targetEffectMissing)
                 || (damageReductionFraction != null && (!Double.isFinite(damageReductionFraction)
                 || damageReductionFraction < 0.0D || damageReductionFraction >= 1.0D))
                 || !validFraction(targetDamageTakenFraction)
                 || !validFraction(ownerDamageToAffectedFraction)
                 || !validFraction(conditionalWardDamageReductionFraction)
-                || !validSiphon(normalizedForm, siphonMaximumHealthFraction, siphonCooldownMs)) {
+                || !validSiphon(normalizedForm, siphonMaximumHealthFraction, siphonCooldownMs)
+                || !validFraction(ownerRegenerationFraction)
+                || speedBurstInvalid
+                || (!speedBurstMissing && (!Double.isFinite(speedBurstMultiplier)
+                || speedBurstMultiplier <= 0.0D || !Double.isFinite(speedBurstDurationSeconds)
+                || speedBurstDurationSeconds <= 0.0D))) {
             return false;
+        }
+        Aura prior = active.get(ownerUuid);
+        if (prior != null && (!prior.profileId().equals(profileId.trim())
+                || !prior.leaseId().equals(leaseId.trim())
+                || !prior.formId().equals(normalizedForm))) {
+            fireConditionalWardUntil.remove(ownerUuid);
+            pendingSpeedBursts.remove(ownerUuid);
         }
         active.put(ownerUuid, new Aura(ownerUuid, profileId.trim(), leaseId.trim(), npcUuid,
                 normalizedForm, targetEffectMissing ? "" : effectId.trim(), durationSeconds,
@@ -57,7 +92,9 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                 targetDamageTakenFraction, ownerDamageToAffectedFraction,
                 blank(wardEffectId) ? null : wardEffectId.trim(),
                 conditionalWardDamageReductionFraction, siphonMaximumHealthFraction,
-                siphonCooldownMs));
+                siphonCooldownMs, ownerEffectMissing ? null : ownerEffectId.trim(),
+                ownerRegenerationFraction, speedBurstMissing ? 0.0D : speedBurstMultiplier,
+                speedBurstMissing ? 0.0D : speedBurstDurationSeconds));
         return true;
     }
 
@@ -71,7 +108,11 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         if (current == null || !current.profileId().equals(profileId.trim())
                 || (!blank(leaseId) && !current.leaseId().equals(leaseId.trim()))) return false;
         boolean removed = active.remove(ownerUuid, current);
-        if (removed) notifyOwnerClear(ownerUuid);
+        if (removed) {
+            fireConditionalWardUntil.remove(ownerUuid);
+            pendingSpeedBursts.remove(ownerUuid);
+            notifyOwnerClear(ownerUuid);
+        }
         return removed;
     }
 
@@ -104,9 +145,13 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                 || !validFraction(aura.ownerDamageToAffectedFraction())) return;
         long expiresAtMs = expiryAt(nowMs, durationMillis(durationSeconds));
         TargetAura projection = new TargetAura(
-                aura.formId(), aura.effectId().trim(), aura.targetOutgoingDamageReductionFraction(),
+                aura.ownerUuid(), aura.leaseId(), aura.formId(), aura.effectId().trim(), aura.targetOutgoingDamageReductionFraction(),
                 aura.targetDamageTakenFraction(), aura.ownerDamageToAffectedFraction(), expiresAtMs);
         targetAuras.put(new TargetAuraKey(targetUuid, projection.effectId()), projection);
+        if ("fire".equals(projection.formId())
+                && aura.conditionalWardDamageReductionFraction() > 0.0D) {
+            fireConditionalWardUntil.put(aura.ownerUuid(), expiryAt(nowMs, 3_000L));
+        }
         if (projection.targetOutgoingDamageReductionFraction() > 0.0D) {
             recordToxicWeakness(targetUuid, projection.effectId(),
                     projection.targetOutgoingDamageReductionFraction(), durationSeconds, nowMs);
@@ -155,6 +200,55 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         return List.copyOf(projections);
     }
 
+    /** Returns whether an owner has a live target projection for the requested form. */
+    public boolean hasActiveTargetAuraForOwner(UUID ownerUuid, String formId, long nowMs) {
+        if (ownerUuid == null || blank(formId)) return false;
+        String normalizedForm = normalize(formId);
+        Aura current = active.get(ownerUuid);
+        if (current == null) return false;
+        for (TargetAura projection : targetAuras.values()) {
+            if (ownerUuid.equals(projection.ownerUuid())
+                    && current.leaseId().equals(projection.leaseId())
+                    && normalizedForm.equals(projection.formId())
+                    && projection.expiresAtMs() > nowMs) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Records one valid Lightning damage event for the next ability-service owner-speed refresh. */
+    public void recordSpeedBurst(UUID ownerUuid) {
+        if (ownerUuid == null) return;
+        Aura aura = active.get(ownerUuid);
+        if (aura == null || aura.speedBurstMultiplier() <= 0.0D
+                || aura.speedBurstDurationSeconds() <= 0.0D) return;
+        pendingSpeedBursts.put(ownerUuid, Boolean.TRUE);
+    }
+
+    public boolean consumeSpeedBurst(UUID ownerUuid) {
+        return ownerUuid != null && pendingSpeedBursts.remove(ownerUuid) != null;
+    }
+
+    /** Arms Fire's three-second conditional general damage reduction after a Burn application. */
+    public void armFireConditionalWard(UUID ownerUuid, long nowMs) {
+        Aura aura = ownerUuid == null ? null : active.get(ownerUuid);
+        if (aura == null || !"fire".equals(aura.formId())
+                || aura.conditionalWardDamageReductionFraction() <= 0.0D) return;
+        fireConditionalWardUntil.put(ownerUuid, expiryAt(nowMs, 3_000L));
+    }
+
+    public boolean conditionalWardActive(UUID ownerUuid, boolean ownerBelowHalf, long nowMs) {
+        Aura aura = ownerUuid == null ? null : active.get(ownerUuid);
+        if (aura == null || aura.conditionalWardDamageReductionFraction() <= 0.0D) return false;
+        return switch (aura.formId()) {
+            case "fire" -> fireConditionalWardUntil.getOrDefault(ownerUuid, 0L) > nowMs;
+            case "nature" -> ownerBelowHalf;
+            case "toxic" -> hasActiveTargetAuraForOwner(ownerUuid, "toxic", nowMs);
+            default -> false;
+        };
+    }
+
     /** Registers an ephemeral-state cleanup hook, returning a handle that unregisters it. */
     AutoCloseable addClearHook(Runnable hook) {
         Objects.requireNonNull(hook, "hook");
@@ -174,6 +268,8 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         active.clear();
         toxicWeaknesses.clear();
         targetAuras.clear();
+        fireConditionalWardUntil.clear();
+        pendingSpeedBursts.clear();
         for (UUID ownerUuid : owners) notifyOwnerClear(ownerUuid);
         for (Runnable hook : clearHooks) {
             try {
@@ -201,25 +297,59 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                        double damageReductionFraction, double targetDamageTakenFraction,
                        double ownerDamageToAffectedFraction, String wardEffectId,
                        double conditionalWardDamageReductionFraction,
-                       double siphonMaximumHealthFraction, long siphonCooldownMs) {
+                       double siphonMaximumHealthFraction, long siphonCooldownMs,
+                       String ownerEffectId, double ownerRegenerationFraction,
+                       double speedBurstMultiplier, double speedBurstDurationSeconds) {
         public Aura { Objects.requireNonNull(ownerUuid); Objects.requireNonNull(npcUuid); }
 
         public Aura(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
                     String formId, String effectId, double durationSeconds,
                     double damageReductionFraction) {
             this(ownerUuid, profileId, leaseId, npcUuid, formId, effectId, durationSeconds,
-                    damageReductionFraction, 0.0D, 0.0D, null, 0.0D, 0.0D, 0L);
+                    damageReductionFraction, 0.0D, 0.0D, null, 0.0D, 0.0D, 0L,
+                    null, 0.0D, 0.0D, 0.0D);
+        }
+
+        public Aura(UUID ownerUuid, String profileId, String leaseId, UUID npcUuid,
+                    String formId, String effectId, double durationSeconds,
+                    double damageReductionFraction, double targetDamageTakenFraction,
+                    double ownerDamageToAffectedFraction, String wardEffectId,
+                    double conditionalWardDamageReductionFraction,
+                    double siphonMaximumHealthFraction, long siphonCooldownMs) {
+            this(ownerUuid, profileId, leaseId, npcUuid, formId, effectId, durationSeconds,
+                    damageReductionFraction, targetDamageTakenFraction, ownerDamageToAffectedFraction,
+                    wardEffectId, conditionalWardDamageReductionFraction,
+                    siphonMaximumHealthFraction, siphonCooldownMs,
+                    null, 0.0D, 0.0D, 0.0D);
         }
 
         /** Explicit name for the target's outgoing-damage reduction value. */
         public double targetOutgoingDamageReductionFraction() { return damageReductionFraction; }
     }
     public record ToxicWeakness(String effectId, double damageReductionFraction, long expiresAtMs) { }
-    public record TargetAura(String formId, String effectId,
+    public record TargetAura(UUID ownerUuid, String leaseId, String formId, String effectId,
                              double targetOutgoingDamageReductionFraction,
                              double targetDamageTakenFraction,
                              double ownerDamageToAffectedFraction,
-                             long expiresAtMs) { }
+                             long expiresAtMs) {
+        public TargetAura(String formId, String effectId,
+                          double targetOutgoingDamageReductionFraction,
+                          double targetDamageTakenFraction,
+                          double ownerDamageToAffectedFraction,
+                          long expiresAtMs) {
+            this(null, null, formId, effectId, targetOutgoingDamageReductionFraction,
+                    targetDamageTakenFraction, ownerDamageToAffectedFraction, expiresAtMs);
+        }
+
+        public TargetAura(UUID ownerUuid, String formId, String effectId,
+                          double targetOutgoingDamageReductionFraction,
+                          double targetDamageTakenFraction,
+                          double ownerDamageToAffectedFraction,
+                          long expiresAtMs) {
+            this(ownerUuid, null, formId, effectId, targetOutgoingDamageReductionFraction,
+                    targetDamageTakenFraction, ownerDamageToAffectedFraction, expiresAtMs);
+        }
+    }
 
     private record TargetAuraKey(UUID targetUuid, String effectId) { }
 

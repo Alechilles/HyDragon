@@ -62,6 +62,20 @@ class MiniwyvernOwnerAuraRegistryTest {
     }
 
     @Test
+    void retainsOwnerOnlyTiersAndRejectsPlayerOnlyTargetEffects() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "lightning", "", 0.0D, null, 0.0D, 0.0D,
+                "StaticWard", 0.0D, 0.0D, 0L,
+                "HyDragon_Miniwyvern_Lightning_Boon_35", 0.0D, 1.15D, 4.0D));
+        MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(OWNER).orElseThrow();
+        assertEquals("HyDragon_Miniwyvern_Lightning_Boon_35", aura.ownerEffectId());
+        assertEquals(1.15D, aura.speedBurstMultiplier());
+        assertFalse(registry.update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "nature", "HyDragon_Miniwyvern_Nature_Regeneration_30", 10.0D, null));
+    }
+
+    @Test
     void invokesClearHooksForEphemeralOwnerState() throws Exception {
         MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
         int[] clears = {0};
@@ -115,10 +129,29 @@ class MiniwyvernOwnerAuraRegistryTest {
         assertEquals(0.20D, projection.targetOutgoingDamageReductionFraction());
         assertEquals(0.22D, projection.targetDamageTakenFraction());
         assertEquals(0.10D, projection.ownerDamageToAffectedFraction());
+        assertEquals(OWNER, projection.ownerUuid());
+        assertEquals("lease", projection.leaseId());
         assertEquals(7_000L, projection.expiresAtMs());
         assertEquals(0.20D, registry.activeToxicWeakness(target, 6_999L).orElseThrow()
                 .damageReductionFraction());
         assertTrue(registry.activeTargetAura(target, 7_000L).isEmpty());
+    }
+
+    @Test
+    void ignoresToxicProjectionFromSupersededOwnerLeaseForConditionalWard() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        UUID target = UUID.randomUUID();
+
+        assertTrue(registry.update(OWNER, "profile", "lease-one", UUID.randomUUID(),
+                "toxic", "weakness-one", 6.0D, 0.12D, 0.0D, 0.0D,
+                null, 0.05D, 0.0D, 0L));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 1_000L);
+        assertTrue(registry.conditionalWardActive(OWNER, false, 1_001L));
+
+        assertTrue(registry.update(OWNER, "profile", "lease-two", UUID.randomUUID(),
+                "toxic", "weakness-two", 6.0D, 0.12D, 0.0D, 0.0D,
+                null, 0.05D, 0.0D, 0L));
+        assertFalse(registry.conditionalWardActive(OWNER, false, 1_001L));
     }
 
     @Test
@@ -163,5 +196,40 @@ class MiniwyvernOwnerAuraRegistryTest {
                 .orElseThrow().targetOutgoingDamageReductionFraction());
         assertEquals(0.20D, registry.activeToxicWeakness(target, 6_999L).orElseThrow()
                 .damageReductionFraction());
+    }
+
+    @Test
+    void conditionalWardsFollowTheirApprovedTriggerAndOwnerProjection() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        UUID npc = UUID.randomUUID();
+        UUID target = UUID.randomUUID();
+        assertTrue(registry.update(OWNER, "profile", "fire-lease", npc,
+                "fire", "burn", 6.0D, null, 0.0D, 0.0D,
+                null, 0.05D, 0.0D, 0L));
+        assertFalse(registry.conditionalWardActive(OWNER, false, 1_000L));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 1_000L);
+        assertTrue(registry.conditionalWardActive(OWNER, false, 1_000L));
+        assertFalse(registry.conditionalWardActive(OWNER, false, 4_001L));
+
+        assertTrue(registry.update(OWNER, "profile", "toxic-lease", npc,
+                "toxic", "weakness", 6.0D, 0.12D, 0.0D, 0.0D,
+                null, 0.05D, 0.0D, 0L));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 5_000L);
+        assertTrue(registry.conditionalWardActive(OWNER, false, 5_001L));
+        assertFalse(registry.conditionalWardActive(OWNER, false, 11_001L));
+    }
+
+    @Test
+    void speedBurstTriggerIsOneShotAndClearedWithOwnerAura() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "lightning", "", 0.0D, null, 0.0D, 0.0D,
+                null, 0.0D, 0.0D, 0L, "boon", 0.0D, 1.1D, 3.0D));
+        registry.recordSpeedBurst(OWNER);
+        assertTrue(registry.consumeSpeedBurst(OWNER));
+        assertFalse(registry.consumeSpeedBurst(OWNER));
+        registry.recordSpeedBurst(OWNER);
+        registry.clear(OWNER, "profile", "lease");
+        assertFalse(registry.consumeSpeedBurst(OWNER));
     }
 }

@@ -215,6 +215,57 @@ class MiniwyvernAbilityServiceTest {
     }
 
     @Test
+    void lightningBondTiersApplyOwnerSpeedEffectsAndNeverQueueTargetEffects() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.roleId = "Tamed_Wyvern_Mini_Lightning";
+        world.purchasedTalents.add("LightningFocus");
+        world.purchasedTalents.add("LightningCapstone");
+        MiniwyvernArchetypeConfig config = lightningConfigWithUpgrades();
+        MiniwyvernOwnerAuraRegistry auras = new MiniwyvernOwnerAuraRegistry();
+
+        assertTrue(new MiniwyvernAbilityService(states, auras).tick(
+                context(), Map.of("lightning", config), world, 1_000L).ready());
+
+        MiniwyvernOwnerAuraRegistry.Aura aura = auras.activeFor(OWNER).orElseThrow();
+        assertEquals("", aura.effectId());
+        assertEquals(0.0D, aura.durationSeconds());
+        assertEquals("Lightning_Boon_35", aura.ownerEffectId());
+        assertTrue(world.appliedEffectIds.contains("Lightning_Boon_35"));
+        assertEquals(0, world.enemyEffects);
+
+        auras.recordSpeedBurst(OWNER);
+        assertTrue(new MiniwyvernAbilityService(states, auras).tick(
+                context(), Map.of("lightning", config), world, 2_000L).ready());
+        assertEquals(1, world.ownerModifierApplications);
+        assertEquals(1.15D, world.lastOwnerModifier.get("MovementSpeedMultiplier"));
+        assertEquals(4.0D, world.lastOwnerModifierDuration);
+    }
+
+    @Test
+    void natureBondTiersChangeOwnerRegenerationAndApplyItsSpeedBurstToOwner() throws Exception {
+        MemoryRepository states = new MemoryRepository();
+        FakeWorld world = new FakeWorld(states);
+        world.roleId = "Tamed_Wyvern_Mini_Nature";
+        world.purchasedTalents.add("NatureFocus");
+        world.purchasedTalents.add("NatureCapstone");
+        MiniwyvernArchetypeConfig config = natureConfigWithUpgrades();
+        MiniwyvernOwnerAuraRegistry auras = new MiniwyvernOwnerAuraRegistry();
+
+        assertTrue(new MiniwyvernAbilityService(states, auras).tick(
+                context(), Map.of("nature", config), world, 1_000L).ready());
+
+        MiniwyvernOwnerAuraRegistry.Aura aura = auras.activeFor(OWNER).orElseThrow();
+        assertEquals("", aura.effectId());
+        assertEquals(0.03D, aura.ownerRegenerationFraction());
+        assertEquals("Nature_Regeneration_30", aura.ownerEffectId());
+        assertEquals(3.0D, world.lastHealAmount);
+        assertEquals(1.10D, world.lastOwnerModifier.get("MovementSpeedMultiplier"));
+        assertEquals(2.0D, world.lastOwnerModifierDuration);
+        assertEquals(0, world.enemyEffects);
+    }
+
+    @Test
     void laterPurchasedUpgradeCanExplicitlyResetAnEarlierValue() throws Exception {
         MemoryRepository states = new MemoryRepository();
         FakeWorld world = new FakeWorld(states);
@@ -355,6 +406,46 @@ class MiniwyvernAbilityServiceTest {
         set(config, "passiveEffects", new String[] { "test-nature-regeneration" });
         set(config, "passiveModifiers", Map.of(
                 "RegenerationTickSeconds", 2.0D, "MaximumHealFractionPerTick", 0.01D));
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig lightningConfigWithUpgrades() throws Exception {
+        MiniwyvernArchetypeConfig config = lightningConfig();
+        MiniwyvernArchetypeConfig.EssenceBondAura aura = construct(
+                MiniwyvernArchetypeConfig.EssenceBondAura.class);
+        MiniwyvernArchetypeConfig.Upgrade focus = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        MiniwyvernArchetypeConfig.Upgrade capstone = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        set(focus, "talentId", "LightningFocus");
+        set(focus, "targetEffectId", "Lightning_Boon_20");
+        set(focus, "targetDurationSeconds", 8.0D);
+        set(capstone, "talentId", "LightningCapstone");
+        set(capstone, "targetEffectId", "Lightning_Boon_35");
+        set(capstone, "targetDurationSeconds", 8.0D);
+        set(capstone, "speedBurstMultiplier", 1.15D);
+        set(capstone, "speedBurstDurationSeconds", 4.0D);
+        set(aura, "upgrades", new MiniwyvernArchetypeConfig.Upgrade[] { focus, capstone });
+        set(config, "essenceBondAura", aura);
+        assertTrue(config.validate().isEmpty(), config.validate().toString());
+        return config;
+    }
+
+    private static MiniwyvernArchetypeConfig natureConfigWithUpgrades() throws Exception {
+        MiniwyvernArchetypeConfig config = natureConfig();
+        MiniwyvernArchetypeConfig.EssenceBondAura aura = construct(
+                MiniwyvernArchetypeConfig.EssenceBondAura.class);
+        MiniwyvernArchetypeConfig.Upgrade focus = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        MiniwyvernArchetypeConfig.Upgrade capstone = construct(MiniwyvernArchetypeConfig.Upgrade.class);
+        set(focus, "talentId", "NatureFocus");
+        set(focus, "targetEffectId", "Nature_Regeneration_15");
+        set(focus, "targetDurationSeconds", 10.0D);
+        set(capstone, "talentId", "NatureCapstone");
+        set(capstone, "targetEffectId", "Nature_Regeneration_30");
+        set(capstone, "targetDurationSeconds", 10.0D);
+        set(capstone, "speedBurstMultiplier", 1.10D);
+        set(capstone, "speedBurstDurationSeconds", 2.0D);
+        set(aura, "upgrades", new MiniwyvernArchetypeConfig.Upgrade[] { focus, capstone });
+        set(config, "essenceBondAura", aura);
         assertTrue(config.validate().isEmpty(), config.validate().toString());
         return config;
     }
@@ -521,6 +612,11 @@ class MiniwyvernAbilityServiceTest {
         int projectiles;
         int damageApplications;
         int heals;
+        double lastHealAmount;
+        int ownerModifierApplications;
+        Map<String, Double> lastOwnerModifier = Map.of();
+        double lastOwnerModifierDuration;
+        final List<String> appliedEffectIds = new java.util.ArrayList<>();
         String roleId = "Tamed_Wyvern_Mini_Fire";
         boolean essenceBondPurchased = true;
         final java.util.Set<String> purchasedTalents = new HashSet<>();
@@ -535,6 +631,7 @@ class MiniwyvernAbilityServiceTest {
         @Override public Health health(UUID entityUuid) { return new Health(50.0D, 100.0D); }
         @Override public boolean applyEffect(UUID entityUuid, String sourceKey, String effectId, double durationSeconds) {
             effects++;
+            appliedEffectIds.add(effectId);
             if (ENEMY.equals(entityUuid)) enemyEffects++;
             return true;
         }
@@ -553,7 +650,13 @@ class MiniwyvernAbilityServiceTest {
             return true;
         }
         @Override public boolean supportsOwnerModifiers(Map<String, Double> modifiers) { return true; }
-        @Override public boolean applyOwnerModifiers(UUID ownerUuid, String sourceKey, Map<String, Double> modifiers, double durationSeconds) { return true; }
+        @Override public boolean applyOwnerModifiers(UUID ownerUuid, String sourceKey,
+                Map<String, Double> modifiers, double durationSeconds) {
+            ownerModifierApplications++;
+            lastOwnerModifier = Map.copyOf(modifiers);
+            lastOwnerModifierDuration = durationSeconds;
+            return true;
+        }
         @Override public boolean removeOwnerModifiers(UUID ownerUuid, String sourceKey) {
             ownerModifierRemovals++;
             return true;
@@ -568,6 +671,7 @@ class MiniwyvernAbilityServiceTest {
         }
         @Override public boolean heal(UUID entityUuid, double amount) {
             heals++;
+            lastHealAmount = amount;
             return true;
         }
         @Override public boolean areAllies(UUID ownerUuid, UUID targetUuid) { return false; }
