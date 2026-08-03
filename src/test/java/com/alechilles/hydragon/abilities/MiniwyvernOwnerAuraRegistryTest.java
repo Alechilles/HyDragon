@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class MiniwyvernOwnerAuraRegistryTest {
     private static final UUID OWNER = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID OWNER_TWO = UUID.fromString("00000000-0000-0000-0000-000000000004");
 
     @Test
     void replacesThePreviousLeaseAndClearsOnlyItsMatchingLiveProjection() {
@@ -216,7 +217,41 @@ class MiniwyvernOwnerAuraRegistryTest {
                 null, 0.05D, 0.0D, 0L));
         registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 5_000L);
         assertTrue(registry.conditionalWardActive(OWNER, false, 5_001L));
+        assertFalse(registry.conditionalWardActive(OWNER, false, false, 5_001L));
         assertFalse(registry.conditionalWardActive(OWNER, false, 11_001L));
+    }
+
+    @Test
+    void targetProjectionsRetainDistinctToxicOwnersAtTheSameEffectTier() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        UUID target = UUID.randomUUID();
+
+        assertTrue(registry.update(OWNER, "profile-one", "lease-one", UUID.randomUUID(),
+                "toxic", "weakness", 6.0D, 0.12D));
+        registry.recordTargetAura(target, registry.activeFor(OWNER).orElseThrow(), 6.0D, 1_000L);
+        assertTrue(registry.update(OWNER_TWO, "profile-two", "lease-two", UUID.randomUUID(),
+                "toxic", "weakness", 6.0D, 0.12D));
+        registry.recordTargetAura(target, registry.activeFor(OWNER_TWO).orElseThrow(), 6.0D, 1_000L);
+
+        assertEquals(2, registry.activeTargetAuras(target, 6_999L).size());
+        assertTrue(registry.hasActiveTargetAuraForOwner(OWNER, "toxic", 6_999L));
+        assertTrue(registry.hasActiveTargetAuraForOwner(OWNER_TWO, "toxic", 6_999L));
+    }
+
+    @Test
+    void staleFireProjectionCannotArmAReplacementLease() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        UUID target = UUID.randomUUID();
+        assertTrue(registry.update(OWNER, "profile", "lease-one", UUID.randomUUID(),
+                "fire", "burn-one", 4.0D, null, 0.0D, 0.0D,
+                null, 0.05D, 0.0D, 0L));
+        MiniwyvernOwnerAuraRegistry.Aura stale = registry.activeFor(OWNER).orElseThrow();
+        assertTrue(registry.update(OWNER, "profile", "lease-two", UUID.randomUUID(),
+                "fire", "burn-two", 4.0D, null, 0.0D, 0.0D,
+                null, 0.05D, 0.0D, 0L));
+
+        registry.recordTargetAura(target, stale, 4.0D, 1_000L);
+        assertFalse(registry.conditionalWardActive(OWNER, false, 1_001L));
     }
 
     @Test

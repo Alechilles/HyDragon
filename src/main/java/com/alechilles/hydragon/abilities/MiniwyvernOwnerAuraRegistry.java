@@ -145,10 +145,12 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                 || !validFraction(aura.ownerDamageToAffectedFraction())) return;
         long expiresAtMs = expiryAt(nowMs, durationMillis(durationSeconds));
         TargetAura projection = new TargetAura(
-                aura.ownerUuid(), aura.leaseId(), aura.formId(), aura.effectId().trim(), aura.targetOutgoingDamageReductionFraction(),
+                targetUuid, aura.ownerUuid(), aura.profileId(), aura.leaseId(), aura.formId(), aura.effectId().trim(),
+                aura.targetOutgoingDamageReductionFraction(),
                 aura.targetDamageTakenFraction(), aura.ownerDamageToAffectedFraction(), expiresAtMs);
-        targetAuras.put(new TargetAuraKey(targetUuid, projection.effectId()), projection);
-        if ("fire".equals(projection.formId())
+        targetAuras.put(new TargetAuraKey(targetUuid, projection.effectId(), projection.ownerUuid(),
+                projection.profileId(), projection.leaseId()), projection);
+        if (isCurrentAura(aura) && "fire".equals(projection.formId())
                 && aura.conditionalWardDamageReductionFraction() > 0.0D) {
             fireConditionalWardUntil.put(aura.ownerUuid(), expiryAt(nowMs, 3_000L));
         }
@@ -175,13 +177,14 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
 
     public Optional<TargetAura> activeTargetAura(UUID targetUuid, String effectId, long nowMs) {
         if (targetUuid == null || blank(effectId)) return Optional.empty();
-        TargetAuraKey key = new TargetAuraKey(targetUuid, effectId.trim());
-        TargetAura projection = targetAuras.get(key);
-        if (projection == null || projection.expiresAtMs() <= nowMs) {
-            if (projection != null) targetAuras.remove(key, projection);
-            return Optional.empty();
+        TargetAura selected = null;
+        for (TargetAura projection : activeTargetAuras(targetUuid, nowMs)) {
+            if (!effectId.trim().equals(projection.effectId())) continue;
+            if (selected == null || projection.expiresAtMs() > selected.expiresAtMs()) {
+                selected = projection;
+            }
         }
-        return Optional.of(projection);
+        return Optional.ofNullable(selected);
     }
 
     public List<TargetAura> activeTargetAuras(UUID targetUuid, long nowMs) {
@@ -202,19 +205,40 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
 
     /** Returns whether an owner has a live target projection for the requested form. */
     public boolean hasActiveTargetAuraForOwner(UUID ownerUuid, String formId, long nowMs) {
-        if (ownerUuid == null || blank(formId)) return false;
-        String normalizedForm = normalize(formId);
+        return !activeTargetAurasForOwner(ownerUuid, formId, nowMs).isEmpty();
+    }
+
+    /** Returns only live projections owned by the current profile/lease. */
+    public List<TargetAura> activeTargetAurasForOwner(UUID ownerUuid, String formId, long nowMs) {
+        if (ownerUuid == null || blank(formId)) return List.of();
         Aura current = active.get(ownerUuid);
-        if (current == null) return false;
-        for (TargetAura projection : targetAuras.values()) {
+        if (current == null) return List.of();
+        String normalizedForm = normalize(formId);
+        List<TargetAura> projections = new ArrayList<>();
+        for (var entry : targetAuras.entrySet()) {
+            TargetAura projection = entry.getValue();
+            if (projection.expiresAtMs() <= nowMs) {
+                targetAuras.remove(entry.getKey(), projection);
+                continue;
+            }
             if (ownerUuid.equals(projection.ownerUuid())
+                    && current.profileId().equals(projection.profileId())
                     && current.leaseId().equals(projection.leaseId())
-                    && normalizedForm.equals(projection.formId())
-                    && projection.expiresAtMs() > nowMs) {
-                return true;
+                    && normalizedForm.equals(projection.formId())) {
+                projections.add(projection);
             }
         }
-        return false;
+        return List.copyOf(projections);
+    }
+
+    /** True when a queued target aura still belongs to the live owner profile/lease/form. */
+    public boolean isCurrentAura(Aura aura) {
+        if (aura == null) return false;
+        Aura current = active.get(aura.ownerUuid());
+        return current != null
+                && current.profileId().equals(aura.profileId())
+                && current.leaseId().equals(aura.leaseId())
+                && current.formId().equals(aura.formId());
     }
 
     /** Records one valid Lightning damage event for the next ability-service owner-speed refresh. */
@@ -239,12 +263,22 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
     }
 
     public boolean conditionalWardActive(UUID ownerUuid, boolean ownerBelowHalf, long nowMs) {
+        return conditionalWardActive(ownerUuid, ownerBelowHalf, true, nowMs);
+    }
+
+    /**
+     * Resolves conditional owner protection. Toxic additionally requires the ECS caller to have
+     * observed the target's live Weakness EntityEffect in this damage cycle.
+     */
+    public boolean conditionalWardActive(
+            UUID ownerUuid, boolean ownerBelowHalf, boolean toxicTargetStatusActive, long nowMs) {
         Aura aura = ownerUuid == null ? null : active.get(ownerUuid);
         if (aura == null || aura.conditionalWardDamageReductionFraction() <= 0.0D) return false;
         return switch (aura.formId()) {
             case "fire" -> fireConditionalWardUntil.getOrDefault(ownerUuid, 0L) > nowMs;
             case "nature" -> ownerBelowHalf;
-            case "toxic" -> hasActiveTargetAuraForOwner(ownerUuid, "toxic", nowMs);
+            case "toxic" -> toxicTargetStatusActive
+                    && hasActiveTargetAuraForOwner(ownerUuid, "toxic", nowMs);
             default -> false;
         };
     }
@@ -327,7 +361,8 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
         public double targetOutgoingDamageReductionFraction() { return damageReductionFraction; }
     }
     public record ToxicWeakness(String effectId, double damageReductionFraction, long expiresAtMs) { }
-    public record TargetAura(UUID ownerUuid, String leaseId, String formId, String effectId,
+    public record TargetAura(UUID targetUuid, UUID ownerUuid, String profileId, String leaseId,
+                             String formId, String effectId,
                              double targetOutgoingDamageReductionFraction,
                              double targetDamageTakenFraction,
                              double ownerDamageToAffectedFraction,
@@ -337,7 +372,7 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                           double targetDamageTakenFraction,
                           double ownerDamageToAffectedFraction,
                           long expiresAtMs) {
-            this(null, null, formId, effectId, targetOutgoingDamageReductionFraction,
+            this(null, null, null, null, formId, effectId, targetOutgoingDamageReductionFraction,
                     targetDamageTakenFraction, ownerDamageToAffectedFraction, expiresAtMs);
         }
 
@@ -346,12 +381,25 @@ public final class MiniwyvernOwnerAuraRegistry implements AutoCloseable {
                           double targetDamageTakenFraction,
                           double ownerDamageToAffectedFraction,
                           long expiresAtMs) {
-            this(ownerUuid, null, formId, effectId, targetOutgoingDamageReductionFraction,
+            this(null, ownerUuid, null, null, formId, effectId, targetOutgoingDamageReductionFraction,
                     targetDamageTakenFraction, ownerDamageToAffectedFraction, expiresAtMs);
         }
+
+        /** Compatibility constructor retaining the pre-projection owner/lease argument order. */
+        public TargetAura(UUID ownerUuid, String leaseId, String formId, String effectId,
+                          double targetOutgoingDamageReductionFraction,
+                          double targetDamageTakenFraction,
+                          double ownerDamageToAffectedFraction,
+                          long expiresAtMs) {
+            this(null, ownerUuid, null, leaseId, formId, effectId,
+                    targetOutgoingDamageReductionFraction, targetDamageTakenFraction,
+                    ownerDamageToAffectedFraction, expiresAtMs);
+        }
+
     }
 
-    private record TargetAuraKey(UUID targetUuid, String effectId) { }
+    private record TargetAuraKey(UUID targetUuid, String effectId, UUID ownerUuid,
+                                 String profileId, String leaseId) { }
 
     private static boolean blank(String value) { return value == null || value.isBlank(); }
     private static String normalize(String value) { return value == null ? "" : value.trim().toLowerCase(Locale.ROOT); }

@@ -80,9 +80,11 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
         Ref<EntityStore> target = chunk.getReferenceTo(index);
         MiniwyvernOwnerAuraEffectQueue.Cycle cycle = queue.drainCycle(worldName, targetUuid);
         for (MiniwyvernOwnerAuraRegistry.Aura aura : cycle.reapplications()) {
+            if (!registry.isCurrentAura(aura)) continue;
             add(target, targetUuid, aura, controller, commandBuffer);
         }
         for (MiniwyvernOwnerAuraRegistry.Aura aura : cycle.applications()) {
+            if (!registry.isCurrentAura(aura)) continue;
             applyOrRestart(worldName, target, targetUuid, aura, controller, commandBuffer);
         }
     }

@@ -2,10 +2,13 @@ package com.alechilles.hydragon.abilities;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
@@ -46,7 +49,11 @@ public final class MiniwyvernConditionalWardDamageSystem extends DamageEventSyst
                 && health.get() / health.getMax() < 0.5F;
         long nowMs = System.currentTimeMillis();
         MiniwyvernOwnerAuraRegistry.Aura aura = registry.activeFor(identity.getUuid()).orElse(null);
-        boolean active = aura != null && registry.conditionalWardActive(identity.getUuid(), belowHalf, nowMs);
+        boolean toxicTargetStatusActive = aura != null && "toxic".equals(aura.formId())
+                && registry.activeTargetAurasForOwner(identity.getUuid(), "toxic", nowMs).stream()
+                .anyMatch(projection -> hasLiveTargetStatus(store, projection));
+        boolean active = aura != null && registry.conditionalWardActive(
+                identity.getUuid(), belowHalf, toxicTargetStatusActive, nowMs);
         boolean blocked = Boolean.TRUE.equals(damage.getIfPresentMetaObject(Damage.BLOCKED));
         boolean healing = damage.getCause() != null
                 && "healing".equalsIgnoreCase(damage.getCause().getId());
@@ -61,5 +68,18 @@ public final class MiniwyvernConditionalWardDamageSystem extends DamageEventSyst
     static float reducedAmount(float amount, double fraction) {
         if (!Double.isFinite(fraction) || fraction <= 0.0D || fraction >= 1.0D) return amount;
         return (float) (amount * (1.0D - fraction));
+    }
+
+    private static boolean hasLiveTargetStatus(
+            Store<EntityStore> store, MiniwyvernOwnerAuraRegistry.TargetAura projection) {
+        if (projection == null || projection.targetUuid() == null || projection.effectId() == null
+                || projection.effectId().isBlank()) return false;
+        Ref<EntityStore> targetRef = store.getExternalData().getWorld().getEntityRef(projection.targetUuid());
+        if (targetRef == null || !targetRef.isValid()) return false;
+        EffectControllerComponent controller = store.getComponent(
+                targetRef, EffectControllerComponent.getComponentType());
+        int effectIndex = EntityEffect.getAssetMap().getIndex(projection.effectId());
+        return controller != null && effectIndex >= 0
+                && controller.getActiveEffects().containsKey(effectIndex);
     }
 }

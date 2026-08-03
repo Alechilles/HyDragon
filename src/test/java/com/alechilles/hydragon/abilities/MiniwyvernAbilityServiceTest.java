@@ -237,9 +237,9 @@ class MiniwyvernAbilityServiceTest {
         auras.recordSpeedBurst(OWNER);
         assertTrue(new MiniwyvernAbilityService(states, auras).tick(
                 context(), Map.of("lightning", config), world, 2_000L).ready());
-        assertEquals(1, world.ownerModifierApplications);
-        assertEquals(1.15D, world.lastOwnerModifier.get("MovementSpeedMultiplier"));
-        assertEquals(4.0D, world.lastOwnerModifierDuration);
+        assertTrue(world.ownerEffectIds.contains("HyDragon_Miniwyvern_Lightning_SpeedBurst_115_4"));
+        assertEquals("hydragon:mini:profile-1:lightning:speed-burst",
+                world.ownerEffectSources.get(world.ownerEffectSources.size() - 1));
     }
 
     @Test
@@ -260,8 +260,7 @@ class MiniwyvernAbilityServiceTest {
         assertEquals(0.03D, aura.ownerRegenerationFraction());
         assertEquals("Nature_Regeneration_30", aura.ownerEffectId());
         assertEquals(3.0D, world.lastHealAmount);
-        assertEquals(1.10D, world.lastOwnerModifier.get("MovementSpeedMultiplier"));
-        assertEquals(2.0D, world.lastOwnerModifierDuration);
+        assertTrue(world.ownerEffectIds.contains("HyDragon_Miniwyvern_Nature_SpeedBurst_110_2"));
         assertEquals(0, world.enemyEffects);
     }
 
