@@ -42,7 +42,7 @@ The plugin must not replace static spawning or crafting that these asset systems
 
 - **HYD-CONT-011:** Ordinary spawns MUST use `WorldNPCSpawn`/`BeaconNPCSpawn` assets for supported environment, weight, time, moon, light, altitude/proximity, radius, cooldown, and state conditions.
 - **HYD-CONT-012:** Every v1 dragon spawn addition other than the independently tuned Hydra variants MUST be an additive Patchwork patch of an existing `WorldNPCSpawn` or `BeaconNPCSpawn` target. It MUST NOT replace an NPC array. Hydra may use a uniquely named `WorldNPCSpawn` asset to own its time and moon tuning without mutating another pool.
-- **HYD-CONT-013:** Nordic Drake MUST be an uncommon ordinary spawn in the Zone 3 Outlander forest pool, with no Java-controlled encounter, owner gate, or special capture requirement.
+- **HYD-CONT-013:** Nordic Drake MUST be an uncommon ordinary spawn in the Zone 3 forest predator pool, with no Java-controlled encounter, owner gate, or special capture requirement.
 - **HYD-CONT-014:** Content assets, domain configs, and all static spawn paths MUST pass schema/reference validation and the acceptance criteria in section 11 before release.
 
 ### Localization and naming
@@ -54,7 +54,7 @@ The plugin must not replace static spawning or crafting that these asset systems
 | Content | Implemented state | Release verification focus |
 | --- | --- | --- |
 | Hydra | Wild/tamed roles, species data, combat, drops, capture mapping, ordinary spawn, and ground-mount policy | Mount behavior, drop balance, and spawn conditions in game |
-| Nordic Drake | Wild/tamed roles, species data, combat, capture mapping, Zone 3 Outlander spawn, and `TameworkAvatarFlight` config | Avatar flight using only Tamework's Flightmaster's Talisman |
+| Nordic Drake | Wild/tamed roles, species data, combat, capture mapping, Zone 3 forest spawn, and `TameworkAvatarFlight` config | Avatar flight using only Tamework's Flightmaster's Talisman |
 | Rock Drake T1/T2/T3 | Wild/tamed roles, capture declarations, commands, cave spawning, mount policy, and tier metadata | Tier balance, commands, spawning, and mounting in game |
 | Miniwyvern | Stored bonded Soul Bond provisioning, seven archetypes, production wild spawning disabled, and ordinary capture denied | Once-only entitlement, bonded family limits, extension continuity, and ability safety |
 | Draconic Stones | Iron, Thorium, Cobalt, Adamantium, and Ancient tiers with altar-only recipes | Tier eligibility, probability, consume-on-roll behavior, durable stored capture, and cooldown |
@@ -187,7 +187,7 @@ Use asset spawning wherever possible:
 | Rock Drake T1 | Zone 1 cave forests | Preserve current patch/weighted spawn |
 | Rock Drake T2 | Zone 2 volcanic caves | Preserve current patch/weighted spawn |
 | Rock Drake T3 | Zone 2 volcanic and Zone 3 glacial caves | Preserve current patches/weights |
-| Nordic Drake | Zone 3 Outlander forest pool | Additive Patchwork `WorldNPCSpawn` patch, weight 0.7058824 (15% with the current base pool) |
+| Nordic Drake | Zone 3 forest predator pool | Additive Patchwork `WorldNPCSpawn` patch, weight 3.1764706 (15% with the current base pool) |
 | Miniwyvern | None | Soul Bond only |
 
 Spawn assets may vary weight by difficulty/rarity and supported moon/light conditions. The v1 patches intentionally inherit their target pool's top-level conditions: an individual inserted NPC cannot safely carry a different `DayTimeRange` or moon modifier without changing the other NPCs in that pool. Do not create a Java polling spawner for conditions already represented by `WorldNPCSpawn` or `BeaconNPCSpawn`.
@@ -215,7 +215,7 @@ Hydra's ground-mount declaration and tamed-role interaction are aligned in the i
 - Only the Draconic Altar lists recipes for the five stones, Revitalizing Essence, and Soul Bond after the pre-release content update; crafting consumes/produces the configured quantities once.
 - The release artifact contains Fire, Ice, and Lightning—not Igne, Cryo, or Storm—as the canonical essence IDs, and no runtime conversion code exists for the unreleased names.
 - The five `server.lang` catalogs have identical key sets and placeholder signatures, load without parser errors, and show reviewed English, Brazilian Portuguese, German, French, and Spanish values for every HyDragon player-facing string.
-- Hydra and each Rock Drake tier spawn only in their configured ordinary pools; Nordic Drake appears through the Zone 3 Outlander pool; Miniwyvern never appears through production spawning.
+- Hydra and each Rock Drake tier spawn only in their configured ordinary pools; Nordic Drake appears through the Zone 3 forest predator pool; Miniwyvern never appears through production spawning.
 - Every capture-eligible wild role resolves to one valid tamed role and species capture record.
 - Ground mounts do not require the Flightmaster's Talisman; every avatar-flight mount does, and no external flight-mod item is queried.
 - `WorldNPCSpawn`/`BeaconNPCSpawn` tests cover environment/weight/time/moon/light/altitude/proximity fields without plugin duplication.
@@ -230,7 +230,7 @@ Hydra's ground-mount declaration and tamed-role interaction are aligned in the i
 4. The Draconic Altar owns the Draconic Stone, Soul Bond, and revitalization recipes instead of `Arcanebench`.
 5. Rock Drake spawn data is represented by additive Patchwork entries in documented base-game pools; Hydra uses dedicated all-day world-spawn assets with independent lunar weight tuning.
 6. Tamed Rock Drake roles and their capture mappings are present together.
-7. Nordic Drake appears as an uncommon Zone 3 Outlander forest spawn and retains its avatar-flight behavior.
+7. Nordic Drake appears as an uncommon Zone 3 forest spawn and retains its avatar-flight behavior.
 8. Miniwyvern is excluded from capture configs and production spawning; Soul Bond is its exclusive creation path.
 9. Ground-mount declarations and interactions are represented consistently in species configuration.
 10. Nordic flight uses Tamework's Flightmaster's Talisman; no third-party flight dependency is declared or documented.

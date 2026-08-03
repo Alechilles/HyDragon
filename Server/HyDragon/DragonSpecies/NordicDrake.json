@@ -12,7 +12,7 @@
     "SpecialRequirementIds": []
   },
   "Spawn": {
-    "OrdinarySpawnAssetIds": [ "Spawns_Zone3_Outlander" ],
+    "OrdinarySpawnAssetIds": [ "Spawns_Zone3_Forests_Predator" ],
     "PluginEncounterIds": []
   },
   "Presentation": {

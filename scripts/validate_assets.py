@@ -84,8 +84,8 @@ WORKSHOP_056_PATCH_TARGETS = {
         "Env_Zone2_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
     "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier3/Zone3_Cave_Glacial_Aggro.json": (
         "Env_Zone3_Caves_Glacial", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Outlander.json": (
-        "Env_Zone3_Outlander", set()),
+    "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Forests_Predator.json": (
+        "Env_Zone3_Forests", {"DayTimeRange"}),
 }
 HYDRA_INDEPENDENT_WORLD_SPAWNS = {
     "Spawns_Zone3_Glacial_HyDragon_Predator": ("Hydra", "Env_Zone3_Glacial", "IceAndSnow", [2, 1, 1, 1, 1]),
@@ -1044,20 +1044,23 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
         fail(errors, "Rock Drake tier drop-list IDs must be distinct")
 
     expected_spawn_insertions = {
-        "NordicDrake_Zone3_Outlander.json": ("Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Outlander.json", "NordicDrake"),
+        "NordicDrake_Zone3_Forests_Predator.json": (
+            "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Forests_Predator.json",
+            {"Weight": 3.1764706, "SpawnBlockSet": "Soil_NoSnow", "Id": "NordicDrake"},
+        ),
     }
-    for filename, (target, role_id) in expected_spawn_insertions.items():
+    for filename, (target, spawn_entry) in expected_spawn_insertions.items():
         patch = parsed.get(ROOT / "Server/Patchwork/Patches/HyDragon" / filename)
         operations = patch.get("Operations", []) if isinstance(patch, dict) else []
         if not isinstance(patch, dict) or patch.get("Target") != target or not any(
             isinstance(operation, dict)
             and operation.get("Op") == "Insert"
             and operation.get("Path") == "/NPCs"
-            and operation.get("Existing") == {"Id": role_id}
-            and operation.get("Value", {}).get("Id") == role_id
+            and operation.get("Existing") == {"Id": spawn_entry["Id"]}
+            and operation.get("Value") == spawn_entry
             for operation in operations
         ):
-            fail(errors, f"{filename} must append {role_id} to {target}")
+            fail(errors, f"{filename} must append NordicDrake to {target}")
 
     altitude_patch_path = ROOT / "Server/Patchwork/Patches/HyDragon/RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
     altitude_patch = parsed.get(altitude_patch_path)
@@ -1097,9 +1100,9 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
         fail(errors, "Nordic Drake species must select the HyDragonNordicDrake avatar-flight config")
     nordic_spawn = nordic_species.get("Spawn") if isinstance(nordic_species, dict) else None
     if not isinstance(nordic_spawn, dict) \
-            or nordic_spawn.get("OrdinarySpawnAssetIds") != ["Spawns_Zone3_Outlander"] \
+            or nordic_spawn.get("OrdinarySpawnAssetIds") != ["Spawns_Zone3_Forests_Predator"] \
             or nordic_spawn.get("PluginEncounterIds") != []:
-        fail(errors, "Nordic Drake must use only the Zone 3 Outlander ordinary spawn route")
+        fail(errors, "Nordic Drake must use only the Zone 3 forest ordinary spawn route")
     nordic_policy = parsed.get(ROOT / "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json")
     if not isinstance(nordic_policy, dict) or nordic_policy.get("Requirements", []) != []:
         fail(errors, "Nordic Drake capture policy must not require an encounter phase")

@@ -1,6 +1,6 @@
 {
-  "Id": "HyDragon_NordicDrake_Zone3_Outlander",
-  "Target": "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Outlander.json",
+  "Id": "HyDragon_NordicDrake_Zone3_Forests_Predator",
+  "Target": "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Forests_Predator.json",
   "Priority": 0,
   "Enabled": true,
   "Operations": [
@@ -11,8 +11,8 @@
       "Position": "End",
       "Existing": { "Id": "NordicDrake" },
       "Value": {
-        "Weight": 0.7058824,
-        "SpawnBlockSet": "Outlander",
+        "Weight": 3.1764706,
+        "SpawnBlockSet": "Soil_NoSnow",
         "Id": "NordicDrake"
       }
     }
