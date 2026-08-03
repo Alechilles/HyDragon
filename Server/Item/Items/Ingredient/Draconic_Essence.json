@@ -10,5 +10,12 @@
     "Color": "#446688",
     "Radius": 1
   },
-  "ResourceTypes": [ { "Id": "HyDragon_DraconicEssences", "Quantity": 1 } ]
+  "ResourceTypes": [
+    { "Id": "HyDragon_DraconicEssences", "Quantity": 1 }
+  ],
+  "IconProperties": {
+    "Scale": 2.3,
+    "Translation": [ 3, -3 ],
+    "Rotation": [ 9, 2, 0 ]
+  }
 }

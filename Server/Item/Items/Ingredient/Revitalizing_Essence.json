@@ -31,5 +31,10 @@
     "Color": "#086a01",
     "Radius": 1
   },
-  "Model": "Items/HyDragon/Revitalizing_Essence/RevitalizeEssence.blockymodel"
+  "Model": "Items/HyDragon/Revitalizing_Essence/RevitalizeEssence.blockymodel",
+  "IconProperties": {
+    "Scale": 1.8,
+    "Translation": [ 3, -3 ],
+    "Rotation": [ 9, 4, 0 ]
+  }
 }

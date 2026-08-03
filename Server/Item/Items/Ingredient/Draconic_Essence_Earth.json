@@ -6,15 +6,30 @@
   },
   "Icon": "Icons/ItemsGenerated/Draconic_Essence_Earth.png",
   "Texture": "Items/HyDragon/Draconic_Essence_Earth.png",
-  "ResourceTypes": [ { "Id": "HyDragon_DraconicEssences", "Quantity": 1 } ],
+  "ResourceTypes": [
+    { "Id": "HyDragon_DraconicEssences", "Quantity": 1 }
+  ],
   "Recipe": {
-    "Input": [ { "ItemId": "Draconic_Essence", "Quantity": 2 }, { "ItemId": "Ingredient_Crystal_Green", "Quantity": 12 } ],
-    "Output": [ { "ItemId": "Draconic_Essence_Earth", "Quantity": 1 } ],
-    "BenchRequirement": [ { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Restoration" ] } ],
+    "Input": [
+      { "ItemId": "Draconic_Essence", "Quantity": 2 },
+      { "ItemId": "Ingredient_Crystal_Green", "Quantity": 12 }
+    ],
+    "Output": [
+      { "ItemId": "Draconic_Essence_Earth", "Quantity": 1 }
+    ],
+    "BenchRequirement": [
+      { "Type": "Crafting", "Id": "Draconic_Altar", "Categories": [ "Draconic_Altar_Restoration" ] }
+    ],
     "TimeSeconds": 3
   },
   "Light": {
     "Color": "#523800",
     "Radius": 1
-  }
+  },
+  "IconProperties": {
+    "Scale": 2.3,
+    "Translation": [ 3, -3 ],
+    "Rotation": [ 9, 2, 0 ]
+  },
+  "Quality": "Uncommon"
 }
