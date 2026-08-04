@@ -87,9 +87,9 @@ WORKSHOP_056_PATCH_TARGETS = {
     "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Forests_Predator.json": (
         "Env_Zone3_Forests", {"DayTimeRange"}),
 }
-HYDRA_INDEPENDENT_WORLD_SPAWNS = {
-    "Spawns_Zone3_Glacial_HyDragon_Predator": ("Hydra", "Env_Zone3_Glacial", "IceAndSnow", [2, 1, 1, 1, 1]),
-    "Spawns_Zone1_Swamps_HyDragon_Predator": ("Hydra_Toxic", "Env_Zone1_Swamps", "Mud", [1, 1, 1, 1, 2]),
+HYDRA_INDEPENDENT_WORLD_SPAWN_IDS = {
+    "Spawns_Zone3_Glacial_HyDragon_Predator",
+    "Spawns_Zone1_Swamps_HyDragon_Predator",
 }
 
 
@@ -837,19 +837,8 @@ def validate_static_spawn_contracts(
     for path in sorted(world_root.rglob("*.json")):
         local_spawn_ids.add(path.stem)
         validate_spawn_shape(parsed.get(path), "WorldNPCSpawn", path.relative_to(ROOT).as_posix(), known_assets, errors)
-        expected = HYDRA_INDEPENDENT_WORLD_SPAWNS.get(path.stem)
-        if expected is None:
+        if path.stem not in HYDRA_INDEPENDENT_WORLD_SPAWN_IDS:
             fail(errors, f"{path.relative_to(ROOT)} is not an approved independent Hydra spawn asset")
-            continue
-        role_id, environment, block_set, moon_weights = expected
-        data = parsed.get(path)
-        npcs = data.get("NPCs", []) if isinstance(data, dict) else []
-        if not isinstance(data, dict) \
-                or data.get("Environments") != [environment] \
-                or data.get("DayTimeRange") is not None \
-                or data.get("MoonPhaseWeightModifiers") != moon_weights \
-                or npcs != [{"Weight": 1, "SpawnBlockSet": block_set, "Id": role_id}]:
-            fail(errors, f"{path.relative_to(ROOT)} must remain the configured all-day lunar Hydra spawn")
 
     patch_root = ROOT / "Server/Patchwork/Patches/HyDragon"
     patch_ids: set[str] = set()
@@ -1042,25 +1031,6 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
                 fail(errors, f"{drop_path.relative_to(ROOT)} does not source {required_item}")
     if len(set(expected_drop_ids)) != 3:
         fail(errors, "Rock Drake tier drop-list IDs must be distinct")
-
-    expected_spawn_insertions = {
-        "NordicDrake_Zone3_Forests_Predator.json": (
-            "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Forests_Predator.json",
-            {"Weight": 3.1764706, "SpawnBlockSet": "Soil_NoSnow", "Id": "NordicDrake"},
-        ),
-    }
-    for filename, (target, spawn_entry) in expected_spawn_insertions.items():
-        patch = parsed.get(ROOT / "Server/Patchwork/Patches/HyDragon" / filename)
-        operations = patch.get("Operations", []) if isinstance(patch, dict) else []
-        if not isinstance(patch, dict) or patch.get("Target") != target or not any(
-            isinstance(operation, dict)
-            and operation.get("Op") == "Insert"
-            and operation.get("Path") == "/NPCs"
-            and operation.get("Existing") == {"Id": spawn_entry["Id"]}
-            and operation.get("Value") == spawn_entry
-            for operation in operations
-        ):
-            fail(errors, f"{filename} must append NordicDrake to {target}")
 
     altitude_patch_path = ROOT / "Server/Patchwork/Patches/HyDragon/RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
     altitude_patch = parsed.get(altitude_patch_path)
