@@ -149,8 +149,16 @@ class ToxicHydraVariantAssetTest {
         JsonObject abilities = flight.getAsJsonObject("CombatAbilities");
         assertEquals("Root_NPC_Hydra_Toxic_Avatar_Ball",
                 abilities.getAsJsonObject("Ability2").get("RootInteraction").getAsString());
+        assertEquals("HyDragon/AvatarFlightIcons/ToxicTripleBolt.png",
+                abilities.getAsJsonObject("Ability2").get("GlyphTexturePath").getAsString());
+        assertEquals(15.0, abilities.getAsJsonObject("Ability2").get("CooldownSeconds").getAsDouble());
         assertEquals("Root_NPC_Hydra_Toxic_Avatar_Spit",
                 abilities.getAsJsonObject("Ability3").get("RootInteraction").getAsString());
+        assertEquals("HyDragon/AvatarFlightIcons/PoisonBreath.png",
+                abilities.getAsJsonObject("Ability3").get("GlyphTexturePath").getAsString());
+        assertEquals(15.0, abilities.getAsJsonObject("Ability3").get("CooldownSeconds").getAsDouble());
+        assertTrue(Files.isRegularFile(ROOT.resolve("Common/UI/Custom/HyDragon/AvatarFlightIcons/ToxicTripleBolt.png")));
+        assertTrue(Files.isRegularFile(ROOT.resolve("Common/UI/Custom/HyDragon/AvatarFlightIcons/PoisonBreath.png")));
         assertEquals("FlyIdle", flight.getAsJsonObject("Animation")
                 .get("IdleAnimation").getAsString());
         assertEquals("Fly", flight.getAsJsonObject("Animation")
@@ -193,6 +201,23 @@ class ToxicHydraVariantAssetTest {
         JsonObject mount = interaction.getAsJsonArray("Interactions").get(0).getAsJsonObject();
         assertEquals("Mount", mount.get("Type").getAsString());
         assertTrue(mount.get("Enabled").getAsBoolean());
+    }
+
+    @Test
+    void mountedPoisonBreathUsesTheDedicatedMovingToxicStream() throws Exception {
+        JsonObject breath = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Avatar_Spit.json");
+        String serialized = breath.toString();
+        assertTrue(serialized.contains("HyDragon_Hydra_Toxic_Breath"));
+        assertFalse(serialized.contains("\"SystemId\":\"Effect_Poison\""));
+
+        JsonObject stream = json("Server/Particles/HyDragon/Hydra/HyDragon_Hydra_Toxic_Breath.particlesystem");
+        assertEquals(1.2, stream.get("LifeSpan").getAsDouble());
+        assertEquals("HyDragon_Hydra_Toxic_Breath_Stream",
+                stream.getAsJsonArray("Spawners").get(0).getAsJsonObject().get("SpawnerId").getAsString());
+        JsonObject spawner = json("Server/Particles/HyDragon/Hydra/Spawners/HyDragon_Hydra_Toxic_Breath_Stream.particlespawner");
+        assertTrue(spawner.getAsJsonObject("SpawnRate").get("Min").getAsDouble() >= 100.0);
+        assertTrue(spawner.getAsJsonObject("InitialVelocity").getAsJsonObject("Speed")
+                .get("Min").getAsDouble() >= 10.0);
     }
 
     @Test

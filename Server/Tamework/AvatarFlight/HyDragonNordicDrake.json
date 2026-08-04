@@ -23,11 +23,15 @@
   "CombatAbilities": {
     "Ability2": {
       "RootInteraction": "Root_NPC_Tamed_NordicDrake_Avatar_Fire_Ball",
-      "Glyph": "FIRE"
+      "Glyph": "FIRE",
+      "GlyphTexturePath": "HyDragon/AvatarFlightIcons/NordicFireball.png",
+      "CooldownSeconds": 15.0
     },
     "Ability3": {
       "RootInteraction": "Root_NPC_NordicDrake_Avatar_Flying_Flame_Breath",
-      "Glyph": "BREATH"
+      "Glyph": "BREATH",
+      "GlyphTexturePath": "HyDragon/AvatarFlightIcons/NordicFireBreath.png",
+      "CooldownSeconds": 15.0
     }
   },
   "Trails": {

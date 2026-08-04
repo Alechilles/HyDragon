@@ -54,9 +54,19 @@ final class NordicAvatarFlightPatchContractTest {
         assertEquals("Root_NPC_Tamed_NordicDrake_Avatar_Fire_Ball",
                 abilities.getAsJsonObject("Ability2").get("RootInteraction").getAsString());
         assertEquals("FIRE", abilities.getAsJsonObject("Ability2").get("Glyph").getAsString());
+        assertEquals("HyDragon/AvatarFlightIcons/NordicFireball.png",
+                abilities.getAsJsonObject("Ability2").get("GlyphTexturePath").getAsString());
+        assertEquals(15.0, abilities.getAsJsonObject("Ability2").get("CooldownSeconds").getAsDouble());
         assertEquals("Root_NPC_NordicDrake_Avatar_Flying_Flame_Breath",
                 abilities.getAsJsonObject("Ability3").get("RootInteraction").getAsString());
         assertEquals("BREATH", abilities.getAsJsonObject("Ability3").get("Glyph").getAsString());
+        assertEquals("HyDragon/AvatarFlightIcons/NordicFireBreath.png",
+                abilities.getAsJsonObject("Ability3").get("GlyphTexturePath").getAsString());
+        assertEquals(15.0, abilities.getAsJsonObject("Ability3").get("CooldownSeconds").getAsDouble());
+        assertTrue(Files.isRegularFile(Path.of(
+                "Common", "UI", "Custom", "HyDragon", "AvatarFlightIcons", "NordicFireball.png")));
+        assertTrue(Files.isRegularFile(Path.of(
+                "Common", "UI", "Custom", "HyDragon", "AvatarFlightIcons", "NordicFireBreath.png")));
     }
 
     @Test

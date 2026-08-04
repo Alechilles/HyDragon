@@ -1,0 +1,13 @@
+{
+  "LifeSpan": 1.2,
+  "CullDistance": 100.0,
+  "IsImportant": false,
+  "Spawners": [
+    {
+      "SpawnerId": "HyDragon_Hydra_Toxic_Breath_Stream",
+      "PositionOffset": {
+        "Z": 2.5
+      }
+    }
+  ]
+}

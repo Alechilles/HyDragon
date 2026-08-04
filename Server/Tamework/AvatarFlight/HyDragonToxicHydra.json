@@ -48,11 +48,15 @@
   "CombatAbilities": {
     "Ability2": {
       "RootInteraction": "Root_NPC_Hydra_Toxic_Avatar_Ball",
-      "Glyph": "POISON"
+      "Glyph": "POISON",
+      "GlyphTexturePath": "HyDragon/AvatarFlightIcons/ToxicTripleBolt.png",
+      "CooldownSeconds": 15.0
     },
     "Ability3": {
       "RootInteraction": "Root_NPC_Hydra_Toxic_Avatar_Spit",
-      "Glyph": "BREATH"
+      "Glyph": "BREATH",
+      "GlyphTexturePath": "HyDragon/AvatarFlightIcons/PoisonBreath.png",
+      "CooldownSeconds": 15.0
     }
   },
   "RiderVisual": {

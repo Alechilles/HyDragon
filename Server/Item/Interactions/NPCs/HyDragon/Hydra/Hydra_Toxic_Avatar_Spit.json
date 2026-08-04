@@ -17,17 +17,17 @@
                   {
                     "TargetEntityPart": "Entity",
                     "TargetNodeName": "AF_Origin",
-                    "SystemId": "Effect_Poison",
+                    "SystemId": "HyDragon_Hydra_Toxic_Breath",
                     "DetachedFromModel": false,
                     "PositionOffset": {
-                      "Z": 5.0
+                      "Z": 4.5
                     },
                     "RotationOffset": {
                       "Pitch": 0,
                       "Roll": 0,
                       "Yaw": 180
                     },
-                    "Scale": 2.0
+                    "Scale": 1.5
                   }
                 ],
                 "ClearAnimationOnFinish": true
