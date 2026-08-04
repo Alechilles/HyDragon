@@ -12,7 +12,7 @@
               "Effects": {
                 "ItemPlayerAnimationsId": "Hydra_Default",
                 "ItemAnimationId": "ChargeShoot",
-                "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
+                "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Flame_Breath_Roar",
                 "Particles": [
                   {
                     "TargetEntityPart": "Entity",

@@ -6,7 +6,8 @@
       "Type": "Simple",
       "Effects": {
         "ItemPlayerAnimationsId": "Hydra_Default",
-        "ItemAnimationId": "ChargeShoot"
+        "ItemAnimationId": "ChargeShoot",
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Roar"
       },
       "RunTime": 0.35
     },
@@ -14,8 +15,7 @@
       "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
       "Effects": {
-        "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
-        "LocalSoundEventId": "SFX_Scarak_Spitball_Fire",
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
         "Particles": [
           {
             "TargetEntityPart": "Entity",
@@ -59,8 +59,7 @@
       "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
       "Effects": {
-        "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
-        "LocalSoundEventId": "SFX_Scarak_Spitball_Fire",
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
         "Particles": [
           {
             "TargetEntityPart": "Entity",
@@ -104,8 +103,7 @@
       "Type": "TameworkLaunchProjectile",
       "RunTime": 0,
       "Effects": {
-        "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
-        "LocalSoundEventId": "SFX_Scarak_Spitball_Fire",
+        "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
         "Particles": [
           {
             "TargetEntityPart": "Entity",

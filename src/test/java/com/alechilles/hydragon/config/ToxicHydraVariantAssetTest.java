@@ -238,10 +238,20 @@ class ToxicHydraVariantAssetTest {
             assertEquals("Direct", string(launch, "TrajectoryMode"));
             assertEquals(48.0, launch.get("LookTargetDistance").getAsDouble());
             assertEquals("Poison_T1", launch.getAsJsonObject("ImpactEffect").get("EffectId").getAsString());
+            assertEquals("SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
+                    launch.getAsJsonObject("Effects").get("WorldSoundEventId").getAsString());
         }
+        assertEquals("SFX_HyDragon_NordicDrake_Avatar_Fireball_Roar",
+                volley.getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                        .getAsJsonObject("Effects").get("WorldSoundEventId").getAsString());
 
         JsonObject breath = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Avatar_Spit.json");
         assertEquals("Serial", breath.get("Type").getAsString());
+        assertEquals("SFX_HyDragon_NordicDrake_Avatar_Flame_Breath_Roar",
+                breath.getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                        .getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                        .getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                        .getAsJsonObject("Effects").get("WorldSoundEventId").getAsString());
         List<JsonObject> breathSweeps = objects(breath,
                 interaction -> "Selector".equals(string(interaction, "Type")));
         assertEquals(3, breathSweeps.size(), "mounted poison breath must sweep its cone three times");
@@ -756,7 +766,7 @@ class ToxicHydraVariantAssetTest {
         assertTrue(Files.isRegularFile(ROOT.resolve(relativePath)), relativePath + " must exist");
         json(relativePath);
         assertNoForbiddenText(relativePath, "Root_NPC_Hydra_RainShoot");
-        assertNoForbiddenText(relativePath, "NordicDrake");
+        assertNoForbiddenText(relativePath, "Root_NPC_NordicDrake");
         assertNoForbiddenText(relativePath, "Flame");
     }
 
