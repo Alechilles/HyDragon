@@ -1,0 +1,42 @@
+{
+  "Id": "HyDragon_Flightmasters_Talisman_Recipe",
+  "Target": "Server/Item/Items/Tools/Tamework_Flightmasters_Talisman.json",
+  "Priority": 100,
+  "Enabled": true,
+  "Operations": [
+    {
+      "Id": "set-talisman-quality",
+      "Op": "Replace",
+      "Path": "/Quality",
+      "Value": "Epic"
+    },
+    {
+      "Id": "add-talisman-recipe",
+      "Op": "Add",
+      "Path": "/Recipe",
+      "Value": {
+        "Input": [
+          { "ItemId": "Ingredient_Bar_Gold", "Quantity": 10 },
+          { "ItemId": "Rock_Gem_Zephyr", "Quantity": 3 }
+        ],
+        "Output": [
+          { "ItemId": "Tamework_Flightmasters_Talisman", "Quantity": 1 }
+        ],
+        "BenchRequirement": [
+          {
+            "Type": "Crafting",
+            "Id": "FarmingBench",
+            "Categories": "Farming",
+            "RequiredTierLevel": 6
+          },
+          {
+            "Type": "Crafting",
+            "Id": "Draconic_Altar",
+            "Categories": [ "Draconic_Altar_Bonding" ]
+          }
+        ],
+        "TimeSeconds": 4
+      }
+    }
+  ]
+}
