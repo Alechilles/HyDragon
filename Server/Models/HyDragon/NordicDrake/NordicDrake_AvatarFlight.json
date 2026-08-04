@@ -108,6 +108,9 @@
         {
           "Animation": "NPC/HyDragon/NordicDrake/Animations/AvatarFlight/Run.blockyanim",
           "SoundEventId": "SFX_Rex_Walk",
+          "FootstepIntervals": [
+            3
+          ],
           "Looping": true,
           "Speed": 1
         }

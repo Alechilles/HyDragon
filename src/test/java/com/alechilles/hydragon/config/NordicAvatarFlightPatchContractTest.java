@@ -104,4 +104,24 @@ final class NordicAvatarFlightPatchContractTest {
         }
         assertTrue(mountRootTrackCount > 0);
     }
+
+    @Test
+    void avatarFlightModelEmitsGroundFootstepsWithoutFootstepEventsInFlightAnimations() throws IOException {
+        JsonObject model = JsonParser.parseString(Files.readString(Path.of(
+                "Server", "Models", "HyDragon", "NordicDrake",
+                "NordicDrake_AvatarFlight.json"))).getAsJsonObject();
+        JsonObject animationSets = model.getAsJsonObject("AnimationSets");
+        JsonObject run = animationSets.getAsJsonObject("Run")
+                .getAsJsonArray("Animations").get(0).getAsJsonObject();
+
+        assertEquals("SFX_Rex_Walk", run.get("SoundEventId").getAsString());
+        assertEquals(3, run.getAsJsonArray("FootstepIntervals").get(0).getAsInt());
+
+        for (String flightAnimation : List.of("FlyIdle", "Fly", "FlyFast")) {
+            JsonObject animation = animationSets.getAsJsonObject(flightAnimation)
+                    .getAsJsonArray("Animations").get(0).getAsJsonObject();
+            assertFalse(animation.has("FootstepIntervals"), flightAnimation);
+            assertFalse(animation.has("SoundEventId"), flightAnimation);
+        }
+    }
 }
