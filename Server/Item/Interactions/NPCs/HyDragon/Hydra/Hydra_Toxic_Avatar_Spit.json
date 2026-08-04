@@ -16,7 +16,7 @@
                 "Particles": [
                   {
                     "TargetEntityPart": "Entity",
-                    "TargetNodeName": "AF_Origin",
+                    "TargetNodeName": "AF_Head",
                     "SystemId": "HyDragon_Hydra_Toxic_Breath",
                     "DetachedFromModel": false,
                     "PositionOffset": {

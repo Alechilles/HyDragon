@@ -209,6 +209,11 @@ class ToxicHydraVariantAssetTest {
         String serialized = breath.toString();
         assertTrue(serialized.contains("HyDragon_Hydra_Toxic_Breath"));
         assertFalse(serialized.contains("\"SystemId\":\"Effect_Poison\""));
+        JsonObject particle = breath.getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                .getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                .getAsJsonArray("Interactions").get(0).getAsJsonObject()
+                .getAsJsonObject("Effects").getAsJsonArray("Particles").get(0).getAsJsonObject();
+        assertEquals("AF_Head", particle.get("TargetNodeName").getAsString());
 
         JsonObject stream = json("Server/Particles/HyDragon/Hydra/HyDragon_Hydra_Toxic_Breath.particlesystem");
         assertEquals(1.2, stream.get("LifeSpan").getAsDouble());
