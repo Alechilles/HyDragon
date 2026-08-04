@@ -148,9 +148,9 @@ class ToxicHydraVariantAssetTest {
         assertTrue(flight.getAsJsonObject("Model").get("ApplyModel").getAsBoolean());
         JsonObject abilities = flight.getAsJsonObject("CombatAbilities");
         assertEquals("Root_NPC_Hydra_Toxic_Avatar_Ball",
-                abilities.getAsJsonObject("Ability2").get("Interaction").getAsString());
+                abilities.getAsJsonObject("Ability2").get("RootInteraction").getAsString());
         assertEquals("Root_NPC_Hydra_Toxic_Avatar_Spit",
-                abilities.getAsJsonObject("Ability3").get("Interaction").getAsString());
+                abilities.getAsJsonObject("Ability3").get("RootInteraction").getAsString());
         assertEquals("FlyIdle", flight.getAsJsonObject("Animation")
                 .get("IdleAnimation").getAsString());
         assertEquals("Fly", flight.getAsJsonObject("Animation")
@@ -193,6 +193,41 @@ class ToxicHydraVariantAssetTest {
         JsonObject mount = interaction.getAsJsonArray("Interactions").get(0).getAsJsonObject();
         assertEquals("Mount", mount.get("Type").getAsString());
         assertTrue(mount.get("Enabled").getAsBoolean());
+    }
+
+    @Test
+    void mountedToxicHydraUsesTripleBoltAndPoisonBreath() throws Exception {
+        JsonObject volley = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Avatar_Ball.json");
+        assertEquals("Serial", volley.get("Type").getAsString());
+        List<JsonObject> volleyLaunches = volley.getAsJsonArray("Interactions").asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(interaction -> "TameworkLaunchProjectile".equals(string(interaction, "Type"))).toList();
+        assertEquals(3, volleyLaunches.size(), "mounted toxic volley must launch exactly three bolts");
+        for (JsonObject launch : volleyLaunches) {
+            assertEquals("Hydra_Toxic_Ball", string(launch, "ProjectileId"));
+            assertEquals("Direct", string(launch, "TrajectoryMode"));
+            assertEquals(48.0, launch.get("LookTargetDistance").getAsDouble());
+            assertEquals("Poison_T1", launch.getAsJsonObject("ImpactEffect").get("EffectId").getAsString());
+        }
+
+        JsonObject breath = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Avatar_Spit.json");
+        assertEquals("Serial", breath.get("Type").getAsString());
+        List<JsonObject> breathSweeps = objects(breath,
+                interaction -> "Selector".equals(string(interaction, "Type")));
+        assertEquals(3, breathSweeps.size(), "mounted poison breath must sweep its cone three times");
+        for (JsonObject sweep : breathSweeps) {
+            assertEquals("Stab", sweep.getAsJsonObject("Selector").get("Id").getAsString());
+            assertTrue(sweep.getAsJsonObject("Selector").get("TestLineOfSight").getAsBoolean());
+            assertEquals(List.of("Hydra_Toxic_Avatar_Breath_Damage"),
+                    strings(sweep.getAsJsonObject("HitEntity").getAsJsonArray("Interactions")));
+        }
+
+        JsonObject breathDamage = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/"
+                + "Hydra_Toxic_Avatar_Breath_Damage.json");
+        assertEquals("DamageEntityParent", breathDamage.get("Parent").getAsString());
+        assertEquals(18, breathDamage.getAsJsonObject("DamageCalculator").getAsJsonObject("BaseDamage")
+                .get("Physical").getAsInt());
+        assertEquals("Poison_T1", breathDamage.getAsJsonObject("Next").get("EffectId").getAsString());
     }
 
     @Test

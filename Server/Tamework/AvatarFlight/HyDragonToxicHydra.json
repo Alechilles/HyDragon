@@ -47,11 +47,11 @@
   },
   "CombatAbilities": {
     "Ability2": {
-      "Interaction": "Root_NPC_Hydra_Toxic_Avatar_Ball",
+      "RootInteraction": "Root_NPC_Hydra_Toxic_Avatar_Ball",
       "Glyph": "POISON"
     },
     "Ability3": {
-      "Interaction": "Root_NPC_Hydra_Toxic_Avatar_Spit",
+      "RootInteraction": "Root_NPC_Hydra_Toxic_Avatar_Spit",
       "Glyph": "BREATH"
     }
   },

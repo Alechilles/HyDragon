@@ -1,35 +1,128 @@
 {
-  "Type": "TameworkLaunchProjectile",
-  "Effects": {
-    "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
-    "LocalSoundEventId": "SFX_Scarak_Spitball_Fire",
-    "Particles": [
-      {
-        "TargetEntityPart": "Entity",
-        "TargetNodeName": "Origin_Projectile",
-        "SystemId": "Effect_Poison",
-        "DetachedFromModel": false,
-        "PositionOffset": {},
-        "Scale": 1.5
-      }
-    ]
-  },
-  "ProjectileId": "Hydra_Toxic_Ball",
-  "TrajectoryMode": "Direct",
-  "LookTargetDistance": 48.0,
-  "ImpactEffect": {
-    "EffectId": "Poison_T1",
-    "Radius": 3.0,
-    "ExcludeSource": true
-  },
-  "LingeringHazard": {
-    "Radius": 3.0,
-    "DurationSeconds": 30.0,
-    "TickIntervalSeconds": 1.0,
-    "DamagePerTick": 5.0,
-    "ExcludeSource": true,
-    "EffectId": "Poison_T1",
-    "SourceTypeId": "hydragon.toxic_hydra_hazard"
-  },
-  "Tags": {}
+  "Type": "Serial",
+  "$Comment": "Player-safe poison breath with a forward toxic plume and three line-of-sight damage sweeps.",
+  "Interactions": [
+    {
+      "Type": "Parallel",
+      "Interactions": [
+        {
+          "Interactions": [
+            {
+              "Type": "Simple",
+              "Effects": {
+                "ItemPlayerAnimationsId": "Hydra_Default",
+                "ItemAnimationId": "ChargeShoot",
+                "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
+                "Particles": [
+                  {
+                    "TargetEntityPart": "Entity",
+                    "TargetNodeName": "AF_Origin",
+                    "SystemId": "Effect_Poison",
+                    "DetachedFromModel": false,
+                    "PositionOffset": {
+                      "Z": 5.0
+                    },
+                    "RotationOffset": {
+                      "Pitch": 0,
+                      "Roll": 0,
+                      "Yaw": 180
+                    },
+                    "Scale": 2.0
+                  }
+                ],
+                "ClearAnimationOnFinish": true
+              },
+              "RunTime": 1.2
+            }
+          ]
+        },
+        {
+          "Interactions": [
+            {
+              "Type": "Simple",
+              "RunTime": 0.5
+            },
+            {
+              "Type": "Selector",
+              "RunTime": 0.05,
+              "Selector": {
+                "Id": "Stab",
+                "TestLineOfSight": true,
+                "ExtendTop": 0.75,
+                "ExtendLeft": 0.75,
+                "ExtendRight": 0.75,
+                "ExtendBottom": 0.75,
+                "StartDistance": 2.0,
+                "EndDistance": 12.5
+              },
+              "HitEntity": {
+                "Interactions": [
+                  "Hydra_Toxic_Avatar_Breath_Damage"
+                ]
+              },
+              "Next": {
+                "Type": "Serial",
+                "Interactions": [
+                  {
+                    "Type": "Simple",
+                    "RunTime": 0.25
+                  },
+                  {
+                    "Type": "Selector",
+                    "RunTime": 0.05,
+                    "Selector": {
+                      "Id": "Stab",
+                      "TestLineOfSight": true,
+                      "ExtendTop": 0.75,
+                      "ExtendLeft": 0.75,
+                      "ExtendRight": 0.75,
+                      "ExtendBottom": 0.75,
+                      "StartDistance": 1.5,
+                      "EndDistance": 12.0
+                    },
+                    "HitEntity": {
+                      "Interactions": [
+                        "Hydra_Toxic_Avatar_Breath_Damage"
+                      ]
+                    }
+                  },
+                  {
+                    "Type": "Simple",
+                    "RunTime": 0.25
+                  },
+                  {
+                    "Type": "Selector",
+                    "RunTime": 0.05,
+                    "Selector": {
+                      "Id": "Stab",
+                      "TestLineOfSight": true,
+                      "ExtendTop": 0.75,
+                      "ExtendLeft": 0.75,
+                      "ExtendRight": 0.75,
+                      "ExtendBottom": 0.75,
+                      "StartDistance": 1.5,
+                      "EndDistance": 12.0
+                    },
+                    "HitEntity": {
+                      "Interactions": [
+                        "Hydra_Toxic_Avatar_Breath_Damage"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Simple",
+      "Effects": {
+        "ItemPlayerAnimationsId": "Hydra_Default",
+        "ItemAnimationId": "FinishShoot"
+      },
+      "RunTime": 0.4
+    }
+  ]
 }

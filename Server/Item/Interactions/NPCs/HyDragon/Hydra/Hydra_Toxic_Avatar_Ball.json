@@ -1,6 +1,6 @@
 {
   "Type": "Serial",
-  "$Comment": "Player-safe Toxic Hydra ball with ChargeShoot/FinishShoot presentation and a single look-targeted launch.",
+  "$Comment": "Player-safe Toxic Hydra triple bolt with ChargeShoot/FinishShoot presentation and three look-targeted launches.",
   "Interactions": [
     {
       "Type": "Simple",
@@ -19,7 +19,97 @@
         "Particles": [
           {
             "TargetEntityPart": "Entity",
-            "TargetNodeName": "Origin_Projectile",
+            "TargetNodeName": "AF_Origin",
+            "SystemId": "Effect_Poison",
+            "DetachedFromModel": false,
+            "PositionOffset": {},
+            "Scale": 1.5
+          }
+        ]
+      },
+      "ProjectileId": "Hydra_Toxic_Ball",
+      "LaunchPositionOffset": {
+        "X": 0.0,
+        "Y": -1.0,
+        "Z": -3.0
+      },
+      "TrajectoryMode": "Direct",
+      "LookTargetDistance": 48.0,
+      "ImpactEffect": {
+        "EffectId": "Poison_T1",
+        "Radius": 3.0,
+        "ExcludeSource": true
+      },
+      "LingeringHazard": {
+        "Radius": 3.0,
+        "DurationSeconds": 30.0,
+        "TickIntervalSeconds": 1.0,
+        "DamagePerTick": 5.0,
+        "ExcludeSource": true,
+        "EffectId": "Poison_T1",
+        "SourceTypeId": "hydragon.toxic_hydra_hazard"
+      },
+      "Tags": {}
+    },
+    {
+      "Type": "Simple",
+      "RunTime": 0.2
+    },
+    {
+      "Type": "TameworkLaunchProjectile",
+      "RunTime": 0,
+      "Effects": {
+        "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
+        "LocalSoundEventId": "SFX_Scarak_Spitball_Fire",
+        "Particles": [
+          {
+            "TargetEntityPart": "Entity",
+            "TargetNodeName": "AF_Origin",
+            "SystemId": "Effect_Poison",
+            "DetachedFromModel": false,
+            "PositionOffset": {},
+            "Scale": 1.5
+          }
+        ]
+      },
+      "ProjectileId": "Hydra_Toxic_Ball",
+      "LaunchPositionOffset": {
+        "X": 0.0,
+        "Y": -1.0,
+        "Z": -3.0
+      },
+      "TrajectoryMode": "Direct",
+      "LookTargetDistance": 48.0,
+      "ImpactEffect": {
+        "EffectId": "Poison_T1",
+        "Radius": 3.0,
+        "ExcludeSource": true
+      },
+      "LingeringHazard": {
+        "Radius": 3.0,
+        "DurationSeconds": 30.0,
+        "TickIntervalSeconds": 1.0,
+        "DamagePerTick": 5.0,
+        "ExcludeSource": true,
+        "EffectId": "Poison_T1",
+        "SourceTypeId": "hydragon.toxic_hydra_hazard"
+      },
+      "Tags": {}
+    },
+    {
+      "Type": "Simple",
+      "RunTime": 0.2
+    },
+    {
+      "Type": "TameworkLaunchProjectile",
+      "RunTime": 0,
+      "Effects": {
+        "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
+        "LocalSoundEventId": "SFX_Scarak_Spitball_Fire",
+        "Particles": [
+          {
+            "TargetEntityPart": "Entity",
+            "TargetNodeName": "AF_Origin",
             "SystemId": "Effect_Poison",
             "DetachedFromModel": false,
             "PositionOffset": {},
