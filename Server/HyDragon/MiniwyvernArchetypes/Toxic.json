@@ -2,12 +2,70 @@
   "Id": "toxic",
   "RoleId": "Tamed_Wyvern_Mini_Toxic",
   "RequiredTalentId": "Miniwyvern_Toxic_VenomBond",
-  "ParticleAndSoundIds": [ "Effect_Poison", "SFX_Scarak_Spitball_Fire" ],
-  "PassiveEffects": [ "HyDragon_Miniwyvern_Toxic_Aura" ],
+  "ParticleAndSoundIds": [
+    "Effect_Poison",
+    "SFX_Scarak_Spitball_Fire"
+  ],
+  "PassiveEffects": [
+    "HyDragon_Miniwyvern_Toxic_Aura"
+  ],
   "OwnerAttackAura": {
     "EffectId": "HyDragon_Miniwyvern_Toxic_Weakness",
-    "DurationSeconds": 6.0,
+    "DurationSeconds": 6,
     "DamageReductionFraction": 0.12
   },
-  "FallbackBehavior": "BASIC_BITE"
+  "FallbackBehavior": "BASIC_BITE",
+  "EssenceBondAura": {
+    "Upgrades": [
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomFocus",
+        "Semantic": "targetoutgoingdamagereduction",
+        "TargetOutgoingDamageReductionFraction": 0.15
+      },
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomAttunement",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward"
+      },
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomAmplification",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Toxic_Weakness_15_8",
+        "TargetDurationSeconds": 8
+      },
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomResonance",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward_12"
+      },
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomEfficiency",
+        "Semantic": "ownerdamagetoaffected",
+        "OwnerDamageToAffectedFraction": 0.05
+      },
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomHarmony",
+        "Semantic": "conditionalward",
+        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward_12_Conditional",
+        "ConditionalWardDamageReductionFraction": 0.05
+      },
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomMastery",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Toxic_Weakness_18_8",
+        "TargetDurationSeconds": 8,
+        "TargetOutgoingDamageReductionFraction": 0.18,
+        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward_18"
+      },
+      {
+        "TalentId": "Miniwyvern_Toxic_VenomAscendance",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Toxic_Weakness_22_10",
+        "TargetDurationSeconds": 10,
+        "TargetOutgoingDamageReductionFraction": 0.22,
+        "OwnerDamageToAffectedFraction": 0.1,
+        "WardEffectId": "HyDragon_Miniwyvern_Toxic_Ward_25"
+      }
+    ]
+  }
 }

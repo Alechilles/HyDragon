@@ -3,10 +3,66 @@
   "RoleId": "Tamed_Wyvern_Mini_Nature",
   "RequiredTalentId": "Miniwyvern_Nature_VerdantBond",
   "ParticleAndSoundIds": [ "HyDragon_Miniwyvern_Nature_HealingMist" ],
-  "PassiveEffects": [ "HyDragon_Miniwyvern_Nature_Regeneration" ],
+  "PassiveEffects": [
+    "HyDragon_Miniwyvern_Nature_Regeneration"
+  ],
   "PassiveModifiers": {
-    "RegenerationTickSeconds": 2.0,
+    "RegenerationTickSeconds": 2,
     "MaximumHealFractionPerTick": 0.01
   },
-  "FallbackBehavior": "BASIC_BITE"
+  "FallbackBehavior": "BASIC_BITE",
+  "EssenceBondAura": {
+    "Upgrades": [
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantFocus",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Nature_Regeneration_15",
+        "TargetDurationSeconds": 10
+      },
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantAttunement",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward"
+      },
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantAmplification",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Nature_Regeneration_20",
+        "TargetDurationSeconds": 10
+      },
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantResonance",
+        "Semantic": "ward",
+        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward_12"
+      },
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantEfficiency",
+        "Semantic": "speedburst",
+        "SpeedBurstMultiplier": 1.05,
+        "SpeedBurstDurationSeconds": 2
+      },
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantHarmony",
+        "Semantic": "conditionalward",
+        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward_12_Conditional",
+        "ConditionalWardDamageReductionFraction": 0.05
+      },
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantMastery",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Nature_Regeneration_25",
+        "TargetDurationSeconds": 10,
+        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward_18"
+      },
+      {
+        "TalentId": "Miniwyvern_Nature_VerdantAscendance",
+        "Semantic": "targeteffect",
+        "TargetEffectId": "HyDragon_Miniwyvern_Nature_Regeneration_30",
+        "TargetDurationSeconds": 10,
+        "SpeedBurstMultiplier": 1.1,
+        "SpeedBurstDurationSeconds": 2,
+        "WardEffectId": "HyDragon_Miniwyvern_Nature_Ward_25"
+      }
+    ]
+  }
 }

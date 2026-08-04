@@ -1,0 +1,17 @@
+{
+  "Name": "server.effects.miniwyvernToxicAura.name",
+  "StatusEffectIcon": "Icons/StatusEffects/HyDragon/Miniwyvern_Toxic_Aura.png",
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 8,
+  "DamageResistance": {
+    "Poison": [
+      {
+        "CalculationType": "Percent",
+        "Amount": 0.08
+      }
+    ]
+  }
+}

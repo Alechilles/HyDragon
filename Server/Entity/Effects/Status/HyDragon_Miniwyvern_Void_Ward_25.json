@@ -1,0 +1,17 @@
+{
+  "Name": "server.effects.miniwyvernVoidAura.name",
+  "StatusEffectIcon": "Icons/StatusEffects/HyDragon/Miniwyvern_Void_Aura.png",
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 8,
+  "DamageResistance": {
+    "Elemental": [
+      {
+        "CalculationType": "Percent",
+        "Amount": 0.25
+      }
+    ]
+  }
+}

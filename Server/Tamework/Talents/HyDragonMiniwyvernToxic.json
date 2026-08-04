@@ -8,180 +8,126 @@
   "Talents": [
     {
       "Id": "Miniwyvern_Toxic_VenomBond",
-      "DisplayName": "Venom Bond",
-      "Description": "Your hits reduce target damage by 12% for 6 sec; +3% companion damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_bond.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_bond.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
-      "MinLevel": 2,
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
-      ]
+      "MinLevel": 2
     },
     {
       "Id": "Miniwyvern_Toxic_VenomFocus",
-      "DisplayName": "Venom Focus",
-      "Description": "+3% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_focus.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_focus.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomBond"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Toxic_VenomAttunement",
-      "DisplayName": "Venom Attunement",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_attunement.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_attunement.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 6,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomBond"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MaxHealthMultiplier",
-          "Multiplier": 1.06
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Toxic_VenomAmplification",
-      "DisplayName": "Venom Amplification",
-      "Description": "+4% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_amplification.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_amplification.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomFocus"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.04
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Toxic_VenomResonance",
-      "DisplayName": "Venom Resonance",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_resonance.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_resonance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomAttunement"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageTakenMultiplier",
-          "Multiplier": 1.0416666666666667
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Toxic_VenomEfficiency",
-      "DisplayName": "Venom Efficiency",
-      "Description": "+3% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_efficiency.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_efficiency.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 14,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomAmplification"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Toxic_VenomHarmony",
-      "DisplayName": "Venom Harmony",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_harmony.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_harmony.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomResonance"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MoveSpeedMultiplier",
-          "Multiplier": 1.05
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Toxic_VenomMastery",
-      "DisplayName": "Venom Mastery",
-      "Description": "+4% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
-        "Miniwyvern_Toxic_VenomEfficiency"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.04
-        }
+        "Miniwyvern_Toxic_VenomEfficiency",
+        "Miniwyvern_Toxic_VenomHarmony"
       ]
     },
     {
       "Id": "Miniwyvern_Toxic_VenomAscendance",
-      "DisplayName": "Venom Ascendance",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.venom_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.venom_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 4,
       "MinLevel": 26,
       "RequiresTalentIds": [
-        "Miniwyvern_Toxic_VenomMastery",
-        "Miniwyvern_Toxic_VenomHarmony"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MaxHealthMultiplier",
-          "Multiplier": 1.06
-        }
+        "Miniwyvern_Toxic_VenomMastery"
       ]
     },
     {
       "Id": "DraconicProjectile",
-      "DisplayName": "Toxic Projectile Initiation",
-      "Description": "Toxic bolt: force 28, 4-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.draconic_projectile.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.draconic_projectile.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -193,11 +139,11 @@
     },
     {
       "Id": "ProjectileRange",
-      "DisplayName": "Toxic Long Reach",
-      "Description": "Toxic bolt: force 34, 5-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.projectile_range.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.projectile_range.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -212,11 +158,11 @@
     },
     {
       "Id": "ProjectileCadence",
-      "DisplayName": "Toxic Quick Cast",
-      "Description": "Toxic bolt every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.projectile_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.projectile_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -231,11 +177,11 @@
     },
     {
       "Id": "ProjectileGuidance",
-      "DisplayName": "Toxic Guided Flight",
-      "Description": "Aim Toxic bolts for 0.55–0.85 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.projectile_guidance.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.projectile_guidance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -250,11 +196,11 @@
     },
     {
       "Id": "ProjectilePattern",
-      "DisplayName": "Toxic Split Flight",
-      "Description": "Two Toxic bolts 0.30 sec apart every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.projectile_pattern.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.projectile_pattern.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -269,11 +215,11 @@
     },
     {
       "Id": "ProjectileMastery",
-      "DisplayName": "Toxic Projectile Mastery",
-      "Description": "Two Toxic bolts every 3–5 sec; force 40, 6-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.projectile_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.projectile_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -289,11 +235,11 @@
     },
     {
       "Id": "SwoopFerocity",
-      "DisplayName": "Toxic Swoop Ferocity",
-      "Description": "20-damage venom swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.swoop_ferocity.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.swoop_ferocity.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -305,11 +251,11 @@
     },
     {
       "Id": "SwoopCadence",
-      "DisplayName": "Toxic Swoop Cadence",
-      "Description": "20-damage venom swoop; 22–30 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.swoop_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.swoop_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -324,11 +270,11 @@
     },
     {
       "Id": "SwoopPrecision",
-      "DisplayName": "Toxic Swoop Precision",
-      "Description": "Venom swoop approach speed: 0.70.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.swoop_precision.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.swoop_precision.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -343,11 +289,11 @@
     },
     {
       "Id": "RelentlessSwoop",
-      "DisplayName": "Toxic Relentless Swoop",
-      "Description": "20-damage venom swoop; 20–26 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.relentless_swoop.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.relentless_swoop.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -362,11 +308,11 @@
     },
     {
       "Id": "RendingDive",
-      "DisplayName": "Toxic Rending Dive",
-      "Description": "24-damage venom swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.rending_dive.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.rending_dive.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -381,11 +327,11 @@
     },
     {
       "Id": "SwoopMastery",
-      "DisplayName": "Toxic Swoop Mastery",
-      "Description": "28-damage venom swoop; 18–24 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.swoop_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.swoop_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -401,11 +347,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_VitalScales",
-      "DisplayName": "Venom Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.vital_scales.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.vital_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
       "MinLevel": 2,
       "Effects": [
@@ -417,11 +363,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_HardenedScales",
-      "DisplayName": "Hardened Venom Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.hardened_scales.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.hardened_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
@@ -436,11 +382,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_ElderScales",
-      "DisplayName": "Elder Venom Scales",
-      "Description": "+8% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.elder_scales.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.elder_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 2,
       "MinLevel": 7,
       "RequiresTalentIds": [
@@ -455,11 +401,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_ScaleGuard",
-      "DisplayName": "Venom Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.scale_guard.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.scale_guard.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
       "MinLevel": 8,
       "RequiresTalentIds": [
@@ -474,11 +420,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_ScaleBulwark",
-      "DisplayName": "Venom Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.scale_bulwark.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.scale_bulwark.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -493,11 +439,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_SwiftWings",
-      "DisplayName": "Venom Wings",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.swift_wings.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.swift_wings.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
       "MinLevel": 12,
       "RequiresTalentIds": [
@@ -512,11 +458,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_SurvivalInstinct",
-      "DisplayName": "Venom Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.survival_instinct.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.survival_instinct.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 2,
       "MinLevel": 15,
       "RequiresTalentIds": [
@@ -531,11 +477,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_LastingScales",
-      "DisplayName": "Lasting Venom Scales",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.lasting_scales.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.lasting_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
@@ -550,11 +496,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_WyrmFortitude",
-      "DisplayName": "Venom Fortitude",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.wyrm_fortitude.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.wyrm_fortitude.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
@@ -569,11 +515,11 @@
     },
     {
       "Id": "Miniwyvern_Toxic_VigorAscendance",
-      "DisplayName": "Venom Vitality",
-      "Description": "+6% maximum health; take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.toxic.vigor_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.toxic.vigor_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 4,
       "MinLevel": 25,
       "RequiresTalentIds": [

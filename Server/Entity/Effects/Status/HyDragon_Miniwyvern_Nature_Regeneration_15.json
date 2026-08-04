@@ -1,0 +1,9 @@
+{
+  "Name": "server.effects.miniwyvernNatureRegeneration.name",
+  "StatusEffectIcon": "Icons/StatusEffects/HyDragon/Miniwyvern_Nature_Aura.png",
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 10
+}

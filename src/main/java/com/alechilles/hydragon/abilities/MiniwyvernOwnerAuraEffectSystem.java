@@ -80,9 +80,11 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
         Ref<EntityStore> target = chunk.getReferenceTo(index);
         MiniwyvernOwnerAuraEffectQueue.Cycle cycle = queue.drainCycle(worldName, targetUuid);
         for (MiniwyvernOwnerAuraRegistry.Aura aura : cycle.reapplications()) {
+            if (!registry.isCurrentAura(aura)) continue;
             add(target, targetUuid, aura, controller, commandBuffer);
         }
         for (MiniwyvernOwnerAuraRegistry.Aura aura : cycle.applications()) {
+            if (!registry.isCurrentAura(aura)) continue;
             applyOrRestart(worldName, target, targetUuid, aura, controller, commandBuffer);
         }
     }
@@ -144,9 +146,8 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
         if (applied && "void".equals(aura.formId())) {
             voidLifetime.observe(targetUuid);
         }
-        if (applied && aura.damageReductionFraction() > 0.0D) {
-            registry.recordToxicWeakness(targetUuid, aura.effectId(), aura.damageReductionFraction(),
-                    effect.getDuration(), System.currentTimeMillis());
+        if (applied) {
+            registry.recordTargetAura(targetUuid, aura, effect.getDuration(), System.currentTimeMillis());
         }
     }
 

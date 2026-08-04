@@ -8,180 +8,126 @@
   "Talents": [
     {
       "Id": "Miniwyvern_Ice_RimeBond",
-      "DisplayName": "Rime Bond",
-      "Description": "Your hits slow targets by 20% for 4 sec; +3% companion damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_bond.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_bond.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 1,
-      "MinLevel": 2,
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
-      ]
+      "MinLevel": 2
     },
     {
       "Id": "Miniwyvern_Ice_RimeFocus",
-      "DisplayName": "Rime Focus",
-      "Description": "+3% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_focus.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_focus.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
         "Miniwyvern_Ice_RimeBond"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Ice_RimeAttunement",
-      "DisplayName": "Rime Attunement",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_attunement.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_attunement.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 6,
       "RequiresTalentIds": [
         "Miniwyvern_Ice_RimeBond"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MaxHealthMultiplier",
-          "Multiplier": 1.06
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Ice_RimeAmplification",
-      "DisplayName": "Rime Amplification",
-      "Description": "+4% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_amplification.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_amplification.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
         "Miniwyvern_Ice_RimeFocus"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.04
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Ice_RimeResonance",
-      "DisplayName": "Rime Resonance",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_resonance.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_resonance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
         "Miniwyvern_Ice_RimeAttunement"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageTakenMultiplier",
-          "Multiplier": 1.0416666666666667
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Ice_RimeEfficiency",
-      "DisplayName": "Rime Efficiency",
-      "Description": "+3% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_efficiency.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_efficiency.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 14,
       "RequiresTalentIds": [
         "Miniwyvern_Ice_RimeAmplification"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Ice_RimeHarmony",
-      "DisplayName": "Rime Harmony",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_harmony.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_harmony.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
         "Miniwyvern_Ice_RimeResonance"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MoveSpeedMultiplier",
-          "Multiplier": 1.05
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Ice_RimeMastery",
-      "DisplayName": "Rime Mastery",
-      "Description": "+4% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
-        "Miniwyvern_Ice_RimeEfficiency"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.04
-        }
+        "Miniwyvern_Ice_RimeEfficiency",
+        "Miniwyvern_Ice_RimeHarmony"
       ]
     },
     {
       "Id": "Miniwyvern_Ice_RimeAscendance",
-      "DisplayName": "Rime Ascendance",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rime_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rime_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.essence_bond",
       "PointCost": 4,
       "MinLevel": 26,
       "RequiresTalentIds": [
-        "Miniwyvern_Ice_RimeMastery",
-        "Miniwyvern_Ice_RimeHarmony"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MaxHealthMultiplier",
-          "Multiplier": 1.06
-        }
+        "Miniwyvern_Ice_RimeMastery"
       ]
     },
     {
       "Id": "DraconicProjectile",
-      "DisplayName": "Ice Projectile Initiation",
-      "Description": "Ice bolt: force 28, 4-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.draconic_projectile.name",
+      "Description": "hydragon.talents.miniwyvern.ice.draconic_projectile.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -193,11 +139,11 @@
     },
     {
       "Id": "ProjectileRange",
-      "DisplayName": "Ice Long Reach",
-      "Description": "Ice bolt: force 34, 5-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.projectile_range.name",
+      "Description": "hydragon.talents.miniwyvern.ice.projectile_range.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -212,11 +158,11 @@
     },
     {
       "Id": "ProjectileCadence",
-      "DisplayName": "Ice Quick Cast",
-      "Description": "Ice bolt every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.projectile_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.ice.projectile_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -231,11 +177,11 @@
     },
     {
       "Id": "ProjectileGuidance",
-      "DisplayName": "Ice Guided Flight",
-      "Description": "Aim Ice bolts for 0.55–0.85 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.projectile_guidance.name",
+      "Description": "hydragon.talents.miniwyvern.ice.projectile_guidance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -250,11 +196,11 @@
     },
     {
       "Id": "ProjectilePattern",
-      "DisplayName": "Ice Split Flight",
-      "Description": "Two Ice bolts 0.30 sec apart every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.projectile_pattern.name",
+      "Description": "hydragon.talents.miniwyvern.ice.projectile_pattern.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -269,11 +215,11 @@
     },
     {
       "Id": "ProjectileMastery",
-      "DisplayName": "Ice Projectile Mastery",
-      "Description": "Two Ice bolts every 3–5 sec; force 40, 6-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.projectile_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.ice.projectile_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -289,11 +235,11 @@
     },
     {
       "Id": "SwoopFerocity",
-      "DisplayName": "Ice Swoop Ferocity",
-      "Description": "20-damage frost swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.swoop_ferocity.name",
+      "Description": "hydragon.talents.miniwyvern.ice.swoop_ferocity.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -305,11 +251,11 @@
     },
     {
       "Id": "SwoopCadence",
-      "DisplayName": "Ice Swoop Cadence",
-      "Description": "20-damage frost swoop; 22–30 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.swoop_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.ice.swoop_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -324,11 +270,11 @@
     },
     {
       "Id": "SwoopPrecision",
-      "DisplayName": "Ice Swoop Precision",
-      "Description": "Frost swoop approach speed: 0.70.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.swoop_precision.name",
+      "Description": "hydragon.talents.miniwyvern.ice.swoop_precision.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -343,11 +289,11 @@
     },
     {
       "Id": "RelentlessSwoop",
-      "DisplayName": "Ice Relentless Swoop",
-      "Description": "20-damage frost swoop; 20–26 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.relentless_swoop.name",
+      "Description": "hydragon.talents.miniwyvern.ice.relentless_swoop.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -362,11 +308,11 @@
     },
     {
       "Id": "RendingDive",
-      "DisplayName": "Ice Rending Dive",
-      "Description": "24-damage frost swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.rending_dive.name",
+      "Description": "hydragon.talents.miniwyvern.ice.rending_dive.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -381,11 +327,11 @@
     },
     {
       "Id": "SwoopMastery",
-      "DisplayName": "Ice Swoop Mastery",
-      "Description": "28-damage frost swoop; 18–24 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.swoop_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.ice.swoop_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -401,11 +347,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_VitalScales",
-      "DisplayName": "Frost Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.vital_scales.name",
+      "Description": "hydragon.talents.miniwyvern.ice.vital_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 1,
       "MinLevel": 2,
       "Effects": [
@@ -417,11 +363,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_HardenedScales",
-      "DisplayName": "Hardened Frost Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.hardened_scales.name",
+      "Description": "hydragon.talents.miniwyvern.ice.hardened_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
@@ -436,11 +382,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_ElderScales",
-      "DisplayName": "Elder Frost Scales",
-      "Description": "+8% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.elder_scales.name",
+      "Description": "hydragon.talents.miniwyvern.ice.elder_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 2,
       "MinLevel": 7,
       "RequiresTalentIds": [
@@ -455,11 +401,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_ScaleGuard",
-      "DisplayName": "Frost Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.scale_guard.name",
+      "Description": "hydragon.talents.miniwyvern.ice.scale_guard.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 1,
       "MinLevel": 8,
       "RequiresTalentIds": [
@@ -474,11 +420,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_ScaleBulwark",
-      "DisplayName": "Frost Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.scale_bulwark.name",
+      "Description": "hydragon.talents.miniwyvern.ice.scale_bulwark.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -493,11 +439,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_SwiftWings",
-      "DisplayName": "Frost Wings",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.swift_wings.name",
+      "Description": "hydragon.talents.miniwyvern.ice.swift_wings.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 1,
       "MinLevel": 12,
       "RequiresTalentIds": [
@@ -512,11 +458,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_SurvivalInstinct",
-      "DisplayName": "Frost Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.survival_instinct.name",
+      "Description": "hydragon.talents.miniwyvern.ice.survival_instinct.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 2,
       "MinLevel": 15,
       "RequiresTalentIds": [
@@ -531,11 +477,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_LastingScales",
-      "DisplayName": "Lasting Frost Scales",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.lasting_scales.name",
+      "Description": "hydragon.talents.miniwyvern.ice.lasting_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
@@ -550,11 +496,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_WyrmFortitude",
-      "DisplayName": "Frost Fortitude",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.wyrm_fortitude.name",
+      "Description": "hydragon.talents.miniwyvern.ice.wyrm_fortitude.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
@@ -569,11 +515,11 @@
     },
     {
       "Id": "Miniwyvern_Ice_VigorAscendance",
-      "DisplayName": "Frost Vitality",
-      "Description": "+6% maximum health; take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.ice.vigor_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.ice.vigor_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.ice.branch.vigor",
       "PointCost": 4,
       "MinLevel": 25,
       "RequiresTalentIds": [

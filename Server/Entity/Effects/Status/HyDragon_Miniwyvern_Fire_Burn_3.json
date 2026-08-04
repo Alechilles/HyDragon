@@ -1,0 +1,14 @@
+{
+  "Name": "server.effects.miniwyvernFireBurn.name",
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Fire": 3
+    }
+  },
+  "DamageCalculatorCooldown": 1,
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 5
+}

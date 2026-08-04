@@ -4,6 +4,9 @@ import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.hydragon.abilities.HyDragonAbilityRegistrationFacade;
 import com.alechilles.hydragon.abilities.HytaleMiniwyvernAbilityWorldDispatcher;
 import com.alechilles.hydragon.abilities.MiniwyvernAbilityRuntime;
+import com.alechilles.hydragon.abilities.MiniwyvernAuraMarkedTargetDamageSystem;
+import com.alechilles.hydragon.abilities.MiniwyvernAuraSiphonDamageSystem;
+import com.alechilles.hydragon.abilities.MiniwyvernConditionalWardDamageSystem;
 import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraDamageSystem;
 import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraEffectQueue;
 import com.alechilles.hydragon.abilities.MiniwyvernOwnerAuraEffectSystem;
@@ -67,6 +70,7 @@ public final class HyDragonPlugin extends JavaPlugin {
     private DynamicEncounterRuntime encounterRuntime;
     private MiniwyvernAbilityRuntime abilityRuntime;
     private final MiniwyvernOwnerAuraRegistry miniwyvernOwnerAuras = new MiniwyvernOwnerAuraRegistry();
+    private MiniwyvernAuraSiphonDamageSystem miniwyvernAuraSiphon;
     private ConsumableSagaRecoveryRuntime sagaRecoveryRuntime;
     private ConsumableRefundClaimService refundClaims;
     private HyDragonRuntimeComposition runtimeComposition;
@@ -83,7 +87,13 @@ public final class HyDragonPlugin extends JavaPlugin {
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
         getEntityStoreRegistry().registerSystem(new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras));
         getEntityStoreRegistry().registerSystem(new TranquilizedHealthFreezeSystem());
-        getEntityStoreRegistry().registerSystem(new MiniwyvernVoidExposureDamageSystem());
+        getEntityStoreRegistry().registerSystem(new MiniwyvernVoidExposureDamageSystem(miniwyvernOwnerAuras));
+        getEntityStoreRegistry().registerSystem(
+                new MiniwyvernConditionalWardDamageSystem(miniwyvernOwnerAuras));
+        getEntityStoreRegistry().registerSystem(
+                new MiniwyvernAuraMarkedTargetDamageSystem(miniwyvernOwnerAuras));
+        miniwyvernAuraSiphon = new MiniwyvernAuraSiphonDamageSystem(miniwyvernOwnerAuras);
+        getEntityStoreRegistry().registerSystem(miniwyvernAuraSiphon);
         MiniwyvernVoidEffectLifetimeSystem voidLifetime = new MiniwyvernVoidEffectLifetimeSystem();
         MiniwyvernOwnerAuraEffectQueue ownerAuraEffects = new MiniwyvernOwnerAuraEffectQueue();
         MiniwyvernVoidEffectReplicationProbe voidReplication = new MiniwyvernVoidEffectReplicationProbe();
@@ -221,6 +231,10 @@ public final class HyDragonPlugin extends JavaPlugin {
         gameplayRuntime = null;
         encounterRuntime = null;
         abilityRuntime = null;
+        if (miniwyvernAuraSiphon != null) {
+            miniwyvernAuraSiphon.close();
+            miniwyvernAuraSiphon = null;
+        }
         miniwyvernOwnerAuras.clear();
         sagaRecoveryRuntime = null;
         refundClaims = null;

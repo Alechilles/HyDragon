@@ -1,0 +1,9 @@
+{
+  "Name": "server.effects.miniwyvernLightningBoon.name",
+  "StatusEffectIcon": "Icons/StatusEffects/HyDragon/Miniwyvern_Lightning_Aura.png",
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 8
+}

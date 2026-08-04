@@ -37,6 +37,17 @@ public interface MiniwyvernAbilityWorld {
 
     boolean removeEffect(UUID entityUuid, String sourceKey, String effectId);
 
+    /** Applies a source-owned EntityEffect to the bonded player. */
+    default boolean applyOwnerEffect(
+            UUID ownerUuid, String sourceKey, String effectId, double durationSeconds) {
+        return applyEffect(ownerUuid, sourceKey, effectId, durationSeconds);
+    }
+
+    /** Removes a source-owned EntityEffect from the bonded player. */
+    default boolean removeOwnerEffect(UUID ownerUuid, String sourceKey, String effectId) {
+        return removeEffect(ownerUuid, sourceKey, effectId);
+    }
+
     /**
      * Verifies that a data-selected effect implements one exact passive modifier semantic.
      * This keeps engine capabilities granular: an unavailable jump or action-speed channel does

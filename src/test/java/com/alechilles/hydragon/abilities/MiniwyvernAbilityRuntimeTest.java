@@ -106,6 +106,26 @@ final class MiniwyvernAbilityRuntimeTest {
         }
     }
 
+    @Test
+    void closeDeactivatesEveryLiveWardBeforeDroppingBindings() throws Exception {
+        Fixture fixture = fixture("close-ward.properties",
+                TameworkGameplayAdapter.MINIWYVERN_FAMILY, "Tamed_Wyvern_Mini_Fire", true);
+
+        fixture.runtime.start();
+        assertEquals(1, fixture.runtime.tickSome(8));
+        assertEquals(1, fixture.worlds.ownerEffectApplications);
+        assertEquals(0, fixture.worlds.ownerEffectRemovals);
+
+        fixture.worlds.deferCallbacks = true;
+        fixture.runtime.close();
+
+        assertEquals(0, fixture.worlds.ownerEffectRemovals,
+                "queued cleanup has not reached the world thread yet");
+        fixture.worlds.drainCallbacks();
+        assertEquals(1, fixture.worlds.ownerEffectRemovals,
+                "queued cleanup must use the captured Ward identity after registry clear");
+    }
+
     /** Regression: malformed bonded extension evidence must revoke a cached same-lease binding. */
     @Test
     void invalidExtensionRefreshDetachesUnchangedActiveLease() throws Exception {
@@ -176,10 +196,15 @@ final class MiniwyvernAbilityRuntimeTest {
     }
 
     private Fixture fixture(String fileName, String familyId) throws Exception {
-        return fixture(fileName, familyId, "Tamed_Wyvern_Mini_Fire");
+        return fixture(fileName, familyId, "Tamed_Wyvern_Mini_Fire", false);
     }
 
     private Fixture fixture(String fileName, String familyId, String roleId) throws Exception {
+        return fixture(fileName, familyId, roleId, false);
+    }
+
+    private Fixture fixture(
+            String fileName, String familyId, String roleId, boolean withWard) throws Exception {
         UUID owner = UUID.randomUUID();
         UUID profile = UUID.randomUUID();
         UUID npc = UUID.randomUUID();
@@ -189,9 +214,10 @@ final class MiniwyvernAbilityRuntimeTest {
         BondedAuthority authority = new BondedAuthority(owner, profile, npc, familyId, roleId);
         RecordingWorldDispatcher worlds = new RecordingWorldDispatcher(owner, npc, roleId);
         MemoryAbilityStates states = new MemoryAbilityStates();
-        MiniwyvernAbilityService service = new MiniwyvernAbilityService(states);
+        MiniwyvernAbilityService service = new MiniwyvernAbilityService(
+                states, new MiniwyvernOwnerAuraRegistry());
         Map<String, com.alechilles.hydragon.config.MiniwyvernArchetypeConfig> archetypes = Map.of(
-                formId(roleId), roleConfig(roleId));
+                formId(roleId), roleConfig(roleId, withWard));
         MiniwyvernAbilityRuntime runtime = new MiniwyvernAbilityRuntime(
                 api(authority), store,
                 () -> new HyDragonConfigRepository.Snapshot(
@@ -209,6 +235,11 @@ final class MiniwyvernAbilityRuntimeTest {
 
     private static com.alechilles.hydragon.config.MiniwyvernArchetypeConfig roleConfig(
             String roleId) throws Exception {
+        return roleConfig(roleId, false);
+    }
+
+    private static com.alechilles.hydragon.config.MiniwyvernArchetypeConfig roleConfig(
+            String roleId, boolean withWard) throws Exception {
         String formId = formId(roleId);
         com.alechilles.hydragon.config.MiniwyvernArchetypeConfig config = construct(
                 com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.class);
@@ -228,6 +259,23 @@ final class MiniwyvernAbilityRuntimeTest {
                     "ActionSpeedMultiplier", 1.10D));
             set(config, "passiveModifierEffects", Map.of(
                     "MovementSpeedMultiplier", "test-lightning-boon"));
+        }
+        if (withWard) {
+            set(config, "requiredTalentId", "EssenceBond");
+            com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.OwnerAttackAura ownerAura =
+                    construct(com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.OwnerAttackAura.class);
+            set(ownerAura, "effectId", "test-owner-aura");
+            set(ownerAura, "durationSeconds", 4.0D);
+            set(config, "ownerAttackAura", ownerAura);
+            com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.EssenceBondAura bond =
+                    construct(com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.EssenceBondAura.class);
+            com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Upgrade ward =
+                    construct(com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Upgrade.class);
+            set(ward, "talentId", "FireWard");
+            set(ward, "wardEffectId", "TestWard");
+            set(bond, "upgrades",
+                    new com.alechilles.hydragon.config.MiniwyvernArchetypeConfig.Upgrade[] { ward });
+            set(config, "essenceBondAura", bond);
         }
         assertTrue(config.validate().isEmpty(), config.validate().toString());
         return config;
@@ -451,6 +499,11 @@ final class MiniwyvernAbilityRuntimeTest {
         private final UUID npc;
         private final String liveRoleId;
         private int dispatches;
+        private int ownerEffectApplications;
+        private int ownerEffectRemovals;
+        private boolean deferCallbacks;
+        private final java.util.ArrayDeque<Consumer<MiniwyvernAbilityWorld>> pendingCallbacks =
+                new java.util.ArrayDeque<>();
 
         private RecordingWorldDispatcher(UUID owner, UUID npc, String liveRoleId) {
             this.owner = owner;
@@ -465,11 +518,25 @@ final class MiniwyvernAbilityRuntimeTest {
             assertEquals(owner, ownerUuid);
             assertEquals(npc, npcUuid);
             dispatches++;
-            callback.accept(new EmptyWorld(owner, npc, liveRoleId));
+            if (deferCallbacks) {
+                pendingCallbacks.addLast(callback);
+                return;
+            }
+            callback.accept(new EmptyWorld(owner, npc, liveRoleId, this));
+        }
+
+        private void drainCallbacks() {
+            while (!pendingCallbacks.isEmpty()) {
+                pendingCallbacks.removeFirst().accept(new EmptyWorld(owner, npc, liveRoleId, this));
+            }
         }
     }
 
-    private record EmptyWorld(UUID ownerUuid, UUID npcUuid, String liveRoleId)
+    private record EmptyWorld(
+            UUID ownerUuid,
+            UUID npcUuid,
+            String liveRoleId,
+            RecordingWorldDispatcher recorder)
             implements MiniwyvernAbilityWorld {
         public boolean isWorldThread() { return true; }
         public String worldName() { return "default"; }
@@ -486,6 +553,15 @@ final class MiniwyvernAbilityRuntimeTest {
             return true;
         }
         public boolean removeEffect(UUID entityUuid, String source, String effect) { return true; }
+        public boolean applyOwnerEffect(
+                UUID owner, String source, String effect, double duration) {
+            recorder.ownerEffectApplications++;
+            return true;
+        }
+        public boolean removeOwnerEffect(UUID owner, String source, String effect) {
+            recorder.ownerEffectRemovals++;
+            return true;
+        }
         public boolean supportsOwnerModifiers(Map<String, Double> modifiers) { return true; }
         public boolean applyOwnerModifiers(
                 UUID owner, String source, Map<String, Double> modifiers, double duration) {
@@ -496,5 +572,8 @@ final class MiniwyvernAbilityRuntimeTest {
         public boolean dealDamage(UUID source, UUID target, double amount) { return true; }
         public boolean heal(UUID entityUuid, double amount) { return true; }
         public boolean areAllies(UUID owner, UUID target) { return false; }
+        public boolean hasPurchasedTalent(String talentId) {
+            return "EssenceBond".equals(talentId) || "FireWard".equals(talentId);
+        }
     }
 }

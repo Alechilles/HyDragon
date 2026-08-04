@@ -32,4 +32,25 @@ class MiniwyvernOwnerAuraDamageSystemTest {
         assertFalse(MiniwyvernOwnerAuraDamageSystem.isLiveRef(null));
     }
 
+    @Test
+    void doesNotQueuePlayerOnlyAuraWithoutTargetEffect() {
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        MiniwyvernOwnerAuraEffectQueue queue = new MiniwyvernOwnerAuraEffectQueue(
+                () -> 0L, 0L);
+        MiniwyvernOwnerAuraDamageSystem system = new MiniwyvernOwnerAuraDamageSystem(registry, queue);
+
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "lightning", "", 0.0D, null));
+        assertFalse(system.shouldApply(OWNER, true, false, 1.0F));
+        assertFalse(MiniwyvernOwnerAuraDamageSystem.hasTargetEffect(
+                registry.activeFor(OWNER).orElseThrow()));
+        assertTrue(queue.drain("world", UUID.randomUUID()).isEmpty());
+
+        assertTrue(registry.update(OWNER, "profile", "lease", UUID.randomUUID(),
+                "nature", "", 0.0D, null));
+        assertFalse(system.shouldApply(OWNER, true, false, 1.0F));
+        assertFalse(MiniwyvernOwnerAuraDamageSystem.hasTargetEffect(
+                registry.activeFor(OWNER).orElseThrow()));
+    }
+
 }

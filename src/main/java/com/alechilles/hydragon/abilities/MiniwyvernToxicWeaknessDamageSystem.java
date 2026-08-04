@@ -17,7 +17,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** Reduces Toxic-weakened entities' outgoing damage during Hytale's pre-application filter phase. */
+/** Reduces weakened/slow-marked entities' outgoing damage during Hytale's pre-application filter phase. */
 public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem {
     private static final String PROJECTILE_EFFECT_ID = "HyDragon_Miniwyvern_Toxic_Projectile_Weakness";
     private final MiniwyvernOwnerAuraRegistry registry;
@@ -46,14 +46,18 @@ public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem
                 sourceRef != null && sourceRef.equals(targetRef), blocked, healing)) return;
         UUIDComponent identity = store.getComponent(sourceRef, UUIDComponent.getComponentType());
         if (identity == null) return;
-        MiniwyvernOwnerAuraRegistry.ToxicWeakness weakness = registry.activeToxicWeakness(
-                identity.getUuid(), System.currentTimeMillis()).orElse(null);
+        long nowMs = System.currentTimeMillis();
+        var weaknesses = registry.activeToxicWeaknesses(identity.getUuid(), nowMs);
         EffectControllerComponent controller = store.getComponent(sourceRef, EffectControllerComponent.getComponentType());
         if (controller == null) return;
-        boolean bondActive = weakness != null && hasEffect(controller, weakness.effectId());
+        double bondFraction = weaknesses.stream()
+                .filter(weakness -> hasEffect(controller, weakness.effectId()))
+                .mapToDouble(MiniwyvernOwnerAuraRegistry.ToxicWeakness::damageReductionFraction)
+                .max()
+                .orElse(0.0D);
         boolean projectileActive = hasEffect(controller, PROJECTILE_EFFECT_ID);
-        if (!bondActive && !projectileActive) return;
-        damage.setAmount(reducedAmount(damage.getAmount(), bondActive, projectileActive));
+        if (bondFraction <= 0.0D && !projectileActive) return;
+        damage.setAmount(reducedAmount(damage.getAmount(), bondFraction, projectileActive));
     }
 
     static boolean shouldModify(boolean cancelled, float amount, boolean entityCaused, boolean self,
@@ -62,8 +66,21 @@ public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem
     }
 
     static float reducedAmount(float amount, boolean bondActive, boolean projectileActive) {
-        double fraction = bondActive ? 0.12D : projectileActive ? 0.10D : 0.0D;
+        return reducedAmount(amount, bondActive ? 0.12D : 0.0D, projectileActive);
+    }
+
+    static float reducedAmount(float amount, double bondFraction) {
+        return reducedAmount(amount, bondFraction, false);
+    }
+
+    static float reducedAmount(float amount, double bondFraction, boolean projectileActive) {
+        double fraction = validFraction(bondFraction) ? bondFraction : 0.0D;
+        if (projectileActive) fraction = Math.max(fraction, 0.10D);
         return (float) (amount * (1.0D - fraction));
+    }
+
+    private static boolean validFraction(double fraction) {
+        return Double.isFinite(fraction) && fraction > 0.0D && fraction < 1.0D;
     }
 
     private static boolean hasEffect(EffectControllerComponent controller, String effectId) {

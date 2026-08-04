@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 
 class MiniwyvernOwnerAuraEffectQueueTest {
     private static final String WORLD = "flat_world";
+    private static final UUID OWNER = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID OWNER_TWO = UUID.fromString("00000000-0000-0000-0000-000000000004");
     private static final UUID TARGET = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @Test
@@ -42,6 +44,30 @@ class MiniwyvernOwnerAuraEffectQueueTest {
 
         assertTrue(queue.drain(WORLD, TARGET).isEmpty());
         assertEquals(List.of(fire, voidAura), queue.drain(WORLD, TARGET));
+    }
+
+    @Test
+    void retainsSameTierToxicOwnersUntilRegistryProjection() {
+        MiniwyvernOwnerAuraEffectQueue queue = immediateQueue();
+        MiniwyvernOwnerAuraRegistry registry = new MiniwyvernOwnerAuraRegistry();
+        MiniwyvernOwnerAuraRegistry.Aura first = toxicAura(OWNER, "profile-one", "lease-one");
+        MiniwyvernOwnerAuraRegistry.Aura second = toxicAura(OWNER_TWO, "profile-two", "lease-two");
+        assertTrue(registry.update(OWNER, "profile-one", "lease-one", UUID.randomUUID(),
+                "toxic", first.effectId(), 6.0D, first.damageReductionFraction()));
+        assertTrue(registry.update(OWNER_TWO, "profile-two", "lease-two", UUID.randomUUID(),
+                "toxic", second.effectId(), 6.0D, second.damageReductionFraction()));
+
+        queue.submit(WORLD, TARGET, first);
+        queue.submit(WORLD, TARGET, second);
+
+        assertTrue(queue.drain(WORLD, TARGET).isEmpty());
+        List<MiniwyvernOwnerAuraRegistry.Aura> drained = queue.drain(WORLD, TARGET);
+        assertEquals(2, drained.size(), "owner/lease identity must prevent same-tier coalescing");
+        drained.forEach(aura -> registry.recordTargetAura(TARGET, aura, 6.0D, 1_000L));
+
+        assertEquals(2, registry.activeTargetAuras(TARGET, 6_999L).size());
+        assertTrue(registry.hasActiveTargetAuraForOwner(OWNER, "toxic", 6_999L));
+        assertTrue(registry.hasActiveTargetAuraForOwner(OWNER_TWO, "toxic", 6_999L));
     }
 
     @Test
@@ -151,9 +177,20 @@ class MiniwyvernOwnerAuraEffectQueueTest {
     }
 
     private static MiniwyvernOwnerAuraRegistry.Aura aura(String formId, String effectId, double durationSeconds) {
+        return aura(OWNER, "profile", "lease", formId, effectId, durationSeconds);
+    }
+
+    private static MiniwyvernOwnerAuraRegistry.Aura toxicAura(
+            UUID ownerUuid, String profileId, String leaseId) {
+        return aura(ownerUuid, profileId, leaseId,
+                "toxic", "HyDragon_Miniwyvern_Toxic_Weakness", 6.0D);
+    }
+
+    private static MiniwyvernOwnerAuraRegistry.Aura aura(
+            UUID ownerUuid, String profileId, String leaseId,
+            String formId, String effectId, double durationSeconds) {
         return new MiniwyvernOwnerAuraRegistry.Aura(
-                UUID.fromString("00000000-0000-0000-0000-000000000001"),
-                "profile", "lease",
+                ownerUuid, profileId, leaseId,
                 UUID.fromString("00000000-0000-0000-0000-000000000003"),
                 formId, effectId, durationSeconds, 0.0D);
     }

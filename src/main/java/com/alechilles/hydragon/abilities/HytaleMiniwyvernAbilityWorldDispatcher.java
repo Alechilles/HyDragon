@@ -251,6 +251,20 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
         }
 
         @Override
+        public boolean applyOwnerEffect(
+                UUID ownerUuid, String sourceKey, String effectId, double durationSeconds) {
+            // Owner wards use the same source-keyed EntityEffect path as retained passives. Keeping
+            // this explicit at the world boundary prevents a future owner-only capability from
+            // silently bypassing source ownership.
+            return applyEffect(ownerUuid, sourceKey, effectId, durationSeconds);
+        }
+
+        @Override
+        public boolean removeOwnerEffect(UUID ownerUuid, String sourceKey, String effectId) {
+            return removeEffect(ownerUuid, sourceKey, effectId);
+        }
+
+        @Override
         public boolean supportsPassiveModifierEffect(
                 String modifierId,
                 double requestedValue,

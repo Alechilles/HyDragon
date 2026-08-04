@@ -123,6 +123,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         MiniwyvernAbilityService.ProfileContext context = context(
                 binding, true, gate != null && gate.available());
         worlds.dispatch(binding.ownerUuid(), binding.npcUuid(), world -> {
+            if (!started || active.get(binding.profileId()) != binding) return;
             MiniwyvernAbilityService.TickResult result = service.tick(
                     context, configs.get().archetypes(), world, nowMs);
             reportDegradation(binding, result);
@@ -256,9 +257,11 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
     }
 
     private void deactivate(ActiveBinding binding, long nowMs) {
+        MiniwyvernAbilityService.WardCleanup wardCleanup =
+                service.captureWard(binding.ownerUuid());
         worlds.dispatch(binding.ownerUuid(), binding.npcUuid(), world -> service.deactivate(
                 context(binding, false, false), configs.get().archetypes(),
-                world, Math.max(0L, nowMs)));
+                world, Math.max(0L, nowMs), wardCleanup));
     }
 
     private MiniwyvernAbilityService.ProfileContext context(
@@ -340,6 +343,10 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         }
         subscription = null;
         started = false;
+        long nowMs = Math.max(0L, clock.millis());
+        for (ActiveBinding binding : new ArrayList<>(active.values())) {
+            deactivate(binding, nowMs);
+        }
         active.clear();
         refreshing.clear();
         generations.clear();

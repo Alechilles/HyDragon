@@ -8,180 +8,126 @@
   "Talents": [
     {
       "Id": "Miniwyvern_Lightning_StormBond",
-      "DisplayName": "Storm Bond",
-      "Description": "Gain 15% horizontal speed; +3% companion damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_bond.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_bond.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 1,
-      "MinLevel": 2,
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
-      ]
+      "MinLevel": 2
     },
     {
       "Id": "Miniwyvern_Lightning_StormFocus",
-      "DisplayName": "Storm Focus",
-      "Description": "+3% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_focus.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_focus.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
         "Miniwyvern_Lightning_StormBond"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Lightning_StormAttunement",
-      "DisplayName": "Storm Attunement",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_attunement.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_attunement.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 6,
       "RequiresTalentIds": [
         "Miniwyvern_Lightning_StormBond"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MaxHealthMultiplier",
-          "Multiplier": 1.06
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Lightning_StormAmplification",
-      "DisplayName": "Storm Amplification",
-      "Description": "+4% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_amplification.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_amplification.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
         "Miniwyvern_Lightning_StormFocus"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.04
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Lightning_StormResonance",
-      "DisplayName": "Storm Resonance",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_resonance.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_resonance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
         "Miniwyvern_Lightning_StormAttunement"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageTakenMultiplier",
-          "Multiplier": 1.0416666666666667
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Lightning_StormEfficiency",
-      "DisplayName": "Storm Efficiency",
-      "Description": "+3% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_efficiency.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_efficiency.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 14,
       "RequiresTalentIds": [
         "Miniwyvern_Lightning_StormAmplification"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.03
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Lightning_StormHarmony",
-      "DisplayName": "Storm Harmony",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_harmony.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_harmony.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
         "Miniwyvern_Lightning_StormResonance"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MoveSpeedMultiplier",
-          "Multiplier": 1.05
-        }
       ]
     },
     {
       "Id": "Miniwyvern_Lightning_StormMastery",
-      "DisplayName": "Storm Mastery",
-      "Description": "+4% damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 5,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
-        "Miniwyvern_Lightning_StormEfficiency"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "DamageDealtMultiplier",
-          "Multiplier": 1.04
-        }
+        "Miniwyvern_Lightning_StormEfficiency",
+        "Miniwyvern_Lightning_StormHarmony"
       ]
     },
     {
       "Id": "Miniwyvern_Lightning_StormAscendance",
-      "DisplayName": "Storm Ascendance",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.storm_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.storm_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 6,
-      "Branch": "Essence Bond",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.essence_bond",
       "PointCost": 4,
       "MinLevel": 26,
       "RequiresTalentIds": [
-        "Miniwyvern_Lightning_StormMastery",
-        "Miniwyvern_Lightning_StormHarmony"
-      ],
-      "Effects": [
-        {
-          "EffectKey": "MaxHealthMultiplier",
-          "Multiplier": 1.06
-        }
+        "Miniwyvern_Lightning_StormMastery"
       ]
     },
     {
       "Id": "DraconicProjectile",
-      "DisplayName": "Lightning Projectile Initiation",
-      "Description": "Lightning bolt: force 28, 4-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.draconic_projectile.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.draconic_projectile.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -193,11 +139,11 @@
     },
     {
       "Id": "ProjectileRange",
-      "DisplayName": "Lightning Long Reach",
-      "Description": "Lightning bolt: force 34, 5-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.projectile_range.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.projectile_range.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -212,11 +158,11 @@
     },
     {
       "Id": "ProjectileCadence",
-      "DisplayName": "Lightning Quick Cast",
-      "Description": "Lightning bolt every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.projectile_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.projectile_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -231,11 +177,11 @@
     },
     {
       "Id": "ProjectileGuidance",
-      "DisplayName": "Lightning Guided Flight",
-      "Description": "Aim Lightning bolts for 0.55–0.85 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.projectile_guidance.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.projectile_guidance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -250,11 +196,11 @@
     },
     {
       "Id": "ProjectilePattern",
-      "DisplayName": "Lightning Split Flight",
-      "Description": "Two Lightning bolts 0.30 sec apart every 4–6 sec.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.projectile_pattern.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.projectile_pattern.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -269,11 +215,11 @@
     },
     {
       "Id": "ProjectileMastery",
-      "DisplayName": "Lightning Projectile Mastery",
-      "Description": "Two Lightning bolts every 3–5 sec; force 40, 6-sec lifetime.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.projectile_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.projectile_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -289,11 +235,11 @@
     },
     {
       "Id": "SwoopFerocity",
-      "DisplayName": "Lightning Swoop Ferocity",
-      "Description": "20-damage storm swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.swoop_ferocity.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.swoop_ferocity.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 1,
       "MinLevel": 3,
       "Effects": [
@@ -305,11 +251,11 @@
     },
     {
       "Id": "SwoopCadence",
-      "DisplayName": "Lightning Swoop Cadence",
-      "Description": "20-damage storm swoop; 22–30 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.swoop_cadence.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.swoop_cadence.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -324,11 +270,11 @@
     },
     {
       "Id": "SwoopPrecision",
-      "DisplayName": "Lightning Swoop Precision",
-      "Description": "Storm swoop approach speed: 0.70.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.swoop_precision.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.swoop_precision.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 2,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 1,
       "MinLevel": 5,
       "RequiresTalentIds": [
@@ -343,11 +289,11 @@
     },
     {
       "Id": "RelentlessSwoop",
-      "DisplayName": "Lightning Relentless Swoop",
-      "Description": "20-damage storm swoop; 20–26 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.relentless_swoop.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.relentless_swoop.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 2,
       "MinLevel": 9,
       "RequiresTalentIds": [
@@ -362,11 +308,11 @@
     },
     {
       "Id": "RendingDive",
-      "DisplayName": "Lightning Rending Dive",
-      "Description": "24-damage storm swoop; 25–35 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.rending_dive.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.rending_dive.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 3,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -381,11 +327,11 @@
     },
     {
       "Id": "SwoopMastery",
-      "DisplayName": "Lightning Swoop Mastery",
-      "Description": "28-damage storm swoop; 18–24 sec cooldown.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.swoop_mastery.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.swoop_mastery.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 4,
-      "Branch": "Combat",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.combat",
       "PointCost": 3,
       "MinLevel": 14,
       "RequiresTalentIds": [
@@ -401,11 +347,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_VitalScales",
-      "DisplayName": "Storm Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.vital_scales.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.vital_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 1,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 1,
       "MinLevel": 2,
       "Effects": [
@@ -417,11 +363,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_HardenedScales",
-      "DisplayName": "Hardened Storm Scales",
-      "Description": "+5% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.hardened_scales.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.hardened_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 2,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 1,
       "MinLevel": 4,
       "RequiresTalentIds": [
@@ -436,11 +382,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_ElderScales",
-      "DisplayName": "Elder Storm Scales",
-      "Description": "+8% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.elder_scales.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.elder_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 2,
       "MinLevel": 7,
       "RequiresTalentIds": [
@@ -455,11 +401,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_ScaleGuard",
-      "DisplayName": "Storm Guard",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.scale_guard.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.scale_guard.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 3,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 1,
       "MinLevel": 8,
       "RequiresTalentIds": [
@@ -474,11 +420,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_ScaleBulwark",
-      "DisplayName": "Storm Bulwark",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.scale_bulwark.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.scale_bulwark.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 2,
       "MinLevel": 11,
       "RequiresTalentIds": [
@@ -493,11 +439,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_SwiftWings",
-      "DisplayName": "Storm Wings",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.swift_wings.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.swift_wings.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 4,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 1,
       "MinLevel": 12,
       "RequiresTalentIds": [
@@ -512,11 +458,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_SurvivalInstinct",
-      "DisplayName": "Storm Instinct",
-      "Description": "Take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.survival_instinct.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.survival_instinct.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 2,
       "MinLevel": 15,
       "RequiresTalentIds": [
@@ -531,11 +477,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_LastingScales",
-      "DisplayName": "Lasting Storm Scales",
-      "Description": "+6% maximum health.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.lasting_scales.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.lasting_scales.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 1,
       "MinLevel": 17,
       "RequiresTalentIds": [
@@ -550,11 +496,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_WyrmFortitude",
-      "DisplayName": "Storm Fortitude",
-      "Description": "+5% movement speed.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.wyrm_fortitude.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.wyrm_fortitude.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 5,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 2,
       "MinLevel": 20,
       "RequiresTalentIds": [
@@ -569,11 +515,11 @@
     },
     {
       "Id": "Miniwyvern_Lightning_VigorAscendance",
-      "DisplayName": "Storm Vitality",
-      "Description": "+6% maximum health; take 4% less damage.",
+      "DisplayName": "hydragon.talents.miniwyvern.lightning.vigor_ascendance.name",
+      "Description": "hydragon.talents.miniwyvern.lightning.vigor_ascendance.description",
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
       "Tier": 6,
-      "Branch": "Vigor",
+      "Branch": "hydragon.talents.miniwyvern.lightning.branch.vigor",
       "PointCost": 4,
       "MinLevel": 25,
       "RequiresTalentIds": [

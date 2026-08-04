@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Deterministic, source-keyed Miniwyvern ability scheduler.
@@ -20,7 +22,19 @@ import java.util.UUID;
  */
 public final class MiniwyvernAbilityService {
     private static final String SOURCE_PREFIX = "hydragon:mini:";
+    private static final String WARD_ABILITY_ID = "ward";
+    private static final String SPEED_BURST_ABILITY_ID = "speed-burst";
+    private static final Map<SpeedBurstKey, String> SPEED_BURST_EFFECT_IDS = Map.of(
+            new SpeedBurstKey("lightning", 1.10D, 3.0D),
+                    "HyDragon_Miniwyvern_Lightning_SpeedBurst_110_3",
+            new SpeedBurstKey("lightning", 1.15D, 4.0D),
+                    "HyDragon_Miniwyvern_Lightning_SpeedBurst_115_4",
+            new SpeedBurstKey("nature", 1.05D, 2.0D),
+                    "HyDragon_Miniwyvern_Nature_SpeedBurst_105_2",
+            new SpeedBurstKey("nature", 1.10D, 2.0D),
+                    "HyDragon_Miniwyvern_Nature_SpeedBurst_110_2");
     private static final long ICE_TARGET_RETENTION_MS = 60_000L;
+    private static final Pattern NATURE_TIER_PATTERN = Pattern.compile("(?:^|\\D)(15|20|25|30)(?:$|\\D)");
     private final MiniwyvernAbilityStateRepository states;
     private final MiniwyvernOwnerAuraRegistry ownerAuras;
 
@@ -68,7 +82,7 @@ public final class MiniwyvernAbilityService {
         }
         String formId = config.getId();
         boolean requiredTalentPurchased = requiredTalentPurchased(config, world);
-        synchronizeOwnerAttackAura(context, config, requiredTalentPurchased);
+        synchronizeOwnerAttackAura(context, config, world, requiredTalentPurchased);
 
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
@@ -118,10 +132,25 @@ public final class MiniwyvernAbilityService {
             Map<String, MiniwyvernArchetypeConfig> archetypes,
             MiniwyvernAbilityWorld world,
             long nowMs) {
+        return deactivate(context, archetypes, world, nowMs, captureWard(context.ownerUuid()));
+    }
+
+    /**
+     * Removes tracked effects when lifecycle state changes, using a ward identity captured before
+     * a world-thread callback was queued. The callback must not depend on the live aura registry,
+     * because shutdown may clear that registry before this world-thread work runs.
+     */
+    TickResult deactivate(
+            ProfileContext context,
+            Map<String, MiniwyvernArchetypeConfig> archetypes,
+            MiniwyvernAbilityWorld world,
+            long nowMs,
+            WardCleanup wardCleanup) {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(archetypes, "archetypes");
         Objects.requireNonNull(world, "world");
         if (!world.isWorldThread()) return TickResult.denied("not-world-thread");
+        removeWard(wardCleanup, world);
         ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
         MiniwyvernAbilityStateRepository.LoadResult loaded = states.load(
                 context.ownerUuid(), context.profileId());
@@ -191,8 +220,9 @@ public final class MiniwyvernAbilityService {
                         : List.of();
         boolean hasPassive = !passiveDisabled && (!config.getPassiveEffects().isEmpty()
                 || !supportedEffectModifiers.isEmpty() || !supportedRawModifiers.isEmpty());
-        boolean refreshPassive = hasPassive && shouldRefreshPassiveLease(
-                state.sourceExpiresAt.get(passiveSource), nowMs, passiveRefreshSeconds(config));
+        boolean playerOnlyForm = config.getId().equals("lightning") || config.getId().equals("nature");
+        boolean refreshPassive = hasPassive && (playerOnlyForm || shouldRefreshPassiveLease(
+                state.sourceExpiresAt.get(passiveSource), nowMs, passiveRefreshSeconds(config)));
         boolean cleanupDisabledPassive = false;
         if (passiveDisabled) {
             cleanupDisabledPassive = state.sources.remove(passiveSource);
@@ -213,25 +243,47 @@ public final class MiniwyvernAbilityService {
             supportedRawModifiers.clear();
         }
 
+        MiniwyvernOwnerAuraRegistry.Aura ownerAura = ownerAuras.activeFor(context.ownerUuid())
+                .filter(aura -> aura.formId().equals(config.getId()))
+                .orElse(null);
         double natureHeal = 0.0D;
+        double speedBurstMultiplier = ownerAura == null ? 0.0D : ownerAura.speedBurstMultiplier();
+        double speedBurstDurationSeconds = ownerAura == null ? 0.0D : ownerAura.speedBurstDurationSeconds();
+        boolean speedBurstTriggered = false;
         if (!passiveDisabled && config.getId().equals("nature")) {
             String abilityId = "nature_regeneration";
             long next = state.cooldowns.getOrDefault(abilityId, 0L);
             if (nowMs >= next) {
                 double tickSeconds = config.getPassiveModifiers().getOrDefault("RegenerationTickSeconds", 0.0D);
-                double maximumFraction = config.getPassiveModifiers().getOrDefault("MaximumHealFractionPerTick", 0.0D);
+                double maximumFraction = ownerAura == null
+                        ? config.getPassiveModifiers().getOrDefault("MaximumHealFractionPerTick", 0.0D)
+                        : ownerAura.ownerRegenerationFraction();
                 MiniwyvernAbilityWorld.Health health = world.health(context.ownerUuid());
                 natureHeal = Math.min(health.maximum() * maximumFraction, health.maximum() - health.current());
                 state.cooldowns.put(abilityId, saturatingAdd(nowMs, secondsToMs(tickSeconds)));
                 state.updatedAt = nowMs;
+                speedBurstTriggered = natureHeal > 0.0D;
             }
         }
+        if (config.getId().equals("lightning") && !passiveDisabled) {
+            speedBurstTriggered = ownerAuras.consumeSpeedBurst(context.ownerUuid());
+        }
+        String speedBurstEffectId = speedBurstEffectId(
+                config.getId(), speedBurstMultiplier, speedBurstDurationSeconds);
+        Set<String> candidateOwnerEffects = ownerEffectCandidates(config);
+        Set<String> activeOwnerEffects = ownerPassiveEffects(config, ownerAura);
         return new PassiveExecution(
                 passiveSource,
                 hasPassive,
                 refreshPassive,
                 cleanupDisabledPassive,
                 natureHeal,
+                speedBurstMultiplier,
+                speedBurstDurationSeconds,
+                speedBurstTriggered,
+                speedBurstEffectId,
+                candidateOwnerEffects,
+                activeOwnerEffects,
                 Map.copyOf(supportedEffectModifiers),
                 Map.copyOf(supportedRawModifiers),
                 List.copyOf(diagnostics));
@@ -245,17 +297,23 @@ public final class MiniwyvernAbilityService {
         int applied = 0;
         boolean gameplayApplied = false;
         if (passive.cleanupDisabledPassive()) {
-            for (String effectId : config.getPassiveEffects()) {
+            for (String effectId : passive.candidateOwnerEffects()) {
                 world.removeEffect(context.ownerUuid(), passive.sourceKey(), effectId);
             }
             for (String effectId : new LinkedHashSet<>(config.getPassiveModifierEffects().values())) {
                 world.removeEffect(context.ownerUuid(), passive.sourceKey(), effectId);
             }
             world.removeOwnerModifiers(context.ownerUuid(), passive.sourceKey());
+            removeSpeedBurstEffects(context.ownerUuid(), context.profileId(), config.getId(), world);
         }
         if (passive.refreshPassive()) {
             double refreshSeconds = passiveRefreshSeconds(config);
-            for (String effectId : config.getPassiveEffects()) {
+            for (String effectId : passive.candidateOwnerEffects()) {
+                if (!passive.activeOwnerEffects().contains(effectId)) {
+                    world.removeEffect(context.ownerUuid(), passive.sourceKey(), effectId);
+                }
+            }
+            for (String effectId : passive.activeOwnerEffects()) {
                 if (world.applyEffect(context.ownerUuid(), passive.sourceKey(), effectId, refreshSeconds)) applied++;
             }
             for (String effectId : new LinkedHashSet<>(passive.effectModifiers().values())) {
@@ -271,6 +329,17 @@ public final class MiniwyvernAbilityService {
             applied++;
             gameplayApplied = true;
         }
+        if (passive.speedBurstTriggered()
+                && passive.speedBurstMultiplier() > 0.0D
+                && passive.speedBurstDurationSeconds() > 0.0D
+                && passive.speedBurstEffectId() != null
+                && world.applyOwnerEffect(context.ownerUuid(),
+                        speedBurstSource(context.profileId(), config.getId()),
+                        passive.speedBurstEffectId(),
+                        passive.speedBurstDurationSeconds())) {
+            applied++;
+            gameplayApplied = true;
+        }
         if (gameplayApplied) world.emitAttachedPresentation(context.ownerUuid(), config.getParticleAndSoundIds());
         return applied;
     }
@@ -283,7 +352,7 @@ public final class MiniwyvernAbilityService {
         for (String source : state.appliedSourceKeys()) {
             world.removeOwnerModifiers(context.ownerUuid(), source);
             for (MiniwyvernArchetypeConfig config : archetypes.values()) {
-                for (String effectId : config.getPassiveEffects()) {
+                for (String effectId : ownerEffectCandidates(config)) {
                     world.removeEffect(context.ownerUuid(), source, effectId);
                 }
                 for (String effectId : new LinkedHashSet<>(config.getPassiveModifierEffects().values())) {
@@ -291,10 +360,49 @@ public final class MiniwyvernAbilityService {
                 }
             }
         }
+        for (MiniwyvernArchetypeConfig config : archetypes.values()) {
+            if (config.getId().equals("lightning") || config.getId().equals("nature")) {
+                removeSpeedBurstEffects(context.ownerUuid(), context.profileId(), config.getId(), world);
+            }
+        }
     }
 
     private static double passiveRefreshSeconds(MiniwyvernArchetypeConfig config) {
         return config.getId().equals("nature") ? 10.0D : 8.0D;
+    }
+
+    private static Set<String> ownerEffectCandidates(MiniwyvernArchetypeConfig config) {
+        LinkedHashSet<String> candidates = new LinkedHashSet<>(config.getPassiveEffects());
+        if (config.getId().equals("lightning") || config.getId().equals("nature")) {
+            MiniwyvernArchetypeConfig.EssenceBondAura essence = config.getEssenceBondAura();
+            if (essence != null) {
+                for (MiniwyvernArchetypeConfig.Upgrade upgrade : essence.getUpgrades()) {
+                    if (upgrade != null && upgrade.getTargetEffectId() != null) {
+                        candidates.add(upgrade.getTargetEffectId());
+                    }
+                }
+            }
+        }
+        return Set.copyOf(candidates);
+    }
+
+    private static Set<String> ownerPassiveEffects(
+            MiniwyvernArchetypeConfig config,
+            MiniwyvernOwnerAuraRegistry.Aura aura) {
+        if (!config.getId().equals("lightning") && !config.getId().equals("nature")) {
+            return Set.copyOf(config.getPassiveEffects());
+        }
+        if (aura == null || aura.ownerEffectId() == null || aura.ownerEffectId().isBlank()) {
+            return Set.of();
+        }
+        return Set.of(aura.ownerEffectId());
+    }
+
+    private static double natureRegenerationFraction(String effectId, double fallback) {
+        if (effectId == null || effectId.isBlank()) return fallback;
+        Matcher matcher = NATURE_TIER_PATTERN.matcher(effectId.trim());
+        if (!matcher.find()) return fallback;
+        return Integer.parseInt(matcher.group(1)) / 1_000.0D;
     }
 
     private static boolean shouldRefreshPassiveLease(
@@ -337,16 +445,184 @@ public final class MiniwyvernAbilityService {
     /** Clears ephemeral owner-hit state even when the world projection is already gone. */
     public void clearOwnerAuras() { ownerAuras.clear(); }
 
+    /** Captures source-owned Ward identity before scheduling world-thread cleanup. */
+    WardCleanup captureWard(UUID ownerUuid) {
+        MiniwyvernOwnerAuraRegistry.Aura aura = ownerAuras.activeFor(ownerUuid).orElse(null);
+        if (aura == null || aura.wardEffectId() == null) return null;
+        String source = wardSource(aura);
+        return source == null ? null : new WardCleanup(ownerUuid, source, aura.wardEffectId());
+    }
+
     private void synchronizeOwnerAttackAura(
             ProfileContext context,
             MiniwyvernArchetypeConfig config,
+            MiniwyvernAbilityWorld world,
             boolean requiredTalentPurchased) {
+        String formId = config.getId();
         MiniwyvernArchetypeConfig.OwnerAttackAura aura = config.getOwnerAttackAura();
-        if (!requiredTalentPurchased || aura == null || aura.getEffectId() == null || !ownerAuras.update(
-                context.ownerUuid(), context.profileId(), context.npcUuid().toString(), context.npcUuid(),
-                config.getId(), aura.getEffectId(), aura.getDurationSeconds(),
-                aura.getDamageReductionFraction())) {
+        boolean playerOnlyForm = formId.equals("lightning") || formId.equals("nature");
+        MiniwyvernOwnerAuraRegistry.Aura previous = ownerAuras.activeFor(context.ownerUuid()).orElse(null);
+        if (!requiredTalentPurchased || (aura == null && !playerOnlyForm)) {
+            removeWard(context.ownerUuid(), previous, world);
+            removeSpeedBurstEffects(context.ownerUuid(), context.profileId(),
+                    previous == null ? formId : previous.formId(), world);
             ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
+            return;
+        }
+
+        String effectId = aura == null || aura.getEffectId() == null ? "" : aura.getEffectId();
+        double durationSeconds = aura == null ? 0.0D : aura.getDurationSeconds();
+        Double damageReductionFraction = aura == null ? null : aura.getDamageReductionFraction();
+        // Void's retained root aura has always increased damage taken by 12%; its original
+        // configuration predates the explicit field, so preserve that baseline when absent.
+        double targetDamageTakenFraction = aura == null ? 0.0D : aura.getTargetDamageTakenFraction();
+        if (aura != null && aura.getTargetDamageTakenFractionOverride() == null && "void".equals(formId)) {
+            targetDamageTakenFraction = 0.12D;
+        }
+        double ownerDamageToAffectedFraction = 0.0D;
+        String wardEffectId = null;
+        double conditionalWardDamageReductionFraction = 0.0D;
+        double wardDamageReductionFraction = 0.0D;
+        double siphonMaximumHealthFraction = 0.0D;
+        long siphonCooldownMs = 0L;
+        String ownerEffectId = playerOnlyForm
+                ? config.getPassiveEffects().stream().findFirst().orElse(null) : null;
+        double ownerRegenerationFraction = formId.equals("nature")
+                ? config.getPassiveModifiers().getOrDefault("MaximumHealFractionPerTick", 0.0D) : 0.0D;
+        double speedBurstMultiplier = 0.0D;
+        double speedBurstDurationSeconds = 0.0D;
+
+        MiniwyvernArchetypeConfig.EssenceBondAura essenceBondAura = config.getEssenceBondAura();
+        if (essenceBondAura != null) {
+            for (MiniwyvernArchetypeConfig.Upgrade upgrade : essenceBondAura.getUpgrades()) {
+                if (upgrade == null || upgrade.getTalentId().isEmpty()
+                        || !world.hasPurchasedTalent(upgrade.getTalentId())) continue;
+                if (upgrade.getTargetEffectId() != null) {
+                    if (playerOnlyForm) {
+                        ownerEffectId = upgrade.getTargetEffectId();
+                        if (formId.equals("nature")) {
+                            ownerRegenerationFraction = natureRegenerationFraction(
+                                    ownerEffectId, ownerRegenerationFraction);
+                        }
+                    } else {
+                        effectId = upgrade.getTargetEffectId();
+                    }
+                }
+                if (!playerOnlyForm && upgrade.getTargetDurationSecondsOverride() != null) {
+                    durationSeconds = upgrade.getTargetDurationSecondsOverride();
+                }
+                if (!playerOnlyForm && upgrade.getTargetOutgoingDamageReductionFractionOverride() != null) {
+                    damageReductionFraction = upgrade.getTargetOutgoingDamageReductionFractionOverride();
+                }
+                if (!playerOnlyForm && upgrade.getTargetDamageTakenFractionOverride() != null) {
+                    targetDamageTakenFraction = upgrade.getTargetDamageTakenFractionOverride();
+                }
+                if (upgrade.getOwnerDamageToAffectedFractionOverride() != null) {
+                    ownerDamageToAffectedFraction = upgrade.getOwnerDamageToAffectedFractionOverride();
+                }
+                if (upgrade.getWardEffectId() != null
+                        && !"conditionalward".equals(normalizeOptional(upgrade.getSemantic()))) {
+                    wardEffectId = upgrade.getWardEffectId();
+                }
+                if (upgrade.getConditionalWardDamageReductionFractionOverride() != null) {
+                    conditionalWardDamageReductionFraction =
+                            upgrade.getConditionalWardDamageReductionFractionOverride();
+                }
+                if (upgrade.getWardDamageReductionFractionOverride() != null) {
+                    wardDamageReductionFraction = upgrade.getWardDamageReductionFractionOverride();
+                }
+                if (upgrade.getSiphonMaximumHealthFractionOverride() != null) {
+                    siphonMaximumHealthFraction = upgrade.getSiphonMaximumHealthFractionOverride();
+                    siphonCooldownMs = siphonMaximumHealthFraction > 0.0D
+                            ? upgrade.getSiphonCooldownMs() : 0L;
+                }
+                if (upgrade.getSpeedBurstMultiplierOverride() != null) {
+                    speedBurstMultiplier = upgrade.getSpeedBurstMultiplierOverride();
+                }
+                if (upgrade.getSpeedBurstDurationSecondsOverride() != null) {
+                    speedBurstDurationSeconds = upgrade.getSpeedBurstDurationSecondsOverride();
+                }
+            }
+        }
+        if (!ownerAuras.update(
+                context.ownerUuid(), context.profileId(), context.npcUuid().toString(), context.npcUuid(),
+                formId, effectId, durationSeconds, damageReductionFraction,
+                targetDamageTakenFraction, ownerDamageToAffectedFraction, wardEffectId,
+                conditionalWardDamageReductionFraction, siphonMaximumHealthFraction, siphonCooldownMs,
+                ownerEffectId, ownerRegenerationFraction,
+                speedBurstMultiplier, speedBurstDurationSeconds, wardDamageReductionFraction)) {
+            removeWard(context.ownerUuid(), previous, world);
+            removeSpeedBurstEffects(context.ownerUuid(), context.profileId(),
+                    previous == null ? formId : previous.formId(), world);
+            ownerAuras.clear(context.ownerUuid(), context.profileId(), context.npcUuid().toString());
+            return;
+        }
+        MiniwyvernOwnerAuraRegistry.Aura current = ownerAuras.activeFor(context.ownerUuid()).orElse(null);
+        replaceWard(context.ownerUuid(), previous, current, world);
+        replaceSpeedBurst(context.ownerUuid(), context.profileId(), previous, current, world);
+    }
+
+    private static void replaceWard(
+            UUID ownerUuid,
+            MiniwyvernOwnerAuraRegistry.Aura previous,
+            MiniwyvernOwnerAuraRegistry.Aura current,
+            MiniwyvernAbilityWorld world) {
+        String previousEffect = previous == null ? null : previous.wardEffectId();
+        String currentEffect = current == null ? null : current.wardEffectId();
+        String previousSource = wardSource(previous);
+        String currentSource = wardSource(current);
+        if (previousEffect != null
+                && (!Objects.equals(previousSource, currentSource)
+                || !Objects.equals(previousEffect, currentEffect))) {
+            world.removeOwnerEffect(ownerUuid, previousSource, previousEffect);
+        }
+        if (currentEffect != null && currentSource != null && current != null) {
+            world.applyOwnerEffect(ownerUuid, currentSource, currentEffect, current.durationSeconds());
+        }
+    }
+
+    private static void removeWard(
+            UUID ownerUuid,
+            MiniwyvernOwnerAuraRegistry.Aura aura,
+            MiniwyvernAbilityWorld world) {
+        if (aura == null || aura.wardEffectId() == null) return;
+        String source = wardSource(aura);
+        if (source != null) world.removeOwnerEffect(ownerUuid, source, aura.wardEffectId());
+    }
+
+    private static void replaceSpeedBurst(
+            UUID ownerUuid,
+            String profileId,
+            MiniwyvernOwnerAuraRegistry.Aura previous,
+            MiniwyvernOwnerAuraRegistry.Aura current,
+            MiniwyvernAbilityWorld world) {
+        if (previous == null) return;
+        String previousEffect = speedBurstEffectId(
+                previous.formId(), previous.speedBurstMultiplier(), previous.speedBurstDurationSeconds());
+        String currentEffect = current == null ? null : speedBurstEffectId(
+                current.formId(), current.speedBurstMultiplier(), current.speedBurstDurationSeconds());
+        if (previousEffect != null && !Objects.equals(previousEffect, currentEffect)) {
+            world.removeOwnerEffect(
+                    ownerUuid, speedBurstSource(profileId, previous.formId()), previousEffect);
+        }
+    }
+
+    private static void removeWard(WardCleanup wardCleanup, MiniwyvernAbilityWorld world) {
+        if (wardCleanup == null) return;
+        world.removeOwnerEffect(
+                wardCleanup.ownerUuid(), wardCleanup.sourceKey(), wardCleanup.effectId());
+    }
+
+    private static String wardSource(MiniwyvernOwnerAuraRegistry.Aura aura) {
+        return aura == null || aura.wardEffectId() == null
+                ? null : sourceKey(aura.profileId(), aura.formId(), WARD_ABILITY_ID);
+    }
+
+    record WardCleanup(UUID ownerUuid, String sourceKey, String effectId) {
+        WardCleanup {
+            Objects.requireNonNull(ownerUuid, "ownerUuid");
+            sourceKey = requiredText(sourceKey, "sourceKey");
+            effectId = requiredText(effectId, "effectId");
         }
     }
 
@@ -360,6 +636,49 @@ public final class MiniwyvernAbilityService {
     private static String sourceKey(String profileId, String formId, String abilityId) {
         return SOURCE_PREFIX + requiredText(profileId, "profileId") + ":"
                 + normalize(formId) + ":" + requiredText(abilityId, "abilityId");
+    }
+
+    private static String speedBurstSource(String profileId, String formId) {
+        return sourceKey(profileId, formId, SPEED_BURST_ABILITY_ID);
+    }
+
+    static String speedBurstEffectId(String formId, double multiplier, double durationSeconds) {
+        if (formId == null || !Double.isFinite(multiplier) || !Double.isFinite(durationSeconds)) {
+            return null;
+        }
+        String normalizedForm = normalizeOptional(formId);
+        return SPEED_BURST_EFFECT_IDS.entrySet().stream()
+                .filter(entry -> entry.getKey().formId().equals(normalizedForm))
+                .filter(entry -> approximatelyEqual(entry.getKey().multiplier(), multiplier)
+                        && approximatelyEqual(entry.getKey().durationSeconds(), durationSeconds))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static Set<String> speedBurstEffectCandidates(String formId) {
+        if (formId == null) return Set.of();
+        String normalizedForm = normalizeOptional(formId);
+        return SPEED_BURST_EFFECT_IDS.entrySet().stream()
+                .filter(entry -> entry.getKey().formId().equals(normalizedForm))
+                .map(Map.Entry::getValue)
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+    }
+
+    private static void removeSpeedBurstEffects(
+            UUID ownerUuid, String profileId, String formId, MiniwyvernAbilityWorld world) {
+        String source = speedBurstSource(profileId, formId);
+        for (String effectId : speedBurstEffectCandidates(formId)) {
+            world.removeOwnerEffect(ownerUuid, source, effectId);
+        }
+    }
+
+    private static String normalizeOptional(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static boolean approximatelyEqual(double left, double right) {
+        return Math.abs(left - right) <= 0.000_001D;
     }
 
     private static long secondsToMs(double seconds) {
@@ -415,9 +734,18 @@ public final class MiniwyvernAbilityService {
             boolean refreshPassive,
             boolean cleanupDisabledPassive,
             double natureHeal,
+            double speedBurstMultiplier,
+            double speedBurstDurationSeconds,
+            boolean speedBurstTriggered,
+            String speedBurstEffectId,
+            Set<String> candidateOwnerEffects,
+            Set<String> activeOwnerEffects,
             Map<String, String> effectModifiers,
             Map<String, Double> rawModifiers,
             List<String> diagnostics) {
+    }
+
+    private record SpeedBurstKey(String formId, double multiplier, double durationSeconds) {
     }
 
     private static final class MutableState {

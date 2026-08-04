@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.assetstore.JsonAsset;
 import com.hypixel.hytale.assetstore.codec.AssetBuilderCodec;
@@ -260,6 +263,120 @@ class BundledConfigAssetContractTest {
         assertOwnerAttackAura(archetypes, "fire", "HyDragon_Miniwyvern_Fire_Burn", 4.0);
         assertOwnerAttackAura(archetypes, "ice", "HyDragon_Miniwyvern_Ice_Slow", 4.0);
         assertOwnerAttackAura(archetypes, "void", "HyDragon_Miniwyvern_Void_Exposure", 6.0);
+    }
+
+    @Test
+    void elementalMiniwyvernEssenceBondUpgradesResolveToBundledEffects() throws IOException {
+        for (String form : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void")) {
+            Path archetypePath = Path.of("Server", "HyDragon", "MiniwyvernArchetypes", form + ".json");
+            JsonObject archetype = JsonParser.parseString(Files.readString(archetypePath)).getAsJsonObject();
+            JsonObject aura = archetype.getAsJsonObject("EssenceBondAura");
+            assertTrue(aura != null, form + " must declare EssenceBondAura");
+            JsonArray upgrades = aura.getAsJsonArray("Upgrades");
+            assertEquals(8, upgrades.size(), form + " must declare eight upgrade tiers");
+            Set<String> talentIds = new HashSet<>();
+            Map<String, JsonObject> byTalentSuffix = new HashMap<>();
+            for (var element : upgrades) {
+                JsonObject upgrade = element.getAsJsonObject();
+                String talentId = upgrade.get("TalentId").getAsString();
+                assertTrue(talentId.startsWith("Miniwyvern_" + form + "_"), talentId);
+                assertTrue(talentIds.add(talentId), form + " repeats " + talentId);
+                for (String suffix : List.of("Focus", "Attunement", "Amplification", "Resonance",
+                        "Efficiency", "Harmony", "Mastery", "Ascendance")) {
+                    if (talentId.endsWith(suffix)) byTalentSuffix.put(suffix, upgrade);
+                }
+                for (String field : List.of("TargetEffectId", "WardEffectId")) {
+                    if (!upgrade.has(field)) continue;
+                    String effectId = upgrade.get(field).getAsString();
+                    Path effectPath = Path.of("Server", "Entity", "Effects", "Status", effectId + ".json");
+                    assertTrue(Files.exists(effectPath), form + " references missing " + effectId);
+                    JsonObject effect = JsonParser.parseString(Files.readString(effectPath)).getAsJsonObject();
+                    assertTrue(effect.has("Name"), effectId + " must retain a localized status name");
+                }
+            }
+            for (String suffix : List.of("Attunement", "Resonance")) {
+                JsonObject upgrade = byTalentSuffix.get(suffix);
+                assertEquals("ward", upgrade.get("Semantic").getAsString(),
+                        form + " " + suffix + " must be a Ward payload");
+                assertTrue(upgrade.has("WardEffectId"), form + " " + suffix + " must select a Ward effect");
+            }
+            JsonObject harmony = byTalentSuffix.get("Harmony");
+            assertTrue(Set.of("ward", "conditionalward", "siphon")
+                            .contains(harmony.get("Semantic").getAsString()),
+                    form + " Harmony must remain on the Ward branch");
+            assertTrue(harmony.has("WardEffectId"), form + " Harmony must select a Ward effect");
+            for (String suffix : List.of("Focus", "Amplification", "Efficiency")) {
+                JsonObject upgrade = byTalentSuffix.get(suffix);
+                assertFalse("ward".equals(upgrade.get("Semantic").getAsString()),
+                        form + " " + suffix + " must remain on the pressure branch");
+            }
+        }
+    }
+
+    @Test
+    void lightningWardUsesRuntimeGeneralReductionInsteadOfDamageResistanceClaims() throws IOException {
+        for (String asset : List.of(
+                "HyDragon_Miniwyvern_Lightning_Ward.json",
+                "HyDragon_Miniwyvern_Lightning_Ward_8.json",
+                "HyDragon_Miniwyvern_Lightning_Ward_8_Knockback.json",
+                "HyDragon_Miniwyvern_Lightning_Ward_12.json",
+                "HyDragon_Miniwyvern_Lightning_Ward_15.json")) {
+            Path path = Path.of("Server", "Entity", "Effects", "Status", asset);
+            JsonObject status = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
+            assertFalse(status.has("DamageResistance"),
+                    path + " must not claim cause-scoped resistance for general Static Ward reduction");
+        }
+        JsonObject lightning = JsonParser.parseString(Files.readString(
+                Path.of("Server", "HyDragon", "MiniwyvernArchetypes", "Lightning.json"))).getAsJsonObject();
+        JsonArray upgrades = lightning.getAsJsonObject("EssenceBondAura").getAsJsonArray("Upgrades");
+        Map<String, Double> expected = Map.of("Attunement", 0.05D, "Resonance", 0.08D,
+                "Mastery", 0.12D, "Ascendance", 0.15D);
+        for (var element : upgrades) {
+            JsonObject upgrade = element.getAsJsonObject();
+            String suffix = upgrade.get("TalentId").getAsString();
+            suffix = expected.keySet().stream().filter(suffix::endsWith).findFirst().orElse("");
+            if (expected.containsKey(suffix)) {
+                assertEquals(expected.get(suffix), upgrade.get("WardDamageReductionFraction").getAsDouble(),
+                        "Lightning " + suffix + " must carry the runtime general reduction");
+            }
+        }
+    }
+
+    @Test
+    void miniwyvernTalentKeysArePresentInEveryServerLocale() throws IOException {
+        Set<String> requiredKeys = new HashSet<>();
+        for (String form : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "Wild")) {
+            Path talentPath = Path.of("Server", "Tamework", "Talents", "HyDragonMiniwyvern" + form + ".json");
+            JsonArray talents = JsonParser.parseString(Files.readString(talentPath))
+                    .getAsJsonObject().getAsJsonArray("Talents");
+            String prefix = "hydragon.talents.miniwyvern." + form.toLowerCase() + ".";
+            for (var element : talents) {
+                JsonObject talent = element.getAsJsonObject();
+                for (String field : List.of("DisplayName", "Description", "Branch")) {
+                    String key = talent.get(field).getAsString();
+                    assertTrue(key.startsWith(prefix), form + " uses an unscoped " + field + " key: " + key);
+                    requiredKeys.add(key);
+                }
+            }
+        }
+        for (String locale : List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR")) {
+            Map<String, String> values = languageValues(Path.of("Server", "Languages", locale, "server.lang"));
+            for (String key : requiredKeys) {
+                String value = values.get(key);
+                assertTrue(value != null && !value.isBlank(), locale + " omits " + key);
+                assertFalse(value.toLowerCase().contains("undefined"), locale + " leaves " + key + " undefined");
+                assertFalse(value.toLowerCase().contains("not implemented"), locale + " leaves " + key + " unfinished");
+            }
+        }
+    }
+
+    private static Map<String, String> languageValues(Path path) throws IOException {
+        Map<String, String> values = new HashMap<>();
+        for (String line : Files.readString(path).split("\\R")) {
+            int delimiter = line.indexOf('=');
+            if (delimiter > 0) values.put(line.substring(0, delimiter), line.substring(delimiter + 1));
+        }
+        return values;
     }
 
     private static void assertOwnerAttackAura(Map<String, MiniwyvernArchetypeConfig> archetypes,
