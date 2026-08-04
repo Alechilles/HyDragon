@@ -6,7 +6,7 @@ HyDragon adds Nordic and Rock Drake roles to existing base-game spawn pools with
 
 ## Version and load contract
 
-- HyDragon requires `Alechilles:Patchwork >=1.1.0 <2.0.0`.
+- HyDragon uses the Patchwork runtime shaded into its required Tamework version.
 - Patchwork must load before HyDragon asset patches are applied.
 - If Patchwork is unavailable or incompatible, the HyDragon manifest dependency rejects startup. HyDragon must not silently load with its dragon spawns absent.
 
