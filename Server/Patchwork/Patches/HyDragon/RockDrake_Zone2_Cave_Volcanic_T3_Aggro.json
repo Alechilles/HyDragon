@@ -9,9 +9,11 @@
       "Op": "Insert",
       "Path": "/NPCs",
       "Position": "End",
-      "Existing": { "Id": "RockDrakeT2" },
+      "Existing": {
+        "Id": "RockDrakeT2"
+      },
       "Value": {
-        "Weight": 10,
+        "Weight": 20,
         "SpawnBlockSet": "Volcanic",
         "Id": "RockDrakeT2"
       }
@@ -21,7 +23,9 @@
       "Op": "Insert",
       "Path": "/NPCs",
       "Position": "End",
-      "Existing": { "Id": "RockDrakeT3" },
+      "Existing": {
+        "Id": "RockDrakeT3"
+      },
       "Value": {
         "Weight": 4,
         "SpawnBlockSet": "Volcanic",

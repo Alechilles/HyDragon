@@ -9,9 +9,11 @@
       "Op": "Insert",
       "Path": "/NPCs",
       "Position": "End",
-      "Existing": { "Id": "RockDrakeT1" },
+      "Existing": {
+        "Id": "RockDrakeT1"
+      },
       "Value": {
-        "Weight": 5,
+        "Weight": 10,
         "Id": "RockDrakeT1"
       }
     }

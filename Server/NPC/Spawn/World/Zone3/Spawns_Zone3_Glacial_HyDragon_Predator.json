@@ -2,7 +2,7 @@
   "Environments": [ "Env_Zone3_Glacial" ],
   "NPCs": [
     {
-      "Weight": 1,
+      "Weight": 0.75,
       "SpawnBlockSet": "IceAndSnow",
       "Id": "Hydra"
     }

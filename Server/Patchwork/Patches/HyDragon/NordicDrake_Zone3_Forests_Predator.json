@@ -9,9 +9,11 @@
       "Op": "Insert",
       "Path": "/NPCs",
       "Position": "End",
-      "Existing": { "Id": "NordicDrake" },
+      "Existing": {
+        "Id": "NordicDrake"
+      },
       "Value": {
-        "Weight": 3.1764706,
+        "Weight": 2,
         "SpawnBlockSet": "Soil_NoSnow",
         "Id": "NordicDrake"
       }
