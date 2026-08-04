@@ -1,40 +1,31 @@
 {
-  "Group": "Alechilles",
-  "Name": "HyDragon",
-  "Version": "${project.version}",
-  "Description": "HyDragon",
-  "Authors": [
-    {
-      "Name": "Alec (Alechilles)",
-      "Email": "",
-      "Url": "https://www.curseforge.com/members/alechilles/projects",
-      "Discord": "alechilles"
+    "Group": "Alechilles",
+    "Name": "HyDragon",
+    "Version": "1.0.0",
+    "Description": "HyDragon",
+    "Authors": [
+        {
+            "Name": "Alec (Alechilles)",
+            "Url": "https://www.curseforge.com/members/alechilles/projects"
+        },
+        {
+            "Name": "Ye",
+            "Url": "https://www.curseforge.com/members/onlyye/projects"
+        }
+    ],
+    "Website": "https://modstats.io/stats",
+    "Main": "com.alechilles.hydragon.HyDragonPlugin",
+    "ServerVersion": "0.5.x",
+    "Dependencies": {
+        "Alechilles:Alec's Tamework!": ">=3.0.0 <4.0.0",
+        "Alechilles:Patchwork": ">=1.1.0 <2.0.0"
     },
-    {
-      "Name": "Ye",
-      "Email": "",
-      "Url": "https://www.curseforge.com/members/onlyye/projects",
-      "Discord": "ye1111"
+    "OptionalDependencies": {
+        "Alechilles:Alec's Nametags!": "*"
+    },
+    "DisabledByDefault": false,
+    "IncludesAssetPack": true,
+    "UpdateChecker": {
+        "CurseForge": "1503366"
     }
-  ],
-  "Website": "https://modstats.io/stats",
-  "Main": "com.alechilles.hydragon.HyDragonPlugin",
-  "ServerVersion": "0.5.x",
-  "Dependencies": {
-    "Alechilles:Alec's Tamework!": ">=3.0.0 <4.0.0",
-    "Alechilles:Patchwork": ">=1.1.0 <2.0.0"
-  },
-  "OptionalDependencies": {
-    "Alechilles:Alec's Nametags!": "*"
-  },
-  "LoadBefore": {},
-  "DisabledByDefault": false,
-  "IncludesAssetPack": true,
-  "SubPlugins": [],
-  "UpdateChecker": {
-    "CurseForge": "1503366"
-  }
 }
-
-
-

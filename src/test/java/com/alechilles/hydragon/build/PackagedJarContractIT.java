@@ -12,7 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.junit.jupiter.api.Test;
 
-/** Verifies the actual release artifact after Maven has packaged it. */
+/** Verifies the actual release artifact after Gradle has packaged it. */
 final class PackagedJarContractIT {
     @Test
     void packagedJarContainsOnlyThePluginAndSupportedAssetRoots() throws IOException {

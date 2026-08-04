@@ -1,46 +1,37 @@
-# Building and installing HyDragon
+# Building HyDragon
 
-HyDragon uses the same Maven 3.9.9 wrapper and `install-plugin` workflow as
-Tamework. HyDragon compiles against the packaged Tamework 3.0.0 JAR, so build
-and install Tamework before building HyDragon.
+HyDragon and Tamework share the Gradle workspace in the parent `Modding`
+directory. It builds HyDragon against Tamework's current project output and
+links both projects' asset files into one development server workspace.
 
-## Quick development install
+## Development hot reload
 
-From the HyDragon repository in PowerShell:
-
-```powershell
-..\alecstamework\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin
-.\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin
-```
-
-The HyDragon command packages the current `Common/`, `Server/`, Java, and
-manifest content, then copies `HyDragon v0.2.1.jar` to both:
-
-- `%APPDATA%\Hytale\install\release\package\game\latest\Server\mods`
-- `%APPDATA%\Hytale\UserData\Mods`
-
-Tamework's first command installs its matching 3.0.0 JAR to the same runtime.
-
-## Verified build
-
-Use `verify` before a release or when changing Java/integration behavior:
+From the `HyDragon` directory:
 
 ```powershell
-.\mvnw.cmd clean verify
+..\gradlew.bat stageAllModAssets
+..\gradlew.bat runAllMods
 ```
 
-This runs asset validation, unit tests, packaged-JAR checks, and the packaged
-HyDragon/Tamework integration test. It builds but does not install the JAR.
-Run the quick install command afterward to deploy the verified sources.
+Leave `runAllMods` running while you edit either project. The workspace stages
+the two mods together, so their linked asset files can hot-reload in the same
+server session.
 
-## Prerelease install
+## Verify before release
 
-Pass `-Dprerelease=true` to both projects:
+Run HyDragon's unit and packaged-artifact suites:
 
 ```powershell
-..\alecstamework\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin -Dprerelease=true
-.\mvnw.cmd package "-Dmaven.test.skip=true" -Pinstall-plugin -Dprerelease=true
+.\gradlew.bat clean test packagingTest
 ```
 
-This selects the prerelease Hytale server and userdata paths while preserving
-the same two-destination install contract.
+When working from the shared workspace, the packaging test automatically uses
+the Tamework JAR built from the sibling project.
+
+## Prerelease
+
+Pass the matching game version and patchline to the shared workspace command:
+
+```powershell
+..\gradlew.bat -Phytale_patchline=pre-release -Phytale_version=<game-version> runAllMods
+```

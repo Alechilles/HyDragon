@@ -2,6 +2,8 @@
 
 # Build and packaged deployment artifacts
 target/
+build/
+.gradle/
 *.jar
 *.zip
 *.json.bak

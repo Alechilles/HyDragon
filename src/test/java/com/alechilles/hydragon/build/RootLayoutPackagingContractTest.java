@@ -25,23 +25,23 @@ final class RootLayoutPackagingContractTest {
     }
 
     @Test
-    void pomPackagesOnlyTheExplicitRootAssetTrees() throws IOException {
-        String pom = Files.readString(projectRoot.resolve("pom.xml"));
+    void gradlePackagesOnlyTheExplicitRootAssetTrees() throws IOException {
+        String build = Files.readString(projectRoot.resolve("build.gradle"));
 
-        assertTrue(pom.contains("${project.basedir}/Common"));
-        assertTrue(pom.contains("<targetPath>Common</targetPath>"));
-        assertTrue(pom.contains("${project.basedir}/Server"));
-        assertTrue(pom.contains("<targetPath>Server</targetPath>"));
-        assertFalse(pom.contains("<directory>${project.basedir}</directory>\n                <filtering>false"));
+        assertTrue(build.contains("from('Common')"));
+        assertTrue(build.contains("into 'Common'"));
+        assertTrue(build.contains("from('Server')"));
+        assertTrue(build.contains("into 'Server'"));
+        assertTrue(build.contains("include 'manifest.json', 'icon-256.png'"));
     }
 
     @Test
-    void sourceVersionMatchesFilteredManifestVersion() throws IOException {
-        String pom = Files.readString(projectRoot.resolve("pom.xml"));
+    void sourceVersionMatchesManifestVersion() throws IOException {
+        String properties = Files.readString(projectRoot.resolve("gradle.properties"));
         String manifest = Files.readString(projectRoot.resolve("manifest.json"));
 
-        assertTrue(pom.contains("<version>1.0.0</version>"));
-        assertEquals(1, count(manifest, "${project.version}"));
+        assertTrue(properties.contains("mod_version=1.0.0"));
+        assertEquals(1, count(manifest, "\"Version\": \"1.0.0\""));
     }
 
     private static int count(String text, String token) {

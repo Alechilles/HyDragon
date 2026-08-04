@@ -1,0 +1,177 @@
+import java.nio.file.Files
+import java.nio.file.Path
+import org.gradle.process.ExecOperations
+
+plugins {
+    id 'java'
+    id 'com.azuredoom.hytale-tools'
+}
+
+def localProperties = new Properties()
+file('gradle.properties').withInputStream { localProperties.load(it) }
+def property = { String name ->
+    providers.gradleProperty(name).getOrElse(localProperties.getProperty(name))
+}
+
+group = 'com.alechilles'
+version = property('mod_version')
+def tameworkProject = findProject(':alecstamework')
+def workspaceAssetsDirectory = layout.buildDirectory.dir('workspace-assets')
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    if (tameworkProject == null) {
+        compileOnly files(property('tamework_jar_path'))
+    } else {
+        compileOnly files(tameworkProject.sourceSets.main.output)
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
+}
+
+configurations.named('testImplementation') {
+    extendsFrom(configurations.compileOnly)
+}
+
+hytaleTools {
+    hytaleVersion = property('hytale_version')
+    patchline = property('hytale_patchline')
+    manifestServerVersion = '0.5.x'
+    manifestFile = layout.projectDirectory.file('manifest.json')
+    manifestGroup = 'Alechilles'
+    modId = 'HyDragon'
+    modDescription = 'HyDragon'
+    modUrl = 'https://modstats.io/stats'
+    modCredits = 'Alec (Alechilles)||https://www.curseforge.com/members/alechilles/projects,Ye||https://www.curseforge.com/members/onlyye/projects'
+    mainClass = 'com.alechilles.hydragon.HyDragonPlugin'
+    manifestDependencies = "Alechilles:Alec's Tamework!=>=3.0.0 <4.0.0,Alechilles:Patchwork=>=1.1.0 <2.0.0"
+    manifestOptionalDependencies = "Alechilles:Alec's Nametags!=*"
+    curseforgeId = '1503366'
+    includesPack = true
+    bundleAssetEditorRuntime = false
+    assetPackSourceDirectory = workspaceAssetsDirectory
+}
+
+tasks.named('processResources', Copy) {
+    from(layout.projectDirectory) {
+        include 'manifest.json', 'icon-256.png'
+    }
+    from('Common') {
+        into 'Common'
+        exclude '**/Source/**', '**/*.bbmodel'
+    }
+    from('Server') {
+        into 'Server'
+    }
+}
+
+tasks.named('jar') {
+    archiveFileName = "HyDragon v${project.version}.jar"
+    manifest {
+        attributes(
+                'Plugin-Group': project.group,
+                'Plugin-Name': project.name,
+                'Plugin-Version': project.version)
+    }
+}
+
+tasks.register('prepareWorkspaceAssets') {
+    description = 'Creates a small linked asset root for workspace staging without moving HyDragon assets.'
+    group = 'hytale'
+    outputs.dir(workspaceAssetsDirectory)
+    doLast {
+        File destination = workspaceAssetsDirectory.get().asFile
+        destination.mkdirs()
+        def createLinkedAsset = { Path targetLink, Path target, boolean directory ->
+            if (Files.exists(targetLink)) {
+                return
+            }
+            try {
+                Files.createSymbolicLink(targetLink, target)
+                return
+            } catch (Exception ignored) {
+                if (!System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                    throw ignored
+                }
+            }
+            if (directory) {
+                def result = project.services.get(ExecOperations).exec {
+                    commandLine 'cmd', '/c', 'mklink', '/J', targetLink.toString(), target.toString()
+                    ignoreExitValue = true
+                }
+                if (result.exitValue == 0 && Files.exists(targetLink)) {
+                    return
+                }
+            } else {
+                Files.createLink(targetLink, target)
+                return
+            }
+            throw new GradleException("Unable to create a linked workspace asset: ${targetLink}")
+        }
+        ['Common', 'Server'].each { String name ->
+            Path assetLink = destination.toPath().resolve(name)
+            createLinkedAsset(assetLink, project.layout.projectDirectory.dir(name).asFile.toPath(), true)
+        }
+        ['manifest.json', 'icon-256.png'].each { String name ->
+            Path assetLink = destination.toPath().resolve(name)
+            createLinkedAsset(assetLink, project.layout.projectDirectory.file(name).asFile.toPath(), false)
+        }
+    }
+}
+
+tasks.named('prepareRunServer') {
+    dependsOn(tasks.named('prepareWorkspaceAssets'))
+}
+
+tasks.register('validateHyDragonAssets', Exec) {
+    commandLine 'python', 'scripts/validate_assets.py'
+}
+
+tasks.named('check') {
+    dependsOn(tasks.named('validateHyDragonAssets'))
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    workingDir projectDir
+    systemProperty 'hydragon.project.basedir', projectDir.absolutePath
+    systemProperty 'java.util.logging.manager', 'com.hypixel.hytale.logger.backend.HytaleLogManager'
+}
+
+tasks.named('test') {
+    exclude '**/*IT.class'
+}
+
+tasks.register('packagingTest', Test) {
+    description = 'Runs packaged HyDragon integration tests against current Gradle artifacts.'
+    group = 'verification'
+    dependsOn(tasks.named('jar'))
+    if (tameworkProject != null) {
+        dependsOn(tameworkProject.tasks.named('shadowJar'))
+    }
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    include '**/*IT.class'
+    useJUnitPlatform()
+    systemProperty 'hydragon.project.basedir', projectDir.absolutePath
+    systemProperty 'hydragon.packaged.jar', tasks.named('jar').get().archiveFile.get().asFile.absolutePath
+    systemProperty 'hydragon.tamework.jar', {
+        tameworkProject == null
+                ? file(property('tamework_jar_path')).absolutePath
+                : tameworkProject.tasks.named('shadowJar').get().archiveFile.get().asFile.absolutePath
+    }.call()
+    systemProperty 'hydragon.plugin.version', project.version.toString()
+    systemProperty 'hydragon.tamework.version', property('tamework_version')
+    systemProperty 'java.util.logging.manager', 'com.hypixel.hytale.logger.backend.HytaleLogManager'
+}

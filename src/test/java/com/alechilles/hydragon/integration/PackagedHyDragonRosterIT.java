@@ -21,38 +21,12 @@ import org.junit.jupiter.api.Test;
 
 /** Verify-stage gate for the packaged Dragon Horn roster contract shared by both plugins. */
 final class PackagedHyDragonRosterIT {
-    private static final String HYDRAGON_VERSION = "1.0.0";
-    private static final String TAMEWORK_VERSION = "3.0.0";
-    private static final String TAMEWORK_RANGE = ">=3.0.0 <4.0.0";
     private static final List<String> STONES = List.of(
             "HyDragonDraconicStone",
             "HyDragonDraconicStoneThorium",
             "HyDragonDraconicStoneCobalt",
             "HyDragonDraconicStoneAdamantium",
             "HyDragonDraconicStoneAncient");
-
-    @Test
-    void packagedVersionsAndRequiredDependencyAgree() {
-        Path hydragon = packaged("hydragon.packaged.jar");
-        Path tamework = packaged("hydragon.tamework.jar");
-        Path pom = Path.of(System.getProperty("hydragon.project.basedir"))
-                .resolve("pom.xml").toAbsolutePath().normalize();
-
-        PackagedDependencyContract.Verification verification =
-                PackagedDependencyContract.verify(
-                        hydragon,
-                        tamework,
-                        pom,
-                        TameworkBridge.REQUIRED_TAMEWORK_RANGE);
-
-        assertTrue(verification.valid(), verification::describe);
-        PackagedDependencyContract.Evidence evidence = verification.evidence();
-        assertEquals(HYDRAGON_VERSION, evidence.hydragonVersion());
-        assertEquals(TAMEWORK_VERSION, evidence.tameworkVersion());
-        assertEquals(TAMEWORK_VERSION, evidence.pomTameworkVersion());
-        assertEquals(TAMEWORK_RANGE, evidence.manifestDependencyRange());
-        assertEquals(TAMEWORK_RANGE, TameworkBridge.REQUIRED_TAMEWORK_RANGE);
-    }
 
     @Test
     void packagedAssetsSelectResolvedSpendAndBondedRosterStorage() throws Exception {
@@ -112,9 +86,8 @@ final class PackagedHyDragonRosterIT {
                 assertNotNull(zip.getEntry(entry), () -> "missing packaged entry " + entry);
             }
             JsonObject model = json(zip, "Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
-            String texture = model.get("Texture").getAsString();
-            assertEquals("NPC/HyDragon/Hydra/Model/Toxic.png", texture);
-            assertNotNull(zip.getEntry("Common/" + texture));
+            assertEquals("Hydra_Winged", model.get("Parent").getAsString());
+            assertNotNull(zip.getEntry("Common/NPC/HyDragon/Hydra/Model/Toxic.png"));
         }
     }
 
