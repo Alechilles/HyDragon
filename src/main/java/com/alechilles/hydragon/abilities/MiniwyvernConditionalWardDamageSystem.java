@@ -58,7 +58,7 @@ public final class MiniwyvernConditionalWardDamageSystem extends DamageEventSyst
         boolean healing = damage.getCause() != null
                 && "healing".equalsIgnoreCase(damage.getCause().getId());
         if (!active || !shouldModify(damage.isCancelled(), damage.getAmount(), blocked, healing)) return;
-        damage.setAmount(reducedAmount(damage.getAmount(), aura.conditionalWardDamageReductionFraction()));
+        damage.setAmount(reducedAmount(damage.getAmount(), reductionFraction(aura)));
     }
 
     static boolean shouldModify(boolean cancelled, float amount, boolean blocked, boolean healing) {
@@ -68,6 +68,13 @@ public final class MiniwyvernConditionalWardDamageSystem extends DamageEventSyst
     static float reducedAmount(float amount, double fraction) {
         if (!Double.isFinite(fraction) || fraction <= 0.0D || fraction >= 1.0D) return amount;
         return (float) (amount * (1.0D - fraction));
+    }
+
+    static double reductionFraction(MiniwyvernOwnerAuraRegistry.Aura aura) {
+        if (aura == null) return 0.0D;
+        return "lightning".equals(aura.formId())
+                ? aura.wardDamageReductionFraction()
+                : aura.conditionalWardDamageReductionFraction();
     }
 
     private static boolean hasLiveTargetStatus(

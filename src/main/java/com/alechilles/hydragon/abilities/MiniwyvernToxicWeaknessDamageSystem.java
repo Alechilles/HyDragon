@@ -74,8 +74,8 @@ public final class MiniwyvernToxicWeaknessDamageSystem extends DamageEventSystem
     }
 
     static float reducedAmount(float amount, double bondFraction, boolean projectileActive) {
-        double fraction = validFraction(bondFraction)
-                ? bondFraction : projectileActive ? 0.10D : 0.0D;
+        double fraction = validFraction(bondFraction) ? bondFraction : 0.0D;
+        if (projectileActive) fraction = Math.max(fraction, 0.10D);
         return (float) (amount * (1.0D - fraction));
     }
 
