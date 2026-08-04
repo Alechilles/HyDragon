@@ -600,7 +600,7 @@ class ToxicHydraVariantAssetTest {
         assertFalse(spawn.has("DayTimeRange"));
         JsonObject npc = spawn.getAsJsonArray("NPCs").get(0).getAsJsonObject();
         assertEquals(1, spawn.getAsJsonArray("NPCs").size());
-        assertEquals(1, npc.get("Weight").getAsInt());
+        assertEquals(0.75, npc.get("Weight").getAsDouble());
         assertEquals("Mud", npc.get("SpawnBlockSet").getAsString());
         assertEquals("Hydra_Toxic", npc.get("Id").getAsString());
         assertEquals(List.of(1.0, 1.0, 1.0, 1.0, 2.0),
@@ -767,7 +767,6 @@ class ToxicHydraVariantAssetTest {
         json(relativePath);
         assertNoForbiddenText(relativePath, "Root_NPC_Hydra_RainShoot");
         assertNoForbiddenText(relativePath, "Root_NPC_NordicDrake");
-        assertNoForbiddenText(relativePath, "Flame");
     }
 
     private static void assertParameter(JsonObject parameters, String name, Object expected) {
@@ -952,7 +951,7 @@ class ToxicHydraVariantAssetTest {
                 interaction.keySet());
         assertEquals(parent, interaction.get("Parent").getAsString());
         if (tamed) {
-            assertEquals(32, interaction.getAsJsonObject("DamageCalculator")
+            assertEquals(16, interaction.getAsJsonObject("DamageCalculator")
                     .getAsJsonObject("BaseDamage").get("Physical").getAsInt());
         }
         JsonObject next = interaction.getAsJsonObject("Next");

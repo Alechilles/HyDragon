@@ -176,7 +176,7 @@ final class DragonHornLocomotionAssetContractTest {
         assertFollowWrapper("Component_HyDragon_Instruction_Follow_Miniwyvern_Ground.json",
                 "Component_Tamework_Instruction_Follow_Advanced", "FollowSeekRange", 45);
         assertFollowWrapper("Component_HyDragon_Instruction_Follow_Miniwyvern_Flying.json",
-                "Component_Tamework_Instruction_Follow_Flying", "FollowTeleportThresholdRange", 45);
+                "Component_Tamework_Instruction_Follow_Flying", "FollowTeleportThresholdRange", 30);
 
         JsonObject defend = stateBehavior(miniwyvern, "Defend");
         assertExactlyTwoDirectModeBranches(defend);

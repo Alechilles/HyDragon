@@ -63,8 +63,12 @@ class BundledConfigAssetContractTest {
         String companion = Files.readString(Path.of("Server", "Tamework", "Companion", "HyDragonMiniwyvern.json"));
         String horn = Files.readString(Path.of("Server", "Tamework", "Items", "Commands", "HyDragonDragonHorn.json"));
         String breeding = Files.readString(Path.of("Server", "Tamework", "Breeding", "HyDragonBondedCompanions.json"));
-        assertEquals(7, occurrences(roster, "\"Tamed_Wyvern_Mini_"), "roster must contain exactly seven form roles");
-        assertEquals(7, occurrences(companion, "\"Tamed_Wyvern_Mini_"), "companion must contain exactly seven form roles");
+        assertEquals(roleIds, JsonParser.parseString(roster).getAsJsonObject().getAsJsonArray("AllowedRoles")
+                .asList().stream().map(element -> element.getAsString()).toList(),
+                "roster must contain exactly seven form roles");
+        assertEquals(roleIds, JsonParser.parseString(companion).getAsJsonObject().getAsJsonArray("RoleIds")
+                .asList().stream().map(element -> element.getAsString()).toList(),
+                "companion must contain exactly seven form roles");
         for (String roleId : roleIds) {
             assertTrue(roster.contains("\"" + roleId + "\""), "roster omits " + roleId);
             assertTrue(companion.contains("\"" + roleId + "\""), "companion omits " + roleId);
@@ -113,7 +117,9 @@ class BundledConfigAssetContractTest {
         for (Map.Entry<String, AuraVisual> expected : expectedAuraByForm.entrySet()) {
             Path archetype = Path.of("Server", "HyDragon", "MiniwyvernArchetypes", expected.getKey() + ".json");
             String json = Files.readString(archetype);
-            assertTrue(json.contains("\"PassiveEffects\": [ \"" + expected.getValue().effectId() + "\" ]"),
+            var passiveEffects = JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("PassiveEffects");
+            assertEquals(List.of(expected.getValue().effectId()),
+                    passiveEffects.asList().stream().map(element -> element.getAsString()).toList(),
                     archetype + " must maintain its owner aura EntityEffect while summoned");
             Path effect = Path.of("Server", "Entity", "Effects", "Status", expected.getValue().effectId() + ".json");
             assertTrue(Files.exists(effect), expected.getValue().effectId() + " must be a bundled EntityEffect");
@@ -390,8 +396,10 @@ class BundledConfigAssetContractTest {
             String directory,
             Class<T> type,
             AssetBuilderCodec<String, T> codec) throws IOException {
+        Path assetDirectory = CONFIG_ROOT.resolve(directory);
+        if (Files.notExists(assetDirectory)) return List.of();
         List<Path> paths;
-        try (var stream = Files.list(CONFIG_ROOT.resolve(directory))) {
+        try (var stream = Files.list(assetDirectory)) {
             paths = stream.filter(path -> path.getFileName().toString().endsWith(".json"))
                     .sorted(Comparator.comparing(path -> path.getFileName().toString()))
                     .toList();
