@@ -12,7 +12,7 @@
     "WanderRadius": 8,
     "ViewRange": 36,
     "HearingRange": 24,
-    "DropList": "Drop_Hydra",
+    "DropList": "Drop_Hydra_Toxic",
     "MaxSpeed": 7,
     "FlightSpeed": 9,
     "MemoriesNameOverride": "Toxic Hydra",

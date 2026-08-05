@@ -93,7 +93,7 @@ Use global order `3` for the section index and child orders 2–7 in the listed 
 
 - [ ] **Step 2: Write Hydra and Toxic Hydra pages**
 
-Hydra: Zone 3 glacial terrain; ice ball and ice-rain combat; ground mount; Ice and Earth materials; Scaleguard, Survivalist, combat, and Summoner's Pact talent identities. Toxic Hydra: Zone 4 volcanic Dark Green Moss; toxic bolts, poison breath/clouds, aerial attacks; dedicated Winged Toxic Hydra flight. The Toxic Hydra currently shares the Hydra drop table, so describe its Ice/Earth drops accurately and do not claim that it drops Toxic Essence. Explain capture, leveling, drops, and next steps without exposing internal probabilities.
+Hydra: Zone 3 glacial terrain; ice ball and ice-rain combat; ground mount; Ice and Earth materials; Scaleguard, Survivalist, combat, and Summoner's Pact talent identities. Toxic Hydra: Zone 4 volcanic Dark Green Moss; toxic bolts, poison breath/clouds, aerial attacks; dedicated Winged Toxic Hydra flight; guaranteed Toxic and Earth materials, plus rare Void essence and a decorative Drake Egg. Explain capture, leveling, drops, and next steps without exposing internal probabilities.
 
 - [ ] **Step 3: Write the Nordic Drake page**
 
@@ -221,7 +221,7 @@ Consolidate all recipes from Steps 2–4 into scannable tables grouped by Setup,
 
 - [ ] **Step 6: Add material-source guidance**
 
-Use these verified drop identities: both Hydra variants currently provide Ice/Earth materials and may provide Void; Nordic Drake provides Ice/Wind and may provide Void; Rock Drakes provide Nature, with Fire on Young/standard variants and Ice on Frost. Toxic Essence is crafted rather than dropped by the current Toxic Hydra. Plain essence and scales come from all full dragon families. Avoid presenting optional drops as guaranteed.
+Use these verified drop identities: the standard Hydra provides Ice/Earth materials; the Toxic Hydra provides Toxic/Earth materials; both may provide Void; Nordic Drake provides Ice/Wind and may provide Void; Rock Drakes provide Nature, with Fire on Young/standard variants and Ice on Frost. Plain essence and scales come from all full dragon families. Avoid presenting optional drops as guaranteed.
 
 - [ ] **Step 7: Validate and return custody**
 

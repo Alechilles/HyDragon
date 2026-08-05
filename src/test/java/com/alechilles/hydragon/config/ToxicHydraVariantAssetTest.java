@@ -40,6 +40,36 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
+    void wildToxicHydraUsesDedicatedToxicDrops() throws Exception {
+        JsonObject role = toxicRole("Hydra_Toxic");
+        assertEquals("Drop_Hydra_Toxic",
+                role.getAsJsonObject("Modify").get("DropList").getAsString());
+
+        JsonArray containers = json("Server/Drops/HyDragon/Drop_Hydra_Toxic.json")
+                .getAsJsonObject("Container").getAsJsonArray("Containers");
+        Map<String, JsonObject> drops = new LinkedHashMap<>();
+        for (JsonElement container : containers) {
+            JsonObject entry = container.getAsJsonObject();
+            JsonObject item = entry.getAsJsonObject("Item");
+            drops.put(item.get("ItemId").getAsString(), entry);
+        }
+
+        assertEquals(Set.of(
+                "Draconic_Scale",
+                "Draconic_Essence",
+                "Draconic_Essence_Toxic",
+                "Draconic_Essence_Earth",
+                "Draconic_Essence_Void",
+                "Drake_Egg"), drops.keySet());
+        assertDrop(drops, "Draconic_Scale", 100, 5, 6);
+        assertDrop(drops, "Draconic_Essence", 100, 5, 6);
+        assertDrop(drops, "Draconic_Essence_Toxic", 100, 3, 4);
+        assertDrop(drops, "Draconic_Essence_Earth", 100, 2, 3);
+        assertDrop(drops, "Draconic_Essence_Void", 8, 1, 1);
+        assertDrop(drops, "Drake_Egg", 6, 1, 1);
+    }
+
+    @Test
     void toxicHydraPoisonAddsOneThirdDurationAcrossWildTamedAndAvatarAttacks() throws Exception {
         JsonObject effect = json("Server/Entity/Effects/Status/" + TOXIC_HYDRA_POISON_EFFECT + ".json");
         assertEquals("Poison_T1", effect.get("Parent").getAsString());
@@ -1216,6 +1246,16 @@ class ToxicHydraVariantAssetTest {
         Map<String, String> result = new LinkedHashMap<>();
         values.entrySet().forEach(entry -> result.put(entry.getKey(), entry.getValue().getAsString()));
         return result;
+    }
+
+    private static void assertDrop(Map<String, JsonObject> drops, String itemId, int weight,
+            int minimum, int maximum) {
+        JsonObject entry = drops.get(itemId);
+        assertNotNull(entry, itemId);
+        assertEquals(weight, entry.get("Weight").getAsInt(), itemId);
+        JsonObject item = entry.getAsJsonObject("Item");
+        assertEquals(minimum, item.get("QuantityMin").getAsInt(), itemId);
+        assertEquals(maximum, item.get("QuantityMax").getAsInt(), itemId);
     }
 
     private static void assertLocaleEntryExactlyOnce(String locale, String key, String value)

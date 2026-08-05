@@ -35,3 +35,4 @@ All notable player-facing changes to HyDragon are documented here.
 - Fixed Rock Drake tier assets, cave spawns, mount anchors, projectile presentation, drops, and targeting behavior.
 - Fixed Miniwyvern summoning, flight-mode transitions, projectile aiming and impacts, swoop recovery, elemental aura cleanup, and localized combat guidance.
 - Fixed invalid animation and asset wiring that could cause visual, movement, or validation failures.
+- Fixed the Toxic Hydra using the standard Hydra drop table; it now rewards Toxic Draconic Essence instead of Ice Draconic Essence.
