@@ -18,7 +18,7 @@
   "TrajectoryMode": "Direct",
   "TargetSlot": "LockedTarget",
   "ImpactEffect": {
-    "EffectId": "Poison_T1",
+    "EffectId": "HyDragon_ToxicHydra_Poison",
     "Radius": 3.0,
     "ExcludeSource": true
   },
@@ -28,7 +28,7 @@
     "TickIntervalSeconds": 1.0,
     "DamagePerTick": 5.0,
     "ExcludeSource": true,
-    "EffectId": "Poison_T1",
+    "EffectId": "HyDragon_ToxicHydra_Poison",
     "SourceTypeId": "hydragon.toxic_hydra_hazard"
   },
   "Tags": {}

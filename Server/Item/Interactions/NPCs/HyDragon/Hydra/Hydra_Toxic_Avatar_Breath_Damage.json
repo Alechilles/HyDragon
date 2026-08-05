@@ -19,7 +19,7 @@
   },
   "Next": {
     "Type": "ApplyEffect",
-    "EffectId": "Poison_T1",
+    "EffectId": "HyDragon_ToxicHydra_Poison",
     "Entity": "Target"
   }
 }

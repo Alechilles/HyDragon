@@ -104,7 +104,7 @@
                 "Parent": "Hydra_Swipe_Left_Damage",
                 "Next": {
                   "Type": "ApplyEffect",
-                  "EffectId": "Poison_T1",
+                  "EffectId": "HyDragon_ToxicHydra_Poison",
                   "Entity": "Target"
                 }
               }
@@ -116,7 +116,7 @@
                 "Parent": "Hydra_Swipe_Right_Damage",
                 "Next": {
                   "Type": "ApplyEffect",
-                  "EffectId": "Poison_T1",
+                  "EffectId": "HyDragon_ToxicHydra_Poison",
                   "Entity": "Target"
                 }
               }
@@ -128,7 +128,7 @@
                 "Parent": "Hydra_Stomp_Damage",
                 "Next": {
                   "Type": "ApplyEffect",
-                  "EffectId": "Poison_T1",
+                  "EffectId": "HyDragon_ToxicHydra_Poison",
                   "Entity": "Target"
                 }
               }
@@ -167,7 +167,7 @@
                 "Parent": "Hydra_Bite_Damage",
                 "Next": {
                   "Type": "ApplyEffect",
-                  "EffectId": "Poison_T1",
+                  "EffectId": "HyDragon_ToxicHydra_Poison",
                   "Entity": "Target"
                 }
               }
@@ -206,7 +206,7 @@
                 "Parent": "Hydra_Tail_Spin_Damage",
                 "Next": {
                   "Type": "ApplyEffect",
-                  "EffectId": "Poison_T1",
+                  "EffectId": "HyDragon_ToxicHydra_Poison",
                   "Entity": "Target"
                 }
               }
@@ -318,7 +318,7 @@
                   "Parent": "Hydra_Swipe_Left_Damage",
                   "Next": {
                     "Type": "ApplyEffect",
-                    "EffectId": "Poison_T1",
+                    "EffectId": "HyDragon_ToxicHydra_Poison",
                     "Entity": "Target"
                   }
                 }
@@ -330,7 +330,7 @@
                   "Parent": "Hydra_Swipe_Right_Damage",
                   "Next": {
                     "Type": "ApplyEffect",
-                    "EffectId": "Poison_T1",
+                    "EffectId": "HyDragon_ToxicHydra_Poison",
                     "Entity": "Target"
                   }
                 }
@@ -342,7 +342,7 @@
                   "Parent": "Hydra_Stomp_Damage",
                   "Next": {
                     "Type": "ApplyEffect",
-                    "EffectId": "Poison_T1",
+                    "EffectId": "HyDragon_ToxicHydra_Poison",
                     "Entity": "Target"
                   }
                 }

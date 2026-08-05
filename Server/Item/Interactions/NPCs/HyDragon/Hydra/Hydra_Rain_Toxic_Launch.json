@@ -15,7 +15,7 @@
     "TickIntervalSeconds": 1.0,
     "DamagePerTick": 5.0,
     "ExcludeSource": true,
-    "EffectId": "Poison_T1",
+    "EffectId": "HyDragon_ToxicHydra_Poison",
     "SourceTypeId": "hydragon.rain_toxic_hazard"
   },
   "Effects": {
