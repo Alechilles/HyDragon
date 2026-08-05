@@ -17,6 +17,13 @@ group = 'com.alechilles'
 version = property('mod_version')
 def tameworkProject = findProject(':alecstamework')
 def workspaceAssetsDirectory = layout.buildDirectory.dir('workspace-assets')
+def execOperations = services.get(ExecOperations)
+def workspaceAssetDirectories = ['Common', 'Server'].collectEntries { String name ->
+    [(name): layout.projectDirectory.dir(name).asFile.toPath()]
+}
+def workspaceAssetFiles = ['manifest.json', 'icon-256.png'].collectEntries { String name ->
+    [(name): layout.projectDirectory.file(name).asFile.toPath()]
+}
 
 java {
     toolchain {
@@ -106,7 +113,7 @@ tasks.register('prepareWorkspaceAssets') {
                 }
             }
             if (directory) {
-                def result = project.services.get(ExecOperations).exec {
+                def result = execOperations.exec {
                     commandLine 'cmd', '/c', 'mklink', '/J', targetLink.toString(), target.toString()
                     ignoreExitValue = true
                 }
@@ -119,13 +126,13 @@ tasks.register('prepareWorkspaceAssets') {
             }
             throw new GradleException("Unable to create a linked workspace asset: ${targetLink}")
         }
-        ['Common', 'Server'].each { String name ->
+        workspaceAssetDirectories.each { String name, Path source ->
             Path assetLink = destination.toPath().resolve(name)
-            createLinkedAsset(assetLink, project.layout.projectDirectory.dir(name).asFile.toPath(), true)
+            createLinkedAsset(assetLink, source, true)
         }
-        ['manifest.json', 'icon-256.png'].each { String name ->
+        workspaceAssetFiles.each { String name, Path source ->
             Path assetLink = destination.toPath().resolve(name)
-            createLinkedAsset(assetLink, project.layout.projectDirectory.file(name).asFile.toPath(), false)
+            createLinkedAsset(assetLink, source, false)
         }
     }
 }
