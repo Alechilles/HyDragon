@@ -20,15 +20,11 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** Applies owner-hit auras in a dedicated ECS phase, matching projectile impact effects. */
 public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<EntityStore> {
-    private static final Logger LOGGER = Logger.getLogger(MiniwyvernOwnerAuraEffectSystem.class.getName());
-    private static final long VOID_DIAGNOSTIC_INTERVAL_MS = 2_000L;
     private static final Set<Dependency<EntityStore>> DEPENDENCIES = Set.of(
             new SystemDependency<>(Order.AFTER, MiniwyvernOwnerAuraDamageSystem.class),
             new SystemDependency<>(Order.BEFORE, EntityTrackerSystems.EffectControllerSystem.class));
@@ -36,18 +32,14 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
     private final MiniwyvernOwnerAuraEffectQueue queue;
     private final MiniwyvernOwnerAuraRegistry registry;
     private final MiniwyvernVoidEffectLifetimeSystem voidLifetime;
-    private final MiniwyvernVoidEffectReplicationProbe replicationProbe;
-    private final ConcurrentHashMap<UUID, Long> lastVoidDiagnosticAt = new ConcurrentHashMap<>();
 
     public MiniwyvernOwnerAuraEffectSystem(
             MiniwyvernOwnerAuraEffectQueue queue,
             MiniwyvernOwnerAuraRegistry registry,
-            MiniwyvernVoidEffectLifetimeSystem voidLifetime,
-            MiniwyvernVoidEffectReplicationProbe replicationProbe) {
+            MiniwyvernVoidEffectLifetimeSystem voidLifetime) {
         this.queue = Objects.requireNonNull(queue, "queue");
         this.registry = Objects.requireNonNull(registry, "registry");
         this.voidLifetime = Objects.requireNonNull(voidLifetime, "voidLifetime");
-        this.replicationProbe = Objects.requireNonNull(replicationProbe, "replicationProbe");
     }
 
     @Nullable
@@ -98,7 +90,6 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
             CommandBuffer<EntityStore> commandBuffer) {
         EntityEffect effect = EntityEffect.getAssetMap().getAsset(aura.effectId());
         if (effect == null) {
-            logVoidApplication(aura, targetUuid, false, false, false, "missing-effect", 0.0F);
             return;
         }
 
@@ -111,8 +102,6 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
             controller.removeEffect(
                     target, effectIndex, RemovalBehavior.COMPLETE, commandBuffer);
             queue.submitAfterRemoval(worldName, targetUuid, aura);
-            logVoidApplication(aura, targetUuid, true, false,
-                    controller.hasEffect(effect), "restart-removed", effect.getDuration());
             return;
         }
 
@@ -127,22 +116,12 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
             CommandBuffer<EntityStore> commandBuffer) {
         EntityEffect effect = EntityEffect.getAssetMap().getAsset(aura.effectId());
         if (effect == null) {
-            logVoidApplication(aura, targetUuid, false, false, false, "missing-effect", 0.0F);
             return;
         }
 
-        boolean activeBefore = controller.hasEffect(effect);
         // This is the same asset-authored EffectController call used by Tamework projectile
         // ImpactEffect and Hytale's ApplyEffect interaction.
         boolean applied = controller.addEffect(target, effect, commandBuffer);
-        boolean activeAfter = controller.hasEffect(effect);
-        replicationProbe.observeApplication(
-                targetUuid,
-                EntityEffect.getAssetMap().getIndex(aura.effectId()),
-                aura.formId(),
-                applied);
-        logVoidApplication(aura, targetUuid, activeBefore, applied, activeAfter,
-                "applied", effect.getDuration());
         if (applied && "void".equals(aura.formId())) {
             voidLifetime.observe(targetUuid);
         }
@@ -155,20 +134,4 @@ public final class MiniwyvernOwnerAuraEffectSystem extends EntityTickingSystem<E
         return activeBefore && modelVfxId != null && !modelVfxId.isBlank();
     }
 
-    private void logVoidApplication(
-            MiniwyvernOwnerAuraRegistry.Aura aura,
-            UUID targetUuid,
-            boolean activeBefore,
-            boolean applied,
-            boolean activeAfter,
-            String outcome,
-            float durationSeconds) {
-        if (!"void".equals(aura.formId())) return;
-        long nowMs = System.currentTimeMillis();
-        Long last = lastVoidDiagnosticAt.put(targetUuid, nowMs);
-        if (last != null && nowMs - last < VOID_DIAGNOSTIC_INTERVAL_MS) return;
-        LOGGER.info(() -> "Void owner-hit aura " + outcome + " for " + targetUuid
-                + ": activeBefore=" + activeBefore + ", addEffect=" + applied
-                + ", activeAfter=" + activeAfter + ", authoredDuration=" + durationSeconds);
-    }
 }
