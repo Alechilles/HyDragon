@@ -280,26 +280,26 @@ Run `git diff --check -- wiki`. Confirm the Help section orders, parent links, t
 - Consumes the complete 30-page wiki from Tasks 1–5.
 - Produces the committed wiki source ready for importer synchronization.
 
-- [ ] **Step 1: Verify page inventory**
+- [x] **Step 1: Verify page inventory**
 
 Run `find wiki -type f -name '*.md' | sort` and confirm exactly 30 Markdown pages matching the design map.
 
-- [ ] **Step 2: Verify metadata and ordering**
+- [x] **Step 2: Verify metadata and ordering**
 
 Check every page contains `title`, `order`, `published: true`, and `draft: false`; confirm only the homepage requires `is_index: true`; confirm section orders 2–6 and unique child orders within each folder.
 
-- [ ] **Step 3: Verify navigation**
+- [x] **Step 3: Verify navigation**
 
 Extract every `/mod/hydragon/...` link, build the expected slug list from page titles, and confirm each target resolves. Confirm every non-home page has a Parent or Back line near the top and every section index lists all of its children.
 
-- [ ] **Step 4: Verify content guardrails**
+- [x] **Step 4: Verify content guardrails**
 
 Search for stale or misleading claims: `Dragon Horn`, unqualified `Dragon Flute`, wild Miniwyvern spawning, a Wind or Earth Miniwyvern form, Toxic Hydra swamp spawning, hard minimum capture-stone requirements, unverified Miniwyvern timers, and technical asset/configuration terminology. Inspect and correct every hit rather than relying only on the search result.
 
-- [ ] **Step 5: Cross-check player facts**
+- [x] **Step 5: Cross-check player facts**
 
 Compare the final wiki tables against the current recipes, drop tables, spawn files, capture policies, rosters, localization, and talent assets. Re-run `git diff --check -- wiki docs/superpowers/plans/2026-08-04-hydragon-player-wiki.md`.
 
-- [ ] **Step 6: Stage and commit**
+- [x] **Step 6: Stage and commit**
 
 Stage only `wiki/` after confirming no unrelated worktree files are included. Commit from the main agent with `Docs: add HyDragon player wiki`.
