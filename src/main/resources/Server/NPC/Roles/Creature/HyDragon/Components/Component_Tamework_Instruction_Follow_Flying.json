@@ -20,7 +20,7 @@
       "Description": "Distance beyond which teleport fallback is used instead of normal flight catch-up."
     },
     "FollowOrbitRadiusRange": {
-      "Value": [16, 24],
+      "Value": [12, 18],
       "Description": "Wander orbit radius range maintained around the owner."
     },
     "FollowOrbitRetargetTimeRange": {
@@ -32,7 +32,7 @@
       "Description": "Distance from a selected orbit point considered reached."
     },
     "FollowOrbitRelativeSpeed": {
-      "Value": 0.65,
+      "Value": 0.45,
       "Description": "Relative speed used while wandering around the owner."
     },
     "FollowHoverRadius": {

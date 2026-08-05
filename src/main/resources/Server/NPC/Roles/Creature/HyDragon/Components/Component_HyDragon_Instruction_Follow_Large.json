@@ -6,9 +6,9 @@
   "Parameters": {
     "MasterTargetSlot": { "Value": "MasterTarget", "Description": "Target slot used to track the owner/master." },
     "FollowTeleportThresholdRange": { "Value": 40, "Description": "Distance beyond which the dragon teleports back to its owner." },
-    "FollowSeekSlowDownDistance": { "Value": 24, "Description": "Distance from the owner where the dragon begins slowing down." },
-    "FollowSeekStopDistance": { "Value": 10, "Description": "Minimum separation maintained while catching up to the owner." },
-    "FollowMaintainDistanceRange": { "Value": [16, 24], "Description": "Preferred separation maintained while following the owner." },
+    "FollowSeekSlowDownDistance": { "Value": 20, "Description": "Distance from the owner where the dragon begins slowing down." },
+    "FollowSeekStopDistance": { "Value": 8, "Description": "Minimum separation maintained while catching up to the owner." },
+    "FollowMaintainDistanceRange": { "Value": [10, 16], "Description": "Preferred separation maintained while following the owner." },
     "FollowRelativeSpeed": { "Value": 1, "Description": "Relative speed used while following the owner." }
   },
   "Content": {

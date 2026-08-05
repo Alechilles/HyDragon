@@ -278,6 +278,10 @@
               {
                 "Type": "State",
                 "State": "Defend"
+              },
+              {
+                "Type": "State",
+                "State": "Aggressive"
               }
             ]
           },
@@ -309,6 +313,33 @@
         {
           "Type": "State",
           "State": "Follow"
+        }
+      ]
+    },
+    {
+      "$Comment": "Continue following the owner while Aggressive has no active target.",
+      "Continue": true,
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          { "Type": "State", "State": "Aggressive" },
+          { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } }
+        ]
+      },
+      "Instructions": [
+        {
+          "Sensor": { "Type": "And", "Sensors": [
+            { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+            { "Type": "MotionController", "MotionController": "Walk" }
+          ] },
+          "Instructions": [{ "Reference": "Component_HyDragon_Instruction_Follow_Miniwyvern_Ground" }]
+        },
+        {
+          "Sensor": { "Type": "And", "Sensors": [
+            { "Type": "Flag", "Name": "AirborneMode" },
+            { "Type": "MotionController", "MotionController": "Fly" }
+          ] },
+          "Instructions": [{ "Reference": "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying" }]
         }
       ]
     },

@@ -1376,11 +1376,11 @@
                 "Modify": {
                 "MasterTargetSlot": "MasterTarget",
                 "FollowTeleportThresholdRange": 60,
-                "FollowSeekSlowDownDistance": 32,
-                "FollowSeekStopDistance": 16,
+                "FollowSeekSlowDownDistance": 20,
+                "FollowSeekStopDistance": 8,
                 "FollowMaintainDistanceRange": [
-                  16,
-                  24
+                  10,
+                  16
                   ]
                 }
               } ]
@@ -1394,12 +1394,12 @@
                 "Reference": "Component_Tamework_Instruction_Follow_Flying",
                 "Modify": {
                   "MasterTargetSlot": "MasterTarget",
-                  "FollowDesiredAltitudeRange": [ 4, 8 ],
+                  "FollowDesiredAltitudeRange": [ 4, 7 ],
                   "FollowTeleportThresholdRange": 60,
-                  "FollowOrbitRadiusRange": [16, 24],
+                  "FollowOrbitRadiusRange": [12, 18],
                   "FollowOrbitRetargetTimeRange": [3, 6],
                   "FollowOrbitStopDistance": 3,
-                  "FollowOrbitRelativeSpeed": 0.65,
+                  "FollowOrbitRelativeSpeed": 0.45,
                   "FollowHoverRadius": 1.75,
                   "FollowHoverRelativeSpeed": 0.12
                 }

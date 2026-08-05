@@ -425,6 +425,43 @@ class ValidatorContractTest(unittest.TestCase):
             errors,
         )
 
+    def test_companions_follow_closely_after_miniwyvern_aggression(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        def asset(relative: str) -> dict[str, object]:
+            value = parsed[VALIDATOR.RESOURCE_ROOT / relative]
+            self.assertIsInstance(value, dict)
+            return value
+
+        large_follow = asset(
+            "Server/NPC/Roles/Creature/HyDragon/Components/"
+            "Component_HyDragon_Instruction_Follow_Large.json"
+        )
+        self.assertEqual([10, 16], large_follow["Parameters"]["FollowMaintainDistanceRange"]["Value"])
+
+        flying_follow = asset(
+            "Server/NPC/Roles/Creature/HyDragon/Components/"
+            "Component_Tamework_Instruction_Follow_Flying.json"
+        )
+        self.assertEqual([12, 18], flying_follow["Parameters"]["FollowOrbitRadiusRange"]["Value"])
+        self.assertEqual(0.45, flying_follow["Parameters"]["FollowOrbitRelativeSpeed"]["Value"])
+
+        mini_flying = asset(
+            "Server/NPC/Roles/Creature/HyDragon/Components/"
+            "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying.json"
+        )
+        self.assertIn('"FollowOrbitRadiusRange": [6, 12]', json.dumps(mini_flying))
+
+        mini_template = asset(
+            "Server/NPC/Roles/Creature/HyDragon/Templates/"
+            "Template_Wyvern_Mini_Flying_Tamed.json"
+        )
+        serialized_template = json.dumps(mini_template)
+        self.assertIn('"State": "Aggressive"', serialized_template)
+        self.assertIn("Component_HyDragon_Instruction_Follow_Miniwyvern_Flying", serialized_template)
+
 
 if __name__ == "__main__":
     unittest.main()

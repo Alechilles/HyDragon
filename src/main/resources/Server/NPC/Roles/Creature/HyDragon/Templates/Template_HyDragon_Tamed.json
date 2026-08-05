@@ -1192,11 +1192,11 @@
               "Modify": {
                 "MasterTargetSlot": "MasterTarget",
                 "FollowTeleportThresholdRange": 60,
-                "FollowSeekSlowDownDistance": 32,
-                "FollowSeekStopDistance": 16,
+                "FollowSeekSlowDownDistance": 20,
+                "FollowSeekStopDistance": 8,
                 "FollowMaintainDistanceRange": [
-                  16,
-                  24
+                  10,
+                  16
                 ]
               }
             }
