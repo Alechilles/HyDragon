@@ -40,3 +40,9 @@ The flute opens your roster for captured full dragons and your Soulbound Miniwyv
 - **Essence** — [Draconic Essences and Scales](/mod/hydragon/draconic-essences-and-scales) lists elemental conversions, and [Revitalizing Essence](/mod/hydragon/revitalizing-essence) makes recovery supplies.
 
 For every quantity in one place, open the [Recipe Reference](/mod/hydragon/recipe-reference).
+
+## Next steps
+
+- Make a capture tool with [Draconic Stones](/mod/hydragon/draconic-stones), then follow [Capturing Dragons](/mod/hydragon/capturing-dragons).
+- Use [Mysterious Egg](/mod/hydragon/mysterious-egg) for the one-per-player Soul Bond route.
+- Open [Quick Reference](/mod/hydragon/quick-reference) when you need a material or stone suggestion.

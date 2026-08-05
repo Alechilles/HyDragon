@@ -20,3 +20,8 @@ Work through these milestones in order. Each stage points to a guide for the det
 7. **Level companions and unlock talents.** Keep adventuring with your roster to grow stronger and open new talent choices. Follow the [Companion Guides](/mod/hydragon/companion-guides-index).
 8. **Take the fight to the ground and sky.** Learn ground mounts first, then master Nordic Drake flight and Toxic Hydra flight. Check the [Dragon Compendium](/mod/hydragon/dragon-compendium-index) and [Companion Guides](/mod/hydragon/companion-guides-index).
 9. **Manage long-term companion care.** Organize storage, plan summon windows, respect cooldowns, and learn how to revive a fallen companion. Use [Companion Guides](/mod/hydragon/companion-guides-index) and [Help and Reference](/mod/hydragon/help-and-reference-index).
+
+## Next steps
+
+- Keep [Quick Reference](/mod/hydragon/quick-reference) open while you plan the next milestone.
+- Use [FAQ and Troubleshooting](/mod/hydragon/faq-and-troubleshooting) when a capture, summon, or attunement result is unexpected.

@@ -23,7 +23,7 @@ The 100-weight elemental entries are the family drops shown below. Only the lowe
 | Full-dragon family | Guaranteed elemental drops | Possible bonuses |
 |---|---|---|
 | **Hydra** | Ice and Earth | Rare Void; a decorative Drake Egg may also appear in the standard Hydra profile. |
-| **Toxic Hydra** | Toxic and Earth | Rare Void only; its current profile does **not** include a Drake Egg. |
+| **Toxic Hydra** | Toxic and Earth | Rare Void only; it does **not** drop a Drake Egg. |
 | **Nordic Drake** | Ice and Wind | Rare Void. |
 | **Rock Drakes** | Nature across the family | Optional Fire on Young and standard variants, optional Ice on the Frost variant, and a decorative Drake Egg in the Rock Drake profiles. |
 
@@ -47,3 +47,9 @@ Each conversion creates one elemental Draconic Essence and consumes **2 plain Dr
 Use the **Draconic Altar** **Essence** category for these conversions. Earth and Wind are crafting essences: they are used in recipes such as the Mysterious Egg, but they are not Miniwyvern forms. The selectable forms and their eight-essence re-attunement costs are listed in [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement).
 
 For a compact quantity lookup, see the [Recipe Reference](/mod/hydragon/recipe-reference).
+
+## Next steps
+
+- Match a source dragon to its elemental material in [Quick Reference](/mod/hydragon/quick-reference).
+- Use the gathered essences in [Mysterious Egg](/mod/hydragon/mysterious-egg) or [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement).
+- Return to [Recipe Reference](/mod/hydragon/recipe-reference) for conversion quantities.

@@ -189,11 +189,11 @@ Run `git diff --check -- wiki/Companion-Guides`. Confirm player-visible terminol
 - Produces `/mod/hydragon/items-and-crafting-index` and six item/reference slugs consumed throughout the wiki.
 - Consumes the capture, Soul Bond, drop, and revival behavior from Tasks 2–3.
 
-- [ ] **Step 1: Create the item navigation**
+- [x] **Step 1: Create the item navigation**
 
 Use global order `5` for the section index and child orders 2–7. The suggested path is altar → stones/materials → Mysterious Egg → Revitalizing Essence → recipe lookup.
 
-- [ ] **Step 2: Write the Draconic Altar and Stones pages**
+- [x] **Step 2: Write the Draconic Altar and Stones pages**
 
 Altar recipe: 8 Thorium Bars and 12 Rubble Stone at a Workbench. Dragon Command Flute recipe: 3 Thorium Bars and 10 Azure Wood at the altar. Stone recipes:
 
@@ -207,23 +207,23 @@ Altar recipe: 8 Thorium Bars and 12 Rubble Stone at a Workbench. Dragon Command 
 
 Explain strength and recommended targets without hard restrictions.
 
-- [ ] **Step 3: Write materials and essence conversions**
+- [x] **Step 3: Write materials and essence conversions**
 
 Explain plain essence and scales as dragon drops, elemental essences as drops or altar conversions, and the decorative Drake Egg as separate from the Mysterious Egg. Conversion recipes all consume two plain Draconic Essences plus: 12 Green Crystals for Earth; 10 Fire Essences; 10 Ice Essences; 3 Lightning Essences; 1 Greater Life Essence for Nature; 10 Venom Sacs for Toxic; 8 Void Essences; or 16 Blue Feathers for Wind.
 
-- [ ] **Step 4: Write Mysterious Egg and Revitalizing Essence pages**
+- [x] **Step 4: Write Mysterious Egg and Revitalizing Essence pages**
 
 Mysterious Egg recipe: 3 each of plain, Earth, Fire, Ice, Lightning, Nature, Toxic, Void, and Wind Draconic Essences plus 10 Draconic Scales. Explain that hatching claims the single lifelong Soul Bond. Revitalizing Essence recipe: 5 Draconic Essences of any accepted type plus 1 Greater Life Essence. Link exact revival costs from the companion guide.
 
-- [ ] **Step 5: Write the Recipe Reference**
+- [x] **Step 5: Write the Recipe Reference**
 
 Consolidate all recipes from Steps 2–4 into scannable tables grouped by Setup, Capture, Soul Bond, Attunement Materials, and Restoration. Repeat quantities intentionally for lookup convenience, but link to detailed item pages for use instructions.
 
-- [ ] **Step 6: Add material-source guidance**
+- [x] **Step 6: Add material-source guidance**
 
 Use these verified drop identities: the standard Hydra provides Ice/Earth materials; the Toxic Hydra provides Toxic/Earth materials; both may provide Void; Nordic Drake provides Ice/Wind and may provide Void; Rock Drakes provide Nature, with Fire on Young/standard variants and Ice on Frost. Plain essence and scales come from all full dragon families. Avoid presenting optional drops as guaranteed.
 
-- [ ] **Step 7: Validate and return custody**
+- [x] **Step 7: Validate and return custody**
 
 Run `git diff --check -- wiki/Items-and-Crafting`. Cross-check every quantity against current item assets, confirm Mysterious Egg and decorative Drake Egg remain distinct, confirm Earth/Wind are never called Miniwyvern forms, and report to the main agent without staging or committing.
 
@@ -245,23 +245,23 @@ Run `git diff --check -- wiki/Items-and-Crafting`. Cross-check every quantity ag
 - Consumes every title slug and verified behavior produced by Tasks 1–4.
 - Produces the final cross-linked 30-page content set before mechanical validation.
 
-- [ ] **Step 1: Create Help and Reference navigation**
+- [x] **Step 1: Create Help and Reference navigation**
 
 Use global order `6` for the section index and child orders `2` and `3`. Link Quick Reference first and FAQ second.
 
-- [ ] **Step 2: Write Quick Reference**
+- [x] **Step 2: Write Quick Reference**
 
 Create compact tables for locations, suggested stones, combat identity, ground/flight availability, primary drops, Miniwyvern form identity, active limits, full-dragon summon/cooldown timing, and revival costs. Link every row to the detailed page instead of expanding into duplicate prose.
 
-- [ ] **Step 3: Write FAQ and Troubleshooting**
+- [x] **Step 3: Write FAQ and Troubleshooting**
 
 Answer: why capture will not start; why a stone failed or disappeared; why interruption did not consume it; why a dragon is stored; why summon is on cooldown; why only one full dragon or Miniwyvern is active; how to find/recall/revive; why the Soul Bond cannot be claimed twice; why Miniwyverns cannot be captured; why Earth/Wind cannot be selected; and where the Toxic Hydra actually spawns.
 
-- [ ] **Step 4: Normalize cross-links and next steps**
+- [x] **Step 4: Normalize cross-links and next steps**
 
 Read all 30 pages. Add missing contextual links, remove duplicated long explanations when a dedicated page exists, ensure every leaf page ends with useful Related Guides or Next Steps, and ensure Home exposes every top-level section plus the most important player journeys.
 
-- [ ] **Step 5: Validate and return custody**
+- [x] **Step 5: Validate and return custody**
 
 Run `git diff --check -- wiki`. Confirm the Help section orders, parent links, title slugs, and that cross-section links are absolute. Report all modified files to the main agent; do not stage or commit.
 

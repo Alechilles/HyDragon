@@ -27,3 +27,5 @@ Build the Draconic Altar, turn dragon drops into capture tools, and gather the m
 3. Convert drops into the elemental materials described in [Draconic Essences and Scales](/mod/hydragon/draconic-essences-and-scales).
 4. Craft and hatch the [Mysterious Egg](/mod/hydragon/mysterious-egg) when you are ready to claim your one Soul Bond.
 5. Keep [Revitalizing Essence](/mod/hydragon/revitalizing-essence) materials ready for recovery, and use the [Recipe Reference](/mod/hydragon/recipe-reference) for a quick lookup.
+
+Use [Quick Reference](/mod/hydragon/quick-reference) for suggested stone targets and material drops, or open [FAQ and Troubleshooting](/mod/hydragon/faq-and-troubleshooting) when an item action does not begin.

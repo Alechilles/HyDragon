@@ -28,3 +28,5 @@ Use these guides to capture full dragons, manage the Dragon Command Flute, grow 
 4. Spend points with [Leveling and Talents](/mod/hydragon/leveling-and-talents).
 5. Learn the riding and avatar-flight differences in [Mounts and Flight](/mod/hydragon/mounts-and-flight).
 6. Keep [Summoning and Revival](/mod/hydragon/summoning-and-revival) nearby for limits, timers, storage, and recovery.
+
+For a compact table of limits, timers, and costs, use [Quick Reference](/mod/hydragon/quick-reference). Troubleshoot an unexpected roster result with [FAQ and Troubleshooting](/mod/hydragon/faq-and-troubleshooting).

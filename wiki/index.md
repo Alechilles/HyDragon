@@ -27,3 +27,11 @@ Follow the [Start Here journey](/mod/hydragon/start-here-index) for installation
 - [Dragon Command Flute](/mod/hydragon/dragon-command-flute)
 - [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement)
 - [Recipe Reference](/mod/hydragon/recipe-reference)
+
+## Player journeys
+
+- **Install and begin:** [Installation and Dependencies](/mod/hydragon/installation-and-dependencies) → [Getting Started](/mod/hydragon/getting-started)
+- **Find and capture:** [Finding Dragons](/mod/hydragon/finding-dragons) → [Capturing Dragons](/mod/hydragon/capturing-dragons)
+- **Bond and specialize:** [Mysterious Egg](/mod/hydragon/mysterious-egg) → [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement) → [Leveling and Talents](/mod/hydragon/leveling-and-talents)
+- **Manage and recover:** [Dragon Command Flute](/mod/hydragon/dragon-command-flute) → [Summoning and Revival](/mod/hydragon/summoning-and-revival)
+- **Need a fast answer?** Start with [Quick Reference](/mod/hydragon/quick-reference) or [FAQ and Troubleshooting](/mod/hydragon/faq-and-troubleshooting).

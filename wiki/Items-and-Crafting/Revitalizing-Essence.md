@@ -22,27 +22,14 @@ Craft one Revitalizing Essence with:
 
 The five essence units may be plain or any listed elemental Draconic Essence, including Earth and Wind crafting essences. Earth and Wind remain crafting materials rather than Miniwyvern forms.
 
-## Revival costs
+## Match the revival cost
 
-Open the dead companion's card in the flute and confirm the listed cost before crafting. The exact role-matched costs are:
+Open the dead companion's card in the flute and confirm the listed role-matched cost before crafting. Full dragons use two Revitalizing Essences plus two Ice, Toxic, or Nature essences according to their family. A Miniwyvern uses one Revitalizing Essence plus one essence matching its current form, or plain essence while Wild. Earth and Wind are crafting materials, not Miniwyvern forms.
 
-| Companion | Revival materials |
-|---|---|
-| **Hydra** | 2 Revitalizing Essences + 2 Ice Draconic Essences |
-| **Nordic Drake** | 2 Revitalizing Essences + 2 Ice Draconic Essences |
-| **Toxic Hydra** | 2 Revitalizing Essences + 2 Toxic Draconic Essences |
-| **Young Rock Drake, Rock Drake, or Frost Rock Drake** | 2 Revitalizing Essences + 2 Nature Draconic Essences |
+See [Summoning and Revival](/mod/hydragon/summoning-and-revival) for the complete cost tables and recovery sequence, or [Quick Reference](/mod/hydragon/quick-reference) for a compact lookup.
 
-Miniwyvern revival uses one Revitalizing Essence plus one essence matching its current form:
+## Next steps
 
-| Miniwyvern form | Revival materials |
-|---|---|
-| **Wild** | 1 Revitalizing Essence + 1 plain Draconic Essence |
-| **Fire** | 1 Revitalizing Essence + 1 Fire Draconic Essence |
-| **Ice** | 1 Revitalizing Essence + 1 Ice Draconic Essence |
-| **Lightning** | 1 Revitalizing Essence + 1 Lightning Draconic Essence |
-| **Nature** | 1 Revitalizing Essence + 1 Nature Draconic Essence |
-| **Toxic** | 1 Revitalizing Essence + 1 Toxic Draconic Essence |
-| **Void** | 1 Revitalizing Essence + 1 Void Draconic Essence |
-
-Earth and Wind do not appear in this form table because they are not selectable Miniwyvern forms. For the full summon, storage, death, and recovery sequence, see [Summoning and Revival](/mod/hydragon/summoning-and-revival).
+- Craft the essence, then choose **Revive** from the dead card in the [Dragon Command Flute](/mod/hydragon/dragon-command-flute).
+- Use [Summoning and Revival](/mod/hydragon/summoning-and-revival) to distinguish confirmed death from ordinary storage.
+- Keep [Recipe Reference](/mod/hydragon/recipe-reference) nearby for the altar recipe.

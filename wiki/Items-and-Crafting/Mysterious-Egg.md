@@ -39,3 +39,9 @@ The [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement) guide exp
 ## Do not confuse the two eggs
 
 The **Drake Egg** is a separate decorative block that may appear as a rare optional dragon drop. It can be placed as scenery but cannot be hatched, cannot claim a Soul Bond, and cannot replace the crafted Mysterious Egg.
+
+## Next steps
+
+- Hatch the egg through [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement) when you are ready to claim the bond.
+- Compare the resulting companion's choices in [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms).
+- Use [Quick Reference](/mod/hydragon/quick-reference) to compare forms and revival materials.

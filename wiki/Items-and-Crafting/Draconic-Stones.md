@@ -40,3 +40,4 @@ An interrupted or invalid channel does not consume a stone. A channel that resol
 - Check material drop identities in [Draconic Essences and Scales](/mod/hydragon/draconic-essences-and-scales).
 - Read [Capturing Dragons](/mod/hydragon/capturing-dragons) before spending a stone.
 - Use the [Recipe Reference](/mod/hydragon/recipe-reference) when you are at the altar.
+- Compare targets quickly in [Quick Reference](/mod/hydragon/quick-reference).

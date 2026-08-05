@@ -60,3 +60,9 @@ The selectable Miniwyvern re-attunement choices and their eight-essence costs ar
 | [Revitalizing Essence](/mod/hydragon/revitalizing-essence) | Draconic Altar — Essence | 5 Draconic Essences from the accepted resource types + 1 Greater Life Essence | 1 Revitalizing Essence |
 
 Use [Summoning and Revival](/mod/hydragon/summoning-and-revival) to match the finished essence to the companion's exact revival cost.
+
+## Next steps
+
+- Start the first-capture route in [Getting Started](/mod/hydragon/getting-started).
+- Use [Quick Reference](/mod/hydragon/quick-reference) when you need a compact location, drop, or stone lookup.
+- Open [FAQ and Troubleshooting](/mod/hydragon/faq-and-troubleshooting) if an altar action does not behave as expected.

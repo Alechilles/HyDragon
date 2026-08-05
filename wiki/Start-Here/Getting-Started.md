@@ -19,4 +19,8 @@ Follow these steps in order to make your first dragon companion:
 6. Channel the Draconic Stone to complete the capture. See [Capturing Dragons](/mod/hydragon/capturing-dragons) for the full process.
 7. Use the flute roster to summon and manage your new companion.
 
-For the next milestone, follow the [Progression Roadmap](/mod/hydragon/progression-roadmap).
+## Next steps
+
+- Follow the [Progression Roadmap](/mod/hydragon/progression-roadmap) for the next milestone.
+- Use [Quick Reference](/mod/hydragon/quick-reference) for creature locations and suggested stones.
+- If a channel or summon does not behave as expected, open [FAQ and Troubleshooting](/mod/hydragon/faq-and-troubleshooting).
