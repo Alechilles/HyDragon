@@ -2,6 +2,8 @@ package com.alechilles.hydragon.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonArray;
@@ -16,6 +18,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 /** Contract for the separate Ice and Toxic Hydra talent trees. */
@@ -24,6 +28,10 @@ final class HydraTalentProgressionAssetTest {
             "Server", "Tamework", "Talents", "HyDragonHydra.json");
     private static final Path TOXIC = Path.of(
             "Server", "Tamework", "Talents", "HyDragonToxicHydra.json");
+    private static final List<String> LOCALES =
+            List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR");
+    private static final Pattern PLACEHOLDER = Pattern.compile("\\{[^}]+}");
+    private static final Pattern NUMBER = Pattern.compile("\\d+(?:[.,]\\d+)?");
     private static final double EPSILON = 0.000_001d;
 
     @Test
@@ -46,6 +54,42 @@ final class HydraTalentProgressionAssetTest {
                 "AvatarFlightForwardBoostImpulseMultiplier",
                 "AvatarFlightGlideSinkMultiplier",
                 "AvatarFlightClimbLiftMultiplier")));
+    }
+
+    @Test
+    void everyHydraTalentKeyIsTranslatedInEverySupportedLocale() throws IOException {
+        Set<String> requiredKeys = new LinkedHashSet<>();
+        collectLocaleKeys(load(ICE), requiredKeys);
+        collectLocaleKeys(load(TOXIC), requiredKeys);
+        assertEquals(83, requiredKeys.size());
+
+        Map<String, String> english = localeEntries("en-US");
+        for (String key : requiredKeys) {
+            assertNotNull(english.get(key), "en-US missing " + key);
+        }
+
+        for (String locale : LOCALES) {
+            List<String> lines = Files.readAllLines(
+                    Path.of("Server", "Languages", locale, "server.lang"));
+            Map<String, String> entries = localeEntries(locale);
+            assertTrue(lines.stream().noneMatch(line -> line.startsWith("hydragon.talents.hydra.")),
+                    locale + " retains legacy shared Hydra talent keys");
+            for (String key : requiredKeys) {
+                assertEquals(1L, lines.stream().filter(line -> line.startsWith(key + "=")).count(),
+                        locale + " must define " + key + " exactly once");
+                String translated = entries.get(key);
+                assertNotNull(translated, locale + " missing " + key);
+                assertFalse(translated.isBlank(), locale + " has blank " + key);
+                assertEquals(placeholders(english.get(key)), placeholders(translated),
+                        locale + " placeholder mismatch for " + key);
+                assertEquals(numbers(english.get(key)), numbers(translated),
+                        locale + " numeric meaning mismatch for " + key);
+                if (!locale.equals("en-US")) {
+                    assertNotEquals(english.get(key), translated,
+                            locale + " must translate " + key);
+                }
+            }
+        }
     }
 
     private static void assertTree(JsonObject config,
@@ -229,6 +273,45 @@ final class HydraTalentProgressionAssetTest {
             }
         }
         return keys;
+    }
+
+    private static void collectLocaleKeys(JsonObject config, Set<String> keys) {
+        for (JsonElement element : config.getAsJsonArray("Talents")) {
+            JsonObject talent = element.getAsJsonObject();
+            keys.add(talent.get("Branch").getAsString());
+            keys.add(talent.get("DisplayName").getAsString());
+            keys.add(talent.get("Description").getAsString());
+        }
+    }
+
+    private static Map<String, String> localeEntries(String locale) throws IOException {
+        Map<String, String> entries = new LinkedHashMap<>();
+        for (String line : Files.readAllLines(
+                Path.of("Server", "Languages", locale, "server.lang"))) {
+            int separator = line.indexOf('=');
+            if (separator > 0 && !line.startsWith("#")) {
+                entries.put(line.substring(0, separator), line.substring(separator + 1));
+            }
+        }
+        return entries;
+    }
+
+    private static List<String> placeholders(String value) {
+        Matcher matcher = PLACEHOLDER.matcher(value);
+        java.util.ArrayList<String> placeholders = new java.util.ArrayList<>();
+        while (matcher.find()) {
+            placeholders.add(matcher.group());
+        }
+        return List.copyOf(placeholders);
+    }
+
+    private static List<String> numbers(String value) {
+        Matcher matcher = NUMBER.matcher(value);
+        java.util.ArrayList<String> numbers = new java.util.ArrayList<>();
+        while (matcher.find()) {
+            numbers.add(matcher.group().replace(',', '.'));
+        }
+        return List.copyOf(numbers);
     }
 
     private static void assertEffects(JsonArray effects, Map<String, Double> expected, String id) {
