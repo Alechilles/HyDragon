@@ -27,7 +27,7 @@ Every form keeps the Miniwyvern's projectile-and-swoop foundation. The form chan
 
 Use [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement) for the attunement steps and material costs. Start Wild when you want neutral damage, choose Fire or Ice for pressure and control, Lightning for faster movement and disruption, Nature for support, Toxic for damage reduction, or Void for amplifying damage taken.
 
-**Earth and Wind Draconic Essences are crafting materials, not selectable Miniwyvern forms.** If a recipe gives you Earth or Wind Essence, use it for crafting and keep the form list above as the complete set of implemented choices.
+**Earth and Wind Draconic Essences are crafting materials, not selectable Miniwyvern forms.** If a recipe gives you Earth or Wind Essence, use it for crafting; the form list above contains every available choice.
 
 ## Next steps
 

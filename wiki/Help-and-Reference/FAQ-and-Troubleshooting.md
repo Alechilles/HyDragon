@@ -15,7 +15,7 @@ Use this page to diagnose the most common capture, roster, summon, and attunemen
 
 ### Why will capture not start?
 
-Capture is only for an eligible full dragon. Carry the [Dragon Command Flute](/mod/hydragon/dragon-command-flute), leave room in its roster, lower the dragon's health, tranquilize it, carry a [Draconic Stone](/mod/hydragon/draconic-stones), and stay in range while holding the action. A Miniwyvern is not a capture target. There is no mandatory minimum stone tier.
+Capture is only for an eligible full dragon. Carry the [Dragon Command Flute](/mod/hydragon/dragon-command-flute), lower the dragon's health, tranquilize it, carry a [Draconic Stone](/mod/hydragon/draconic-stones), and stay in range while holding the action. A Miniwyvern is not a capture target. There is no mandatory minimum stone tier.
 
 ### Why did a stone fail or disappear?
 
@@ -33,7 +33,7 @@ Dismissal, summon expiry, logout, and world transfer store the companion profile
 
 ### Why is summon on cooldown?
 
-Full dragons have a five-minute base summon window and a five-minute base cooldown before that full-dragon profile can be summoned again. Summoner's Pact talents shorten the cooldown. Check the roster status rather than expecting a published Miniwyvern timer.
+Full dragons have a five-minute base summon window and a five-minute base cooldown before that dragon can be summoned again. Summoner's Pact talents shorten the cooldown. Check the roster status rather than expecting a published Miniwyvern timer.
 
 ### Why can only one full dragon or one Miniwyvern be active?
 
@@ -55,7 +55,7 @@ Miniwyverns do not spawn in the world. Create one by crafting and hatching the M
 
 ### Why can I not select Earth or Wind?
 
-Earth and Wind Draconic Essences are crafting materials used in recipes. They are not selectable Miniwyvern forms. The implemented choices are Wild, Fire, Ice, Lightning, Nature, Toxic, and Void; compare them on [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms).
+Earth and Wind Draconic Essences are crafting materials used in recipes. They are not selectable Miniwyvern forms. The available choices are Wild, Fire, Ice, Lightning, Nature, Toxic, and Void; compare them on [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms).
 
 ## Toxic Hydra and drops
 

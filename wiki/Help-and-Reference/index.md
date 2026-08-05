@@ -1,5 +1,5 @@
 ---
-title: "Help and Reference"
+title: "Help and Reference Index"
 order: 6
 published: true
 draft: false

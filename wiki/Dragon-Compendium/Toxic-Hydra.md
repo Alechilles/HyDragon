@@ -45,7 +45,7 @@ Adventure experience lets the Toxic Hydra grow into a damage, durability, or com
 
 ## Drops and progression value
 
-The Toxic Hydra's drop profile matches its venomous identity and supplies materials for later capture and crafting work:
+Defeating a Toxic Hydra provides venom-themed materials for later capture and crafting work:
 
 | Material | Drop range |
 |---|---:|
