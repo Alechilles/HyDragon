@@ -43,10 +43,9 @@ The Hydra gains experience while it adventures with you. Spend its talent points
 
 | Branch | Best fit |
 |---|---|
-| Battle Instinct | More pressure and damage in combat. |
-| Scaleguard | Tougher defenses for dangerous encounters. |
-| Survivalist | Staying power during long hunts. |
-| Summoner's Pact | Longer summon windows and faster returns after cooldowns. |
+| Winter's Wrath | More ice pressure and damage in combat. |
+| Glacierguard | More health and protection from incoming damage. |
+| Broodcaller's Pact | Longer summon windows and faster returns after cooldowns. |
 
 Read [Leveling and Talents](/mod/hydragon/leveling-and-talents) before spending points if you want to commit to a single role.
 
