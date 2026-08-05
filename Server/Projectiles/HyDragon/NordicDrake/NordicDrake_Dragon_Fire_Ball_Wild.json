@@ -16,7 +16,7 @@
     "SystemId": "Impact_Explosion",
     "Scale": 2.4
   },
-  "Damage": 27.2,
+  "Damage": 27,
   "MissParticles": {
     "SystemId": "Impact_Explosion",
     "Scale": 1.8

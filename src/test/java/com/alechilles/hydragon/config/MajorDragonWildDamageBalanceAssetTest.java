@@ -17,7 +17,7 @@ final class MajorDragonWildDamageBalanceAssetTest {
     private static final double SCALE = 0.85;
 
     @Test
-    void wildHydraDamageIsReducedFifteenPercentWithoutChangingTamedOrToxicDamage() throws Exception {
+    void wildHydraDamageIsReducedAboutFifteenPercentWithoutChangingTamedOrToxicDamage() throws Exception {
         JsonObject wildVars = roleVars("Hydra/Hydra.json");
         for (String attack : List.of(
                 "Bite_Damage", "Swipe_Left_Damage", "Swipe_Right_Damage", "Stomp_Damage",
@@ -31,7 +31,7 @@ final class MajorDragonWildDamageBalanceAssetTest {
                 direct.getAsJsonObject("ExplosionConfig").get("EntityDamage").getAsDouble(), 0.000001);
 
         JsonObject rain = json("Server/Projectiles/HyDragon/Hydra/Hydra_Rain_Ice_Ball.json");
-        assertEquals(18 * SCALE, rain.get("Damage").getAsDouble(), 0.000001);
+        assertEquals("15", rain.get("Damage").getAsString());
         assertEquals(10 * SCALE,
                 rain.getAsJsonObject("ExplosionConfig").get("EntityDamage").getAsDouble(), 0.000001);
         JsonObject rainLaunch = json("Server/Item/Interactions/NPCs/HyDragon/Hydra/"
@@ -47,7 +47,7 @@ final class MajorDragonWildDamageBalanceAssetTest {
     }
 
     @Test
-    void wildNordicDrakeDamageIsReducedFifteenPercentThroughWildOnlyOverrides() throws Exception {
+    void wildNordicDrakeDamageIsReducedAboutFifteenPercentThroughWildOnlyOverrides() throws Exception {
         JsonObject wildVars = roleVars("NordicDrake/NordicDrake.json");
         for (String attack : List.of(
                 "Bite_Damage", "Swipe_Left_Damage", "Swipe_Right_Damage", "Stomp_Damage",
@@ -61,7 +61,7 @@ final class MajorDragonWildDamageBalanceAssetTest {
 
         JsonObject projectile = json("Server/Projectiles/HyDragon/NordicDrake/"
                 + "NordicDrake_Dragon_Fire_Ball_Wild.json");
-        assertEquals(32 * SCALE, projectile.get("Damage").getAsDouble(), 0.000001);
+        assertEquals("27", projectile.get("Damage").getAsString());
         assertEquals(16 * SCALE,
                 projectile.getAsJsonObject("ExplosionConfig").get("EntityDamage").getAsDouble(), 0.000001);
         JsonObject wildLaunch = json("Server/Item/Interactions/NPCs/HyDragon/NordicDrake/"
