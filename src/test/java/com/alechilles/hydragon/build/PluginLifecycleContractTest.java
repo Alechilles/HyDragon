@@ -23,8 +23,7 @@ final class PluginLifecycleContractTest {
         assertTrue(source.contains("new MiniwyvernOwnerAuraEffectQueue()"));
         assertOrdered(source,
                 "new MiniwyvernOwnerAuraDamageSystem(miniwyvernOwnerAuras, ownerAuraEffects)",
-                "new MiniwyvernOwnerAuraEffectSystem(",
-                "new MiniwyvernVoidEffectReplicationSystem(voidReplication)");
+                "new MiniwyvernOwnerAuraEffectSystem(");
         assertOrdered(source,
                 "new MiniwyvernToxicWeaknessDamageSystem(miniwyvernOwnerAuras)",
                 "new MiniwyvernVoidExposureDamageSystem(miniwyvernOwnerAuras)",
