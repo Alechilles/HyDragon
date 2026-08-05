@@ -566,6 +566,16 @@ def _aggressive_movement_pair(sensor: object) -> tuple[bool, str] | None:
     return airborne, motion
 
 
+def _contains_aggressive_component(value: object) -> bool:
+    if isinstance(value, dict):
+        if value.get("Reference") == "Component_Tamework_Instruction_Aggressive":
+            return True
+        return any(_contains_aggressive_component(child) for child in value.values())
+    if isinstance(value, list):
+        return any(_contains_aggressive_component(child) for child in value)
+    return False
+
+
 def _collect_aggressive_movement_pairs(value: object, inside_aggressive: bool = False) -> set[tuple[bool, str]]:
     pairs: set[tuple[bool, str]] = set()
     if isinstance(value, dict):
@@ -573,7 +583,7 @@ def _collect_aggressive_movement_pairs(value: object, inside_aggressive: bool = 
         is_aggressive = isinstance(sensor, dict) \
             and sensor.get("Type") == "State" \
             and sensor.get("State") == "Aggressive"
-        if inside_aggressive:
+        if inside_aggressive and _contains_aggressive_component(value.get("Instructions")):
             pair = _aggressive_movement_pair(sensor)
             if pair is not None:
                 pairs.add(pair)

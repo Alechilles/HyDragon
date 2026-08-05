@@ -137,6 +137,60 @@ class ValidatorContractTest(unittest.TestCase):
             errors,
         )
 
+    def test_rejects_aggressive_path_without_generic_component(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        template_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
+        )
+        source_template = parsed[template_path]
+
+        def find_aggressive(value: object) -> dict[str, object] | None:
+            if isinstance(value, dict):
+                sensor = value.get("Sensor")
+                if isinstance(sensor, dict) and sensor.get("Type") == "State" \
+                        and sensor.get("State") == "Aggressive":
+                    return value
+                for child in value.values():
+                    found = find_aggressive(child)
+                    if found is not None:
+                        return found
+            elif isinstance(value, list):
+                for child in value:
+                    found = find_aggressive(child)
+                    if found is not None:
+                        return found
+            return None
+
+        self.assertIsInstance(source_template, dict)
+        source_aggressive = find_aggressive(source_template)
+        self.assertIsNotNone(source_aggressive)
+        source_instructions = source_aggressive.get("Instructions")
+        self.assertIsInstance(source_instructions, list)
+        self.assertEqual(2, len(source_instructions))
+
+        for branch_index in range(2):
+            for replacement in ([], [{"Reference": "Component_Instruction_Null"}]):
+                with self.subTest(branch_index=branch_index, replacement=replacement):
+                    template = copy.deepcopy(source_template)
+                    aggressive = find_aggressive(template)
+                    self.assertIsNotNone(aggressive)
+                    instructions = aggressive.get("Instructions")
+                    self.assertIsInstance(instructions, list)
+                    instructions[branch_index]["Instructions"] = replacement
+                    parsed[template_path] = template
+
+                    errors: list[str] = []
+                    VALIDATOR.validate_miniwyvern_role_wiring(parsed, errors)
+
+                    self.assertIn(
+                        "Miniwyvern aggressive state must have grounded and flying paths",
+                        errors,
+                    )
+
 
 if __name__ == "__main__":
     unittest.main()
