@@ -89,6 +89,11 @@ final class PackagedHyDragonRosterIT {
             JsonObject model = json(zip, "Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
             assertEquals("Hydra_Winged", model.get("Parent").getAsString());
             assertNotNull(zip.getEntry("Common/NPC/HyDragon/Hydra/Model/Toxic.png"));
+            assertNotNull(zip.getEntry("Server/Tamework/Talents/HyDragonHydra.json"));
+            assertNotNull(zip.getEntry("Server/Tamework/Talents/HyDragonToxicHydra.json"));
+            for (String locale : List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR")) {
+                assertNotNull(zip.getEntry("Server/Languages/" + locale + "/server.lang"));
+            }
         }
     }
 
