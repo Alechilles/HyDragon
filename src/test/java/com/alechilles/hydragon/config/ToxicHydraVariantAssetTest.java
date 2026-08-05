@@ -59,14 +59,12 @@ class ToxicHydraVariantAssetTest {
                 "Draconic_Essence",
                 "Draconic_Essence_Toxic",
                 "Draconic_Essence_Earth",
-                "Draconic_Essence_Void",
-                "Drake_Egg"), drops.keySet());
+                "Draconic_Essence_Void"), drops.keySet());
         assertDrop(drops, "Draconic_Scale", 100, 5, 6);
         assertDrop(drops, "Draconic_Essence", 100, 5, 6);
         assertDrop(drops, "Draconic_Essence_Toxic", 100, 3, 4);
         assertDrop(drops, "Draconic_Essence_Earth", 100, 2, 3);
         assertDrop(drops, "Draconic_Essence_Void", 8, 1, 1);
-        assertDrop(drops, "Drake_Egg", 6, 1, 1);
     }
 
     @Test

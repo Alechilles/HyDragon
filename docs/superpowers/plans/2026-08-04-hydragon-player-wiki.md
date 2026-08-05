@@ -93,7 +93,7 @@ Use global order `3` for the section index and child orders 2–7 in the listed 
 
 - [ ] **Step 2: Write Hydra and Toxic Hydra pages**
 
-Hydra: Zone 3 glacial terrain; ice ball and ice-rain combat; ground mount; Ice and Earth materials; Scaleguard, Survivalist, combat, and Summoner's Pact talent identities. Toxic Hydra: Zone 4 volcanic Dark Green Moss; toxic bolts, poison breath/clouds, aerial attacks; dedicated Winged Toxic Hydra flight; guaranteed Toxic and Earth materials, plus rare Void essence and a decorative Drake Egg. Explain capture, leveling, drops, and next steps without exposing internal probabilities.
+Hydra: Zone 3 glacial terrain; ice ball and ice-rain combat; ground mount; Ice and Earth materials; Scaleguard, Survivalist, combat, and Summoner's Pact talent identities. Toxic Hydra: Zone 4 volcanic Dark Green Moss; toxic bolts, poison breath/clouds, aerial attacks; dedicated Winged Toxic Hydra flight; guaranteed Toxic and Earth materials, plus rare Void essence. It does not drop the decorative Drake Egg. Explain capture, leveling, drops, and next steps without exposing internal probabilities.
 
 - [ ] **Step 3: Write the Nordic Drake page**
 

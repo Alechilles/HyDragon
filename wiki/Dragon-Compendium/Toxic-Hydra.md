@@ -54,7 +54,7 @@ The Toxic Hydra's drop profile matches its venomous identity and supplies materi
 | Toxic Draconic Essence | 3–4 |
 | Earth Draconic Essence | 2–3 |
 
-A **Void Draconic Essence** and the decorative **Drake Egg** are possible additional drops. The Drake Egg is separate from the crafted [Mysterious Egg](/mod/hydragon/mysterious-egg); use the [Draconic Essences and Scales](/mod/hydragon/draconic-essences-and-scales) guide when planning recipes.
+A **Void Draconic Essence** is a possible additional drop. Use the [Draconic Essences and Scales](/mod/hydragon/draconic-essences-and-scales) guide when planning recipes.
 
 ## Next steps
 
