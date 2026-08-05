@@ -303,4 +303,3 @@ Compare the final wiki tables against the current recipes, drop tables, spawn fi
 - [ ] **Step 6: Stage and commit**
 
 Stage only `wiki/` after confirming no unrelated worktree files are included. Commit from the main agent with `Docs: add HyDragon player wiki`.
-
