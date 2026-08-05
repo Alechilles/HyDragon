@@ -12,6 +12,14 @@
     },
     "EyeHeight": 3.6
   },
+  "Vfx": {
+    "LaunchChargeMinScale": 3.9,
+    "LaunchChargeMaxScale": 6.9,
+    "LaunchCancelScale": 4.2,
+    "LaunchReleasePartialScale": 4.5,
+    "LaunchReleaseMidScale": 6.0,
+    "LaunchReleaseFullScale": 7.2
+  },
   "Audio": {
     "IdleFlightFlapSoundEvent": "SFX_Tamework_AvatarFlight_Wing_Flap_Footstep",
     "IdleFlightFlapIntervalMs": 2000.0,

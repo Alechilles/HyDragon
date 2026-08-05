@@ -208,6 +208,13 @@ class ToxicHydraVariantAssetTest {
         assertEquals("Hydra_Winged_AvatarFlight",
                 flight.getAsJsonObject("Model").get("ModelId").getAsString());
         assertTrue(flight.getAsJsonObject("Model").get("ApplyModel").getAsBoolean());
+        JsonObject vfx = flight.getAsJsonObject("Vfx");
+        assertEquals(3.9, vfx.get("LaunchChargeMinScale").getAsDouble());
+        assertEquals(6.9, vfx.get("LaunchChargeMaxScale").getAsDouble());
+        assertEquals(4.2, vfx.get("LaunchCancelScale").getAsDouble());
+        assertEquals(4.5, vfx.get("LaunchReleasePartialScale").getAsDouble());
+        assertEquals(6.0, vfx.get("LaunchReleaseMidScale").getAsDouble());
+        assertEquals(7.2, vfx.get("LaunchReleaseFullScale").getAsDouble());
         JsonObject abilities = flight.getAsJsonObject("CombatAbilities");
         assertEquals("Root_NPC_Hydra_Toxic_Avatar_Ball",
                 abilities.getAsJsonObject("Ability2").get("RootInteraction").getAsString());
