@@ -463,6 +463,83 @@
           ]
         },
         {
+          "$Comment": "Aggressive State: Miniwyvern attacks nearby threats to its owner.",
+          "Sensor": {
+            "Type": "State",
+            "State": "Aggressive"
+          },
+          "Instructions": [
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Aggressive", "Modify": {
+                "HardLeashDistance": { "Compute": "HardLeashDistance" },
+                "AlertedRange": { "Compute": "ViewRange" },
+                "ViewSector": { "Compute": "ViewSector" },
+                "HearingRange": { "Compute": "HearingRange" },
+                "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+                "ViewRange": { "Compute": "ViewRange" },
+                "Attack": { "Compute": "Attack" },
+                "AttackDistance": { "Compute": "AttackDistance" },
+                "AttackPauseRange": { "Compute": "AttackPauseRange" },
+                "CombatAttackPreDelay": { "Compute": "CombatAttackPreDelay" },
+                "CombatAttackPostDelay": { "Compute": "CombatAttackPostDelay" },
+                "CombatBackOffAfterAttack": true,
+                "CombatBackOffDistanceRange": [2.5, 4],
+                "CombatBackOffDurationRange": [2, 3],
+                "BlockAbility": "",
+                "BlockProbability": 50,
+                "CombatStrafingDurationRange": [1, 1],
+                "CombatStrafingFrequencyRange": [2, 2],
+                "CombatBehaviorDistance": 8,
+                "CombatMovingRelativeSpeed": 0.6,
+                "CombatStrafeWeight": 4,
+                "CombatDirectWeight": 8,
+                "CombatAlwaysMovingWeight": 8,
+                "CombatRelativeTurnSpeed": 1.5,
+                "ChaseRelativeSpeed": 0.9,
+                "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
+              } } ]
+            },
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": true },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Aggressive", "Modify": {
+                "HardLeashDistance": { "Compute": "HardLeashDistance" },
+                "AlertedRange": { "Compute": "ViewRange" },
+                "ViewSector": { "Compute": "ViewSector" },
+                "HearingRange": { "Compute": "HearingRange" },
+                "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+                "ViewRange": { "Compute": "ViewRange" },
+                "Attack": { "Compute": "Attack" },
+                "AttackDistance": { "Compute": "AttackDistance" },
+                "AttackPauseRange": { "Compute": "AttackPauseRange" },
+                "CombatAttackPreDelay": { "Compute": "CombatAttackPreDelay" },
+                "CombatAttackPostDelay": { "Compute": "CombatAttackPostDelay" },
+                "CombatBackOffAfterAttack": true,
+                "CombatBackOffDistanceRange": [2.5, 4],
+                "CombatBackOffDurationRange": [2, 3],
+                "BlockAbility": "",
+                "BlockProbability": 50,
+                "CombatStrafingDurationRange": [1, 1],
+                "CombatStrafingFrequencyRange": [2, 2],
+                "CombatBehaviorDistance": 8,
+                "CombatMovingRelativeSpeed": 0.6,
+                "CombatStrafeWeight": 4,
+                "CombatDirectWeight": 8,
+                "CombatAlwaysMovingWeight": 8,
+                "CombatRelativeTurnSpeed": 1.5,
+                "ChaseRelativeSpeed": 0.9,
+                "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
+              } } ]
+            }
+          ]
+        },
+        {
           "Sensor": {
             "Type": "State",
             "State": "Follow"

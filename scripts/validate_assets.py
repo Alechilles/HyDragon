@@ -41,6 +41,10 @@ REQUIRED_STATUS_MESSAGE_KEYS = {
     "messages.status.state.readOnly",
     "messages.refund.description",
 }
+REQUIRED_HYDRAGON_COMMAND_KEYS = {
+    "hydragon.commands.aggressive.name",
+    "hydragon.commands.aggressive.hud",
+}
 BANNED_PRE_RELEASE_TOKENS = (
     "Draconic_Essence_Igne",
     "Draconic_Essence_Cryo",
@@ -246,6 +250,9 @@ def validate_locales(errors: list[str]) -> None:
         missing_status = sorted(REQUIRED_STATUS_MESSAGE_KEYS - set(catalog))
         if missing_status:
             fail(errors, f"{locale} missing status command keys: {', '.join(missing_status)}")
+        missing_hydragon_commands = sorted(REQUIRED_HYDRAGON_COMMAND_KEYS - set(catalog))
+        if missing_hydragon_commands:
+            fail(errors, f"{locale} missing Dragon Horn command keys: {', '.join(missing_hydragon_commands)}")
     for locale in LOCALES[1:]:
         translated = catalogs.get(locale, {})
         missing = sorted(set(source) - set(translated))
@@ -533,6 +540,71 @@ def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str])
             fail(errors, "Soul Bond-only Miniwyvern wild role must not expose TameRoleChange")
 
 
+def _aggressive_movement_pair(sensor: object) -> tuple[bool, str] | None:
+    if not isinstance(sensor, dict) or sensor.get("Type") != "And":
+        return None
+    sensors = sensor.get("Sensors")
+    if not isinstance(sensors, list):
+        return None
+    airborne: bool | None = None
+    motion: str | None = None
+    for candidate in sensors:
+        if not isinstance(candidate, dict):
+            continue
+        if candidate.get("Type") == "Flag" and candidate.get("Name") == "AirborneMode":
+            value = candidate.get("Set", True)
+            if not isinstance(value, bool):
+                return None
+            airborne = value
+        elif candidate.get("Type") == "MotionController":
+            value = candidate.get("MotionController")
+            if not isinstance(value, str):
+                return None
+            motion = value
+    if airborne is None or motion is None:
+        return None
+    return airborne, motion
+
+
+def _contains_aggressive_component(value: object) -> bool:
+    if isinstance(value, dict):
+        if value.get("Reference") == "Component_Tamework_Instruction_Aggressive":
+            return True
+        return any(_contains_aggressive_component(child) for child in value.values())
+    if isinstance(value, list):
+        return any(_contains_aggressive_component(child) for child in value)
+    return False
+
+
+def _collect_aggressive_movement_pairs(value: object, inside_aggressive: bool = False) -> set[tuple[bool, str]]:
+    pairs: set[tuple[bool, str]] = set()
+    if isinstance(value, dict):
+        sensor = value.get("Sensor")
+        is_aggressive = isinstance(sensor, dict) \
+            and sensor.get("Type") == "State" \
+            and sensor.get("State") == "Aggressive"
+        if inside_aggressive and _contains_aggressive_component(value.get("Instructions")):
+            pair = _aggressive_movement_pair(sensor)
+            if pair is not None:
+                pairs.add(pair)
+        for child in value.values():
+            pairs.update(_collect_aggressive_movement_pairs(child, inside_aggressive or is_aggressive))
+    elif isinstance(value, list):
+        for child in value:
+            pairs.update(_collect_aggressive_movement_pairs(child, inside_aggressive))
+    return pairs
+
+
+def validate_aggressive_movement_paths(
+    template: object,
+    label: str,
+    errors: list[str],
+) -> None:
+    required = {(False, "Walk"), (True, "Fly")}
+    if not required.issubset(_collect_aggressive_movement_pairs(template)):
+        fail(errors, f"{label} aggressive state must have grounded and flying paths")
+
+
 def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str]) -> None:
     """Validate the Soul Bond companion's complete role/config reference graph."""
     wild_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
@@ -557,6 +629,8 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
     if not isinstance(wild, dict):
         fail(errors, "Miniwyvern wild role is missing")
         return
+
+    validate_aggressive_movement_paths(template, "Miniwyvern", errors)
 
     wild_modify = wild.get("Modify")
     if isinstance(wild_modify, dict) and wild_modify.get("InteractionConfigId") not in (None, ""):
@@ -1272,15 +1346,24 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
         "Recall": "SFX_HyDragon_Dragon_Flute_SE_17",
         "MoveToPing": "SFX_HyDragon_Dragon_Flute_SE_04",
         "Defend": "SFX_HyDragon_Dragon_Flute_SE_11",
+        "Aggressive": "SFX_HyDragon_Dragon_Flute_SE_05",
         "AttackTarget": "SFX_HyDragon_Dragon_Flute_SE_07",
         "Idle": "SFX_HyDragon_Dragon_Flute_SE_02",
-        "ToggleAirborneMode": "SFX_HyDragon_Dragon_Flute_SE_05",
     }
     commands = {
         command.get("Id"): command
         for command in config.get("CommandList", [])
         if isinstance(command, dict)
     }
+    expected_ids = {
+        "Follow", "Hold", "Recall", "MoveToPing", "Defend", "Aggressive",
+        "AttackTarget", "Idle",
+    }
+    if set(commands) != expected_ids:
+        fail(errors, "Dragon Horn command wheel must contain Aggressive instead of ToggleAirborneMode")
+    aggressive = commands.get("Aggressive", {})
+    if aggressive.get("Steps") != [{"Type": "SetState", "State": "Aggressive"}]:
+        fail(errors, "Dragon Horn Aggressive must enter the hostility-only Aggressive state")
     for command_id, sound_event in expected_feedback.items():
         feedback = commands.get(command_id, {}).get("Feedback")
         if not isinstance(feedback, dict) or feedback.get("SoundEvent") != sound_event \
@@ -1306,6 +1389,8 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
     actual_roles = set(allowed.get("Allowlist", [])) if isinstance(allowed, dict) else set()
     if actual_roles != required_roles:
         fail(errors, f"HyDragon command role allowlist mismatch: {sorted(actual_roles)}")
+    dragon_template_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon_Tamed.json"
+    validate_aggressive_movement_paths(parsed.get(dragon_template_path), "Full dragon", errors)
 
 
 def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> None:
