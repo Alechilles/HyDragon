@@ -22,4 +22,3 @@ Search the right terrain for each creature, then use the [Capturing Dragons guid
 | Soulbound Miniwyvern | Does not spawn in the world | Craft and hatch a Mysterious Egg |
 
 The Soulbound Miniwyvern is made through the [Soul Bond and Attunement guide](/mod/hydragon/soul-bond-and-attunement), not found as a wild spawn.
-

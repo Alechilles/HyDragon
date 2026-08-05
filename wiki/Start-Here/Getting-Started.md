@@ -20,4 +20,3 @@ Follow these steps in order to make your first dragon companion:
 7. Use the flute roster to summon and manage your new companion.
 
 For the next milestone, follow the [Progression Roadmap](/mod/hydragon/progression-roadmap).
-

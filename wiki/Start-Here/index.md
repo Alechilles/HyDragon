@@ -24,4 +24,3 @@ Begin here if you are installing HyDragon for the first time or want a guided ro
 2. Follow [Getting Started](/mod/hydragon/getting-started) to prepare your first capture.
 3. Use [Finding Dragons](/mod/hydragon/finding-dragons) to choose a creature and locate it.
 4. Keep the [Progression Roadmap](/mod/hydragon/progression-roadmap) nearby as your companions grow.
-

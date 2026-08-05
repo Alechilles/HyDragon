@@ -27,4 +27,3 @@ Follow the [Start Here journey](/mod/hydragon/start-here-index) for installation
 - [Dragon Command Flute](/mod/hydragon/dragon-command-flute)
 - [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement)
 - [Recipe Reference](/mod/hydragon/recipe-reference)
-
