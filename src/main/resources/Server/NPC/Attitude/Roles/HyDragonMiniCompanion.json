@@ -1,0 +1,14 @@
+{
+  "Groups": {
+    "Friendly": [
+      "Self",
+      "HyDragonCompanion",
+      "HyDragonMiniCompanion",
+      "AH_Predator_Tamed",
+      "AH_Livestock_Tamed"
+    ],
+    "Ignore": [
+      "Player"
+    ]
+  }
+}

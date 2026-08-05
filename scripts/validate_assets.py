@@ -580,12 +580,7 @@ def _contains_aggressive_component(value: object) -> bool:
     if isinstance(value, dict):
         if value.get("Reference") == "Component_Tamework_Instruction_Aggressive":
             return True
-        if (
-            value.get("Reference")
-            == "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend"
-            and isinstance(value.get("Modify"), dict)
-            and value["Modify"].get("UseAggressiveTargeting") is True
-        ):
+        if value.get("Reference") == "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend":
             return True
         return any(_contains_aggressive_component(child) for child in value.values())
     if isinstance(value, list):

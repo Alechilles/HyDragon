@@ -231,7 +231,7 @@ class ValidatorContractTest(unittest.TestCase):
         )
         mini_template = parsed[mini_template_path]
         self.assertIsInstance(mini_template, dict)
-        self.assertEqual("HyDragonCompanion", mini_template.get("AttitudeGroup"))
+        self.assertEqual("HyDragonMiniCompanion", mini_template.get("AttitudeGroup"))
 
         state_declarations = mini_template["Instructions"][0]["Actions"]
         self.assertIn(
@@ -396,8 +396,15 @@ class ValidatorContractTest(unittest.TestCase):
             "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend",
         )
         self.assertEqual(1, len(mini_aerial_refs))
-        self.assertIs(True, mini_aerial_refs[0]["Modify"].get("UseAggressiveTargeting"))
-        self.assertIs(True, mini_aerial_refs[0]["Modify"].get("AggressiveInitialSwoop"))
+        self.assertNotIn("UseAggressiveTargeting", mini_aerial_refs[0]["Modify"])
+        self.assertNotIn("AggressiveInitialSwoop", mini_aerial_refs[0]["Modify"])
+        self.assertEqual(
+            2,
+            len(reference_instructions(
+                mini_aggressive,
+                "Component_HyDragon_Instruction_Miniwyvern_Aggressive_Acquire",
+            )),
+        )
 
         aerial_component_path = (
             VALIDATOR.RESOURCE_ROOT
@@ -405,18 +412,9 @@ class ValidatorContractTest(unittest.TestCase):
             / "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json"
         )
         aerial_component = parsed[aerial_component_path]
-        self.assertEqual(
-            False,
-            aerial_component["Parameters"]["UseAggressiveTargeting"]["Value"],
-        )
-        self.assertEqual(
-            False,
-            aerial_component["Parameters"]["AggressiveInitialSwoop"]["Value"],
-        )
         serialized_component = json.dumps(aerial_component)
-        self.assertIn("Component_Sensor_Standard_Detection", serialized_component)
-        self.assertIn("UseAggressiveTargeting", serialized_component)
-        self.assertIn("AggressiveInitialSwoop", serialized_component)
+        self.assertNotIn("UseAggressiveTargeting", serialized_component)
+        self.assertNotIn("AggressiveInitialSwoop", serialized_component)
 
     def test_validator_accepts_aerial_miniwyvern_aggressive_combat_routine(self) -> None:
         load_errors: list[str] = []

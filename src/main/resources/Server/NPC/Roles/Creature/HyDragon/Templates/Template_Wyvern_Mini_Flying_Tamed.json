@@ -195,7 +195,7 @@
   "KnockbackScale": 0.2,
   "DefaultNPCAttitude": "Ignore",
   "DefaultPlayerAttitude": "Neutral",
-  "AttitudeGroup": "HyDragonCompanion",
+  "AttitudeGroup": "HyDragonMiniCompanion",
   "DropList": {
     "Compute": "DropList"
   },
@@ -478,7 +478,11 @@
                 { "Type": "Flag", "Name": "AirborneMode", "Set": false },
                 { "Type": "MotionController", "MotionController": "Walk" }
               ] },
-              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Aggressive", "Modify": {
+              "Instructions": [
+                { "Reference": "Component_HyDragon_Instruction_Miniwyvern_Aggressive_Acquire", "Modify": {
+                  "ViewRange": { "Compute": "ViewRange" }, "ViewSector": { "Compute": "ViewSector" }, "HearingRange": { "Compute": "HearingRange" }, "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" }
+                } },
+                { "Reference": "Component_Tamework_Instruction_Aggressive", "Modify": {
                 "HardLeashDistance": { "Compute": "HardLeashDistance" },
                 "AlertedRange": { "Compute": "ViewRange" },
                 "ViewSector": { "Compute": "ViewSector" },
@@ -513,7 +517,11 @@
                 { "Type": "Flag", "Name": "AirborneMode", "Set": true },
                 { "Type": "MotionController", "MotionController": "Fly" }
               ] },
-              "Instructions": [ { "Reference": "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend", "Modify": {
+              "Instructions": [
+                { "Reference": "Component_HyDragon_Instruction_Miniwyvern_Aggressive_Acquire", "Modify": {
+                  "ViewRange": { "Compute": "ViewRange" }, "ViewSector": { "Compute": "ViewSector" }, "HearingRange": { "Compute": "HearingRange" }, "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" }
+                } },
+                { "Reference": "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend", "Modify": {
                 "HardLeashDistance": { "Compute": "HardLeashDistance" },
                 "AlertedRange": { "Compute": "ViewRange" },
                 "ViewSector": { "Compute": "ViewSector" },
@@ -529,8 +537,6 @@
                 "CombatBackOffDistanceRange": [8, 14],
                 "CombatBackOffDurationRange": [2, 4],
                 "DefendFollowMacroElement": "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying",
-                "UseAggressiveTargeting": true,
-                "AggressiveInitialSwoop": true,
                 "SwoopAttack": { "Compute": "SwoopAttack" },
                 "SwoopAttackFerocity": { "Compute": "SwoopAttackFerocity" },
                 "SwoopAttackRending": { "Compute": "SwoopAttackRending" },

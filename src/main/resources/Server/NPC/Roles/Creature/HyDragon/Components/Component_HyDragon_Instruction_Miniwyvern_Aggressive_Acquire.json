@@ -1,0 +1,31 @@
+{
+  "Type": "Component",
+  "Class": "Instruction",
+  "Parameters": {
+    "ViewRange": { "Value": 28 },
+    "ViewSector": { "Value": 180 },
+    "HearingRange": { "Value": 18 },
+    "AbsoluteDetectionRange": { "Value": 4 }
+  },
+  "Content": {
+    "Continue": true,
+    "Sensor": {
+      "Type": "And",
+      "Sensors": [
+        { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
+        {
+          "Reference": "Component_HyDragon_Sensor_Aggressive_Targets",
+          "Modify": {
+            "ViewRange": { "Compute": "ViewRange" },
+            "ViewSector": { "Compute": "ViewSector" },
+            "HearingRange": { "Compute": "HearingRange" },
+            "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" }
+          }
+        }
+      ]
+    },
+    "Actions": [
+      { "Type": "SetFlag", "Name": "Miniwyvern_Aggressive_Target_Acquired", "SetTo": true }
+    ]
+  }
+}
