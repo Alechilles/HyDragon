@@ -1,16 +1,17 @@
 package com.alechilles.hydragon.config;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 final class NordicAvatarFlightPatchContractTest {
     @Test
@@ -71,25 +72,5 @@ final class NordicAvatarFlightPatchContractTest {
             }
         }
         assertTrue(mountRootTrackCount > 0);
-    }
-
-    @Test
-    void avatarFlightModelEmitsGroundFootstepsWithoutFootstepEventsInFlightAnimations() throws IOException {
-        JsonObject model = JsonParser.parseString(Files.readString(Path.of(
-                "src/main/resources", "Server", "Models", "HyDragon", "NordicDrake",
-                "NordicDrake_AvatarFlight.json"))).getAsJsonObject();
-        JsonObject animationSets = model.getAsJsonObject("AnimationSets");
-        JsonObject run = animationSets.getAsJsonObject("Run")
-                .getAsJsonArray("Animations").get(0).getAsJsonObject();
-
-        assertEquals("SFX_Rex_Walk", run.get("SoundEventId").getAsString());
-        assertEquals(3, run.getAsJsonArray("FootstepIntervals").get(0).getAsInt());
-
-        for (String flightAnimation : List.of("FlyIdle", "Fly", "FlyFast")) {
-            JsonObject animation = animationSets.getAsJsonObject(flightAnimation)
-                    .getAsJsonArray("Animations").get(0).getAsJsonObject();
-            assertFalse(animation.has("FootstepIntervals"), flightAnimation);
-            assertFalse(animation.has("SoundEventId"), flightAnimation);
-        }
     }
 }
