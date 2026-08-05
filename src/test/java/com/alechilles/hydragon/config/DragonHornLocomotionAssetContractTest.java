@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 final class DragonHornLocomotionAssetContractTest {
     private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
     private static final List<String> COMMAND_IDS = List.of(
-            "Follow", "Hold", "Recall", "MoveToPing", "Defend", "AttackTarget", "Idle", "ToggleAirborneMode");
+            "Follow", "Hold", "Recall", "MoveToPing", "Defend", "AttackTarget", "Idle", "Aggressive");
     private static final Map<String, String> HORN_COMMAND_SOUNDS = Map.of(
             "Follow", "SFX_HyDragon_Dragon_Flute_SE_01",
             "Hold", "SFX_HyDragon_Dragon_Flute_SE_09",
@@ -31,12 +31,12 @@ final class DragonHornLocomotionAssetContractTest {
             "Defend", "SFX_HyDragon_Dragon_Flute_SE_11",
             "AttackTarget", "SFX_HyDragon_Dragon_Flute_SE_07",
             "Idle", "SFX_HyDragon_Dragon_Flute_SE_02",
-            "ToggleAirborneMode", "SFX_HyDragon_Dragon_Flute_SE_05");
+            "Aggressive", "SFX_HyDragon_Dragon_Flute_SE_05");
     private static final Set<String> HORN_COMMAND_LANGUAGE_KEYS = Set.of(
             "hydragon.commands.defend.name",
             "hydragon.commands.defend.hud",
-            "hydragon.commands.toggleAirborneMode.name",
-            "hydragon.commands.toggleAirborneMode.hud");
+            "hydragon.commands.aggressive.name",
+            "hydragon.commands.aggressive.hud");
     private static final List<String> LOCALES = List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR");
     private static final Map<String, JsonElement> FULL_DRAGON_UNCHANGED_CONTROLLERS = Map.of(
             "Walk", JsonParser.parseString("""
@@ -81,7 +81,7 @@ final class DragonHornLocomotionAssetContractTest {
 
         assertDefendSteps(command(commands, "Defend").getAsJsonArray("Steps"));
         assertAttackTargetSteps(command(commands, "AttackTarget").getAsJsonArray("Steps"));
-        assertToggleSteps(command(commands, "ToggleAirborneMode").getAsJsonArray("Steps"));
+        assertAggressiveSteps(command(commands, "Aggressive").getAsJsonArray("Steps"));
 
         assertIdenticalHornCommandCatalogs();
     }
@@ -996,10 +996,10 @@ final class DragonHornLocomotionAssetContractTest {
                         && "MasterTarget".equals(step.get("TargetSlot").getAsString())));
     }
 
-    private static void assertToggleSteps(JsonArray steps) {
+    private static void assertAggressiveSteps(JsonArray steps) {
         assertEquals(1, steps.size());
         assertEquals(JsonParser.parseString("""
-                { "Type": "TriggerHook", "HookId": "HyDragon.Command.ToggleAirborneMode" }
+                { "Type": "SetState", "State": "Aggressive" }
                 """), steps.get(0));
     }
 
