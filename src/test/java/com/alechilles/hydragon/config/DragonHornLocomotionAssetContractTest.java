@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 final class DragonHornLocomotionAssetContractTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
     private static final List<String> COMMAND_IDS = List.of(
             "Follow", "Hold", "Recall", "MoveToPing", "Defend", "AttackTarget", "Idle", "ToggleAirborneMode");
     private static final Map<String, String> HORN_COMMAND_SOUNDS = Map.of(

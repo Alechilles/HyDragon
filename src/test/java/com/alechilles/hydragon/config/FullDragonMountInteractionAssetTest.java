@@ -33,12 +33,12 @@ final class FullDragonMountInteractionAssetTest {
     @Test
     void rockDrakesAndIceHydraKeepNativeMountWiring() throws IOException {
         for (String tier : List.of("Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3")) {
-            JsonObject role = json(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "RockDrake",
+            JsonObject role = json(Path.of("src/main/resources", "Server", "NPC", "Roles", "Creature", "HyDragon", "RockDrake",
                     tier + ".json"));
             assertTrue(role.getAsJsonObject("Modify").get("IsMountable").getAsBoolean());
         }
 
-        JsonObject iceHydra = json(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Hydra",
+        JsonObject iceHydra = json(Path.of("src/main/resources", "Server", "NPC", "Roles", "Creature", "HyDragon", "Hydra",
                 "Tamed_Hydra.json"));
         assertTrue(iceHydra.getAsJsonObject("Modify").get("IsMountable").getAsBoolean());
         assertEquals("", iceHydra.getAsJsonObject("Parameters").getAsJsonObject("MountMode")
@@ -47,7 +47,7 @@ final class FullDragonMountInteractionAssetTest {
 
     private static void assertInteractionContract(String file, List<String> roles, List<String> cycle)
             throws IOException {
-        JsonObject config = json(Path.of("Server", "Tamework", "Interactions", file));
+        JsonObject config = json(Path.of("src/main/resources", "Server", "Tamework", "Interactions", file));
         assertEquals(roles, strings(config.getAsJsonArray("RoleIds")));
 
         JsonArray interactions = config.getAsJsonArray("Interactions");

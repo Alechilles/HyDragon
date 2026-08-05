@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 class DraconicAltarAssetContractTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
 
     @Test
     void altarAnimationRunsAtQuarterOfItsOriginalPlaybackRate() throws Exception {

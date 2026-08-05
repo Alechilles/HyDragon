@@ -22,9 +22,9 @@ import org.junit.jupiter.api.Test;
 
 final class NordicDrakeProgressionAssetTest {
     private static final Path LEVELING_PATH = Path.of(
-            "Server", "Tamework", "Leveling", "HyDragonNordicDrake.json");
+            "src/main/resources", "Server", "Tamework", "Leveling", "HyDragonNordicDrake.json");
     private static final Path TALENTS_PATH = Path.of(
-            "Server", "Tamework", "Talents", "HyDragonNordicDrake.json");
+            "src/main/resources", "Server", "Tamework", "Talents", "HyDragonNordicDrake.json");
     private static final List<String> LOCALES = List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR");
     private static final String LOCALE_PREFIX = "hydragon.talents.nordic_drake.";
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{[^}]+}");
@@ -309,7 +309,7 @@ final class NordicDrakeProgressionAssetTest {
 
     private static Map<String, String> localeEntries(String locale) throws IOException {
         Map<String, String> entries = new LinkedHashMap<>();
-        for (String line : Files.readAllLines(Path.of("Server", "Languages", locale, "server.lang"))) {
+        for (String line : Files.readAllLines(Path.of("src/main/resources", "Server", "Languages", locale, "server.lang"))) {
             int separator = line.indexOf('=');
             if (separator > 0 && !line.startsWith("#")) {
                 entries.put(line.substring(0, separator), line.substring(separator + 1));

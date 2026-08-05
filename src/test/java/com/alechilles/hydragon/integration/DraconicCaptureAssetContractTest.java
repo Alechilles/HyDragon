@@ -16,7 +16,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class DraconicCaptureAssetContractTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
 
     @Test
     void baseStoneChannelsThenStoresEveryResolvedRollInTheDragonHornBondedRoster() throws Exception {

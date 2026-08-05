@@ -16,7 +16,7 @@ final class NordicAvatarFlightPatchContractTest {
     @Test
     void avatarFlightConfigMapsNativeCombatSlotsToPlayerSafeNordicRoots() throws IOException {
         JsonObject config = JsonParser.parseString(Files.readString(Path.of(
-                "Server", "Tamework", "AvatarFlight", "HyDragonNordicDrake.json"))).getAsJsonObject();
+                "src/main/resources", "Server", "Tamework", "AvatarFlight", "HyDragonNordicDrake.json"))).getAsJsonObject();
         JsonObject abilities = config.getAsJsonObject("CombatAbilities");
 
         assertEquals("Root_NPC_Tamed_NordicDrake_Avatar_Fire_Ball",
@@ -32,15 +32,15 @@ final class NordicAvatarFlightPatchContractTest {
                 abilities.getAsJsonObject("Ability3").get("GlyphTexturePath").getAsString());
         assertEquals(15.0, abilities.getAsJsonObject("Ability3").get("CooldownSeconds").getAsDouble());
         assertTrue(Files.isRegularFile(Path.of(
-                "Common", "UI", "Custom", "HyDragon", "AvatarFlightIcons", "NordicFireball.png")));
+                "src/main/resources", "Common", "UI", "Custom", "HyDragon", "AvatarFlightIcons", "NordicFireball.png")));
         assertTrue(Files.isRegularFile(Path.of(
-                "Common", "UI", "Custom", "HyDragon", "AvatarFlightIcons", "NordicFireBreath.png")));
+                "src/main/resources", "Common", "UI", "Custom", "HyDragon", "AvatarFlightIcons", "NordicFireBreath.png")));
     }
 
     @Test
     void avatarFlightModelKeepsRiderArmorOnTheRiderAndOutOfMountPoseTracks() throws IOException {
         JsonObject config = JsonParser.parseString(Files.readString(Path.of(
-                "Server", "Tamework", "AvatarFlight", "HyDragonNordicDrake.json"))).getAsJsonObject();
+                "src/main/resources", "Server", "Tamework", "AvatarFlight", "HyDragonNordicDrake.json"))).getAsJsonObject();
         JsonObject riderVisual = config.getAsJsonObject("RiderVisual");
         assertTrue(riderVisual.get("ShowRider").getAsBoolean());
         assertTrue(riderVisual.get("IncludeAppearanceAttachments").getAsBoolean());
@@ -48,13 +48,13 @@ final class NordicAvatarFlightPatchContractTest {
         assertTrue(riderVisual.get("HideOwnerArmor").getAsBoolean());
 
         String model = Files.readString(Path.of(
-                "Common", "NPC", "HyDragon", "NordicDrake", "Model",
+                "src/main/resources", "Common", "NPC", "HyDragon", "NordicDrake", "Model",
                 "NordicDrake_AvatarFlight.blockymodel"));
 
         assertTrue(model.contains("\"name\": \"AF_Origin\""));
         assertFalse(model.contains("\"name\": \"Origin\""));
         Path animationRoot = Path.of(
-                "Common", "NPC", "HyDragon", "NordicDrake", "Animations", "AvatarFlight");
+                "src/main/resources", "Common", "NPC", "HyDragon", "NordicDrake", "Animations", "AvatarFlight");
         List<Path> clips;
         try (var files = Files.list(animationRoot)) {
             clips = files.filter(path -> path.toString().endsWith(".blockyanim")).toList();
@@ -76,7 +76,7 @@ final class NordicAvatarFlightPatchContractTest {
     @Test
     void avatarFlightModelEmitsGroundFootstepsWithoutFootstepEventsInFlightAnimations() throws IOException {
         JsonObject model = JsonParser.parseString(Files.readString(Path.of(
-                "Server", "Models", "HyDragon", "NordicDrake",
+                "src/main/resources", "Server", "Models", "HyDragon", "NordicDrake",
                 "NordicDrake_AvatarFlight.json"))).getAsJsonObject();
         JsonObject animationSets = model.getAsJsonObject("AnimationSets");
         JsonObject run = animationSets.getAsJsonObject("Run")

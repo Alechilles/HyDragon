@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 final class NordicDrakeInteractionAssetTest {
     private static final Path INTERACTION_PATH = Path.of(
-            "Server", "Tamework", "Interactions", "HyDragonIntDragon.json");
+            "src/main/resources", "Server", "Tamework", "Interactions", "HyDragonIntDragon.json");
     private static final String FLIGHTMASTERS_TALISMAN = "Tamework_Flightmasters_Talisman";
 
     @Test
@@ -124,7 +124,7 @@ final class NordicDrakeInteractionAssetTest {
 
     private static void assertRootResolvesPlayerSafeInteraction(String rootId, String interactionId)
             throws IOException {
-        Path rootPath = Path.of("Server", "Item", "RootInteractions", "NPCs", "Creature", "HyDragon",
+        Path rootPath = Path.of("src/main/resources", "Server", "Item", "RootInteractions", "NPCs", "Creature", "HyDragon",
                 rootId + ".json");
         JsonObject root = JsonParser.parseString(Files.readString(rootPath)).getAsJsonObject();
         assertEquals(interactionId, root.getAsJsonArray("Interactions").get(0).getAsString());
@@ -139,14 +139,14 @@ final class NordicDrakeInteractionAssetTest {
     }
 
     private static void assertSoundEvent(String soundEventId, String soundFileName) throws IOException {
-        Path soundEventPath = Path.of("Server", "Audio", "SoundEvents", "SFX", "HyDragon", "NordicDrake",
+        Path soundEventPath = Path.of("src/main/resources", "Server", "Audio", "SoundEvents", "SFX", "HyDragon", "NordicDrake",
                 soundEventId + ".json");
         JsonObject soundEvent = JsonParser.parseString(Files.readString(soundEventPath)).getAsJsonObject();
         assertEquals("SFX_Attn_Quiet", soundEvent.get("Parent").getAsString());
         assertEquals("Sounds/HyDragon/NordicDrake/" + soundFileName,
                 soundEvent.getAsJsonArray("Layers").get(0).getAsJsonObject().getAsJsonArray("Files")
                         .get(0).getAsString());
-        Path soundPath = Path.of("Common", "Sounds", "HyDragon", "NordicDrake", soundFileName);
+        Path soundPath = Path.of("src/main/resources", "Common", "Sounds", "HyDragon", "NordicDrake", soundFileName);
         assertTrue(Files.isRegularFile(soundPath));
         assertMonoVorbis(soundPath);
     }
@@ -171,7 +171,7 @@ final class NordicDrakeInteractionAssetTest {
     }
 
     private static Path interactionPath(String interactionId) {
-        return Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon", "NordicDrake",
+        return Path.of("src/main/resources", "Server", "Item", "Interactions", "NPCs", "HyDragon", "NordicDrake",
                 interactionId + ".json");
     }
 }

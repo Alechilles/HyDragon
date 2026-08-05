@@ -63,7 +63,8 @@
     "Support": { "Down": [ { "FaceType": "Full" } ] },
     "BlockSoundSetId": "Stone",
     "PhysicalMaterialId": "Stone",
-    "TextureComputedColor": "#4A3728"
+    "TextureComputedColor": "#4A3728",
+    "RotationYawPlacementOffset": "OneEighty"
   },
   "PlayerAnimationsId": "Block",
   "IconProperties": {

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 /** Contract for element-specific Miniwyvern projectile impact audio. */
 final class MiniwyvernProjectileImpactAudioAssetTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
     private static final Path PROJECTILES = ROOT.resolve(
             Path.of("Server", "ProjectileConfigs", "HyDragon", "Wyvern_Mini"));
     private static final Path ROOT_INTERACTIONS = ROOT.resolve(

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 class CaptureEnergyTetherAssetContractTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
 
     @Test
     void captureMoteUsesTheSoulLanternTwoSpawnerContract() throws Exception {

@@ -12,7 +12,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ASSET_ROOTS = (ROOT / "Common", ROOT / "Server")
+RESOURCE_ROOT = ROOT / "src" / "main" / "resources"
+ASSET_ROOTS = (RESOURCE_ROOT / "Common", RESOURCE_ROOT / "Server")
 JSON_SUFFIXES = {".json", ".particlesystem", ".particlespawner", ".blockymodel", ".blockyanim"}
 LOCALES = ("en-US", "pt-BR", "de-DE", "fr-FR", "es-ES")
 REQUIRED_STATUS_MESSAGE_KEYS = {
@@ -129,7 +130,7 @@ def load_json_assets(errors: list[str]) -> dict[Path, object]:
 
 def validate_runtime_item_contracts(parsed: dict[Path, object], errors: list[str]) -> None:
     """Mirror runtime-only item checks that are not expressed by JSON syntax."""
-    item_root = ROOT / "Server/Item/Items"
+    item_root = RESOURCE_ROOT / "Server/Item/Items"
     allowed_icon_roots = ("Icons/ItemsGenerated/", "Icons/Items/")
 
     def validate_item(item: object, context: str) -> None:
@@ -191,7 +192,7 @@ def validate_bonded_system_removed(errors: list[str]) -> None:
         "Common/Items/HyDragon/Draconic_Stone_Filled.blockymodel",
     )
     for relative in obsolete_paths:
-        if (ROOT / relative).exists():
+        if (RESOURCE_ROOT / relative).exists():
             fail(errors, f"obsolete bonded-system asset remains: {relative}")
 
     obsolete_tokens = (
@@ -201,7 +202,7 @@ def validate_bonded_system_removed(errors: list[str]) -> None:
         '"Vessel"',
         "Draconic_Stone_State_",
     )
-    for root in (ROOT / "Common", ROOT / "Server", ROOT / "src/main"):
+    for root in (RESOURCE_ROOT / "Common", RESOURCE_ROOT / "Server", ROOT / "src/main"):
         for path in root.rglob("*"):
             if not path.is_file() or path.suffix.lower() in {".png", ".zip"}:
                 continue
@@ -235,7 +236,7 @@ def read_lang(path: Path, errors: list[str]) -> dict[str, str]:
 def validate_locales(errors: list[str]) -> None:
     catalogs: dict[str, dict[str, str]] = {}
     for locale in LOCALES:
-        path = ROOT / "Server" / "Languages" / locale / "server.lang"
+        path = RESOURCE_ROOT / "Server" / "Languages" / locale / "server.lang"
         if not path.is_file():
             fail(errors, f"missing localization catalog: {path.relative_to(ROOT)}")
             continue
@@ -276,7 +277,7 @@ def validate_locales(errors: list[str]) -> None:
 
 
 def validate_interaction_message_localization(parsed: dict[Path, object], errors: list[str]) -> None:
-    english_path = ROOT / "Server/Languages/en-US/server.lang"
+    english_path = RESOURCE_ROOT / "Server/Languages/en-US/server.lang"
     english = read_lang(english_path, errors) if english_path.is_file() else {}
 
     def visit(value: object, path: Path) -> None:
@@ -293,7 +294,7 @@ def validate_interaction_message_localization(parsed: dict[Path, object], errors
             for child in value:
                 visit(child, path)
 
-    interaction_root = ROOT / "Server/Tamework/Interactions"
+    interaction_root = RESOURCE_ROOT / "Server/Tamework/Interactions"
     for path in sorted(interaction_root.glob("*.json")):
         visit(parsed.get(path), path)
 
@@ -341,12 +342,12 @@ def require_files(errors: list[str]) -> None:
         for suffix in ("", "Thorium", "Cobalt", "Adamantium", "Ancient")
     )
     for relative in required:
-        if not (ROOT / relative).is_file():
+        if not (RESOURCE_ROOT / relative).is_file():
             fail(errors, f"missing required asset: {relative}")
 
 
 def validate_capture_configs(parsed: dict[Path, object], errors: list[str]) -> None:
-    spawner_root = ROOT / "Server" / "Tamework" / "Items" / "Spawners"
+    spawner_root = RESOURCE_ROOT / "Server" / "Tamework" / "Items" / "Spawners"
     banned_roles = {"Wyvern_Mini", "Tamed_Wyvern_Mini"}
     for path in spawner_root.glob("HyDragonDraconicStone*.json"):
         data = parsed.get(path)
@@ -367,8 +368,8 @@ def validate_capture_configs(parsed: dict[Path, object], errors: list[str]) -> N
 
 
 def validate_miniwyvern_ability_contract(parsed: dict[Path, object], errors: list[str]) -> None:
-    archetype_root = ROOT / "Server/HyDragon/MiniwyvernArchetypes"
-    effect_root = ROOT / "Server/Entity/Effects/Status"
+    archetype_root = RESOURCE_ROOT / "Server/HyDragon/MiniwyvernArchetypes"
+    effect_root = RESOURCE_ROOT / "Server/Entity/Effects/Status"
     hostile_policies = {"OWNER_HOSTILE_ONLY", "OWNER_HOSTILE_AREA"}
     for path in sorted(archetype_root.glob("*.json")):
         data = parsed.get(path)
@@ -444,7 +445,7 @@ def validate_miniwyvern_ability_contract(parsed: dict[Path, object], errors: lis
 
 
 def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
-    spawner_root = ROOT / "Server" / "Tamework" / "Items" / "Spawners"
+    spawner_root = RESOURCE_ROOT / "Server" / "Tamework" / "Items" / "Spawners"
     tiers = (
         ("HyDragonDraconicStone.json", 1),
         ("HyDragonDraconicStoneThorium.json", 2),
@@ -501,8 +502,8 @@ def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
 
 def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str]) -> None:
     spawn_roots = (
-        ROOT / "Server" / "NPC" / "Spawn",
-        ROOT / "Server" / "Tamework" / "Patches",
+        RESOURCE_ROOT / "Server" / "NPC" / "Spawn",
+        RESOURCE_ROOT / "Server" / "Tamework" / "Patches",
     )
     banned = {"Wyvern_Mini", "Tamed_Wyvern_Mini"}
 
@@ -522,7 +523,7 @@ def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str])
             if visit(parsed.get(path)):
                 fail(errors, f"production Miniwyvern spawn path remains: {path.relative_to(ROOT)}")
 
-    wild_role_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
+    wild_role_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
     wild_role = parsed.get(wild_role_path)
     modify = wild_role.get("Modify") if isinstance(wild_role, dict) else None
     if isinstance(modify, dict):
@@ -534,13 +535,13 @@ def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str])
 
 def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str]) -> None:
     """Validate the Soul Bond companion's complete role/config reference graph."""
-    wild_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
-    template_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
-    follow_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Components/Component_HyDragon_Instruction_Follow_Miniwyvern_Flying.json"
-    companion_path = ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json"
-    root_bite_path = ROOT / "Server/Item/RootInteractions/NPCs/Creature/HyDragon/Root_NPC_Wyvern_Mini_Bite.json"
-    bite_path = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite.json"
-    bite_damage_path = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite_Damage.json"
+    wild_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
+    template_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
+    follow_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Components/Component_HyDragon_Instruction_Follow_Miniwyvern_Flying.json"
+    companion_path = RESOURCE_ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json"
+    root_bite_path = RESOURCE_ROOT / "Server/Item/RootInteractions/NPCs/Creature/HyDragon/Root_NPC_Wyvern_Mini_Bite.json"
+    bite_path = RESOURCE_ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite.json"
+    bite_damage_path = RESOURCE_ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini/Wyvern_Mini_Bite_Damage.json"
 
     wild = parsed.get(wild_path)
     template = parsed.get(template_path)
@@ -566,7 +567,7 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
     appearances = {"Wild": "Wyvern_Mini", "Nature": "Wyvern_Mini_Nature", "Toxic": "Wyvern_Mini_Toxic", "Fire": "Wyvern_Mini_Fire", "Void": "Wyvern_Mini_Void", "Lightning": "Wyvern_Mini_Lightning", "Ice": "Wyvern_Mini_Ice"}
     for form in forms:
         role_id = f"Tamed_Wyvern_Mini_{form}"
-        role = parsed.get(ROOT / f"Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/{role_id}.json")
+        role = parsed.get(RESOURCE_ROOT / f"Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/{role_id}.json")
         modify = role.get("Modify") if isinstance(role, dict) else None
         if not isinstance(role, dict) or role.get("Reference") != "Template_Wyvern_Mini_Flying_Tamed" or not isinstance(modify, dict):
             fail(errors, f"{role_id} must be a Template_Wyvern_Mini_Flying_Tamed variant")
@@ -577,7 +578,7 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
         if modify.get("IsMountable") is not False or modify.get("Attack") != "Root_NPC_Wyvern_Mini_Bite" or modify.get("Appearance") != appearances[form]:
             fail(errors, f"{role_id} has invalid companion or form wiring")
         config_id = f"HyDragonIntWyvernMini_{form}"
-        interaction = parsed.get(ROOT / f"Server/Tamework/Interactions/{config_id}.json")
+        interaction = parsed.get(RESOURCE_ROOT / f"Server/Tamework/Interactions/{config_id}.json")
         if modify.get("InteractionConfigId") != config_id or not isinstance(interaction, dict) or interaction.get("RoleIds") != [role_id]:
             fail(errors, f"{role_id} must reference a role-specific interaction config")
             continue
@@ -671,7 +672,7 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
 
 
 def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors: list[str]) -> None:
-    companion_root = ROOT / "Server/Tamework/Companion"
+    companion_root = RESOURCE_ROOT / "Server/Tamework/Companion"
     expected_toggle = {
         "Enabled": True,
         "HookId": "HyDragon.Command.ToggleAirborneMode",
@@ -708,8 +709,8 @@ def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors
 
 
 def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[str]) -> None:
-    species_root = ROOT / "Server/HyDragon/DragonSpecies"
-    patch_root = ROOT / "Server/Patchwork/Patches/HyDragon"
+    species_root = RESOURCE_ROOT / "Server/HyDragon/DragonSpecies"
+    patch_root = RESOURCE_ROOT / "Server/Patchwork/Patches/HyDragon"
     for species_path in sorted(species_root.glob("*.json")):
         species = parsed.get(species_path)
         if not isinstance(species, dict):
@@ -718,7 +719,7 @@ def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[
         spawn = species.get("Spawn")
         ordinary_ids = spawn.get("OrdinarySpawnAssetIds", []) if isinstance(spawn, dict) else []
         for asset_id in ordinary_ids:
-            local_paths = list((ROOT / "Server/NPC/Spawn/World").rglob(f"{asset_id}.json"))
+            local_paths = list((RESOURCE_ROOT / "Server/NPC/Spawn/World").rglob(f"{asset_id}.json"))
             if local_paths:
                 inserted_roles = {
                     entry.get("Id")
@@ -832,7 +833,7 @@ def validate_static_spawn_contracts(
     errors: list[str],
 ) -> None:
     """Validate authored spawns plus base patches against Workshop's 0.5.6 contracts."""
-    world_root = ROOT / "Server/NPC/Spawn/World"
+    world_root = RESOURCE_ROOT / "Server/NPC/Spawn/World"
     local_spawn_ids: set[str] = set()
     for path in sorted(world_root.rglob("*.json")):
         local_spawn_ids.add(path.stem)
@@ -840,7 +841,7 @@ def validate_static_spawn_contracts(
         if path.stem not in HYDRA_INDEPENDENT_WORLD_SPAWN_IDS:
             fail(errors, f"{path.relative_to(ROOT)} is not an approved independent Hydra spawn asset")
 
-    patch_root = ROOT / "Server/Patchwork/Patches/HyDragon"
+    patch_root = RESOURCE_ROOT / "Server/Patchwork/Patches/HyDragon"
     patch_ids: set[str] = set()
     target_stems: set[str] = set()
     for path in sorted(patch_root.glob("*.json")):
@@ -915,7 +916,7 @@ def validate_static_spawn_contracts(
         asset_type = "BeaconNPCSpawn" if "/Beacons/" in str(target) else "WorldNPCSpawn"
         validate_spawn_shape(merged, asset_type, f"{context} effective target", known_assets, errors)
 
-    species_root = ROOT / "Server/HyDragon/DragonSpecies"
+    species_root = RESOURCE_ROOT / "Server/HyDragon/DragonSpecies"
     available_routes = local_spawn_ids | target_stems | patch_ids
     for path in sorted(species_root.glob("*.json")):
         species = parsed.get(path)
@@ -930,7 +931,7 @@ def validate_domain_references(
     parsed: dict[Path, object], known_assets: set[str], projectile_ids: set[str], errors: list[str]
 ) -> None:
     """Resolve release-critical species, encounter, and archetype references to local/base assets."""
-    species_root = ROOT / "Server/HyDragon/DragonSpecies"
+    species_root = RESOURCE_ROOT / "Server/HyDragon/DragonSpecies"
     species_ids: set[str] = set()
     for path in sorted(species_root.glob("*.json")):
         species = parsed.get(path)
@@ -954,7 +955,7 @@ def validate_domain_references(
                 if not isinstance(reference, str) or reference not in known_assets:
                     fail(errors, f"{path.relative_to(ROOT)} unresolved {field} reference: {reference}")
 
-    for path in sorted((ROOT / "Server/HyDragon/Encounters").glob("*.json")):
+    for path in sorted((RESOURCE_ROOT / "Server/HyDragon/Encounters").glob("*.json")):
         encounter = parsed.get(path)
         if not isinstance(encounter, dict):
             continue
@@ -971,7 +972,7 @@ def validate_domain_references(
                 if not separator or reference not in known_assets:
                     fail(errors, f"{path.relative_to(ROOT)} unresolved grounding source asset: {source}")
 
-    for path in sorted((ROOT / "Server/HyDragon/MiniwyvernArchetypes").glob("*.json")):
+    for path in sorted((RESOURCE_ROOT / "Server/HyDragon/MiniwyvernArchetypes").glob("*.json")):
         archetype = parsed.get(path)
         if not isinstance(archetype, dict):
             continue
@@ -1002,7 +1003,7 @@ def validate_domain_references(
 
 def validate_release_content_contracts(parsed: dict[Path, object], errors: list[str]) -> None:
     """Gate first-release capture, flight, spawn, loot, and presentation contracts."""
-    stone_path = ROOT / "Server/Item/Items/Ingredient/Draconic_Stone.json"
+    stone_path = RESOURCE_ROOT / "Server/Item/Items/Ingredient/Draconic_Stone.json"
     stone = parsed.get(stone_path)
     if not isinstance(stone, dict) or "State" in stone or "MaxDurability" in stone:
         fail(errors, "Draconic Stones must be stateless consumable capture attempts")
@@ -1011,9 +1012,9 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
     for tier in (1, 2, 3):
         expected = f"Drop_RockDrake_T{tier}"
         expected_drop_ids.append(expected)
-        species_path = ROOT / f"Server/HyDragon/DragonSpecies/RockDrakeT{tier}.json"
-        role_path = ROOT / f"Server/NPC/Roles/Creature/HyDragon/RockDrake/RockDrakeT{tier}.json"
-        drop_path = ROOT / f"Server/Drops/HyDragon/{expected}.json"
+        species_path = RESOURCE_ROOT / f"Server/HyDragon/DragonSpecies/RockDrakeT{tier}.json"
+        role_path = RESOURCE_ROOT / f"Server/NPC/Roles/Creature/HyDragon/RockDrake/RockDrakeT{tier}.json"
+        drop_path = RESOURCE_ROOT / f"Server/Drops/HyDragon/{expected}.json"
         species = parsed.get(species_path)
         role = parsed.get(role_path)
         drop = parsed.get(drop_path)
@@ -1032,7 +1033,7 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
     if len(set(expected_drop_ids)) != 3:
         fail(errors, "Rock Drake tier drop-list IDs must be distinct")
 
-    altitude_patch_path = ROOT / "Server/Patchwork/Patches/HyDragon/RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
+    altitude_patch_path = RESOURCE_ROOT / "Server/Patchwork/Patches/HyDragon/RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
     altitude_patch = parsed.get(altitude_patch_path)
     operations = altitude_patch.get("Operations", []) if isinstance(altitude_patch, dict) else []
     if not any(
@@ -1044,7 +1045,7 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
     ):
         fail(errors, f"{altitude_patch_path.relative_to(ROOT)} must author a valid BeaconNPCSpawn YRange")
 
-    flight_patch_path = ROOT / "Server/Patchwork/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json"
+    flight_patch_path = RESOURCE_ROOT / "Server/Patchwork/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json"
     flight_patch = parsed.get(flight_patch_path)
     flight_operations = flight_patch.get("Operations", []) if isinstance(flight_patch, dict) else []
     expected_flight_values = {
@@ -1059,12 +1060,12 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
         for operation in flight_operations
     ):
         fail(errors, "Nordic Drake must receive Tamework avatar-flight role wiring through its clean patch asset")
-    avatar_config = parsed.get(ROOT / "Server/Tamework/AvatarFlight/HyDragonNordicDrake.json")
+    avatar_config = parsed.get(RESOURCE_ROOT / "Server/Tamework/AvatarFlight/HyDragonNordicDrake.json")
     model = avatar_config.get("Model") if isinstance(avatar_config, dict) else None
     if not isinstance(avatar_config, dict) or avatar_config.get("Enabled") is not True \
             or not isinstance(model, dict) or model.get("ModelId") != "NordicDrake_AvatarFlight":
         fail(errors, "HyDragonNordicDrake must be an enabled avatar-flight config using its authored model")
-    nordic_species = parsed.get(ROOT / "Server/HyDragon/DragonSpecies/NordicDrake.json")
+    nordic_species = parsed.get(RESOURCE_ROOT / "Server/HyDragon/DragonSpecies/NordicDrake.json")
     mount = nordic_species.get("Mount") if isinstance(nordic_species, dict) else None
     if mount != {"Mode": "AVATAR_FLIGHT", "AvatarFlightConfigId": "HyDragonNordicDrake"}:
         fail(errors, "Nordic Drake species must select the HyDragonNordicDrake avatar-flight config")
@@ -1073,10 +1074,10 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
             or nordic_spawn.get("OrdinarySpawnAssetIds") != ["Spawns_Zone3_Forests_Predator"] \
             or nordic_spawn.get("PluginEncounterIds") != []:
         fail(errors, "Nordic Drake must use only the Zone 3 forest ordinary spawn route")
-    nordic_policy = parsed.get(ROOT / "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json")
+    nordic_policy = parsed.get(RESOURCE_ROOT / "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json")
     if not isinstance(nordic_policy, dict) or nordic_policy.get("Requirements", []) != []:
         fail(errors, "Nordic Drake capture policy must not require an encounter phase")
-    interaction = parsed.get(ROOT / "Server/Tamework/Interactions/HyDragonIntDragon.json")
+    interaction = parsed.get(RESOURCE_ROOT / "Server/Tamework/Interactions/HyDragonIntDragon.json")
     interaction_entries = interaction.get("Interactions", []) if isinstance(interaction, dict) else []
     if not any(isinstance(entry, dict) and entry.get("Type") == "Mount" and entry.get("Enabled") is True
                for entry in interaction_entries):
@@ -1085,7 +1086,7 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
 
 def validate_nordic_landing_recovery(parsed: dict[Path, object], errors: list[str]) -> None:
     """Ensure a failed Nordic Drake touchdown returns to a fresh landing approach."""
-    template_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon.json"
+    template_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon.json"
     template = parsed.get(template_path)
     if not isinstance(template, dict):
         fail(errors, "Nordic Drake landing template is unavailable")
@@ -1132,7 +1133,7 @@ def validate_nordic_landing_recovery(parsed: dict[Path, object], errors: list[st
 
 def validate_nordic_health_phase_recovery(parsed: dict[Path, object], errors: list[str]) -> None:
     """Keep health-phase transitions coherent when healing interrupts a landing."""
-    template_path = ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon.json"
+    template_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon.json"
     template = parsed.get(template_path)
     if not isinstance(template, dict):
         fail(errors, "Nordic Drake health-phase template is unavailable")
@@ -1215,7 +1216,7 @@ def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> Non
         "HyDragon_Dragon_Horn",
     }
     seen: set[str] = set()
-    item_root = ROOT / "Server" / "Item" / "Items"
+    item_root = RESOURCE_ROOT / "Server" / "Item" / "Items"
     for path in item_root.rglob("*.json"):
         data = parsed.get(path)
         if not isinstance(data, dict):
@@ -1246,8 +1247,8 @@ def validate_altar_recipes(parsed: dict[Path, object], errors: list[str]) -> Non
 
 
 def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None:
-    item_path = ROOT / "Server/Item/Items/Tool/HyDragon_Dragon_Horn.json"
-    config_path = ROOT / "Server/Tamework/Items/Commands/HyDragonDragonHorn.json"
+    item_path = RESOURCE_ROOT / "Server/Item/Items/Tool/HyDragon_Dragon_Horn.json"
+    config_path = RESOURCE_ROOT / "Server/Tamework/Items/Commands/HyDragonDragonHorn.json"
     item = parsed.get(item_path)
     config = parsed.get(config_path)
     if not isinstance(item, dict) or item.get("Parent") != "Tamework_Command_Whistle_Example":
@@ -1297,11 +1298,11 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
             continue
         suffix = sound_event.removeprefix("SFX_HyDragon_Dragon_Flute_")
         sound_path = f"Sounds/Items/HyDragon/DragonFlute/HyDragon_Dragon_Flute_{suffix}.ogg"
-        event_path = ROOT / "Server/Audio/SoundEvents/SFX/Items/HyDragon/DragonFlute" / f"{sound_event}.json"
+        event_path = RESOURCE_ROOT / "Server/Audio/SoundEvents/SFX/Items/HyDragon/DragonFlute" / f"{sound_event}.json"
         event = parsed.get(event_path)
         if not isinstance(event, dict) or event.get("Layers", [{}])[0].get("Files") != [sound_path]:
             fail(errors, f"Dragon Horn {command_id} flute sound event is missing or malformed")
-        if not (ROOT / "Common" / sound_path).is_file():
+        if not (RESOURCE_ROOT / "Common" / sound_path).is_file():
             fail(errors, f"Dragon Horn {command_id} flute audio file is missing")
     allowed = config.get("AllowedRoles")
     required_roles = {
@@ -1318,9 +1319,9 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
 
 def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> None:
     companion_paths = [
-        ROOT / "Server/Tamework/Companion/HyDragonFullDragons.json",
-        ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json",
-        ROOT / "Server/Tamework/Companion/HyDragonNordicDrake.json",
+        RESOURCE_ROOT / "Server/Tamework/Companion/HyDragonFullDragons.json",
+        RESOURCE_ROOT / "Server/Tamework/Companion/HyDragonMiniwyvern.json",
+        RESOURCE_ROOT / "Server/Tamework/Companion/HyDragonNordicDrake.json",
     ]
     for path in companion_paths:
         data = parsed.get(path)
@@ -1366,7 +1367,7 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
                          "Dismiss": True, "Revive": True},
         },
     }
-    policy_root = ROOT / "Server/Tamework/BondedCompanions/Rosters"
+    policy_root = RESOURCE_ROOT / "Server/Tamework/BondedCompanions/Rosters"
     for filename, expected in policies.items():
         path = policy_root / filename
         data = parsed.get(path)
@@ -1400,14 +1401,14 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         if data.get("Features") != expected["Features"]:
             fail(errors, f"{path.relative_to(ROOT)} has invalid bonded feature policy")
 
-    population_root = ROOT / "Server/Tamework/PopulationGroups"
+    population_root = RESOURCE_ROOT / "Server/Tamework/PopulationGroups"
     for obsolete in ("HyDragonFullDragons.json", "HyDragonSoulboundMiniwyvern.json"):
         if (population_root / obsolete).exists():
             fail(errors, f"obsolete generic population policy remains: {obsolete}")
-    if (ROOT / "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json").exists():
+    if (RESOURCE_ROOT / "Server/HyDragon/Encounters/NordicDrakeHighAltitude.json").exists():
         fail(errors, "Nordic Drake must not retain a Java-controlled encounter asset")
 
-    essence_path = ROOT / "Server/Item/Items/Ingredient/Revitalizing_Essence.json"
+    essence_path = RESOURCE_ROOT / "Server/Item/Items/Ingredient/Revitalizing_Essence.json"
     essence = parsed.get(essence_path)
     secondary = essence.get("Interactions", {}).get("Secondary", {}).get("Interactions") \
         if isinstance(essence, dict) else None
@@ -1435,9 +1436,9 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
         "Void": "SFX_Eye_Void_Attack_Blast",
         "Wild": "SFX_Rubble_Hit",
     }
-    config_root = ROOT / "Server/ProjectileConfigs/HyDragon/Wyvern_Mini"
-    interaction_root = ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini"
-    root_root = ROOT / "Server/Item/RootInteractions/NPCs/HyDragon/Wyvern_Mini"
+    config_root = RESOURCE_ROOT / "Server/ProjectileConfigs/HyDragon/Wyvern_Mini"
+    interaction_root = RESOURCE_ROOT / "Server/Item/Interactions/NPCs/HyDragon/Wyvern_Mini"
+    root_root = RESOURCE_ROOT / "Server/Item/RootInteractions/NPCs/HyDragon/Wyvern_Mini"
     profiles = {
         "Base": (28, 32, 6, 4.0, 0),
         "Intermediate": (34, 40, 4, 5.0, 1),
@@ -1446,7 +1447,7 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
         "Mastery_First": (40, 48, 3, 6.0, 2),
         "Mastery_Echo": (40, 48, 3, 6.0, 2),
     }
-    legacy_root = ROOT / "Server/Projectiles/HyDragon/Wyvern_Mini"
+    legacy_root = RESOURCE_ROOT / "Server/Projectiles/HyDragon/Wyvern_Mini"
     hit_root_dir = root_root / "ProjectileHits"
     hit_child_dir = interaction_root / "ProjectileHits"
     hit_references: dict[str, int] = {}
@@ -1597,7 +1598,7 @@ def main() -> int:
     errors: list[str] = []
     parsed = load_json_assets(errors)
     base_root = hytale_asset_root(errors)
-    known_assets = asset_stems(ROOT / "Common") | asset_stems(ROOT / "Server")
+    known_assets = asset_stems(RESOURCE_ROOT / "Common") | asset_stems(RESOURCE_ROOT / "Server")
     if base_root is not None:
         known_assets |= asset_stems(base_root)
     validate_english_ids(errors)
@@ -1617,7 +1618,7 @@ def main() -> int:
     validate_spawn_patch_role_identity(parsed, errors)
     validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
     projectile_ids = {
-        path.stem for root in (ROOT, base_root) if root is not None
+        path.stem for root in (RESOURCE_ROOT, base_root) if root is not None
         for path in (root / "Server" / "Projectiles").rglob("*.json")
     }
     validate_domain_references(parsed, known_assets, projectile_ids, errors)

@@ -24,7 +24,7 @@ final class RockDrakeProgressionAssetTest {
 
     @Test
     void allTamedRockDrakeTiersShareTheApprovedThirtyLevelProgression() throws IOException {
-        JsonObject leveling = json(Path.of("Server", "Tamework", "Leveling", "HyDragonRockDrake.json"));
+        JsonObject leveling = json(Path.of("src/main/resources", "Server", "Tamework", "Leveling", "HyDragonRockDrake.json"));
         assertEquals(ROLES, strings(leveling.getAsJsonArray("RoleIds")));
         assertEquals(30, leveling.getAsJsonObject("Levels").get("MaxLevel").getAsInt());
         assertEquals(160.0, leveling.getAsJsonObject("Levels").get("BaseXp").getAsDouble());
@@ -38,7 +38,7 @@ final class RockDrakeProgressionAssetTest {
 
     @Test
     void rockDrakeTreeHasCombatDefenseAndFullSummonTimerLinesInEveryLocale() throws IOException {
-        JsonArray talents = json(Path.of("Server", "Tamework", "Talents", "HyDragonRockDrake.json"))
+        JsonArray talents = json(Path.of("src/main/resources", "Server", "Tamework", "Talents", "HyDragonRockDrake.json"))
                 .getAsJsonArray("Talents");
         assertEquals(10, talents.size());
         Map<String, JsonObject> byId = new LinkedHashMap<>();
@@ -86,7 +86,7 @@ final class RockDrakeProgressionAssetTest {
 
     private static Map<String, String> localeEntries(String locale) throws IOException {
         Map<String, String> entries = new LinkedHashMap<>();
-        for (String line : Files.readAllLines(Path.of("Server", "Languages", locale, "server.lang"))) {
+        for (String line : Files.readAllLines(Path.of("src/main/resources", "Server", "Languages", locale, "server.lang"))) {
             int separator = line.indexOf('=');
             if (separator > 0 && !line.startsWith("#")) {
                 entries.put(line.substring(0, separator), line.substring(separator + 1));

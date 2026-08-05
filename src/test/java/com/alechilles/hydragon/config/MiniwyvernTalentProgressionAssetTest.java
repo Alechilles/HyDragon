@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 /** Contract for role-specific Miniwyvern talent trees. */
 final class MiniwyvernTalentProgressionAssetTest {
-    private static final String TALENTS = "Server/Tamework/Talents/";
+    private static final String TALENTS = "src/main/resources/Server/Tamework/Talents/";
     private static final List<Form> FORMS = List.of(
             new Form("Fire", "Tamed_Wyvern_Mini_Fire", true),
             new Form("Ice", "Tamed_Wyvern_Mini_Ice", true),

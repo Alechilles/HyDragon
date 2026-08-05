@@ -7,7 +7,7 @@ Target Tamework public API: `0.9.0`
 
 ## 1. Purpose
 
-HyDragon is one Java plugin and root-layout asset pack. Maven packages compiled classes, `manifest.json`, `Common/`, and `Server/` into a single JAR without relocating the existing asset trees.
+HyDragon is one Java plugin and conventional Gradle asset pack. Gradle packages compiled classes, `manifest.json`, `Common/`, and `Server/` from `src/main/resources` into a single JAR.
 
 The Java layer owns HyDragon-specific transactions and behavior that assets cannot safely express. Assets remain responsible for models, textures, items, recipes, NPC roles, ordinary spawn data, effects, projectiles, audio references, and localization. Tamework owns reusable companion mechanics.
 
@@ -25,7 +25,7 @@ Related documents:
 ## 2. Architectural decisions
 
 1. The distributable remains one JAR containing Java classes and the complete asset pack.
-2. The initial build consumes root `Common/`, root `Server/`, and root `manifest.json` directly.
+2. Source assets use the standard `src/main/resources/{Common,Server}` layout; the packaged JAR retains `Common/` and `Server/` at its root.
 3. HyDragon requires Tamework `>=3.0.0 <4.0.0` and integrates through the public API plus registered custom asset/interaction contracts.
 4. Manifest version compatibility is necessary but not sufficient; each runtime feature checks required capability names and current bonded availability.
 5. Full dragons and the Soul Bond Miniwyvern share roster `hydragon:dragon_horn` but use families `hydragon:full_dragons` and `hydragon:soulbound_mini`.
@@ -72,10 +72,6 @@ Related documents:
 
 ```text
 HyDragon/
-  Common/                         shared/client assets packaged at JAR root
-  Server/                         server, HyDragon, and Tamework assets
-  manifest.json                   packaged at JAR root
-  pom.xml
   src/main/java/com/alechilles/hydragon/
     abilities/                    Miniwyvern ability behavior and bonded events
     bonded/                       extension document, codec, and CAS gateway
@@ -85,11 +81,16 @@ HyDragon/
     integration/                  Tamework bridge, gates, and messages
     persistence/                  HyDragon entitlement/saga/encounter data
     runtime/                      gameplay orchestration
+  src/main/resources/
+    Common/                       shared/client assets; packaged at JAR root
+    Server/                       server, HyDragon, and Tamework assets
+    icon-256.png
+    manifest.json
   src/test/java/com/alechilles/hydragon/
   docs/
 ```
 
-Moving assets to `src/main/resources` is optional future work. It is not part of this integration because the current root-layout packaging is intentional and tested.
+The source layout is intentionally conventional so Gradle's workspace runner and packaged artifact consume the same asset root.
 
 ## 5. Runtime component model
 

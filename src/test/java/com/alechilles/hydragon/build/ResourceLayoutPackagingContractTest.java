@@ -9,13 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
-/** Protects the no-mass-move root-layout packaging contract. */
-final class RootLayoutPackagingContractTest {
+/** Protects the conventional Gradle resource-layout packaging contract. */
+final class ResourceLayoutPackagingContractTest {
     private final Path projectRoot = Path.of(System.getProperty("hydragon.project.basedir"));
 
     @Test
     void manifestDeclaresCombinedPluginAndSupportedTameworkRange() throws IOException {
-        String manifest = Files.readString(projectRoot.resolve("manifest.json"));
+        String manifest = Files.readString(projectRoot.resolve("src/main/resources/manifest.json"));
 
         assertTrue(manifest.contains("\"Main\": \"com.alechilles.hydragon.HyDragonPlugin\""));
         assertTrue(manifest.contains("\"IncludesAssetPack\": true"));
@@ -25,20 +25,18 @@ final class RootLayoutPackagingContractTest {
     }
 
     @Test
-    void gradlePackagesOnlyTheExplicitRootAssetTrees() throws IOException {
+    void gradlePackagesTheStandardResourceTree() throws IOException {
         String build = Files.readString(projectRoot.resolve("build.gradle"));
 
-        assertTrue(build.contains("from('Common')"));
-        assertTrue(build.contains("into 'Common'"));
-        assertTrue(build.contains("from('Server')"));
-        assertTrue(build.contains("into 'Server'"));
-        assertTrue(build.contains("include 'manifest.json', 'icon-256.png'"));
+        assertTrue(build.contains("assetPackSourceDirectory = layout.projectDirectory.dir('src/main/resources')"));
+        assertTrue(build.contains("exclude 'Common/**/Source/**', 'Common/**/*.bbmodel'"));
+        assertFalse(build.contains("workspace-assets"));
     }
 
     @Test
     void sourceVersionMatchesManifestVersion() throws IOException {
         String properties = Files.readString(projectRoot.resolve("gradle.properties"));
-        String manifest = Files.readString(projectRoot.resolve("manifest.json"));
+        String manifest = Files.readString(projectRoot.resolve("src/main/resources/manifest.json"));
 
         assertTrue(properties.contains("mod_version=1.0.0"));
         assertEquals(1, count(manifest, "\"Version\": \"1.0.0\""));

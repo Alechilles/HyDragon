@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class BundledConfigAssetContractTest {
-    private static final Path CONFIG_ROOT = Path.of("Server", "HyDragon");
+    private static final Path CONFIG_ROOT = Path.of("src/main/resources", "Server", "HyDragon");
     private static final Pattern TEXTURE_FIELD = Pattern.compile("\\\"Texture\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"");
     private static final List<String> MINI_WYVERN_FORMS = List.of(
             "Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice");
@@ -42,7 +42,7 @@ class BundledConfigAssetContractTest {
                 "HyDragonMiniwyvern.json",
                 "HyDragonNordicDrake.json",
                 "HyDragonFullDragons.json")) {
-            Path path = Path.of("Server", "Tamework", "Companion", asset);
+            Path path = Path.of("src/main/resources", "Server", "Tamework", "Companion", asset);
             com.google.gson.JsonObject config = com.google.gson.JsonParser.parseString(Files.readString(path))
                     .getAsJsonObject();
             assertFalse(config.has("General"), path + " must not use the removed General wrapper");
@@ -59,10 +59,10 @@ class BundledConfigAssetContractTest {
                 "Void", "Draconic_Essence_Void", "Lightning", "Draconic_Essence_Lightning",
                 "Ice", "Draconic_Essence_Ice");
         List<String> roleIds = MINI_WYVERN_FORMS.stream().map(form -> "Tamed_Wyvern_Mini_" + form).toList();
-        String roster = Files.readString(Path.of("Server", "Tamework", "BondedCompanions", "Rosters", "HyDragonMiniwyvern.json"));
-        String companion = Files.readString(Path.of("Server", "Tamework", "Companion", "HyDragonMiniwyvern.json"));
-        String horn = Files.readString(Path.of("Server", "Tamework", "Items", "Commands", "HyDragonDragonHorn.json"));
-        String breeding = Files.readString(Path.of("Server", "Tamework", "Breeding", "HyDragonBondedCompanions.json"));
+        String roster = Files.readString(Path.of("src/main/resources", "Server", "Tamework", "BondedCompanions", "Rosters", "HyDragonMiniwyvern.json"));
+        String companion = Files.readString(Path.of("src/main/resources", "Server", "Tamework", "Companion", "HyDragonMiniwyvern.json"));
+        String horn = Files.readString(Path.of("src/main/resources", "Server", "Tamework", "Items", "Commands", "HyDragonDragonHorn.json"));
+        String breeding = Files.readString(Path.of("src/main/resources", "Server", "Tamework", "Breeding", "HyDragonBondedCompanions.json"));
         assertEquals(roleIds, JsonParser.parseString(roster).getAsJsonObject().getAsJsonArray("AllowedRoles")
                 .asList().stream().map(element -> element.getAsString()).toList(),
                 "roster must contain exactly seven form roles");
@@ -77,12 +77,12 @@ class BundledConfigAssetContractTest {
         }
         for (String source : MINI_WYVERN_FORMS) {
             String roleId = "Tamed_Wyvern_Mini_" + source;
-            Path rolePath = Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", roleId + ".json");
+            Path rolePath = Path.of("src/main/resources", "Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", roleId + ".json");
             String role = Files.readString(rolePath);
             String configId = "HyDragonIntWyvernMini_" + source;
             assertTrue(role.contains("\"Reference\": \"Template_Wyvern_Mini_Flying_Tamed\""), rolePath.toString());
             assertTrue(role.contains("\"InteractionConfigId\": \"" + configId + "\""), rolePath.toString());
-            String interaction = Files.readString(Path.of("Server", "Tamework", "Interactions", configId + ".json"));
+            String interaction = Files.readString(Path.of("src/main/resources", "Server", "Tamework", "Interactions", configId + ".json"));
             assertEquals(6, occurrences(interaction, "\"Type\": \"Custom\""), configId);
             assertTrue(interaction.contains("\"Type\": \"Feed\""), configId);
             assertTrue(interaction.contains("\"Type\": \"ModeCycle\""), configId);
@@ -97,12 +97,12 @@ class BundledConfigAssetContractTest {
             assertEquals(6, occurrences(interaction, "\"IsTamed\": true"), configId);
             assertEquals(6, occurrences(interaction, "\"PlayerIsOwner\": true"), configId);
         }
-        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Water.json")));
-        assertFalse(Files.exists(Path.of("Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Wind.json")));
-        assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Water.json")));
-        assertFalse(Files.exists(Path.of("Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Wind.json")));
-        assertFalse(Files.exists(Path.of("Server", "Models", "HyDragon", "Wyvern_Mini", "Wyvern_Mini_Water.json")));
-        assertFalse(Files.exists(Path.of("Server", "Models", "HyDragon", "Wyvern_Mini", "Wyvern_Mini_Wind.json")));
+        assertFalse(Files.exists(Path.of("src/main/resources", "Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Water.json")));
+        assertFalse(Files.exists(Path.of("src/main/resources", "Server", "NPC", "Roles", "Creature", "HyDragon", "Wyvern_Mini", "Tamed_Wyvern_Mini_Wind.json")));
+        assertFalse(Files.exists(Path.of("src/main/resources", "Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Water.json")));
+        assertFalse(Files.exists(Path.of("src/main/resources", "Server", "Tamework", "Interactions", "HyDragonIntWyvernMini_Wind.json")));
+        assertFalse(Files.exists(Path.of("src/main/resources", "Server", "Models", "HyDragon", "Wyvern_Mini", "Wyvern_Mini_Water.json")));
+        assertFalse(Files.exists(Path.of("src/main/resources", "Server", "Models", "HyDragon", "Wyvern_Mini", "Wyvern_Mini_Wind.json")));
     }
 
     @Test
@@ -115,13 +115,13 @@ class BundledConfigAssetContractTest {
                 "Lightning", new AuraVisual("HyDragon_Miniwyvern_Lightning_Boon", "Icons/StatusEffects/HyDragon/Miniwyvern_Lightning_Aura.png"),
                 "Ice", new AuraVisual("HyDragon_Miniwyvern_Ice_Aura", "Icons/StatusEffects/HyDragon/Miniwyvern_Ice_Aura.png"));
         for (Map.Entry<String, AuraVisual> expected : expectedAuraByForm.entrySet()) {
-            Path archetype = Path.of("Server", "HyDragon", "MiniwyvernArchetypes", expected.getKey() + ".json");
+            Path archetype = Path.of("src/main/resources", "Server", "HyDragon", "MiniwyvernArchetypes", expected.getKey() + ".json");
             String json = Files.readString(archetype);
             var passiveEffects = JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("PassiveEffects");
             assertEquals(List.of(expected.getValue().effectId()),
                     passiveEffects.asList().stream().map(element -> element.getAsString()).toList(),
                     archetype + " must maintain its owner aura EntityEffect while summoned");
-            Path effect = Path.of("Server", "Entity", "Effects", "Status", expected.getValue().effectId() + ".json");
+            Path effect = Path.of("src/main/resources", "Server", "Entity", "Effects", "Status", expected.getValue().effectId() + ".json");
             assertTrue(Files.exists(effect), expected.getValue().effectId() + " must be a bundled EntityEffect");
             String effectJson = Files.readString(effect);
             assertTrue(effectJson.contains("\"StatusEffectIcon\": \"" + expected.getValue().iconPath() + "\""),
@@ -130,18 +130,18 @@ class BundledConfigAssetContractTest {
                     expected.getValue().effectId() + " must not tint the owner while its aura is active");
             assertFalse(effectJson.contains("\"EntityTopTint\""),
                     expected.getValue().effectId() + " must not tint the owner while its aura is active");
-            assertTrue(Files.exists(Path.of("Common", expected.getValue().iconPath())),
+            assertTrue(Files.exists(Path.of("src/main/resources", "Common", expected.getValue().iconPath())),
                     expected.getValue().iconPath() + " must be bundled with the HUD effect");
         }
     }
 
     @Test
     void voidExposureAndIceSlowHaveTargetReadableVisuals() throws IOException {
-        Path voidEffect = Path.of("Server", "Entity", "Effects", "Status", "HyDragon_Miniwyvern_Void_Exposure.json");
+        Path voidEffect = Path.of("src/main/resources", "Server", "Entity", "Effects", "Status", "HyDragon_Miniwyvern_Void_Exposure.json");
         String voidJson = Files.readString(voidEffect);
         assertTrue(voidJson.contains("\"ModelVFXId\": \"HyDragon_Void_Debuff\""),
                 "Void Exposure must use the bundled target ModelVFX");
-        Path voidVfx = Path.of("Server", "Entity", "ModelVFX", "HyDragon_Void_Debuff.json");
+        Path voidVfx = Path.of("src/main/resources", "Server", "Entity", "ModelVFX", "HyDragon_Void_Debuff.json");
         assertTrue(Files.exists(voidVfx),
                 "Void Exposure ModelVFX must be bundled");
         String voidVfxJson = Files.readString(voidVfx);
@@ -152,7 +152,7 @@ class BundledConfigAssetContractTest {
         assertTrue(voidVfxJson.contains("\"PostColorOpacity\": 0.7"),
                 "Void Exposure must retain its authored post-color opacity");
 
-        Path iceEffect = Path.of("Server", "Entity", "Effects", "Status", "HyDragon_Miniwyvern_Ice_Slow.json");
+        Path iceEffect = Path.of("src/main/resources", "Server", "Entity", "Effects", "Status", "HyDragon_Miniwyvern_Ice_Slow.json");
         String iceJson = Files.readString(iceEffect);
         assertTrue(iceJson.contains("\"HorizontalSpeedMultiplier\": 0.8"),
                 "Ice Slow must reduce target movement speed by twenty percent");
@@ -165,7 +165,7 @@ class BundledConfigAssetContractTest {
         assertTrue(iceJson.contains("\"PositionOffset\": { \"Y\": 0.05 }"),
                 "Ice Slow frost aura must sit at the target's feet");
 
-        assertFalse(Files.exists(Path.of("Server", "Particles", "HyDragon", "Miniwyvern",
+        assertFalse(Files.exists(Path.of("src/main/resources", "Server", "Particles", "HyDragon", "Miniwyvern",
                 "HyDragon_Miniwyvern_Ice_ChillGround.particlesystem")),
                 "Ice Slow must not retain the replaced custom ground particle system");
     }
@@ -184,7 +184,7 @@ class BundledConfigAssetContractTest {
 
     @Test
     void itemAssetsDoNotUseEmptyLightColors() throws IOException {
-        try (var assets = Files.walk(Path.of("Server", "Item", "Items"))) {
+        try (var assets = Files.walk(Path.of("src/main/resources", "Server", "Item", "Items"))) {
             for (Path asset : assets.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".json"))
                     .toList()) {
@@ -213,7 +213,7 @@ class BundledConfigAssetContractTest {
         for (String asset : List.of(
                 "HyDragon_Miniwyvern_Nature_Regeneration.json",
                 "HyDragon_Miniwyvern_Water_Heal.json")) {
-            Path path = Path.of("Server", "Entity", "Effects", "Status", asset);
+            Path path = Path.of("src/main/resources", "Server", "Entity", "Effects", "Status", asset);
             String json = Files.readString(path);
             assertFalse(json.contains("\"Parent\""), path + " must not inherit an additional healing mechanic");
             assertFalse(json.contains("\"StatModifiers\""), path + " must not apply health outside the capped service");
@@ -224,7 +224,7 @@ class BundledConfigAssetContractTest {
 
     @Test
     void natureHealingPresentationIsSilentAndFinite() throws IOException {
-        Path archetype = Path.of("Server", "HyDragon", "MiniwyvernArchetypes", "Nature.json");
+        Path archetype = Path.of("src/main/resources", "Server", "HyDragon", "MiniwyvernArchetypes", "Nature.json");
         String archetypeJson = Files.readString(archetype);
         String mistId = "HyDragon_Miniwyvern_Nature_HealingMist";
         assertTrue(archetypeJson.contains("\"ParticleAndSoundIds\": [ \"" + mistId + "\" ]"),
@@ -232,9 +232,9 @@ class BundledConfigAssetContractTest {
         assertFalse(archetypeJson.contains("Effect_Heal"), "Nature healing must not use the persistent stock heal effect");
         assertFalse(archetypeJson.contains("SFX_"), "Nature healing must not play a sound");
 
-        Path system = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", mistId + ".particlesystem");
-        Path spawner = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", "Spawners", mistId + ".particlespawner");
-        Path sparkSpawner = Path.of("Server", "Particles", "HyDragon", "Miniwyvern", "Spawners", mistId + "_Spark.particlespawner");
+        Path system = Path.of("src/main/resources", "Server", "Particles", "HyDragon", "Miniwyvern", mistId + ".particlesystem");
+        Path spawner = Path.of("src/main/resources", "Server", "Particles", "HyDragon", "Miniwyvern", "Spawners", mistId + ".particlespawner");
+        Path sparkSpawner = Path.of("src/main/resources", "Server", "Particles", "HyDragon", "Miniwyvern", "Spawners", mistId + "_Spark.particlespawner");
         assertTrue(Files.exists(system), "Nature healing mist particle system must be bundled");
         assertTrue(Files.exists(spawner), "Nature healing mist spawner must be bundled");
         assertTrue(Files.exists(sparkSpawner), "Nature healing magic spark spawner must be bundled");
@@ -262,7 +262,7 @@ class BundledConfigAssetContractTest {
             assertEquals("Tamed_Wyvern_Mini_" + title, archetype.getRoleId(), id);
         }
         assertTrue(archetypes.get("nature").getPassiveEffects().contains("HyDragon_Miniwyvern_Nature_Regeneration"));
-        assertFalse(Files.readString(Path.of("Server", "HyDragon", "MiniwyvernArchetypes", "Toxic.json"))
+        assertFalse(Files.readString(Path.of("src/main/resources", "Server", "HyDragon", "MiniwyvernArchetypes", "Toxic.json"))
                 .contains("ActiveAbilities"), "Miniwyvern combat must be owned by role assets");
         assertOwnerAttackAura(archetypes, "toxic", "HyDragon_Miniwyvern_Toxic_Weakness", 6.0);
         assertEquals(0.12, archetypes.get("toxic").getOwnerAttackAura().getDamageReductionFraction());
@@ -274,7 +274,7 @@ class BundledConfigAssetContractTest {
     @Test
     void elementalMiniwyvernEssenceBondUpgradesResolveToBundledEffects() throws IOException {
         for (String form : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void")) {
-            Path archetypePath = Path.of("Server", "HyDragon", "MiniwyvernArchetypes", form + ".json");
+            Path archetypePath = Path.of("src/main/resources", "Server", "HyDragon", "MiniwyvernArchetypes", form + ".json");
             JsonObject archetype = JsonParser.parseString(Files.readString(archetypePath)).getAsJsonObject();
             JsonObject aura = archetype.getAsJsonObject("EssenceBondAura");
             assertTrue(aura != null, form + " must declare EssenceBondAura");
@@ -294,7 +294,7 @@ class BundledConfigAssetContractTest {
                 for (String field : List.of("TargetEffectId", "WardEffectId")) {
                     if (!upgrade.has(field)) continue;
                     String effectId = upgrade.get(field).getAsString();
-                    Path effectPath = Path.of("Server", "Entity", "Effects", "Status", effectId + ".json");
+                    Path effectPath = Path.of("src/main/resources", "Server", "Entity", "Effects", "Status", effectId + ".json");
                     assertTrue(Files.exists(effectPath), form + " references missing " + effectId);
                     JsonObject effect = JsonParser.parseString(Files.readString(effectPath)).getAsJsonObject();
                     assertTrue(effect.has("Name"), effectId + " must retain a localized status name");
@@ -327,13 +327,13 @@ class BundledConfigAssetContractTest {
                 "HyDragon_Miniwyvern_Lightning_Ward_8_Knockback.json",
                 "HyDragon_Miniwyvern_Lightning_Ward_12.json",
                 "HyDragon_Miniwyvern_Lightning_Ward_15.json")) {
-            Path path = Path.of("Server", "Entity", "Effects", "Status", asset);
+            Path path = Path.of("src/main/resources", "Server", "Entity", "Effects", "Status", asset);
             JsonObject status = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
             assertFalse(status.has("DamageResistance"),
                     path + " must not claim cause-scoped resistance for general Static Ward reduction");
         }
         JsonObject lightning = JsonParser.parseString(Files.readString(
-                Path.of("Server", "HyDragon", "MiniwyvernArchetypes", "Lightning.json"))).getAsJsonObject();
+                Path.of("src/main/resources", "Server", "HyDragon", "MiniwyvernArchetypes", "Lightning.json"))).getAsJsonObject();
         JsonArray upgrades = lightning.getAsJsonObject("EssenceBondAura").getAsJsonArray("Upgrades");
         Map<String, Double> expected = Map.of("Attunement", 0.05D, "Resonance", 0.08D,
                 "Mastery", 0.12D, "Ascendance", 0.15D);
@@ -352,7 +352,7 @@ class BundledConfigAssetContractTest {
     void miniwyvernTalentKeysArePresentInEveryServerLocale() throws IOException {
         Set<String> requiredKeys = new HashSet<>();
         for (String form : List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "Wild")) {
-            Path talentPath = Path.of("Server", "Tamework", "Talents", "HyDragonMiniwyvern" + form + ".json");
+            Path talentPath = Path.of("src/main/resources", "Server", "Tamework", "Talents", "HyDragonMiniwyvern" + form + ".json");
             JsonArray talents = JsonParser.parseString(Files.readString(talentPath))
                     .getAsJsonObject().getAsJsonArray("Talents");
             String prefix = "hydragon.talents.miniwyvern." + form.toLowerCase() + ".";
@@ -366,7 +366,7 @@ class BundledConfigAssetContractTest {
             }
         }
         for (String locale : List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR")) {
-            Map<String, String> values = languageValues(Path.of("Server", "Languages", locale, "server.lang"));
+            Map<String, String> values = languageValues(Path.of("src/main/resources", "Server", "Languages", locale, "server.lang"));
             for (String key : requiredKeys) {
                 String value = values.get(key);
                 assertTrue(value != null && !value.isBlank(), locale + " omits " + key);

@@ -24,19 +24,20 @@ final class BuildToolingContractTest {
     }
 
     @Test
-    void gradleBuildUsesWorkspaceTameworkAndLinkedAssetSources() throws IOException {
+    void gradleBuildUsesWorkspaceTameworkAndStandardResourceSources() throws IOException {
         String build = Files.readString(projectRoot.resolve("build.gradle"));
 
         assertTrue(build.contains("compileOnly files(tameworkProject.sourceSets.main.output)"));
-        assertTrue(build.contains("assetPackSourceDirectory = workspaceAssetsDirectory"));
+        assertTrue(build.contains("assetPackSourceDirectory = layout.projectDirectory.dir('src/main/resources')"));
         assertTrue(build.contains("prepareWorkspaceAssets"));
+        assertTrue(build.contains("exclude 'Common/**/Source/**', 'Common/**/*.bbmodel'"));
     }
 
     @Test
     void buildDocumentationUsesTheSharedWorkspace() throws IOException {
         String documentation = Files.readString(projectRoot.resolve("BUILDING.md"));
-        assertTrue(documentation.contains("..\\gradlew.bat stageAllModAssets"));
-        assertTrue(documentation.contains("..\\gradlew.bat runAllMods"));
+        assertTrue(documentation.contains(".\\gradlew.bat -p .. stageAllModAssets"));
+        assertTrue(documentation.contains(".\\gradlew.bat -p .. runAllMods"));
         assertTrue(documentation.contains(".\\gradlew.bat clean test packagingTest"));
     }
 

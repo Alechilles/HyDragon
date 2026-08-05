@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 /** Contract for the dedicated Miniwyvern projectile statuses. */
 final class MiniwyvernProjectileStatusAssetTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
 
     @Test
     void projectileStatusesHaveExactDurationsAndControlBoundaries() throws IOException {

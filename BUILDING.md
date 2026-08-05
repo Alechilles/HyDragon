@@ -2,7 +2,7 @@
 
 HyDragon and Tamework share the Gradle workspace in the parent `Modding`
 directory. It builds HyDragon against Tamework's current project output and
-links both projects' asset files into one development server workspace.
+stages both projects' asset packs into one development server workspace.
 
 ## Development hot reload
 
@@ -19,8 +19,8 @@ Running `..\gradlew.bat` without `-p ..` still uses HyDragon's standalone
 directory rather than the wrapper's location.
 
 Leave `runAllMods` running while you edit either project. The workspace stages
-the two mods together, so their linked asset files can hot-reload in the same
-server session.
+the two mods together, so their asset files can hot-reload in the same server
+session.
 
 ## Verify before release
 

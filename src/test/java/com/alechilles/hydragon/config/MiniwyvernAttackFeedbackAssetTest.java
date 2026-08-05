@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 /** Asset contract for Miniwyvern attack animations and randomized sound pools. */
 final class MiniwyvernAttackFeedbackAssetTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
 
     @Test
     void attackSoundPoolsUseTrimmedMonoVorbisClipsWithoutImmediateRepeats() throws IOException {

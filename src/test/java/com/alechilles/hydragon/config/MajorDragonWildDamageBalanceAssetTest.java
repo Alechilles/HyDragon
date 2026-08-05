@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 final class MajorDragonWildDamageBalanceAssetTest {
-    private static final Path ROOT = Path.of(".").toAbsolutePath().normalize();
+    private static final Path ROOT = Path.of("src/main/resources").toAbsolutePath().normalize();
     private static final double SCALE = 0.85;
 
     @Test

@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 class DragonRosterAssetContractTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
     private static final Pattern COST = Pattern.compile(
             "\\{\\s*\\\"ItemId\\\"\\s*:\\s*\\\"([^\\\"]+)\\\"\\s*,\\s*\\\"Quantity\\\"\\s*:\\s*(\\d+)\\s*}");
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{[^{}]+}");

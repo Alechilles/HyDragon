@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 
 final class NordicDrakeTamedCombatAssetTest {
-    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", "."));
+    private static final Path ROOT = Path.of(System.getProperty("hydragon.project.basedir", ".")).resolve("src/main/resources");
     private static final Path TEMPLATE = ROOT.resolve(
             "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon_Tamed.json");
     private static final Path TAMED_NORDIC = ROOT.resolve(

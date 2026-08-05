@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class ToxicHydraVariantAssetTest {
-    private static final Path ROOT = Path.of(".").toAbsolutePath().normalize();
+    private static final Path ROOT = Path.of("src/main/resources").toAbsolutePath().normalize();
     private static final String TOXIC_HYDRA_POISON_EFFECT = "HyDragon_ToxicHydra_Poison";
 
     @Test

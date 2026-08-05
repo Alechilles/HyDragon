@@ -25,9 +25,9 @@ import org.junit.jupiter.api.Test;
 /** Contract for the separate Ice and Toxic Hydra talent trees. */
 final class HydraTalentProgressionAssetTest {
     private static final Path ICE = Path.of(
-            "Server", "Tamework", "Talents", "HyDragonHydra.json");
+            "src/main/resources", "Server", "Tamework", "Talents", "HyDragonHydra.json");
     private static final Path TOXIC = Path.of(
-            "Server", "Tamework", "Talents", "HyDragonToxicHydra.json");
+            "src/main/resources", "Server", "Tamework", "Talents", "HyDragonToxicHydra.json");
     private static final List<String> LOCALES =
             List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR");
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{[^}]+}");
@@ -70,7 +70,7 @@ final class HydraTalentProgressionAssetTest {
 
         for (String locale : LOCALES) {
             List<String> lines = Files.readAllLines(
-                    Path.of("Server", "Languages", locale, "server.lang"));
+                    Path.of("src/main/resources", "Server", "Languages", locale, "server.lang"));
             Map<String, String> entries = localeEntries(locale);
             assertTrue(lines.stream().noneMatch(line -> line.startsWith("hydragon.talents.hydra.")),
                     locale + " retains legacy shared Hydra talent keys");
@@ -287,7 +287,7 @@ final class HydraTalentProgressionAssetTest {
     private static Map<String, String> localeEntries(String locale) throws IOException {
         Map<String, String> entries = new LinkedHashMap<>();
         for (String line : Files.readAllLines(
-                Path.of("Server", "Languages", locale, "server.lang"))) {
+                Path.of("src/main/resources", "Server", "Languages", locale, "server.lang"))) {
             int separator = line.indexOf('=');
             if (separator > 0 && !line.startsWith("#")) {
                 entries.put(line.substring(0, separator), line.substring(separator + 1));

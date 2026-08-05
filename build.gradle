@@ -1,7 +1,3 @@
-import java.nio.file.Files
-import java.nio.file.Path
-import org.gradle.process.ExecOperations
-
 plugins {
     id 'java'
     id 'com.azuredoom.hytale-tools'
@@ -16,15 +12,6 @@ def property = { String name ->
 group = 'com.alechilles'
 version = property('mod_version')
 def tameworkProject = findProject(':alecstamework')
-def workspaceAssetsDirectory = layout.buildDirectory.dir('workspace-assets')
-def execOperations = services.get(ExecOperations)
-def workspaceAssetDirectories = ['Common', 'Server'].collectEntries { String name ->
-    [(name): layout.projectDirectory.dir(name).asFile.toPath()]
-}
-def workspaceAssetFiles = [
-        'manifest.json': layout.projectDirectory.file('src/main/resources/manifest.json').asFile.toPath(),
-        'icon-256.png': layout.projectDirectory.file('icon-256.png').asFile.toPath()
-]
 
 java {
     toolchain {
@@ -74,20 +61,11 @@ hytaleTools {
     curseforgeId = '1503366'
     includesPack = true
     bundleAssetEditorRuntime = false
-    assetPackSourceDirectory = workspaceAssetsDirectory
+    assetPackSourceDirectory = layout.projectDirectory.dir('src/main/resources')
 }
 
 tasks.named('processResources', Copy) {
-    from(layout.projectDirectory) {
-        include 'icon-256.png'
-    }
-    from('Common') {
-        into 'Common'
-        exclude '**/Source/**', '**/*.bbmodel'
-    }
-    from('Server') {
-        into 'Server'
-    }
+    exclude 'Common/**/Source/**', 'Common/**/*.bbmodel'
 }
 
 tasks.named('jar') {
@@ -101,47 +79,10 @@ tasks.named('jar') {
 }
 
 tasks.register('prepareWorkspaceAssets') {
-    description = 'Creates a small linked asset root for workspace staging without moving HyDragon assets.'
+    description = 'Verifies HyDragon uses the conventional Gradle resource layout for workspace staging.'
     group = 'hytale'
-    outputs.dir(workspaceAssetsDirectory)
-    doLast {
-        File destination = workspaceAssetsDirectory.get().asFile
-        destination.mkdirs()
-        def createLinkedAsset = { Path targetLink, Path target, boolean directory ->
-            if (Files.exists(targetLink)) {
-                return
-            }
-            try {
-                Files.createSymbolicLink(targetLink, target)
-                return
-            } catch (Exception ignored) {
-                if (!System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-                    throw ignored
-                }
-            }
-            if (directory) {
-                def result = execOperations.exec {
-                    commandLine 'cmd', '/c', 'mklink', '/J', targetLink.toString(), target.toString()
-                    ignoreExitValue = true
-                }
-                if (result.exitValue == 0 && Files.exists(targetLink)) {
-                    return
-                }
-            } else {
-                Files.createLink(targetLink, target)
-                return
-            }
-            throw new GradleException("Unable to create a linked workspace asset: ${targetLink}")
-        }
-        workspaceAssetDirectories.each { String name, Path source ->
-            Path assetLink = destination.toPath().resolve(name)
-            createLinkedAsset(assetLink, source, true)
-        }
-        workspaceAssetFiles.each { String name, Path source ->
-            Path assetLink = destination.toPath().resolve(name)
-            createLinkedAsset(assetLink, source, false)
-        }
-    }
+    inputs.dir(layout.projectDirectory.dir('src/main/resources/Common'))
+    inputs.dir(layout.projectDirectory.dir('src/main/resources/Server'))
 }
 
 tasks.named('prepareRunServer') {

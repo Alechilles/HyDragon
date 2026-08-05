@@ -19,9 +19,9 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 final class MiniwyvernProjectileBalanceAssetTest {
-    private static final Path CONFIG_ROOT = Path.of("Server", "ProjectileConfigs", "HyDragon", "Wyvern_Mini");
-    private static final Path ROOT_ROOT = Path.of("Server", "Item", "RootInteractions", "NPCs", "HyDragon", "Wyvern_Mini");
-    private static final Path INTERACTION_ROOT = Path.of("Server", "Item", "Interactions", "NPCs", "HyDragon", "Wyvern_Mini");
+    private static final Path CONFIG_ROOT = Path.of("src/main/resources", "Server", "ProjectileConfigs", "HyDragon", "Wyvern_Mini");
+    private static final Path ROOT_ROOT = Path.of("src/main/resources", "Server", "Item", "RootInteractions", "NPCs", "HyDragon", "Wyvern_Mini");
+    private static final Path INTERACTION_ROOT = Path.of("src/main/resources", "Server", "Item", "Interactions", "NPCs", "HyDragon", "Wyvern_Mini");
     private static final Map<String, FormProfile> FORMS = forms();
     private static final Map<String, String> IMPACT_EVENTS = Map.of(
             "Fire", "SFX_Staff_Flame_Fireball_Impact",
@@ -64,7 +64,7 @@ final class MiniwyvernProjectileBalanceAssetTest {
 
     @Test
     void miniwyvernNamespaceContainsNoDeprecatedProjectileLaunchOrLegacyProfiles() throws IOException {
-        Path legacyRoot = Path.of("Server", "Projectiles", "HyDragon", "Wyvern_Mini");
+        Path legacyRoot = Path.of("src/main/resources", "Server", "Projectiles", "HyDragon", "Wyvern_Mini");
         if (Files.isDirectory(legacyRoot)) {
             try (var profiles = Files.list(legacyRoot)) {
                 assertEquals(0, profiles.filter(path -> path.getFileName().toString().endsWith(".json")).count(),

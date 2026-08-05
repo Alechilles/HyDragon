@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 
 /** Exact, mutation-resistant contract for Miniwyvern projectile arbitration. */
 final class MiniwyvernTalentAssetWiringTest {
-    private static final Path COMPONENT = Path.of("Server/NPC/Roles/Creature/HyDragon/Components/Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
-    private static final Path TEMPLATE = Path.of("Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json");
+    private static final Path COMPONENT = Path.of("src/main/resources/Server/NPC/Roles/Creature/HyDragon/Components/Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json");
+    private static final Path TEMPLATE = Path.of("src/main/resources/Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json");
     private static final List<String> ROOTS = List.of("TalentProjectileBase", "TalentProjectileIntermediate", "TalentProjectilePattern", "TalentProjectilePatternEcho", "TalentProjectileMastery", "TalentProjectileMasteryEcho");
     private static final List<String> FORMS = List.of("Fire", "Ice", "Lightning", "Nature", "Toxic", "Void", "Wild");
     private static final String AIMING = "Miniwyvern_Projectile_Aiming";
@@ -265,7 +265,7 @@ final class MiniwyvernTalentAssetWiringTest {
     private static List<JsonObject> echoes() throws IOException { return attacks(instructions()).stream().filter(i -> attack(i).endsWith("Echo")).toList(); }
     private static JsonObject componentModify(JsonObject template) { return find(template, o -> "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend".equals(string(o, "Reference"))).getAsJsonObject("Modify"); }
     private static List<JsonObject> cancellations(JsonObject asset) { return all(asset, o -> hasAction(o, "ResetInstructions", null)); }
-    private static Path role(String form) { return Path.of("Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Tamed_Wyvern_Mini_" + form + ".json"); }
+    private static Path role(String form) { return Path.of("src/main/resources/Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Tamed_Wyvern_Mini_" + form + ".json"); }
     private static JsonArray instructions() throws IOException { return load(COMPONENT).getAsJsonObject("Content").getAsJsonArray("Instructions"); }
     private static JsonObject load(Path p) throws IOException { return JsonParser.parseString(Files.readString(p)).getAsJsonObject(); }
     private static boolean hasAction(JsonObject i, String t, String n) { return i.has("Actions") && index(i.getAsJsonArray("Actions"), t, n, false) >= 0; }

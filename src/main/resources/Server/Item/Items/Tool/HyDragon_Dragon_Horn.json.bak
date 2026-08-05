@@ -10,12 +10,10 @@
   "Quality": "Epic",
   "Recipe": {
     "Input": [
-      { "ItemId": "Ingredient_Bar_Cobalt", "Quantity": 3 },
-      { "ItemId": "Draconic_Scale", "Quantity": 10 },
-      { "ItemId": "Draconic_Essence", "Quantity": 10 },
+      { "ItemId": "Ingredient_Bar_Thorium", "Quantity": 3 },
       {
-        "ItemId": "Wood_Azure",
-        "Quantity": 10
+        "Quantity": 10,
+        "ItemId": "Wood_Azure_Trunk"
       }
     ],
     "Output": [
@@ -27,9 +25,9 @@
     "TimeSeconds": 4
   },
   "IconProperties": {
-    "Scale": 0.55,
-    "Translation": [ 0, 0 ],
-    "Rotation": [ -4.8, 29, 37 ]
+    "Scale": 0.68,
+    "Translation": [ 1, -4 ],
+    "Rotation": [ 334, 331, 321 ]
   },
   "Icon": "Icons/ItemsGenerated/HyDragon_Dragon_Horn.png"
 }

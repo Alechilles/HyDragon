@@ -25,40 +25,8 @@
   "Recipe": {
     "Input": [
       {
-        "ItemId": "Draconic_Essence",
-        "Quantity": 3
-      },
-      {
-        "ItemId": "Draconic_Essence_Earth",
-        "Quantity": 3
-      },
-      {
-        "ItemId": "Draconic_Essence_Fire",
-        "Quantity": 3
-      },
-      {
-        "ItemId": "Draconic_Essence_Ice",
-        "Quantity": 3
-      },
-      {
-        "ItemId": "Draconic_Essence_Lightning",
-        "Quantity": 3
-      },
-      {
-        "ItemId": "Draconic_Essence_Nature",
-        "Quantity": 3
-      },
-      {
-        "ItemId": "Draconic_Essence_Toxic",
-        "Quantity": 3
-      },
-      {
-        "ItemId": "Draconic_Essence_Void",
-        "Quantity": 3
-      },
-      {
-        "ItemId": "Draconic_Essence_Wind",
-        "Quantity": 3
+        "ResourceTypeId": "HyDragon_DraconicEssences",
+        "Quantity": 10
       },
       {
         "ItemId": "Draconic_Scale",
