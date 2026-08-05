@@ -13,7 +13,7 @@ Every bonded companion grows to **level 30**. Each level grants **one talent poi
 
 ## How companions gain experience
 
-Combat awards experience while a companion fights. Active-companion time also contributes, so keeping a companion summoned while you adventure helps it grow even when every encounter is not a direct kill. A Nordic Drake can also progress through its flight-focused play.
+Combat awards experience while a companion fights. Some companion families also award passive experience while they are active, so a summoned companion can grow between fights where that family supports it; this is not a universal rule. Nordic Drake instead uses Combat experience and qualified avatar-flight experience, so it does not gain passive summoned-time experience simply for standing summoned.
 
 ## Full-dragon branches
 
@@ -26,9 +26,28 @@ The branch names can be themed for the species, but their practical jobs stay fa
 | **Survival / role utility** | Staying power, movement, or the species' special job. |
 | **Summoner's Pact** | Longer summon windows and shorter summon cooldowns. |
 
-### Summoner's Pact milestones
+The themed Hydra trees make those roles explicit:
 
-The four Summoner's Pact choices unlock at these levels:
+### Ice Hydra trees
+
+| Tree | Practical purpose |
+|---|---|
+| **Winter's Wrath** | Ice Hydra combat pressure and damage. |
+| **Glacierguard** | Ice Hydra health and incoming-damage protection. |
+| **Broodcaller's Pact** | Ice Hydra summon-duration and summon-cooldown improvements. |
+
+### Toxic Hydra trees
+
+| Tree | Practical purpose |
+|---|---|
+| **Plaguewing** | Toxic Hydra flight: Vigour, boosts, gliding, and climbing. |
+| **Venomous Onslaught** | Toxic Hydra combat pressure and damage. |
+| **Blightguard** | Toxic Hydra health and incoming-damage protection. |
+| **Broodcaller's Pact** | Toxic Hydra summon-duration and summon-cooldown improvements. |
+
+### Summon-tree milestones
+
+For Rock Drakes and Nordic Drake, the summon tree is named **Summoner's Pact**. Ice Hydra and Toxic Hydra use the themed name **Broodcaller's Pact** for the same four summon milestones:
 
 | Unlock level | Benefit |
 |---:|---|
@@ -41,7 +60,7 @@ The duration and cooldown improvements stack within the branch. Choose it when y
 
 ## Nordic Drake flight branch
 
-Nordic Drake adds **Aerial Mastery** alongside its combat and durability options. Its flight talents improve Vigour capacity and recharge, reduce the cost of boosts, soften glide sink, improve boost strength, and make climbing easier. Pair this branch with [Mounts and Flight](/mod/hydragon/mounts-and-flight) if the Drake is your travel mount.
+Nordic Drake adds **Aerial Mastery** alongside its **War Drake** combat, **Wyrmguard** durability, and summon options. Its flight talents improve Vigour capacity and recharge, reduce the cost of boosts, soften glide sink, improve boost strength, and make climbing easier. Pair this branch with [Mounts and Flight](/mod/hydragon/mounts-and-flight) if the Drake is your travel mount.
 
 ## Miniwyvern branches
 

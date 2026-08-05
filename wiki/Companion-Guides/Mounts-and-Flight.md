@@ -38,7 +38,8 @@ If a companion does not expose the airborne toggle, keep it in its ground role. 
 ## Talent choices for travel
 
 - **Nordic Drake — Aerial Mastery:** improve Vigour capacity and recharge, boost efficiency and strength, glide control, and climbing.
-- **Winged Toxic Hydra:** use its airborne toxic attacks for mounted combat, then choose from its available combat, durability, survival, and summon-focused talents.
+- **Ice Hydra:** **Winter's Wrath** is the combat tree, **Glacierguard** is the durability tree, and **Broodcaller's Pact** supplies the summon milestones.
+- **Winged Toxic Hydra:** **Plaguewing** is the flight tree, **Venomous Onslaught** is the combat tree, **Blightguard** is the durability tree, and **Broodcaller's Pact** supplies the summon milestones.
 - **Ground mounts:** invest in combat, durability, or survival branches instead of flight-specific choices.
 
 See [Leveling and Talents](/mod/hydragon/leveling-and-talents) before committing points, and [Summoning and Revival](/mod/hydragon/summoning-and-revival) for the full-dragon summon window.
