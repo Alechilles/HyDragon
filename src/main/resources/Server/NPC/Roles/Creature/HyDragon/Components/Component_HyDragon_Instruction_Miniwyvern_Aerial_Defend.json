@@ -96,6 +96,9 @@
     "UseAggressiveTargeting": {
       "Value": false
     },
+    "AggressiveInitialSwoop": {
+      "Value": false
+    },
     "TalentProjectilePattern": {
       "Value": ""
     },
@@ -509,6 +512,44 @@
           {
             "Type": "State",
             "State": ".Combat"
+          }
+        ]
+      },
+      {
+        "$Comment": "Aggressive acquisition enters the normal swoop routine immediately instead of presenting an extended target orbit.",
+        "Continue": true,
+        "Enabled": {
+          "Compute": "AggressiveInitialSwoop"
+        },
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "State",
+              "State": ".Combat"
+            },
+            {
+              "Type": "Flag",
+              "Name": "Miniwyvern_Aerial_Combat_Active",
+              "Set": false
+            },
+            {
+              "Type": "Timer",
+              "Name": "Miniwyvern_Swoop_Cooldown",
+              "State": "Stopped"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Aerial_Combat_Active",
+            "SetTo": true
+          },
+          {
+            "Type": "SetFlag",
+            "Name": "Miniwyvern_Swoop_Pending",
+            "SetTo": true
           }
         ]
       },

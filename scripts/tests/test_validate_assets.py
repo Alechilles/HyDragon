@@ -397,6 +397,7 @@ class ValidatorContractTest(unittest.TestCase):
         )
         self.assertEqual(1, len(mini_aerial_refs))
         self.assertIs(True, mini_aerial_refs[0]["Modify"].get("UseAggressiveTargeting"))
+        self.assertIs(True, mini_aerial_refs[0]["Modify"].get("AggressiveInitialSwoop"))
 
         aerial_component_path = (
             VALIDATOR.RESOURCE_ROOT
@@ -408,9 +409,14 @@ class ValidatorContractTest(unittest.TestCase):
             False,
             aerial_component["Parameters"]["UseAggressiveTargeting"]["Value"],
         )
+        self.assertEqual(
+            False,
+            aerial_component["Parameters"]["AggressiveInitialSwoop"]["Value"],
+        )
         serialized_component = json.dumps(aerial_component)
         self.assertIn("Component_Sensor_Standard_Detection", serialized_component)
         self.assertIn("UseAggressiveTargeting", serialized_component)
+        self.assertIn("AggressiveInitialSwoop", serialized_component)
 
     def test_validator_accepts_aerial_miniwyvern_aggressive_combat_routine(self) -> None:
         load_errors: list[str] = []

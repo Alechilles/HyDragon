@@ -530,6 +530,7 @@
                 "CombatBackOffDurationRange": [2, 4],
                 "DefendFollowMacroElement": "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying",
                 "UseAggressiveTargeting": true,
+                "AggressiveInitialSwoop": true,
                 "SwoopAttack": { "Compute": "SwoopAttack" },
                 "SwoopAttackFerocity": { "Compute": "SwoopAttackFerocity" },
                 "SwoopAttackRending": { "Compute": "SwoopAttackRending" },
