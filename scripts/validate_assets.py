@@ -89,7 +89,7 @@ WORKSHOP_056_PATCH_TARGETS = {
 }
 HYDRA_INDEPENDENT_WORLD_SPAWN_IDS = {
     "Spawns_Zone3_Glacial_HyDragon_Predator",
-    "Spawns_Zone1_Swamps_HyDragon_Predator",
+    "Spawns_Zone4_Volcanoes_HyDragon_Predator",
 }
 
 
