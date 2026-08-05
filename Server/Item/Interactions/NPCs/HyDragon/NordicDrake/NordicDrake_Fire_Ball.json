@@ -20,22 +20,31 @@
       "RunTime": 0.8
     },
     {
-      "Type": "TameworkLaunchProjectile",
-      "RunTime": 0,
-      "ProjectileId": "NordicDrake_Dragon_Fire_Ball",
-      "LaunchPositionOffset": {
-        "X": 0.0,
-        "Y": 1.5,
-        "Z": -3.0
-      },
-      "TrajectoryMode": "Direct",
-      "TargetSlot": "LockedTarget",
-      "ImpactEffect": {
-        "EffectId": "Flame_Staff_Burn",
-        "Radius": 3,
-        "ExcludeSource": true
-      },
-      "Tags": {}
+      "Type": "Replace",
+      "DefaultOk": true,
+      "Var": "Dragon_Fire_Ball_Launch",
+      "DefaultValue": {
+        "Interactions": [
+          {
+            "Type": "TameworkLaunchProjectile",
+            "RunTime": 0,
+            "ProjectileId": "NordicDrake_Dragon_Fire_Ball",
+            "LaunchPositionOffset": {
+              "X": 0.0,
+              "Y": 1.5,
+              "Z": -3.0
+            },
+            "TrajectoryMode": "Direct",
+            "TargetSlot": "LockedTarget",
+            "ImpactEffect": {
+              "EffectId": "Flame_Staff_Burn",
+              "Radius": 3,
+              "ExcludeSource": true
+            },
+            "Tags": {}
+          }
+        ]
+      }
     },
     {
       "Type": "Simple",

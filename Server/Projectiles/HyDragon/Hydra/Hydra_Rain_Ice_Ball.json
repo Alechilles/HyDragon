@@ -9,7 +9,7 @@
   "MuzzleVelocity": 28,
   "TerminalVelocity": 60,
   "Gravity": 14,
-  "Damage": 18,
+  "Damage": 15.3,
   "DeathEffectsOnHit": true,
   "TimeToLive": 10,
   "DeadTimeMiss": 0,
@@ -31,7 +31,7 @@
   "ExplosionConfig": {
     "DamageEntities": true,
     "EntityDamageRadius": 5.0,
-    "EntityDamage": 10,
+    "EntityDamage": 8.5,
     "Knockback": {
       "Type": "Force",
       "Force": 6,

@@ -1,0 +1,45 @@
+{
+  "Appearance": "NordicDrake_Dragon_Fire_Ball_Projectile",
+  "Radius": 1.5,
+  "Height": -1,
+  "VerticalCenterShot": 0,
+  "HorizontalCenterShot": 0,
+  "DepthShot": 0,
+  "PitchAdjustShot": false,
+  "MuzzleVelocity": 22,
+  "TerminalVelocity": 34,
+  "Gravity": 5,
+  "ImpactSlowdown": 0,
+  "SticksVertically": true,
+  "TimeToLive": 8,
+  "HitParticles": {
+    "SystemId": "Impact_Explosion",
+    "Scale": 2.4
+  },
+  "Damage": 27.2,
+  "MissParticles": {
+    "SystemId": "Impact_Explosion",
+    "Scale": 1.8
+  },
+  "DeadTimeMiss": 0,
+  "DeathParticles": {
+    "SystemId": "Impact_Explosion",
+    "Scale": 2.4
+  },
+  "DeathEffectsOnHit": true,
+  "ExplosionConfig": {
+    "DamageEntities": true,
+    "DamageBlocks": true,
+    "EntityDamageRadius": 3,
+    "EntityDamage": 13.6,
+    "Knockback": {
+      "Type": "Force",
+      "Force": 9,
+      "Direction": {
+        "X": 0.45,
+        "Y": 1.65,
+        "Z": 0.45
+      }
+    }
+  }
+}

@@ -66,7 +66,16 @@
               },
               "HitEntity": {
                 "Interactions": [
-                  "NordicDrake_Flame_Breath_Damage"
+                  {
+                    "Type": "Replace",
+                    "DefaultOk": true,
+                    "Var": "Flame_Breath_Damage",
+                    "DefaultValue": {
+                      "Interactions": [
+                        "NordicDrake_Flame_Breath_Damage"
+                      ]
+                    }
+                  }
                 ]
               },
               "Next": {
@@ -91,7 +100,16 @@
                     },
                     "HitEntity": {
                       "Interactions": [
-                        "NordicDrake_Flame_Breath_Damage"
+                        {
+                          "Type": "Replace",
+                          "DefaultOk": true,
+                          "Var": "Flame_Breath_Damage",
+                          "DefaultValue": {
+                            "Interactions": [
+                              "NordicDrake_Flame_Breath_Damage"
+                            ]
+                          }
+                        }
                       ]
                     }
                   },
@@ -118,7 +136,16 @@
                     },
                     "HitEntity": {
                       "Interactions": [
-                        "NordicDrake_Flame_Breath_Damage"
+                        {
+                          "Type": "Replace",
+                          "DefaultOk": true,
+                          "Var": "Flame_Breath_Damage",
+                          "DefaultValue": {
+                            "Interactions": [
+                              "NordicDrake_Flame_Breath_Damage"
+                            ]
+                          }
+                        }
                       ]
                     }
                   },
@@ -145,7 +172,16 @@
                     },
                     "HitEntity": {
                       "Interactions": [
-                        "NordicDrake_Flame_Breath_Damage"
+                        {
+                          "Type": "Replace",
+                          "DefaultOk": true,
+                          "Var": "Flame_Breath_Damage",
+                          "DefaultValue": {
+                            "Interactions": [
+                              "NordicDrake_Flame_Breath_Damage"
+                            ]
+                          }
+                        }
                       ]
                     }
                   }

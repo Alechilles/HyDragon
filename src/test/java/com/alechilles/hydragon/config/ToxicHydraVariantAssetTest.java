@@ -542,7 +542,7 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
-    void iceLeafInteractionsRetainExistingProjectileBehavior() throws Exception {
+    void iceLeafInteractionsUseReducedWildHazardDamage() throws Exception {
         assertLeaf("Hydra_Ice_Ball_Charge_Effect.json", """
                 {"Type":"Simple","Effects":{"ItemPlayerAnimationsId":"Hydra_Default","ItemAnimationId":"ChargeShoot","Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Hydra_Ice_Ball_Charging","PositionOffset":{"Z":0}}]}}
                 """);
@@ -553,12 +553,12 @@ class ToxicHydraVariantAssetTest {
                 {"Type":"Simple","Effects":{"Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Hydra_Ice_Ball_Charging","PositionOffset":{"Z":0}}]}}
                 """);
         assertLeaf("Hydra_Rain_Ice_Launch.json", """
-                {"Type":"TameworkLaunchProjectile","ProjectileId":"Hydra_Rain_Ice_Ball","LaunchPositionOffset":{"X":0.0,"Y":-1.0,"Z":-2.0},"RandomAroundSourceMinRadius":6.0,"RandomAroundSourceMaxRadius":15.0,"RandomAroundSourceVerticalOffset":0.0,"LingeringHazard":{"Radius":4.0,"DurationSeconds":6.0,"TickIntervalSeconds":1.0,"DamagePerTick":5.0,"ExcludeSource":true,"EffectId":"Chilled","SourceTypeId":"hydragon.rain_ice_hazard"},"Effects":{"WorldSoundEventId":"SFX_Staff_Ice_Shoot","LocalSoundEventId":"SFX_Staff_Ice_Shoot","Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Ice_Staff","DetachedFromModel":false,"PositionOffset":{},"Scale":1.5}]},"Tags":{}}
+                {"Type":"TameworkLaunchProjectile","ProjectileId":"Hydra_Rain_Ice_Ball","LaunchPositionOffset":{"X":0.0,"Y":-1.0,"Z":-2.0},"RandomAroundSourceMinRadius":6.0,"RandomAroundSourceMaxRadius":15.0,"RandomAroundSourceVerticalOffset":0.0,"LingeringHazard":{"Radius":4.0,"DurationSeconds":6.0,"TickIntervalSeconds":1.0,"DamagePerTick":4.25,"ExcludeSource":true,"EffectId":"Chilled","SourceTypeId":"hydragon.rain_ice_hazard"},"Effects":{"WorldSoundEventId":"SFX_Staff_Ice_Shoot","LocalSoundEventId":"SFX_Staff_Ice_Shoot","Particles":[{"TargetEntityPart":"Entity","TargetNodeName":"Origin_Projectile","SystemId":"Ice_Staff","DetachedFromModel":false,"PositionOffset":{},"Scale":1.5}]},"Tags":{}}
                 """);
     }
 
     @Test
-    void toxicProjectilesPreserveIceMechanicsAndReplaceOnlyElementPresentation() throws Exception {
+    void toxicProjectilesPreserveIceMechanicsWhileKeepingTheirHigherDamage() throws Exception {
         assertProjectileParity(
                 "Server/Projectiles/HyDragon/Hydra/Hydra_Ice_Ball.json",
                 "Server/Projectiles/HyDragon/Hydra/Hydra_Toxic_Ball.json");
@@ -612,6 +612,7 @@ class ToxicHydraVariantAssetTest {
         replaceLaunchPresentation(expectedRain, "Hydra_Rain_Toxic_Ball");
         JsonObject expectedToxicHazard = expectedRain.getAsJsonObject("LingeringHazard");
         expectedToxicHazard.addProperty("DurationSeconds", 30.0);
+        expectedToxicHazard.addProperty("DamagePerTick", 5.0);
         expectedToxicHazard.addProperty("EffectId", TOXIC_HYDRA_POISON_EFFECT);
         expectedToxicHazard.addProperty("SourceTypeId", "hydragon.rain_toxic_hazard");
         assertEquals(expectedRain, rain);
@@ -1025,6 +1026,10 @@ class ToxicHydraVariantAssetTest {
             ice.remove(presentationField);
             toxic.remove(presentationField);
         }
+        ice.remove("Damage");
+        toxic.remove("Damage");
+        ice.getAsJsonObject("ExplosionConfig").remove("EntityDamage");
+        toxic.getAsJsonObject("ExplosionConfig").remove("EntityDamage");
         assertEquals(ice, toxic, toxicPath);
     }
 

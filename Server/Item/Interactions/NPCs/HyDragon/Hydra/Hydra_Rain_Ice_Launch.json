@@ -13,7 +13,7 @@
     "Radius": 4.0,
     "DurationSeconds": 6.0,
     "TickIntervalSeconds": 1.0,
-    "DamagePerTick": 5.0,
+    "DamagePerTick": 4.25,
     "ExcludeSource": true,
     "EffectId": "Chilled",
     "SourceTypeId": "hydragon.rain_ice_hazard"

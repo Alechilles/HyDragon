@@ -1,0 +1,15 @@
+{
+  "Parent": "NordicDrake_Flame_Breath_Damage",
+  "DamageCalculator": {
+    "Type": "Absolute",
+    "BaseDamage": {
+      "Fire": 15.3
+    },
+    "RandomPercentageModifier": 0.1
+  },
+  "Next": {
+    "Type": "ApplyEffect",
+    "EffectId": "Flame_Staff_Burn",
+    "Entity": "Target"
+  }
+}

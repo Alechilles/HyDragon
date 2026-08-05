@@ -66,7 +66,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 68
+                "Physical": 57.8
               },
               "RandomPercentageModifier": 0.1
             }
@@ -80,7 +80,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 68
+                "Physical": 57.8
               },
               "RandomPercentageModifier": 0.1
             }
@@ -94,7 +94,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 68
+                "Physical": 57.8
               },
               "RandomPercentageModifier": 0.1
             }
@@ -108,7 +108,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 68
+                "Physical": 57.8
               },
               "RandomPercentageModifier": 0.1
             }
@@ -122,7 +122,7 @@
             "DamageCalculator": {
               "Type": "Absolute",
               "BaseDamage": {
-                "Physical": 68
+                "Physical": 57.8
               },
               "RandomPercentageModifier": 0.1
             }
