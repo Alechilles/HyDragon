@@ -54,6 +54,89 @@ class ValidatorContractTest(unittest.TestCase):
             errors,
         )
 
+    def test_rejects_missing_flying_aggressive_path(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        template_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
+        )
+        template = copy.deepcopy(parsed[template_path])
+        self.assertIsInstance(template, dict)
+
+        def find_aggressive(value: object) -> dict[str, object] | None:
+            if isinstance(value, dict):
+                sensor = value.get("Sensor")
+                if isinstance(sensor, dict) and sensor.get("Type") == "State" \
+                        and sensor.get("State") == "Aggressive":
+                    return value
+                for child in value.values():
+                    found = find_aggressive(child)
+                    if found is not None:
+                        return found
+            elif isinstance(value, list):
+                for child in value:
+                    found = find_aggressive(child)
+                    if found is not None:
+                        return found
+            return None
+
+        aggressive = find_aggressive(template)
+        if aggressive is None:
+            aggressive = {
+                "Sensor": {"Type": "State", "State": "Aggressive"},
+                "Instructions": [
+                    {
+                        "Sensor": {
+                            "Type": "And",
+                            "Sensors": [
+                                {"Type": "Flag", "Name": "AirborneMode", "Set": False},
+                                {"Type": "MotionController", "MotionController": "Walk"},
+                            ],
+                        },
+                        "Instructions": [{"Reference": "Component_Tamework_Instruction_Aggressive"}],
+                    },
+                    {
+                        "Sensor": {
+                            "Type": "And",
+                            "Sensors": [
+                                {"Type": "Flag", "Name": "AirborneMode"},
+                                {"Type": "MotionController", "MotionController": "Fly"},
+                            ],
+                        },
+                        "Instructions": [{"Reference": "Component_Tamework_Instruction_Aggressive"}],
+                    },
+                ],
+            }
+            template.setdefault("Instructions", []).append(aggressive)
+
+        instructions = aggressive.get("Instructions")
+        self.assertIsInstance(instructions, list)
+        aggressive["Instructions"] = [
+            branch for branch in instructions
+            if not (
+                isinstance(branch, dict)
+                and isinstance(branch.get("Sensor"), dict)
+                and any(
+                    isinstance(sensor, dict)
+                    and sensor.get("Type") == "MotionController"
+                    and sensor.get("MotionController") == "Fly"
+                    for sensor in branch["Sensor"].get("Sensors", [])
+                )
+            )
+        ]
+        parsed[template_path] = template
+
+        errors: list[str] = []
+        VALIDATOR.validate_miniwyvern_role_wiring(parsed, errors)
+
+        self.assertIn(
+            "Miniwyvern aggressive state must have grounded and flying paths",
+            errors,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

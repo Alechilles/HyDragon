@@ -463,6 +463,83 @@
           ]
         },
         {
+          "$Comment": "Aggressive State: Miniwyvern attacks nearby threats to its owner.",
+          "Sensor": {
+            "Type": "State",
+            "State": "Aggressive"
+          },
+          "Instructions": [
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": false },
+                { "Type": "MotionController", "MotionController": "Walk" }
+              ] },
+              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Aggressive", "Modify": {
+                "HardLeashDistance": { "Compute": "HardLeashDistance" },
+                "AlertedRange": { "Compute": "AlertedRange" },
+                "ViewSector": { "Compute": "ViewSector" },
+                "HearingRange": { "Compute": "HearingRange" },
+                "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+                "ViewRange": { "Compute": "ViewRange" },
+                "Attack": { "Compute": "Attack" },
+                "AttackDistance": { "Compute": "AttackDistance" },
+                "AttackPauseRange": { "Compute": "AttackPauseRange" },
+                "CombatAttackPreDelay": { "Compute": "CombatAttackPreDelay" },
+                "CombatAttackPostDelay": { "Compute": "CombatAttackPostDelay" },
+                "CombatBackOffAfterAttack": { "Compute": "CombatBackOffAfterAttack" },
+                "CombatBackOffDistanceRange": { "Compute": "CombatBackOffDistanceRange" },
+                "CombatBackOffDurationRange": { "Compute": "CombatBackOffDurationRange" },
+                "BlockAbility": { "Compute": "BlockAbility" },
+                "BlockProbability": { "Compute": "BlockProbability" },
+                "CombatStrafingDurationRange": { "Compute": "CombatStrafingDurationRange" },
+                "CombatStrafingFrequencyRange": { "Compute": "CombatStrafingFrequencyRange" },
+                "CombatBehaviorDistance": { "Compute": "CombatBehaviorDistance" },
+                "CombatMovingRelativeSpeed": { "Compute": "CombatMovingRelativeSpeed" },
+                "CombatStrafeWeight": { "Compute": "CombatStrafeWeight" },
+                "CombatDirectWeight": { "Compute": "CombatDirectWeight" },
+                "CombatAlwaysMovingWeight": { "Compute": "CombatAlwaysMovingWeight" },
+                "CombatRelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" },
+                "ChaseRelativeSpeed": { "Compute": "ChaseRelativeSpeed" },
+                "AdditionalCombatBehaviorMacroElement": { "Compute": "AdditionalCombatBehaviorMacroElement" }
+              } } ]
+            },
+            {
+              "Sensor": { "Type": "And", "Sensors": [
+                { "Type": "Flag", "Name": "AirborneMode", "Set": true },
+                { "Type": "MotionController", "MotionController": "Fly" }
+              ] },
+              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Aggressive", "Modify": {
+                "HardLeashDistance": { "Compute": "HardLeashDistance" },
+                "AlertedRange": { "Compute": "AlertedRange" },
+                "ViewSector": { "Compute": "ViewSector" },
+                "HearingRange": { "Compute": "HearingRange" },
+                "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
+                "ViewRange": { "Compute": "ViewRange" },
+                "Attack": { "Compute": "Attack" },
+                "AttackDistance": { "Compute": "AttackDistance" },
+                "AttackPauseRange": { "Compute": "AttackPauseRange" },
+                "CombatAttackPreDelay": { "Compute": "CombatAttackPreDelay" },
+                "CombatAttackPostDelay": { "Compute": "CombatAttackPostDelay" },
+                "CombatBackOffAfterAttack": { "Compute": "CombatBackOffAfterAttack" },
+                "CombatBackOffDistanceRange": { "Compute": "CombatBackOffDistanceRange" },
+                "CombatBackOffDurationRange": { "Compute": "CombatBackOffDurationRange" },
+                "BlockAbility": { "Compute": "BlockAbility" },
+                "BlockProbability": { "Compute": "BlockProbability" },
+                "CombatStrafingDurationRange": { "Compute": "CombatStrafingDurationRange" },
+                "CombatStrafingFrequencyRange": { "Compute": "CombatStrafingFrequencyRange" },
+                "CombatBehaviorDistance": { "Compute": "CombatBehaviorDistance" },
+                "CombatMovingRelativeSpeed": { "Compute": "CombatMovingRelativeSpeed" },
+                "CombatStrafeWeight": { "Compute": "CombatStrafeWeight" },
+                "CombatDirectWeight": { "Compute": "CombatDirectWeight" },
+                "CombatAlwaysMovingWeight": { "Compute": "CombatAlwaysMovingWeight" },
+                "CombatRelativeTurnSpeed": { "Compute": "CombatRelativeTurnSpeed" },
+                "ChaseRelativeSpeed": { "Compute": "ChaseRelativeSpeed" },
+                "AdditionalCombatBehaviorMacroElement": { "Compute": "AdditionalCombatBehaviorMacroElement" }
+              } } ]
+            }
+          ]
+        },
+        {
           "Sensor": {
             "Type": "State",
             "State": "Follow"
