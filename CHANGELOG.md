@@ -7,7 +7,7 @@ All notable player-facing changes to HyDragon are documented here.
 ### Added
 
 - Added a complete dragon content roster: Hydras, including the Toxic Hydra variant; Nordic Drakes; three Rock Drake tiers; and Miniwyverns.
-- Added dragon world spawns and encounters, including volcanic-cave Rock Drakes, forest Nordic Drakes, swamp Toxic Hydras, and lunar Hydra spawns.
+- Added dragon world spawns and encounters, including volcanic-cave Rock Drakes, forest Nordic Drakes, volcanic Dark Green Moss Toxic Hydras, and lunar Hydra spawns.
 - Added the Draconic Stone capture loop for eligible full dragons, with capture effects, energy tethers, homing motes, and Dragon Horn roster integration.
 - Added the Dragon Horn as the shared companion interface for summoning, dismissing, commanding, and reviving captured dragons and Soul Bond Miniwyverns.
 - Added the once-per-player Wyvern Egg Soul Bond: it creates a persistent Miniwyvern companion that can be summoned and managed through the Dragon Horn.

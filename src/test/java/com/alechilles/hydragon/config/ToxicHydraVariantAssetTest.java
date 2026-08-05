@@ -594,17 +594,22 @@ class ToxicHydraVariantAssetTest {
     }
 
     @Test
-    void toxicHydraHasOneAllDayNewMoonSwampSpawnRegistration() throws Exception {
-        JsonObject spawn = json("Server/NPC/Spawn/World/Zone1/Spawns_Zone1_Swamps_HyDragon_Predator.json");
-        assertEquals(List.of("Env_Zone1_Swamps"), strings(spawn.getAsJsonArray("Environments")));
+    void toxicHydraHasOneAllDayNewMoonVolcanoSpawnOnDarkGreenMoss() throws Exception {
+        JsonObject spawn = json("Server/NPC/Spawn/World/Zone4/Spawns_Zone4_Volcanoes_HyDragon_Predator.json");
+        assertEquals(List.of("Env_Zone4_Volcanoes"), strings(spawn.getAsJsonArray("Environments")));
         assertFalse(spawn.has("DayTimeRange"));
         JsonObject npc = spawn.getAsJsonArray("NPCs").get(0).getAsJsonObject();
         assertEquals(1, spawn.getAsJsonArray("NPCs").size());
         assertEquals(0.75, npc.get("Weight").getAsDouble());
-        assertEquals("Mud", npc.get("SpawnBlockSet").getAsString());
+        assertEquals("HyDragon_DarkGreenMoss", npc.get("SpawnBlockSet").getAsString());
         assertEquals("Hydra_Toxic", npc.get("Id").getAsString());
         assertEquals(List.of(1.0, 1.0, 1.0, 1.0, 2.0),
                 doubles(spawn.getAsJsonArray("MoonPhaseWeightModifiers")));
+
+        JsonObject blockSet = json("Server/Item/Block/Sets/HyDragon_DarkGreenMoss.json");
+        assertEquals(List.of("Plant_Moss_Block_Green_Dark"),
+                strings(blockSet.getAsJsonArray("IncludeBlockTypes")));
+        assertEquals(1, blockSet.entrySet().size());
     }
 
     @Test
@@ -614,7 +619,7 @@ class ToxicHydraVariantAssetTest {
         assertEquals(Map.of("Hydra", "Tamed_Hydra", "Hydra_Toxic", "Tamed_Hydra_Toxic"),
                 stringMap(species.getAsJsonObject("TamedRoleIdByWildRole")));
         assertEquals(List.of("Spawns_Zone3_Glacial_HyDragon_Predator",
-                        "Spawns_Zone1_Swamps_HyDragon_Predator"),
+                        "Spawns_Zone4_Volcanoes_HyDragon_Predator"),
                 strings(species.getAsJsonObject("Spawn").getAsJsonArray("OrdinarySpawnAssetIds")));
         assertEquals(List.of("Hydra", "Hydra_Toxic"),
                 strings(species.getAsJsonObject("Presentation").getAsJsonArray("ModelIds")));

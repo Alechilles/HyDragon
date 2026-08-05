@@ -1,9 +1,9 @@
 {
-  "Environments": [ "Env_Zone1_Swamps" ],
+  "Environments": [ "Env_Zone4_Volcanoes" ],
   "NPCs": [
     {
       "Weight": 0.75,
-      "SpawnBlockSet": "Mud",
+      "SpawnBlockSet": "HyDragon_DarkGreenMoss",
       "Id": "Hydra_Toxic"
     }
   ],

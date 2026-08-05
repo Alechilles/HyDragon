@@ -183,7 +183,7 @@ Use asset spawning wherever possible:
 
 | Species | Initial ordinary spawn target | Asset mechanism |
 | --- | --- | --- |
-| Hydra | Zone 3 glacial and Zone 1 swamps | Dedicated all-day `WorldNPCSpawn` assets; Ice Hydra is 2x weight on full moon, Toxic Hydra on new moon |
+| Hydra | Zone 3 glacial and Zone 4 volcanoes | Dedicated all-day `WorldNPCSpawn` assets; Ice Hydra is 2x weight on full moon, Toxic Hydra is restricted to Dark Green Moss and is 2x weight on new moon |
 | Rock Drake T1 | Zone 1 cave forests | Preserve current patch/weighted spawn |
 | Rock Drake T2 | Zone 2 volcanic caves | Preserve current patch/weighted spawn |
 | Rock Drake T3 | Zone 2 volcanic and Zone 3 glacial caves | Preserve current patches/weights |
