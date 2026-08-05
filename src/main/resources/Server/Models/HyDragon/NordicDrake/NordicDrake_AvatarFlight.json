@@ -20,7 +20,7 @@
       }
     }
   },
-  "EyeHeight": 3.0,
+  "EyeHeight": 3,
   "CrouchOffset": -0.1,
   "HitBox": {
     "Max": {
@@ -40,9 +40,7 @@
         "Max": 45,
         "Min": -15
       },
-      "TargetNodes": [
-        "Head"
-      ]
+      "TargetNodes": [ "Head" ]
     },
     "PositionOffset": {
       "X": 1,
@@ -54,9 +52,7 @@
         "Max": 30,
         "Min": -30
       },
-      "TargetNodes": [
-        "Head"
-      ]
+      "TargetNodes": [ "Head" ]
     }
   },
   "MinScale": 1,
@@ -108,9 +104,6 @@
         {
           "Animation": "NPC/HyDragon/NordicDrake/Animations/AvatarFlight/Run.blockyanim",
           "SoundEventId": "SFX_Rex_Walk",
-          "FootstepIntervals": [
-            3
-          ],
           "Looping": true,
           "Speed": 1
         }
