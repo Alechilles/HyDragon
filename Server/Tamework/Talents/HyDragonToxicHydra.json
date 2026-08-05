@@ -1,0 +1,279 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "AllocationRevision": 1,
+  "RoleIds": [
+    "Tamed_Hydra_Toxic"
+  ],
+  "Talents": [
+    {
+      "Id": "ToxicHydra_VirulentLift",
+      "DisplayName": "hydragon.talents.toxic_hydra.virulent_lift.name",
+      "Description": "hydragon.talents.toxic_hydra.virulent_lift.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.toxic_hydra.branch.plaguewing",
+      "PointCost": 1,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "AvatarFlightVigourCapacityMultiplier", "Multiplier": 1.15}]
+    },
+    {
+      "Id": "ToxicHydra_CausticCurrent",
+      "DisplayName": "hydragon.talents.toxic_hydra.caustic_current.name",
+      "Description": "hydragon.talents.toxic_hydra.caustic_current.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.toxic_hydra.branch.plaguewing",
+      "PointCost": 2,
+      "MinLevel": 6,
+      "RequiresTalentIds": ["ToxicHydra_VirulentLift"],
+      "Effects": [{"EffectKey": "AvatarFlightVigourRechargeRateMultiplier", "Multiplier": 1.15}]
+    },
+    {
+      "Id": "ToxicHydra_Venomwake",
+      "DisplayName": "hydragon.talents.toxic_hydra.venomwake.name",
+      "Description": "hydragon.talents.toxic_hydra.venomwake.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.toxic_hydra.branch.plaguewing",
+      "PointCost": 2,
+      "MinLevel": 6,
+      "RequiresTalentIds": ["ToxicHydra_VirulentLift"],
+      "Effects": [{"EffectKey": "AvatarFlightForwardBoostCostMultiplier", "Multiplier": 0.88}]
+    },
+    {
+      "Id": "ToxicHydra_MiasmaMantle",
+      "DisplayName": "hydragon.talents.toxic_hydra.miasma_mantle.name",
+      "Description": "hydragon.talents.toxic_hydra.miasma_mantle.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.toxic_hydra.branch.plaguewing",
+      "PointCost": 3,
+      "MinLevel": 14,
+      "RequiresTalentIds": ["ToxicHydra_CausticCurrent"],
+      "Effects": [{"EffectKey": "AvatarFlightGlideSinkMultiplier", "Multiplier": 0.86}]
+    },
+    {
+      "Id": "ToxicHydra_BlightSurge",
+      "DisplayName": "hydragon.talents.toxic_hydra.blight_surge.name",
+      "Description": "hydragon.talents.toxic_hydra.blight_surge.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.toxic_hydra.branch.plaguewing",
+      "PointCost": 3,
+      "MinLevel": 14,
+      "RequiresTalentIds": ["ToxicHydra_Venomwake"],
+      "Effects": [{"EffectKey": "AvatarFlightForwardBoostImpulseMultiplier", "Multiplier": 1.15}]
+    },
+    {
+      "Id": "ToxicHydra_PlagueSovereign",
+      "DisplayName": "hydragon.talents.toxic_hydra.plague_sovereign.name",
+      "Description": "hydragon.talents.toxic_hydra.plague_sovereign.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.toxic_hydra.branch.plaguewing",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["ToxicHydra_MiasmaMantle", "ToxicHydra_BlightSurge"],
+      "Effects": [
+        {"EffectKey": "AvatarFlightVigourCapacityMultiplier", "Multiplier": 1.10},
+        {"EffectKey": "AvatarFlightClimbLiftMultiplier", "Multiplier": 1.12}
+      ]
+    },
+    {
+      "Id": "ToxicHydra_VenomDiscipline",
+      "DisplayName": "hydragon.talents.toxic_hydra.venom_discipline.name",
+      "Description": "hydragon.talents.toxic_hydra.venom_discipline.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.toxic_hydra.branch.venomous_onslaught",
+      "PointCost": 2,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.02}]
+    },
+    {
+      "Id": "ToxicHydra_CausticHeart",
+      "DisplayName": "hydragon.talents.toxic_hydra.caustic_heart.name",
+      "Description": "hydragon.talents.toxic_hydra.caustic_heart.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.toxic_hydra.branch.venomous_onslaught",
+      "PointCost": 2,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["ToxicHydra_VenomDiscipline"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}]
+    },
+    {
+      "Id": "ToxicHydra_ToxicMomentum",
+      "DisplayName": "hydragon.talents.toxic_hydra.toxic_momentum.name",
+      "Description": "hydragon.talents.toxic_hydra.toxic_momentum.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.toxic_hydra.branch.venomous_onslaught",
+      "PointCost": 3,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["ToxicHydra_VenomDiscipline"],
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.035}]
+    },
+    {
+      "Id": "ToxicHydra_RuinousMiasma",
+      "DisplayName": "hydragon.talents.toxic_hydra.ruinous_miasma.name",
+      "Description": "hydragon.talents.toxic_hydra.ruinous_miasma.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.toxic_hydra.branch.venomous_onslaught",
+      "PointCost": 4,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["ToxicHydra_ToxicMomentum"],
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.045}]
+    },
+    {
+      "Id": "ToxicHydra_BarbedTalons",
+      "DisplayName": "hydragon.talents.toxic_hydra.barbed_talons.name",
+      "Description": "hydragon.talents.toxic_hydra.barbed_talons.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.toxic_hydra.branch.venomous_onslaught",
+      "PointCost": 3,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["ToxicHydra_CausticHeart"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05}]
+    },
+    {
+      "Id": "ToxicHydra_ThreefoldBlight",
+      "DisplayName": "hydragon.talents.toxic_hydra.threefold_blight.name",
+      "Description": "hydragon.talents.toxic_hydra.threefold_blight.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.toxic_hydra.branch.venomous_onslaught",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["ToxicHydra_RuinousMiasma", "ToxicHydra_BarbedTalons"],
+      "Effects": [
+        {"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04},
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}
+      ]
+    },
+    {
+      "Id": "ToxicHydra_BogscaleHide",
+      "DisplayName": "hydragon.talents.toxic_hydra.bogscale_hide.name",
+      "Description": "hydragon.talents.toxic_hydra.bogscale_hide.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.toxic_hydra.branch.blightguard",
+      "PointCost": 1,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
+    },
+    {
+      "Id": "ToxicHydra_AcidHardenedScales",
+      "DisplayName": "hydragon.talents.toxic_hydra.acid_hardened_scales.name",
+      "Description": "hydragon.talents.toxic_hydra.acid_hardened_scales.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.toxic_hydra.branch.blightguard",
+      "PointCost": 2,
+      "MinLevel": 7,
+      "RequiresTalentIds": ["ToxicHydra_BogscaleHide"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}]
+    },
+    {
+      "Id": "ToxicHydra_PatientStalker",
+      "DisplayName": "hydragon.talents.toxic_hydra.patient_stalker.name",
+      "Description": "hydragon.talents.toxic_hydra.patient_stalker.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.toxic_hydra.branch.blightguard",
+      "PointCost": 2,
+      "MinLevel": 7,
+      "RequiresTalentIds": ["ToxicHydra_BogscaleHide"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
+    },
+    {
+      "Id": "ToxicHydra_DeathlessBrood",
+      "DisplayName": "hydragon.talents.toxic_hydra.deathless_brood.name",
+      "Description": "hydragon.talents.toxic_hydra.deathless_brood.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.toxic_hydra.branch.blightguard",
+      "PointCost": 3,
+      "MinLevel": 15,
+      "RequiresTalentIds": ["ToxicHydra_PatientStalker"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.06}]
+    },
+    {
+      "Id": "ToxicHydra_Blightscar",
+      "DisplayName": "hydragon.talents.toxic_hydra.blightscar.name",
+      "Description": "hydragon.talents.toxic_hydra.blightscar.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.toxic_hydra.branch.blightguard",
+      "PointCost": 3,
+      "MinLevel": 15,
+      "RequiresTalentIds": ["ToxicHydra_AcidHardenedScales"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0638297872340425}]
+    },
+    {
+      "Id": "ToxicHydra_PestilentBulwark",
+      "DisplayName": "hydragon.talents.toxic_hydra.pestilent_bulwark.name",
+      "Description": "hydragon.talents.toxic_hydra.pestilent_bulwark.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.toxic_hydra.branch.blightguard",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["ToxicHydra_DeathlessBrood", "ToxicHydra_Blightscar"],
+      "Effects": [
+        {"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05},
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}
+      ]
+    },
+    {
+      "Id": "ToxicHydra_BlightboundPact",
+      "DisplayName": "hydragon.talents.toxic_hydra.blightbound_pact.name",
+      "Description": "hydragon.talents.toxic_hydra.blightbound_pact.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.toxic_hydra.branch.broodcallers_pact",
+      "PointCost": 1,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.25}]
+    },
+    {
+      "Id": "ToxicHydra_SwiftRecall",
+      "DisplayName": "hydragon.talents.toxic_hydra.swift_recall.name",
+      "Description": "hydragon.talents.toxic_hydra.swift_recall.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.toxic_hydra.branch.broodcallers_pact",
+      "PointCost": 2,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["ToxicHydra_BlightboundPact"],
+      "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.8}]
+    },
+    {
+      "Id": "ToxicHydra_LingeringPresence",
+      "DisplayName": "hydragon.talents.toxic_hydra.lingering_presence.name",
+      "Description": "hydragon.talents.toxic_hydra.lingering_presence.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.toxic_hydra.branch.broodcallers_pact",
+      "PointCost": 3,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["ToxicHydra_SwiftRecall"],
+      "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.6}]
+    },
+    {
+      "Id": "ToxicHydra_BroodmastersCall",
+      "DisplayName": "hydragon.talents.toxic_hydra.broodmasters_call.name",
+      "Description": "hydragon.talents.toxic_hydra.broodmasters_call.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.toxic_hydra.branch.broodcallers_pact",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["ToxicHydra_LingeringPresence"],
+      "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.625}]
+    }
+  ]
+}

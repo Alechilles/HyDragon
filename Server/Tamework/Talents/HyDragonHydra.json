@@ -1,47 +1,205 @@
 {
   "Enabled": true,
   "Priority": 100,
-  "RoleIds": ["Tamed_Hydra", "Tamed_Hydra_Toxic"],
+  "AllocationRevision": 1,
+  "RoleIds": [
+    "Tamed_Hydra"
+  ],
   "Talents": [
     {
-      "Id": "Hydra_RazorFangs", "DisplayName": "hydragon.talents.hydra.razor_fangs.name", "Description": "hydragon.talents.hydra.razor_fangs.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 1, "Branch": "hydragon.talents.hydra.branch.battle_instinct", "PointCost": 1, "MinLevel": 1,
-      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.025 }]
+      "Id": "IceHydra_FrostDiscipline",
+      "DisplayName": "hydragon.talents.ice_hydra.frost_discipline.name",
+      "Description": "hydragon.talents.ice_hydra.frost_discipline.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.ice_hydra.branch.winters_wrath",
+      "PointCost": 2,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.02}]
     },
     {
-      "Id": "Hydra_RelentlessAssault", "DisplayName": "hydragon.talents.hydra.relentless_assault.name", "Description": "hydragon.talents.hydra.relentless_assault.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 2, "Branch": "hydragon.talents.hydra.branch.battle_instinct", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["Hydra_RazorFangs"],
-      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04 }]
+      "Id": "IceHydra_FrozenCore",
+      "DisplayName": "hydragon.talents.ice_hydra.frozen_core.name",
+      "Description": "hydragon.talents.ice_hydra.frozen_core.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.ice_hydra.branch.winters_wrath",
+      "PointCost": 2,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["IceHydra_FrostDiscipline"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}]
     },
     {
-      "Id": "Hydra_ThickScales", "DisplayName": "hydragon.talents.hydra.thick_scales.name", "Description": "hydragon.talents.hydra.thick_scales.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png", "Tier": 1, "Branch": "hydragon.talents.hydra.branch.scaleguard", "PointCost": 1, "MinLevel": 1,
-      "Effects": [{ "EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04 }]
+      "Id": "IceHydra_RimeboundMomentum",
+      "DisplayName": "hydragon.talents.ice_hydra.rimebound_momentum.name",
+      "Description": "hydragon.talents.ice_hydra.rimebound_momentum.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.ice_hydra.branch.winters_wrath",
+      "PointCost": 3,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["IceHydra_FrostDiscipline"],
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.035}]
     },
     {
-      "Id": "Hydra_GuardiansHide", "DisplayName": "hydragon.talents.hydra.guardians_hide.name", "Description": "hydragon.talents.hydra.guardians_hide.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png", "Tier": 2, "Branch": "hydragon.talents.hydra.branch.scaleguard", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["Hydra_ThickScales"],
-      "Effects": [{ "EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667 }]
+      "Id": "IceHydra_ShatteringBreath",
+      "DisplayName": "hydragon.talents.ice_hydra.shattering_breath.name",
+      "Description": "hydragon.talents.ice_hydra.shattering_breath.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.ice_hydra.branch.winters_wrath",
+      "PointCost": 4,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["IceHydra_RimeboundMomentum"],
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.045}]
     },
     {
-      "Id": "Hydra_EnduringHunt", "DisplayName": "hydragon.talents.hydra.enduring_hunt.name", "Description": "hydragon.talents.hydra.enduring_hunt.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png", "Tier": 1, "Branch": "hydragon.talents.hydra.branch.survivalist", "PointCost": 1, "MinLevel": 1,
-      "Effects": [{ "EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04 }]
+      "Id": "IceHydra_IcecladTalons",
+      "DisplayName": "hydragon.talents.ice_hydra.iceclad_talons.name",
+      "Description": "hydragon.talents.ice_hydra.iceclad_talons.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.ice_hydra.branch.winters_wrath",
+      "PointCost": 3,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["IceHydra_FrozenCore"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05}]
     },
     {
-      "Id": "Hydra_PrimalFocus", "DisplayName": "hydragon.talents.hydra.primal_focus.name", "Description": "hydragon.talents.hydra.primal_focus.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png", "Tier": 2, "Branch": "hydragon.talents.hydra.branch.survivalist", "PointCost": 2, "MinLevel": 12, "RequiresTalentIds": ["Hydra_EnduringHunt"],
-      "Effects": [{ "EffectKey": "DamageDealtMultiplier", "Multiplier": 1.03 }]
+      "Id": "IceHydra_ThreefoldWinter",
+      "DisplayName": "hydragon.talents.ice_hydra.threefold_winter.name",
+      "Description": "hydragon.talents.ice_hydra.threefold_winter.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.ice_hydra.branch.winters_wrath",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["IceHydra_ShatteringBreath", "IceHydra_IcecladTalons"],
+      "Effects": [
+        {"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04},
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}
+      ]
     },
     {
-      "Id": "Hydra_DragonboundPact", "DisplayName": "hydragon.talents.hydra.dragonbound_pact.name", "Description": "hydragon.talents.hydra.dragonbound_pact.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png", "Tier": 1, "Branch": "hydragon.talents.hydra.branch.summoners_pact", "PointCost": 1, "MinLevel": 1,
-      "Effects": [{ "EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.25 }]
+      "Id": "IceHydra_GlacialHide",
+      "DisplayName": "hydragon.talents.ice_hydra.glacial_hide.name",
+      "Description": "hydragon.talents.ice_hydra.glacial_hide.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.ice_hydra.branch.glacierguard",
+      "PointCost": 1,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
     },
     {
-      "Id": "Hydra_SwiftRecall", "DisplayName": "hydragon.talents.hydra.swift_recall.name", "Description": "hydragon.talents.hydra.swift_recall.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png", "Tier": 2, "Branch": "hydragon.talents.hydra.branch.summoners_pact", "PointCost": 2, "MinLevel": 8, "RequiresTalentIds": ["Hydra_DragonboundPact"],
-      "Effects": [{ "EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.8 }]
+      "Id": "IceHydra_PermafrostScales",
+      "DisplayName": "hydragon.talents.ice_hydra.permafrost_scales.name",
+      "Description": "hydragon.talents.ice_hydra.permafrost_scales.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.ice_hydra.branch.glacierguard",
+      "PointCost": 2,
+      "MinLevel": 7,
+      "RequiresTalentIds": ["IceHydra_GlacialHide"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}]
     },
     {
-      "Id": "Hydra_EternalWings", "DisplayName": "hydragon.talents.hydra.eternal_wings.name", "Description": "hydragon.talents.hydra.eternal_wings.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png", "Tier": 3, "Branch": "hydragon.talents.hydra.branch.summoners_pact", "PointCost": 3, "MinLevel": 16, "RequiresTalentIds": ["Hydra_SwiftRecall"],
-      "Effects": [{ "EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.6 }]
+      "Id": "IceHydra_LongHibernation",
+      "DisplayName": "hydragon.talents.ice_hydra.long_hibernation.name",
+      "Description": "hydragon.talents.ice_hydra.long_hibernation.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.ice_hydra.branch.glacierguard",
+      "PointCost": 2,
+      "MinLevel": 7,
+      "RequiresTalentIds": ["IceHydra_GlacialHide"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
     },
     {
-      "Id": "Hydra_HornmastersCall", "DisplayName": "hydragon.talents.hydra.hornmasters_call.name", "Description": "hydragon.talents.hydra.hornmasters_call.description", "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png", "Tier": 4, "Branch": "hydragon.talents.hydra.branch.summoners_pact", "PointCost": 4, "MinLevel": 24, "RequiresTalentIds": ["Hydra_EternalWings"],
-      "Effects": [{ "EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.625 }]
+      "Id": "IceHydra_UnyieldingWinter",
+      "DisplayName": "hydragon.talents.ice_hydra.unyielding_winter.name",
+      "Description": "hydragon.talents.ice_hydra.unyielding_winter.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.ice_hydra.branch.glacierguard",
+      "PointCost": 3,
+      "MinLevel": 15,
+      "RequiresTalentIds": ["IceHydra_LongHibernation"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.06}]
+    },
+    {
+      "Id": "IceHydra_Frostscar",
+      "DisplayName": "hydragon.talents.ice_hydra.frostscar.name",
+      "Description": "hydragon.talents.ice_hydra.frostscar.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.ice_hydra.branch.glacierguard",
+      "PointCost": 3,
+      "MinLevel": 15,
+      "RequiresTalentIds": ["IceHydra_PermafrostScales"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0638297872340425}]
+    },
+    {
+      "Id": "IceHydra_FrozenBulwark",
+      "DisplayName": "hydragon.talents.ice_hydra.frozen_bulwark.name",
+      "Description": "hydragon.talents.ice_hydra.frozen_bulwark.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.ice_hydra.branch.glacierguard",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["IceHydra_UnyieldingWinter", "IceHydra_Frostscar"],
+      "Effects": [
+        {"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05},
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}
+      ]
+    },
+    {
+      "Id": "IceHydra_FrostboundPact",
+      "DisplayName": "hydragon.talents.ice_hydra.frostbound_pact.name",
+      "Description": "hydragon.talents.ice_hydra.frostbound_pact.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.ice_hydra.branch.broodcallers_pact",
+      "PointCost": 1,
+      "MinLevel": 1,
+      "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.25}]
+    },
+    {
+      "Id": "IceHydra_SwiftRecall",
+      "DisplayName": "hydragon.talents.ice_hydra.swift_recall.name",
+      "Description": "hydragon.talents.ice_hydra.swift_recall.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.ice_hydra.branch.broodcallers_pact",
+      "PointCost": 2,
+      "MinLevel": 8,
+      "RequiresTalentIds": ["IceHydra_FrostboundPact"],
+      "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.8}]
+    },
+    {
+      "Id": "IceHydra_EndlessWinter",
+      "DisplayName": "hydragon.talents.ice_hydra.endless_winter.name",
+      "Description": "hydragon.talents.ice_hydra.endless_winter.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.ice_hydra.branch.broodcallers_pact",
+      "PointCost": 3,
+      "MinLevel": 16,
+      "RequiresTalentIds": ["IceHydra_SwiftRecall"],
+      "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.6}]
+    },
+    {
+      "Id": "IceHydra_BroodmastersCall",
+      "DisplayName": "hydragon.talents.ice_hydra.broodmasters_call.name",
+      "Description": "hydragon.talents.ice_hydra.broodmasters_call.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.ice_hydra.branch.broodcallers_pact",
+      "PointCost": 4,
+      "MinLevel": 24,
+      "RequiresTalentIds": ["IceHydra_EndlessWinter"],
+      "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.625}]
     }
   ]
 }
