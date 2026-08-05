@@ -203,7 +203,21 @@ class ValidatorContractTest(unittest.TestCase):
         self.assertEqual(
             {
                 "Groups": {
-                    "Hostile": ["Aggressive"],
+                    "Hostile": [
+                        "Aggressive",
+                        "Predators",
+                        "PredatorsBig",
+                        "Undead",
+                        "Void",
+                        "Trork",
+                        "Goblin",
+                        "Outlander",
+                        "Scarak",
+                        "Vermin",
+                        "Spiders",
+                        "Scorpions",
+                        "Snakes",
+                    ],
                     "Ignore": ["Prey", "PreyBig", "Self"],
                 }
             },
