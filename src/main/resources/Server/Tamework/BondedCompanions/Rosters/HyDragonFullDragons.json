@@ -15,6 +15,7 @@
   "SessionDurationSeconds": 300,
   "SummonCooldownSeconds": 300,
   "SummonAuraEffectId": "HyDragon_DragonStone_SummonAura",
+  "ExpiryWarningEffectId": "HyDragon_Dragon_Desummon",
   "RevivePriceByRole": [
     { "RoleId": "Tamed_NordicDrake", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Ice", "Quantity": 2 } ] },
     { "RoleId": "Tamed_Hydra", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Ice", "Quantity": 2 } ] },

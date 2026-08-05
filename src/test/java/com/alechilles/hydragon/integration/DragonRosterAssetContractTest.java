@@ -82,6 +82,19 @@ class DragonRosterAssetContractTest {
     }
 
     @Test
+    void fullDragonThirtySecondExpiryWarningUsesTheDesummonModelVfx()
+            throws Exception {
+        String roster = read("Server/Tamework/BondedCompanions/Rosters/HyDragonFullDragons.json");
+        String effect = read("Server/Entity/Effects/Status/HyDragon_Dragon_Desummon.json");
+        String modelVfx = read("Server/Entity/ModelVFX/HyDragon_Desummon.json");
+
+        assertTrue(roster.contains("\"ExpiryWarningEffectId\": \"HyDragon_Dragon_Desummon\""));
+        assertTrue(effect.contains("\"ModelVFXId\": \"HyDragon_Desummon\""));
+        assertTrue(effect.contains("\"Duration\": 30"));
+        assertTrue(modelVfx.contains("\"AnimationDuration\": 30"));
+    }
+
+    @Test
     void obsoleteGenericPopulationGroupsAndNordicEncounterAreAbsent() throws Exception {
         assertFalse(Files.exists(ROOT.resolve(
                 "Server/Tamework/PopulationGroups/HyDragonFullDragons.json")));

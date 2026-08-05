@@ -1,0 +1,10 @@
+{
+  "ApplicationEffects": {
+    "ModelVFXId": "HyDragon_Desummon"
+  },
+  "OverlapBehavior": "Overwrite",
+  "RemovalBehavior": "Duration",
+  "Infinite": false,
+  "Debuff": false,
+  "Duration": 30
+}

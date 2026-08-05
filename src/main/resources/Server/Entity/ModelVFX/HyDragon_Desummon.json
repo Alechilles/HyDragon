@@ -1,0 +1,19 @@
+{
+  "SwitchTo": "Disappear",
+  "EffectDirection": "ToCenter",
+  "AnimationDuration": 30,
+  "AnimationRange": {
+    "Y": 1.0
+  },
+  "UseBloomOnHighlight": true,
+  "NoiseScale": {
+    "X": 29.0,
+    "Y": 25.0
+  },
+  "UseProgessiveHighlight": false,
+  "HighlightColor": "#55D9FF",
+  "HighlightThickness": 3,
+  "CurveType": "Linear",
+  "PostColorOpacity": 1,
+  "PostColor": "#12b4ca"
+}
