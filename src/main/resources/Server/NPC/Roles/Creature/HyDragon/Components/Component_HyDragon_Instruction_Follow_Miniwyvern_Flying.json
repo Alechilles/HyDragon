@@ -16,7 +16,7 @@
           "FollowOrbitRadiusRange": [6, 12],
           "FollowOrbitRetargetTimeRange": [3, 6],
           "FollowOrbitStopDistance": 3,
-          "FollowOrbitRelativeSpeed": 0.32,
+          "FollowOrbitRelativeSpeed": 0.5,
           "FollowHoverRadius": 1.75,
           "FollowHoverRelativeSpeed": 0.12
         }

@@ -452,7 +452,9 @@ class ValidatorContractTest(unittest.TestCase):
             "Server/NPC/Roles/Creature/HyDragon/Components/"
             "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying.json"
         )
-        self.assertIn('"FollowOrbitRadiusRange": [6, 12]', json.dumps(mini_flying))
+        serialized_mini_flying = json.dumps(mini_flying)
+        self.assertIn('"FollowOrbitRadiusRange": [6, 12]', serialized_mini_flying)
+        self.assertIn('"FollowOrbitRelativeSpeed": 0.5', serialized_mini_flying)
 
         mini_template = asset(
             "Server/NPC/Roles/Creature/HyDragon/Templates/"
