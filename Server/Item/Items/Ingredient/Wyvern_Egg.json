@@ -15,7 +15,11 @@
       ]
     },
     "Secondary": {
-      "Type": "HyDragonSoulBond"
+      "Interactions": [
+        {
+          "Type": "HyDragonSoulBond"
+        }
+      ]
     }
   },
   "Recipe": {

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -102,7 +104,14 @@ class DraconicCaptureAssetContractTest {
         String horn = read("Server/Item/Items/Tool/HyDragon_Dragon_Horn.json");
         String command = read("Server/Tamework/Items/Commands/HyDragonDragonHorn.json");
 
-        assertTrue(egg.contains("\"Type\": \"HyDragonSoulBond\""));
+        JsonObject eggInteractions = JsonParser.parseString(egg).getAsJsonObject()
+                .getAsJsonObject("Interactions");
+        for (String binding : Set.of("Primary", "Secondary")) {
+            JsonObject rootInteraction = eggInteractions.getAsJsonObject(binding);
+            assertFalse(rootInteraction.has("Type"), binding);
+            assertEquals("HyDragonSoulBond", rootInteraction.getAsJsonArray("Interactions")
+                    .get(0).getAsJsonObject().get("Type").getAsString(), binding);
+        }
         assertFalse(egg.contains("\"BlockType\""));
         assertTrue(horn.contains("\"ItemId\": \"HyDragon_Dragon_Horn\""));
         assertTrue(command.contains("\"RosterStorage\": \"BondedCompanions\""));
