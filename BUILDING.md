@@ -6,12 +6,17 @@ links both projects' asset files into one development server workspace.
 
 ## Development hot reload
 
-From the `HyDragon` directory:
+From the `HyDragon` directory, explicitly select the parent workspace as the
+Gradle project root:
 
 ```powershell
-..\gradlew.bat stageAllModAssets
-..\gradlew.bat runAllMods
+.\gradlew.bat -p .. stageAllModAssets
+.\gradlew.bat -p .. runAllMods
 ```
+
+Running `..\gradlew.bat` without `-p ..` still uses HyDragon's standalone
+`settings.gradle`, because Gradle selects its project root from the current
+directory rather than the wrapper's location.
 
 Leave `runAllMods` running while you edit either project. The workspace stages
 the two mods together, so their linked asset files can hot-reload in the same
@@ -33,5 +38,5 @@ the Tamework JAR built from the sibling project.
 Pass the matching game version and patchline to the shared workspace command:
 
 ```powershell
-..\gradlew.bat -Phytale_patchline=pre-release -Phytale_version=<game-version> runAllMods
+.\gradlew.bat -p .. -Phytale_patchline=pre-release -Phytale_version=<game-version> runAllMods
 ```
