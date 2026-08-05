@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import json
 import unittest
 from pathlib import Path
 
@@ -288,6 +289,139 @@ class ValidatorContractTest(unittest.TestCase):
 
         self.assertIn(
             "Miniwyvern tamed template must declare Aggressive as a valid state",
+            errors,
+        )
+
+    def test_aggressive_reuses_defend_follow_and_combat_routines(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        def state_behavior(template: object, state: str) -> dict[str, object]:
+            if isinstance(template, dict):
+                sensor = template.get("Sensor")
+                if isinstance(sensor, dict) and sensor.get("Type") == "State" \
+                        and sensor.get("State") == state and isinstance(template.get("Instructions"), list):
+                    return template
+                for value in template.values():
+                    found = state_behavior(value, state)
+                    if found:
+                        return found
+            elif isinstance(template, list):
+                for value in template:
+                    found = state_behavior(value, state)
+                    if found:
+                        return found
+            return {}
+
+        def reference_instructions(value: object, reference: str) -> list[dict[str, object]]:
+            found: list[dict[str, object]] = []
+            if isinstance(value, dict):
+                if value.get("Reference") == reference:
+                    found.append(value)
+                for child in value.values():
+                    found.extend(reference_instructions(child, reference))
+            elif isinstance(value, list):
+                for child in value:
+                    found.extend(reference_instructions(child, reference))
+            return found
+
+        full_template_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon_Tamed.json"
+        )
+        full_template = parsed[full_template_path]
+        full_aggressive = state_behavior(full_template, "Aggressive")
+        full_aggressive_refs = reference_instructions(
+            full_aggressive,
+            "Component_Tamework_Instruction_Aggressive",
+        )
+        self.assertEqual(2, len(full_aggressive_refs))
+        self.assertEqual(
+            {
+                "Component_HyDragon_Instruction_Follow_Large",
+                "Component_Tamework_Instruction_Follow_Flying",
+            },
+            {
+                reference["Modify"].get("DefendFollowMacroElement")
+                for reference in full_aggressive_refs
+            },
+        )
+        self.assertEqual(
+            1,
+            len(reference_instructions(
+                full_aggressive,
+                "Component_HyDragon_Instruction_NordicDrake_Tamed_Combat",
+            )),
+        )
+        self.assertEqual(
+            1,
+            len(reference_instructions(
+                full_aggressive,
+                "Component_HyDragon_Instruction_ToxicHydra_Tamed_Combat",
+            )),
+        )
+
+        ground_template_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Tamed.json"
+        )
+        ground_aggressive = state_behavior(parsed[ground_template_path], "Aggressive")
+        ground_refs = reference_instructions(
+            ground_aggressive,
+            "Component_Tamework_Instruction_Aggressive",
+        )
+        self.assertEqual(1, len(ground_refs))
+        self.assertEqual(
+            "Component_HyDragon_Instruction_Follow_Large",
+            ground_refs[0]["Modify"].get("DefendFollowMacroElement"),
+        )
+
+        mini_template_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
+        )
+        mini_aggressive = state_behavior(parsed[mini_template_path], "Aggressive")
+        mini_ground_refs = reference_instructions(
+            mini_aggressive,
+            "Component_Tamework_Instruction_Aggressive",
+        )
+        self.assertEqual(1, len(mini_ground_refs))
+        self.assertEqual(
+            "Component_HyDragon_Instruction_Follow_Miniwyvern_Ground",
+            mini_ground_refs[0]["Modify"].get("DefendFollowMacroElement"),
+        )
+        mini_aerial_refs = reference_instructions(
+            mini_aggressive,
+            "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend",
+        )
+        self.assertEqual(1, len(mini_aerial_refs))
+        self.assertIs(True, mini_aerial_refs[0]["Modify"].get("UseAggressiveTargeting"))
+
+        aerial_component_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Components"
+            / "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json"
+        )
+        aerial_component = parsed[aerial_component_path]
+        self.assertEqual(
+            False,
+            aerial_component["Parameters"]["UseAggressiveTargeting"]["Value"],
+        )
+        serialized_component = json.dumps(aerial_component)
+        self.assertIn("Component_Sensor_Standard_Detection", serialized_component)
+        self.assertIn("UseAggressiveTargeting", serialized_component)
+
+    def test_validator_accepts_aerial_miniwyvern_aggressive_combat_routine(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        errors: list[str] = []
+        VALIDATOR.validate_miniwyvern_role_wiring(parsed, errors)
+
+        self.assertNotIn(
+            "Miniwyvern aggressive state must have grounded and flying paths",
             errors,
         )
 

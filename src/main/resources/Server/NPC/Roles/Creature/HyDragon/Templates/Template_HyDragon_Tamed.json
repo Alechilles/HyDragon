@@ -1380,6 +1380,7 @@
                 "ChaseRelativeSpeed": {
                   "Compute": "ChaseRelativeSpeed"
                 },
+                "DefendFollowMacroElement": "Component_HyDragon_Instruction_Follow_Large",
                 "AdditionalCombatBehaviorMacroElement": {
                   "Compute": "AdditionalCombatBehaviorMacroElement"
                 }

@@ -504,6 +504,7 @@
                 "CombatAlwaysMovingWeight": 8,
                 "CombatRelativeTurnSpeed": 1.5,
                 "ChaseRelativeSpeed": 0.9,
+                "DefendFollowMacroElement": "Component_HyDragon_Instruction_Follow_Miniwyvern_Ground",
                 "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
               } } ]
             },
@@ -512,33 +513,35 @@
                 { "Type": "Flag", "Name": "AirborneMode", "Set": true },
                 { "Type": "MotionController", "MotionController": "Fly" }
               ] },
-              "Instructions": [ { "Reference": "Component_Tamework_Instruction_Aggressive", "Modify": {
+              "Instructions": [ { "Reference": "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend", "Modify": {
                 "HardLeashDistance": { "Compute": "HardLeashDistance" },
                 "AlertedRange": { "Compute": "ViewRange" },
                 "ViewSector": { "Compute": "ViewSector" },
                 "HearingRange": { "Compute": "HearingRange" },
                 "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" },
                 "ViewRange": { "Compute": "ViewRange" },
-                "Attack": { "Compute": "Attack" },
                 "AttackDistance": { "Compute": "AttackDistance" },
-                "AttackPauseRange": { "Compute": "AttackPauseRange" },
-                "CombatAttackPreDelay": { "Compute": "CombatAttackPreDelay" },
-                "CombatAttackPostDelay": { "Compute": "CombatAttackPostDelay" },
-                "CombatBackOffAfterAttack": true,
-                "CombatBackOffDistanceRange": [2.5, 4],
-                "CombatBackOffDurationRange": [2, 3],
-                "BlockAbility": "",
-                "BlockProbability": 50,
-                "CombatStrafingDurationRange": [1, 1],
-                "CombatStrafingFrequencyRange": [2, 2],
-                "CombatBehaviorDistance": 8,
-                "CombatMovingRelativeSpeed": 0.6,
-                "CombatStrafeWeight": 4,
-                "CombatDirectWeight": 8,
-                "CombatAlwaysMovingWeight": 8,
-                "CombatRelativeTurnSpeed": 1.5,
-                "ChaseRelativeSpeed": 0.9,
-                "AdditionalCombatBehaviorMacroElement": "Component_Instruction_Null"
+                "LoiterDistanceRange": [8, 14],
+                "LoiterAltitudeRange": [5, 9],
+                "LoiterRelativeSpeed": 0.28,
+                "LoiterRetargetTimeRange": [3, 6],
+                "LoiterStopDistance": 2.5,
+                "CombatBackOffDistanceRange": [8, 14],
+                "CombatBackOffDurationRange": [2, 4],
+                "DefendFollowMacroElement": "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying",
+                "UseAggressiveTargeting": true,
+                "SwoopAttack": { "Compute": "SwoopAttack" },
+                "SwoopAttackFerocity": { "Compute": "SwoopAttackFerocity" },
+                "SwoopAttackRending": { "Compute": "SwoopAttackRending" },
+                "SwoopAttackMastery": { "Compute": "SwoopAttackMastery" },
+                "SwoopAltitudeRange": { "Compute": "SwoopAltitudeRange" },
+                "SwoopApproachTimeout": { "Compute": "SwoopApproachTimeout" },
+                "TalentProjectileBase": { "Compute": "TalentProjectileBase" },
+                "TalentProjectileIntermediate": { "Compute": "TalentProjectileIntermediate" },
+                "TalentProjectilePattern": { "Compute": "TalentProjectilePattern" },
+                "TalentProjectilePatternEcho": { "Compute": "TalentProjectilePatternEcho" },
+                "TalentProjectileMastery": { "Compute": "TalentProjectileMastery" },
+                "TalentProjectileMasteryEcho": { "Compute": "TalentProjectileMasteryEcho" }
               } } ]
             }
           ]
