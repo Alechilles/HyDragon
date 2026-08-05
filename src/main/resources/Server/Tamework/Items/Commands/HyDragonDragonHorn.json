@@ -124,14 +124,14 @@
       ]
     },
     {
-      "Id": "ToggleAirborneMode",
-      "DisplayName": "hydragon.commands.toggleAirborneMode.name",
+      "Id": "Aggressive",
+      "DisplayName": "hydragon.commands.aggressive.name",
       "Feedback": {
-        "HudMessage": "hydragon.commands.toggleAirborneMode.hud",
+        "HudMessage": "hydragon.commands.aggressive.hud",
         "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_05"
       },
       "Steps": [
-        { "Type": "TriggerHook", "HookId": "HyDragon.Command.ToggleAirborneMode" }
+        { "Type": "SetState", "State": "Aggressive" }
       ]
     }
   ]
