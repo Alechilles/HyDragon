@@ -191,6 +191,92 @@ class ValidatorContractTest(unittest.TestCase):
                         errors,
                     )
 
+    def test_declares_safe_aggressive_attitude_for_tamed_dragons(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        attitude_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Attitude/Roles/HyDragonCompanion.json"
+        )
+        self.assertEqual(
+            {
+                "Groups": {
+                    "Hostile": ["Aggressive"],
+                    "Ignore": ["Prey", "PreyBig", "Self"],
+                }
+            },
+            parsed.get(attitude_path),
+        )
+
+        mini_template_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
+        )
+        mini_template = parsed[mini_template_path]
+        self.assertIsInstance(mini_template, dict)
+        self.assertEqual("HyDragonCompanion", mini_template.get("AttitudeGroup"))
+
+        state_declarations = mini_template["Instructions"][0]["Actions"]
+        self.assertIn(
+            {"Type": "State", "State": "Aggressive"},
+            state_declarations,
+        )
+
+        for template_name in (
+            "Template_HyDragon_Dragon_Tamed.json",
+            "Template_HyDragon_Tamed.json",
+        ):
+            template_path = (
+                VALIDATOR.RESOURCE_ROOT
+                / "Server/NPC/Roles/Creature/HyDragon/Templates"
+                / template_name
+            )
+            template = parsed[template_path]
+            self.assertIsInstance(template, dict)
+            self.assertEqual(
+                "HyDragonCompanion",
+                template["Parameters"]["AttitudeGroup"]["Value"],
+                template_name,
+            )
+
+        for role_path in sorted(
+            (VALIDATOR.RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon").rglob("Tamed_*.json")
+        ):
+            role = parsed[role_path]
+            self.assertIsInstance(role, dict)
+            attitude_group = role.get("Modify", {}).get("AttitudeGroup")
+            if attitude_group is not None:
+                self.assertEqual("HyDragonCompanion", attitude_group, role_path.name)
+
+    def test_rejects_miniwyvern_aggressive_without_state_declaration(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        template_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
+        )
+        template = copy.deepcopy(parsed[template_path])
+        self.assertIsInstance(template, dict)
+        actions = template["Instructions"][0]["Actions"]
+        template["Instructions"][0]["Actions"] = [
+            action
+            for action in actions
+            if action != {"Type": "State", "State": "Aggressive"}
+        ]
+        parsed[template_path] = template
+
+        errors: list[str] = []
+        VALIDATOR.validate_miniwyvern_role_wiring(parsed, errors)
+
+        self.assertIn(
+            "Miniwyvern tamed template must declare Aggressive as a valid state",
+            errors,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

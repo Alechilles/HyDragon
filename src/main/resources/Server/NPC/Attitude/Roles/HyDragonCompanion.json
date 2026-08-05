@@ -1,0 +1,12 @@
+{
+  "Groups": {
+    "Hostile": [
+      "Aggressive"
+    ],
+    "Ignore": [
+      "Prey",
+      "PreyBig",
+      "Self"
+    ]
+  }
+}

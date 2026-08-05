@@ -694,6 +694,16 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
             fail(errors, "Miniwyvern tamed template must default IsMountable to false")
 
     serialized_template = json.dumps(template, sort_keys=True)
+    declared_states = {
+        action.get("State")
+        for instruction in template.get("Instructions", [])
+        if isinstance(instruction, dict) and instruction.get("Enabled") is False
+        for action in instruction.get("Actions", [])
+        if isinstance(action, dict) and action.get("Type") == "State"
+        and isinstance(action.get("State"), str)
+    }
+    if "Aggressive" not in declared_states:
+        fail(errors, "Miniwyvern tamed template must declare Aggressive as a valid state")
     required_states = {"Follow", "Hold", "Idle", "Defend"}
     state_values: set[str] = set()
 

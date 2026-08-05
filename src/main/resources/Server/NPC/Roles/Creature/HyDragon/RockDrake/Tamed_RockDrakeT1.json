@@ -5,7 +5,7 @@
     "Appearance": "RockDrakeT1",
     "Weapons": [],
     "FlockArray": [ "Tamed_RockDrakeT1" ],
-    "AttitudeGroup": "PredatorsBig",
+    "AttitudeGroup": "HyDragonCompanion",
     "DropList": "Empty",
     "WanderRadius": 8,
     "ViewRange": 28,

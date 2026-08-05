@@ -5,7 +5,7 @@
     "Appearance": "Hydra_Toxic",
     "Weapons": [],
     "FlockArray": ["Tamed_Hydra_Toxic"],
-    "AttitudeGroup": "PredatorsBig",
+    "AttitudeGroup": "HyDragonCompanion",
     "WanderRadius": 8,
     "ViewRange": 36,
     "HearingRange": 24,

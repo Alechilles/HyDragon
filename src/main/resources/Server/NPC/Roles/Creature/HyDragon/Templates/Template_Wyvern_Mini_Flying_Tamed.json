@@ -195,7 +195,7 @@
   "KnockbackScale": 0.2,
   "DefaultNPCAttitude": "Ignore",
   "DefaultPlayerAttitude": "Neutral",
-  "AttitudeGroup": "Predators",
+  "AttitudeGroup": "HyDragonCompanion",
   "DropList": {
     "Compute": "DropList"
   },
@@ -250,6 +250,10 @@
         {
           "Type": "State",
           "State": "Defend"
+        },
+        {
+          "Type": "State",
+          "State": "Aggressive"
         }
       ]
     },

@@ -210,7 +210,7 @@
       "Description": "How long to play the daytime flavor animation."
     },
     "AttitudeGroup": {
-      "Value": "PredatorsBig",
+      "Value": "HyDragonCompanion",
       "Description": "This NPC's attitude group."
     },
     "FlockArray": {
