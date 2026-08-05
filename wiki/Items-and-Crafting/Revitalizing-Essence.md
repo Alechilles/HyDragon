@@ -9,7 +9,7 @@ draft: false
 
 Parent: [Items and Crafting](/mod/hydragon/items-and-crafting-index) | [Home](/mod/hydragon/)
 
-Revitalizing Essence restores a companion whose Dragon Command Flute card shows confirmed death. Craft it at the **Draconic Altar** in the restoration category; revival returns the profile to storage, so summon it separately afterward.
+Revitalizing Essence restores a companion whose Dragon Command Flute card shows confirmed death. Craft it at the **Draconic Altar** in the **Essence** category; revival returns the profile to storage, so summon it separately afterward.
 
 ## Recipe
 

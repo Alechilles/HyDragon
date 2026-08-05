@@ -9,7 +9,7 @@ draft: false
 
 Parent: [Items and Crafting](/mod/hydragon/items-and-crafting-index) | [Home](/mod/hydragon/)
 
-The Draconic Altar is the crafting station for capture stones, essence conversions, the Mysterious Egg, and restoration supplies. Build it at a Workbench first, then use its crafting categories for the recipes below.
+The Draconic Altar is the crafting station for capture stones, essence conversions, the Mysterious Egg, and recovery materials. Build it at a Workbench first, then use its three player-facing categories for the recipes below: **Capture**, **Bonding**, and **Essence**.
 
 ## Build the altar
 
@@ -35,9 +35,8 @@ The flute opens your roster for captured full dragons and your Soulbound Miniwyv
 
 ## What the altar supports
 
-- The [Draconic Stones](/mod/hydragon/draconic-stones) category makes capture tools from bars, scales, and plain essence.
-- [Draconic Essences and Scales](/mod/hydragon/draconic-essences-and-scales) lists elemental conversions.
-- The [Mysterious Egg](/mod/hydragon/mysterious-egg) category creates the one-per-player Soul Bond route.
-- [Revitalizing Essence](/mod/hydragon/revitalizing-essence) is the restoration recipe.
+- **Capture** — The [Draconic Stones](/mod/hydragon/draconic-stones) recipes make capture tools from bars, scales, and plain essence.
+- **Bonding** — The Dragon Command Flute and [Mysterious Egg](/mod/hydragon/mysterious-egg) recipes prepare your roster and one-per-player Soul Bond.
+- **Essence** — [Draconic Essences and Scales](/mod/hydragon/draconic-essences-and-scales) lists elemental conversions, and [Revitalizing Essence](/mod/hydragon/revitalizing-essence) makes recovery supplies.
 
 For every quantity in one place, open the [Recipe Reference](/mod/hydragon/recipe-reference).

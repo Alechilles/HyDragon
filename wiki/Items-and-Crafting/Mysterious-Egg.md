@@ -9,7 +9,7 @@ draft: false
 
 Parent: [Items and Crafting](/mod/hydragon/items-and-crafting-index) | [Home](/mod/hydragon/)
 
-The Mysterious Egg is the crafted start of your personal Soul Bond. Make it at the **Draconic Altar** in the bonding category, then hatch it when you are ready to claim the one lifelong Miniwyvern bond available to your player.
+The Mysterious Egg is the crafted start of your personal Soul Bond. Make it at the **Draconic Altar** in the **Bonding** category, then hatch it when you are ready to claim the one lifelong Miniwyvern bond available to your player.
 
 ## Recipe
 

@@ -13,7 +13,7 @@ A Draconic Stone is the capture tool for an eligible full dragon. Craft it at th
 
 ## Stone recipes
 
-Each recipe creates one stone in the **Draconic Altar** capture category.
+Each recipe creates one stone in the **Draconic Altar** **Capture** category.
 
 | Stone | Bar ingredient | Scales | Plain Draconic Essences | Void Draconic Essences |
 |---|---|---:|---:|---:|
