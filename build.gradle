@@ -21,9 +21,10 @@ def execOperations = services.get(ExecOperations)
 def workspaceAssetDirectories = ['Common', 'Server'].collectEntries { String name ->
     [(name): layout.projectDirectory.dir(name).asFile.toPath()]
 }
-def workspaceAssetFiles = ['manifest.json', 'icon-256.png'].collectEntries { String name ->
-    [(name): layout.projectDirectory.file(name).asFile.toPath()]
-}
+def workspaceAssetFiles = [
+        'manifest.json': layout.projectDirectory.file('src/main/resources/manifest.json').asFile.toPath(),
+        'icon-256.png': layout.projectDirectory.file('icon-256.png').asFile.toPath()
+]
 
 java {
     toolchain {
@@ -51,11 +52,17 @@ configurations.named('testImplementation') {
     extendsFrom(configurations.compileOnly)
 }
 
+if (tameworkProject != null) {
+    tasks.named('compileJava') {
+        dependsOn(tameworkProject.tasks.named('classes'))
+    }
+}
+
 hytaleTools {
     hytaleVersion = property('hytale_version')
     patchline = property('hytale_patchline')
     manifestServerVersion = '0.5.x'
-    manifestFile = layout.projectDirectory.file('manifest.json')
+    manifestFile = layout.projectDirectory.file('src/main/resources/manifest.json')
     manifestGroup = 'Alechilles'
     modId = 'HyDragon'
     modDescription = 'HyDragon'
@@ -72,7 +79,7 @@ hytaleTools {
 
 tasks.named('processResources', Copy) {
     from(layout.projectDirectory) {
-        include 'manifest.json', 'icon-256.png'
+        include 'icon-256.png'
     }
     from('Common') {
         into 'Common'
