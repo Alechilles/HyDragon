@@ -59,7 +59,7 @@ wiki/
     FAQ-and-Troubleshooting.md
 ```
 
-This produces 29 Markdown pages: one home page, five section indexes, and 23 focused content pages. Rock Drake tiers share one comparison page because their progression, attacks, drops, and habitats are easiest to understand together. Standard and Toxic Hydras remain separate because their habitats, attacks, and flight behavior differ materially.
+This produces 30 Markdown pages: one home page, five section indexes, and 24 focused content pages. Rock Drake tiers share one comparison page because their progression, attacks, drops, and habitats are easiest to understand together. Standard and Toxic Hydras remain separate because their habitats, attacks, and flight behavior differ materially.
 
 ## Page Responsibilities
 
