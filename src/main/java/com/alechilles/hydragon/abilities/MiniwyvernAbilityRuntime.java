@@ -44,6 +44,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
     private final Map<String, ActiveBinding> active = new ConcurrentHashMap<>();
     private final Map<UUID, Long> generations = new ConcurrentHashMap<>();
     private final Map<UUID, Long> refreshing = new ConcurrentHashMap<>();
+    private final java.util.Set<UUID> knownOwners = ConcurrentHashMap.newKeySet();
     private final java.util.Set<String> reportedDegradations =
             ConcurrentHashMap.newKeySet();
     private AutoCloseable subscription;
@@ -75,6 +76,14 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         subscription = tamework.subscribeBondedChanges(this::onBondedChanged);
         started = true;
         refreshClaims();
+    }
+
+    /** Discovers durable Miniwyvern authority when an owner enters a world. */
+    public synchronized void discoverOwner(UUID ownerUuid) {
+        UUID owner = Objects.requireNonNull(ownerUuid, "ownerUuid");
+        if (!started) return;
+        knownOwners.add(owner);
+        scheduleRefresh(owner);
     }
 
     /** Reconciles every currently active bonded Miniwyvern. */
@@ -149,7 +158,8 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         stateStore.snapshot().playerSoulBonds().values().stream()
                 .filter(record -> record.state() == SoulBondState.CLAIMED)
                 .map(PlayerSoulBondRecord::playerUuid)
-                .forEach(this::scheduleRefresh);
+                .forEach(knownOwners::add);
+        knownOwners.forEach(this::scheduleRefresh);
     }
 
     private void scheduleRefresh(UUID ownerUuid) {
@@ -172,21 +182,28 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         }
     }
 
-    private void reconcile(
+    private synchronized void reconcile(
             UUID ownerUuid,
             long generation,
             BondedCompanionResult<List<BondedCompanionProfileView>> result) {
+        if (!started || generation != currentGeneration(ownerUuid)) return;
         String claimedProfile = claimedProfile(ownerUuid);
         Map<String, BondedCompanionProfileView> desired = new LinkedHashMap<>();
-        if (claimedProfile != null) {
-            for (BondedCompanionProfileView profile : result.value()) {
-                if (activeMiniwyvern(ownerUuid, claimedProfile, profile)) {
-                    desired.put(profile.profileId(), profile);
-                }
+        boolean hasMiniwyvern = false;
+        for (BondedCompanionProfileView profile : result.value()) {
+            if (!miniwyvernProfile(ownerUuid, profile)) continue;
+            hasMiniwyvern = true;
+            if ((claimedProfile == null || claimedProfile.equals(profile.profileId()))
+                    && activeMiniwyvern(profile)) {
+                desired.put(profile.profileId(), profile);
             }
         }
         removeStale(ownerUuid, desired);
         desired.values().forEach(profile -> loadBinding(ownerUuid, generation, profile));
+        if (claimedProfile == null && !hasMiniwyvern) {
+            knownOwners.remove(ownerUuid);
+            generations.remove(ownerUuid, generation);
+        }
     }
 
     private void removeStale(
@@ -241,13 +258,14 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         }
     }
 
-    private void onBondedChanged(BondedCompanionChangedEvent event) {
-        String claimed = event == null ? null : claimedProfile(event.ownerUuid());
+    private synchronized void onBondedChanged(BondedCompanionChangedEvent event) {
         if (event == null
-                || !TameworkGameplayAdapter.DRAGON_HORN_ROSTER.equals(event.rosterId())
-                || !event.profileId().equals(claimed)) {
+                || !TameworkGameplayAdapter.DRAGON_HORN_ROSTER.equals(event.rosterId())) {
             return;
         }
+        String claimed = claimedProfile(event.ownerUuid());
+        if (claimed != null && !event.profileId().equals(claimed)) return;
+        knownOwners.add(event.ownerUuid());
         invalidate(event.ownerUuid());
         if (event.newState() != BondedCompanionStateView.ACTIVE) {
             ActiveBinding removed = active.remove(event.profileId());
@@ -300,18 +318,19 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         return generations.getOrDefault(ownerUuid, 0L);
     }
 
-    private static boolean activeMiniwyvern(
+    private static boolean miniwyvernProfile(
             UUID ownerUuid,
-            String claimedProfile,
             BondedCompanionProfileView profile) {
-        BondedCompanionLeaseView lease = profile == null ? null : profile.activeLease();
         return profile != null
                 && ownerUuid.equals(profile.ownerUuid())
-                && claimedProfile.equals(profile.profileId())
                 && TameworkGameplayAdapter.DRAGON_HORN_ROSTER.equals(profile.rosterId())
                 && TameworkGameplayAdapter.MINIWYVERN_FAMILY.equals(profile.familyId())
-                && TameworkGameplayAdapter.MINIWYVERN_ROLE_IDS.contains(profile.roleId())
-                && profile.state() == BondedCompanionStateView.ACTIVE
+                && TameworkGameplayAdapter.MINIWYVERN_ROLE_IDS.contains(profile.roleId());
+    }
+
+    private static boolean activeMiniwyvern(BondedCompanionProfileView profile) {
+        BondedCompanionLeaseView lease = profile.activeLease();
+        return profile.state() == BondedCompanionStateView.ACTIVE
                 && lease != null && lease.liveNpcUuid() != null;
     }
 
@@ -350,6 +369,7 @@ public final class MiniwyvernAbilityRuntime implements AutoCloseable {
         active.clear();
         refreshing.clear();
         generations.clear();
+        knownOwners.clear();
         tickCursor = null;
         reportedDegradations.clear();
         service.clearOwnerAuras();

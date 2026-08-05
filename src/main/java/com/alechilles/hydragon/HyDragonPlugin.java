@@ -48,9 +48,11 @@ import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.assetstore.event.RemovedAssetsEvent;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
+import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
@@ -100,6 +102,7 @@ public final class HyDragonPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(
                 new MiniwyvernOwnerAuraEffectSystem(
                         ownerAuraEffects, miniwyvernOwnerAuras, voidLifetime));
+        getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::onPlayerAdded);
         tameworkBridge = TameworkBridge.connect();
         registerConfigAssets();
         getCommandRegistry().registerCommand(new HyDragonStatusCommand(
@@ -184,6 +187,15 @@ public final class HyDragonPlugin extends JavaPlugin {
     @Nonnull
     public HyDragonPersistenceStatus getPersistenceStatus() {
         return HyDragonPersistenceStatus.from(stateStore, persistenceFailure);
+    }
+
+    private void onPlayerAdded(AddPlayerToWorldEvent event) {
+        if (event == null || event.getHolder() == null) return;
+        PlayerRef player = event.getHolder().getComponent(PlayerRef.getComponentType());
+        MiniwyvernAbilityRuntime runtime = abilityRuntime;
+        if (runtime != null && player != null && player.getUuid() != null) {
+            runtime.discoverOwner(player.getUuid());
+        }
     }
 
     private void openStateStore() {

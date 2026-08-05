@@ -94,6 +94,43 @@ final class MiniwyvernAbilityRuntimeTest {
         assertEquals(0, fixture.worlds.dispatches);
     }
 
+    /** Regression: the durable bonded profile remains ability authority if local entitlement data is lost. */
+    @Test
+    void ownerArrivalRestoresOwnerBuffWithoutLocalClaimLedger() throws Exception {
+        Fixture fixture = fixture("missing-local-claim.properties",
+                TameworkGameplayAdapter.MINIWYVERN_FAMILY,
+                "Tamed_Wyvern_Mini_Fire", true, false);
+        fixture.runtime.start();
+
+        fixture.runtime.discoverOwner(fixture.owner);
+
+        assertEquals(1, fixture.runtime.tickSome(8));
+        assertEquals(1, fixture.worlds.dispatches);
+        assertEquals(1, fixture.worlds.ownerEffectApplications);
+    }
+
+    @Test
+    void unrelatedDragonHornOwnerIsPrunedAfterRosterReconciliation() throws Exception {
+        Fixture fixture = fixture("unrelated-owner.properties",
+                TameworkGameplayAdapter.FULL_DRAGON_FAMILY,
+                "Tamed_Wyvern_Mini_Fire", false, false);
+        fixture.runtime.start();
+
+        fixture.authority.emit(new BondedCompanionChangedEvent(
+                fixture.profile.toString(), fixture.owner,
+                TameworkGameplayAdapter.DRAGON_HORN_ROSTER,
+                BondedCompanionStateView.STORED,
+                BondedCompanionStateView.ACTIVE,
+                2L,
+                "summoned"));
+        assertEquals(1, fixture.authority.listCalls);
+
+        assertEquals(0, fixture.runtime.tickSome(8));
+        assertEquals(0, fixture.runtime.tickSome(8));
+        assertEquals(1, fixture.authority.listCalls,
+                "owners without a Miniwyvern must not remain in the polling set");
+    }
+
     @Test
     void everyConfiguredMiniwyvernRoleActivatesTheLiveRuntime() throws Exception {
         for (String roleId : TameworkGameplayAdapter.MINIWYVERN_ROLE_IDS) {
@@ -205,12 +242,23 @@ final class MiniwyvernAbilityRuntimeTest {
 
     private Fixture fixture(
             String fileName, String familyId, String roleId, boolean withWard) throws Exception {
+        return fixture(fileName, familyId, roleId, withWard, true);
+    }
+
+    private Fixture fixture(
+            String fileName,
+            String familyId,
+            String roleId,
+            boolean withWard,
+            boolean withLocalClaim) throws Exception {
         UUID owner = UUID.randomUUID();
         UUID profile = UUID.randomUUID();
         UUID npc = UUID.randomUUID();
         HyDragonStateStore store = new HyDragonStateStore(temp.resolve(fileName));
-        store.beginSoulBond(owner, "claim");
-        store.completeSoulBond(owner, "claim", profile, 10L);
+        if (withLocalClaim) {
+            store.beginSoulBond(owner, "claim");
+            store.completeSoulBond(owner, "claim", profile, 10L);
+        }
         BondedAuthority authority = new BondedAuthority(owner, profile, npc, familyId, roleId);
         RecordingWorldDispatcher worlds = new RecordingWorldDispatcher(owner, npc, roleId);
         MemoryAbilityStates states = new MemoryAbilityStates();
