@@ -32,7 +32,7 @@ The Miniwyvern lives in the flute roster with your captured full dragons. You ca
 
 ## Forms, re-attunement, and recovery
 
-The Miniwyvern begins Wild and can be re-attuned later. Each elemental form changes its combat identity; compare the implemented choices on [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms), then use [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement) when you are ready to switch.
+The Miniwyvern begins Wild and can be re-attuned later. Each elemental form changes its combat identity; compare the available choices on [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms), then use [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement) when you are ready to switch.
 
 If it falls in battle, it can be revived. Keep the right restoration materials nearby and use [Summoning and Revival](/mod/hydragon/summoning-and-revival) for the current revival sequence and cost.
 
@@ -40,4 +40,4 @@ If it falls in battle, it can be revived. Keep the right restoration materials n
 
 - Read [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement) before choosing a form.
 - Use the [Dragon Command Flute](/mod/hydragon/dragon-command-flute) to summon, command, locate, or revive it.
-- Compare every implemented path on [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms).
+- Compare every available path on [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms).

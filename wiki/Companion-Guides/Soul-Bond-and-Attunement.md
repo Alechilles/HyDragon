@@ -44,5 +44,5 @@ Compare the form identities on [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms
 ## Next steps
 
 - Gather essence sources from the [Dragon Compendium](/mod/hydragon/dragon-compendium-index).
-- Use the [Dragon Command Flute](/mod/hydragon/dragon-command-flute) to summon or store the same bonded profile.
+- Use the [Dragon Command Flute](/mod/hydragon/dragon-command-flute) to summon or store the same bonded companion.
 - Keep the [Summoning and Revival](/mod/hydragon/summoning-and-revival) guide nearby for recovery costs.

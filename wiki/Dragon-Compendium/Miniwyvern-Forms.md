@@ -9,7 +9,7 @@ draft: false
 
 Parent: [Dragon Compendium](/mod/hydragon/dragon-compendium-index) | [Home](/mod/hydragon/)
 
-The Soulbound Miniwyvern starts Wild. After the Soul Bond is active, you can choose an attunement and re-attune later when another role fits your adventure better. These are the seven implemented forms:
+The Soulbound Miniwyvern starts Wild. After the Soul Bond is active, you can choose an attunement and re-attune later when another combat style fits your adventure better. These are the seven available forms:
 
 | Form | Player-facing identity |
 |---|---|

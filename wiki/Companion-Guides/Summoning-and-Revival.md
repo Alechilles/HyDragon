@@ -22,15 +22,15 @@ The two active slots are independent: one full dragon and one Miniwyvern can be 
 
 ## Full-dragon summon timing
 
-A full dragon has a **five-minute base summon window** and a **five-minute base cooldown** before it can be summoned again. Summoner's Pact talents can extend the window and shorten the cooldown. A dismissed, expired, logged-out, or transferred companion is stored back in its roster profile.
+A full dragon has a **five-minute base summon window** and a **five-minute base cooldown** before it can be summoned again. Summoner's Pact talents can extend the window and shorten the cooldown. A dismissed, expired, logged-out, or transferred companion returns to roster storage.
 
 Miniwyvern timing is not listed here. Use the roster's current status instead of planning around an unlisted timer.
 
 ## Storage versus confirmed death
 
-- **Dismissal, expiry, logout, and world transfer** store the same companion profile for later use.
-- **Confirmed death** marks the profile as needing revival. Do not treat a stored card as a dead companion.
-- **Revive** restores a dead profile to storage. It does not auto-summon; choose Summon after the revival succeeds.
+- **Dismissal, expiry, logout, and world transfer** store the same companion for later use.
+- **Confirmed death** marks the roster card as needing revival. Do not treat a stored card as a dead companion.
+- **Revive** restores a dead companion to storage. It does not auto-summon; choose Summon after the revival succeeds.
 
 ## Revival costs
 

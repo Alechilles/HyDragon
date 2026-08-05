@@ -16,18 +16,18 @@ Scales and plain Draconic Essences are the shared foundation for capture and Sou
 - **Draconic Scale** — a general dragon crafting material. Full dragon families (Hydras, Nordic Drakes, and Rock Drakes) drop scales; the amount varies by family and variant.
 - **Plain Draconic Essence** — concentrated power with no elemental attunement. All full dragon families drop plain essence, with quantities varying by family and variant.
 
-The 100-weight elemental entries are the family drops shown below. Only the lower-weight Void entries, optional Rock Drake Fire or Ice entries, and decorative Drake Eggs are possible bonuses rather than guaranteed elemental materials.
+Each dragon family always provides the main elemental materials shown below. Void essences, extra Rock Drake Fire or Ice essences, and decorative Drake Eggs are occasional bonuses rather than guaranteed rewards.
 
 ## Verified drop identities
 
 | Full-dragon family | Guaranteed elemental drops | Possible bonuses |
 |---|---|---|
-| **Hydra** | Ice and Earth | Rare Void; a decorative Drake Egg may also appear in the standard Hydra profile. |
+| **Hydra** | Ice and Earth | Rare Void; a decorative Drake Egg may also appear. |
 | **Toxic Hydra** | Toxic and Earth | Rare Void only; it does **not** drop a Drake Egg. |
 | **Nordic Drake** | Ice and Wind | Rare Void. |
-| **Rock Drakes** | Nature across the family | Optional Fire on Young and standard variants, optional Ice on the Frost variant, and a decorative Drake Egg in the Rock Drake profiles. |
+| **Rock Drakes** | Nature across the family | Possible Fire on Young and standard variants, possible Ice on the Frost variant, and a possible decorative Drake Egg. |
 
-The standard Hydra and Rock Drake profiles can also list a rare **decorative Drake Egg**. That item is a placeable decoration, not a hatching item. Do not substitute it for the [Mysterious Egg](/mod/hydragon/mysterious-egg).
+The standard Hydra and Rock Drakes can also drop a rare **decorative Drake Egg**. That item is a placeable decoration, not a hatching item. Do not substitute it for the [Mysterious Egg](/mod/hydragon/mysterious-egg).
 
 ## Altar conversions
 

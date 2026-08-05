@@ -39,11 +39,11 @@ Use the command wheel while the companion is active:
 | **Idle / Wander** | Stop an active order and let the companion idle nearby. |
 | **Airborne mode** | Toggle flight or ground mode for a companion that supports it. |
 
-The airborne toggle is shown only where the companion supports it. Miniwyverns use it to switch their own ground or air companion movement; this is NPC locomotion, not a player mount. Nordic Drake and Winged Toxic Hydra use the toggle for their distinct avatar-flight mounting modes, while ground-only Hydra and Rock Drakes remain ground mounts.
+The airborne toggle is shown only where the companion supports it. Miniwyverns use it to switch their own movement between the ground and air; it does not turn them into a player mount. Nordic Drake and Winged Toxic Hydra use the toggle for their distinct player-flight modes, while ground-only Hydra and Rock Drakes remain ground mounts.
 
 ## A reliable routine
 
-1. Summon the profile you want from the roster.
+1. Summon the companion you want from the roster.
 2. Set **Follow** while traveling, or **Hold** while setting up a fight.
 3. Use **Move** for a precise position, **Defend** for protection, or **Attack** while pointing at a target.
 4. Use **Recall** before you cross a dangerous gap or need the companion beside you.

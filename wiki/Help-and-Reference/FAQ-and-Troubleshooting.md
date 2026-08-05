@@ -29,7 +29,7 @@ Releasing early, losing range, losing the target, or making a prerequisite inval
 
 ### Why is my dragon stored?
 
-Dismissal, summon expiry, logout, and world transfer store the companion profile for later use. Storage is not death. A confirmed-death card needs [Revive](/mod/hydragon/dragon-command-flute) before it can be summoned again.
+Dismissal, summon expiry, logout, and world transfer return the companion to roster storage for later use. Storage is not death. A confirmed-death card needs [Revive](/mod/hydragon/dragon-command-flute) before it can be summoned again.
 
 ### Why is summon on cooldown?
 
@@ -41,7 +41,7 @@ The roster has one active full-dragon slot and one active Miniwyvern slot. You c
 
 ### How do I find, recall, or revive a companion?
 
-Use [Locate](/mod/hydragon/dragon-command-flute) from the selected roster card when the companion is not beside you. For an active companion, use [Recall](/mod/hydragon/dragon-command-flute) to call it back. For a confirmed-death card, choose [Revive](/mod/hydragon/dragon-command-flute), provide the listed materials, and then choose Summon after revival returns the profile to storage. [Summoning and Revival](/mod/hydragon/summoning-and-revival) lists the role-matched costs.
+Use [Locate](/mod/hydragon/dragon-command-flute) from the selected roster card when the companion is not beside you. For an active companion, use [Recall](/mod/hydragon/dragon-command-flute) to call it back. For a confirmed-death card, choose [Revive](/mod/hydragon/dragon-command-flute), provide the listed materials, and then choose Summon after revival returns the companion to storage. [Summoning and Revival](/mod/hydragon/summoning-and-revival) lists the cost for each dragon type.
 
 ## Soul Bond and forms
 

@@ -73,7 +73,7 @@ The two active slots are independent, so one full dragon and one Miniwyvern can 
 
 ## Full-dragon timing
 
-| Profile | Base summon window | Base cooldown | Details |
+| Companion | Base summon window | Base cooldown | Details |
 |---|---:|---:|---|
 | [Full dragon](/mod/hydragon/summoning-and-revival) | 5 minutes | 5 minutes | [Summoning and Revival](/mod/hydragon/summoning-and-revival) |
 | [Summoner's Pact](/mod/hydragon/leveling-and-talents) | Extends the window | Shortens the cooldown | [Leveling and Talents](/mod/hydragon/leveling-and-talents) |
@@ -90,7 +90,7 @@ No Miniwyvern timer is published; use the roster's current status.
 | [Rock Drakes](/mod/hydragon/summoning-and-revival) | 2 Revitalizing Essences + 2 Nature Draconic Essences | [Summoning and Revival](/mod/hydragon/summoning-and-revival) |
 | [Miniwyvern](/mod/hydragon/summoning-and-revival) | 1 Revitalizing Essence + 1 essence matching its current form; plain essence for Wild | [Summoning and Revival](/mod/hydragon/summoning-and-revival) |
 
-Open the dead companion's card in the flute to confirm the current cost before crafting. Revival returns the profile to storage; summon it separately afterward.
+Open the dead companion's card in the flute to confirm the current cost before crafting. Revival returns the companion to storage; summon it separately afterward.
 
 ## Next steps
 
