@@ -195,7 +195,7 @@
   "KnockbackScale": 0.2,
   "DefaultNPCAttitude": "Ignore",
   "DefaultPlayerAttitude": "Neutral",
-  "AttitudeGroup": "HyDragonMiniCompanion",
+  "AttitudeGroup": "HyDragonCompanion",
   "DropList": {
     "Compute": "DropList"
   },
@@ -362,7 +362,7 @@
       ]
     },
     {
-      "$Comment": "Cancel aerial combat when the outer Defend context or flight prerequisites are lost.",
+      "$Comment": "Cancel aerial combat only when its outer Defend or Aggressive context, target, or flight prerequisites are lost.",
       "Continue": true,
       "Sensor": {
         "Type": "And",
@@ -370,7 +370,13 @@
           {
             "Type": "Or",
             "Sensors": [
-              { "Type": "Not", "Sensor": { "Type": "State", "State": "Defend" } },
+              {
+                "Type": "And",
+                "Sensors": [
+                  { "Type": "Not", "Sensor": { "Type": "State", "State": "Defend" } },
+                  { "Type": "Not", "Sensor": { "Type": "State", "State": "Aggressive" } }
+                ]
+              },
               { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
               { "Type": "Flag", "Name": "AirborneMode", "Set": false },
               { "Type": "Not", "Sensor": { "Type": "MotionController", "MotionController": "Fly" } }

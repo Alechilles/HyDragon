@@ -71,7 +71,8 @@ class ValidatorContractTest(unittest.TestCase):
             if isinstance(value, dict):
                 sensor = value.get("Sensor")
                 if isinstance(sensor, dict) and sensor.get("Type") == "State" \
-                        and sensor.get("State") == "Aggressive":
+                        and sensor.get("State") == "Aggressive" \
+                        and isinstance(value.get("Instructions"), list):
                     return value
                 for child in value.values():
                     found = find_aggressive(child)
@@ -153,7 +154,8 @@ class ValidatorContractTest(unittest.TestCase):
             if isinstance(value, dict):
                 sensor = value.get("Sensor")
                 if isinstance(sensor, dict) and sensor.get("Type") == "State" \
-                        and sensor.get("State") == "Aggressive":
+                        and sensor.get("State") == "Aggressive" \
+                        and isinstance(value.get("Instructions"), list):
                     return value
                 for child in value.values():
                     found = find_aggressive(child)
@@ -231,7 +233,7 @@ class ValidatorContractTest(unittest.TestCase):
         )
         mini_template = parsed[mini_template_path]
         self.assertIsInstance(mini_template, dict)
-        self.assertEqual("HyDragonMiniCompanion", mini_template.get("AttitudeGroup"))
+        self.assertEqual("HyDragonCompanion", mini_template.get("AttitudeGroup"))
 
         state_declarations = mini_template["Instructions"][0]["Actions"]
         self.assertIn(
@@ -406,15 +408,9 @@ class ValidatorContractTest(unittest.TestCase):
             )),
         )
 
-        aerial_component_path = (
-            VALIDATOR.RESOURCE_ROOT
-            / "Server/NPC/Roles/Creature/HyDragon/Components"
-            / "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend.json"
-        )
-        aerial_component = parsed[aerial_component_path]
-        serialized_component = json.dumps(aerial_component)
-        self.assertNotIn("UseAggressiveTargeting", serialized_component)
-        self.assertNotIn("AggressiveInitialSwoop", serialized_component)
+        serialized_template = json.dumps(parsed[mini_template_path])
+        self.assertNotIn("HyDragonMiniCompanion", serialized_template)
+        self.assertIn('"State": "Aggressive"', serialized_template)
 
     def test_validator_accepts_aerial_miniwyvern_aggressive_combat_routine(self) -> None:
         load_errors: list[str] = []
