@@ -80,15 +80,25 @@ ROLE_SPAWN_FIELDS_056 = {
     "Id", "Weight", "SpawnBlockSet", "SpawnFluidTag", "MovementModes",
     "EnableSafeSpawning", "Flock",
 }
-WORKSHOP_056_PATCH_TARGETS = {
-    "Server/NPC/Spawn/Beacons/Zone1/Zone1_Cave_Tier2/Zone1_Cave_Forests_Aggro.json": (
-        "Env_Zone1_Caves_Forests", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier2/Zone2_Cave_Volcanic_T2_Aggro.json": (
+WORKSHOP_057_PATCH_TARGETS = {
+    "Server/NPC/Spawn/Beacons/Zone1/Zone1_Cave_Tier1/Zone1_Cave_Volcanic_T1_Aggro.json": (
+        "Env_Zone1_Caves_Volcanic_T1", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone1/Zone1_Cave_Tier2/Zone1_Cave_Volcanic_T2_Aggro.json": (
+        "Env_Zone1_Caves_Volcanic_T2", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone1/Zone1_Cave_Tier3/Zone1_Cave_Volcanic_T3_Aggro.json": (
+        "Env_Zone1_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier1/Zone2_Cave_Volcanic_T1_Goblin.json": (
+        "Env_Zone2_Caves_Volcanic_T1", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier2/Zone2_Cave_Volcanic_T2_Goblin.json": (
         "Env_Zone2_Caves_Volcanic_T2", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier3/Zone2_Cave_Volcanic_T3_Aggro.json": (
+    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier3/Zone2_Cave_Volcanic_T3_Goblin.json": (
         "Env_Zone2_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier3/Zone3_Cave_Glacial_Aggro.json": (
-        "Env_Zone3_Caves_Glacial", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier1/Zone3_Cave_Volcanic_T1_Aggro.json": (
+        "Env_Zone3_Caves_Volcanic_T1", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier2/Zone3_Cave_Volcanic_T2_Aggro.json": (
+        "Env_Zone3_Caves_Volcanic_T2", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
+    "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier3/Zone3_Cave_Volcanic_T3_Aggro.json": (
+        "Env_Zone3_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
     "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Forests_Predator.json": (
         "Env_Zone3_Forests", {"DayTimeRange"}),
 }
@@ -950,8 +960,8 @@ def validate_static_spawn_contracts(
             if patch_id != f"HyDragon_{path.stem}":
                 fail(errors, f"{context} Id must be HyDragon_{path.stem}")
         target = data.get("Target")
-        if target not in WORKSHOP_056_PATCH_TARGETS:
-            fail(errors, f"{context} target is not in the verified Workshop 0.5.6 manifest: {target}")
+        if target not in WORKSHOP_057_PATCH_TARGETS:
+            fail(errors, f"{context} target is not in the verified Workshop 0.5.7 manifest: {target}")
             continue
         target_stems.add(Path(str(target)).stem)
         if base_root is None:
@@ -965,9 +975,9 @@ def validate_static_spawn_contracts(
         except (OSError, UnicodeError, json.JSONDecodeError) as exc:
             fail(errors, f"cannot read base spawn target {target}: {exc}")
             continue
-        expected_environment, required_fields = WORKSHOP_056_PATCH_TARGETS[str(target)]
+        expected_environment, required_fields = WORKSHOP_057_PATCH_TARGETS[str(target)]
         if expected_environment not in base.get("Environments", []):
-            fail(errors, f"{context} base target environment drifted from Workshop 0.5.6 evidence")
+            fail(errors, f"{context} base target environment drifted from Workshop 0.5.7 evidence")
         missing_fields = sorted(required_fields - set(base))
         if missing_fields:
             fail(errors, f"{context} base target lost required static-spawn fields: {missing_fields}")
@@ -990,7 +1000,7 @@ def validate_static_spawn_contracts(
                 operation_ids.add(operation_id)
             if (operation.get("Op"), operation.get("Path")) == ("Add", "/YRange"):
                 if not validate_range(operation.get("Value"), 2, -4096, 4096):
-                    fail(errors, f"{operation_context}.Value violates the Hytale 0.5.6 YRange contract")
+                    fail(errors, f"{operation_context}.Value violates the Hytale 0.5.7 YRange contract")
                 else:
                     merged["YRange"] = operation.get("Value")
                 continue
@@ -1123,18 +1133,6 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
                 fail(errors, f"{drop_path.relative_to(ROOT)} does not source {required_item}")
     if len(set(expected_drop_ids)) != 3:
         fail(errors, "Rock Drake tier drop-list IDs must be distinct")
-
-    altitude_patch_path = RESOURCE_ROOT / "Server/Patchwork/Patches/HyDragon/RockDrakeT3_Zone3_Cave_Glacial_Aggro.json"
-    altitude_patch = parsed.get(altitude_patch_path)
-    operations = altitude_patch.get("Operations", []) if isinstance(altitude_patch, dict) else []
-    if not any(
-        isinstance(operation, dict)
-        and operation.get("Op") == "Add"
-        and operation.get("Path") == "/YRange"
-        and validate_range(operation.get("Value"), 2, -4096, 4096)
-        for operation in operations
-    ):
-        fail(errors, f"{altitude_patch_path.relative_to(ROOT)} must author a valid BeaconNPCSpawn YRange")
 
     flight_patch_path = RESOURCE_ROOT / "Server/Patchwork/Patches/HyDragonRoles/Tamed_NordicDrake_AvatarFlight.json"
     flight_patch = parsed.get(flight_patch_path)

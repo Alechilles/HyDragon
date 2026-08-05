@@ -2,7 +2,7 @@
   "Id": "hydragon:rock_drake_t3",
   "WildRoleIds": [ "RockDrakeT3" ],
   "TamedRoleIdByWildRole": { "RockDrakeT3": "Tamed_RockDrakeT3" },
-  "DifficultyId": "rare",
+  "DifficultyId": "uncommon",
   "StatsAndBehaviorAssetIds": [ "CAE_RockDrake", "Root_NPC_RockDrake_Attack" ],
   "DropListId": "Drop_RockDrake_T3",
   "Mount": { "Mode": "GROUND", "AvatarFlightConfigId": null },
@@ -13,8 +13,9 @@
   },
   "Spawn": {
     "OrdinarySpawnAssetIds": [
-      "RockDrake_Zone2_Cave_Volcanic_T3_Aggro",
-      "RockDrakeT3_Zone3_Cave_Glacial_Aggro"
+      "RockDrakeT3_Zone3_Cave_Volcanic_T1_Aggro",
+      "RockDrakeT3_Zone3_Cave_Volcanic_T2_Aggro",
+      "RockDrakeT3_Zone3_Cave_Volcanic_T3_Aggro"
     ],
     "PluginEncounterIds": []
   },

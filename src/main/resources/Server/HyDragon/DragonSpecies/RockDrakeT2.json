@@ -13,8 +13,9 @@
   },
   "Spawn": {
     "OrdinarySpawnAssetIds": [
-      "RockDrake_Zone2_Cave_Volcanic_T2_Aggro",
-      "RockDrake_Zone2_Cave_Volcanic_T3_Aggro"
+      "RockDrakeT2_Zone2_Cave_Volcanic_T1_Goblin",
+      "RockDrakeT2_Zone2_Cave_Volcanic_T2_Goblin",
+      "RockDrakeT2_Zone2_Cave_Volcanic_T3_Goblin"
     ],
     "PluginEncounterIds": []
   },
