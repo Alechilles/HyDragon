@@ -41,6 +41,10 @@ REQUIRED_STATUS_MESSAGE_KEYS = {
     "messages.status.state.readOnly",
     "messages.refund.description",
 }
+REQUIRED_HYDRAGON_COMMAND_KEYS = {
+    "hydragon.commands.aggressive.name",
+    "hydragon.commands.aggressive.hud",
+}
 BANNED_PRE_RELEASE_TOKENS = (
     "Draconic_Essence_Igne",
     "Draconic_Essence_Cryo",
@@ -246,6 +250,9 @@ def validate_locales(errors: list[str]) -> None:
         missing_status = sorted(REQUIRED_STATUS_MESSAGE_KEYS - set(catalog))
         if missing_status:
             fail(errors, f"{locale} missing status command keys: {', '.join(missing_status)}")
+        missing_hydragon_commands = sorted(REQUIRED_HYDRAGON_COMMAND_KEYS - set(catalog))
+        if missing_hydragon_commands:
+            fail(errors, f"{locale} missing Dragon Horn command keys: {', '.join(missing_hydragon_commands)}")
     for locale in LOCALES[1:]:
         translated = catalogs.get(locale, {})
         missing = sorted(set(source) - set(translated))
@@ -1272,15 +1279,24 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
         "Recall": "SFX_HyDragon_Dragon_Flute_SE_17",
         "MoveToPing": "SFX_HyDragon_Dragon_Flute_SE_04",
         "Defend": "SFX_HyDragon_Dragon_Flute_SE_11",
+        "Aggressive": "SFX_HyDragon_Dragon_Flute_SE_05",
         "AttackTarget": "SFX_HyDragon_Dragon_Flute_SE_07",
         "Idle": "SFX_HyDragon_Dragon_Flute_SE_02",
-        "ToggleAirborneMode": "SFX_HyDragon_Dragon_Flute_SE_05",
     }
     commands = {
         command.get("Id"): command
         for command in config.get("CommandList", [])
         if isinstance(command, dict)
     }
+    expected_ids = {
+        "Follow", "Hold", "Recall", "MoveToPing", "Defend", "Aggressive",
+        "AttackTarget", "Idle",
+    }
+    if set(commands) != expected_ids:
+        fail(errors, "Dragon Horn command wheel must contain Aggressive instead of ToggleAirborneMode")
+    aggressive = commands.get("Aggressive", {})
+    if aggressive.get("Steps") != [{"Type": "SetState", "State": "Aggressive"}]:
+        fail(errors, "Dragon Horn Aggressive must enter the hostility-only Aggressive state")
     for command_id, sound_event in expected_feedback.items():
         feedback = commands.get(command_id, {}).get("Feedback")
         if not isinstance(feedback, dict) or feedback.get("SoundEvent") != sound_event \
