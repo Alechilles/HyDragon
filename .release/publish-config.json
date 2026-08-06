@@ -1,0 +1,48 @@
+{
+  "modName": "HyDragon",
+  "repository": "Alechilles/HyDragon",
+  "github": {
+    "prerelease": false
+  },
+  "packaging": "jar",
+  "artifactNameTemplate": "HyDragon v{version}.jar",
+  "versionSource": "manifest",
+  "versionFile": "src/main/resources/manifest.json",
+  "requiresTameworkDependency": true,
+  "curseforge": {
+    "projectId": "1503366",
+    "releaseType": "release",
+    "changelogType": "html",
+    "gameVersionTypeIds": [65437],
+    "requiredProjects": [
+      {
+        "id": 1447962,
+        "slug": "alecs-tamework",
+        "type": "requiredDependency"
+      }
+    ]
+  },
+  "modtale": {
+    "enabled": false,
+    "setupStatus": "project-required",
+    "projectId": "",
+    "projectSlug": "hydragon",
+    "projectTitle": "HyDragon",
+    "projectDescription": "Raise dragons, master the elements, and rule the skies with legendary companions, elemental Miniwyverns, and aerial dragon combat.",
+    "classification": "PLUGIN"
+  },
+  "modifold": {
+    "enabled": false,
+    "setupStatus": "project-required",
+    "projectId": "",
+    "projectSlug": "hydragon",
+    "projectTitle": "HyDragon",
+    "projectSummary": "Raise dragons, master the elements, and rule the skies with legendary companions and elemental Miniwyverns.",
+    "projectType": "mod",
+    "projectIconUrl": "https://raw.githubusercontent.com/Alechilles/HyDragon/main/src/main/resources/icon-256.png",
+    "projectDescriptionUrl": "https://raw.githubusercontent.com/Alechilles/HyDragon/main/README.md",
+    "projectSourceUrl": "https://github.com/Alechilles/HyDragon",
+    "projectIssueUrl": "https://github.com/Alechilles/HyDragon/issues",
+    "projectDiscordUrl": "https://discord.gg/E8n8RgTTdq"
+  }
+}
