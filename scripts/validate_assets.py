@@ -81,24 +81,6 @@ ROLE_SPAWN_FIELDS_056 = {
     "EnableSafeSpawning", "Flock",
 }
 WORKSHOP_057_PATCH_TARGETS = {
-    "Server/NPC/Spawn/Beacons/Zone1/Zone1_Cave_Tier1/Zone1_Cave_Volcanic_T1_Aggro.json": (
-        "Env_Zone1_Caves_Volcanic_T1", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone1/Zone1_Cave_Tier2/Zone1_Cave_Volcanic_T2_Aggro.json": (
-        "Env_Zone1_Caves_Volcanic_T2", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone1/Zone1_Cave_Tier3/Zone1_Cave_Volcanic_T3_Aggro.json": (
-        "Env_Zone1_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier1/Zone2_Cave_Volcanic_T1_Goblin.json": (
-        "Env_Zone2_Caves_Volcanic_T1", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier2/Zone2_Cave_Volcanic_T2_Goblin.json": (
-        "Env_Zone2_Caves_Volcanic_T2", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone2/Zone2_Cave_Tier3/Zone2_Cave_Volcanic_T3_Goblin.json": (
-        "Env_Zone2_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier1/Zone3_Cave_Volcanic_T1_Aggro.json": (
-        "Env_Zone3_Caves_Volcanic_T1", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier2/Zone3_Cave_Volcanic_T2_Aggro.json": (
-        "Env_Zone3_Caves_Volcanic_T2", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
-    "Server/NPC/Spawn/Beacons/Zone3/Zone3_Cave_Tier3/Zone3_Cave_Volcanic_T3_Aggro.json": (
-        "Env_Zone3_Caves_Volcanic_T3", {"LightRanges", "MinDistanceFromPlayer", "SpawnRadius", "SpawnAfterGameTimeRange"}),
     "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Forests_Predator.json": (
         "Env_Zone3_Forests", {"DayTimeRange"}),
 }
@@ -804,48 +786,6 @@ def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors
             fail(errors, f"{path.relative_to(ROOT)} must use the exact enabled flight-toggle configuration")
 
 
-def validate_spawn_patch_role_identity(parsed: dict[Path, object], errors: list[str]) -> None:
-    species_root = RESOURCE_ROOT / "Server/HyDragon/DragonSpecies"
-    patch_root = RESOURCE_ROOT / "Server/Patchwork/Patches/HyDragon"
-    for species_path in sorted(species_root.glob("*.json")):
-        species = parsed.get(species_path)
-        if not isinstance(species, dict):
-            continue
-        wild_roles = set(species.get("WildRoleIds", []))
-        spawn = species.get("Spawn")
-        ordinary_ids = spawn.get("OrdinarySpawnAssetIds", []) if isinstance(spawn, dict) else []
-        for asset_id in ordinary_ids:
-            local_paths = list((RESOURCE_ROOT / "Server/NPC/Spawn/World").rglob(f"{asset_id}.json"))
-            if local_paths:
-                inserted_roles = {
-                    entry.get("Id")
-                    for local_path in local_paths
-                    for entry in parsed.get(local_path, {}).get("NPCs", [])
-                    if isinstance(entry, dict)
-                }
-                if inserted_roles.intersection(wild_roles):
-                    continue
-            patches = [patch_root / f"{asset_id}.json"]
-            patches.extend(
-                path for path in patch_root.glob("*.json")
-                if isinstance(parsed.get(path), dict)
-                and Path(str(parsed[path].get("Target", ""))).stem == asset_id
-            )
-            matched = False
-            for patch_path in patches:
-                patch = parsed.get(patch_path)
-                operations = patch.get("Operations", []) if isinstance(patch, dict) else []
-                inserted_roles = {
-                    operation.get("Value", {}).get("Id")
-                    for operation in operations
-                    if isinstance(operation, dict) and isinstance(operation.get("Value"), dict)
-                }
-                if inserted_roles.intersection(wild_roles):
-                    matched = True
-            if not matched:
-                fail(errors, f"{species_path.relative_to(ROOT)} has no Patchwork spawn insertion for {asset_id}")
-
-
 def validate_range(value: object, size: int, minimum: float, maximum: float) -> bool:
     return (
         isinstance(value, list)
@@ -936,6 +876,11 @@ def validate_static_spawn_contracts(
         validate_spawn_shape(parsed.get(path), "WorldNPCSpawn", path.relative_to(ROOT).as_posix(), known_assets, errors)
         if path.stem not in HYDRA_INDEPENDENT_WORLD_SPAWN_IDS:
             fail(errors, f"{path.relative_to(ROOT)} is not an approved independent Hydra spawn asset")
+
+    beacon_root = RESOURCE_ROOT / "Server/NPC/Spawn/Beacons/HyDragon"
+    for path in sorted(beacon_root.rglob("*.json")):
+        local_spawn_ids.add(path.stem)
+        validate_spawn_shape(parsed.get(path), "BeaconNPCSpawn", path.relative_to(ROOT).as_posix(), known_assets, errors)
 
     patch_root = RESOURCE_ROOT / "Server/Patchwork/Patches/HyDragon"
     patch_ids: set[str] = set()
@@ -1724,7 +1669,6 @@ def main() -> int:
     validate_miniwyvern_role_wiring(parsed, errors)
     validate_shared_aerial_component_wiring(parsed, errors)
     validate_companion_flight_toggle_contract(parsed, errors)
-    validate_spawn_patch_role_identity(parsed, errors)
     validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
     projectile_ids = {
         path.stem for root in (RESOURCE_ROOT, base_root) if root is not None
