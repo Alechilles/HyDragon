@@ -341,7 +341,7 @@ class ValidatorContractTest(unittest.TestCase):
         self.assertEqual(2, len(full_aggressive_refs))
         self.assertEqual(
             {
-                "Component_HyDragon_Instruction_Follow_Large",
+                "Component_Tamework_Instruction_Follow_Large",
                 "Component_Tamework_Instruction_Follow_Flying",
             },
             {
@@ -375,7 +375,7 @@ class ValidatorContractTest(unittest.TestCase):
         )
         self.assertEqual(1, len(ground_refs))
         self.assertEqual(
-            "Component_HyDragon_Instruction_Follow_Large",
+            "Component_Tamework_Instruction_Follow_Large",
             ground_refs[0]["Modify"].get("DefendFollowMacroElement"),
         )
 
@@ -435,18 +435,22 @@ class ValidatorContractTest(unittest.TestCase):
             self.assertIsInstance(value, dict)
             return value
 
-        large_follow = asset(
-            "Server/NPC/Roles/Creature/HyDragon/Components/"
-            "Component_HyDragon_Instruction_Follow_Large.json"
+        ground_template = asset(
+            "Server/NPC/Roles/Creature/HyDragon/Templates/"
+            "Template_HyDragon_Tamed.json"
         )
-        self.assertEqual([10, 16], large_follow["Parameters"]["FollowMaintainDistanceRange"]["Value"])
+        serialized_ground = json.dumps(ground_template)
+        self.assertIn('"Reference": "Component_Tamework_Instruction_Follow_Large"', serialized_ground)
+        self.assertIn('"FollowMaintainDistanceRange": [10, 16]', serialized_ground)
 
-        flying_follow = asset(
-            "Server/NPC/Roles/Creature/HyDragon/Components/"
-            "Component_Tamework_Instruction_Follow_Flying.json"
+        dragon_template = asset(
+            "Server/NPC/Roles/Creature/HyDragon/Templates/"
+            "Template_HyDragon_Dragon_Tamed.json"
         )
-        self.assertEqual([12, 18], flying_follow["Parameters"]["FollowOrbitRadiusRange"]["Value"])
-        self.assertEqual(0.45, flying_follow["Parameters"]["FollowOrbitRelativeSpeed"]["Value"])
+        serialized_dragon = json.dumps(dragon_template)
+        self.assertIn('"Reference": "Component_Tamework_Instruction_Follow_Flying"', serialized_dragon)
+        self.assertIn('"FollowOrbitRadiusRange": [12, 18]', serialized_dragon)
+        self.assertIn('"FollowOrbitRelativeSpeed": 0.45', serialized_dragon)
 
         mini_flying = asset(
             "Server/NPC/Roles/Creature/HyDragon/Components/"
@@ -463,6 +467,40 @@ class ValidatorContractTest(unittest.TestCase):
         serialized_template = json.dumps(mini_template)
         self.assertIn('"State": "Aggressive"', serialized_template)
         self.assertIn("Component_HyDragon_Instruction_Follow_Miniwyvern_Flying", serialized_template)
+
+    def test_rejects_local_shared_aerial_components(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        component_root = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Components"
+        )
+        parsed[component_root / "Component_HyDragon_Instruction_Airborne_Mode_Transition.json"] = {}
+        parsed[component_root / "Component_Tamework_Instruction_Hold_Flying.json"] = {}
+
+        errors: list[str] = []
+        VALIDATOR.validate_shared_aerial_component_wiring(parsed, errors)
+
+        self.assertIn(
+            "HyDragon must not define a local airborne-mode transition component",
+            errors,
+        )
+        self.assertIn(
+            "HyDragon must not define a local flying Hold component",
+            errors,
+        )
+
+    def test_accepts_tamework_airborne_transition_wiring(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        errors: list[str] = []
+        VALIDATOR.validate_shared_aerial_component_wiring(parsed, errors)
+
+        self.assertEqual([], errors)
 
 
 if __name__ == "__main__":

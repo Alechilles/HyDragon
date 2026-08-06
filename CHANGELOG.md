@@ -5,6 +5,8 @@
 - Replaced HyDragon's copied large-ground and flying follow bases with the
   reusable components published by Alec's Tamework 3.0 while preserving all
   dragon- and Miniwyvern-specific tuning.
+- Replaced the copied autonomous airborne-mode transition with Tamework's
+  parameterized component and removed an unused local flying Hold component.
 
 All notable player-facing changes to HyDragon are documented here.
 
