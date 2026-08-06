@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Replaced HyDragon's copied large-ground and flying follow bases with the
+  reusable components published by Alec's Tamework 3.0 while preserving all
+  dragon- and Miniwyvern-specific tuning.
+
 All notable player-facing changes to HyDragon are documented here.
 
 ## [1.0.0] - 2026-08-04
