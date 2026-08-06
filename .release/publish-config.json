@@ -24,8 +24,8 @@
   },
   "modtale": {
     "enabled": false,
-    "setupStatus": "project-required",
-    "projectId": "",
+    "setupStatus": "draft",
+    "projectId": "d76c46d2-8890-4395-a14a-e575cb1605bb",
     "projectSlug": "hydragon",
     "projectTitle": "HyDragon",
     "projectDescription": "Raise dragons, master the elements, and rule the skies with legendary companions, elemental Miniwyverns, and aerial dragon combat.",
@@ -33,8 +33,8 @@
   },
   "modifold": {
     "enabled": false,
-    "setupStatus": "project-required",
-    "projectId": "",
+    "setupStatus": "draft",
+    "projectId": "8h6f5Q",
     "projectSlug": "hydragon",
     "projectTitle": "HyDragon",
     "projectSummary": "Raise dragons, master the elements, and rule the skies with legendary companions and elemental Miniwyverns.",
