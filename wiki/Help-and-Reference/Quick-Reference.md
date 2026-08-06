@@ -20,9 +20,9 @@ The stone column is a practical progression, not a hard minimum. Every eligible 
 | [Hydra](/mod/hydragon/hydra) | Zone 3 glacial ice-and-snow terrain; its favored moon phase increases sightings | [Cobalt](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
 | [Toxic Hydra](/mod/hydragon/toxic-hydra) | Zone 4 volcanic terrain on Dark Green Moss patches | [Adamantium](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
 | [Nordic Drake](/mod/hydragon/nordic-drake) | Zone 3 forests on non-snowy soil | [Adamantium](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
-| [Young Rock Drake](/mod/hydragon/rock-drakes) | Zone 1 forest caves | [Iron](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
-| [Rock Drake](/mod/hydragon/rock-drakes) | Zone 2 volcanic caves | [Thorium](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
-| [Frost Rock Drake](/mod/hydragon/rock-drakes) | Deeper Zone 2 volcanic caves and Zone 3 glacial caves | [Cobalt](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
+| [Young Rock Drake](/mod/hydragon/rock-drakes) | Zone 1 volcanic cave aggro beacons, tiers 1–3 | [Iron](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
+| [Rock Drake](/mod/hydragon/rock-drakes) | Zone 2 volcanic cave goblin beacons, tiers 1–3 | [Thorium](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
+| [Frost Rock Drake](/mod/hydragon/rock-drakes) | Zone 3 volcanic cave aggro beacons, tiers 1–3 | [Cobalt](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
 | [Soulbound Miniwyvern](/mod/hydragon/soulbound-miniwyvern) | Does not spawn in the world | [Mysterious Egg](/mod/hydragon/mysterious-egg) | [Soul Bond and Attunement](/mod/hydragon/soul-bond-and-attunement) |
 
 ## Combat and movement identity
