@@ -1,0 +1,11 @@
+{
+  "Groups": {
+    "Hostile": [
+      "Trork",
+      "Undead",
+      "Void",
+      "AH_Predator_Tamed",
+      "HyDragonCompanion"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Groups": {
+    "Hostile": [
+      "Feran",
+      "Kweebec",
+      "Player",
+      "AH_Predator_Tamed",
+      "HyDragonCompanion"
+    ]
+  }
+}

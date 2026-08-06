@@ -1,0 +1,10 @@
+{
+  "Groups": {
+    "Hostile": [
+      "Birds",
+      "Deer",
+      "AH_Predator_Tamed",
+      "HyDragonCompanion"
+    ]
+  }
+}

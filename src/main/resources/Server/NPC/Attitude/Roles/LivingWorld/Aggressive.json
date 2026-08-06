@@ -1,0 +1,9 @@
+{
+  "Groups": {
+    "Hostile": [
+      "Passive",
+      "AH_Predator_Tamed",
+      "HyDragonCompanion"
+    ]
+  }
+}

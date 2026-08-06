@@ -1,0 +1,11 @@
+{
+  "Groups": {
+    "Friendly": [
+      "Goblin"
+    ],
+    "Hostile": [
+      "AH_Predator_Tamed",
+      "HyDragonCompanion"
+    ]
+  }
+}

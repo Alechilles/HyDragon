@@ -1,0 +1,12 @@
+{
+  "Groups": {
+    "Hostile": [
+      "Birds",
+      "AH_Predator_Tamed",
+      "HyDragonCompanion"
+    ],
+    "Revered": [
+      "Outlander_Marauder"
+    ]
+  }
+}
