@@ -1669,7 +1669,6 @@ def validate_shared_aerial_component_wiring(
         "GroundedActivityFlagName": "HyDragon_AirborneMode_UnusedGroundedActivity",
         "LandingRayName": "LandingRay",
         "LandingBlocks": "StoneAndSoil",
-        "TakeOffJumpSpeed": 4,
         "LandingSearchRange": 64,
         "LandingSearchAngle": 90,
         "LandingSlowDownDistance": 5,

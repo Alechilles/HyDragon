@@ -42,6 +42,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Fixed
 
+- Fixed flying dragon and Miniwyvern roles failing Hytale validation after the
+  shared Tamework aerial-component migration.
 - Fixed Nordic Drake grounded and aerial combat recovery, mounted flight transitions, landing behavior, Avatar Flight visuals, and attack feedback.
 - Fixed Toxic Hydra and Hydra attack origins, mounted combat, animations, follow behavior, and ranged-combat presentation.
 - Fixed oversized Toxic Hydra flight effects and rebalanced full-dragon revival
