@@ -65,7 +65,7 @@ hytaleTools {
 }
 
 tasks.named('processResources', Copy) {
-    exclude 'Common/**/Source/**', 'Common/**/*.bbmodel'
+    exclude 'Common/**/Source/**', 'Common/**/*.bbmodel', '**/*.bak'
 }
 
 tasks.named('jar') {
