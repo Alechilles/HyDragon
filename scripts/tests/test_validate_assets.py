@@ -425,6 +425,30 @@ class ValidatorContractTest(unittest.TestCase):
             errors,
         )
 
+    def test_miniwyvern_hard_leash_preserves_combat_command(self) -> None:
+        load_errors: list[str] = []
+        parsed = VALIDATOR.load_json_assets(load_errors)
+        self.assertEqual([], load_errors)
+
+        template_path = (
+            VALIDATOR.RESOURCE_ROOT
+            / "Server/NPC/Roles/Creature/HyDragon/Templates/Template_Wyvern_Mini_Flying_Tamed.json"
+        )
+        template = parsed[template_path]
+        self.assertIsInstance(template, dict)
+        recoveries = [
+            instruction
+            for instruction in template.get("Instructions", [])
+            if isinstance(instruction, dict)
+            and instruction.get("$Comment")
+            == "Defend and Aggressive companions break off distant combat without replacing their commanded mode."
+        ]
+        self.assertEqual(1, len(recoveries))
+        self.assertEqual(
+            [{"Type": "ReleaseTarget", "TargetSlot": "LockedTarget"}],
+            recoveries[0].get("Actions"),
+        )
+
     def test_companions_follow_closely_after_miniwyvern_aggression(self) -> None:
         load_errors: list[str] = []
         parsed = VALIDATOR.load_json_assets(load_errors)

@@ -7,6 +7,8 @@
   dragon- and Miniwyvern-specific tuning.
 - Replaced the copied autonomous airborne-mode transition with Tamework's
   parameterized component and removed an unused local flying Hold component.
+- Preserved Miniwyvern Defend and Aggressive commands when hard-leash recovery
+  breaks off combat and returns them to their owner.
 
 All notable player-facing changes to HyDragon are documented here.
 

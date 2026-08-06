@@ -278,7 +278,48 @@
       }
     },
     {
-      "$Comment": "Keep owner-relative modes bounded and fail safe when their owner target is unavailable.",
+      "$Comment": "Idle companions that exceed the hard leash resume explicit Follow mode.",
+      "Continue": true,
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          {
+            "Type": "State",
+            "State": "Idle"
+          },
+          {
+            "Type": "Target",
+            "TargetSlot": {
+              "Compute": "MasterTargetSlot"
+            }
+          },
+          {
+            "Type": "Not",
+            "Sensor": {
+              "Type": "Target",
+              "TargetSlot": {
+                "Compute": "MasterTargetSlot"
+              },
+              "Range": {
+                "Compute": "HardLeashDistance"
+              }
+            }
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "ReleaseTarget",
+          "TargetSlot": "LockedTarget"
+        },
+        {
+          "Type": "State",
+          "State": "Follow"
+        }
+      ]
+    },
+    {
+      "$Comment": "Defend and Aggressive companions break off distant combat without replacing their commanded mode.",
       "Continue": true,
       "Sensor": {
         "Type": "And",
@@ -286,10 +327,6 @@
           {
             "Type": "Or",
             "Sensors": [
-              {
-                "Type": "State",
-                "State": "Idle"
-              },
               {
                 "Type": "State",
                 "State": "Defend"
@@ -324,10 +361,6 @@
         {
           "Type": "ReleaseTarget",
           "TargetSlot": "LockedTarget"
-        },
-        {
-          "Type": "State",
-          "State": "Follow"
         }
       ]
     },
