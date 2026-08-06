@@ -1,18 +1,8 @@
 # Changelog
 
-## Unreleased
-
-- Replaced HyDragon's copied large-ground and flying follow bases with the
-  reusable components published by Alec's Tamework 3.0 while preserving all
-  dragon- and Miniwyvern-specific tuning.
-- Replaced the copied autonomous airborne-mode transition with Tamework's
-  parameterized component and removed an unused local flying Hold component.
-- Preserved Miniwyvern Defend and Aggressive commands when hard-leash recovery
-  breaks off combat and returns them to their owner.
-
 All notable player-facing changes to HyDragon are documented here.
 
-## [1.0.0] - 2026-08-04
+## [1.0.0] - Unreleased
 
 ### Added
 
@@ -20,6 +10,10 @@ All notable player-facing changes to HyDragon are documented here.
 - Added dragon world spawns and encounters, including volcanic-cave Rock Drakes, forest Nordic Drakes, volcanic Dark Green Moss Toxic Hydras, and lunar Hydra spawns.
 - Added the Draconic Stone capture loop for eligible full dragons, with capture effects, energy tethers, homing motes, and Dragon Horn roster integration.
 - Added the Dragon Horn as the shared companion interface for summoning, dismissing, commanding, and reviving captured dragons and Soul Bond Miniwyverns.
+- Added an Aggressive Dragon Horn command for full dragons and Miniwyverns,
+  including autonomous ground and aerial engagement of nearby hostile mobs.
+- Added a confirmation warning before the Dragon Horn dismisses an active
+  dragon.
 - Added the once-per-player Wyvern Egg Soul Bond: it creates a persistent Miniwyvern companion that can be summoned and managed through the Dragon Horn.
 - Added a six-form Miniwyvern attunement system: Fire, Ice, Lightning, Nature, Toxic, and Void. Each form has its own appearance, combat identity, talent tree, and Essence Bond effects.
 - Added Miniwyvern talent progression, elemental projectile and swoop combat routes, owner auras, wards, debuffs, impact effects, and combat audio.
@@ -35,14 +29,29 @@ All notable player-facing changes to HyDragon are documented here.
 - Finalized full-dragon capture as a tranquilizer-only process and kept Miniwyverns exclusive to the Soul Bond system.
 - Finalized Miniwyvern combat and progression around the current elemental forms; removed superseded attunement, controller-item, and backpack designs from the shipped feature set.
 - Refined dragon spawning, follow behavior, cooldowns, active limits, session durations, health growth, drops, recipes, and companion balance for the final release.
+- Moved Rock Drakes into volcanic caves, reduced wild Hydra and Nordic Drake
+  damage, reduced Toxic Hydra poison stacking, and expanded each Hydra form
+  with a themed talent tree.
 - Polished mount anchors, rider placement, flight animations, attack timing, hitboxes, sounds, visual effects, and Dragon Stone presentation across the dragon roster.
+- Migrated dragon and Miniwyvern following, flying Hold, airborne transitions,
+  and favorite-item pursuit to the shared Tamework 3.0 companion components
+  while preserving species-specific tuning.
+- Autonomous flying dragons now steer around nearby obstacles and return toward
+  their owner or combat target when they wander beyond their configured range.
 - Updated HyDragon to the Gradle workspace build and required Alec's Tamework `>=3.0.0 <4.0.0` for its bonded-companion and Patchwork integrations.
 
 ### Fixed
 
 - Fixed Nordic Drake grounded and aerial combat recovery, mounted flight transitions, landing behavior, Avatar Flight visuals, and attack feedback.
 - Fixed Toxic Hydra and Hydra attack origins, mounted combat, animations, follow behavior, and ranged-combat presentation.
+- Fixed oversized Toxic Hydra flight effects and rebalanced full-dragon revival
+  costs across the progression tiers.
 - Fixed Rock Drake tier assets, cave spawns, mount anchors, projectile presentation, drops, and targeting behavior.
 - Fixed Miniwyvern summoning, flight-mode transitions, projectile aiming and impacts, swoop recovery, elemental aura cleanup, and localized combat guidance.
+- Fixed Miniwyvern Aggressive mode failing to enter or remain in aerial combat,
+  restored its intended follow speed and Essence Bond buffs, and preserved
+  Defend or Aggressive after hard-leash recovery returns it to its owner.
+- Fixed hostile mobs overlooking tamed dragons and broadened Aggressive-mode
+  targeting to use the intended hostile creature groups.
 - Fixed invalid animation and asset wiring that could cause visual, movement, or validation failures.
 - Fixed the Toxic Hydra using the standard Hydra drop table; it now rewards Toxic Draconic Essence instead of Ice Draconic Essence.
