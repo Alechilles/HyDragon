@@ -1,0 +1,15 @@
+{
+  "Id": "HyDragon_Tamework_TamedCompanion",
+  "Target": "Server/NPC/Groups/Tamework_TamedCompanion.json",
+  "Priority": 0,
+  "Enabled": true,
+  "Operations": [
+    {
+      "Id": "include-hydragon-companion-group",
+      "Op": "Insert",
+      "Path": "/IncludeGroups",
+      "Position": "End",
+      "Value": "HyDragonCompanion"
+    }
+  ]
+}
