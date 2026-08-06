@@ -2,7 +2,7 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
-## [1.0.0] - Unreleased
+## 1.0.0 - Unreleased
 
 ### Added
 
