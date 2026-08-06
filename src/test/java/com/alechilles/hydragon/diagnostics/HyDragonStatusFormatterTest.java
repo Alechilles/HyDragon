@@ -45,7 +45,7 @@ class HyDragonStatusFormatterTest {
                 "1.0.0", config, config.issues(), bridge, diagnostics, localPersistence);
 
         assertTrue(lines.stream().anyMatch(line -> line.equals("HyDragon 1.0.0 status")));
-        assertTrue(lines.stream().anyMatch(line -> line.contains("required=>=3.1.0 <4.0.0")));
+        assertTrue(lines.stream().anyMatch(line -> line.contains("required=>=3.0.0 <4.0.0")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("Config: INVALID")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("missing bundled assets")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("CAPTURE_AND_ROSTER: DISABLED")));
