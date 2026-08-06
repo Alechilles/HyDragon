@@ -32,6 +32,7 @@ All notable player-facing changes to HyDragon are documented here.
 - Moved Rock Drakes into volcanic caves, reduced wild Hydra and Nordic Drake
   damage, reduced Toxic Hydra poison stacking, and expanded each Hydra form
   with a themed talent tree.
+- Moved Rock Drakes from vanilla cave spawn pools to rare, solitary HyDragon beacons so their encounters no longer consume or alter vanilla beacon population slots.
 - Polished mount anchors, rider placement, flight animations, attack timing, hitboxes, sounds, visual effects, and Dragon Stone presentation across the dragon roster.
 - Migrated dragon and Miniwyvern following, flying Hold, airborne transitions,
   and favorite-item pursuit to the shared Tamework 3.0 companion components
