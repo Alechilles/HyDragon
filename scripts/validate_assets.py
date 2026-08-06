@@ -1648,6 +1648,61 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
                 fail(errors, f"Miniwyvern {form} {tier} roots must expose direct first and echo projectiles")
 
 
+def validate_shared_aerial_component_wiring(
+        parsed: dict[Path, object], errors: list[str]) -> None:
+    component_root = (
+        RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Components"
+    )
+    local_components = {
+        component_root / "Component_HyDragon_Instruction_Airborne_Mode_Transition.json":
+            "HyDragon must not define a local airborne-mode transition component",
+        component_root / "Component_Tamework_Instruction_Hold_Flying.json":
+            "HyDragon must not define a local flying Hold component",
+    }
+    for path, message in local_components.items():
+        if path in parsed:
+            fail(errors, message)
+
+    expected_modify = {
+        "ToggleAirborneModeHookId": "HyDragon.Command.ToggleAirborneMode",
+        "AirborneModeFlagName": "AirborneMode",
+        "GroundedActivityFlagName": "HyDragon_AirborneMode_UnusedGroundedActivity",
+        "LandingRayName": "LandingRay",
+        "LandingBlocks": "StoneAndSoil",
+        "TakeOffJumpSpeed": 4,
+        "LandingSearchRange": 64,
+        "LandingSearchAngle": 90,
+        "LandingSlowDownDistance": 5,
+        "LandingStopDistance": 0.5,
+        "LandingHeightDifference": [-3, 2],
+        "LandingGoalLenience": 3,
+        "LandingDesiredAltitudeWeight": 0,
+    }
+    template_root = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Templates"
+    template_names = (
+        "Template_HyDragon_Dragon_Tamed.json",
+        "Template_Wyvern_Mini_Flying_Tamed.json",
+    )
+
+    def matching_references(value: object) -> list[dict[str, object]]:
+        matches: list[dict[str, object]] = []
+        if isinstance(value, dict):
+            if value.get("Reference") == "Component_Tamework_Instruction_Airborne_Mode_Transition":
+                matches.append(value)
+            for child in value.values():
+                matches.extend(matching_references(child))
+        elif isinstance(value, list):
+            for child in value:
+                matches.extend(matching_references(child))
+        return matches
+
+    for template_name in template_names:
+        template = parsed.get(template_root / template_name)
+        references = matching_references(template)
+        if len(references) != 1 or references[0].get("Modify") != expected_modify:
+            fail(errors, f"{template_name} must use the configured Tamework airborne transition")
+
+
 def main() -> int:
     errors: list[str] = []
     parsed = load_json_assets(errors)
@@ -1668,6 +1723,7 @@ def main() -> int:
     validate_stone_tiers(parsed, errors)
     validate_no_miniwyvern_spawns(parsed, errors)
     validate_miniwyvern_role_wiring(parsed, errors)
+    validate_shared_aerial_component_wiring(parsed, errors)
     validate_companion_flight_toggle_contract(parsed, errors)
     validate_spawn_patch_role_identity(parsed, errors)
     validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
