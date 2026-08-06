@@ -1364,9 +1364,49 @@
               },
               "Instructions": [
                 {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Any",
+                    "Once": true
+                  },
+                  "Actions": [
+                    {
+                      "$Comment": "Immediately begin a fall-speed descent if tranquilized while flying.",
+                      "Type": "TameworkSetFlyingCompanionMode",
+                      "Mode": "Hold",
+                      "LandingState": "Sleep.Tranquilized",
+                      "GroundedState": "Sleep.Tranquilized",
+                      "DescendStep": 15,
+                      "ReissueDelayMs": 50,
+                      "GroundedStableTicks": 3,
+                      "VerticalMovementEpsilon": 0.15
+                    }
+                  ]
+                },
+                {
                   "Reference": "Component_Instruction_Play_Animation",
                   "Modify": {
                     "Animation": "Sleep"
+                  }
+                },
+                {
+                  "$Comment": "Re-arm the looping sleep animation after a hit reaction interrupts it.",
+                  "Sensor": {
+                    "Type": "Damage",
+                    "Environment": true,
+                    "Drowning": true,
+                    "Combat": true,
+                    "Other": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "ResetInstructions"
+                    }
+                  ]
+                },
+                {
+                  "BodyMotion": {
+                    "Type": "Nothing"
                   }
                 },
                 {
@@ -1378,6 +1418,10 @@
                     }
                   },
                   "Actions": [
+                    {
+                      "Type": "TameworkSetFlyingCompanionMode",
+                      "Mode": "Follow"
+                    },
                     {
                       "Type": "State",
                       "State": "Idle"

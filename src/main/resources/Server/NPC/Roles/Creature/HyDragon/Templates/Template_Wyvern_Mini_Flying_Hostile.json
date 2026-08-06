@@ -1070,6 +1070,21 @@
                           "Modify": {
                             "Animation": "Sleep"
                           }
+                        },
+                        {
+                          "$Comment": "Re-arm the looping sleep animation after a hit reaction interrupts it.",
+                          "Sensor": {
+                            "Type": "Damage",
+                            "Environment": true,
+                            "Drowning": true,
+                            "Combat": true,
+                            "Other": true
+                          },
+                          "Actions": [
+                            {
+                              "Type": "ResetInstructions"
+                            }
+                          ]
                         }
                       ]
                     },
