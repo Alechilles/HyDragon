@@ -56,6 +56,26 @@ final class DragonHornLocomotionAssetContractTest {
             """);
 
     @Test
+    void reusableFollowBasesComeFromTamework() throws IOException {
+        Path components = ROOT.resolve("Server/NPC/Roles/Creature/HyDragon/Components");
+        assertFalse(Files.exists(components.resolve("Component_HyDragon_Instruction_Follow_Large.json")));
+        assertFalse(Files.exists(components.resolve("Component_Tamework_Instruction_Follow_Flying.json")));
+
+        JsonObject standard = readJson(
+                "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Tamed.json");
+        JsonObject dragon = readJson(
+                "Server/NPC/Roles/Creature/HyDragon/Templates/Template_HyDragon_Dragon_Tamed.json");
+        assertTrue(anyObject(standard, object ->
+                "Component_Tamework_Instruction_Follow_Large".equals(string(object, "Reference"))));
+        assertTrue(anyObject(dragon, object ->
+                "Component_Tamework_Instruction_Follow_Large".equals(string(object, "Reference"))));
+        assertFalse(anyObject(standard, object ->
+                "Component_HyDragon_Instruction_Follow_Large".equals(string(object, "Reference"))));
+        assertFalse(anyObject(dragon, object ->
+                "Component_HyDragon_Instruction_Follow_Large".equals(string(object, "Reference"))));
+    }
+
+    @Test
     void dragonHornDefinesTheExplicitStatePreservingLocomotionCommandContract() throws IOException {
         JsonObject horn = readJson("Server/Tamework/Items/Commands/HyDragonDragonHorn.json");
 
@@ -217,7 +237,7 @@ final class DragonHornLocomotionAssetContractTest {
 
         JsonObject follow = stateBehavior(fullDragon, "Follow");
         assertExactlyTwoDirectModeBranches(follow);
-        assertModeBranch(follow, false, "Walk", null, "Component_HyDragon_Instruction_Follow_Large");
+        assertModeBranch(follow, false, "Walk", null, "Component_Tamework_Instruction_Follow_Large");
         assertModeBranch(follow, true, "Fly", null, "Component_Tamework_Instruction_Follow_Flying");
         assertAerialFollowTuning(follow);
 
@@ -225,7 +245,7 @@ final class DragonHornLocomotionAssetContractTest {
         assertExactlyTwoDirectModeBranches(defend);
         assertModeBranch(defend, false, "Walk", null, "Component_Tamework_Instruction_Defend");
         assertModeBranch(defend, true, "Fly", null, "Component_Tamework_Instruction_Defend");
-        assertDefendFollowMacro(defend, false, "Component_HyDragon_Instruction_Follow_Large");
+        assertDefendFollowMacro(defend, false, "Component_Tamework_Instruction_Follow_Large");
         assertDefendFollowMacro(defend, true, "Component_Tamework_Instruction_Follow_Flying");
         assertFullDragonDefendTuning(defend, false);
         assertFullDragonDefendTuning(defend, true);
