@@ -2,7 +2,7 @@
 
 ## Purpose
 
-HyDragon adds Nordic and Rock Drake roles to existing base-game spawn pools without replacing the pools. Patchwork is the required integration layer for those changes. Hydra uses two uniquely named `WorldNPCSpawn` assets so its lunar tuning remains independent.
+HyDragon uses Patchwork only to append Nordic Drake to the base Zone 3 forest predator pool. Hydra owns two uniquely named standalone `WorldNPCSpawn` assets for independent lunar tuning, and Rock Drakes own three standalone `BeaconNPCSpawn` assets under `Server/NPC/Spawn/Beacons/HyDragon` for their volcanic cave encounters. None of these five standalone assets mutates a base-game spawn asset.
 
 ## Version and load contract
 
@@ -12,18 +12,18 @@ HyDragon adds Nordic and Rock Drake roles to existing base-game spawn pools with
 
 ## Exposed integration surface
 
-The Patchwork surface is `Server/Patchwork/Patches/HyDragon/*.json`.
+The Patchwork surface is `Server/Patchwork/Patches/HyDragon/NordicDrake_Zone3_Forests_Predator.json`.
 
-- Each patch targets an existing base-game `WorldNPCSpawn` or `BeaconNPCSpawn` asset.
-- Each operation uses `Insert` at `/NPCs` with an `Existing` role-ID guard.
-- Patches append roles only; they do not replace arrays, remove entries, or modify top-level pool conditions owned by the target asset.
+- The Nordic patch targets the existing Zone 3 forest predator `WorldNPCSpawn` asset.
+- Its operation uses `Insert` at `/NPCs` with an `Existing` `NordicDrake` role-ID guard.
+- The patch appends only Nordic Drake; it does not replace arrays, remove entries, or modify top-level pool conditions owned by the target asset.
 
-The two Hydra assets under `Server/NPC/Spawn/World` are not patches and must remain uniquely named; they do not mutate a base-game spawn asset.
+The two Hydra assets under `Server/NPC/Spawn/World` and the three Rock Drake assets under `Server/NPC/Spawn/Beacons/HyDragon` are not patches. They must remain uniquely named and do not mutate a base-game spawn asset.
 
 ## Ownership
 
-HyDragon owns its patch files, dragon roles, and relative weights. Patchwork owns patch application. Base-game and third-party mods retain ownership of their spawn assets and entries.
+HyDragon owns the Nordic patch, its dragon roles, relative weights, two Hydra world-spawn assets, and three Rock Drake beacon assets. Patchwork owns patch application. Base-game and third-party mods retain ownership of their spawn assets and entries.
 
 ## Validation and rollback
 
-Validate JSON syntax, patch targets, and packaged asset presence before release. Validate a live server with Patchwork installed through its status/self-test commands. Removing the HyDragon JAR cleanly removes its additions; no target spawn asset is modified in place.
+Validate JSON syntax, the guarded Nordic patch target, and packaged standalone asset presence before release. Validate a live server with Patchwork installed through its status/self-test commands. Removing the HyDragon JAR removes the additive Nordic entry and all five standalone spawn assets without modifying vanilla files in place.

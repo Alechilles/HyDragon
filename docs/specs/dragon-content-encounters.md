@@ -5,7 +5,7 @@ Base-game target: Hytale `>=0.5.7 <0.6.0`; exact public `0.5.7` Workshop-profile
 
 ## 1. Purpose and boundaries
 
-This specification completes HyDragon's content layer. It covers materials, the Draconic Altar, recipes, the current dragon roster, difficulty metadata, static spawning, and mounts. Most v1 dragon spawning is asset-driven through additive Patchwork patches; Hydra uses dedicated world-spawn assets for independent lunar tuning.
+This specification completes HyDragon's content layer. It covers materials, the Draconic Altar, recipes, the current dragon roster, difficulty metadata, static spawning, and mounts. Most v1 dragon spawning is asset-driven through dedicated `WorldNPCSpawn`/`BeaconNPCSpawn` assets. The Nordic Drake uses one additive Patchwork patch for the Zone 3 forest predator pool; Hydra uses two dedicated world-spawn assets for independent lunar tuning; Rock Drakes use three dedicated cave beacons.
 
 Capture spending, the shared bonded Dragon Horn, and paid revival are defined in [Draconic capture, Dragon Horn, and revival](capture-summoning-maintenance.md). Miniwyvern content is defined in [Wyvern Egg, Soul Bond, and Miniwyvern](soul-bond-miniwyvern.md). Runtime boundaries follow [Plugin architecture](plugin-architecture.md) and the local [HyDragon - Tamework bonded integration contract](../integration/tamework-bonded-companions-contract.md).
 
@@ -15,8 +15,8 @@ The current source/asset split uses these base-game asset contracts:
 
 - `CraftingRecipe` supports `Input`, `Output`, `BenchRequirement`, and `TimeSeconds`. The Draconic Altar and its recipes are therefore asset/config work.
 - `WorldNPCSpawn` supports weighted NPC entries, `Environments`, `DayTimeRange`, `MoonPhaseRange`, `LightRanges`, and `MoonPhaseWeightModifiers`. Ordinary biome/region/time/light/moon/rarity spawning is asset/config work.
-- `BeaconNPCSpawn` adds player-distance, `YRange`, spawn cooldown/radius, and state controls. Rock Drake cave additions use it where appropriate.
-- Patchwork `Insert` operations append HyDragon roles to existing spawn pools and use an `Existing` guard, so HyDragon does not replace base-game or other-mod NPC arrays.
+- `BeaconNPCSpawn` adds player-distance, `YRange`, spawn cooldown/radius, and state controls. Rock Drake T1/T2/T3 use dedicated beacon assets under `Server/NPC/Spawn/Beacons/HyDragon`.
+- The Nordic Drake Patchwork `Insert` appends its role to the existing Zone 3 forest predator pool and uses an `Existing` guard, so HyDragon does not replace base-game or other-mod NPC arrays. Hydra's two world-spawn assets and Rock Drakes' three beacon assets are standalone and do not mutate a base-game spawn asset.
 
 The plugin must not replace static spawning or crafting that these asset systems already express. The local schema catalog available during the bonded-companion pass did not expose an exact public `0.5.6` profile, so exact-profile validation remains an explicit packaging gate rather than a completed claim in this document.
 
@@ -41,7 +41,7 @@ The plugin must not replace static spawning or crafting that these asset systems
 ### Spawning and special encounters
 
 - **HYD-CONT-011:** Ordinary spawns MUST use `WorldNPCSpawn`/`BeaconNPCSpawn` assets for supported environment, weight, time, moon, light, altitude/proximity, radius, cooldown, and state conditions.
-- **HYD-CONT-012:** Every v1 dragon spawn addition other than the independently tuned Hydra variants MUST be an additive Patchwork patch of an existing `WorldNPCSpawn` or `BeaconNPCSpawn` target. It MUST NOT replace an NPC array. Hydra may use a uniquely named `WorldNPCSpawn` asset to own its time and moon tuning without mutating another pool.
+- **HYD-CONT-012:** HyDragon MUST use additive Patchwork only when it modifies an existing spawn pool (currently, the Nordic Drake's Zone 3 forest predator pool). Independent spawn conditions MUST use uniquely named HyDragon-owned `WorldNPCSpawn` or `BeaconNPCSpawn` assets: Hydra owns two world-spawn assets, and Rock Drakes own three cave beacons. HyDragon MUST NOT replace or mutate vanilla spawn assets.
 - **HYD-CONT-013:** Nordic Drake MUST be an uncommon ordinary spawn in the Zone 3 forest predator pool, with no Java-controlled encounter, owner gate, or special capture requirement.
 - **HYD-CONT-014:** Content assets, domain configs, and all static spawn paths MUST pass schema/reference validation and the acceptance criteria in section 11 before release.
 
@@ -184,13 +184,13 @@ Use asset spawning wherever possible:
 | Species | Initial ordinary spawn target | Asset mechanism |
 | --- | --- | --- |
 | Hydra | Zone 3 glacial and Zone 4 volcanoes | Dedicated all-day `WorldNPCSpawn` assets; Ice Hydra is 2x weight on full moon, Toxic Hydra is restricted to Dark Green Moss and is 2x weight on new moon |
-| Rock Drake T1 | Zone 1 cave forests | Preserve current patch/weighted spawn |
-| Rock Drake T2 | Zone 2 volcanic caves | Preserve current patch/weighted spawn |
-| Rock Drake T3 | Zone 2 volcanic and Zone 3 glacial caves | Preserve current patches/weights |
+| Rock Drake T1 | Zone 1 volcanic caves | Dedicated `BeaconNPCSpawn`: `HyDragon_RockDrakeT1_Volcanic_Caves` |
+| Rock Drake T2 | Zone 2 volcanic caves | Dedicated `BeaconNPCSpawn`: `HyDragon_RockDrakeT2_Volcanic_Caves` |
+| Rock Drake T3 | Zone 3 volcanic caves | Dedicated `BeaconNPCSpawn`: `HyDragon_RockDrakeT3_Volcanic_Caves` |
 | Nordic Drake | Zone 3 forest predator pool | Additive Patchwork `WorldNPCSpawn` patch, weight 3.1764706 (15% with the current base pool) |
 | Miniwyvern | None | Soul Bond only |
 
-Spawn assets may vary weight by difficulty/rarity and supported moon/light conditions. The v1 patches intentionally inherit their target pool's top-level conditions: an individual inserted NPC cannot safely carry a different `DayTimeRange` or moon modifier without changing the other NPCs in that pool. Do not create a Java polling spawner for conditions already represented by `WorldNPCSpawn` or `BeaconNPCSpawn`.
+Spawn assets may vary weight by difficulty/rarity and supported moon/light conditions. All three Rock Drake beacons share a one-NPC cap, rare `SpawnAfterGameTimeRange` cooldowns (`PT45M`–`PT90M`), light range `[0, 7]`, and `YRange: [-24, 24]`. The Nordic Drake Patchwork entry intentionally inherits its target pool's top-level conditions: an individual inserted NPC cannot safely carry a different `DayTimeRange` or moon modifier without changing the other NPCs in that pool. Patchwork operations apply only to the Nordic Drake. Do not create a Java polling spawner for conditions already represented by `WorldNPCSpawn` or `BeaconNPCSpawn`.
 
 ## 9. Mount and flight content
 
@@ -204,8 +204,8 @@ Hydra's ground-mount declaration and tamed-role interaction are aligned in the i
 
 ## 10. Spawn compatibility
 
-- Patchwork is a required HyDragon dependency. If it is absent or outside `>=1.1.0 <2.0.0`, HyDragon is rejected at startup instead of silently omitting dragon spawns.
-- Every operation has an `Existing` guard and appends to `/NPCs`; it neither removes nor replaces existing pool entries.
+- Patchwork is a required HyDragon dependency for the Nordic Drake integration. If it is absent or outside `>=1.1.0 <2.0.0`, HyDragon is rejected at startup instead of silently omitting the Nordic Drake spawn.
+- The Nordic Drake operation has an `Existing` guard and appends to `/NPCs`; it neither removes nor replaces existing pool entries. Hydra's two world-spawn assets and Rock Drakes' three cave beacons are standalone assets and do not modify vanilla pools.
 - The Nordic Drake has no dynamic encounter asset or capture special requirement. It remains a standard tranquilize-and-capture target once spawned.
 
 ## 11. Acceptance criteria
@@ -215,11 +215,11 @@ Hydra's ground-mount declaration and tamed-role interaction are aligned in the i
 - Only the Draconic Altar lists recipes for the five stones, Revitalizing Essence, and Soul Bond after the pre-release content update; crafting consumes/produces the configured quantities once.
 - The release artifact contains Fire, Ice, and Lightning—not Igne, Cryo, or Storm—as the canonical essence IDs, and no runtime conversion code exists for the unreleased names.
 - The five `server.lang` catalogs have identical key sets and placeholder signatures, load without parser errors, and show reviewed English, Brazilian Portuguese, German, French, and Spanish values for every HyDragon player-facing string.
-- Hydra and each Rock Drake tier spawn only in their configured ordinary pools; Nordic Drake appears through the Zone 3 forest predator pool; Miniwyvern never appears through production spawning.
+- Hydra and each Rock Drake tier spawn only in their configured ordinary pools; Rock Drake tiers resolve to their dedicated cave beacons, Nordic Drake appears through the Zone 3 forest predator pool, and Miniwyvern never appears through production spawning.
 - Every capture-eligible wild role resolves to one valid tamed role and species capture record.
 - Ground mounts do not require the Flightmaster's Talisman; every avatar-flight mount does, and no external flight-mod item is queried.
 - `WorldNPCSpawn`/`BeaconNPCSpawn` tests cover environment/weight/time/moon/light/altitude/proximity fields without plugin duplication.
-- Patch validation confirms every non-Hydra spawn operation is an `Insert` into `/NPCs`, guarded by the inserted role ID. The two uniquely named Hydra world-spawn assets are validated separately for their all-day lunar tuning.
+- Patch validation confirms the sole Nordic Drake spawn operation is an `Insert` into `/NPCs`, guarded by the `NordicDrake` role ID. The two uniquely named Hydra world-spawn assets and three uniquely named Rock Drake beacon assets are validated separately for their independent conditions and shared beacon limits.
 - Nordic Drake has no plugin encounter configuration or capture-special requirement.
 
 ## 12. Implemented sequence
@@ -228,7 +228,7 @@ Hydra's ground-mount declaration and tamed-role interaction are aligned in the i
 2. Five complete localization catalogs use the same canonical English localization keys.
 3. Generic, Water, Wind, and Revitalizing item assets and semantic mappings are present.
 4. The Draconic Altar owns the Draconic Stone, Soul Bond, and revitalization recipes instead of `Arcanebench`.
-5. Rock Drake spawn data is represented by additive Patchwork entries in documented base-game pools; Hydra uses dedicated all-day world-spawn assets with independent lunar weight tuning.
+5. Nordic Drake uses one additive Patchwork entry in the Zone 3 forest predator pool; Hydra uses two dedicated all-day world-spawn assets with independent lunar weight tuning; Rock Drake T1/T2/T3 use three dedicated volcanic-cave beacon assets.
 6. Tamed Rock Drake roles and their capture mappings are present together.
 7. Nordic Drake appears as an uncommon Zone 3 forest spawn and retains its avatar-flight behavior.
 8. Miniwyvern is excluded from capture configs and production spawning; Soul Bond is its exclusive creation path.
@@ -245,5 +245,5 @@ No release artifact may retain a reference to a replaced pre-release identifier.
 | D1 | Draconic Altar and recipes | None beyond validation | Current Hytale `CraftingRecipe` contract; exact `0.5.6` profile validation pending |
 | D2 | Complete tamed roles, commands, drops, ordinary spawns | Species repository | Tamework 3.0.0 capture policy and bonded companion capability |
 | D3 | Ground/avatar-flight content and verification | Talisman capability/status messaging | Tamework avatar flight |
-| D4 | Additive Patchwork spawn assets | None | [Patchwork spawn-patch contract](../integration/patchwork-spawn-patches-contract.md) |
+| D4 | Nordic Drake additive Patchwork patch plus dedicated Hydra world-spawn and Rock Drake beacon assets | None | [Patchwork spawn-patch contract](../integration/patchwork-spawn-patches-contract.md) |
 | D5 | Balance and polish | Telemetry/diagnostics-driven tuning | D0-D4 |

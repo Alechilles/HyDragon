@@ -12,11 +12,7 @@
     "SpecialRequirementIds": []
   },
   "Spawn": {
-    "OrdinarySpawnAssetIds": [
-      "RockDrakeT2_Zone2_Cave_Volcanic_T1_Goblin",
-      "RockDrakeT2_Zone2_Cave_Volcanic_T2_Goblin",
-      "RockDrakeT2_Zone2_Cave_Volcanic_T3_Goblin"
-    ],
+    "OrdinarySpawnAssetIds": [ "HyDragon_RockDrakeT2_Volcanic_Caves" ],
     "PluginEncounterIds": []
   },
   "Presentation": {
