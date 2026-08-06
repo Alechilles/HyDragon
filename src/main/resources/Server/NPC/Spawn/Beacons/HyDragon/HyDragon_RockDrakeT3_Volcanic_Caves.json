@@ -1,0 +1,24 @@
+{
+  "Environments": [
+    "Env_Zone3_Caves_Volcanic_T1",
+    "Env_Zone3_Caves_Volcanic_T2",
+    "Env_Zone3_Caves_Volcanic_T3"
+  ],
+  "MinDistanceFromPlayer": 15,
+  "MaxSpawnedNPCs": 1,
+  "ConcurrentSpawnsRange": [ 1, 1 ],
+  "SpawnAfterGameTimeRange": [ "PT45M", "PT90M" ],
+  "InitialSpawnDelayRange": [ "PT10M", "PT30M" ],
+  "NPCIdleDespawnTime": 60,
+  "BeaconVacantDespawnGameTime": "PT15M",
+  "BeaconRadius": 70,
+  "SpawnRadius": 50,
+  "TargetDistanceFromPlayer": 25,
+  "YRange": [ -24, 24 ],
+  "NPCs": [
+    { "Weight": 100, "Id": "RockDrakeT3" }
+  ],
+  "LightRanges": {
+    "Light": [ 0, 7 ]
+  }
+}

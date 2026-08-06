@@ -12,11 +12,7 @@
     "SpecialRequirementIds": []
   },
   "Spawn": {
-    "OrdinarySpawnAssetIds": [
-      "RockDrakeT3_Zone3_Cave_Volcanic_T1_Aggro",
-      "RockDrakeT3_Zone3_Cave_Volcanic_T2_Aggro",
-      "RockDrakeT3_Zone3_Cave_Volcanic_T3_Aggro"
-    ],
+    "OrdinarySpawnAssetIds": [ "HyDragon_RockDrakeT3_Volcanic_Caves" ],
     "PluginEncounterIds": []
   },
   "Presentation": {
