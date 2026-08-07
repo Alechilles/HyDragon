@@ -1,0 +1,12 @@
+{
+  "Parent": "Immunity_Fire",
+  "Infinite": true,
+  "DamageResistance": {
+    "Environmental": [
+      {
+        "Amount": 1.0,
+        "CalculationType": "Percent"
+      }
+    ]
+  }
+}
