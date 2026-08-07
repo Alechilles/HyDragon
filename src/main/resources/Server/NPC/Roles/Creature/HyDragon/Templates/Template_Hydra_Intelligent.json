@@ -28,8 +28,8 @@
       "Description": "The range from which the target will be heard. If zero, hearing will be disabled."
     },
     "SleepHearingRange": {
-      "Value": { "Compute": "HearingRange" },
-      "Description": "The range from which a sleeping NPC detects nearby targets. Defaults to the awake hearing range."
+      "Value": 8,
+      "Description": "The range from which a sleeping NPC detects nearby targets."
     },
     "AbsoluteDetectionRange": {
       "Value": 2,
