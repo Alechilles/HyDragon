@@ -3,21 +3,25 @@
   "RosterId": "hydragon:dragon_horn",
   "FamilyId": "hydragon:soulbound_mini",
   "AllowedRoles": [
-    "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
-    "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
+    "Tamed_Wyvern_Mini_Wild",
+    "Tamed_Wyvern_Mini_Nature",
+    "Tamed_Wyvern_Mini_Toxic",
+    "Tamed_Wyvern_Mini_Fire",
+    "Tamed_Wyvern_Mini_Void",
+    "Tamed_Wyvern_Mini_Lightning",
     "Tamed_Wyvern_Mini_Ice"
   ],
   "MaximumOwned": 1,
   "MaximumActive": 1,
   "SummonAuraEffectId": "HyDragon_DragonStone_SummonAura",
   "RevivePriceByRole": [
-    { "RoleId": "Tamed_Wyvern_Mini_Wild", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 }, { "ItemId": "Draconic_Essence", "Quantity": 1 } ] },
-    { "RoleId": "Tamed_Wyvern_Mini_Nature", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 }, { "ItemId": "Draconic_Essence_Nature", "Quantity": 1 } ] },
-    { "RoleId": "Tamed_Wyvern_Mini_Toxic", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 }, { "ItemId": "Draconic_Essence_Toxic", "Quantity": 1 } ] },
-    { "RoleId": "Tamed_Wyvern_Mini_Fire", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 }, { "ItemId": "Draconic_Essence_Fire", "Quantity": 1 } ] },
-    { "RoleId": "Tamed_Wyvern_Mini_Void", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 }, { "ItemId": "Draconic_Essence_Void", "Quantity": 1 } ] },
-    { "RoleId": "Tamed_Wyvern_Mini_Lightning", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 }, { "ItemId": "Draconic_Essence_Lightning", "Quantity": 1 } ] },
-    { "RoleId": "Tamed_Wyvern_Mini_Ice", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 }, { "ItemId": "Draconic_Essence_Ice", "Quantity": 1 } ] }
+    { "RoleId": "Tamed_Wyvern_Mini_Wild", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 } ] },
+    { "RoleId": "Tamed_Wyvern_Mini_Nature", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 } ] },
+    { "RoleId": "Tamed_Wyvern_Mini_Toxic", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 } ] },
+    { "RoleId": "Tamed_Wyvern_Mini_Fire", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 } ] },
+    { "RoleId": "Tamed_Wyvern_Mini_Void", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 } ] },
+    { "RoleId": "Tamed_Wyvern_Mini_Lightning", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 } ] },
+    { "RoleId": "Tamed_Wyvern_Mini_Ice", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 1 } ] }
   ],
   "Features": {
     "Capture": false,
