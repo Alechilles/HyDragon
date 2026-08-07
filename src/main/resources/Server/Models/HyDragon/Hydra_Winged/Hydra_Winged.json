@@ -1,7 +1,7 @@
 {
   "Parent": "Hydra",
   "Model": "NPC/HyDragon/Hydra_Winged/Model/Hydra_Winged.blockymodel",
-  "Texture": "NPC/HyDragon/Hydra_Winged/Model/texture.png",
+  "Texture": "NPC/HyDragon/Hydra_Winged/Model/Toxic.png",
   "AnimationSets": {
     "Idle": {
       "Animations": [
