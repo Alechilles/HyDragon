@@ -16,6 +16,32 @@ MODULE_SPEC.loader.exec_module(VALIDATOR)
 
 
 class ValidatorContractTest(unittest.TestCase):
+    def test_rejects_non_finite_or_non_numeric_beacon_initial_delay_ranges(self) -> None:
+        fixture = {
+            "Environments": ["Environment_Volcanic_Caves"],
+            "NPCs": [{"Id": "Tamed_RockDrakeT1", "Weight": 1}],
+        }
+        known_assets = {"Environment_Volcanic_Caves", "Tamed_RockDrakeT1"}
+
+        for invalid_range in (["PT10M", "PT30M"], [False, True], [0, float("inf")]):
+            with self.subTest(invalid_range=invalid_range):
+                asset = copy.deepcopy(fixture)
+                asset["InitialSpawnDelayRange"] = invalid_range
+                errors: list[str] = []
+
+                VALIDATOR.validate_spawn_shape(
+                    asset,
+                    "BeaconNPCSpawn",
+                    "fixture",
+                    known_assets,
+                    errors,
+                )
+
+                self.assertIn(
+                    "fixture.InitialSpawnDelayRange must contain two ordered numeric real-time seconds",
+                    errors,
+                )
+
     def test_rejects_obsolete_toggle_in_dragon_horn_wheel(self) -> None:
         load_errors: list[str] = []
         parsed = VALIDATOR.load_json_assets(load_errors)

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import math
 import os
 import re
 import sys
@@ -790,7 +791,13 @@ def validate_range(value: object, size: int, minimum: float, maximum: float) -> 
     return (
         isinstance(value, list)
         and len(value) == size
-        and all(isinstance(item, (int, float)) and minimum <= item <= maximum for item in value)
+        and all(
+            isinstance(item, (int, float))
+            and not isinstance(item, bool)
+            and math.isfinite(item)
+            and minimum <= item <= maximum
+            for item in value
+        )
         and value[0] <= value[-1]
     )
 
@@ -860,6 +867,10 @@ def validate_spawn_shape(
         fail(errors, f"{context}.MoonPhaseWeightModifiers must contain five non-negative weights")
     if "YRange" in data and data["YRange"] is not None and not validate_range(data["YRange"], 2, -4096, 4096):
         fail(errors, f"{context}.YRange must contain two ordered integer offsets")
+    if asset_type == "BeaconNPCSpawn" and data.get("InitialSpawnDelayRange") is not None and not validate_range(
+        data["InitialSpawnDelayRange"], 2, 0, float("inf")
+    ):
+        fail(errors, f"{context}.InitialSpawnDelayRange must contain two ordered numeric real-time seconds")
 
 
 def validate_static_spawn_contracts(
@@ -868,7 +879,7 @@ def validate_static_spawn_contracts(
     known_assets: set[str],
     errors: list[str],
 ) -> None:
-    """Validate authored spawns plus base patches against Workshop's 0.5.6 contracts."""
+    """Validate authored spawns plus base patches against Workshop's 0.5.7 release contracts."""
     world_root = RESOURCE_ROOT / "Server/NPC/Spawn/World"
     local_spawn_ids: set[str] = set()
     for path in sorted(world_root.rglob("*.json")):
