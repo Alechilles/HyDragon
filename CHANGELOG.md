@@ -2,6 +2,20 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
+## 1.0.1 - Dragon Tranquilizer and Spawn Hotfix - Unreleased
+
+### Changed
+
+- Increased Toxic Hydra encounter availability and removed the initial delay
+  from dedicated Rock Drake beacon spawns.
+
+### Fixed
+
+- Fixed tranquilized dragons remaining suspended in midair; they now leave
+  flight immediately and fall to the ground.
+- Fixed tranquilized dragons leaving their sleep animation when hit again,
+  including by zero-damage tranquilizer arrows.
+
 ## 1.0.0 - Unreleased
 
 ### Added

@@ -1,7 +1,7 @@
 {
     "Group": "Alechilles",
     "Name": "HyDragon",
-    "Version": "1.0.0",
+    "Version": "1.0.1",
     "Description": "HyDragon",
     "Authors": [
         {
@@ -17,7 +17,7 @@
     "Main": "com.alechilles.hydragon.HyDragonPlugin",
     "ServerVersion": "0.5.x",
     "Dependencies": {
-        "Alechilles:Alec's Tamework!": ">=3.0.0 <4.0.0"
+        "Alechilles:Alec's Tamework!": ">=3.0.2 <4.0.0"
     },
     "OptionalDependencies": {
         "Alechilles:Alec's Nametags!": "*"
