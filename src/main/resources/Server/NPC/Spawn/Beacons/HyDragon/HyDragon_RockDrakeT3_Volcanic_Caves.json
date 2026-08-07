@@ -8,7 +8,6 @@
   "MaxSpawnedNPCs": 1,
   "ConcurrentSpawnsRange": [ 1, 1 ],
   "SpawnAfterGameTimeRange": [ "PT45M", "PT90M" ],
-  "InitialSpawnDelayRange": [ "PT10M", "PT30M" ],
   "NPCIdleDespawnTime": 60,
   "BeaconVacantDespawnGameTime": "PT15M",
   "BeaconRadius": 70,
