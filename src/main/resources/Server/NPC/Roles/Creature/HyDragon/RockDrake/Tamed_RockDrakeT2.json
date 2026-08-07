@@ -10,7 +10,7 @@
     "WanderRadius": 8,
     "ViewRange": 30,
     "HearingRange": 22,
-    "MaxSpeed": 5.5,
+    "MaxSpeed": 3.5,
     "Attack": "Root_NPC_RockDrake_Attack",
     "AttackDistance": 4.5,
     "TargetRange": 10,
