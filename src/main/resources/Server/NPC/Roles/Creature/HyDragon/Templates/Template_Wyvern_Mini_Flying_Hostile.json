@@ -960,13 +960,20 @@
                   "Actions": [
                     {
                       "Type": "TameworkSetFlyingCompanionMode",
-                      "Mode": "Hold",
-                      "LandingState": "Sleep.TranquilizedLanding",
-                      "GroundedState": "Sleep.TranquilizedGrounded",
-                      "DescendStep": 0.12,
-                      "ReissueDelayMs": 50,
-                      "GroundedStableTicks": 3,
-                      "VerticalMovementEpsilon": 0.15
+                      "Mode": "Fall"
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "Continue into the sleep branch as soon as gravity takes over.",
+                  "Sensor": {
+                    "Type": "MotionController",
+                    "MotionController": "Walk"
+                  },
+                  "Actions": [
+                    {
+                      "Type": "State",
+                      "State": ".TranquilizedGrounded"
                     }
                   ]
                 },
@@ -1070,21 +1077,6 @@
                           "Modify": {
                             "Animation": "Sleep"
                           }
-                        },
-                        {
-                          "$Comment": "Re-arm the looping sleep animation after a hit reaction interrupts it.",
-                          "Sensor": {
-                            "Type": "Damage",
-                            "Environment": true,
-                            "Drowning": true,
-                            "Combat": true,
-                            "Other": true
-                          },
-                          "Actions": [
-                            {
-                              "Type": "ResetInstructions"
-                            }
-                          ]
                         }
                       ]
                     },

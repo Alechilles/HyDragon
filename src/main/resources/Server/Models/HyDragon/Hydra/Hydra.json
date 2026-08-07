@@ -206,7 +206,8 @@
       "Animations": [
         {
           "Animation": "NPC/HyDragon/Hydra/Animations/Idle.blockyanim",
-          "Speed": 0.25
+          "Speed": 0.25,
+          "Looping": true
         }
       ]
     },

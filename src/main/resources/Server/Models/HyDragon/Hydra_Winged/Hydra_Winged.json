@@ -101,7 +101,7 @@
     },
     "Sleep": {
       "Animations": [
-        { "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/Sleep.blockyanim", "Speed": 0.25 }
+        { "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/Sleep.blockyanim", "Speed": 0.25, "Looping": true }
       ]
     },
     "Wake": {
