@@ -20,7 +20,8 @@
         "Alechilles:Alec's Tamework!": ">=3.0.2 <4.0.0"
     },
     "OptionalDependencies": {
-        "Alechilles:Alec's Nametags!": "*"
+        "Alechilles:Alec's Nametags!": "*",
+        "Alechilles:Alec's Telemetry!": ">=1.0.0 <2.0.0"
     },
     "DisabledByDefault": false,
     "IncludesAssetPack": true,

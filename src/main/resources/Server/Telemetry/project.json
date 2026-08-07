@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "projectId": "hydragon",
+  "displayName": "HyDragon",
+  "hosted": {
+    "projectKey": "proj_4_M5IIa3RvKd-mCX4vJzfsb5"
+  },
+  "telemetry": {
+    "crash": {
+      "supported": true,
+      "uncaughtExceptions": true,
+      "setupFailures": true,
+      "startFailures": true,
+      "exceptionalWorldRemovals": true
+    },
+    "stats": {
+      "supported": true
+    },
+    "reports": {
+      "supported": true,
+      "issue": {
+        "enabled": true
+      },
+      "suggestion": {
+        "enabled": true
+      },
+      "attachments": {
+        "currentServerLog": true,
+        "previousServerLog": true,
+        "maxBytes": 262144
+      },
+      "contact": {
+        "enabled": true,
+        "maxLength": 160
+      },
+      "resolutionUpdates": {
+        "enabled": true
+      }
+    }
+  }
+}
