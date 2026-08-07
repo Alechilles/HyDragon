@@ -365,7 +365,7 @@
       "Ranged": {
         "BasicAttacks": {
           "Attacks": [
-            "Root_NPC_Hydra_Ice_Ball"
+            "Root_NPC_Hydra_Toxic_Aerial_Spit"
           ],
           "InteractionVars": {
             "Hydra_Ball_Charge_Effect": {
@@ -399,7 +399,7 @@
       "AirRanged": {
         "BasicAttacks": {
           "Attacks": [
-            "Root_NPC_Hydra_Ice_Ball"
+            "Root_NPC_Hydra_Toxic_Aerial_Spit"
           ],
           "Randomise": false,
           "MaxRange": 28,

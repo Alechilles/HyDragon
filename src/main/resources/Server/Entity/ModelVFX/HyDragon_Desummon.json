@@ -1,7 +1,7 @@
 {
   "SwitchTo": "Disappear",
   "EffectDirection": "ToCenter",
-  "AnimationDuration": 30,
+  "AnimationDuration": 5,
   "AnimationRange": {
     "Y": 1.0
   },
