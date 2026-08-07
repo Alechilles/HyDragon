@@ -6,7 +6,7 @@
     "Weapons": [],
     "FlockArray": [ "Tamed_RockDrakeT1" ],
     "AttitudeGroup": "HyDragonCompanion",
-    "_CombatConfig": { "EntityEffect": "Immunity_Fire" },
+    "_CombatConfig": { "EntityEffect": "HyDragon_RockDrake_Immunity" },
     "DropList": "Empty",
     "WanderRadius": 8,
     "ViewRange": 28,
