@@ -1,6 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id 'java'
     id 'com.azuredoom.hytale-tools'
+    id 'com.gradleup.shadow' version '9.6.1'
 }
 
 def localProperties = new Properties()
@@ -22,6 +25,7 @@ java {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url = uri('https://www.cursemaven.com') }
 }
 
 dependencies {
@@ -30,6 +34,7 @@ dependencies {
     } else {
         compileOnly files(tameworkProject.sourceSets.main.output)
     }
+    implementation "curse.maven:creditor-1560961:${property('creditor_file_id')}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
@@ -69,13 +74,22 @@ tasks.named('processResources', Copy) {
 }
 
 tasks.named('jar') {
+    enabled = false
+}
+
+tasks.named('shadowJar', ShadowJar) {
     archiveFileName = "HyDragon v${project.version}.jar"
+    archiveClassifier = ''
     manifest {
         attributes(
                 'Plugin-Group': project.group,
                 'Plugin-Name': project.name,
                 'Plugin-Version': project.version)
     }
+}
+
+tasks.named('assemble') {
+    dependsOn(tasks.named('shadowJar'))
 }
 
 tasks.register('prepareWorkspaceAssets') {
@@ -111,7 +125,7 @@ tasks.named('test') {
 tasks.register('packagingTest', Test) {
     description = 'Runs packaged HyDragon integration tests against current Gradle artifacts.'
     group = 'verification'
-    dependsOn(tasks.named('jar'))
+    dependsOn(tasks.named('shadowJar'))
     if (tameworkProject != null) {
         dependsOn(tameworkProject.tasks.named('shadowJar'))
     }
@@ -120,7 +134,7 @@ tasks.register('packagingTest', Test) {
     include '**/*IT.class'
     useJUnitPlatform()
     systemProperty 'hydragon.project.basedir', projectDir.absolutePath
-    systemProperty 'hydragon.packaged.jar', tasks.named('jar').get().archiveFile.get().asFile.absolutePath
+    systemProperty 'hydragon.packaged.jar', tasks.named('shadowJar', ShadowJar).get().archiveFile.get().asFile.absolutePath
     systemProperty 'hydragon.tamework.jar', {
         tameworkProject == null
                 ? file(property('tamework_jar_path')).absolutePath

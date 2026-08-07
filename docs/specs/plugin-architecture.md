@@ -7,7 +7,7 @@ Target Tamework public API: `0.9.0`
 
 ## 1. Purpose
 
-HyDragon is one Java plugin and conventional Gradle asset pack. Gradle packages compiled classes, `manifest.json`, `Common/`, and `Server/` from `src/main/resources` into a single JAR.
+HyDragon is one Java plugin and conventional Gradle asset pack. Gradle packages compiled classes, embedded Creditor, `manifest.json`, `Common/`, and `Server/` from `src/main/resources` into a single shaded JAR.
 
 The Java layer owns HyDragon-specific transactions and behavior that assets cannot safely express. Assets remain responsible for models, textures, items, recipes, NPC roles, ordinary spawn data, effects, projectiles, audio references, and localization. Tamework owns reusable companion mechanics.
 
@@ -24,7 +24,7 @@ Related documents:
 
 ## 2. Architectural decisions
 
-1. The distributable remains one JAR containing Java classes and the complete asset pack.
+1. The distributable remains one JAR containing Java classes, embedded Creditor, and the complete asset pack.
 2. Source assets use the standard `src/main/resources/{Common,Server}` layout; the packaged JAR retains `Common/` and `Server/` at its root.
 3. HyDragon requires Tamework `>=3.0.0 <4.0.0` and integrates through the public API plus registered custom asset/interaction contracts.
 4. Manifest version compatibility is necessary but not sufficient; each runtime feature checks required capability names and current bonded availability.
@@ -40,7 +40,7 @@ Related documents:
 
 ### Packaging and identity
 
-- **HYD-ARCH-001:** A clean build must produce one JAR containing `HyDragonPlugin`, `manifest.json`, and the expected `Common/` and `Server/` trees.
+- **HYD-ARCH-001:** A clean build must produce one shaded JAR containing `HyDragonPlugin`, Creditor, `manifest.json`, and the expected `Common/` and `Server/` trees.
 - **HYD-ARCH-002:** Resource includes must exclude repository metadata, docs, source models, generated output, and development archives.
 - **HYD-ARCH-003:** `manifest.json` declares `Main`, keeps `IncludesAssetPack: true`, and requires `Alechilles:Alec's Tamework!` in range `>=3.0.0 <4.0.0`.
 - **HYD-ARCH-004:** `pom.xml`, `manifest.json`, and `TameworkBridge.REQUIRED_TAMEWORK_RANGE` must agree.

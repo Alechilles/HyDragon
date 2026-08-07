@@ -4,6 +4,11 @@ All notable player-facing changes to HyDragon are documented here.
 
 ## 1.0.1 - Dragon Tranquilizer and Spawn Hotfix - Unreleased
 
+### Added
+
+- Embedded Creditor 1.1.0 so `/credits` includes HyDragon and its authors
+  without requiring a separate Creditor installation.
+
 ### Changed
 
 - Increased Toxic Hydra encounter availability and removed the initial delay

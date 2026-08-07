@@ -30,6 +30,9 @@ Run HyDragon's unit and packaged-artifact suites:
 .\gradlew.bat clean test packagingTest
 ```
 
+The release JAR shades Creditor so `/credits` is available without a separate
+Creditor installation while retaining HyDragon's own root `manifest.json`.
+
 When working from the shared workspace, the packaging test automatically uses
 the Tamework JAR built from the sibling project.
 

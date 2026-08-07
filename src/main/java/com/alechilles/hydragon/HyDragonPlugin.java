@@ -31,6 +31,7 @@ import com.alechilles.hydragon.integration.FeatureGate;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkCapabilityDiagnostics;
+import com.alechilles.hydragon.integration.creditor.CreditorIntegration;
 import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
@@ -82,6 +83,7 @@ public final class HyDragonPlugin extends JavaPlugin {
 
     @Override
     protected void setup() {
+        CreditorIntegration.setup(this);
         registerInteractionCodecs();
         // The persistent encounter marker and damage system must exist before any world loads.
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);
@@ -117,6 +119,7 @@ public final class HyDragonPlugin extends JavaPlugin {
 
     @Override
     protected void start() {
+        CreditorIntegration.start(this);
         tameworkBridge = TameworkBridge.connect();
         configRepository.refreshFromAssetRegistry();
         openStateStore();
