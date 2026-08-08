@@ -61,7 +61,7 @@ hytaleTools {
     modUrl = 'https://modstats.io/stats'
     modCredits = 'Alec (Alechilles)||https://www.curseforge.com/members/alechilles/projects,Ye||https://www.curseforge.com/members/onlyye/projects'
     mainClass = 'com.alechilles.hydragon.HyDragonPlugin'
-    manifestDependencies = "Alechilles:Alec's Tamework!=>=3.0.2 <4.0.0"
+    manifestDependencies = "Alechilles:Alec's Tamework!=>=3.1.0 <4.0.0"
     manifestOptionalDependencies = "Alechilles:Alec's Nametags!=*,Alechilles:Alec's Telemetry!=>=1.0.0 <2.0.0"
     curseforgeId = '1503366'
     includesPack = true
