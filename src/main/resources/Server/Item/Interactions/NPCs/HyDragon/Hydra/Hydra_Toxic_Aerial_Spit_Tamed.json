@@ -1,8 +1,7 @@
 {
   "Type": "TameworkLaunchProjectile",
   "Effects": {
-    "WorldSoundEventId": "SFX_Scarak_Spitball_Fire",
-    "LocalSoundEventId": "SFX_Scarak_Spitball_Fire",
+    "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
     "Particles": [
       {
         "TargetEntityPart": "Entity",
