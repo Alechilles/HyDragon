@@ -1,0 +1,7 @@
+{
+  "Layers": [{ "Files": ["Sounds/Items/HyDragon/DragonFlute/HyDragon_Dragon_Flute_SE_14.ogg"], "RandomSettings": { "MinPitch": 0, "MaxPitch": 0, "MinVolume": 0, "MaxVolume": 0 }, "StartDelay": 0, "Looping": false }],
+  "Volume": -3.0,
+  "PreventSoundInterruption": false,
+  "MaxInstance": 6,
+  "Parent": "SFX_Attn_Moderate"
+}
