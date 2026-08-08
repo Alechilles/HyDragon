@@ -1319,7 +1319,7 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
     commands = {
         command.get("Id"): command
         for command in config.get("CommandList", [])
-        if isinstance(command, dict)
+        if isinstance(command, dict) and command.get("ShowInRadial", True)
     }
     expected_ids = {
         "Follow", "Hold", "Recall", "MoveToPing", "Defend", "Aggressive",
