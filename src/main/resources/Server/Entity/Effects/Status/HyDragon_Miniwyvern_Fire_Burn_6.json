@@ -1,4 +1,5 @@
 {
+  "Parent": "HyDragon_Miniwyvern_Fire_Burn",
   "Name": "server.effects.miniwyvernFireBurn.name",
   "DamageCalculator": {
     "BaseDamage": {
