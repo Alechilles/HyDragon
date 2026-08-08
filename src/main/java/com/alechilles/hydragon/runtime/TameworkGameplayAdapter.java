@@ -73,7 +73,7 @@ public final class TameworkGameplayAdapter implements BondedMiniwyvernExtensionG
                 Objects.requireNonNull(ownerUuid, "ownerUuid"),
                 DRAGON_HORN_ROSTER,
                 WILD_MINIWYVERN_ROLE,
-                "Bonded Miniwyvern",
+                null,
                 "Miniwyvern",
                 null,
                 Map.of("source", "soul-bond"),

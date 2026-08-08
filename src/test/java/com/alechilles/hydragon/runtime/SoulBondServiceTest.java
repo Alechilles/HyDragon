@@ -56,6 +56,8 @@ final class SoulBondServiceTest {
         assertEquals(TameworkGameplayAdapter.DRAGON_HORN_ROSTER, request.rosterId());
         assertEquals(TameworkGameplayAdapter.MINIWYVERN_FAMILY, request.familyId());
         assertEquals(TameworkGameplayAdapter.WILD_MINIWYVERN_ROLE, request.roleId());
+        assertNull(request.displayName(),
+                "newly bonded Miniwyverns must remain unnamed");
         assertEquals(BondedCompanionStateView.STORED,
                 fixture.authority.profile().state());
         assertNull(fixture.authority.profile().activeLease());
