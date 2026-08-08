@@ -1,0 +1,6 @@
+{
+  "Parent": "Mount",
+  "BaseSpeed": 4.0,
+  "Acceleration": 0.075,
+  "ForwardSprintSpeedMultiplier": 1.25
+}

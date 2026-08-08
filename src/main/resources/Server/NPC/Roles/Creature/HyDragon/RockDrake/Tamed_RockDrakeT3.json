@@ -49,6 +49,9 @@
     "NameTranslationKey": { "Compute": "NameTranslationKey" }
   },
   "Parameters": {
+    "MountMovementConfig": {
+      "Value": "HyDragonRockDrakeMount"
+    },
     "NameTranslationKey": {
       "Value": "server.npcRoles.Tamed_RockDrakeT3.name",
       "Description": "Translation key for NPC name display"

@@ -15,9 +15,9 @@ Young, standard, and Frost Rock Drakes form a natural ground-mount progression. 
 
 | Variant | Where to search | Appearance | Suggested stone | Mount and combat | Typical drops |
 |---|---|---|---|---|---|
-| **Young Rock Drake** | Zone 1 regular caves at middle depth, before the volcanic lava layer | Stone-skinned | **Iron** | Ground mount; boulder attacks | 2–3 scales, 2–3 plain essence, 1–2 Nature essence; Fire essence may also drop |
-| **Rock Drake** | Zone 2's deepest volcanic and lava caves only | Magma-rock skin | **Thorium** | Ground mount; boulder attacks | 3–4 scales, 3–4 plain essence, 2–3 Nature essence; Fire essence may also drop |
-| **Frost Rock Drake** | Zone 3 caves from middle depth through the deepest volcanic sections | Frosted ice skin | **Cobalt** | Ground mount; boulder attacks | 4–5 scales, 4–5 plain essence, 3–4 Nature essence; Ice essence may also drop |
+| **Young Rock Drake** | Zone 1 regular caves at middle depth, before the volcanic lava layer | Stone-skinned | **Iron** | Slow ground mount; boulder attacks | 2–3 scales, 2–3 plain essence, 1–2 Nature essence; Fire essence may also drop |
+| **Rock Drake** | Zone 2's deepest volcanic and lava caves only | Magma-rock skin | **Thorium** | Slow ground mount; boulder attacks | 3–4 scales, 3–4 plain essence, 2–3 Nature essence; Fire essence may also drop |
+| **Frost Rock Drake** | Zone 3 caves from middle depth through the deepest volcanic sections | Frosted ice skin | **Cobalt** | Slow ground mount; boulder attacks | 4–5 scales, 4–5 plain essence, 3–4 Nature essence; Ice essence may also drop |
 
 The listed material quantities are drop ranges. Optional Fire or Ice essence is not guaranteed on every defeat.
 
@@ -33,7 +33,7 @@ Any eligible stone can attempt a full-dragon capture. Bring a tranquilizer, lowe
 
 ## Combat and mount identity
 
-Rock Drakes are ground mounts rather than flight mounts. Their shared signature is the **boulder attack**, so keep a target in front of the Drake and use terrain to control the approach. Talent points can specialize the roster entry for damage, toughness, footing, or summon convenience; see [Leveling and Talents](/mod/hydragon/leveling-and-talents).
+Rock Drakes are slow, heavy ground mounts rather than flight mounts. They trade travel speed for a sturdy feel and their shared **boulder attack**, so keep a target in front of the Drake and use terrain to control the approach. Talent points can specialize the roster entry for damage, toughness, footing, or summon convenience; see [Leveling and Talents](/mod/hydragon/leveling-and-talents).
 
 ## Next steps
 
