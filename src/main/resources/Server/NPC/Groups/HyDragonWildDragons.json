@@ -1,0 +1,8 @@
+{
+  "IncludeRoles": [
+    "Hydra*",
+    "NordicDrake*",
+    "RockDrake*",
+    "Wyvern_Mini*"
+  ]
+}

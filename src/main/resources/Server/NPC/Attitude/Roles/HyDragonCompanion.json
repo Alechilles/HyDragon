@@ -2,6 +2,7 @@
   "Groups": {
     "Hostile": [
       "Aggressive",
+      "HyDragonWildDragons",
       "Predators",
       "PredatorsBig",
       "Undead",
