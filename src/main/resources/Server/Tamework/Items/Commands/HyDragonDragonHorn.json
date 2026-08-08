@@ -133,6 +133,41 @@
       "Steps": [
         { "Type": "SetState", "State": "Aggressive" }
       ]
+    },
+    {
+      "Id": "SetHome",
+      "ShowInRadial": false,
+      "DisplayName": "tamework.commands.setHome.name",
+      "Feedback": {
+        "ChatMessage": "tamework.commands.setHome.chat",
+        "HudMessage": "tamework.commands.setHome.hud"
+      },
+      "Steps": [
+        { "Type": "StoreHome", "Source": "RaycastHit", "FailurePolicy": "AbortAll" }
+      ]
+    },
+    {
+      "Id": "ReturnHome",
+      "ShowInRadial": false,
+      "DisplayName": "tamework.commands.returnHome.name",
+      "Feedback": {
+        "HudMessage": "tamework.commands.returnHome.hud"
+      },
+      "Steps": [
+        { "Type": "MoveToPosition", "Source": "StoredHome", "FailurePolicy": "AbortCommandForNpc" }
+      ]
+    },
+    {
+      "Id": "ToggleAirborneMode",
+      "ShowInRadial": false,
+      "DisplayName": "Toggle Flight / Ground Mode",
+      "Feedback": {
+        "HudMessage": "Flight mode toggled",
+        "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_05"
+      },
+      "Steps": [
+        { "Type": "TriggerHook", "HookId": "HyDragon.Command.ToggleAirborneMode" }
+      ]
     }
   ]
 }
