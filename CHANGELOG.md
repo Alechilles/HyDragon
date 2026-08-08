@@ -2,12 +2,35 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
-## 1.0.1 - Dragon Tranquilizer and Spawn Hotfix - Unreleased
+## 1.1.0 - Dragon Commands and Behavior Polish - Unreleased
 
 ### Added
 
+- Added assignable command hotswaps to the Dragon Horn and a flute-playing
+  animation when the horn is used.
 - Embedded Creditor 1.1.0 so `/credits` includes HyDragon and its authors
   without requiring a separate Creditor installation.
+- Added descriptor-based Alec's Telemetry reporting while keeping telemetry an
+  optional dependency controlled by the server owner.
+
+### Changed
+
+- Retuned Rock Drake cave progression, wake behavior, mounted movement, and
+  environmental survivability.
+- Refreshed dragon and Miniwyvern textures and adjusted dragon drop balance.
+- Updated the required Alec's Tamework version to `>=3.1.0 <4.0.0`.
+
+### Fixed
+
+- Fixed Toxic Hydra aerial combat and projectile audio, Winged Hydra idle
+  flight animation, and wild-dragon sleep and targeting behavior.
+- Fixed supported dragons failing to target hostile Void Grubs.
+- Fixed companion-expiry effects lasting too long and newly bonded Miniwyverns
+  receiving an unintended name.
+- Fixed Fire Miniwyverns failing to inherit their bond's burn particles.
+- Fixed tamed Rock Drakes taking lava or other environmental damage.
+
+## 1.0.1 - Dragon Tranquilizer and Spawn Hotfix - Unreleased
 
 ### Changed
 
