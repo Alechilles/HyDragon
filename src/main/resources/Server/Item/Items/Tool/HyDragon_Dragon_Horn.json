@@ -4,7 +4,63 @@
     "Name": "server.items.HyDragon_Dragon_Horn.name",
     "Description": "server.items.HyDragon_Dragon_Horn.description"
   },
-  "PlayerAnimationsId": "Item",
+  "PlayerAnimationsId": "Flute",
+  "Interactions": {
+    "Primary": {
+      "Interactions": [
+        {
+          "Type": "TameworkCommand",
+          "Effects": {
+            "ItemAnimationId": "PlayFlute"
+          }
+        }
+      ]
+    },
+    "Secondary": {
+      "Interactions": [
+        {
+          "Type": "TameworkCommand",
+          "CommandId": "OpenSelectionMenu",
+          "Effects": {
+            "ItemAnimationId": "PlayFlute"
+          }
+        }
+      ]
+    },
+    "Ability1": {
+      "Interactions": [
+        {
+          "Type": "TameworkCommandHotswap",
+          "Slot": "Q",
+          "Effects": {
+            "ItemAnimationId": "PlayFlute"
+          }
+        }
+      ]
+    },
+    "Ability2": {
+      "Interactions": [
+        {
+          "Type": "TameworkCommandHotswap",
+          "Slot": "E",
+          "Effects": {
+            "ItemAnimationId": "PlayFlute"
+          }
+        }
+      ]
+    },
+    "Ability3": {
+      "Interactions": [
+        {
+          "Type": "TameworkCommandHotswap",
+          "Slot": "R",
+          "Effects": {
+            "ItemAnimationId": "PlayFlute"
+          }
+        }
+      ]
+    }
+  },
   "Model": "Items/HyDragon/Dragon_Command_Flute.blockymodel",
   "Texture": "Items/HyDragon/Dragon_Command_Flute.png",
   "Quality": "Epic",

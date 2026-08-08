@@ -1,0 +1,9 @@
+{
+  "Parent": "Item",
+  "Animations": {
+    "PlayFlute": {
+      "ThirdPerson": "Characters/Animations/Items/Main_Handed/Flute/PlayFlute.blockyanim",
+      "FirstPerson": "Characters/Animations/Items/Main_Handed/Flute/PlayFlute.blockyanim"
+    }
+  }
+}
