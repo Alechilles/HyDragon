@@ -9,15 +9,15 @@ draft: false
 
 Parent: [Dragon Compendium](/mod/hydragon/dragon-compendium-index) | [Home](/mod/hydragon/)
 
-Young, standard, and Frost Rock Drakes form a natural ground-mount progression. All three are uncommon volcanic-cave spawns, use boulder attacks, and can carry you over ground terrain; the variant determines the zone, beacon type, and materials you can expect from the hunt.
+Young, standard, and Frost Rock Drakes form a natural ground-mount progression. All three are uncommon cave spawns, use boulder attacks, and can carry you over ground terrain; the variant determines the zone, cave depth, appearance, and materials you can expect from the hunt.
 
 ## Compare the variants
 
-| Variant | Where to search | Suggested stone | Mount and combat | Typical drops |
-|---|---|---|---|---|
-| **Young Rock Drake** | Zone 1 volcanic cave aggro beacons, tiers 1–3 | **Iron** | Ground mount; boulder attacks | 2–3 scales, 2–3 plain essence, 1–2 Nature essence; Fire essence may also drop |
-| **Rock Drake** | Zone 2 volcanic cave goblin beacons, tiers 1–3 | **Thorium** | Ground mount; boulder attacks | 3–4 scales, 3–4 plain essence, 2–3 Nature essence; Fire essence may also drop |
-| **Frost Rock Drake** | Zone 3 volcanic cave aggro beacons, tiers 1–3 | **Cobalt** | Ground mount; boulder attacks | 4–5 scales, 4–5 plain essence, 3–4 Nature essence; Ice essence may also drop |
+| Variant | Where to search | Appearance | Suggested stone | Mount and combat | Typical drops |
+|---|---|---|---|---|---|
+| **Young Rock Drake** | Zone 1 regular caves at middle depth, before the volcanic lava layer | Stone-skinned | **Iron** | Ground mount; boulder attacks | 2–3 scales, 2–3 plain essence, 1–2 Nature essence; Fire essence may also drop |
+| **Rock Drake** | Zone 2's deepest volcanic and lava caves only | Magma-rock skin | **Thorium** | Ground mount; boulder attacks | 3–4 scales, 3–4 plain essence, 2–3 Nature essence; Fire essence may also drop |
+| **Frost Rock Drake** | Zone 3 caves from middle depth through the deepest volcanic sections | Frosted ice skin | **Cobalt** | Ground mount; boulder attacks | 4–5 scales, 4–5 plain essence, 3–4 Nature essence; Ice essence may also drop |
 
 The listed material quantities are drop ranges. Optional Fire or Ice essence is not guaranteed on every defeat.
 
@@ -25,9 +25,9 @@ The listed material quantities are drop ranges. Optional Fire or Ice essence is 
 
 The stone column is a practical recommendation, not a hard restriction:
 
-1. Start with **Iron** for a Young Rock Drake in Zone 1 volcanic cave aggro beacons.
-2. Move to **Thorium** for the standard Rock Drake in Zone 2 volcanic cave goblin beacons.
-3. Use **Cobalt** for Frost Rock Drakes in Zone 3 volcanic cave aggro beacons.
+1. Start with **Iron** for a Young Rock Drake in Zone 1's regular middle-depth caves.
+2. Move to **Thorium** for the standard Rock Drake in Zone 2's deepest volcanic and lava caves.
+3. Use **Cobalt** for Frost Rock Drakes in Zone 3's middle-to-deep caves.
 
 Any eligible stone can attempt a full-dragon capture. Bring a tranquilizer, lower the Drake's health, and channel the stone only when the capture opening is ready. See [Capturing Dragons](/mod/hydragon/capturing-dragons) for the exact sequence and what happens when a channel is interrupted.
 

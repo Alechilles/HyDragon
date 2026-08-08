@@ -1,5 +1,5 @@
 {
   "Model": "NPC/HyDragon/RockDrake/Model/RockDrake.blockymodel",
-  "Texture": "NPC/HyDragon/RockDrake/Model/RockDragon.png",
+  "Texture": "NPC/HyDragon/RockDrake/Model/RockDragonfire.png",
   "Parent": "RockDrake"
 }

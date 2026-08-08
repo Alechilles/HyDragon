@@ -1,8 +1,9 @@
 {
   "Environments": [
-    "Env_Zone1_Caves_Volcanic_T1",
-    "Env_Zone1_Caves_Volcanic_T2",
-    "Env_Zone1_Caves_Volcanic_T3"
+    "Env_Zone1_Caves_Plains",
+    "Env_Zone1_Caves_Forests",
+    "Env_Zone1_Caves_Swamps",
+    "Env_Zone1_Caves_Mountains"
   ],
   "MinDistanceFromPlayer": 15,
   "MaxSpawnedNPCs": 1,
@@ -15,7 +16,7 @@
   "TargetDistanceFromPlayer": 25,
   "YRange": [ -24, 24 ],
   "NPCs": [
-    { "Weight": 100, "SpawnBlockSet": "Volcanic", "Id": "RockDrakeT1" }
+    { "Weight": 100, "SpawnBlockSet": "Rock", "Id": "RockDrakeT1" }
   ],
   "LightRanges": {
     "Light": [ 0, 7 ]
