@@ -24,9 +24,9 @@ if ([string]::IsNullOrWhiteSpace($normalizedVersion)) {
 }
 
 New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
-$gradleArgs = @("--no-daemon", "clean", "check", "jar")
+$gradleArgs = @("--no-daemon", "clean", "check", "shadowJar")
 if ($SkipTests) {
-    $gradleArgs = @("--no-daemon", "clean", "jar")
+    $gradleArgs = @("--no-daemon", "clean", "shadowJar")
 }
 
 & .\gradlew.bat @gradleArgs
