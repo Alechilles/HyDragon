@@ -28,6 +28,8 @@ All notable player-facing changes to HyDragon are documented here.
 - Fixed companion-expiry effects lasting too long and newly bonded Miniwyverns
   receiving an unintended name.
 - Fixed Fire Miniwyverns failing to inherit their bond's burn particles.
+- Fixed Toxic Miniwyvern weakness effects not showing their intended toxic
+  debuff visuals.
 - Fixed tamed Rock Drakes taking lava or other environmental damage.
 
 ## 1.0.1 - Dragon Tranquilizer and Spawn Hotfix - Unreleased
