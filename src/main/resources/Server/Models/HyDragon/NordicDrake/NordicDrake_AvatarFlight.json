@@ -105,7 +105,7 @@
           "Animation": "NPC/HyDragon/NordicDrake/Animations/AvatarFlight/Run.blockyanim",
           "SoundEventId": "SFX_Rex_Walk",
           "Looping": true,
-          "Speed": 1
+          "Speed": 0.7
         }
       ]
     },
@@ -115,7 +115,7 @@
           "Animation": "NPC/HyDragon/NordicDrake/Animations/AvatarFlight/Run.blockyanim",
           "SoundEventId": "SFX_Rex_Walk",
           "Looping": true,
-          "Speed": 1.2
+          "Speed": 1.1
         }
       ]
     },
