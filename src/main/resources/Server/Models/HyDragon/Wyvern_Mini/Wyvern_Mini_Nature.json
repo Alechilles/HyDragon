@@ -1,4 +1,8 @@
 {
   "Parent": "Wyvern_Mini",
-  "Texture": "NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Nature.png"
+  "Texture": "NPC/HyDragon/Wyvern_Mini/Model/Miniwyvern_Nature.png",
+  "Light": {
+    "Color": "#173",
+    "Radius": 1
+  }
 }
