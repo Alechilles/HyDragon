@@ -1,5 +1,8 @@
 {
   "Name": "server.effects.miniwyvernToxicWeakness.name",
+  "ApplicationEffects": {
+    "ModelVFXId": "HyDragon_Toxic_Debuff"
+  },
   "OverlapBehavior": "Overwrite",
   "RemovalBehavior": "Duration",
   "Infinite": false,

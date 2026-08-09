@@ -1,4 +1,5 @@
 {
+  "Parent": "HyDragon_Miniwyvern_Toxic_Weakness",
   "Name": "server.effects.miniwyvernToxicWeakness.name",
   "OverlapBehavior": "Overwrite",
   "RemovalBehavior": "Duration",
