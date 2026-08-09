@@ -12,7 +12,7 @@
   "BeaconVacantDespawnGameTime": "PT15M",
   "BeaconRadius": 70,
   "SpawnRadius": 50,
-  "TargetDistanceFromPlayer": 25,
+  "TargetDistanceFromPlayer": 30,
   "YRange": [ -24, 24 ],
   "NPCs": [
     { "Weight": 100, "SpawnBlockSet": "Volcanic", "Id": "RockDrakeT2" }
