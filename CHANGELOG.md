@@ -2,7 +2,7 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
-## 1.1.0 - Dragon Commands and Behavior Polish - Unreleased
+## 1.1.0 - Dragon Commands and Behavior Polish - 2026-08-08
 
 ### Added
 
