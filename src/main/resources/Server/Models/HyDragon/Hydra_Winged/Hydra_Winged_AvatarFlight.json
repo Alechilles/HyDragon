@@ -73,7 +73,7 @@
           "Animation": "NPC/HyDragon/Hydra_Winged/Animation/Default/AvatarFlight/Run.blockyanim",
           "SoundEventId": "SFX_Rex_Walk",
           "Looping": true,
-          "Speed": 0.7
+          "Speed": 1.1
         }
       ]
     },
