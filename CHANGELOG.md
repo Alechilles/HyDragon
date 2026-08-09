@@ -12,11 +12,14 @@ All notable player-facing changes to HyDragon are documented here.
   without requiring a separate Creditor installation.
 - Added descriptor-based Alec's Telemetry reporting while keeping telemetry an
   optional dependency controlled by the server owner.
+- Added a subtle element-colored glow to every Miniwyvern form.
 
 ### Changed
 
 - Retuned Rock Drake cave progression, wake behavior, mounted movement, and
   environmental survivability.
+- Moved volcanic-cave Rock Drake encounters slightly farther from players and
+  refreshed their shared appearance.
 - Refreshed dragon and Miniwyvern textures and adjusted dragon drop balance.
 - Updated the required Alec's Tamework version to `>=3.1.0 <4.0.0`.
 
@@ -30,6 +33,8 @@ All notable player-facing changes to HyDragon are documented here.
 - Fixed Fire Miniwyverns failing to inherit their bond's burn particles.
 - Fixed Toxic Miniwyvern weakness effects not showing their intended toxic
   debuff visuals.
+- Fixed mounted run and Avatar Flight animation speeds for Nordic Drakes, Rock
+  Drakes, and Winged Toxic Hydras.
 - Fixed tamed Rock Drakes taking lava or other environmental damage.
 
 ## 1.0.1 - Dragon Tranquilizer and Spawn Hotfix - Unreleased
