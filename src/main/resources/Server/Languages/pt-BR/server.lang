@@ -823,3 +823,6 @@ hydragon.talents.miniwyvern.wild.wyrm_fortitude.name=Fortitude de Wyrm
 hydragon.talents.miniwyvern.wild.wyrm_fortitude.description=Aumenta a velocidade de movimento em 5%.
 hydragon.talents.miniwyvern.wild.vigor_ascendance.name=Ascensão de Vigor
 hydragon.talents.miniwyvern.wild.vigor_ascendance.description=Aumenta a vida máxima em 6%. Reduz o dano recebido em 4%.
+
+# Interactions
+hydragon.interactions.message.flightmastersTalismanRequired=Você precisa de um Talismã de Mestre de Voo para montar.

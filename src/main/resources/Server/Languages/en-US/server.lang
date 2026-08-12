@@ -823,3 +823,6 @@ hydragon.talents.miniwyvern.wild.wyrm_fortitude.name=Wyrm Fortitude
 hydragon.talents.miniwyvern.wild.wyrm_fortitude.description=Increase movement speed by 5%.
 hydragon.talents.miniwyvern.wild.vigor_ascendance.name=Vigor Ascendance
 hydragon.talents.miniwyvern.wild.vigor_ascendance.description=Increase maximum health by 6%. Reduce damage taken by 4%.
+
+# Interactions
+hydragon.interactions.message.flightmastersTalismanRequired=You need a Flightmaster's Talisman to mount.

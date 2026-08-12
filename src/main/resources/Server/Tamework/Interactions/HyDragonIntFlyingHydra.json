@@ -27,7 +27,7 @@
       },
       "Effects": {
         "ShowFloatingText": {
-          "Message": "You need a Flightmaster's Talisman to mount."
+          "Message": "hydragon.interactions.message.flightmastersTalismanRequired"
         }
       }
     },
