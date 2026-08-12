@@ -46,7 +46,7 @@
       "orientation": [
         {
           "time": 0,
-          "delta": {"x": -0.08378, "y": 0.15107, "z": -0.22926, "w": 0.95791},
+          "delta": {"x": -0.06122, "y": -0.11748, "z": -0.02171, "w": 0.99095},
           "interpolationType": "smooth"
         }
       ],
@@ -184,11 +184,17 @@
       "shapeUvOffset": []
     },
     "Head": {
-      "position": [],
+      "position": [
+        {
+          "time": 0,
+          "delta": {"x": 0, "y": 2, "z": -4},
+          "interpolationType": "linear"
+        }
+      ],
       "orientation": [
         {
           "time": 0,
-          "delta": {"x": 0.06029, "y": 0.34791, "z": 0.27087, "w": 0.89552},
+          "delta": {"x": 0.18765, "y": -0.14646, "z": 0.20444, "w": 0.94949},
           "interpolationType": "smooth"
         }
       ],
@@ -234,7 +240,18 @@
       "shapeUvOffset": []
     },
     "Jaw": {
-      "position": [],
+      "position": [
+        {
+          "time": 0,
+          "delta": {"x": 0, "y": 0, "z": 0},
+          "interpolationType": "linear"
+        },
+        {
+          "time": 6,
+          "delta": {"x": 0, "y": 0, "z": 6},
+          "interpolationType": "linear"
+        }
+      ],
       "orientation": [
         {
           "time": 0,
