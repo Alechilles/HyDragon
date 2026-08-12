@@ -1,8 +1,8 @@
 {
   "Enabled": true,
-  "Priority": 200,
+  "Priority": 201,
   "RoleIds": [
-    "Tamed_NordicDrake"
+    "Tamed_Hydra_Toxic"
   ],
   "Interactions": [
     {
@@ -34,7 +34,6 @@
     {
       "Type": "Mount",
       "Enabled": true,
-      "RequireMountable": false,
       "RequireCrouching": true,
       "Requires": {
         "All": {
