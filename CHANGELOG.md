@@ -2,6 +2,18 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
+## 1.1.1 - Dragon Flight Mount Notice - 2026-08-11
+
+### Added
+
+- Added a floating notice when crouch-interacting with Nordic Drakes or Winged
+  Toxic Hydras without a Flightmaster's Talisman.
+
+### Changed
+
+- Refreshed dragon, Miniwyvern, and Rock Drake appearances and the Rock Drake
+  sleep animation.
+
 ## 1.1.0 - Dragon Commands and Behavior Polish - 2026-08-08
 
 ### Added
