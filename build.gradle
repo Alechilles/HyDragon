@@ -53,7 +53,7 @@ if (tameworkProject != null) {
 hytaleTools {
     hytaleVersion = property('hytale_version')
     patchline = property('hytale_patchline')
-    manifestServerVersion = '0.5.x'
+    manifestServerVersion = '>=0.5.7 <0.7.0 || >=0.6.0-pre.1 <0.6.0'
     manifestFile = layout.projectDirectory.file('src/main/resources/manifest.json')
     manifestGroup = 'Alechilles'
     modId = 'HyDragon'

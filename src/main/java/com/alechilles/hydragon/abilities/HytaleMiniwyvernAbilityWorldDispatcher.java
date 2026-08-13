@@ -3,6 +3,7 @@ package com.alechilles.hydragon.abilities;
 import com.alechilles.alecstamework.api.NpcProfileView;
 import com.alechilles.alecstamework.api.TameworkApi;
 import com.alechilles.alecstamework.npc.components.TameworkTalentsComponent;
+import com.alechilles.hydragon.compat.HytaleNpcSupportAccess;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
@@ -40,6 +41,9 @@ import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.MarkedEntitySupport;
+import com.hypixel.hytale.server.npc.role.support.WorldSupport;
 import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.protocol.packets.entities.SpawnModelParticles;
 import java.util.ArrayList;
@@ -131,16 +135,20 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
         @Override
         public Optional<Target> hostileTarget(double maximumRange) {
             NPCEntity npc = store.getComponent(npcRef, NPCEntity.getComponentType());
-            if (npc == null || npc.getRole() == null || npc.getRole().getMarkedEntitySupport() == null) {
+            Role role = npc == null ? null : npc.getRole();
+            MarkedEntitySupport markedEntities = HytaleNpcSupportAccess.markedEntitySupport(
+                    role, npcRef, store);
+            WorldSupport worldSupport = HytaleNpcSupportAccess.worldSupport(role, npcRef, store);
+            if (role == null || markedEntities == null || worldSupport == null) {
                 return Optional.empty();
             }
             for (String slot : HOSTILE_TARGET_SLOTS) {
-                Ref<EntityStore> candidate = npc.getRole().getMarkedEntitySupport().getMarkedEntityRef(slot);
+                Ref<EntityStore> candidate = markedEntities.getMarkedEntityRef(slot);
                 if (!valid(candidate)) continue;
                 Target resolved = target(candidate, resolveOwner(candidate)).orElse(null);
                 if (resolved == null || resolved.distance() > maximumRange || !resolved.alive()) continue;
                 try {
-                    Attitude attitude = npc.getRole().getWorldSupport().getAttitude(npcRef, candidate, store);
+                    Attitude attitude = worldSupport.getAttitude(npcRef, candidate, store);
                     if (attitude == Attitude.HOSTILE) return Optional.of(resolved);
                 } catch (RuntimeException ignored) {
                     // Unknown attitude is not treated as hostile.
@@ -158,7 +166,9 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
             TransformComponent transform = store.getComponent(npcRef, TransformComponent.getComponentType());
             SpatialResource<Ref<EntityStore>, EntityStore> spatial =
                     store.getResource(EntityModule.get().getEntitySpatialResourceType());
-            if (npc == null || npc.getRole() == null || transform == null || spatial == null) return List.of();
+            Role role = npc == null ? null : npc.getRole();
+            WorldSupport worldSupport = HytaleNpcSupportAccess.worldSupport(role, npcRef, store);
+            if (role == null || worldSupport == null || transform == null || spatial == null) return List.of();
 
             List<Ref<EntityStore>> nearby = SpatialResource.getThreadLocalReferenceList();
             spatial.getSpatialStructure().collect(transform.getPosition(), maximumRange, nearby);
@@ -168,7 +178,7 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
                 Target resolved = target(candidate, resolveOwner(candidate)).orElse(null);
                 if (resolved == null || !resolved.alive() || resolved.distance() > maximumRange) continue;
                 try {
-                    if (npc.getRole().getWorldSupport().getAttitude(npcRef, candidate, store) == Attitude.HOSTILE) {
+                    if (worldSupport.getAttitude(npcRef, candidate, store) == Attitude.HOSTILE) {
                         targets.add(resolved);
                     }
                 } catch (RuntimeException ignored) {
@@ -490,9 +500,11 @@ public final class HytaleMiniwyvernAbilityWorldDispatcher implements MiniwyvernA
             UUID targetOwner = valid(target) ? resolveOwner(target) : null;
             if (ownerUuid.equals(targetOwner)) return true;
             NPCEntity npc = store.getComponent(npcRef, NPCEntity.getComponentType());
-            if (npc == null || npc.getRole() == null || !valid(target)) return true;
+            Role role = npc == null ? null : npc.getRole();
+            WorldSupport worldSupport = HytaleNpcSupportAccess.worldSupport(role, npcRef, store);
+            if (role == null || worldSupport == null || !valid(target)) return true;
             try {
-                return npc.getRole().getWorldSupport().getAttitude(npcRef, target, store) != Attitude.HOSTILE;
+                return worldSupport.getAttitude(npcRef, target, store) != Attitude.HOSTILE;
             } catch (RuntimeException failure) {
                 return true;
             }

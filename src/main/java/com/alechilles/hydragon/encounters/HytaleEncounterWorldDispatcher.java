@@ -1,5 +1,6 @@
 package com.alechilles.hydragon.encounters;
 
+import com.alechilles.hydragon.compat.HytaleNpcSupportAccess;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
@@ -198,7 +199,7 @@ public final class HytaleEncounterWorldDispatcher implements EncounterWorldDispa
             if (!valid(target)) return false;
             NPCEntity npc = store.getComponent(target, NPCEntity.getComponentType());
             StateSupport states = npc == null || npc.getRole() == null
-                    ? null : npc.getRole().getStateSupport();
+                    ? null : HytaleNpcSupportAccess.stateSupport(npc.getRole(), target, store);
             EntityEffect effect = EntityEffect.getAssetMap().getAsset(groundedEffectId);
             EffectControllerComponent effects = store.getComponent(target, EffectControllerComponent.getComponentType());
             if (npc == null || states == null || effect == null || effects == null
