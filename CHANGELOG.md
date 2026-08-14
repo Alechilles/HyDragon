@@ -2,6 +2,19 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
+## 1.1.2 - Update 5 and 6 Compatibility Hotfix - 2026-08-13
+
+### Changed
+
+- Added compatibility with Hytale 0.5.7 and the Update 6 pre-release.
+
+### Fixed
+
+- Fixed Miniwyvern combat targeting and tranquilized dragon grounding after
+  Update 6 moved NPC role data.
+- Fixed invalid Miniwyvern, Rock Drake, and Draconic Scale texture dimensions
+  that caused asset validation errors.
+
 ## 1.1.1 - Dragon Flight Mount Notice - 2026-08-11
 
 ### Added
