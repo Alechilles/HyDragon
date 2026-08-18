@@ -1,5 +1,4 @@
 {
-  "Parent": "TwCommandExample",
   "Enabled": true,
   "ItemIds": [ "HyDragon_Dragon_Horn" ],
   "RosterStorage": "BondedCompanions",

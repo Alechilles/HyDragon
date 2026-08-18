@@ -10,6 +10,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Fixed
 
+- Fixed the Dragon Horn depending on Tamework's disabled optional examples.
+  The horn now declares its command interactions and config directly.
 - Fixed Miniwyvern combat targeting and tranquilized dragon grounding after
   Update 6 moved NPC role data.
 - Fixed invalid Miniwyvern, Rock Drake, and Draconic Scale texture dimensions

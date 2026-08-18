@@ -1,5 +1,4 @@
 {
-  "Parent": "Tamework_Command_Whistle_Example",
   "TranslationProperties": {
     "Name": "server.items.HyDragon_Dragon_Horn.name",
     "Description": "server.items.HyDragon_Dragon_Horn.description"
@@ -85,5 +84,6 @@
     "Translation": [ 1, -4 ],
     "Rotation": [ 334, 331, 321 ]
   },
-  "Icon": "Icons/ItemsGenerated/HyDragon_Dragon_Horn.png"
+  "Icon": "Icons/ItemsGenerated/HyDragon_Dragon_Horn.png",
+  "MaxStack": 1
 }

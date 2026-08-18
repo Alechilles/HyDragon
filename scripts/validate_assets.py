@@ -1296,11 +1296,32 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
     config_path = RESOURCE_ROOT / "Server/Tamework/Items/Commands/HyDragonDragonHorn.json"
     item = parsed.get(item_path)
     config = parsed.get(config_path)
-    if not isinstance(item, dict) or item.get("Parent") != "Tamework_Command_Whistle_Example":
-        fail(errors, "HyDragon Dragon Horn must inherit Tamework's supported command interaction")
-    if not isinstance(config, dict) or config.get("Parent") != "TwCommandExample":
-        fail(errors, "HyDragon command config must inherit the supported Tamework command set")
+    if not isinstance(item, dict):
+        fail(errors, "HyDragon Dragon Horn item config is missing")
         return
+    if item.get("Parent") == "Tamework_Command_Whistle_Example":
+        fail(errors, "Dragon Horn must not depend on Tamework's optional example item")
+    interactions = item.get("Interactions")
+    required_interactions = {
+        "Primary": ("TameworkCommand", None),
+        "Secondary": ("TameworkCommand", "OpenSelectionMenu"),
+        "Ability1": ("TameworkCommandHotswap", "Q"),
+        "Ability2": ("TameworkCommandHotswap", "E"),
+        "Ability3": ("TameworkCommandHotswap", "R"),
+    }
+    for slot, (interaction_type, command_value) in required_interactions.items():
+        group = interactions.get(slot) if isinstance(interactions, dict) else None
+        entries = group.get("Interactions") if isinstance(group, dict) else None
+        entry = entries[0] if isinstance(entries, list) and entries else None
+        value = entry.get("CommandId", entry.get("Slot")) if isinstance(entry, dict) else None
+        if not isinstance(entry, dict) or entry.get("Type") != interaction_type \
+                or value != command_value:
+            fail(errors, f"Dragon Horn {slot} must define its Tamework command interaction")
+    if not isinstance(config, dict):
+        fail(errors, "HyDragon command config is missing")
+        return
+    if config.get("Parent") == "TwCommandExample":
+        fail(errors, "Dragon Horn config must not depend on Tamework's optional example config")
     if config.get("ItemIds") != ["HyDragon_Dragon_Horn"]:
         fail(errors, "HyDragon command config must bind only the Dragon Horn")
     if config.get("BondedRosterId") != "hydragon:dragon_horn" \
