@@ -3,8 +3,12 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import os
+import tempfile
 import unittest
+import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 
 VALIDATOR_PATH = Path(__file__).resolve().parents[1] / "validate_assets.py"
@@ -16,6 +20,33 @@ MODULE_SPEC.loader.exec_module(VALIDATOR)
 
 
 class ValidatorContractTest(unittest.TestCase):
+    def test_reads_packaged_hytale_asset_archive(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            archive_path = (
+                Path(temp_dir)
+                / "Hytale/install/release/package/game/latest/Assets.zip"
+            )
+            archive_path.parent.mkdir(parents=True)
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("Common/Models/Test.blockymodel", "{}")
+                archive.writestr(
+                    "Server/Environments/Env_Test.json",
+                    json.dumps({"Id": "Env_Test"}),
+                )
+
+            errors: list[str] = []
+            with patch.dict(os.environ, {"APPDATA": temp_dir}):
+                os.environ.pop("HYTALE_ASSETS_PATH", None)
+                source = VALIDATOR.hytale_asset_root(errors)
+
+            self.assertEqual(archive_path.resolve(), source)
+            self.assertEqual([], errors)
+            self.assertIn("Env_Test", VALIDATOR.asset_stems(source))
+            self.assertEqual(
+                {"Id": "Env_Test"},
+                VALIDATOR.read_base_json(source, Path("Server/Environments/Env_Test.json")),
+            )
+
     def test_rejects_non_finite_or_non_numeric_beacon_initial_delay_ranges(self) -> None:
         fixture = {
             "Environments": ["Environment_Volcanic_Caves"],

@@ -9,6 +9,7 @@ import math
 import os
 import re
 import sys
+import zipfile
 from pathlib import Path
 
 
@@ -100,16 +101,66 @@ def hytale_asset_root(errors: list[str]) -> Path | None:
     candidates = [] if not configured else [Path(configured)]
     appdata = os.environ.get("APPDATA")
     if appdata:
-        candidates.append(Path(appdata) / "Hytale/install/release/package/game/latest/Assets")
+        install_root = Path(appdata) / "Hytale/install/release/package/game/latest"
+        candidates.extend((install_root / "Assets", install_root / "Assets.zip"))
     for candidate in candidates:
         if (candidate / "Server").is_dir() and (candidate / "Common").is_dir():
             return candidate.resolve()
-    fail(errors, "installed Hytale Assets directory unavailable; set HYTALE_ASSETS_PATH for base-reference validation")
+        if candidate.is_file() and zipfile.is_zipfile(candidate):
+            with zipfile.ZipFile(candidate) as archive:
+                names = archive.namelist()
+            if any(name.startswith("Server/") for name in names) \
+                    and any(name.startswith("Common/") for name in names):
+                return candidate.resolve()
+    fail(errors, "installed Hytale Assets directory or archive unavailable; set HYTALE_ASSETS_PATH for base-reference validation")
     return None
 
 
 def asset_stems(root: Path) -> set[str]:
+    if root.is_file():
+        with zipfile.ZipFile(root) as archive:
+            return {
+                Path(info.filename).stem
+                for info in archive.infolist()
+                if not info.is_dir()
+            }
     return {path.stem for path in root.rglob("*") if path.is_file()}
+
+
+def read_base_json(root: Path, relative_path: Path) -> object:
+    if root.is_file():
+        with zipfile.ZipFile(root) as archive:
+            return json.loads(archive.read(relative_path.as_posix()).decode("utf-8-sig"))
+    return json.loads((root / relative_path).read_text(encoding="utf-8-sig"))
+
+
+def base_asset_exists(root: Path, relative_path: Path) -> bool:
+    if root.is_file():
+        with zipfile.ZipFile(root) as archive:
+            try:
+                info = archive.getinfo(relative_path.as_posix())
+            except KeyError:
+                return False
+            return not info.is_dir()
+    return (root / relative_path).is_file()
+
+
+def asset_stems_under(root: Path, relative_root: Path, suffix: str) -> set[str]:
+    if root.is_file():
+        prefix = relative_root.as_posix().rstrip("/") + "/"
+        with zipfile.ZipFile(root) as archive:
+            return {
+                Path(info.filename).stem
+                for info in archive.infolist()
+                if not info.is_dir()
+                and info.filename.startswith(prefix)
+                and Path(info.filename).suffix == suffix
+            }
+    return {
+        path.stem
+        for path in (root / relative_root).rglob(f"*{suffix}")
+        if path.is_file()
+    }
 
 
 def load_json_assets(errors: list[str]) -> dict[Path, object]:
@@ -922,13 +973,13 @@ def validate_static_spawn_contracts(
         target_stems.add(Path(str(target)).stem)
         if base_root is None:
             continue
-        target_path = base_root / str(target)
-        if not target_path.is_file():
+        target_path = Path(str(target))
+        if not base_asset_exists(base_root, target_path):
             fail(errors, f"{context} base target does not exist in the installed Hytale assets: {target}")
             continue
         try:
-            base = json.loads(target_path.read_text(encoding="utf-8-sig"))
-        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            base = read_base_json(base_root, target_path)
+        except (OSError, UnicodeError, json.JSONDecodeError, KeyError, zipfile.BadZipFile) as exc:
             fail(errors, f"cannot read base spawn target {target}: {exc}")
             continue
         expected_environment, required_fields = WORKSHOP_057_PATCH_TARGETS[str(target)]
@@ -1707,10 +1758,9 @@ def main() -> int:
     validate_shared_aerial_component_wiring(parsed, errors)
     validate_companion_flight_toggle_contract(parsed, errors)
     validate_static_spawn_contracts(parsed, base_root, known_assets, errors)
-    projectile_ids = {
-        path.stem for root in (RESOURCE_ROOT, base_root) if root is not None
-        for path in (root / "Server" / "Projectiles").rglob("*.json")
-    }
+    projectile_ids = asset_stems_under(RESOURCE_ROOT, Path("Server/Projectiles"), ".json")
+    if base_root is not None:
+        projectile_ids |= asset_stems_under(base_root, Path("Server/Projectiles"), ".json")
     validate_domain_references(parsed, known_assets, projectile_ids, errors)
     validate_release_content_contracts(parsed, errors)
     validate_nordic_landing_recovery(parsed, errors)
