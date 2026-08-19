@@ -6,14 +6,17 @@ import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkRuntimeDiagnostics;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractAsyncCommand;
+import com.hypixel.hytale.logger.HytaleLogger;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import javax.annotation.Nonnull;
 
 /** {@code /hydragon status} capability/config diagnostics. */
 public final class HyDragonStatusCommand extends AbstractAsyncCommand {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     public static final String PERMISSION = "hydragon.command.status";
     private final Supplier<HyDragonConfigRepository.Snapshot> configSupplier;
     private final Supplier<List<String>> reloadIssuesSupplier;
@@ -51,6 +54,16 @@ public final class HyDragonStatusCommand extends AbstractAsyncCommand {
             return CompletableFuture.completedFuture(null);
         }
         TameworkRuntimeDiagnostics.Snapshot diagnostics = TameworkRuntimeDiagnostics.read(bridge);
+        for (var line : HyDragonStatusFormatter.format(
+                pluginVersion,
+                configSupplier.get(),
+                reloadIssuesSupplier.get(),
+                bridge.snapshot(),
+                diagnostics,
+                persistenceSupplier.get()
+        )) {
+            LOGGER.at(Level.INFO).log("/hydragon status: " + line);
+        }
         for (var message : HyDragonStatusFormatter.formatMessages(
                 pluginVersion,
                 configSupplier.get(),
