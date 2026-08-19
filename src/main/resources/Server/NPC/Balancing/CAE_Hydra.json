@@ -172,7 +172,7 @@
             }
           }
         ],
-        "RequireAiming": false
+        "RequireAiming": true
       },
       "RainShootAttack": {
         "Type": "Ability",

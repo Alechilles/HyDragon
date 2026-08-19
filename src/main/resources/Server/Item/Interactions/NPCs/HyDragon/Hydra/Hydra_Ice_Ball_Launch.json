@@ -27,5 +27,7 @@
     "Radius": 3.0,
     "ExcludeSource": true
   },
-  "Tags": {}
+  "Tags": {
+    "AimingReference": []
+  }
 }
