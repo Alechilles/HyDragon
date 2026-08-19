@@ -57,7 +57,7 @@ The selectable Miniwyvern re-attunement choices and their eight-essence costs ar
 
 | Recipe | Station | Ingredients | Output |
 |---|---|---|---|
-| [Revitalizing Essence](/mod/hydragon/revitalizing-essence) | Draconic Altar — Essence | 5 Draconic Essences of any type + 1 Greater Life Essence | 1 Revitalizing Essence |
+| [Revitalizing Essence](/mod/hydragon/revitalizing-essence) | Draconic Altar — Essence | 3 Draconic Essences of any type + 30 Life Essence | 1 Revitalizing Essence |
 
 Use [Summoning and Revival](/mod/hydragon/summoning-and-revival) to match the finished essence to the companion's exact revival cost.
 

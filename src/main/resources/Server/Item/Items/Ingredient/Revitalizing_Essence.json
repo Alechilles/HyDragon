@@ -17,7 +17,7 @@
   "Recipe": {
     "Input": [
       { "ResourceTypeId": "HyDragon_DraconicEssences", "Quantity": 3 },
-      { "ItemId": "Ingredient_Life_Essence_Concentrated", "Quantity": 1 }
+      { "ItemId": "Ingredient_Life_Essence", "Quantity": 30 }
     ],
     "Output": [
       { "ItemId": "Revitalizing_Essence", "Quantity": 1 }

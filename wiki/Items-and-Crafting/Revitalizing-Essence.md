@@ -17,10 +17,10 @@ Craft one Revitalizing Essence with:
 
 | Ingredient | Quantity |
 |---|---:|
-| Draconic Essences from the altar's accepted resource types | 5 |
-| Greater Life Essence | 1 |
+| Draconic Essences from the altar's accepted resource types | 3 |
+| Life Essence | 30 |
 
-The five essence units may be plain or any listed elemental Draconic Essence, including Earth and Wind crafting essences. Earth and Wind remain crafting materials rather than Miniwyvern forms.
+The three Draconic Essence units may be plain or any listed elemental Draconic Essence, including Earth and Wind crafting essences. Earth and Wind remain crafting materials rather than Miniwyvern forms.
 
 ## Match the revival cost
 

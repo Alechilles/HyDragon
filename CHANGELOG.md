@@ -2,6 +2,20 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
+## 1.1.3 - Hydra Combat and Crafting Hotfix - 2026-08-19
+
+### Changed
+
+- Refreshed Nordic Drake and Hydra appearances and removed unused skins.
+- Added `/hydragon status` output to the server log for easier diagnostics.
+
+### Fixed
+
+- Fixed Hydras failing to use ranged attacks reliably. Hydras now open ranged
+  combat correctly, aim ballistic projectiles, and continue chasing targets.
+- Fixed the Revitalizing Essence recipe requiring an unavailable ingredient.
+  It now uses 3 Draconic Essences and 30 regular Life Essence.
+
 ## 1.1.2 - Update 5 and 6 Compatibility Hotfix - 2026-08-18
 
 ### Changed

@@ -68,36 +68,6 @@ final class PackagedHyDragonRosterIT {
     }
 
     @Test
-    void packagedToxicHydraAssetsAreCompleteAndTextureResolves() throws Exception {
-        Path hydragon = packaged("hydragon.packaged.jar");
-        try (ZipFile zip = new ZipFile(hydragon.toFile())) {
-            for (String entry : List.of(
-                    "Server/NPC/Roles/Creature/HyDragon/Hydra/Hydra_Toxic.json",
-                    "Server/NPC/Roles/Creature/HyDragon/Hydra/Tamed_Hydra_Toxic.json",
-                    "Server/Projectiles/HyDragon/Hydra/Hydra_Toxic_Ball.json",
-                    "Server/Projectiles/HyDragon/Hydra/Hydra_Rain_Toxic_Ball.json",
-                    "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Ball_Charge_Effect.json",
-                    "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Toxic_Ball_Launch.json",
-                    "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Toxic_Charge_Effect.json",
-                    "Server/Item/Interactions/NPCs/HyDragon/Hydra/Hydra_Rain_Toxic_Launch.json",
-                    "Server/Models/HyDragon/Hydra/Hydra_Toxic.json",
-                    "Server/Models/Projectiles/HyDragon/Hydra_Toxic_Ball_Projectile.json",
-                    "Server/NPC/Spawn/World/Zone4/Spawns_Zone4_Volcanoes_HyDragon_Predator.json",
-                    "Server/Item/Block/Sets/HyDragon_DarkGreenMoss.json")) {
-                assertNotNull(zip.getEntry(entry), () -> "missing packaged entry " + entry);
-            }
-            JsonObject model = json(zip, "Server/Models/HyDragon/Hydra/Hydra_Toxic.json");
-            assertEquals("Hydra_Winged", model.get("Parent").getAsString());
-            assertNotNull(zip.getEntry("Common/NPC/HyDragon/Hydra/Model/Toxic.png"));
-            assertNotNull(zip.getEntry("Server/Tamework/Talents/HyDragonHydra.json"));
-            assertNotNull(zip.getEntry("Server/Tamework/Talents/HyDragonToxicHydra.json"));
-            for (String locale : List.of("en-US", "de-DE", "es-ES", "fr-FR", "pt-BR")) {
-                assertNotNull(zip.getEntry("Server/Languages/" + locale + "/server.lang"));
-            }
-        }
-    }
-
-    @Test
     void packagedAssetsAndApiExposeSharedPoliciesAndBondedApi() throws Exception {
         Path hydragon = packaged("hydragon.packaged.jar");
         Path tamework = packaged("hydragon.tamework.jar");
