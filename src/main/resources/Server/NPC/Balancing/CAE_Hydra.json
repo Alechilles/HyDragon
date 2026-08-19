@@ -147,7 +147,7 @@
         "WeightCoefficient": 2.0,
         "AttackDistanceRange": [
           6,
-          20
+          25
         ],
         "PostExecuteDistanceRange": [
           3.5,
@@ -159,16 +159,16 @@
             "Curve": {
               "ResponseCurve": "SimpleLogistic",
               "XRange": [
-                0,
-                20
+                6,
+                25
               ]
             }
           },
           {
             "Type": "TimeSinceLastUsed",
             "Curve": {
-              "Type": "Switch",
-              "SwitchPoint": 10
+              "XRange": [ 0, 6 ],
+              "ResponseCurve": "SimpleLogistic"
             }
           }
         ],
