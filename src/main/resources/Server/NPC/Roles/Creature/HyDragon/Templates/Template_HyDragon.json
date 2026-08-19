@@ -2147,6 +2147,7 @@
                       ]
                     },
                     {
+                      "Continue": true,
                       "Sensor": {
                         "Type": "CombatActionEvaluator",
                         "TargetInRange": false
