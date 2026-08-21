@@ -5,15 +5,14 @@
     "Env_Zone2_Caves_Volcanic_T3"
   ],
   "MinDistanceFromPlayer": 15,
-  "MaxSpawnedNPCs": 1,
+  "MaxSpawnedNPCs": 2,
   "ConcurrentSpawnsRange": [ 1, 1 ],
   "SpawnAfterGameTimeRange": [ "PT45M", "PT90M" ],
-  "NPCIdleDespawnTime": 120,
+  "NPCIdleDespawnTime": 600,
   "BeaconVacantDespawnGameTime": "PT15M",
   "BeaconRadius": 70,
   "SpawnRadius": 50,
   "TargetDistanceFromPlayer": 30,
-  "YRange": [ -24, 24 ],
   "NPCs": [
     { "Weight": 100, "SpawnBlockSet": "Volcanic", "Id": "RockDrakeT2" }
   ],
