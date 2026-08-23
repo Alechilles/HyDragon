@@ -2,6 +2,15 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
+## 1.1.4 - Flightmaster's Talisman Recipe Hotfix - 2026-08-23
+
+### Fixed
+
+- HyDragon now adds the Flightmaster's Talisman recipe only at the Draconic
+  Altar. Animal Husbandry provides the Tier 6 Farming Bench recipe.
+- When both mods are installed, the Draconic Altar option is added to Animal
+  Husbandry's recipe without replacing its Farming Bench option.
+
 ## 1.1.3 - Hydra Combat and Crafting Hotfix - 2026-08-19
 
 ### Changed

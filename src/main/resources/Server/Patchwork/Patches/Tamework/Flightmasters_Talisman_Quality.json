@@ -1,0 +1,14 @@
+{
+  "Id": "HyDragon_Flightmasters_Talisman_Quality",
+  "Target": "Server/Item/Items/Tools/Tamework_Flightmasters_Talisman.json",
+  "Priority": 100,
+  "Enabled": true,
+  "Operations": [
+    {
+      "Id": "set-talisman-quality",
+      "Op": "Replace",
+      "Path": "/Quality",
+      "Value": "Epic"
+    }
+  ]
+}

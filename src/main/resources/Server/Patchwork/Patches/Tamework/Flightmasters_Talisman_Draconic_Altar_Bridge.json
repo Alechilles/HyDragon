@@ -1,0 +1,31 @@
+{
+  "Id": "HyDragon_Flightmasters_Talisman_Draconic_Altar_Bridge",
+  "$Comment": "Adds HyDragon's Draconic Altar option to Animal Husbandry's talisman recipe.",
+  "Target": "Server/Item/Items/Tools/Tamework_Flightmasters_Talisman.json",
+  "When": {
+    "All": [
+      {
+        "TargetExists": true
+      },
+      {
+        "ModInstalled": "Alechilles:Alec's Animal Husbandry!"
+      }
+    ]
+  },
+  "Priority": 110,
+  "Enabled": true,
+  "Operations": [
+    {
+      "Id": "add-talisman-draconic-altar-bench",
+      "Op": "Add",
+      "Path": "/Recipe/BenchRequirement/-",
+      "Value": {
+        "Type": "Crafting",
+        "Id": "Draconic_Altar",
+        "Categories": [
+          "Draconic_Altar_Bonding"
+        ]
+      }
+    }
+  ]
+}

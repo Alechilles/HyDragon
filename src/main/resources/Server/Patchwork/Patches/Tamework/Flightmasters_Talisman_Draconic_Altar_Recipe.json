@@ -1,0 +1,54 @@
+{
+  "Id": "HyDragon_Flightmasters_Talisman_Draconic_Altar_Recipe",
+  "$Comment": "Provides HyDragon's Flightmaster's Talisman recipe when Animal Husbandry is not installed.",
+  "Target": "Server/Item/Items/Tools/Tamework_Flightmasters_Talisman.json",
+  "When": {
+    "All": [
+      {
+        "TargetExists": true
+      },
+      {
+        "Not": {
+          "ModInstalled": "Alechilles:Alec's Animal Husbandry!"
+        }
+      }
+    ]
+  },
+  "Priority": 100,
+  "Enabled": true,
+  "Operations": [
+    {
+      "Id": "add-talisman-draconic-altar-recipe",
+      "Op": "Add",
+      "Path": "/Recipe",
+      "Value": {
+        "Input": [
+          {
+            "ItemId": "Ingredient_Bar_Gold",
+            "Quantity": 10
+          },
+          {
+            "ItemId": "Rock_Gem_Zephyr",
+            "Quantity": 3
+          }
+        ],
+        "Output": [
+          {
+            "ItemId": "Tamework_Flightmasters_Talisman",
+            "Quantity": 1
+          }
+        ],
+        "BenchRequirement": [
+          {
+            "Type": "Crafting",
+            "Id": "Draconic_Altar",
+            "Categories": [
+              "Draconic_Altar_Bonding"
+            ]
+          }
+        ],
+        "TimeSeconds": 4
+      }
+    }
+  ]
+}
