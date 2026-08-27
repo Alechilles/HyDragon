@@ -28,11 +28,12 @@ class ManifestCompatibilityTest {
 
         SemverRange range = SemverRange.fromString(serverVersionRange);
 
+        assertAccepted(range, "0.5.0");
+        assertAccepted(range, "0.5.6");
         assertAccepted(range, "0.5.7");
-        assertAccepted(range, "0.6.0-pre.11");
         assertAccepted(range, "0.6.0");
-        assertRejected(range, "0.5.6");
-        assertRejected(range, "0.6.0-pre.0");
+        assertRejected(range, "0.4.9");
+        assertRejected(range, "0.6.0-pre.11");
         assertRejected(range, "0.7.0");
     }
 

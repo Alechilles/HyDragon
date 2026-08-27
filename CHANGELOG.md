@@ -2,6 +2,16 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
+## Unreleased
+
+### Changed
+
+- Standardized the Hytale server compatibility range on `>=0.5.0 <0.7.0`.
+
+### Fixed
+
+- Added the HyDragon icon to Alec's Telemetry consent screens.
+
 ## 1.1.4 - Flightmaster's Talisman Recipe Hotfix - 2026-08-23
 
 ### Fixed

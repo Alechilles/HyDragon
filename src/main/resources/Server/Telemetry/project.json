@@ -2,6 +2,9 @@
   "schemaVersion": 1,
   "projectId": "hydragon",
   "displayName": "HyDragon",
+  "ui": {
+    "iconTexturePath": "HyDragon/Telemetry/ConsentIcon.png"
+  },
   "hosted": {
     "projectKey": "proj_4_M5IIa3RvKd-mCX4vJzfsb5"
   },
