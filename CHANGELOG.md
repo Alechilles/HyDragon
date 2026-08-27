@@ -7,6 +7,7 @@ All notable player-facing changes to HyDragon are documented here.
 ### Changed
 
 - Standardized the Hytale server compatibility range on `>=0.5.0 <0.7.0`.
+- Updated the embedded Creditor library to 1.1.1 for stable Hytale 0.6 support.
 
 ### Fixed
 
