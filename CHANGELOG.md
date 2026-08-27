@@ -2,7 +2,7 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
-## Unreleased
+## 1.1.5 - Stable 0.6 Compatibility Hotfix - 2026-08-27
 
 ### Changed
 
