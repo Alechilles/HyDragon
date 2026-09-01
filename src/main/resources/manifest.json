@@ -1,7 +1,7 @@
 {
     "Group": "Alechilles",
     "Name": "HyDragon",
-    "Version": "1.1.5",
+    "Version": "1.1.6",
     "Description": "HyDragon",
     "Authors": [
         {
@@ -21,7 +21,7 @@
     },
     "OptionalDependencies": {
         "Alechilles:Alec's Nametags!": "*",
-        "Alechilles:Alec's Telemetry!": ">=1.0.0 <2.0.0"
+        "Alechilles:Beacon": ">=2.0.0 <3.0.0"
     },
     "DisabledByDefault": false,
     "IncludesAssetPack": true,
