@@ -4971,10 +4971,10 @@
                                   "id": "123",
                                   "name": "cube--C3",
                                   "position": {"x": -9.65889, "y": -7.53215, "z": 35.00929},
-                                  "orientation": {"x": 0, "y": 0.70711, "z": 0, "w": 0.70711},
+                                  "orientation": {"x": 0, "y": -0.70711, "z": 0, "w": 0.70711},
                                   "shape": {
                                     "type": "quad",
-                                    "offset": {"x": -4.5, "y": 3, "z": 0},
+                                    "offset": {"x": 4.5, "y": 3, "z": 0},
                                     "stretch": {"x": 1, "y": 1, "z": 1},
                                     "settings": {
                                       "isPiece": false,
@@ -4999,10 +4999,10 @@
                                   "id": "124",
                                   "name": "cube--C4",
                                   "position": {"x": 1.34111, "y": -7.53215, "z": 37.00929},
-                                  "orientation": {"x": 0, "y": 0.70711, "z": 0, "w": 0.70711},
+                                  "orientation": {"x": 0, "y": -0.70711, "z": 0, "w": 0.70711},
                                   "shape": {
                                     "type": "quad",
-                                    "offset": {"x": -4.5, "y": 3, "z": 0},
+                                    "offset": {"x": 4.5, "y": 3, "z": 0},
                                     "stretch": {"x": 1, "y": 1, "z": 1},
                                     "settings": {
                                       "isPiece": false,
@@ -5027,10 +5027,10 @@
                                   "id": "125",
                                   "name": "cube--C5",
                                   "position": {"x": 11.34111, "y": -7.53215, "z": 35.00929},
-                                  "orientation": {"x": 0, "y": 0.70711, "z": 0, "w": 0.70711},
+                                  "orientation": {"x": 0, "y": -0.70711, "z": 0, "w": 0.70711},
                                   "shape": {
                                     "type": "quad",
-                                    "offset": {"x": -4.5, "y": 3, "z": 0},
+                                    "offset": {"x": 4.5, "y": 3, "z": 0},
                                     "stretch": {"x": 1, "y": 1, "z": 1},
                                     "settings": {
                                       "isPiece": false,
@@ -5697,10 +5697,10 @@
                           "id": "140",
                           "name": "cube--C3",
                           "position": {"x": -10.44889, "y": -3.40215, "z": 31.26929},
-                          "orientation": {"x": 0, "y": 0.70711, "z": 0, "w": 0.70711},
+                          "orientation": {"x": 0, "y": -0.70711, "z": 0, "w": 0.70711},
                           "shape": {
                             "type": "quad",
-                            "offset": {"x": -4.5, "y": 3, "z": 0},
+                            "offset": {"x": 3.5, "y": 3, "z": 0},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
@@ -5725,10 +5725,10 @@
                           "id": "141",
                           "name": "cube--C4",
                           "position": {"x": -0.44889, "y": -3.40215, "z": 31.26929},
-                          "orientation": {"x": 0, "y": 0.70711, "z": 0, "w": 0.70711},
+                          "orientation": {"x": 0, "y": -0.70711, "z": 0, "w": 0.70711},
                           "shape": {
                             "type": "quad",
-                            "offset": {"x": -4.5, "y": 3, "z": 0},
+                            "offset": {"x": 5.5, "y": 3, "z": 0},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
@@ -5753,10 +5753,10 @@
                           "id": "142",
                           "name": "cube--C5",
                           "position": {"x": 8.55111, "y": -3.40215, "z": 31.26929},
-                          "orientation": {"x": 0, "y": 0.70711, "z": 0, "w": 0.70711},
+                          "orientation": {"x": 0, "y": -0.70711, "z": 0, "w": 0.70711},
                           "shape": {
                             "type": "quad",
-                            "offset": {"x": -4.5, "y": 3, "z": 0},
+                            "offset": {"x": 3.5, "y": 3, "z": 0},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
