@@ -3702,7 +3702,7 @@
                                         "angle": 0
                                       },
                                       "right": {
-                                        "offset": {"x": 400, "y": 418},
+                                        "offset": {"x": 371, "y": 454},
                                         "mirror": {"x": false, "y": false},
                                         "angle": 0
                                       },
@@ -4161,7 +4161,7 @@
                                         "angle": 0
                                       },
                                       "right": {
-                                        "offset": {"x": 419, "y": 418},
+                                        "offset": {"x": 390, "y": 454},
                                         "mirror": {"x": true, "y": false},
                                         "angle": 0
                                       },
@@ -5549,7 +5549,7 @@
                                 "angle": 0
                               },
                               "right": {
-                                "offset": {"x": 400, "y": 418},
+                                "offset": {"x": 371, "y": 454},
                                 "mirror": {"x": false, "y": false},
                                 "angle": 0
                               },
@@ -5800,7 +5800,7 @@
                                 "angle": 0
                               },
                               "right": {
-                                "offset": {"x": 419, "y": 418},
+                                "offset": {"x": 390, "y": 454},
                                 "mirror": {"x": true, "y": false},
                                 "angle": 0
                               },
