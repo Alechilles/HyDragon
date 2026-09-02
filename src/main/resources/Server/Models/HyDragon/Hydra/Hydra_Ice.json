@@ -1,6 +1,6 @@
 {
   "Model": "NPC/HyDragon/Hydra/Models/Hydra.blockymodel",
-  "Texture": "NPC/HyDragon/Hydra/Textures/Hydra_Ice.png",
+  "Texture": "NPC/HyDragon/Hydra/Models/Hydra_Ice.png",
   "EyeHeight": 1.5,
   "CrouchOffset": -0.1,
   "HitBox": {
