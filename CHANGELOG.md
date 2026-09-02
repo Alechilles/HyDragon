@@ -2,6 +2,26 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
+## 1.1.7 - Texture Atlas Hotfix - 2026-09-02
+
+### Changed
+
+- Reduced texture atlas space used by dragons and Miniwyverns without
+  downscaling their artwork. Shared repeated scale, hand, claw, and wing
+  surfaces, and removed unused texture areas.
+- Kept Nordic Drake and Winged Hydra texture layouts mostly aligned to make
+  custom skins easier to share.
+- Standardized model and skin asset names and folders. Existing NPC Role IDs
+  and skin-selection keys remain unchanged.
+
+### Fixed
+
+- Cleared unused texture pixels and added spacing around transparent surfaces
+  to prevent stray edges and seams.
+- Corrected misplaced belly, scale, and claw textures and missing pixels on
+  dragon skins.
+- Fixed Miniwyvern attack animation paths.
+
 ## 1.1.6 - Beacon Integration - 2026-09-01
 
 ### Changed
