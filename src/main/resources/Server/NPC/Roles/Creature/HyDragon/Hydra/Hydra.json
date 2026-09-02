@@ -164,7 +164,7 @@
   },
   "Parameters": {
     "Appearance": {
-      "Value": "Hydra",
+      "Value": "Hydra_Ice",
       "Description": "Model asset used for this Hydra variant."
     },
     "FlockArray": {

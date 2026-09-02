@@ -1,0 +1,8 @@
+{
+  "Parent": "WyvernMini",
+  "Texture": "NPC/HyDragon/WyvernMini/Textures/WyvernMini_Toxic.png",
+  "Light": {
+    "Color": "#050",
+    "Radius": 1
+  }
+}

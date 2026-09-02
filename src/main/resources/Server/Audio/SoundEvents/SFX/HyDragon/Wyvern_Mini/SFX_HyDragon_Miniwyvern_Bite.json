@@ -3,9 +3,9 @@
   "Layers": [
     {
       "Files": [
-        "Sounds/HyDragon/Wyvern_Mini/Attack/Bite_01.ogg",
-        "Sounds/HyDragon/Wyvern_Mini/Attack/Bite_02.ogg",
-        "Sounds/HyDragon/Wyvern_Mini/Attack/Bite_03.ogg"
+        "Sounds/HyDragon/WyvernMini/Attack/Bite_01.ogg",
+        "Sounds/HyDragon/WyvernMini/Attack/Bite_02.ogg",
+        "Sounds/HyDragon/WyvernMini/Attack/Bite_03.ogg"
       ],
       "RoundRobinHistorySize": 1,
       "Volume": -10

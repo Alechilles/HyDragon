@@ -6,7 +6,7 @@
   "StartState": "Follow",
   "Parameters": {
     "Appearance": {
-      "Value": "Wyvern_Mini",
+      "Value": "WyvernMini",
       "Description": "Model to be used"
     },
     "WanderRadius": {

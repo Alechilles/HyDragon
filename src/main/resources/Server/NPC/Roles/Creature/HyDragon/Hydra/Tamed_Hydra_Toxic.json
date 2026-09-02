@@ -2,7 +2,7 @@
   "Type": "Variant",
   "Reference": "Template_HyDragon_Dragon_Tamed",
   "Modify": {
-    "Appearance": "Hydra_Toxic",
+    "Appearance": "HydraWinged_Toxic",
     "Weapons": [],
     "FlockArray": ["Tamed_Hydra_Toxic"],
     "AttitudeGroup": "HyDragonCompanion",

@@ -1,21 +1,21 @@
 {
-  "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake.blockymodel",
-  "Texture": "NPC/HyDragon/NordicDrake/Model/OldOrange.png",
+  "Model": "NPC/HyDragon/NordicDrake/Models/NordicDrake.blockymodel",
+  "Texture": "NPC/HyDragon/NordicDrake/Textures/NordicDrake_Orange.png",
   "RandomAttachmentSets": {
     "Skin": {
       "GreenBalls": {
-        "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake.blockymodel",
-        "Texture": "NPC/HyDragon/NordicDrake/Model/GreenBalls.png",
+        "Model": "NPC/HyDragon/NordicDrake/Models/NordicDrake.blockymodel",
+        "Texture": "NPC/HyDragon/NordicDrake/Textures/NordicDrake_Green.png",
         "Weight": 1
       },
       "OldOrange": {
-        "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake.blockymodel",
-        "Texture": "NPC/HyDragon/NordicDrake/Model/OldOrange.png",
+        "Model": "NPC/HyDragon/NordicDrake/Models/NordicDrake.blockymodel",
+        "Texture": "NPC/HyDragon/NordicDrake/Textures/NordicDrake_Orange.png",
         "Weight": 1
       },
       "Cobalt": {
-        "Model": "NPC/HyDragon/NordicDrake/Model/NordicDrake.blockymodel",
-        "Texture": "NPC/HyDragon/NordicDrake/Model/Cobalt.png",
+        "Model": "NPC/HyDragon/NordicDrake/Models/NordicDrake.blockymodel",
+        "Texture": "NPC/HyDragon/NordicDrake/Textures/NordicDrake_Cobalt.png",
         "Weight": 1
       }
     }

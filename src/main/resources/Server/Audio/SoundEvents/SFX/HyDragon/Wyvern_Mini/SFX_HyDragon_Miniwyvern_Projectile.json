@@ -2,7 +2,7 @@
   "Parent": "SFX_Attn_Quiet",
   "Layers": [
     {
-      "Files": [ "Sounds/HyDragon/Wyvern_Mini/Attack/Projectile_01.ogg", "Sounds/HyDragon/Wyvern_Mini/Attack/Projectile_02.ogg", "Sounds/HyDragon/Wyvern_Mini/Attack/Projectile_03.ogg", "Sounds/HyDragon/Wyvern_Mini/Attack/Projectile_04.ogg" ],
+      "Files": [ "Sounds/HyDragon/WyvernMini/Attack/Projectile_01.ogg", "Sounds/HyDragon/WyvernMini/Attack/Projectile_02.ogg", "Sounds/HyDragon/WyvernMini/Attack/Projectile_03.ogg", "Sounds/HyDragon/WyvernMini/Attack/Projectile_04.ogg" ],
       "RoundRobinHistorySize": 1,
       "Volume": -10
     }

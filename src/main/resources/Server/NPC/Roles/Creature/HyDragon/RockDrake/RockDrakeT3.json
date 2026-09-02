@@ -2,7 +2,7 @@
   "Type": "Variant",
   "Reference": "Template_Hydra_Intelligent",
   "Modify": {
-    "Appearance": "RockDrakeT3",
+    "Appearance": "RockDrake_Ice",
     "Weapons": [],
     "OffHand": [],
     "NighttimeOffhandSlot": -1,

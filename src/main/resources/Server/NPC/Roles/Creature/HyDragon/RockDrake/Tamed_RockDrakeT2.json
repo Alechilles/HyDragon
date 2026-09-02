@@ -2,7 +2,7 @@
   "Type": "Variant",
   "Reference": "Template_HyDragon_Tamed",
   "Modify": {
-    "Appearance": "RockDrakeT2",
+    "Appearance": "RockDrake_Fire",
     "Weapons": [],
     "FlockArray": [ "Tamed_RockDrakeT2" ],
     "AttitudeGroup": "HyDragonCompanion",

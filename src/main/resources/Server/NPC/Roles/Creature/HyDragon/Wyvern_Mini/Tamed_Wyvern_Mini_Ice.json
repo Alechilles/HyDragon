@@ -2,7 +2,7 @@
     "Type": "Variant",
     "Reference": "Template_Wyvern_Mini_Flying_Tamed",
     "Modify": {
-        "Appearance": "Wyvern_Mini_Ice",
+        "Appearance": "WyvernMini_Ice",
         "DropList": "Empty",
         "WanderRadius": 10,
         "ViewRange": 28,

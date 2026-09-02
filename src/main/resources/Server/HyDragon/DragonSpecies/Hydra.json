@@ -23,6 +23,6 @@
   },
   "Presentation": {
     "LocalizationPrefix": "server.npcRoles.Hydra.name",
-    "ModelIds": [ "Hydra", "Hydra_Toxic" ]
+    "ModelIds": [ "Hydra_Ice", "HydraWinged_Toxic" ]
   }
 }

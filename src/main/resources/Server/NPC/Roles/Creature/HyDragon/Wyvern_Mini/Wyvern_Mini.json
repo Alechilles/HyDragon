@@ -2,7 +2,7 @@
   "Type": "Variant",
   "Reference": "Template_Wyvern_Mini_Flying_Hostile",
   "Modify": {
-    "Appearance": "Wyvern_Mini",
+    "Appearance": "WyvernMini",
     "WanderRadius": 10,
     "ViewRange": 28,
     "HearingRange": 18,

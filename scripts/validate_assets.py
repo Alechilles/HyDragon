@@ -689,7 +689,7 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
 
     forms = ("Wild", "Nature", "Toxic", "Fire", "Void", "Lightning", "Ice")
     essences = {"Wild": "Draconic_Essence", "Nature": "Draconic_Essence_Nature", "Toxic": "Draconic_Essence_Toxic", "Fire": "Draconic_Essence_Fire", "Void": "Draconic_Essence_Void", "Lightning": "Draconic_Essence_Lightning", "Ice": "Draconic_Essence_Ice"}
-    appearances = {"Wild": "Wyvern_Mini", "Nature": "Wyvern_Mini_Nature", "Toxic": "Wyvern_Mini_Toxic", "Fire": "Wyvern_Mini_Fire", "Void": "Wyvern_Mini_Void", "Lightning": "Wyvern_Mini_Lightning", "Ice": "Wyvern_Mini_Ice"}
+    appearances = {"Wild": "WyvernMini", "Nature": "WyvernMini_Nature", "Toxic": "WyvernMini_Toxic", "Fire": "WyvernMini_Fire", "Void": "WyvernMini_Void", "Lightning": "WyvernMini_Lightning", "Ice": "WyvernMini_Ice"}
     for form in forms:
         role_id = f"Tamed_Wyvern_Mini_{form}"
         role = parsed.get(RESOURCE_ROOT / f"Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/{role_id}.json")

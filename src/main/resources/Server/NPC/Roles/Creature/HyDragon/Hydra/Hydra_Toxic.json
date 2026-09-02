@@ -2,7 +2,7 @@
   "Type": "Variant",
   "Reference": "Template_HyDragon_Dragon",
   "Modify": {
-    "Appearance": "Hydra_Toxic",
+    "Appearance": "HydraWinged_Toxic",
     "Weapons": [],
     "OffHand": [],
     "NighttimeOffhandSlot": -1,

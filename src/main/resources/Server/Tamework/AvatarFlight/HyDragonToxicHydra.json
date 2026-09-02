@@ -3,7 +3,7 @@
   "Priority": 100,
   "Model": {
     "ApplyModel": true,
-    "ModelId": "Hydra_Winged_AvatarFlight",
+    "ModelId": "HydraWinged_AvatarFlight",
     "Scale": 1.0,
     "CameraPositionOffset": {
       "X": 1.0,
