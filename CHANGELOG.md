@@ -2,6 +2,13 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
+## 1.1.6 - Beacon Integration - 2026-09-01
+
+### Changed
+
+- Replaced the optional Alec's Telemetry integration with Beacon 2.x.
+- Moved the passive project descriptor to `Server/Beacon/project.json`.
+
 ## 1.1.5 - Stable 0.6 Compatibility Hotfix - 2026-08-27
 
 ### Changed

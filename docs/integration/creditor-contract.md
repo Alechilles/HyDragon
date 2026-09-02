@@ -1,6 +1,6 @@
 # Creditor Integration Contract
 
-- Primary mod: HyDragon 1.1.5
+- Primary mod: HyDragon 1.1.6
 - External library: Creditor 1.1.1 (CurseForge file `8724366`)
 - Dependency: embedded in the HyDragon release JAR; no separate mod dependency
 - Exposed hook: Creditor receives HyDragon's plugin during `setup()` and `start()`

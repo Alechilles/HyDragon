@@ -137,6 +137,31 @@ final class PackagedHyDragonRosterIT {
         assertNotNull(TameworkApi.class.getMethod("bondedCompanions"));
     }
 
+    @Test
+    void packagedManifestKeepsBeaconIntegrationOptional() throws Exception {
+        Path hydragon = packaged("hydragon.packaged.jar");
+        try (ZipFile zip = new ZipFile(hydragon.toFile())) {
+            JsonObject manifest = json(zip, "manifest.json");
+            JsonObject optionalDependencies = manifest.getAsJsonObject("OptionalDependencies");
+
+            assertEquals(">=2.0.0 <3.0.0",
+                    optionalDependencies.get("Alechilles:Beacon").getAsString());
+            assertEquals("*",
+                    optionalDependencies.get("Alechilles:Alec's Nametags!").getAsString());
+        }
+    }
+
+    @Test
+    void packagedBeaconDescriptorExposesHyDragonProjectIdentity() throws Exception {
+        Path hydragon = packaged("hydragon.packaged.jar");
+        try (ZipFile zip = new ZipFile(hydragon.toFile())) {
+            JsonObject descriptor = json(zip, "Server/Beacon/project.json");
+
+            assertEquals("hydragon", descriptor.get("projectId").getAsString());
+            assertEquals("HyDragon", descriptor.get("displayName").getAsString());
+        }
+    }
+
     private static Path packaged(String property) {
         Path path = Path.of(System.getProperty(property)).toAbsolutePath().normalize();
         assertTrue(Files.isRegularFile(path), () -> "missing packaged artifact: " + path);
