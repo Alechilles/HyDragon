@@ -39,7 +39,7 @@ Use the command wheel while the companion is active:
 | **Idle / Wander** | Stop an active order and let the companion idle nearby. |
 | **Airborne mode** | Toggle flight or ground mode for a companion that supports it. |
 
-The airborne toggle is shown only where the companion supports it. Miniwyverns use it to switch their own movement between the ground and air; it does not turn them into a player mount. Nordic Drake and Winged Toxic Hydra use the toggle for their distinct player-flight modes, while ground-only Hydra and Rock Drakes remain ground mounts.
+The airborne toggle is shown only where the companion supports it. Miniwyverns use it to switch their own movement between the ground and air; it does not turn them into a player mount. To ride Nordic Drake or Winged Toxic Hydra in avatar flight, select the **Flightmaster's Talisman** and crouch-interact with your dragon. See [Mounts and Flight](/mod/hydragon/mounts-and-flight) for launch and flight controls. Standard Hydra and Rock Drakes remain ground mounts.
 
 ## A reliable routine
 

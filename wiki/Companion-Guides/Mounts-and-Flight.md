@@ -22,18 +22,23 @@ The standard Hydra and every Rock Drake are **ground mounts**. They carry you ac
 | **Nordic Drake** | Full avatar flight with fire abilities and a dedicated flight talent branch. |
 | **Winged Toxic Hydra** | A separate airborne Toxic Hydra mode with toxic ranged and breath abilities. |
 
-Avatar flight changes your riding view and movement; you are flying as the companion rather than directing a separate wild creature. Use the flute's airborne toggle when the companion is active and the control is available.
+Avatar flight changes your riding view and movement; you are flying as the companion rather than directing a separate wild creature. Summon your dragon, select the **Flightmaster's Talisman**, then **crouch and interact** with the dragon to mount.
 
 ## Flight controls
 
-The shared flight controls are easy to remember:
+Nordic Drake and Winged Toxic Hydra share these avatar-flight controls. The mouse buttons and keys below assume default bindings.
 
-- Hold jump to flap or climb.
-- Use sprint for a forward boost.
-- Use crouch to air-brake.
-- Glide between boosts and watch your **Vigour** so you have energy for the next climb or escape.
+| Action | Control |
+|---|---|
+| **Charge and launch** | While mounted on the ground, hold crouch to charge, then release to launch. |
+| **Flap upward** | Left-click (primary action). |
+| **Airbrake** | Right-click (secondary action). |
+| **Forward boost** | Press **Q** (Ability 1). |
+| **Dismount** | Press **F** (interact). This also dismounts immediately while airborne. |
 
-If a companion does not expose the airborne toggle, keep it in its ground role. The standard Hydra and Rock Drakes remain ground mounts.
+Steer with your movement controls and look direction. Glide between flaps and boosts, and watch your **Vigour** so you have energy for the next climb or escape. Land before dismounting if you want to stay on the ground.
+
+The standard Hydra and Rock Drakes remain ground mounts.
 
 ## Talent choices for travel
 
@@ -46,6 +51,6 @@ See [Leveling and Talents](/mod/hydragon/leveling-and-talents) before committing
 
 ## Next steps
 
-- Learn the [Dragon Command Flute](/mod/hydragon/dragon-command-flute) airborne toggle.
+- Summon and manage companions with the [Dragon Command Flute](/mod/hydragon/dragon-command-flute).
 - Compare habitats and combat roles in the [Dragon Compendium](/mod/hydragon/dragon-compendium-index).
 - Prepare a safe return route with [Summoning and Revival](/mod/hydragon/summoning-and-revival).

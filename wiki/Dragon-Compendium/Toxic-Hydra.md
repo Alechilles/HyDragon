@@ -37,7 +37,7 @@ Give poison clouds room to expire and watch the Hydra's flight path before commi
 
 ## Bonded combat and flight
 
-The bonded variant can use the same toxic bolts, poison breath, and poison-cloud pressure. It also receives the dedicated **Winged Toxic Hydra** flight experience: switch to its airborne mode from the flute when you need to cross vertical terrain or make a mounted attack run. This is separate from the standard Hydra, which remains a ground mount.
+The bonded variant can use the same toxic bolts, poison breath, and poison-cloud pressure. It also receives the dedicated **Winged Toxic Hydra** flight experience: select the **Flightmaster's Talisman** and crouch-interact with your dragon to mount, then hold and release crouch on the ground to launch. This is separate from the standard Hydra, which remains a ground mount.
 
 ## Leveling and talent identity
 

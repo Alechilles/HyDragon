@@ -66,5 +66,5 @@ A **Void Draconic Essence** is a rare additional drop and is not guaranteed.
 ## Next steps
 
 - Prepare your capture attempt with [Capturing Dragons](/mod/hydragon/capturing-dragons).
-- Learn mounted Vigour and the flight toggle in [Mounts and Flight](/mod/hydragon/mounts-and-flight).
+- Learn how to mount, launch, and manage Vigour in [Mounts and Flight](/mod/hydragon/mounts-and-flight).
 - Plan longer sessions with [Summoning and Revival](/mod/hydragon/summoning-and-revival).
