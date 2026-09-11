@@ -708,7 +708,11 @@ def validate_miniwyvern_role_wiring(parsed: dict[Path, object], errors: list[str
             fail(errors, f"{role_id} must reference a role-specific interaction config")
             continue
         entries = interaction.get("Interactions")
-        transforms = [entry for entry in entries if isinstance(entry, dict) and entry.get("Type") == "Custom"] if isinstance(entries, list) else []
+        transforms = [
+            entry for entry in entries
+            if isinstance(entry, dict) and entry.get("Type") == "Custom"
+            and "SetRole" in entry.get("Effects", {})
+        ] if isinstance(entries, list) else []
         destinations = set()
         for entry in transforms:
             requirements = entry.get("Requires", {}).get("All", {})

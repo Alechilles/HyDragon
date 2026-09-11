@@ -66,6 +66,28 @@
       }
     },
     {
+      "Type": "Custom",
+      "Requires": {
+        "All": {
+          "AlarmState": [
+            {
+              "Name": "Pet_Ready",
+              "State": "unset"
+            }
+          ],
+          "PlayerHandEmpty": true,
+          "IsTamed": true
+        }
+      },
+      "Effects": {
+        "TriggerNpcHook": {
+          "HookId": "TwHook_Pet",
+          "Consume": true
+        }
+      },
+      "PromptHint": "server.interactionHints.pet"
+    },
+    {
       "Type": "ModeCycle",
       "Enabled": true,
       "Cycle": [

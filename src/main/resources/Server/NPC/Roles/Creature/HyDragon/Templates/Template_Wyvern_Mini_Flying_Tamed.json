@@ -232,6 +232,54 @@
   ],
   "Instructions": [
     {
+      "Continue": true,
+      "Instructions": [
+        {
+          "$Comment": "Apply pet hearts and the Animal Husbandry pet cooldown.",
+          "Continue": true,
+          "Sensor": {
+            "Type": "TameworkHook",
+            "HookId": "TwHook_Pet",
+            "Consume": true
+          },
+          "Actions": [
+            {
+              "Type": "SpawnParticles",
+              "ParticleSystem": "Hearts_Subtle",
+              "Offset": [
+                0,
+                0.8,
+                0
+              ]
+            },
+            {
+              "Type": "SetAlarm",
+              "Name": "Pet_Ready",
+              "DurationRange": [
+                "PT15M",
+                "PT15M"
+              ]
+            }
+          ]
+        },
+        {
+          "$Comment": "Clear the pet cooldown when it finishes.",
+          "Continue": true,
+          "Sensor": {
+            "Type": "Alarm",
+            "Name": "Pet_Ready",
+            "State": "Passed",
+            "Clear": true
+          },
+          "Actions": [
+            {
+              "Type": "Nothing"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "$Comment": "Validation-only state setters (disabled).",
       "Enabled": false,
       "Actions": [
