@@ -103,7 +103,7 @@
         "Wyvern_Mini"
       ],
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini/{combo_slug}.png",
-      "cameraScale": 2.0,
+      "cameraScale": 1.25,
       "cameraAutoFramePadding": 2
     },
     {
@@ -114,7 +114,7 @@
         "Tamed_Wyvern_Mini_Fire"
       ],
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Fire/{combo_slug}.png",
-      "cameraScale": 2.0,
+      "cameraScale": 1.25,
       "cameraAutoFramePadding": 2
     },
     {
@@ -125,7 +125,7 @@
         "Tamed_Wyvern_Mini_Ice"
       ],
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Ice/{combo_slug}.png",
-      "cameraScale": 2.0,
+      "cameraScale": 1.25,
       "cameraAutoFramePadding": 2
     },
     {
@@ -136,7 +136,7 @@
         "Tamed_Wyvern_Mini_Lightning"
       ],
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Lightning/{combo_slug}.png",
-      "cameraScale": 2.0,
+      "cameraScale": 1.25,
       "cameraAutoFramePadding": 2
     },
     {
@@ -147,7 +147,7 @@
         "Tamed_Wyvern_Mini_Nature"
       ],
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Nature/{combo_slug}.png",
-      "cameraScale": 2.0,
+      "cameraScale": 1.25,
       "cameraAutoFramePadding": 2
     },
     {
@@ -158,7 +158,7 @@
         "Tamed_Wyvern_Mini_Toxic"
       ],
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Toxic/{combo_slug}.png",
-      "cameraScale": 2.0,
+      "cameraScale": 1.25,
       "cameraAutoFramePadding": 2
     },
     {
@@ -169,7 +169,7 @@
         "Tamed_Wyvern_Mini_Void"
       ],
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Void/{combo_slug}.png",
-      "cameraScale": 2.0,
+      "cameraScale": 1.25,
       "cameraAutoFramePadding": 2
     }
   ]

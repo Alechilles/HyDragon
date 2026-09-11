@@ -14,8 +14,13 @@ python "../Alec's Animal Husbandry!/scripts/tools/spawner-icons/prepare_models.p
 python ../alecstamework/scripts/tools/generate_spawner_icon_overrides.py --batch-manifest "$work/prepared/effective.batch.json" --asset-root "$work/staging" --dynamic-icons-output-dir "$work/staging/Server/Tamework/DynamicIcons" --dynamic-icon-id-prefix HyDragon_DynamicIcon --manifest-out "$work/manifest.json" --renderer-jobs-out "$work/jobs.json"
 ```
 
+Miniwyvern entries use `cameraScale: 1.25` and `cameraAutoFramePadding: 2` in
+`hydragon.batch.json`. They retain the shared rotation `[22.5, 45, 22.5]`,
+auto-framing, and six attempts. The lower starting scale keeps the full
+snout, wings, and tail in the raw render before alpha framing.
+
 In Blockbench, run **Run Tamework Dynamic Icon Batch (From Jobs JSON)** with `jobs.json`. Use the current Tamework batch renderer and Hytale Models plugin. Inspect all 15 images, check references and role coverage, then copy the generated PNGs and dynamic configs from staging into `src/main/resources` together. Rebuild HyDragon's JAR for client installation.
 
 The manifest limits each pass to 100 combinations. If future models add attachment slots, select the most visible features before expanding the batch.
 
-Miniwyvern entries use `cameraScale: 2.0` and `cameraAutoFramePadding: 2` to fill more of the icon canvas. Keep these settings aligned across the wild and six elemental forms when regenerating their portraits.
+Keep the Miniwyvern camera settings aligned across the wild and six elemental forms when regenerating their portraits. Inspect the full silhouette; transparent borders alone do not prove the model was not cropped during rendering.
