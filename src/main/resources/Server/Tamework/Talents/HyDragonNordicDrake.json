@@ -13,7 +13,6 @@
       "Tier": 1,
       "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
       "PointCost": 1,
-      "MinLevel": 1,
       "Effects": [{"EffectKey": "AvatarFlightVigourCapacityMultiplier", "Multiplier": 1.15}]
     },
     {
@@ -24,7 +23,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
       "PointCost": 2,
-      "MinLevel": 6,
       "RequiresTalentIds": ["NordicDrake_NorthwindResolve"],
       "Effects": [{"EffectKey": "AvatarFlightVigourRechargeRateMultiplier", "Multiplier": 1.15}]
     },
@@ -36,7 +34,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
       "PointCost": 2,
-      "MinLevel": 6,
       "RequiresTalentIds": ["NordicDrake_NorthwindResolve"],
       "Effects": [{"EffectKey": "AvatarFlightForwardBoostCostMultiplier", "Multiplier": 0.88}]
     },
@@ -48,7 +45,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
       "PointCost": 3,
-      "MinLevel": 14,
       "RequiresTalentIds": ["NordicDrake_SustainedCurrent"],
       "Effects": [{"EffectKey": "AvatarFlightGlideSinkMultiplier", "Multiplier": 0.86}]
     },
@@ -60,7 +56,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
       "PointCost": 3,
-      "MinLevel": 14,
       "RequiresTalentIds": ["NordicDrake_Flamewake"],
       "Effects": [{"EffectKey": "AvatarFlightForwardBoostImpulseMultiplier", "Multiplier": 1.15}]
     },
@@ -72,7 +67,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
       "PointCost": 4,
-      "MinLevel": 24,
       "RequiresTalentIds": ["NordicDrake_ThermalGuard", "NordicDrake_Skyrend"],
       "Effects": [
         {"EffectKey": "AvatarFlightVigourCapacityMultiplier", "Multiplier": 1.10},
@@ -87,7 +81,6 @@
       "Tier": 1,
       "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
       "PointCost": 2,
-      "MinLevel": 1,
       "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.02}]
     },
     {
@@ -98,7 +91,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
       "PointCost": 2,
-      "MinLevel": 8,
       "RequiresTalentIds": ["NordicDrake_EmberDiscipline"],
       "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}]
     },
@@ -110,7 +102,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
       "PointCost": 3,
-      "MinLevel": 8,
       "RequiresTalentIds": ["NordicDrake_EmberDiscipline"],
       "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.035}]
     },
@@ -122,7 +113,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
       "PointCost": 4,
-      "MinLevel": 16,
       "RequiresTalentIds": ["NordicDrake_ScorchingMomentum"],
       "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.045}]
     },
@@ -134,7 +124,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
       "PointCost": 3,
-      "MinLevel": 16,
       "RequiresTalentIds": ["NordicDrake_FurnaceHeart"],
       "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05}]
     },
@@ -146,7 +135,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
       "PointCost": 4,
-      "MinLevel": 24,
       "RequiresTalentIds": ["NordicDrake_RuinousBreath", "NordicDrake_IronTalons"],
       "Effects": [
         {"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04},
@@ -161,7 +149,6 @@
       "Tier": 1,
       "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
       "PointCost": 1,
-      "MinLevel": 1,
       "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
     },
     {
@@ -172,7 +159,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
       "PointCost": 2,
-      "MinLevel": 7,
       "RequiresTalentIds": ["NordicDrake_RunestoneHide"],
       "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}]
     },
@@ -184,7 +170,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
       "PointCost": 2,
-      "MinLevel": 7,
       "RequiresTalentIds": ["NordicDrake_RunestoneHide"],
       "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
     },
@@ -196,7 +181,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
       "PointCost": 3,
-      "MinLevel": 15,
       "RequiresTalentIds": ["NordicDrake_LongVigil"],
       "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.06}]
     },
@@ -208,7 +192,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
       "PointCost": 3,
-      "MinLevel": 15,
       "RequiresTalentIds": ["NordicDrake_GlacierScales"],
       "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0638297872340425}]
     },
@@ -220,7 +203,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
       "PointCost": 4,
-      "MinLevel": 24,
       "RequiresTalentIds": ["NordicDrake_Unyielding", "NordicDrake_Sagascar"],
       "Effects": [
         {"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05},
@@ -235,7 +217,6 @@
       "Tier": 1,
       "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
       "PointCost": 1,
-      "MinLevel": 1,
       "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.25}]
     },
     {
@@ -246,7 +227,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
       "PointCost": 2,
-      "MinLevel": 8,
       "RequiresTalentIds": ["NordicDrake_DragonboundPact"],
       "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.8}]
     },
@@ -258,7 +238,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
       "PointCost": 3,
-      "MinLevel": 16,
       "RequiresTalentIds": ["NordicDrake_SwiftRecall"],
       "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.6}]
     },
@@ -270,7 +249,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
       "PointCost": 4,
-      "MinLevel": 24,
       "RequiresTalentIds": ["NordicDrake_EternalWings"],
       "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.625}]
     }

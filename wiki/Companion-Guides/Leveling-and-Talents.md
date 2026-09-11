@@ -9,7 +9,7 @@ draft: false
 
 Parent: [Companion Guides](/mod/hydragon/companion-guides-index) | [Home](/mod/hydragon/)
 
-Every bonded companion grows to **level 30**. Each level grants **one talent point**. Spend those points in the branches that match how you fight, travel, and use the companion.
+Every bonded companion grows to **level 30**. Each level grants **one talent point**. Spend those points in the branches that match how you fight, travel, and use the companion. Talents require only their point cost and any prerequisite talents; there are no talent level requirements.
 
 ## How companions gain experience
 
@@ -49,12 +49,12 @@ The themed Hydra trees make those roles explicit:
 
 For Rock Drakes and Nordic Drake, the summon tree is named **Summoner's Pact**. Ice Hydra and Toxic Hydra use the themed name **Broodcaller's Pact** for the same four summon milestones:
 
-| Unlock level | Benefit |
+| Point cost | Benefit |
 |---:|---|
 | **1** | The first summon-duration improvement. |
-| **8** | The first cooldown reduction. |
-| **16** | A larger summon-duration improvement that builds on the first. |
-| **24** | A further cooldown reduction that builds on the earlier one. |
+| **2** | The first cooldown reduction. |
+| **3** | A larger summon-duration improvement that builds on the first. |
+| **4** | A further cooldown reduction that builds on the earlier one. |
 
 The duration and cooldown improvements stack within the branch. Choose it when you want fewer interruptions between companion sessions rather than a direct damage specialization.
 

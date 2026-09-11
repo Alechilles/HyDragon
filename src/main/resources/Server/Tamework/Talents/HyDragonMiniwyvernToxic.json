@@ -13,8 +13,7 @@
       "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
       "Tier": 1,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
-      "PointCost": 1,
-      "MinLevel": 2
+      "PointCost": 1
     },
     {
       "Id": "Miniwyvern_Toxic_VenomFocus",
@@ -24,7 +23,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
-      "MinLevel": 4,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomBond"
       ]
@@ -37,7 +35,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
-      "MinLevel": 6,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomBond"
       ]
@@ -50,7 +47,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 2,
-      "MinLevel": 9,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomFocus"
       ]
@@ -63,7 +59,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 2,
-      "MinLevel": 11,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomAttunement"
       ]
@@ -76,7 +71,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
-      "MinLevel": 14,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomAmplification"
       ]
@@ -89,7 +83,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 1,
-      "MinLevel": 17,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomResonance"
       ]
@@ -102,7 +95,6 @@
       "Tier": 5,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 2,
-      "MinLevel": 20,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomEfficiency",
         "Miniwyvern_Toxic_VenomHarmony"
@@ -116,7 +108,6 @@
       "Tier": 6,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.essence_bond",
       "PointCost": 4,
-      "MinLevel": 26,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VenomMastery"
       ]
@@ -129,7 +120,6 @@
       "Tier": 1,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
-      "MinLevel": 3,
       "Effects": [
         {
           "EffectKey": "DraconicProjectile",
@@ -145,7 +135,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
-      "MinLevel": 5,
       "RequiresTalentIds": [
         "DraconicProjectile"
       ],
@@ -164,7 +153,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
-      "MinLevel": 5,
       "RequiresTalentIds": [
         "DraconicProjectile"
       ],
@@ -183,7 +171,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 2,
-      "MinLevel": 9,
       "RequiresTalentIds": [
         "ProjectileRange"
       ],
@@ -202,7 +189,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 2,
-      "MinLevel": 11,
       "RequiresTalentIds": [
         "ProjectileCadence"
       ],
@@ -221,7 +207,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 3,
-      "MinLevel": 14,
       "RequiresTalentIds": [
         "ProjectileGuidance",
         "ProjectilePattern"
@@ -241,7 +226,6 @@
       "Tier": 1,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
-      "MinLevel": 3,
       "Effects": [
         {
           "EffectKey": "SwoopFerocity",
@@ -257,7 +241,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
-      "MinLevel": 5,
       "RequiresTalentIds": [
         "SwoopFerocity"
       ],
@@ -276,7 +259,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 1,
-      "MinLevel": 5,
       "RequiresTalentIds": [
         "SwoopFerocity"
       ],
@@ -295,7 +277,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 2,
-      "MinLevel": 9,
       "RequiresTalentIds": [
         "SwoopCadence"
       ],
@@ -314,7 +295,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 2,
-      "MinLevel": 11,
       "RequiresTalentIds": [
         "SwoopPrecision"
       ],
@@ -333,7 +313,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.combat",
       "PointCost": 3,
-      "MinLevel": 14,
       "RequiresTalentIds": [
         "RelentlessSwoop",
         "RendingDive"
@@ -353,7 +332,6 @@
       "Tier": 1,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
-      "MinLevel": 2,
       "Effects": [
         {
           "EffectKey": "MaxHealthMultiplier",
@@ -369,7 +347,6 @@
       "Tier": 2,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
-      "MinLevel": 4,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_VitalScales"
       ],
@@ -388,7 +365,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 2,
-      "MinLevel": 7,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_HardenedScales"
       ],
@@ -407,7 +383,6 @@
       "Tier": 3,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
-      "MinLevel": 8,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_ElderScales"
       ],
@@ -426,7 +401,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 2,
-      "MinLevel": 11,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_ScaleGuard"
       ],
@@ -445,7 +419,6 @@
       "Tier": 4,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
-      "MinLevel": 12,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_ScaleBulwark"
       ],
@@ -464,7 +437,6 @@
       "Tier": 5,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 2,
-      "MinLevel": 15,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_SwiftWings"
       ],
@@ -483,7 +455,6 @@
       "Tier": 5,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 1,
-      "MinLevel": 17,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_SurvivalInstinct"
       ],
@@ -502,7 +473,6 @@
       "Tier": 5,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 2,
-      "MinLevel": 20,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_LastingScales"
       ],
@@ -521,7 +491,6 @@
       "Tier": 6,
       "Branch": "hydragon.talents.miniwyvern.toxic.branch.vigor",
       "PointCost": 4,
-      "MinLevel": 25,
       "RequiresTalentIds": [
         "Miniwyvern_Toxic_WyrmFortitude"
       ],
