@@ -1,0 +1,162 @@
+{
+  "defaults": {
+    "rendererName": "HyDragon companion portraits",
+    "iconSize": 64,
+    "cameraScale": 1.0,
+    "cameraRotation": [
+      22.5,
+      45,
+      22.5
+    ],
+    "cameraTranslation": [
+      0,
+      0
+    ],
+    "cameraAutoFrame": true,
+    "cameraAutoFramePadding": 4,
+    "cameraAutoFrameMaxAttempts": 6,
+    "maxCombos": 100,
+    "enabled": true
+  },
+  "sources": {
+    "baseGame": {
+      "modelsRoot": "${APPDATA}/Hytale/install/release/package/game/latest/Assets.zip!Server/Models",
+      "commonRoot": "${APPDATA}/Hytale/install/release/package/game/latest/Assets.zip!Common"
+    },
+    "hydragon": {
+      "modelsRoot": "${MANIFEST_DIR}/../../src/main/resources/Server/Models",
+      "commonRoot": "${MANIFEST_DIR}/../../src/main/resources/Common"
+    }
+  },
+  "entries": [
+    {
+      "id": "HydraWinged_Toxic",
+      "source": "hydragon",
+      "model": "HyDragon/HydraWinged/HydraWinged_Toxic.json",
+      "roles": [
+        "Hydra_Toxic",
+        "Tamed_Hydra_Toxic"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/HydraWinged_Toxic/{combo_slug}.png"
+    },
+    {
+      "id": "Hydra_Ice",
+      "source": "hydragon",
+      "model": "HyDragon/Hydra/Hydra_Ice.json",
+      "roles": [
+        "Hydra",
+        "Tamed_Hydra"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/Hydra_Ice/{combo_slug}.png"
+    },
+    {
+      "id": "NordicDrake",
+      "source": "hydragon",
+      "model": "HyDragon/NordicDrake/NordicDrake.json",
+      "roles": [
+        "NordicDrake",
+        "Tamed_NordicDrake"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/NordicDrake/{combo_slug}.png",
+      "keepAttachmentSets": [
+        "Skin"
+      ],
+      "iconDefault": "Icons/ItemsGenerated/HyDragon/Companions/NordicDrake/skin-oldorange.png"
+    },
+    {
+      "id": "RockDrake_Fire",
+      "source": "hydragon",
+      "model": "HyDragon/RockDrake/RockDrake_Fire.json",
+      "roles": [
+        "RockDrake",
+        "RockDrakeT2",
+        "Tamed_RockDrakeT2"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/RockDrake_Fire/{combo_slug}.png"
+    },
+    {
+      "id": "RockDrake_Ice",
+      "source": "hydragon",
+      "model": "HyDragon/RockDrake/RockDrake_Ice.json",
+      "roles": [
+        "RockDrakeT3",
+        "Tamed_RockDrakeT3"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/RockDrake_Ice/{combo_slug}.png"
+    },
+    {
+      "id": "RockDrake_Stone",
+      "source": "hydragon",
+      "model": "HyDragon/RockDrake/RockDrake_Stone.json",
+      "roles": [
+        "RockDrakeT1",
+        "Tamed_RockDrakeT1"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/RockDrake_Stone/{combo_slug}.png"
+    },
+    {
+      "id": "WyvernMini",
+      "source": "hydragon",
+      "model": "HyDragon/WyvernMini/WyvernMini.json",
+      "roles": [
+        "Tamed_Wyvern_Mini_Wild",
+        "Wyvern_Mini"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini/{combo_slug}.png"
+    },
+    {
+      "id": "WyvernMini_Fire",
+      "source": "hydragon",
+      "model": "HyDragon/WyvernMini/WyvernMini_Fire.json",
+      "roles": [
+        "Tamed_Wyvern_Mini_Fire"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Fire/{combo_slug}.png"
+    },
+    {
+      "id": "WyvernMini_Ice",
+      "source": "hydragon",
+      "model": "HyDragon/WyvernMini/WyvernMini_Ice.json",
+      "roles": [
+        "Tamed_Wyvern_Mini_Ice"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Ice/{combo_slug}.png"
+    },
+    {
+      "id": "WyvernMini_Lightning",
+      "source": "hydragon",
+      "model": "HyDragon/WyvernMini/WyvernMini_Lightning.json",
+      "roles": [
+        "Tamed_Wyvern_Mini_Lightning"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Lightning/{combo_slug}.png"
+    },
+    {
+      "id": "WyvernMini_Nature",
+      "source": "hydragon",
+      "model": "HyDragon/WyvernMini/WyvernMini_Nature.json",
+      "roles": [
+        "Tamed_Wyvern_Mini_Nature"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Nature/{combo_slug}.png"
+    },
+    {
+      "id": "WyvernMini_Toxic",
+      "source": "hydragon",
+      "model": "HyDragon/WyvernMini/WyvernMini_Toxic.json",
+      "roles": [
+        "Tamed_Wyvern_Mini_Toxic"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Toxic/{combo_slug}.png"
+    },
+    {
+      "id": "WyvernMini_Void",
+      "source": "hydragon",
+      "model": "HyDragon/WyvernMini/WyvernMini_Void.json",
+      "roles": [
+        "Tamed_Wyvern_Mini_Void"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Void/{combo_slug}.png"
+    }
+  ]
+}

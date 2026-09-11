@@ -1,0 +1,10 @@
+{
+  "RoleIds": [
+    "RockDrake",
+    "RockDrakeT2",
+    "Tamed_RockDrakeT2"
+  ],
+  "IconOverrides": [],
+  "IconDefault": "Icons/ItemsGenerated/HyDragon/Companions/RockDrake_Fire/base.png",
+  "Enabled": true
+}

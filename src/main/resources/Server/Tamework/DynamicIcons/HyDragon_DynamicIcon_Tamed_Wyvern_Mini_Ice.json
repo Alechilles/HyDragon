@@ -1,0 +1,8 @@
+{
+  "RoleIds": [
+    "Tamed_Wyvern_Mini_Ice"
+  ],
+  "IconOverrides": [],
+  "IconDefault": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Ice/base.png",
+  "Enabled": true
+}

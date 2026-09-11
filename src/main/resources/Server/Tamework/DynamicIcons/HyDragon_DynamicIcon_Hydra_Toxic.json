@@ -1,0 +1,9 @@
+{
+  "RoleIds": [
+    "Hydra_Toxic",
+    "Tamed_Hydra_Toxic"
+  ],
+  "IconOverrides": [],
+  "IconDefault": "Icons/ItemsGenerated/HyDragon/Companions/HydraWinged_Toxic/base.png",
+  "Enabled": true
+}

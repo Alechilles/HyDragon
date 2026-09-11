@@ -1,0 +1,8 @@
+{
+  "RoleIds": [
+    "Tamed_Wyvern_Mini_Toxic"
+  ],
+  "IconOverrides": [],
+  "IconDefault": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Toxic/base.png",
+  "Enabled": true
+}

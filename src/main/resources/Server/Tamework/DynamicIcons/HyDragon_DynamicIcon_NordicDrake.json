@@ -1,0 +1,28 @@
+{
+  "RoleIds": [
+    "NordicDrake",
+    "Tamed_NordicDrake"
+  ],
+  "IconOverrides": [
+    {
+      "Icon": "Icons/ItemsGenerated/HyDragon/Companions/NordicDrake/skin-greenballs.png",
+      "Attachments": {
+        "Skin": "GreenBalls"
+      }
+    },
+    {
+      "Icon": "Icons/ItemsGenerated/HyDragon/Companions/NordicDrake/skin-oldorange.png",
+      "Attachments": {
+        "Skin": "OldOrange"
+      }
+    },
+    {
+      "Icon": "Icons/ItemsGenerated/HyDragon/Companions/NordicDrake/skin-cobalt.png",
+      "Attachments": {
+        "Skin": "Cobalt"
+      }
+    }
+  ],
+  "IconDefault": "Icons/ItemsGenerated/HyDragon/Companions/NordicDrake/skin-oldorange.png",
+  "Enabled": true
+}
