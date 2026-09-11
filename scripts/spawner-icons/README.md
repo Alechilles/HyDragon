@@ -17,3 +17,5 @@ python ../alecstamework/scripts/tools/generate_spawner_icon_overrides.py --batch
 In Blockbench, run **Run Tamework Dynamic Icon Batch (From Jobs JSON)** with `jobs.json`. Use the current Tamework batch renderer and Hytale Models plugin. Inspect all 15 images, check references and role coverage, then copy the generated PNGs and dynamic configs from staging into `src/main/resources` together. Rebuild HyDragon's JAR for client installation.
 
 The manifest limits each pass to 100 combinations. If future models add attachment slots, select the most visible features before expanding the batch.
+
+Miniwyvern entries use `cameraScale: 2.0` and `cameraAutoFramePadding: 2` to fill more of the icon canvas. Keep these settings aligned across the wild and six elemental forms when regenerating their portraits.

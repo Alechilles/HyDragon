@@ -4,6 +4,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ## Unreleased development changes
 
+- Reframed all seven Miniwyvern portraits to make their bodies and elemental colors clearer in capture items and roster cards.
+
 - Added shared companion portraits for every dragon and Miniwyvern appearance, including all three Nordic Drake skins, for capture items and both command panels. Requires the matching Tamework dynamic-icon development build.
 
 ## 1.1.7 - Texture Atlas Hotfix - 2026-09-02
