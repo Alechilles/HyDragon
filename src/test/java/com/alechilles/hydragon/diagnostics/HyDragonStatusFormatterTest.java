@@ -1,10 +1,12 @@
 package com.alechilles.hydragon.diagnostics;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.integration.FeatureGate;
+import com.alechilles.hydragon.integration.HyDragonDiagnosticText;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.TameworkBridge;
 import com.alechilles.hydragon.integration.TameworkRuntimeDiagnostics;
@@ -84,6 +86,71 @@ class HyDragonStatusFormatterTest {
                 "server.messages.status.rejectedReload".equals(message.getMessageId())));
         assertTrue(messages.stream().anyMatch(message ->
                 "server.messages.status.configIssue".equals(message.getMessageId())));
+        Message configIssue = messages.stream()
+                .filter(message -> "server.messages.status.configIssue".equals(message.getMessageId()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals("server.messages.status.diagnostic.config.scoped",
+                configIssue.getFormattedMessage().messageParams.get("issue").messageId);
         assertFalse(messages.stream().anyMatch(message -> message.getMessageId() == null));
+    }
+
+    @Test
+    void translatesKnownNestedConfigDiagnostics() {
+        for (ConfigDiagnosticCase testCase : knownConfigDiagnostics()) {
+            Message translated = HyDragonDiagnosticText.configIssue(testCase.issue());
+
+            assertEquals(testCase.expectedMessageId(), translated.getMessageId(), testCase.issue());
+            if (testCase.nestedMessageId() != null) {
+                Message nested = new Message(translated.getFormattedMessage().messageParams.get("reason"));
+                assertEquals(testCase.nestedMessageId(), nested.getMessageId(), testCase.issue());
+            }
+        }
+
+        Message between = HyDragonDiagnosticText.configIssue("Capture.Resistance must be between 0 and 1");
+        assertEquals("0", ((com.hypixel.hytale.protocol.StringParamValue)
+                between.getFormattedMessage().params.get("minimum")).value);
+        assertEquals("1", ((com.hypixel.hytale.protocol.StringParamValue)
+                between.getFormattedMessage().params.get("maximum")).value);
+    }
+
+    private static List<ConfigDiagnosticCase> knownConfigDiagnostics() {
+        return List.of(
+                new ConfigDiagnosticCase("Encounter[storm]: Unknown encounter phase: DAYBREAK",
+                        "server.messages.status.diagnostic.config.scoped",
+                        "server.messages.status.diagnostic.config.unknownEncounterPhase"),
+                new ConfigDiagnosticCase("EssenceBondAura.Upgrades[2].Semantic is unknown: whorl",
+                        "server.messages.status.diagnostic.config.scoped",
+                        "server.messages.status.diagnostic.config.unknownSemantic"),
+                new ConfigDiagnosticCase("EssenceBondAura.Upgrades[2].SiphonCooldownMs must be at least 3000 for a siphon",
+                        "server.messages.status.diagnostic.config.scoped",
+                        "server.messages.status.diagnostic.config.siphonCooldownMinimum"),
+                new ConfigDiagnosticCase("Grounding.BuildupSourceIds contains unsupported source: Unknown_Source",
+                        "server.messages.status.diagnostic.config.unsupportedValue", null),
+                new ConfigDiagnosticCase("DragonSpecies[ember] references missing encounter storm",
+                        "server.messages.status.diagnostic.config.referencesMissingEncounter", null),
+                new ConfigDiagnosticCase("DragonSpecies[ember] references encounter storm targeting frost",
+                        "server.messages.status.diagnostic.config.referencesEncounterTarget", null),
+                new ConfigDiagnosticCase("MiniwyvernArchetypes has duplicate RoleId Tamed_Wyvern_Mini_Fire for fire and toxic",
+                        "server.messages.status.diagnostic.config.duplicateRoleId", null),
+                new ConfigDiagnosticCase("Grounding.BuildupSourceIds contains duplicate source: Lure",
+                        "server.messages.status.diagnostic.config.duplicateSource", null),
+                new ConfigDiagnosticCase("WildRoleIds contains a blank role",
+                        "server.messages.status.diagnostic.config.blankRole", null),
+                new ConfigDiagnosticCase("ParticleAndSoundIds cannot contain blank values",
+                        "server.messages.status.diagnostic.config.blankValues", null),
+                new ConfigDiagnosticCase("RegionsAndAltitude requires finite MinY <= MaxY",
+                        "server.messages.status.diagnostic.config.finiteAltitudeRange", null),
+                new ConfigDiagnosticCase("Capture.Resistance must be between 0 and 1",
+                        "server.messages.status.diagnostic.config.between", null),
+                new ConfigDiagnosticCase("SiphonCooldownMs must be at least 3000 for a siphon",
+                        "server.messages.status.diagnostic.config.siphonCooldownMinimum", null),
+                new ConfigDiagnosticCase("Mount.Mode must be NONE, GROUND, or AVATAR_FLIGHT",
+                        "server.messages.status.diagnostic.config.mountModeOptions", null),
+                new ConfigDiagnosticCase("WeatherPredicate.Mode must be AnyOf or AllOf",
+                        "server.messages.status.diagnostic.config.weatherModeOptions", null));
+    }
+
+    private record ConfigDiagnosticCase(String issue, String expectedMessageId, String nestedMessageId) {
     }
 }

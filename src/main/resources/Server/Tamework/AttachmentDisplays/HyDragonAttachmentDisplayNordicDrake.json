@@ -1,0 +1,23 @@
+{
+  "Enabled": true,
+  "Priority": 0,
+  "Entries": [
+    {
+      "Id": "hydragon-nordic-drake-skin",
+      "AppliesTo": {
+        "ModelIds": ["NordicDrake", "NordicDrake_AvatarFlight"],
+        "RoleIds": ["NordicDrake", "Tamed_NordicDrake"]
+      },
+      "Sets": {
+        "Skin": {
+          "Label": "hydragon.attachments.skin.label",
+          "Values": {
+            "GreenBalls": "hydragon.attachments.skin.green",
+            "OldOrange": "hydragon.attachments.skin.orange",
+            "Cobalt": "hydragon.attachments.skin.cobalt"
+          }
+        }
+      }
+    }
+  ]
+}

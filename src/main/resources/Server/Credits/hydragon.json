@@ -1,7 +1,6 @@
 {
   "Plugin": "Alechilles:HyDragon",
   "Description": {
-    "MessageId": "hydragon.credits.description",
-    "RawText": "HyDragon adds dragon encounters, capture, bonded companions, progression, mounted flight, and elemental combat."
+    "MessageId": "server.hydragon.credits.description"
   }
 }

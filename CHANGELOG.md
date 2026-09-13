@@ -4,6 +4,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ## Unreleased development changes
 
+- Completed the six-language catalogs, including Canadian French, and localized command feedback, diagnostic explanations, credits, and Nordic Drake appearance labels. Localized attachment labels require the matching Tamework update.
+
 - Reframed all seven Miniwyvern portraits to make their bodies and elemental colors clearer in capture items and roster cards.
 
 - Added shared companion portraits for every dragon and Miniwyvern appearance, including all three Nordic Drake skins, for capture items and both command panels. Requires the matching Tamework dynamic-icon development build.

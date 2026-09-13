@@ -2,6 +2,7 @@ package com.alechilles.hydragon.diagnostics;
 
 import com.alechilles.hydragon.config.HyDragonConfigRepository;
 import com.alechilles.hydragon.integration.FeatureGate;
+import com.alechilles.hydragon.integration.HyDragonDiagnosticText;
 import com.alechilles.hydragon.integration.HyDragonFeature;
 import com.alechilles.hydragon.integration.HyDragonMessages;
 import com.alechilles.hydragon.integration.TameworkBridge;
@@ -108,13 +109,14 @@ public final class HyDragonStatusFormatter {
             messages.add(HyDragonMessages.statusFeature(
                     feature.name(),
                     gate.available() ? HyDragonMessages.statusStateReady() : HyDragonMessages.statusStateDisabled(),
-                    gate.reason()));
+                    HyDragonDiagnosticText.featureReason(gate.reason())));
         }
         messages.add(HyDragonMessages.statusTameworkPersistence(
                 diagnostics.persistenceStatus(), diagnostics.queueDepth(),
                 diagnostics.populationReadiness(), diagnostics.resilienceState()));
         if (!diagnostics.available() && diagnostics.persistenceReason() != null) {
-            messages.add(HyDragonMessages.statusDiagnosticsIssue(diagnostics.persistenceReason()));
+            messages.add(HyDragonMessages.statusDiagnosticsIssue(
+                    HyDragonDiagnosticText.diagnosticsReason(diagnostics.persistenceReason())));
         }
 
         Message localState = !localPersistence.available()
@@ -134,20 +136,21 @@ public final class HyDragonStatusFormatter {
         for (HyDragonPersistenceStatus.OrphanedLink orphan
                 : localPersistence.orphanedLinks().stream().limit(5).toList()) {
             messages.add(HyDragonMessages.statusOrphan(
-                    orphan.kind(), orphan.identity(), orphan.operatorAction()));
+                    orphan.kind(), orphan.identity(), HyDragonDiagnosticText.orphanAction(orphan.operatorAction())));
         }
         if (localPersistence.orphanedLinks().size() > 5) {
             messages.add(HyDragonMessages.statusOrphanMore(localPersistence.orphanedLinks().size() - 5));
         }
         if (localPersistence.reason() != null) {
-            messages.add(HyDragonMessages.statusLocalPersistenceIssue(localPersistence.reason()));
+            messages.add(HyDragonMessages.statusLocalPersistenceIssue(
+                    HyDragonDiagnosticText.localPersistenceReason(localPersistence.reason())));
         }
         return List.copyOf(messages);
     }
 
     private static void appendIssues(List<Message> messages, List<String> issues) {
         for (String issue : issues.stream().limit(5).toList()) {
-            messages.add(HyDragonMessages.statusConfigIssue(issue));
+            messages.add(HyDragonMessages.statusConfigIssue(HyDragonDiagnosticText.configIssue(issue)));
         }
         if (issues.size() > 5) {
             messages.add(HyDragonMessages.statusConfigMore(issues.size() - 5));

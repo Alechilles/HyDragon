@@ -161,9 +161,9 @@
     {
       "Id": "ToggleAirborneMode",
       "ShowInRadial": false,
-      "DisplayName": "Toggle Flight / Ground Mode",
+      "DisplayName": "hydragon.commands.flightToggle.name",
       "Feedback": {
-        "HudMessage": "Flight mode toggled",
+        "HudMessage": "hydragon.commands.flightToggle.hud",
         "SoundEvent": "SFX_HyDragon_Dragon_Flute_SE_13"
       },
       "Steps": [

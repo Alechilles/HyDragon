@@ -41,6 +41,9 @@ public final class HyDragonMessages {
     public static Message statusConfigIssue(String issue) {
         return translated("status.configIssue").param("issue", issue);
     }
+    public static Message statusConfigIssue(Message issue) {
+        return translated("status.configIssue").param("issue", issue);
+    }
     public static Message statusConfigMore(int count) {
         return translated("status.configMore").param("count", count);
     }
@@ -59,6 +62,12 @@ public final class HyDragonMessages {
                 .param("state", state)
                 .param("reason", reason);
     }
+    public static Message statusFeature(String feature, Message state, Message reason) {
+        return translated("status.feature")
+                .param("feature", feature)
+                .param("state", state)
+                .param("reason", reason);
+    }
     public static Message statusTameworkPersistence(
             String status, long queue, String population, String resilience) {
         return translated("status.tameworkPersistence")
@@ -68,6 +77,9 @@ public final class HyDragonMessages {
                 .param("resilience", resilience);
     }
     public static Message statusDiagnosticsIssue(String reason) {
+        return translated("status.diagnosticsIssue").param("reason", reason);
+    }
+    public static Message statusDiagnosticsIssue(Message reason) {
         return translated("status.diagnosticsIssue").param("reason", reason);
     }
     public static Message statusLocalPersistence(
@@ -95,10 +107,19 @@ public final class HyDragonMessages {
                 .param("identity", identity)
                 .param("action", action);
     }
+    public static Message statusOrphan(String kind, String identity, Message action) {
+        return translated("status.orphan")
+                .param("kind", kind)
+                .param("identity", identity)
+                .param("action", action);
+    }
     public static Message statusOrphanMore(int count) {
         return translated("status.orphanMore").param("count", count);
     }
     public static Message statusLocalPersistenceIssue(String reason) {
+        return translated("status.localPersistenceIssue").param("reason", reason);
+    }
+    public static Message statusLocalPersistenceIssue(Message reason) {
         return translated("status.localPersistenceIssue").param("reason", reason);
     }
     public static Message statusStateReady() { return translated("status.state.ready"); }
@@ -107,6 +128,10 @@ public final class HyDragonMessages {
     public static Message statusStateUnavailable() { return translated("status.state.unavailable"); }
     public static Message statusStateReadWrite() { return translated("status.state.readWrite"); }
     public static Message statusStateReadOnly() { return translated("status.state.readOnly"); }
+
+    static Message diagnostic(String key) {
+        return translated("status.diagnostic." + key);
+    }
 
     /** Server-side resolution for non-client sinks and locale contract tests. */
     public static String resolve(String language, String key) {

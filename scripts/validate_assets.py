@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_ROOT = ROOT / "src" / "main" / "resources"
 ASSET_ROOTS = (RESOURCE_ROOT / "Common", RESOURCE_ROOT / "Server")
 JSON_SUFFIXES = {".json", ".particlesystem", ".particlespawner", ".blockymodel", ".blockyanim"}
-LOCALES = ("en-US", "pt-BR", "de-DE", "fr-FR", "es-ES")
+LOCALES = ("en-US", "pt-BR", "de-DE", "fr-FR", "fr-CA", "es-ES")
 REQUIRED_STATUS_MESSAGE_KEYS = {
     "messages.status.description",
     "messages.status.usage",
