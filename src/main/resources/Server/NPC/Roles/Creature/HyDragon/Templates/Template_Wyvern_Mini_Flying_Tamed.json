@@ -654,6 +654,7 @@
                   "ViewRange": { "Compute": "ViewRange" }, "ViewSector": { "Compute": "ViewSector" }, "HearingRange": { "Compute": "HearingRange" }, "AbsoluteDetectionRange": { "Compute": "AbsoluteDetectionRange" }
                 } },
                 { "Reference": "Component_HyDragon_Instruction_Miniwyvern_Aerial_Defend", "Modify": {
+                "AcquireHostileTargets": true,
                 "HardLeashDistance": { "Compute": "HardLeashDistance" },
                 "AlertedRange": { "Compute": "ViewRange" },
                 "ViewSector": { "Compute": "ViewSector" },

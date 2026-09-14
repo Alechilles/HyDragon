@@ -93,6 +93,10 @@
     "DefendFollowMacroElement": {
       "Value": "Component_HyDragon_Instruction_Follow_Miniwyvern_Flying"
     },
+    "AcquireHostileTargets": {
+      "Value": false,
+      "Description": "Allow proactive hostile-to-owner acquisition only in Aggressive mode."
+    },
     "TalentProjectilePattern": {
       "Value": ""
     },
@@ -228,6 +232,9 @@
         ]
       },
       {
+        "Enabled": {
+          "Compute": "AcquireHostileTargets"
+        },
         "Continue": true,
         "Sensor": {
           "Type": "And",
