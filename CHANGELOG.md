@@ -2,13 +2,19 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
-## Unreleased development changes
+## 1.2.0 - Companion Portraits and Localization - 2026-09-14
 
-- Completed the six-language catalogs, including Canadian French, and localized command feedback, diagnostic explanations, credits, and Nordic Drake appearance labels. Localized attachment labels require the matching Tamework update.
+### Added
 
-- Reframed all seven Miniwyvern portraits to make their bodies and elemental colors clearer in capture items and roster cards.
+- Added shared companion portraits for every dragon and Miniwyvern appearance, including all three Nordic Drake skins, in capture items and both command panels.
+- Added pet interactions for tamed dragons and Miniwyverns.
 
-- Added shared companion portraits for every dragon and Miniwyvern appearance, including all three Nordic Drake skins, for capture items and both command panels. Requires the matching Tamework dynamic-icon development build.
+### Changed
+
+- Requires Alec's Tamework 4.0.0 or later.
+- Completed all six language catalogs, including Canadian French, and localized command feedback, diagnostic explanations, credits, and Nordic Drake appearance labels.
+- Reframed all seven Miniwyvern portraits to show their full silhouettes and elemental colors more clearly.
+- Removed companion level requirements from dragon and Miniwyvern talents. Talent point costs and prerequisite talents still apply.
 
 ## 1.1.7 - Texture Atlas Hotfix - 2026-09-02
 

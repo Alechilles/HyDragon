@@ -1,5 +1,7 @@
 # HyDragon
 
+Requires **Alec's Tamework 4.0.0 or later**.
+
 ### Raise dragons. Master the elements. Rule the skies.
 
 HyDragon transforms your world into the ultimate dragon adventure. Seek out legendary beasts, earn their loyalty, raise powerful companions, and take flight alongside creatures worthy of myth.
