@@ -8,6 +8,7 @@
   "LinkUseTogglesMembership": false,
   "RequireTamed": true,
   "RequireOwner": true,
+  "CooldownSeconds": 0.25,
   "AllowedRoles": {
     "Mode": "Allowlist",
     "Allowlist": [
