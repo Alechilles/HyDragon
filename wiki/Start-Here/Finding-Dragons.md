@@ -23,6 +23,8 @@ Search the right terrain for each creature, then use the [Capturing Dragons guid
 
 The Soulbound Miniwyvern is made through the [Soul Bond and Attunement guide](/mod/hydragon/soul-bond-and-attunement), not found as a wild spawn.
 
+Normal wild Miniwyverns also roam Zone 1 plains in hostile flocks of one to five. These encounters cannot be tamed and do not replace the crafted-egg companion route.
+
 ## Next steps
 
 - Choose a creature's combat role in the [Dragon Compendium](/mod/hydragon/dragon-compendium-index).

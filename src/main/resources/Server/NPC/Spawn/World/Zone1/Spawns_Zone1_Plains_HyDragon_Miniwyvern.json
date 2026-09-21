@@ -1,0 +1,11 @@
+{
+  "Environments": ["Env_Zone1_Plains"],
+  "NPCs": [
+    {
+      "Id": "Wyvern_Mini",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Grass",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    }
+  ]
+}

@@ -1,0 +1,325 @@
+{
+  "Type": "Component",
+  "Class": "Instruction",
+  "DefaultState": ".Position",
+  "Parameters": {
+    "SwoopAttack": { "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite" },
+    "RangedAttack": { "Value": "Root_NPC_Wyvern_Mini_Wild_Projectile_Base" },
+    "AttackDistance": { "Value": 2.75 },
+    "OrbitDistanceRange": { "Value": [8, 14] },
+    "OrbitAltitudeRange": { "Value": [5, 9] },
+    "OrbitRelativeSpeed": { "Value": 0.28 },
+    "OrbitRetargetTimeRange": { "Value": [3, 6] },
+    "OrbitStopDistance": { "Value": 2.5 },
+    "ProjectileRange": { "Value": 18 },
+    "ProjectileMinimumRange": { "Value": 3.25 },
+    "ProjectileCooldownRange": { "Value": [5, 7] },
+    "SwoopCooldownRange": { "Value": [25, 35] },
+    "SwoopAltitudeRange": { "Value": [0, 2] },
+    "SwoopApproachTimeout": { "Value": [6, 6] },
+    "SwoopApproachRelativeSpeed": { "Value": 0.55 },
+    "RecoveryDistanceRange": { "Value": [8, 14] },
+    "RecoveryDurationRange": { "Value": [2, 4] },
+    "RecoveryRelativeSpeed": { "Value": 0.45 }
+  },
+  "Content": {
+    "Continue": true,
+    "Sensor": { "Type": "Any" },
+    "Instructions": [
+      {
+        "$Comment": "Ambient flight cruises higher than combat. Override the controller band during positioning and recovery; swoops set their own lower band.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Or", "Sensors": [{ "Type": "State", "State": ".Position" }, { "Type": "State", "State": ".Recover" }] }
+          ]
+        },
+        "Actions": [{ "Type": "OverrideAltitude", "DesiredAltitudeRange": { "Compute": "OrbitAltitudeRange" } }]
+      },
+      {
+        "$Comment": "The parent owns target loss and combat exit. This component only clears its attack lifecycle when combat can no longer remain airborne.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "Or",
+          "Sensors": [
+            { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget" } },
+            { "Type": "Not", "Sensor": { "Type": "MotionController", "MotionController": "Fly" } },
+            { "Type": "OnGround" }
+          ]
+        },
+        "Actions": [
+          { "Type": "SetFlag", "Name": "HD_Wild_Aerial_Combat_Active", "SetTo": false },
+          { "Type": "SetFlag", "Name": "HD_Wild_Swoop_Pending", "SetTo": false },
+          { "Type": "SetFlag", "Name": "HD_Wild_Swooping", "SetTo": false },
+          { "Type": "SetFlag", "Name": "HD_Wild_Projectile_Aiming", "SetTo": false },
+          { "Type": "SetFlag", "Name": "HD_Wild_Swoop_Recovery_Started", "SetTo": false },
+          { "Type": "TimerStop", "Name": "HD_Wild_Swoop_Cooldown" },
+          { "Type": "TimerStop", "Name": "HD_Wild_Swoop_Approach" },
+          { "Type": "TimerStop", "Name": "HD_Wild_Swoop_Recovery" },
+          { "Type": "TimerStop", "Name": "HD_Wild_Projectile_Aim" },
+          { "Type": "TimerStop", "Name": "HD_Wild_Projectile_Cooldown" }
+        ]
+      },
+      {
+        "$Comment": "Enter Combat.Position with a fresh swoop cadence and a short randomized first-shot delay for flock staggering.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Target", "TargetSlot": "LockedTarget" },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } },
+            { "Type": "Flag", "Name": "HD_Wild_Aerial_Combat_Active", "Set": false },
+            { "Type": "Timer", "Name": "HD_Wild_Swoop_Cooldown", "State": "Stopped" }
+          ]
+        },
+        "Actions": [
+          { "Type": "SetFlag", "Name": "HD_Wild_Aerial_Combat_Active", "SetTo": true },
+          { "Type": "TimerStart", "Name": "HD_Wild_Swoop_Cooldown", "StartValueRange": { "Compute": "SwoopCooldownRange" }, "RestartValueRange": { "Compute": "SwoopCooldownRange" } },
+          { "Type": "TimerRestart", "Name": "HD_Wild_Swoop_Cooldown" },
+          { "Type": "TimerStart", "Name": "HD_Wild_Projectile_Cooldown", "StartValueRange": [0.5, 2.5], "RestartValueRange": [0.5, 2.5] },
+          { "Type": "TimerRestart", "Name": "HD_Wild_Projectile_Cooldown" }
+        ]
+      },
+      {
+        "$Comment": "A ready swoop takes priority only before projectile aiming begins, so a started projectile cannot be interrupted.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Target", "TargetSlot": "LockedTarget" },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } },
+            { "Type": "Flag", "Name": "HD_Wild_Aerial_Combat_Active" },
+            { "Type": "Timer", "Name": "HD_Wild_Swoop_Cooldown", "State": "Stopped" },
+            { "Type": "Flag", "Name": "HD_Wild_Projectile_Aiming", "Set": false }
+          ]
+        },
+        "Actions": [
+          { "Type": "SetFlag", "Name": "HD_Wild_Swoop_Pending", "SetTo": true }
+        ]
+      },
+      {
+        "$Comment": "Start a single base projectile only while it remains in the configured useful range.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "ProjectileRange" }, "Filters": [{ "Type": "LineOfSight" }] },
+            { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "ProjectileMinimumRange" } } },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } },
+            { "Type": "Flag", "Name": "HD_Wild_Aerial_Combat_Active" },
+            { "Type": "Flag", "Name": "HD_Wild_Swoop_Pending", "Set": false },
+            { "Type": "Flag", "Name": "HD_Wild_Swooping", "Set": false },
+            { "Type": "Flag", "Name": "HD_Wild_Projectile_Aiming", "Set": false },
+            { "Type": "Timer", "Name": "HD_Wild_Projectile_Cooldown", "State": "Stopped" }
+          ]
+        },
+        "Actions": [
+          { "Type": "TimerStart", "Name": "HD_Wild_Projectile_Aim", "StartValueRange": [0.4, 0.7], "RestartValueRange": [0.4, 0.7] },
+          { "Type": "TimerRestart", "Name": "HD_Wild_Projectile_Aim" },
+          { "Type": "SetFlag", "Name": "HD_Wild_Projectile_Aiming", "SetTo": true }
+        ]
+      },
+      {
+        "$Comment": "Cancel an aim that no longer has a legal shot, leaving normal positioning available again.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Flag", "Name": "HD_Wild_Projectile_Aiming" },
+            {
+              "Type": "Or",
+              "Sensors": [
+                { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "ProjectileRange" }, "Filters": [{ "Type": "LineOfSight" }] } },
+                { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "ProjectileMinimumRange" } }
+              ]
+            }
+          ]
+        },
+        "Actions": [
+          { "Type": "SetFlag", "Name": "HD_Wild_Projectile_Aiming", "SetTo": false },
+          { "Type": "TimerStop", "Name": "HD_Wild_Projectile_Aim" }
+        ]
+      },
+      {
+        "$Comment": "The projectile fires only after its aim completes, while still airborne and outside swoop ownership.",
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "ProjectileRange" }, "Filters": [{ "Type": "LineOfSight" }] },
+            { "Type": "Not", "Sensor": { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "ProjectileMinimumRange" } } },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } },
+            { "Type": "Flag", "Name": "HD_Wild_Aerial_Combat_Active" },
+            { "Type": "Flag", "Name": "HD_Wild_Projectile_Aiming" },
+            { "Type": "Flag", "Name": "HD_Wild_Swoop_Pending", "Set": false },
+            { "Type": "Flag", "Name": "HD_Wild_Swooping", "Set": false },
+            { "Type": "Timer", "Name": "HD_Wild_Projectile_Aim", "State": "Stopped" }
+          ]
+        },
+        "ActionsBlocking": true,
+        "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true },
+        "Actions": [
+          { "Type": "PlayAnimation", "Slot": "Action", "Animation": "Shoot" },
+          { "Type": "Attack", "Attack": { "Compute": "RangedAttack" }, "AimingTimeRange": [0.1, 0.2], "AttackPauseRange": [0, 0] },
+          { "Type": "PlaySound", "SoundEventId": "SFX_HyDragon_Miniwyvern_Projectile" },
+          { "Type": "TimerStart", "Name": "HD_Wild_Projectile_Cooldown", "StartValueRange": { "Compute": "ProjectileCooldownRange" }, "RestartValueRange": { "Compute": "ProjectileCooldownRange" } },
+          { "Type": "TimerRestart", "Name": "HD_Wild_Projectile_Cooldown" },
+          { "Type": "SetFlag", "Name": "HD_Wild_Projectile_Aiming", "SetTo": false }
+        ]
+      },
+      {
+        "$Comment": "Commit the swoop after any already-started projectile completes.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Flag", "Name": "HD_Wild_Swoop_Pending" },
+            { "Type": "Flag", "Name": "HD_Wild_Projectile_Aiming", "Set": false },
+            { "Type": "Target", "TargetSlot": "LockedTarget" },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } }
+          ]
+        },
+        "Actions": [
+          { "Type": "SetFlag", "Name": "HD_Wild_Swoop_Pending", "SetTo": false },
+          { "Type": "SetFlag", "Name": "HD_Wild_Swooping", "SetTo": true },
+          { "Type": "TimerStart", "Name": "HD_Wild_Swoop_Approach", "StartValueRange": { "Compute": "SwoopApproachTimeout" }, "RestartValueRange": { "Compute": "SwoopApproachTimeout" } },
+          { "Type": "TimerRestart", "Name": "HD_Wild_Swoop_Approach" },
+          { "Type": "State", "State": ".Swoop" }
+        ]
+      },
+      {
+        "Sensor": { "Type": "State", "State": ".Swoop" },
+        "Instructions": [
+          {
+            "Continue": true,
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                { "Type": "Target", "TargetSlot": "LockedTarget" },
+                { "Type": "MotionController", "MotionController": "Fly" },
+                { "Type": "Not", "Sensor": { "Type": "OnGround" } }
+              ]
+            },
+            "Actions": [{ "Type": "OverrideAltitude", "DesiredAltitudeRange": { "Compute": "SwoopAltitudeRange" } }],
+            "HeadMotion": { "Type": "Watch" },
+            "BodyMotion": { "Type": "Seek", "RelativeSpeed": { "Compute": "SwoopApproachRelativeSpeed" }, "DesiredAltitudeWeight": 0, "SlowDownDistance": 4, "StopDistance": 2.2 }
+          },
+          {
+            "Continue": true,
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                { "Type": "Target", "TargetSlot": "LockedTarget", "Range": { "Compute": "AttackDistance" }, "Filters": [{ "Type": "LineOfSight" }] },
+                { "Type": "MotionController", "MotionController": "Fly" },
+                { "Type": "Not", "Sensor": { "Type": "OnGround" } }
+              ]
+            },
+            "ActionsBlocking": true,
+            "Actions": [
+              { "Type": "PlayAnimation", "Slot": "Action", "Animation": "Bite" },
+              { "Type": "Attack", "Attack": { "Compute": "SwoopAttack" }, "AimingTimeRange": [0, 0], "AttackPauseRange": [0, 0] },
+              { "Type": "State", "State": ".Recover" }
+            ]
+          },
+          {
+            "Sensor": { "Type": "Timer", "Name": "HD_Wild_Swoop_Approach", "State": "Stopped" },
+            "Actions": [{ "Type": "State", "State": ".Recover" }]
+          }
+        ]
+      },
+      {
+        "$Comment": "Both a completed and a timed-out swoop use the same bounded backoff before resuming positioning.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Recover" },
+            { "Type": "Flag", "Name": "HD_Wild_Swoop_Recovery_Started", "Set": false }
+          ]
+        },
+        "Actions": [
+          { "Type": "SetFlag", "Name": "HD_Wild_Swoop_Recovery_Started", "SetTo": true },
+          { "Type": "TimerStop", "Name": "HD_Wild_Swoop_Approach" },
+          { "Type": "TimerStart", "Name": "HD_Wild_Swoop_Cooldown", "StartValueRange": { "Compute": "SwoopCooldownRange" }, "RestartValueRange": { "Compute": "SwoopCooldownRange" } },
+          { "Type": "TimerRestart", "Name": "HD_Wild_Swoop_Cooldown" },
+          { "Type": "TimerStart", "Name": "HD_Wild_Swoop_Recovery", "StartValueRange": { "Compute": "RecoveryDurationRange" }, "RestartValueRange": { "Compute": "RecoveryDurationRange" } },
+          { "Type": "TimerRestart", "Name": "HD_Wild_Swoop_Recovery" }
+        ]
+      },
+      {
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Recover" },
+            { "Type": "Target", "TargetSlot": "LockedTarget" },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } }
+          ]
+        },
+        "HeadMotion": { "Type": "Watch" },
+        "BodyMotion": {
+          "Type": "TameworkFlyingOrbit",
+          "Mode": "WANDER_TARGET",
+          "WanderRadiusRange": { "Compute": "RecoveryDistanceRange" },
+          "DesiredAltitudeRange": { "Compute": "OrbitAltitudeRange" },
+          "WanderRetargetTimeRange": { "Compute": "RecoveryDurationRange" },
+          "WanderStopDistance": { "Compute": "OrbitStopDistance" },
+          "RelativeSpeed": { "Compute": "RecoveryRelativeSpeed" },
+          "ClimbRelativeSpeed": 0.45,
+          "SinkRelativeSpeed": 0.35
+        }
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Recover" },
+            { "Type": "Flag", "Name": "HD_Wild_Swoop_Recovery_Started" },
+            { "Type": "Timer", "Name": "HD_Wild_Swoop_Recovery", "State": "Stopped" }
+          ]
+        },
+        "Actions": [
+          { "Type": "SetFlag", "Name": "HD_Wild_Swoop_Recovery_Started", "SetTo": false },
+          { "Type": "SetFlag", "Name": "HD_Wild_Swooping", "SetTo": false },
+          { "Type": "State", "State": ".Position" }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Target", "TargetSlot": "LockedTarget" },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } }
+          ]
+        },
+        "HeadMotion": { "Type": "Watch" },
+        "BodyMotion": {
+          "Type": "TameworkFlyingOrbit",
+          "Mode": "WANDER_TARGET",
+          "WanderRadiusRange": { "Compute": "OrbitDistanceRange" },
+          "DesiredAltitudeRange": { "Compute": "OrbitAltitudeRange" },
+          "WanderRetargetTimeRange": { "Compute": "OrbitRetargetTimeRange" },
+          "WanderStopDistance": { "Compute": "OrbitStopDistance" },
+          "RelativeSpeed": { "Compute": "OrbitRelativeSpeed" },
+          "ClimbRelativeSpeed": 0.45,
+          "SinkRelativeSpeed": 0.35
+        }
+      }
+    ]
+  }
+}

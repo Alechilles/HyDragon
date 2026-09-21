@@ -86,10 +86,6 @@ WORKSHOP_057_PATCH_TARGETS = {
     "Server/NPC/Spawn/World/Zone3/Spawns_Zone3_Forests_Predator.json": (
         "Env_Zone3_Forests", {"DayTimeRange"}),
 }
-HYDRA_INDEPENDENT_WORLD_SPAWN_IDS = {
-    "Spawns_Zone3_Glacial_HyDragon_Predator",
-    "Spawns_Zone4_Volcanoes_HyDragon_Predator",
-}
 
 
 def fail(errors: list[str], message: str) -> None:
@@ -556,16 +552,16 @@ def validate_stone_tiers(parsed: dict[Path, object], errors: list[str]) -> None:
             fail(errors, f"obsolete filled/vessel capture config remains: {path.relative_to(ROOT)}")
 
 
-def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str]) -> None:
+def validate_miniwyvern_acquisition(parsed: dict[Path, object], errors: list[str]) -> None:
+    """Wild encounters may spawn; Soul Bond companions still come only from eggs."""
     spawn_roots = (
         RESOURCE_ROOT / "Server" / "NPC" / "Spawn",
         RESOURCE_ROOT / "Server" / "Tamework" / "Patches",
     )
-    banned = {"Wyvern_Mini", "Tamed_Wyvern_Mini"}
 
     def visit(value: object) -> bool:
         if isinstance(value, str):
-            return value in banned
+            return value == "Tamed_Wyvern_Mini" or value.startswith("Tamed_Wyvern_Mini_")
         if isinstance(value, list):
             return any(visit(item) for item in value)
         if isinstance(value, dict):
@@ -577,16 +573,16 @@ def validate_no_miniwyvern_spawns(parsed: dict[Path, object], errors: list[str])
             continue
         for path in root.rglob("*.json"):
             if visit(parsed.get(path)):
-                fail(errors, f"production Miniwyvern spawn path remains: {path.relative_to(ROOT)}")
+                fail(errors, f"Soul Bond companion must not spawn in the wild: {path.relative_to(ROOT)}")
 
     wild_role_path = RESOURCE_ROOT / "Server/NPC/Roles/Creature/HyDragon/Wyvern_Mini/Wyvern_Mini.json"
     wild_role = parsed.get(wild_role_path)
     modify = wild_role.get("Modify") if isinstance(wild_role, dict) else None
     if isinstance(modify, dict):
         if modify.get("IsTameable") is not False:
-            fail(errors, "Soul Bond-only Miniwyvern wild role must set IsTameable to false")
+            fail(errors, "Wild Miniwyvern encounters must set IsTameable to false")
         if modify.get("TameRoleChange") not in (None, ""):
-            fail(errors, "Soul Bond-only Miniwyvern wild role must not expose TameRoleChange")
+            fail(errors, "Wild Miniwyvern encounters must not expose TameRoleChange")
 
 
 def _aggressive_movement_pair(sensor: object) -> tuple[bool, str] | None:
@@ -945,8 +941,6 @@ def validate_static_spawn_contracts(
     for path in sorted(world_root.rglob("*.json")):
         local_spawn_ids.add(path.stem)
         validate_spawn_shape(parsed.get(path), "WorldNPCSpawn", path.relative_to(ROOT).as_posix(), known_assets, errors)
-        if path.stem not in HYDRA_INDEPENDENT_WORLD_SPAWN_IDS:
-            fail(errors, f"{path.relative_to(ROOT)} is not an approved independent Hydra spawn asset")
 
     beacon_root = RESOURCE_ROOT / "Server/NPC/Spawn/Beacons/HyDragon"
     for path in sorted(beacon_root.rglob("*.json")):
@@ -1757,7 +1751,7 @@ def main() -> int:
     validate_miniwyvern_ability_contract(parsed, errors)
     validate_miniwyvern_projectile_contract(parsed, errors)
     validate_stone_tiers(parsed, errors)
-    validate_no_miniwyvern_spawns(parsed, errors)
+    validate_miniwyvern_acquisition(parsed, errors)
     validate_miniwyvern_role_wiring(parsed, errors)
     validate_shared_aerial_component_wiring(parsed, errors)
     validate_companion_flight_toggle_contract(parsed, errors)

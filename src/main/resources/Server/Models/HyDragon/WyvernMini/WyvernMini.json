@@ -110,6 +110,26 @@
         }
       ]
     },
+    "Tw_Kettle_Glide": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/WyvernMini/Animations/Glide.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.2
+        }
+      ]
+    },
+    "Tw_Kettle_Flap": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/WyvernMini/Animations/Fly.blockyanim",
+          "Speed": 1,
+          "Looping": true,
+          "BlendingDuration": 0.2
+        }
+      ]
+    },
     "FlyFast": {
       "Animations": [
         {

@@ -1,0 +1,776 @@
+{
+  "Type": "Component",
+  "Class": "Instruction",
+  "Parameters": {
+    "WanderRadius": {
+      "Value": 20
+    },
+    "GroundDurationRange": {
+      "Value": [
+        45,
+        90
+      ]
+    },
+    "FlightDurationRange": {
+      "Value": [
+        60,
+        180
+      ]
+    },
+    "FlockFollowDistance": {
+      "Value": 8
+    },
+    "FlockLeaderLeashDistance": {
+      "Value": 80
+    },
+    "FlightFormation": {
+      "Value": "Loose"
+    },
+    "FlightFormationSpacing": {
+      "Value": 8
+    },
+    "FlightFormationTightness": {
+      "Value": 0.2
+    },
+    "KettleEnabled": {
+      "Value": true
+    },
+    "KettleRadius": {
+      "Value": 18
+    },
+    "KettleAltitudeRange": {
+      "Value": [
+        15,
+        28
+      ]
+    },
+    "KettleCooldownRange": {
+      "Value": [
+        120,
+        240
+      ]
+    },
+    "KettleDurationRange": {
+      "Value": [
+        180,
+        420
+      ]
+    },
+    "DayTimePeriod": {
+      "Value": [
+        6.01,
+        17.99
+      ]
+    },
+    "KettleRelativeSpeed": {
+      "Value": 0.8
+    }
+  },
+  "Content": {
+    "Instructions": [
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "Self",
+              "Filters": [
+                {
+                  "Type": "Flock",
+                  "FlockStatus": "Leader"
+                }
+              ]
+            },
+            {
+              "Type": "Or",
+              "Sensors": [
+                {
+                  "Type": "State",
+                  "State": ".Air"
+                },
+                {
+                  "Type": "State",
+                  "State": ".TakeOff"
+                }
+              ]
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "FlockBeacon",
+            "Message": "HD_Wild_Flock_Air",
+            "SendToSelf": false,
+            "ExpirationTime": 2
+          }
+        ],
+        "Continue": true
+      },
+      {
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "Self",
+              "Filters": [
+                {
+                  "Type": "Flock",
+                  "FlockStatus": "Leader"
+                }
+              ]
+            },
+            {
+              "Type": "Or",
+              "Sensors": [
+                {
+                  "Type": "State",
+                  "State": ".Ground"
+                },
+                {
+                  "Type": "State",
+                  "State": ".Land"
+                }
+              ]
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "FlockBeacon",
+            "Message": "HD_Wild_Flock_Ground",
+            "SendToSelf": false,
+            "ExpirationTime": 2
+          }
+        ],
+        "Continue": true
+      },
+      {
+        "Sensor": {
+          "Type": "State",
+          "State": ".Default"
+        },
+        "Instructions": [
+          {
+            "Sensor": {
+              "Type": "MotionController",
+              "MotionController": "Walk"
+            },
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".Ground"
+              }
+            ]
+          },
+          {
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".Air"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "State",
+          "State": ".Ground"
+        },
+        "Instructions": [
+          {
+            "Sensor": {
+              "Type": "MotionController",
+              "MotionController": "Fly"
+            },
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".Air"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "Any",
+              "Once": true
+            },
+            "Actions": [
+              {
+                "Type": "TimerStart",
+                "Name": "HD_Wild_GroundDuration",
+                "StartValueRange": {
+                  "Compute": "GroundDurationRange"
+                },
+                "RestartValueRange": {
+                  "Compute": "GroundDurationRange"
+                }
+              },
+              {
+                "Type": "TimerRestart",
+                "Name": "HD_Wild_GroundDuration"
+              },
+              {
+                "Type": "PlayAnimation",
+                "Slot": "Status"
+              }
+            ],
+            "Continue": true
+          },
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Self",
+                  "Filters": [
+                    {
+                      "Type": "Flock",
+                      "FlockStatus": "Follower"
+                    }
+                  ]
+                },
+                {
+                  "Type": "Beacon",
+                  "Message": "HD_Wild_Flock_Air",
+                  "ConsumeMessage": false,
+                  "Range": 160
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".TakeOff"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "Self",
+                        "Filters": [
+                          {
+                            "Type": "Flock",
+                            "FlockStatus": "Follower"
+                          }
+                        ]
+                      },
+                      {
+                        "Type": "Or",
+                        "Sensors": [
+                          {
+                            "Type": "Beacon",
+                            "Message": "HD_Wild_Flock_Air",
+                            "ConsumeMessage": false,
+                            "Range": 160
+                          },
+                          {
+                            "Type": "Beacon",
+                            "Message": "HD_Wild_Flock_Ground",
+                            "ConsumeMessage": false,
+                            "Range": 160
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "Timer",
+                  "Name": "HD_Wild_GroundDuration",
+                  "State": "Stopped"
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".TakeOff"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "FlockLeader"
+                },
+                {
+                  "Type": "Leash",
+                  "Range": {
+                    "Compute": "FlockFollowDistance"
+                  }
+                },
+                {
+                  "Type": "Self",
+                  "Filters": [
+                    {
+                      "Type": "Flock",
+                      "FlockStatus": "Follower"
+                    }
+                  ]
+                }
+              ]
+            },
+            "BodyMotion": {
+              "Type": "Seek",
+              "StopDistance": {
+                "Compute": "FlockFollowDistance"
+              },
+              "SlowDownDistance": {
+                "Compute": "FlockFollowDistance * 1.5"
+              },
+              "RelativeSpeed": 0.5,
+              "UsePathfinder": true
+            }
+          },
+          {
+            "BodyMotion": {
+              "Type": "WanderInCircle",
+              "Radius": {
+                "Compute": "WanderRadius"
+              },
+              "RelativeSpeed": 0.25
+            }
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "State",
+          "State": ".TakeOff"
+        },
+        "Instructions": [
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "MotionController",
+                  "MotionController": "Fly"
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "OnGround"
+                  }
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".Air"
+              }
+            ]
+          },
+          {
+            "BodyMotion": {
+              "Type": "TakeOff",
+              "JumpSpeed": 4
+            }
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "State",
+          "State": ".Air"
+        },
+        "Instructions": [
+          {
+            "Sensor": {
+              "Type": "MotionController",
+              "MotionController": "Walk"
+            },
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".Ground"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Self",
+                  "Filters": [
+                    {
+                      "Type": "Flock",
+                      "FlockStatus": "Follower"
+                    }
+                  ]
+                },
+                {
+                  "Type": "Beacon",
+                  "Message": "HD_Wild_Flock_Ground",
+                  "ConsumeMessage": false,
+                  "Range": 160
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".Land"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "Self",
+                        "Filters": [
+                          {
+                            "Type": "Flock",
+                            "FlockStatus": "Follower"
+                          }
+                        ]
+                      },
+                      {
+                        "Type": "Or",
+                        "Sensors": [
+                          {
+                            "Type": "Beacon",
+                            "Message": "HD_Wild_Flock_Air",
+                            "ConsumeMessage": false,
+                            "Range": 160
+                          },
+                          {
+                            "Type": "Beacon",
+                            "Message": "HD_Wild_Flock_Ground",
+                            "ConsumeMessage": false,
+                            "Range": 160
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "Timer",
+                  "Name": "HD_Wild_FlightDuration",
+                  "State": "Stopped"
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "Timer",
+                    "Name": "Tw_Kettle_Duration",
+                    "State": "Running"
+                  }
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "Or",
+                    "Sensors": [
+                      {
+                        "Type": "Beacon",
+                        "Message": "Tw_Kettle_Active",
+                        "ConsumeMessage": false,
+                        "Range": 160
+                      },
+                      {
+                        "Type": "Beacon",
+                        "Message": "Tw_Kettle_Ending",
+                        "ConsumeMessage": false,
+                        "Range": 160
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "State",
+                "State": ".Land"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "Eval",
+              "Expression": "blocked"
+            },
+            "BodyMotion": {
+              "Type": "Wander",
+              "MinHeadingChange": 150,
+              "MaxHeadingChange": 180,
+              "RelativeSpeed": 0.6
+            }
+          },
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Leash",
+                  "Range": {
+                    "Compute": "FlockLeaderLeashDistance"
+                  }
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "Self",
+                    "Filters": [
+                      {
+                        "Type": "Flock",
+                        "FlockStatus": "Follower"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "BodyMotion": {
+              "Type": "Seek",
+              "StopDistance": {
+                "Compute": "FlockLeaderLeashDistance * 0.5"
+              },
+              "SlowDownDistance": {
+                "Compute": "FlockLeaderLeashDistance * 0.75"
+              },
+              "RelativeSpeed": 0.4
+            }
+          },
+          {
+            "Reference": "Component_Tamework_Instruction_Flight_Kettle",
+            "Modify": {
+              "KettleEnabled": {
+                "Compute": "KettleEnabled"
+              },
+              "KettleRadius": {
+                "Compute": "KettleRadius"
+              },
+              "KettleAltitudeRange": {
+                "Compute": "KettleAltitudeRange"
+              },
+              "KettleCooldownRange": {
+                "Compute": "KettleCooldownRange"
+              },
+              "KettleDurationRange": {
+                "Compute": "KettleDurationRange"
+              },
+              "DayTimePeriod": {
+                "Compute": "DayTimePeriod"
+              },
+              "KettleRelativeSpeed": {
+                "Compute": "KettleRelativeSpeed"
+              }
+            }
+          },
+          {
+            "Reference": "Component_Tamework_Instruction_Flight_Formation",
+            "Modify": {
+              "FlightFormation": {
+                "Compute": "FlightFormation"
+              },
+              "FlightFormationSpacing": {
+                "Compute": "FlightFormationSpacing"
+              },
+              "FlightFormationTightness": {
+                "Compute": "FlightFormationTightness"
+              }
+            }
+          },
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "FlockLeader"
+                },
+                {
+                  "Type": "Self",
+                  "Filters": [
+                    {
+                      "Type": "Flock",
+                      "FlockStatus": "Follower"
+                    }
+                  ]
+                }
+              ]
+            },
+            "BodyMotion": {
+              "Type": "TameworkFlyingOrbit",
+              "Mode": "WANDER_TARGET",
+              "WanderRadiusRange": [
+                10,
+                25
+              ],
+              "WanderRetargetTimeRange": [
+                4,
+                8
+              ],
+              "WanderStopDistance": 5,
+              "DesiredAltitudeRange": [
+                15,
+                28
+              ],
+              "RelativeSpeed": 0.4,
+              "ClimbRelativeSpeed": 0.2,
+              "SinkRelativeSpeed": 0.2,
+              "UseTargetLeashPoint": true,
+              "AvoidObstacles": true
+            }
+          },
+          {
+            "BodyMotion": {
+              "Type": "WanderInCircle",
+              "Radius": {
+                "Compute": "WanderRadius"
+              },
+              "RelativeSpeed": 0.4
+            }
+          }
+        ]
+      },
+      {
+        "Sensor": {
+          "Type": "State",
+          "State": ".Land"
+        },
+        "Instructions": [
+          {
+            "Sensor": {
+              "Type": "MotionController",
+              "MotionController": "Walk"
+            },
+            "Actions": [
+              {
+                "Type": "ResetSearchRays"
+              },
+              {
+                "Type": "State",
+                "State": ".Ground"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Self",
+                  "Filters": [
+                    {
+                      "Type": "Flock",
+                      "FlockStatus": "Follower"
+                    }
+                  ]
+                },
+                {
+                  "Type": "Beacon",
+                  "Message": "HD_Wild_Flock_Air",
+                  "ConsumeMessage": false,
+                  "Range": 160
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "ResetSearchRays"
+              },
+              {
+                "Type": "State",
+                "State": ".Air"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "Any",
+              "Once": true
+            },
+            "Actions": [
+              {
+                "Type": "ResetSearchRays"
+              }
+            ],
+            "Continue": true
+          },
+          {
+            "Actions": [
+              {
+                "Type": "Timeout",
+                "Delay": [
+                  45,
+                  60
+                ],
+                "Action": {
+                  "Type": "ResetSearchRays"
+                }
+              }
+            ],
+            "Continue": true
+          },
+          {
+            "Sensor": {
+              "Type": "Eval",
+              "Expression": "blocked"
+            },
+            "BodyMotion": {
+              "Type": "Wander",
+              "MinHeadingChange": 150,
+              "MaxHeadingChange": 180,
+              "RelativeSpeed": 0.6
+            }
+          },
+          {
+            "Sensor": {
+              "Type": "AdjustPosition",
+              "Offset": [
+                0,
+                1,
+                0
+              ],
+              "Sensor": {
+                "Type": "SearchRay",
+                "Name": "HD_Wild_Landing",
+                "Range": 64,
+                "Angle": 30,
+                "Blocks": "StoneAndSoil"
+              }
+            },
+            "BodyMotion": {
+              "Type": "Land",
+              "RelativeSpeed": 0.4,
+              "SlowDownDistance": 1,
+              "StopDistance": 0.5,
+              "UsePathfinder": true
+            }
+          },
+          {
+            "BodyMotion": {
+              "Type": "Wander",
+              "MinHeadingChange": 90,
+              "MaxHeadingChange": 180,
+              "RelativeSpeed": 0.25
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

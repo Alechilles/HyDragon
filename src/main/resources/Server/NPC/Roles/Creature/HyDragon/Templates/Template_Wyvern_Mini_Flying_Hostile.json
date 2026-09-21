@@ -1,34 +1,14 @@
 {
   "Type": "Abstract",
-  "Debug": "DisplayState",
-  "Appearance": {
-    "Compute": "Appearance"
-  },
-  "StartState": "IdleGround",
+  "StartState": "Idle.Default",
   "Parameters": {
     "Appearance": {
       "Value": "WyvernMini",
       "Description": "Model to be used"
     },
-    "WanderRadius": {
-      "Value": 10,
-      "Description": "General idle movement radius"
-    },
     "ViewRange": {
       "Value": 28,
       "Description": "View range"
-    },
-    "ViewSector": {
-      "Value": 180,
-      "Description": "View sector"
-    },
-    "HearingRange": {
-      "Value": 18,
-      "Description": "Hearing range"
-    },
-    "AlertedRange": {
-      "Value": 36,
-      "Description": "A range within which the player can still be sensed while alerted"
     },
     "DropList": {
       "Value": "Empty",
@@ -42,58 +22,17 @@
       "Value": 12,
       "Description": "Maximum flight speed"
     },
-    "RangedAttack": {
-      "Value": "Root_NPC_Wyvern_Mini_Shot",
-      "Description": "The ranged attack to use"
-    },
-    "RangedAttackDistance": {
-      "Value": 18,
-      "Description": "The distance to attack at range from"
-    },
-    "RangedAttackMinimumDistance": {
-      "Value": 3.25,
-      "Description": "Minimum distance before preferring the ranged shot"
-    },
-    "Attack": {
-      "Value": "Root_NPC_Wyvern_Mini_Bite",
-      "Description": "The close attack"
-    },
-    "AttackDistance": {
-      "Value": 2.75,
-      "Description": "The close distance attack range"
-    },
-    "CombatBehaviorDistance": {
-      "Value": 8,
-      "Description": "Distance at which to start slowing in combat movement"
+    "MaxHealth": {
+      "Value": 80,
+      "Description": "Max health for the NPC"
     },
     "AttitudeGroup": {
       "Value": "Predators",
       "Description": "This NPCs attitude group"
     },
-    "CombatRelativeTurnSpeed": {
-      "Value": 1.5,
-      "Description": "Modifier that decides turn speed difference in combat"
-    },
-    "MaxHealth": {
-      "Value": 80,
-      "Description": "Max health for the NPC"
-    },
-    "AttractiveItemSet": {
-      "Value": [
-        "Food_Wildmeat_Raw",
-        "Food_Chicken_Raw",
-        "Food_Fish_Raw"
-      ],
-      "TypeHint": "String",
-      "Description": "The list of items that are deemed attractive for tame interactions."
-    },
     "IsTameable": {
       "Value": false,
       "Description": "Whether this NPC can be tamed."
-    },
-    "TameRoleChange": {
-      "Value": "Tamed_Wyvern_Mini_Wild",
-      "Description": "The role the NPC will change into when it's tamed."
     },
     "TranquilizerSleepThresholdSeconds": {
       "Value": 50,
@@ -105,10 +44,6 @@
         0.2
       ],
       "Description": "Health ratio range required for tranquilizer-forced sleep."
-    },
-    "InteractionConfigId": {
-      "Value": "",
-      "Description": "Optional TwInteractionConfig asset id override. If set, Tamework interaction flow is used for this role."
     },
     "IsMemory": {
       "Value": false,
@@ -125,7 +60,193 @@
     "NameTranslationKey": {
       "Value": "server.npcRoles.Template.name",
       "Description": "Translation key for NPC name display"
+    },
+    "WanderRadius": {
+      "Value": 20
+    },
+    "GroundDurationRange": {
+      "Value": [
+        45,
+        90
+      ]
+    },
+    "FlightDurationRange": {
+      "Value": [
+        60,
+        180
+      ]
+    },
+    "FlockFollowDistance": {
+      "Value": 8
+    },
+    "FlockLeaderLeashDistance": {
+      "Value": 80
+    },
+    "FlightFormation": {
+      "Value": "Loose"
+    },
+    "FlightFormationSpacing": {
+      "Value": 8
+    },
+    "FlightFormationTightness": {
+      "Value": 0.2
+    },
+    "KettleEnabled": {
+      "Value": true
+    },
+    "KettleRadius": {
+      "Value": 18
+    },
+    "KettleAltitudeRange": {
+      "Value": [
+        15,
+        28
+      ]
+    },
+    "KettleCooldownRange": {
+      "Value": [
+        120,
+        240
+      ]
+    },
+    "KettleDurationRange": {
+      "Value": [
+        180,
+        420
+      ]
+    },
+    "DayTimePeriod": {
+      "Value": [
+        6.01,
+        17.99
+      ]
+    },
+    "KettleRelativeSpeed": {
+      "Value": 0.8
+    },
+    "SwoopAttack": {
+      "Value": "Root_NPC_Wyvern_Mini_Swoop_Bite"
+    },
+    "RangedAttack": {
+      "Value": "Root_NPC_Wyvern_Mini_Wild_Projectile_Base"
+    },
+    "AttackDistance": {
+      "Value": 2.75
+    },
+    "OrbitDistanceRange": {
+      "Value": [
+        8,
+        14
+      ]
+    },
+    "OrbitAltitudeRange": {
+      "Value": [
+        5,
+        9
+      ]
+    },
+    "OrbitRelativeSpeed": {
+      "Value": 0.28
+    },
+    "OrbitRetargetTimeRange": {
+      "Value": [
+        3,
+        6
+      ]
+    },
+    "OrbitStopDistance": {
+      "Value": 2.5
+    },
+    "ProjectileRange": {
+      "Value": 18
+    },
+    "ProjectileMinimumRange": {
+      "Value": 3.25
+    },
+    "ProjectileCooldownRange": {
+      "Value": [
+        5,
+        7
+      ]
+    },
+    "SwoopCooldownRange": {
+      "Value": [
+        25,
+        35
+      ]
+    },
+    "SwoopAltitudeRange": {
+      "Value": [
+        0,
+        2
+      ]
+    },
+    "SwoopApproachTimeout": {
+      "Value": [
+        6,
+        6
+      ]
+    },
+    "SwoopApproachRelativeSpeed": {
+      "Value": 0.55
+    },
+    "RecoveryDistanceRange": {
+      "Value": [
+        8,
+        14
+      ]
+    },
+    "RecoveryDurationRange": {
+      "Value": [
+        2,
+        4
+      ]
+    },
+    "RecoveryRelativeSpeed": {
+      "Value": 0.45
+    },
+    "FlockArray": {
+      "Value": [
+        "Wyvern_Mini"
+      ],
+      "TypeHint": "String"
+    },
+    "FlockAssistRange": {
+      "Value": 24
+    },
+    "PursuitRange": {
+      "Value": 48
+    },
+    "PursuitLeashDistance": {
+      "Value": 100
+    },
+    "LostTargetTimeoutRange": {
+      "Value": [
+        5,
+        8
+      ]
+    },
+    "TakeOffTimeoutRange": {
+      "Value": [
+        8,
+        12
+      ]
+    },
+    "RegroupTimeoutRange": {
+      "Value": [
+        15,
+        20
+      ]
+    },
+    "MinHeightOverGround": {
+      "Value": 15
+    },
+    "MaxHeightOverGround": {
+      "Value": 35
     }
+  },
+  "Appearance": {
+    "Compute": "Appearance"
   },
   "IsMemory": {
     "Compute": "IsMemory"
@@ -136,36 +257,56 @@
   "MemoriesNameOverride": {
     "Compute": "MemoriesNameOverride"
   },
-  "DisableDamageGroups": [
-    "Self"
-  ],
-  "KnockbackScale": 0.2,
   "DefaultNPCAttitude": "Ignore",
-  "DefaultPlayerAttitude": "Neutral",
+  "DefaultPlayerAttitude": "Hostile",
   "AttitudeGroup": {
     "Compute": "AttitudeGroup"
   },
+  "DisableDamageGroups": [
+    "Self"
+  ],
+  "DisableDamageFlock": true,
+  "KnockbackScale": 0.2,
   "DropList": {
     "Compute": "DropList"
   },
   "MaxHealth": {
     "Compute": "MaxHealth"
   },
+  "FlockSpawnTypes": {
+    "Compute": "FlockArray"
+  },
+  "FlockSpawnTypesRandom": true,
+  "FlockAllowedNPC": {
+    "Compute": "FlockArray"
+  },
+  "FlockCanLead": true,
+  "ApplySeparation": true,
+  "SeparationDistance": 2,
+  "SeparationWeight": 1,
   "MotionControllerList": [
     {
-      "Type": "Fly",
+      "Type": "TameworkFormationFly",
       "MaxHorizontalSpeed": {
         "Compute": "FlightSpeed"
       },
       "MaxSinkSpeed": 8,
       "MaxClimbSpeed": 10,
-      "MinAirSpeed": 3,
+      "MinAirSpeed": 0,
       "Acceleration": 6,
-      "MinHeightOverGround": 4,
-      "MaxHeightOverGround": 10,
+      "MinHeightOverGround": {
+        "Compute": "MinHeightOverGround"
+      },
+      "MaxHeightOverGround": {
+        "Compute": "MaxHeightOverGround"
+      },
       "MaxRollAngle": 70,
       "MaxTurnSpeed": 180,
-      "DesiredAltitudeWeight": 1
+      "DesiredAltitudeWeight": 1,
+      "Formation": {
+        "Compute": "FlightFormation"
+      },
+      "Deceleration": 12
     },
     {
       "Type": "Walk",
@@ -178,20 +319,6 @@
     }
   ],
   "Instructions": [
-    {
-      "$Comment": "Validation-only state setters (disabled).",
-      "Enabled": false,
-      "Actions": [
-        {
-          "Type": "State",
-          "State": "Sleep.TranquilizedLanding"
-        },
-        {
-          "Type": "State",
-          "State": "Sleep.TranquilizedGrounded"
-        }
-      ]
-    },
     {
       "$Comment": "Latch tranquilizer sleep eligibility once remaining duration reaches threshold.",
       "Continue": true,
@@ -277,300 +404,241 @@
       },
       "Actions": [
         {
+          "Type": "ReleaseTarget",
+          "TargetSlot": "LockedTarget"
+        },
+        {
           "Type": "State",
           "State": "Sleep.TranquilizedLanding"
         }
       ]
     },
     {
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          {
+            "Type": "Not",
+            "Sensor": {
+              "Type": "State",
+              "State": "Combat"
+            }
+          },
+          {
+            "Type": "Flag",
+            "Name": "HD_Wild_Aerial_Combat_Active",
+            "Set": true
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "SetFlag",
+          "Name": "HD_Wild_Aerial_Combat_Active",
+          "SetTo": false
+        },
+        {
+          "Type": "SetFlag",
+          "Name": "HD_Wild_Swoop_Pending",
+          "SetTo": false
+        },
+        {
+          "Type": "SetFlag",
+          "Name": "HD_Wild_Swooping",
+          "SetTo": false
+        },
+        {
+          "Type": "SetFlag",
+          "Name": "HD_Wild_Projectile_Aiming",
+          "SetTo": false
+        },
+        {
+          "Type": "SetFlag",
+          "Name": "HD_Wild_Swoop_Recovery_Started",
+          "SetTo": false
+        },
+        {
+          "Type": "TimerStop",
+          "Name": "HD_Wild_Swoop_Cooldown"
+        },
+        {
+          "Type": "TimerStop",
+          "Name": "HD_Wild_Swoop_Approach"
+        },
+        {
+          "Type": "TimerStop",
+          "Name": "HD_Wild_Swoop_Recovery"
+        },
+        {
+          "Type": "TimerStop",
+          "Name": "HD_Wild_Projectile_Aim"
+        },
+        {
+          "Type": "TimerStop",
+          "Name": "HD_Wild_Projectile_Cooldown"
+        }
+      ],
+      "Continue": true
+    },
+    {
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          {
+            "Type": "MotionController",
+            "MotionController": "Fly"
+          },
+          {
+            "Type": "Flag",
+            "Name": "HD_Wild_FlightClockActive",
+            "Set": false
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "TimerStart",
+          "Name": "HD_Wild_FlightDuration",
+          "StartValueRange": {
+            "Compute": "FlightDurationRange"
+          },
+          "RestartValueRange": {
+            "Compute": "FlightDurationRange"
+          }
+        },
+        {
+          "Type": "TimerRestart",
+          "Name": "HD_Wild_FlightDuration"
+        },
+        {
+          "Type": "SetFlag",
+          "Name": "HD_Wild_FlightClockActive",
+          "SetTo": true
+        }
+      ],
+      "Continue": true
+    },
+    {
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          {
+            "Type": "MotionController",
+            "MotionController": "Walk"
+          },
+          {
+            "Type": "Flag",
+            "Name": "HD_Wild_FlightClockActive",
+            "Set": true
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "TimerStop",
+          "Name": "HD_Wild_FlightDuration"
+        },
+        {
+          "Type": "SetFlag",
+          "Name": "HD_Wild_FlightClockActive",
+          "SetTo": false
+        }
+      ],
+      "Continue": true
+    },
+    {
+      "Sensor": {
+        "Type": "And",
+        "Sensors": [
+          {
+            "Type": "Or",
+            "Sensors": [
+              {
+                "Type": "State",
+                "State": "Idle"
+              },
+              {
+                "Type": "State",
+                "State": "Return"
+              }
+            ]
+          },
+          {
+            "Type": "FlockLeader"
+          },
+          {
+            "Type": "Self",
+            "Filters": [
+              {
+                "Type": "Flock",
+                "FlockStatus": "Follower"
+              }
+            ]
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "SetLeashPosition",
+          "ToTarget": true
+        }
+      ],
+      "Continue": true
+    },
+    {
+      "Sensor": {
+        "Type": "State",
+        "State": "Sleep"
+      },
       "Instructions": [
         {
           "Sensor": {
-            "Type": "State",
-            "State": "IdleGround"
+            "Type": "Not",
+            "Sensor": {
+              "Type": "TameworkEffectActive",
+              "EffectId": "Tw_Status_Tranquilized"
+            }
           },
-          "Instructions": [
+          "Actions": [
             {
-              "Reference": "Component_Instruction_Clear_Status_Animation"
+              "Type": "ResetSearchRays"
             },
             {
-              "Sensor": {
-                "Type": "Damage",
-                "Combat": true
-              },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "Alerted"
-                }
-              ]
+              "Type": "ReleaseTarget",
+              "TargetSlot": "LockedTarget"
             },
             {
-              "Sensor": {
-                "Type": "Or",
-                "Sensors": [
-                  {
-                    "Reference": "Component_Sensor_Sight_By_Attitude",
-                    "Modify": {
-                      "ViewRange": {
-                        "Compute": "ViewRange"
-                      },
-                      "ViewSector": {
-                        "Compute": "ViewSector"
-                      },
-                      "Attitudes": [
-                        "Hostile",
-                        "Neutral"
-                      ]
-                    }
-                  },
-                  {
-                    "Reference": "Component_Sensor_Sound_By_Attitude",
-                    "Modify": {
-                      "HearingRange": {
-                        "Compute": "HearingRange"
-                      },
-                      "Attitudes": [
-                        "Hostile",
-                        "Neutral"
-                      ]
-                    }
-                  }
-                ]
-              },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "Alerted"
-                }
-              ]
+              "Type": "TameworkSetFlyingCompanionMode",
+              "Mode": "Follow"
             },
             {
-              "ActionsBlocking": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    6,
-                    10
-                  ]
-                },
-                {
-                  "Type": "State",
-                  "State": "TakeOff"
-                }
-              ],
-              "BodyMotion": {
-                "Type": "WanderInCircle",
-                "Radius": {
-                  "Compute": "WanderRadius"
-                }
-              }
+              "Type": "PlayAnimation",
+              "Slot": "Status"
+            },
+            {
+              "Type": "State",
+              "State": "Idle.Default"
             }
           ]
         },
         {
           "Sensor": {
             "Type": "State",
-            "State": "TakeOff"
+            "State": ".TranquilizedLanding"
           },
           "Instructions": [
             {
-              "Sensor": {
-                "Type": "Damage",
-                "Combat": true
-              },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "Alerted"
-                }
-              ]
-            },
-            {
-              "Sensor": {
-                "Type": "Or",
-                "Sensors": [
-                  {
-                    "Reference": "Component_Sensor_Sight_By_Attitude",
-                    "Modify": {
-                      "ViewRange": {
-                        "Compute": "AlertedRange"
-                      },
-                      "ViewSector": {
-                        "Compute": "ViewSector"
-                      },
-                      "Attitudes": [
-                        "Hostile",
-                        "Neutral"
-                      ]
-                    }
-                  },
-                  {
-                    "Reference": "Component_Sensor_Sound_By_Attitude",
-                    "Modify": {
-                      "HearingRange": {
-                        "Compute": "HearingRange"
-                      },
-                      "Attitudes": [
-                        "Hostile",
-                        "Neutral"
-                      ]
-                    }
-                  }
-                ]
-              },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "Alerted"
-                }
-              ]
-            },
-            {
-              "BodyMotion": {
-                "Type": "TakeOff",
-                "JumpSpeed": 4
-              }
-            },
-            {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Fly"
-              },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "IdleAir"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "Sensor": {
-            "Type": "State",
-            "State": "IdleAir"
-          },
-          "Instructions": [
-            {
-              "Reference": "Component_Instruction_Clear_Status_Animation"
-            },
-            {
-              "Sensor": {
-                "Type": "Damage",
-                "Combat": true
-              },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "Alerted"
-                }
-              ]
-            },
-            {
-              "Sensor": {
-                "Type": "Or",
-                "Sensors": [
-                  {
-                    "Reference": "Component_Sensor_Sight_By_Attitude",
-                    "Modify": {
-                      "ViewRange": {
-                        "Compute": "ViewRange"
-                      },
-                      "ViewSector": {
-                        "Compute": "ViewSector"
-                      },
-                      "Attitudes": [
-                        "Hostile",
-                        "Neutral"
-                      ]
-                    }
-                  },
-                  {
-                    "Reference": "Component_Sensor_Sound_By_Attitude",
-                    "Modify": {
-                      "HearingRange": {
-                        "Compute": "HearingRange"
-                      },
-                      "Attitudes": [
-                        "Hostile",
-                        "Neutral"
-                      ]
-                    }
-                  }
-                ]
-              },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "Alerted"
-                }
-              ]
-            },
-            {
-              "ActionsBlocking": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    8,
-                    12
-                  ]
-                },
-                {
-                  "Type": "State",
-                  "State": "Land"
-                }
-              ],
-              "BodyMotion": {
-                "Type": "WanderInCircle",
-                "Radius": {
-                  "Compute": "WanderRadius + 2"
-                },
-                "RelativeSpeed": 0.35
-              }
-            }
-          ]
-        },
-        {
-          "Sensor": {
-            "Type": "State",
-            "State": "Alerted"
-          },
-          "Instructions": [
-            {
-              "Continue": true,
               "Sensor": {
                 "Type": "Any",
                 "Once": true
               },
               "Actions": [
                 {
-                  "Type": "PlayAnimation",
-                  "Slot": "Status",
-                  "Animation": "Alerted"
-                },
-                {
-                  "Type": "SpawnParticles",
-                  "Offset": [
-                    0,
-                    1.2,
-                    0
-                  ],
-                  "ParticleSystem": "Alerted"
+                  "Type": "TameworkSetFlyingCompanionMode",
+                  "Mode": "Fall"
                 }
-              ]
-            },
-            {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Walk"
-              },
-              "BodyMotion": {
-                "Type": "TakeOff",
-                "JumpSpeed": 4
-              }
+              ],
+              "Continue": true
             },
             {
               "Sensor": {
@@ -578,612 +646,631 @@
                 "Sensors": [
                   {
                     "Type": "MotionController",
-                    "MotionController": "Fly"
+                    "MotionController": "Walk"
                   },
                   {
-                    "Type": "Target",
-                    "Range": {
-                      "Compute": "ViewRange"
-                    }
+                    "Type": "OnGround"
                   }
                 ]
               },
               "Actions": [
                 {
-                  "Type": "Timeout",
-                  "Delay": [
-                    1,
-                    1.5
-                  ],
-                  "Action": {
-                    "Type": "State",
-                    "State": "Attack"
-                  }
-                }
-              ],
-              "HeadMotion": {
-                "Type": "Watch"
-              }
-            },
-            {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Fly"
-              },
-              "ActionsAtomic": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    2,
-                    3
-                  ]
-                },
-                {
-                  "Type": "ReleaseTarget"
-                },
-                {
                   "Type": "State",
-                  "State": "IdleAir"
+                  "State": ".TranquilizedGrounded"
                 }
               ]
             },
             {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Walk"
-              },
-              "ActionsAtomic": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    2,
-                    3
-                  ]
-                },
-                {
-                  "Type": "ReleaseTarget"
-                },
-                {
-                  "Type": "State",
-                  "State": "IdleGround"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "Sensor": {
-            "Type": "State",
-            "State": "Attack"
-          },
-          "Instructions": [
-            {
-              "Reference": "Component_Instruction_Clear_Status_Animation"
-            },
-            {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Walk"
-              },
               "BodyMotion": {
-                "Type": "TakeOff",
-                "JumpSpeed": 4
+                "Type": "Nothing"
+              }
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "State",
+            "State": ".TranquilizedGrounded"
+          },
+          "Instructions": [
+            {
+              "Reference": "Component_Instruction_Play_Animation",
+              "Modify": {
+                "Animation": "Sleep"
               }
             },
             {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Fly"
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Sensor": {
+        "Type": "Or",
+        "Sensors": [
+          {
+            "Type": "State",
+            "State": "Engage"
+          },
+          {
+            "Type": "State",
+            "State": "Combat"
+          }
+        ]
+      },
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "Or",
+            "Sensors": [
+              {
+                "Type": "Not",
+                "Sensor": {
+                  "Type": "Target",
+                  "TargetSlot": "LockedTarget",
+                  "Range": {
+                    "Compute": "PursuitRange"
+                  }
+                }
               },
-              "Instructions": [
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Any"
-                  },
-                  "Actions": [
-                    {
-                      "Type": "OverrideAltitude",
-                      "DesiredAltitudeRange": [
-                        4,
-                        8
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Target",
-                    "Range": {
-                      "Compute": "AttackDistance"
-                    },
-                    "Filters": [
-                      {
-                        "Type": "LineOfSight"
-                      }
-                    ]
-                  },
-                  "Actions": [
-                    {
-                      "Type": "Attack",
-                      "Attack": {
-                        "Compute": "Attack"
-                      },
-                      "AimingTimeRange": [
-                        0.25,
-                        0.5
-                      ],
-                      "AttackPauseRange": [
-                        1.25,
-                        2
-                      ]
-                    }
-                  ],
-                  "HeadMotion": {
-                    "Type": "Aim",
-                    "Spread": 0,
-                    "HitProbability": 1,
-                    "Deflection": true,
-                    "RelativeTurnSpeed": {
-                      "Compute": "CombatRelativeTurnSpeed"
-                    }
-                  }
-                },
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "And",
-                    "Sensors": [
-                      {
-                        "Type": "Target",
-                        "Range": {
-                          "Compute": "RangedAttackDistance"
-                        },
-                        "Filters": [
-                          {
-                            "Type": "LineOfSight"
-                          }
-                        ]
-                      },
-                      {
-                        "Type": "Not",
-                        "Sensor": {
-                          "Type": "Target",
-                          "Range": {
-                            "Compute": "RangedAttackMinimumDistance"
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "Actions": [
-                    {
-                      "Type": "Attack",
-                      "Attack": {
-                        "Compute": "RangedAttack"
-                      },
-                      "BallisticMode": "Short",
-                      "AimingTimeRange": [
-                        0.75,
-                        1.25
-                      ],
-                      "AttackPauseRange": [
-                        2,
-                        3
-                      ]
-                    }
-                  ],
-                  "HeadMotion": {
-                    "Type": "Aim",
-                    "Spread": 0,
-                    "HitProbability": 1,
-                    "Deflection": true,
-                    "RelativeTurnSpeed": {
-                      "Compute": "CombatRelativeTurnSpeed"
-                    }
-                  }
-                },
-                {
-                  "Sensor": {
-                    "Type": "Target",
-                    "Range": {
-                      "Compute": "ViewRange"
-                    }
-                  },
-                  "BodyMotion": {
-                    "Type": "Seek",
-                    "SlowDownDistance": {
-                      "Compute": "CombatBehaviorDistance"
-                    },
-                    "StopDistance": {
-                      "Compute": "RangedAttackMinimumDistance"
-                    },
-                    "RelativeSpeed": 0.7
-                  }
+              {
+                "Type": "Leash",
+                "Range": {
+                  "Compute": "PursuitLeashDistance"
                 }
-              ]
-            },
+              }
+            ]
+          },
+          "Actions": [
             {
-              "ActionsAtomic": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    4,
-                    6
-                  ]
-                },
-                {
-                  "Type": "ReleaseTarget"
-                },
-                {
-                  "Type": "State",
-                  "State": "IdleAir"
-                }
-              ]
+              "Type": "State",
+              "State": "Return"
             }
           ]
         },
         {
           "Sensor": {
-            "Type": "State",
-            "State": "Land"
+            "Type": "Target",
+            "TargetSlot": "LockedTarget",
+            "Range": {
+              "Compute": "PursuitRange"
+            },
+            "Filters": [
+              {
+                "Type": "LineOfSight"
+              }
+            ]
           },
-          "Instructions": [
+          "Actions": [
             {
-              "Sensor": {
-                "Type": "Damage",
-                "Combat": true
+              "Type": "TimerStart",
+              "Name": "HD_Wild_LostTarget",
+              "StartValueRange": {
+                "Compute": "LostTargetTimeoutRange"
               },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "Alerted"
-                }
-              ]
+              "RestartValueRange": {
+                "Compute": "LostTargetTimeoutRange"
+              }
             },
             {
-              "Sensor": {
-                "Type": "Nav",
-                "NavStates": [
-                  "Defer",
-                  "Blocked",
-                  "Aborted"
-                ]
+              "Type": "TimerRestart",
+              "Name": "HD_Wild_LostTarget"
+            }
+          ],
+          "Continue": true
+        },
+        {
+          "Sensor": {
+            "Type": "Timer",
+            "Name": "HD_Wild_LostTarget",
+            "State": "Stopped"
+          },
+          "Actions": [
+            {
+              "Type": "State",
+              "State": "Return"
+            }
+          ]
+        }
+      ],
+      "Continue": true
+    },
+    {
+      "Sensor": {
+        "Type": "State",
+        "State": "Engage"
+      },
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "Any",
+            "Once": true
+          },
+          "Actions": [
+            {
+              "Type": "TimerStart",
+              "Name": "HD_Wild_TakeOff",
+              "StartValueRange": {
+                "Compute": "TakeOffTimeoutRange"
               },
-              "Actions": [
-                {
-                  "Type": "State",
-                  "State": "IdleAir"
-                }
-              ]
+              "RestartValueRange": {
+                "Compute": "TakeOffTimeoutRange"
+              }
             },
             {
-              "Sensor": {
+              "Type": "TimerRestart",
+              "Name": "HD_Wild_TakeOff"
+            },
+            {
+              "Type": "ResetSearchRays"
+            },
+            {
+              "Type": "PlayAnimation",
+              "Slot": "Status"
+            }
+          ],
+          "Continue": true
+        },
+        {
+          "Sensor": {
+            "Type": "And",
+            "Sensors": [
+              {
                 "Type": "MotionController",
                 "MotionController": "Fly"
               },
-              "Instructions": [
+              {
+                "Type": "Not",
+                "Sensor": {
+                  "Type": "OnGround"
+                }
+              }
+            ]
+          },
+          "Actions": [
+            {
+              "Type": "State",
+              "State": "Combat.Position"
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "Timer",
+            "Name": "HD_Wild_TakeOff",
+            "State": "Stopped"
+          },
+          "Actions": [
+            {
+              "Type": "State",
+              "State": "Return"
+            }
+          ]
+        },
+        {
+          "BodyMotion": {
+            "Type": "TakeOff",
+            "JumpSpeed": 4
+          }
+        }
+      ]
+    },
+    {
+      "Sensor": {
+        "Type": "State",
+        "State": "Combat"
+      },
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "Not",
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
                 {
-                  "Sensor": {
-                    "Type": "AdjustPosition",
-                    "Offset": [
-                      0,
-                      1,
-                      0
-                    ],
-                    "Sensor": {
-                      "Type": "SearchRay",
-                      "Name": "LandingRay",
-                      "Range": 20,
-                      "Angle": 45,
-                      "Blocks": "Gaia"
-                    }
-                  },
-                  "BodyMotion": {
-                    "Type": "Land",
-                    "SlowDownDistance": 5,
-                    "StopDistance": 0.5,
-                    "GoalLenience": 3
-                  }
+                  "Type": "MotionController",
+                  "MotionController": "Fly"
                 },
                 {
-                  "BodyMotion": {
-                    "Type": "Wander",
-                    "RelativeSpeed": 0.2
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "OnGround"
                   }
                 }
               ]
+            }
+          },
+          "Actions": [
+            {
+              "Type": "State",
+              "State": "Engage"
+            }
+          ]
+        },
+        {
+          "Reference": "Component_HyDragon_Instruction_Miniwyvern_Wild_Combat",
+          "Modify": {
+            "SwoopAttack": {
+              "Compute": "SwoopAttack"
+            },
+            "RangedAttack": {
+              "Compute": "RangedAttack"
+            },
+            "AttackDistance": {
+              "Compute": "AttackDistance"
+            },
+            "OrbitDistanceRange": {
+              "Compute": "OrbitDistanceRange"
+            },
+            "OrbitAltitudeRange": {
+              "Compute": "OrbitAltitudeRange"
+            },
+            "OrbitRelativeSpeed": {
+              "Compute": "OrbitRelativeSpeed"
+            },
+            "OrbitRetargetTimeRange": {
+              "Compute": "OrbitRetargetTimeRange"
+            },
+            "OrbitStopDistance": {
+              "Compute": "OrbitStopDistance"
+            },
+            "ProjectileRange": {
+              "Compute": "ProjectileRange"
+            },
+            "ProjectileMinimumRange": {
+              "Compute": "ProjectileMinimumRange"
+            },
+            "ProjectileCooldownRange": {
+              "Compute": "ProjectileCooldownRange"
+            },
+            "SwoopCooldownRange": {
+              "Compute": "SwoopCooldownRange"
+            },
+            "SwoopAltitudeRange": {
+              "Compute": "SwoopAltitudeRange"
+            },
+            "SwoopApproachTimeout": {
+              "Compute": "SwoopApproachTimeout"
+            },
+            "SwoopApproachRelativeSpeed": {
+              "Compute": "SwoopApproachRelativeSpeed"
+            },
+            "RecoveryDistanceRange": {
+              "Compute": "RecoveryDistanceRange"
+            },
+            "RecoveryDurationRange": {
+              "Compute": "RecoveryDurationRange"
+            },
+            "RecoveryRelativeSpeed": {
+              "Compute": "RecoveryRelativeSpeed"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Sensor": {
+        "Type": "State",
+        "State": "Return"
+      },
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "Any",
+            "Once": true
+          },
+          "Actions": [
+            {
+              "Type": "ReleaseTarget",
+              "TargetSlot": "LockedTarget"
             },
             {
-              "Sensor": {
+              "Type": "ResetSearchRays"
+            },
+            {
+              "Type": "TimerStart",
+              "Name": "HD_Wild_Regroup",
+              "StartValueRange": {
+                "Compute": "RegroupTimeoutRange"
+              },
+              "RestartValueRange": {
+                "Compute": "RegroupTimeoutRange"
+              }
+            },
+            {
+              "Type": "TimerRestart",
+              "Name": "HD_Wild_Regroup"
+            }
+          ],
+          "Continue": true
+        },
+        {
+          "Sensor": {
+            "Type": "Timer",
+            "Name": "HD_Wild_Regroup",
+            "State": "Stopped"
+          },
+          "Actions": [
+            {
+              "Type": "State",
+              "State": "Idle.Default"
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "And",
+            "Sensors": [
+              {
+                "Type": "Leash",
+                "Range": 16
+              },
+              {
                 "Type": "MotionController",
                 "MotionController": "Walk"
-              },
-              "Actions": [
-                {
-                  "Type": "ResetSearchRays"
-                },
-                {
-                  "Type": "State",
-                  "State": "IdleGround"
-                }
-              ]
+              }
+            ]
+          },
+          "BodyMotion": {
+            "Type": "Seek",
+            "StopDistance": 12,
+            "SlowDownDistance": 20,
+            "RelativeSpeed": 0.7,
+            "UsePathfinder": true
+          }
+        },
+        {
+          "Sensor": {
+            "Type": "Leash",
+            "Range": 16
+          },
+          "BodyMotion": {
+            "Type": "Seek",
+            "StopDistance": 12,
+            "SlowDownDistance": 20,
+            "RelativeSpeed": 0.5
+          }
+        },
+        {
+          "Actions": [
+            {
+              "Type": "State",
+              "State": "Idle.Default"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Sensor": {
+        "Type": "State",
+        "State": "Idle"
+      },
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "Player",
+            "Range": {
+              "Compute": "ViewRange"
+            },
+            "LockedTargetSlot": "LockedTarget",
+            "LockOnTarget": true,
+            "Filters": [
+              {
+                "Type": "LineOfSight"
+              }
+            ]
+          },
+          "Actions": [
+            {
+              "Type": "FlockBeacon",
+              "Message": "HD_Wild_Alert",
+              "SendToSelf": false,
+              "ExpirationTime": 2
             },
             {
-              "Sensor": {
-                "Type": "MotionController",
-                "MotionController": "Fly"
+              "Type": "FlockBeacon",
+              "Message": "HD_Wild_Attack",
+              "SendTargetSlot": "LockedTarget",
+              "SendToSelf": false,
+              "ExpirationTime": 2
+            },
+            {
+              "Type": "ResetSearchRays"
+            },
+            {
+              "Type": "TimerStart",
+              "Name": "HD_Wild_LostTarget",
+              "StartValueRange": {
+                "Compute": "LostTargetTimeoutRange"
               },
-              "ActionsBlocking": true,
-              "Actions": [
-                {
-                  "Type": "Timeout",
-                  "Delay": [
-                    4,
-                    6
-                  ]
-                },
-                {
-                  "Type": "ResetSearchRays"
-                },
-                {
-                  "Type": "State",
-                  "State": "IdleAir"
-                }
-              ]
+              "RestartValueRange": {
+                "Compute": "LostTargetTimeoutRange"
+              }
+            },
+            {
+              "Type": "TimerRestart",
+              "Name": "HD_Wild_LostTarget"
+            },
+            {
+              "Type": "TimerStop",
+              "Name": "Tw_Kettle_Duration"
+            },
+            {
+              "Type": "TimerStart",
+              "Name": "Tw_Kettle_Cooldown",
+              "StartValueRange": {
+                "Compute": "KettleCooldownRange"
+              },
+              "RestartValueRange": {
+                "Compute": "KettleCooldownRange"
+              }
+            },
+            {
+              "Type": "TimerRestart",
+              "Name": "Tw_Kettle_Cooldown"
+            },
+            {
+              "Type": "SetFlag",
+              "Name": "Tw_Kettle_Seen",
+              "SetTo": false
+            },
+            {
+              "Type": "SetFlag",
+              "Name": "Tw_Kettle_Leaving",
+              "SetTo": false
+            },
+            {
+              "Type": "SetFlag",
+              "Name": "Tw_Kettle_Departed",
+              "SetTo": false
+            },
+            {
+              "Type": "State",
+              "State": "Engage"
             }
           ]
         },
         {
           "Sensor": {
-            "Type": "State",
-            "State": "Sleep"
-          },
-          "Instructions": [
-            {
-              "$Comment": "Tranquilized sleep landing: stay in a landing-only substate until Tamework confirms touchdown.",
-              "Sensor": {
-                "Type": "State",
-                "State": ".TranquilizedLanding"
-              },
-              "Instructions": [
-                {
-                  "Continue": true,
-                  "Sensor": {
-                    "Type": "Any",
-                    "Once": true
-                  },
-                  "Actions": [
-                    {
-                      "Type": "TameworkSetFlyingCompanionMode",
-                      "Mode": "Fall"
-                    }
-                  ]
-                },
-                {
-                  "$Comment": "Continue into the sleep branch as soon as gravity takes over.",
-                  "Sensor": {
-                    "Type": "MotionController",
-                    "MotionController": "Walk"
-                  },
-                  "Actions": [
-                    {
-                      "Type": "State",
-                      "State": ".TranquilizedGrounded"
-                    }
-                  ]
-                },
-                {
-                  "BodyMotion": {
-                    "Type": "Nothing"
-                  }
-                },
-                {
-                  "Sensor": {
-                    "Type": "Not",
-                    "Sensor": {
-                      "Type": "TameworkEffectActive",
-                      "EffectId": "Tw_Status_Tranquilized"
-                    }
-                  },
-                  "Actions": [
-                    {
-                      "Type": "ResetSearchRays"
-                    },
-                    {
-                      "Type": "ReleaseTarget"
-                    },
-                    {
-                      "Type": "TameworkSetFlyingCompanionMode",
-                      "Mode": "Follow"
-                    },
-                    {
-                      "Type": "State",
-                      "State": "IdleGround"
-                    }
-                  ]
+            "Type": "And",
+            "Sensors": [
+              {
+                "Type": "Beacon",
+                "Message": "HD_Wild_Alert",
+                "Range": {
+                  "Compute": "FlockAssistRange"
                 }
-              ]
+              },
+              {
+                "Type": "Beacon",
+                "Message": "HD_Wild_Attack",
+                "Range": {
+                  "Compute": "PursuitRange"
+                },
+                "TargetSlot": "LockedTarget"
+              }
+            ]
+          },
+          "Actions": [
+            {
+              "Type": "ResetSearchRays"
             },
             {
-              "$Comment": "Tranquilized grounded sleep: play the touchdown animation once, then sleep while effect is active.",
-              "Sensor": {
-                "Type": "State",
-                "State": ".TranquilizedGrounded"
+              "Type": "TimerStart",
+              "Name": "HD_Wild_LostTarget",
+              "StartValueRange": {
+                "Compute": "LostTargetTimeoutRange"
               },
-              "Instructions": [
-                {
-                  "Sensor": {
-                    "Type": "MotionController",
-                    "MotionController": "Walk"
-                  },
-                  "Instructions": [
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Any",
-                        "Once": true
-                      },
-                      "Actions": [
-                        {
-                          "Type": "SetFlag",
-                          "Name": "TranquilizedLandAnimationPending",
-                          "SetTo": true
-                        },
-                        {
-                          "Type": "PlayAnimation",
-                          "Slot": "Status",
-                          "Animation": "Land"
-                        }
-                      ]
-                    },
-                    {
-                      "Continue": true,
-                      "Sensor": {
-                        "Type": "Flag",
-                        "Name": "TranquilizedLandAnimationPending"
-                      },
-                      "ActionsBlocking": true,
-                      "Actions": [
-                        {
-                          "Type": "Timeout",
-                          "Delay": [
-                            0.6,
-                            0.6
-                          ]
-                        },
-                        {
-                          "Type": "SetFlag",
-                          "Name": "TranquilizedLandAnimationPending",
-                          "SetTo": false
-                        }
-                      ]
-                    },
-                    {
-                      "Sensor": {
-                        "Type": "Not",
-                        "Sensor": {
-                          "Type": "Flag",
-                          "Name": "TranquilizedLandAnimationPending"
-                        }
-                      },
-                      "Instructions": [
-                        {
-                          "Reference": "Component_Instruction_Play_Animation",
-                          "Modify": {
-                            "Animation": "Sleep"
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      "BodyMotion": {
-                        "Type": "Nothing"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "Sensor": {
-                    "Type": "Not",
-                    "Sensor": {
-                      "Type": "TameworkEffectActive",
-                      "EffectId": "Tw_Status_Tranquilized"
-                    }
-                  },
-                  "Actions": [
-                    {
-                      "Type": "ResetSearchRays"
-                    },
-                    {
-                      "Type": "ReleaseTarget"
-                    },
-                    {
-                      "Type": "TameworkSetFlyingCompanionMode",
-                      "Mode": "Follow"
-                    },
-                    {
-                      "Type": "State",
-                      "State": "IdleGround"
-                    }
-                  ]
-                }
-              ]
+              "RestartValueRange": {
+                "Compute": "LostTargetTimeoutRange"
+              }
+            },
+            {
+              "Type": "TimerRestart",
+              "Name": "HD_Wild_LostTarget"
+            },
+            {
+              "Type": "TimerStop",
+              "Name": "Tw_Kettle_Duration"
+            },
+            {
+              "Type": "TimerStart",
+              "Name": "Tw_Kettle_Cooldown",
+              "StartValueRange": {
+                "Compute": "KettleCooldownRange"
+              },
+              "RestartValueRange": {
+                "Compute": "KettleCooldownRange"
+              }
+            },
+            {
+              "Type": "TimerRestart",
+              "Name": "Tw_Kettle_Cooldown"
+            },
+            {
+              "Type": "SetFlag",
+              "Name": "Tw_Kettle_Seen",
+              "SetTo": false
+            },
+            {
+              "Type": "SetFlag",
+              "Name": "Tw_Kettle_Leaving",
+              "SetTo": false
+            },
+            {
+              "Type": "SetFlag",
+              "Name": "Tw_Kettle_Departed",
+              "SetTo": false
+            },
+            {
+              "Type": "State",
+              "State": "Engage"
             }
           ]
+        },
+        {
+          "Reference": "Component_HyDragon_Instruction_Miniwyvern_Wild_Idle",
+          "Modify": {
+            "WanderRadius": {
+              "Compute": "WanderRadius"
+            },
+            "GroundDurationRange": {
+              "Compute": "GroundDurationRange"
+            },
+            "FlightDurationRange": {
+              "Compute": "FlightDurationRange"
+            },
+            "FlockFollowDistance": {
+              "Compute": "FlockFollowDistance"
+            },
+            "FlockLeaderLeashDistance": {
+              "Compute": "FlockLeaderLeashDistance"
+            },
+            "FlightFormation": {
+              "Compute": "FlightFormation"
+            },
+            "FlightFormationSpacing": {
+              "Compute": "FlightFormationSpacing"
+            },
+            "FlightFormationTightness": {
+              "Compute": "FlightFormationTightness"
+            },
+            "KettleEnabled": {
+              "Compute": "KettleEnabled"
+            },
+            "KettleRadius": {
+              "Compute": "KettleRadius"
+            },
+            "KettleAltitudeRange": {
+              "Compute": "KettleAltitudeRange"
+            },
+            "KettleCooldownRange": {
+              "Compute": "KettleCooldownRange"
+            },
+            "KettleDurationRange": {
+              "Compute": "KettleDurationRange"
+            },
+            "DayTimePeriod": {
+              "Compute": "DayTimePeriod"
+            },
+            "KettleRelativeSpeed": {
+              "Compute": "KettleRelativeSpeed"
+            }
+          }
         }
       ]
     }
   ],
   "InteractionInstruction": {
-    "Instructions": [
+    "Actions": [
       {
-        "Continue": true,
-        "Actions": [
-          {
-            "Type": "LockOnInteractionTarget",
-            "TargetSlot": "InteractionTarget"
-          }
-        ]
-      },
-      {
-        "Enabled": {
-          "Compute": "!isEmpty(InteractionConfigId) && IsTameable"
-        },
-        "Continue": true,
-        "Sensor": {
-          "Type": "Any"
-        },
-        "Actions": [
-          {
-            "Type": "TameworkInteractPrompt",
-            "ConfigId": {
-              "Compute": "InteractionConfigId"
-            },
-            "LovedItems": {
-              "Compute": "AttractiveItemSet"
-            }
-          }
-        ]
-      },
-      {
-        "Enabled": {
-          "Compute": "!isEmpty(InteractionConfigId) && IsTameable"
-        },
-        "Sensor": {
-          "Type": "HasInteracted"
-        },
-        "Actions": [
-          {
-            "Type": "LockOnInteractionTarget",
-            "TargetSlot": "InteractionTarget"
-          },
-          {
-            "Type": "TameworkInteract",
-            "ConfigId": {
-              "Compute": "InteractionConfigId"
-            },
-            "LovedItems": {
-              "Compute": "AttractiveItemSet"
-            }
-          }
-        ]
-      },
-      {
-        "$Comment": "Only now that we've failed to match all possible interactions do we set interactability to false.",
-        "Enabled": {
-          "Compute": "isEmpty(InteractionConfigId)"
-        },
-        "Actions": [
-          {
-            "Type": "SetInteractable",
-            "Interactable": false
-          }
-        ]
+        "Type": "SetInteractable",
+        "Interactable": false
       }
     ]
   },

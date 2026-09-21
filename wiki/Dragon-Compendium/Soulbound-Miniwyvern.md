@@ -17,7 +17,13 @@ The Soulbound Miniwyvern is a personal companion created through a lifelong Soul
 2. Hatch the egg to claim your one Soul Bond. This claim is once per player, so choose the timing deliberately.
 3. The new Miniwyvern starts in the **Wild** form and joins the roster in your [Dragon Command Flute](/mod/hydragon/dragon-command-flute).
 
-There is no wild Miniwyvern route. If you are searching the world for one, return to the crafted-egg step instead.
+Wild Miniwyverns do not provide a shortcut to a Soul Bond. Use the crafted egg to obtain your companion.
+
+## Wild encounters
+
+Normal wild Miniwyverns appear in Zone 1 plains in flocks of one to five. They use loose flight formations, circle in thermals, and rest on the ground between flights. They are hostile: nearby flockmates help attack players with projectiles and swooping bites. A grounded Miniwyvern takes off before attacking.
+
+These wild Miniwyverns cannot be tamed. Elemental forms remain available through Soul Bond attunement.
 
 ## Roster and active companion
 
