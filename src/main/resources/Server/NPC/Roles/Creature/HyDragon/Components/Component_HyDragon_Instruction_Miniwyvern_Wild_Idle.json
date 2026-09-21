@@ -252,6 +252,27 @@
               {
                 "Type": "PlayAnimation",
                 "Slot": "Status"
+              },
+              {
+                "Type": "SetFlag",
+                "Name": "HD_Wild_GroundMoving",
+                "SetTo": false
+              },
+              {
+                "Type": "TimerStart",
+                "Name": "HD_Wild_GroundActivity",
+                "StartValueRange": [
+                  4,
+                  8
+                ],
+                "RestartValueRange": [
+                  4,
+                  8
+                ]
+              },
+              {
+                "Type": "TimerRestart",
+                "Name": "HD_Wild_GroundActivity"
               }
             ],
             "Continue": true
@@ -337,6 +358,100 @@
             ]
           },
           {
+            "$Comment": "Alternate short ground walks with longer rests.",
+            "Continue": true,
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Flag",
+                  "Name": "HD_Wild_GroundMoving",
+                  "Set": false
+                },
+                {
+                  "Type": "Timer",
+                  "Name": "HD_Wild_GroundActivity",
+                  "State": "Stopped"
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "SetFlag",
+                "Name": "HD_Wild_GroundMoving",
+                "SetTo": true
+              },
+              {
+                "Type": "TimerStart",
+                "Name": "HD_Wild_GroundActivity",
+                "StartValueRange": [
+                  2,
+                  4
+                ],
+                "RestartValueRange": [
+                  2,
+                  4
+                ]
+              },
+              {
+                "Type": "TimerRestart",
+                "Name": "HD_Wild_GroundActivity"
+              }
+            ]
+          },
+          {
+            "$Comment": "Alternate short ground walks with longer rests.",
+            "Continue": true,
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "Flag",
+                  "Name": "HD_Wild_GroundMoving",
+                  "Set": true
+                },
+                {
+                  "Type": "Timer",
+                  "Name": "HD_Wild_GroundActivity",
+                  "State": "Stopped"
+                }
+              ]
+            },
+            "Actions": [
+              {
+                "Type": "SetFlag",
+                "Name": "HD_Wild_GroundMoving",
+                "SetTo": false
+              },
+              {
+                "Type": "TimerStart",
+                "Name": "HD_Wild_GroundActivity",
+                "StartValueRange": [
+                  4,
+                  8
+                ],
+                "RestartValueRange": [
+                  4,
+                  8
+                ]
+              },
+              {
+                "Type": "TimerRestart",
+                "Name": "HD_Wild_GroundActivity"
+              }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "Flag",
+              "Name": "HD_Wild_GroundMoving",
+              "Set": false
+            },
+            "BodyMotion": {
+              "Type": "Nothing"
+            }
+          },
+          {
             "Sensor": {
               "Type": "And",
               "Sensors": [
@@ -368,7 +483,7 @@
               "SlowDownDistance": {
                 "Compute": "FlockFollowDistance * 1.5"
               },
-              "RelativeSpeed": 0.5,
+              "RelativeSpeed": 0.25,
               "UsePathfinder": true
             }
           },
@@ -378,7 +493,9 @@
               "Radius": {
                 "Compute": "WanderRadius"
               },
-              "RelativeSpeed": 0.25
+              "RelativeSpeed": 0.15,
+              "MinWalkTime": 2,
+              "MaxWalkTime": 4
             }
           }
         ]
