@@ -150,6 +150,24 @@
         ]
       },
       {
+        "$Comment": "Track the target and turn toward the shot throughout the aim window, as the tamed projectile attack does.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Target", "TargetSlot": "LockedTarget" },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } },
+            { "Type": "Flag", "Name": "HD_Wild_Projectile_Aiming" },
+            { "Type": "Flag", "Name": "HD_Wild_Swoop_Pending", "Set": false },
+            { "Type": "Flag", "Name": "HD_Wild_Swooping", "Set": false }
+          ]
+        },
+        "BodyMotion": { "Type": "MatchLook" },
+        "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
+      },
+      {
         "$Comment": "The projectile fires only after its aim completes, while still airborne and outside swoop ownership.",
         "Sensor": {
           "Type": "And",
