@@ -14,7 +14,7 @@
     "ProjectileRange": { "Value": 18 },
     "ProjectileMinimumRange": { "Value": 3.25 },
     "ProjectileCooldownRange": { "Value": [5, 7] },
-    "SwoopCooldownRange": { "Value": [25, 35] },
+    "SwoopCooldownRange": { "Value": [12.5, 17.5] },
     "SwoopAltitudeRange": { "Value": [0, 2] },
     "SwoopApproachTimeout": { "Value": [6, 6] },
     "SwoopApproachRelativeSpeed": { "Value": 0.55 },

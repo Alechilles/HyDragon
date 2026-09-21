@@ -171,8 +171,8 @@
     },
     "SwoopCooldownRange": {
       "Value": [
-        25,
-        35
+        12.5,
+        17.5
       ]
     },
     "SwoopAltitudeRange": {
