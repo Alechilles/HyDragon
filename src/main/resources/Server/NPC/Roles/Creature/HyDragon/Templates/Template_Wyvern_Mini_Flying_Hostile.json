@@ -261,7 +261,7 @@
       "Description": "Maximum heading change in degrees between ambient flight segments."
     },
     "IndependentFlightRoaming": {
-      "Value": true,
+      "Value": false,
       "Description": "Wander independently around the flock leader between kettle episodes instead of holding formation."
     },
     "IndependentFlightRoamRadiusRange": {
