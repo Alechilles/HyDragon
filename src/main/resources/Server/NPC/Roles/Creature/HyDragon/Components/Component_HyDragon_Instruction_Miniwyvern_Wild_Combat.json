@@ -150,25 +150,7 @@
         ]
       },
       {
-        "$Comment": "Track the target and turn toward the shot throughout the aim window, as the tamed projectile attack does.",
-        "Continue": true,
-        "Sensor": {
-          "Type": "And",
-          "Sensors": [
-            { "Type": "State", "State": ".Position" },
-            { "Type": "Target", "TargetSlot": "LockedTarget" },
-            { "Type": "MotionController", "MotionController": "Fly" },
-            { "Type": "Not", "Sensor": { "Type": "OnGround" } },
-            { "Type": "Flag", "Name": "HD_Wild_Projectile_Aiming" },
-            { "Type": "Flag", "Name": "HD_Wild_Swoop_Pending", "Set": false },
-            { "Type": "Flag", "Name": "HD_Wild_Swooping", "Set": false }
-          ]
-        },
-        "BodyMotion": { "Type": "MatchLook" },
-        "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
-      },
-      {
-        "$Comment": "The projectile fires only after its aim completes, while still airborne and outside swoop ownership.",
+        "$Comment": "Give the ballistic attack first claim on aiming and body turning once the windup finishes.",
         "Sensor": {
           "Type": "And",
           "Sensors": [
@@ -185,15 +167,34 @@
           ]
         },
         "ActionsBlocking": true,
+        "BodyMotion": { "Type": "MatchLook" },
         "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true },
         "Actions": [
           { "Type": "PlayAnimation", "Slot": "Action", "Animation": "Shoot" },
-          { "Type": "Attack", "Attack": { "Compute": "RangedAttack" }, "AimingTimeRange": [0.1, 0.2], "AttackPauseRange": [0, 0] },
+          { "Type": "Attack", "Attack": { "Compute": "RangedAttack" }, "AimingTimeRange": [3, 3], "LineOfSight": true, "AttackPauseRange": [0, 0] },
           { "Type": "PlaySound", "SoundEventId": "SFX_HyDragon_Miniwyvern_Projectile" },
           { "Type": "TimerStart", "Name": "HD_Wild_Projectile_Cooldown", "StartValueRange": { "Compute": "ProjectileCooldownRange" }, "RestartValueRange": { "Compute": "ProjectileCooldownRange" } },
           { "Type": "TimerRestart", "Name": "HD_Wild_Projectile_Cooldown" },
           { "Type": "SetFlag", "Name": "HD_Wild_Projectile_Aiming", "SetTo": false }
         ]
+      },
+      {
+        "$Comment": "Track the target and turn toward the shot throughout the aim window, as the tamed projectile attack does.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            { "Type": "State", "State": ".Position" },
+            { "Type": "Target", "TargetSlot": "LockedTarget" },
+            { "Type": "MotionController", "MotionController": "Fly" },
+            { "Type": "Not", "Sensor": { "Type": "OnGround" } },
+            { "Type": "Flag", "Name": "HD_Wild_Projectile_Aiming" },
+            { "Type": "Flag", "Name": "HD_Wild_Swoop_Pending", "Set": false },
+            { "Type": "Flag", "Name": "HD_Wild_Swooping", "Set": false }
+          ]
+        },
+        "BodyMotion": { "Type": "MatchLook" },
+        "HeadMotion": { "Type": "Aim", "Spread": 0, "HitProbability": 1, "Deflection": true }
       },
       {
         "$Comment": "Commit the swoop after any already-started projectile completes.",

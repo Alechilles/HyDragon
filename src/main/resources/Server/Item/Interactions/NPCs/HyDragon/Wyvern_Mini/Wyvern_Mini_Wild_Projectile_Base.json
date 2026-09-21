@@ -1,4 +1,7 @@
 {
   "Type": "Projectile",
-  "Config": "Projectile_Config_HyDragon_Miniwyvern_Wild_Base"
+  "Config": "Projectile_Config_HyDragon_Miniwyvern_Wild_Base",
+  "Tags": {
+    "AimingReference": []
+  }
 }

@@ -1663,7 +1663,8 @@ def validate_miniwyvern_projectile_contract(parsed: dict[Path, object], errors: 
             expected = f"Projectile_Config_HyDragon_Miniwyvern_{form}_{tier}"
             expected_root = {"Interactions": [f"Wyvern_Mini_{form}_Projectile_{tier}"], "Tags": {"Attack": ["Ranged"]}}
             if root != expected_root \
-                    or not isinstance(interaction, dict) or interaction != {"Type": "Projectile", "Config": expected}:
+                    or not isinstance(interaction, dict) \
+                    or interaction.get("Type") != "Projectile" or interaction.get("Config") != expected:
                 fail(errors, f"Miniwyvern {form} {tier} root does not resolve its modern projectile")
         for tier in ("Pattern", "Mastery"):
             root = parsed.get(root_root / f"Root_NPC_Wyvern_Mini_{form}_Projectile_{tier}.json")

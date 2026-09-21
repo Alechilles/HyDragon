@@ -23,7 +23,7 @@
       "Description": "Maximum flight speed"
     },
     "MaxHealth": {
-      "Value": 80,
+      "Value": 40,
       "Description": "Max health for the NPC"
     },
     "AttitudeGroup": {

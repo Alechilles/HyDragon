@@ -12,7 +12,7 @@
     "AttackDistance": 2.75,
     "RangedAttack": "Root_NPC_Wyvern_Mini_Wild_Projectile_Base",
     "AttitudeGroup": "Predators",
-    "MaxHealth": 80,
+    "MaxHealth": 40,
     "IsTameable": false,
     "FlockArray": ["Wyvern_Mini"],
     "NameTranslationKey": {
