@@ -243,6 +243,40 @@
     },
     "MaxHeightOverGround": {
       "Value": 35
+    },
+    "FlightCruiseRelativeSpeed": {
+      "Value": 0.25,
+      "Description": "Relative speed during ambient airborne wandering, with the original 4 blocks/second minimum cruise pace."
+    },
+    "FlightCruiseMinSegmentTime": {
+      "Value": 6,
+      "Description": "Minimum seconds per ambient flight segment before choosing a new direction."
+    },
+    "FlightCruiseMaxSegmentTime": {
+      "Value": 10,
+      "Description": "Maximum seconds per ambient flight segment; obstacles and wander bounds can shorten it."
+    },
+    "FlightCruiseMaxHeadingChange": {
+      "Value": 60,
+      "Description": "Maximum heading change in degrees between ambient flight segments."
+    },
+    "IndependentFlightRoaming": {
+      "Value": true,
+      "Description": "Wander independently around the flock leader between kettle episodes instead of holding formation."
+    },
+    "IndependentFlightRoamRadiusRange": {
+      "Value": [
+        40,
+        70
+      ],
+      "Description": "Inner and outer radii for independent flight around the leader, in blocks."
+    },
+    "IndependentFlightRetargetTimeRange": {
+      "Value": [
+        10,
+        20
+      ],
+      "Description": "Seconds between independent flight waypoint selections."
     }
   },
   "Appearance": {
@@ -287,26 +321,26 @@
   "MotionControllerList": [
     {
       "Type": "TameworkFormationFly",
+      "Formation": {
+        "Compute": "FlightFormation"
+      },
       "MaxHorizontalSpeed": {
         "Compute": "FlightSpeed"
       },
-      "MaxSinkSpeed": 8,
+      "MaxSinkSpeed": 3,
       "MaxClimbSpeed": 10,
-      "MinAirSpeed": 0,
-      "Acceleration": 6,
+      "MinAirSpeed": 4,
+      "Acceleration": 5,
       "MinHeightOverGround": {
         "Compute": "MinHeightOverGround"
       },
       "MaxHeightOverGround": {
         "Compute": "MaxHeightOverGround"
       },
-      "MaxRollAngle": 70,
-      "MaxTurnSpeed": 180,
-      "DesiredAltitudeWeight": 1,
-      "Formation": {
-        "Compute": "FlightFormation"
-      },
-      "Deceleration": 12
+      "MaxRollAngle": 180,
+      "MaxTurnSpeed": 360,
+      "MaxClimbAngle": 75,
+      "MaxSinkAngle": 45
     },
     {
       "Type": "Walk",
@@ -855,6 +889,27 @@
           "BodyMotion": {
             "Type": "TakeOff",
             "JumpSpeed": 4
+          },
+          "Sensor": {
+            "Type": "MotionController",
+            "MotionController": "Walk"
+          },
+          "$Comment": "Do not keep running native takeoff after the flight controller has taken over."
+        },
+        {
+          "$Comment": "Let flight clear contact with the ground before the airborne-only combat guard passes.",
+          "Sensor": {
+            "Type": "MotionController",
+            "MotionController": "Fly"
+          },
+          "BodyMotion": {
+            "Type": "Wander",
+            "RelativeSpeed": {
+              "Compute": "max(FlightCruiseRelativeSpeed, 4 / FlightSpeed)"
+            },
+            "MaxHeadingChange": {
+              "Compute": "FlightCruiseMaxHeadingChange"
+            }
           }
         }
       ]
@@ -1260,6 +1315,30 @@
             },
             "KettleRelativeSpeed": {
               "Compute": "KettleRelativeSpeed"
+            },
+            "FlightCruiseRelativeSpeed": {
+              "Compute": "FlightCruiseRelativeSpeed"
+            },
+            "FlightCruiseMinSegmentTime": {
+              "Compute": "FlightCruiseMinSegmentTime"
+            },
+            "FlightCruiseMaxSegmentTime": {
+              "Compute": "FlightCruiseMaxSegmentTime"
+            },
+            "FlightCruiseMaxHeadingChange": {
+              "Compute": "FlightCruiseMaxHeadingChange"
+            },
+            "IndependentFlightRoaming": {
+              "Compute": "IndependentFlightRoaming"
+            },
+            "IndependentFlightRoamRadiusRange": {
+              "Compute": "IndependentFlightRoamRadiusRange"
+            },
+            "IndependentFlightRetargetTimeRange": {
+              "Compute": "IndependentFlightRetargetTimeRange"
+            },
+            "FlightSpeed": {
+              "Compute": "FlightSpeed"
             }
           }
         }

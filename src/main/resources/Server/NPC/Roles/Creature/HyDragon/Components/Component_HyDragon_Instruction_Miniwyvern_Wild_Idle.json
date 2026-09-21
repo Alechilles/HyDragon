@@ -64,6 +64,44 @@
     },
     "KettleRelativeSpeed": {
       "Value": 0.8
+    },
+    "FlightCruiseRelativeSpeed": {
+      "Value": 0.25,
+      "Description": "Relative speed during ambient airborne wandering, with the original 4 blocks/second minimum cruise pace."
+    },
+    "FlightCruiseMinSegmentTime": {
+      "Value": 6,
+      "Description": "Minimum seconds per ambient flight segment before choosing a new direction."
+    },
+    "FlightCruiseMaxSegmentTime": {
+      "Value": 10,
+      "Description": "Maximum seconds per ambient flight segment; obstacles and wander bounds can shorten it."
+    },
+    "FlightCruiseMaxHeadingChange": {
+      "Value": 60,
+      "Description": "Maximum heading change in degrees between ambient flight segments."
+    },
+    "IndependentFlightRoaming": {
+      "Value": true,
+      "Description": "Wander independently around the flock leader between kettle episodes instead of holding formation."
+    },
+    "IndependentFlightRoamRadiusRange": {
+      "Value": [
+        40,
+        70
+      ],
+      "Description": "Inner and outer radii for independent flight around the leader, in blocks."
+    },
+    "IndependentFlightRetargetTimeRange": {
+      "Value": [
+        10,
+        20
+      ],
+      "Description": "Seconds between independent flight waypoint selections."
+    },
+    "FlightSpeed": {
+      "Value": 12,
+      "Description": "Maximum flight speed"
     }
   },
   "Content": {
@@ -352,34 +390,24 @@
         "Instructions": [
           {
             "Sensor": {
-              "Type": "And",
-              "Sensors": [
-                {
-                  "Type": "MotionController",
-                  "MotionController": "Fly"
-                },
-                {
-                  "Type": "Not",
-                  "Sensor": {
-                    "Type": "OnGround"
-                  }
-                }
-              ]
+              "Type": "MotionController",
+              "MotionController": "Walk"
             },
+            "BodyMotion": {
+              "Type": "TakeOff",
+              "JumpSpeed": 4
+            }
+          },
+          {
             "Actions": [
               {
                 "Type": "State",
                 "State": ".Air"
               }
             ]
-          },
-          {
-            "BodyMotion": {
-              "Type": "TakeOff",
-              "JumpSpeed": 4
-            }
           }
-        ]
+        ],
+        "$Comment": "Use the wild-bird handoff: native takeoff owns Walk only; Fly immediately resumes ambient steering."
       },
       {
         "Sensor": {
@@ -516,7 +544,7 @@
               "Type": "Wander",
               "MinHeadingChange": 150,
               "MaxHeadingChange": 180,
-              "RelativeSpeed": 0.6
+              "RelativeSpeed": 1
             }
           },
           {
@@ -581,6 +609,52 @@
             }
           },
           {
+            "$Comment": "Use the wild raptor roaming pattern around the flock leader home between thermal episodes.",
+            "Enabled": {
+              "Compute": "IndependentFlightRoaming"
+            },
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "FlockLeader"
+                },
+                {
+                  "Type": "MotionController",
+                  "MotionController": "Fly"
+                },
+                {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "OnGround"
+                  }
+                }
+              ]
+            },
+            "BodyMotion": {
+              "Type": "TameworkFlyingOrbit",
+              "Mode": "WANDER_TARGET",
+              "WanderRadiusRange": {
+                "Compute": "IndependentFlightRoamRadiusRange"
+              },
+              "WanderRetargetTimeRange": {
+                "Compute": "IndependentFlightRetargetTimeRange"
+              },
+              "RelativeSpeed": {
+                "Compute": "max(FlightCruiseRelativeSpeed, 4 / FlightSpeed)"
+              },
+              "DesiredAltitudeRange": [
+                0,
+                8
+              ],
+              "ClimbRelativeSpeed": 0.12,
+              "SinkRelativeSpeed": 0.12,
+              "WanderStopDistance": 5,
+              "AvoidObstacles": true,
+              "UseTargetLeashPoint": true
+            }
+          },
+          {
             "Reference": "Component_Tamework_Instruction_Flight_Formation",
             "Modify": {
               "FlightFormation": {
@@ -596,43 +670,31 @@
           },
           {
             "Sensor": {
-              "Type": "And",
-              "Sensors": [
+              "Type": "Self",
+              "Filters": [
                 {
-                  "Type": "FlockLeader"
-                },
-                {
-                  "Type": "Self",
-                  "Filters": [
-                    {
-                      "Type": "Flock",
-                      "FlockStatus": "Follower"
-                    }
-                  ]
+                  "Type": "Flock",
+                  "FlockStatus": "Leader"
                 }
               ]
             },
             "BodyMotion": {
-              "Type": "TameworkFlyingOrbit",
-              "Mode": "WANDER_TARGET",
-              "WanderRadiusRange": [
-                10,
-                25
-              ],
-              "WanderRetargetTimeRange": [
-                4,
-                8
-              ],
-              "WanderStopDistance": 5,
-              "DesiredAltitudeRange": [
-                15,
-                28
-              ],
-              "RelativeSpeed": 0.4,
-              "ClimbRelativeSpeed": 0.2,
-              "SinkRelativeSpeed": 0.2,
-              "UseTargetLeashPoint": true,
-              "AvoidObstacles": true
+              "Type": "WanderInCircle",
+              "Radius": {
+                "Compute": "FlockLeaderLeashDistance"
+              },
+              "MaxHeadingChange": {
+                "Compute": "FlightCruiseMaxHeadingChange"
+              },
+              "MinWalkTime": {
+                "Compute": "FlightCruiseMinSegmentTime"
+              },
+              "MaxWalkTime": {
+                "Compute": "FlightCruiseMaxSegmentTime"
+              },
+              "RelativeSpeed": {
+                "Compute": "max(FlightCruiseRelativeSpeed, 4 / FlightSpeed)"
+              }
             }
           },
           {
@@ -641,7 +703,18 @@
               "Radius": {
                 "Compute": "WanderRadius"
               },
-              "RelativeSpeed": 0.4
+              "MaxHeadingChange": {
+                "Compute": "FlightCruiseMaxHeadingChange"
+              },
+              "MinWalkTime": {
+                "Compute": "FlightCruiseMinSegmentTime"
+              },
+              "MaxWalkTime": {
+                "Compute": "FlightCruiseMaxSegmentTime"
+              },
+              "RelativeSpeed": {
+                "Compute": "max(FlightCruiseRelativeSpeed, 4 / FlightSpeed)"
+              }
             }
           }
         ]
@@ -734,7 +807,7 @@
               "Type": "Wander",
               "MinHeadingChange": 150,
               "MaxHeadingChange": 180,
-              "RelativeSpeed": 0.6
+              "RelativeSpeed": 1
             }
           },
           {

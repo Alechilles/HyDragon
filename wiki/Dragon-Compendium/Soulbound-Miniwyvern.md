@@ -21,7 +21,7 @@ Wild Miniwyverns do not provide a shortcut to a Soul Bond. Use the crafted egg t
 
 ## Wild encounters
 
-Normal wild Miniwyverns appear in Zone 1 plains in flocks of one to five. They use loose flight formations, circle in thermals, and rest on the ground between flights. They are hostile: nearby flockmates help attack players with projectiles and swooping bites. A grounded Miniwyvern takes off before attacking.
+Normal wild Miniwyverns appear in Zone 1 plains in flocks of one to five. They roam independently around their flock, circle in thermals, and rest on the ground between flights. They are hostile: nearby flockmates help attack players with projectiles and swooping bites. A grounded Miniwyvern takes off before attacking.
 
 These wild Miniwyverns cannot be tamed. Elemental forms remain available through Soul Bond attunement.
 

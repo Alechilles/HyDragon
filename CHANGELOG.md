@@ -6,9 +6,13 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Added
 
-- Normal wild Miniwyverns spawn in flocks of one to five in Zone 1 plains. They fly in loose formations, circle in thermals, and rest on the ground between flights.
+- Normal wild Miniwyverns spawn in flocks of one to five in Zone 1 plains. They roam around their flock, circle in thermals, and rest on the ground between flights.
 - Wild Miniwyverns attack players with airborne projectiles and swooping bites. Nearby flockmates join the fight, then regroup when pursuit ends.
 - Wild Miniwyverns cannot be tamed. Soulbound companions still come from the Mysterious Egg.
+
+### Changed
+
+- Wild Miniwyverns use Animal Husbandry's raptor takeoff, flight steering, and wider roaming patterns, with takeoff handing control to normal flight as soon as the flight controller activates.
 
 ## 1.2.0 - Companion Portraits and Localization - 2026-09-14
 
