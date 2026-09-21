@@ -30,7 +30,7 @@ Wild Miniwyverns travel in hostile flocks of one to five, with one element per f
 | Normal | Zone 1 plains |
 | Fire | Zone 2 deserts; Zone 4 volcanoes and forests, on soil or volcanic rock |
 | Ice | Zone 3 glaciers and snowy mountains; tundra soil |
-| Nature | Zone 1 forests, autumn forests, and azure forests; Zone 2 oases; non-snowy Zone 3 forests; Zone 4 jungles |
+| Nature | Zone 1 autumn and azure forests; Zone 4 jungles |
 | Toxic | Zone 1 swamp soil and mud; Zone 2 oases |
 | Lightning | Zone 1 and Zone 3 mountains; Zone 2 plateaus |
 | Void | Dark outdoor habitats across Zones 1–3 at night; they despawn during the day |
