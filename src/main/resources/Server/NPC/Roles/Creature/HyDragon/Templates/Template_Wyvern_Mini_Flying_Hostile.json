@@ -1,6 +1,6 @@
 {
   "Type": "Abstract",
-  "StartState": "Idle.Default",
+  "StartState": "Idle",
   "Parameters": {
     "Appearance": {
       "Value": "WyvernMini",
@@ -651,7 +651,7 @@
             },
             {
               "Type": "State",
-              "State": "Idle.Default"
+              "State": "Idle"
             }
           ]
         },
@@ -868,7 +868,7 @@
           "Actions": [
             {
               "Type": "State",
-              "State": "Combat.Position"
+              "State": "Combat"
             }
           ]
         },
@@ -1052,7 +1052,7 @@
           "Actions": [
             {
               "Type": "State",
-              "State": "Idle.Default"
+              "State": "Idle"
             }
           ]
         },
@@ -1094,7 +1094,7 @@
           "Actions": [
             {
               "Type": "State",
-              "State": "Idle.Default"
+              "State": "Idle"
             }
           ]
         }

@@ -1,6 +1,7 @@
 {
   "Type": "Component",
   "Class": "Instruction",
+  "DefaultState": ".Default",
   "Parameters": {
     "WanderRadius": {
       "Value": 20
