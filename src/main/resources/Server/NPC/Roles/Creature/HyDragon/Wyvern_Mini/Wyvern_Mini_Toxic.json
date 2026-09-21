@@ -1,0 +1,13 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Wyvern_Mini_Flying_Hostile",
+  "Modify": {
+    "Appearance": "WyvernMini_Toxic",
+    "DropList": "Drop_Wyvern_Mini_Toxic",
+    "RangedAttack": "Root_NPC_Wyvern_Mini_Toxic_Projectile_Base",
+    "FlockArray": [
+      "Wyvern_Mini_Toxic"
+    ],
+    "NameTranslationKey": "server.npcRoles.Wyvern_Mini_Toxic.name"
+  }
+}

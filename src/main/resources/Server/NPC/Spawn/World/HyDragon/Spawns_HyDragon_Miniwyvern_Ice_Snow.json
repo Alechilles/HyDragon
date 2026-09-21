@@ -1,0 +1,14 @@
+{
+  "Environments": [
+    "Env_Zone3_Glacial",
+    "Env_Zone3_Mountains"
+  ],
+  "NPCs": [
+    {
+      "Id": "Wyvern_Mini_Ice",
+      "Weight": 0.5,
+      "SpawnBlockSet": "IceAndSnow",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    }
+  ]
+}

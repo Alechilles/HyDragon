@@ -1,0 +1,13 @@
+{
+  "Environments": [
+    "Env_Zone3_Tundra"
+  ],
+  "NPCs": [
+    {
+      "Id": "Wyvern_Mini_Ice",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Soil",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    }
+  ]
+}

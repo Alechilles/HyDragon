@@ -1,4 +1,10 @@
 npcRoles.Wyvern_Mini.name=Miniwyvern
+npcRoles.Wyvern_Mini_Fire.name=Fire Miniwyvern
+npcRoles.Wyvern_Mini_Ice.name=Ice Miniwyvern
+npcRoles.Wyvern_Mini_Lightning.name=Lightning Miniwyvern
+npcRoles.Wyvern_Mini_Nature.name=Nature Miniwyvern
+npcRoles.Wyvern_Mini_Toxic.name=Toxic Miniwyvern
+npcRoles.Wyvern_Mini_Void.name=Void Miniwyvern
 npcRoles.Tamed_Wyvern_Mini.name=Soulbound Miniwyvern
 npcRoles.Wyvern_Wild.name=Wild Wyvern
 npcRoles.GhoulDragon.name=Ghoul Dragon

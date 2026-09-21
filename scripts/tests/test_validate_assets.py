@@ -20,6 +20,17 @@ MODULE_SPEC.loader.exec_module(VALIDATOR)
 
 
 class ValidatorContractTest(unittest.TestCase):
+    def test_world_spawn_accepts_overnight_hours_but_rejects_invalid_hours(self) -> None:
+        for hours, valid in (([19, 5], True), ([6, 18], True), ([-1, 5], False), ([19, 25], False)):
+            with self.subTest(hours=hours):
+                errors: list[str] = []
+                VALIDATOR.validate_spawn_shape(
+                    {"Environments": ["Env_Test"], "NPCs": [{"Id": "Test", "Weight": 1}],
+                     "DayTimeRange": hours},
+                    "WorldNPCSpawn", "fixture", {"Env_Test", "Test"}, errors,
+                )
+                self.assertEqual(valid, not errors, errors)
+
     def test_reads_packaged_hytale_asset_archive(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             archive_path = (

@@ -1,0 +1,13 @@
+{
+  "Environments": [
+    "Env_Zone2_Deserts"
+  ],
+  "NPCs": [
+    {
+      "Id": "Wyvern_Mini_Fire",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Sand",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "Environments": [
+    "Env_Zone2_Oasis"
+  ],
+  "NPCs": [
+    {
+      "Id": "Wyvern_Mini_Toxic",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Soil_CorruptedOasis",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    }
+  ]
+}

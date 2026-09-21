@@ -843,7 +843,7 @@ def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors
             fail(errors, f"{path.relative_to(ROOT)} must use the exact enabled flight-toggle configuration")
 
 
-def validate_range(value: object, size: int, minimum: float, maximum: float) -> bool:
+def validate_range(value: object, size: int, minimum: float, maximum: float, *, wraps: bool = False) -> bool:
     return (
         isinstance(value, list)
         and len(value) == size
@@ -854,7 +854,7 @@ def validate_range(value: object, size: int, minimum: float, maximum: float) -> 
             and minimum <= item <= maximum
             for item in value
         )
-        and value[0] <= value[-1]
+        and (wraps or value[0] <= value[-1])
     )
 
 
@@ -905,7 +905,10 @@ def validate_spawn_shape(
         ("DayTimeRange", 2, 0, 24),
         ("MoonPhaseRange", 2, 0, 4),
     ):
-        if field in data and data[field] is not None and not validate_range(data[field], size, minimum, maximum):
+        # Native nighttime spawn schedules can cross midnight, for example [19, 5].
+        if field in data and data[field] is not None and not validate_range(
+            data[field], size, minimum, maximum, wraps=field == "DayTimeRange"
+        ):
             fail(errors, f"{context}.{field} violates the Hytale 0.5.6 range contract")
     lights = data.get("LightRanges")
     if lights is not None:

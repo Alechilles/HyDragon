@@ -21,9 +21,9 @@ Wild Miniwyverns do not provide a shortcut to a Soul Bond. Use the crafted egg t
 
 ## Wild encounters
 
-Normal wild Miniwyverns appear in Zone 1 plains in flocks of one to five. They fly in loose formations with generous spacing, circle in thermals, and rest on the ground between flights. They are hostile: nearby flockmates help attack players with projectiles and swooping bites. A grounded Miniwyvern takes off before attacking.
+Wild Miniwyverns appear in normal, Fire, Ice, Lightning, Nature, Toxic, and Void variants, in single-variant flocks of one to five. All have 40 health. They fly in loose formations with generous spacing, circle in thermals, and rest on the ground between flights. They are hostile: nearby flockmates help attack players with projectiles and swooping bites. A grounded Miniwyvern takes off before attacking.
 
-These wild Miniwyverns cannot be tamed. Elemental forms remain available through Soul Bond attunement.
+These wild Miniwyverns cannot be tamed. See [Finding Dragons](/mod/hydragon/finding-dragons) for their habitats. Your companion still gains elemental forms through Soul Bond attunement.
 
 ## Roster and active companion
 

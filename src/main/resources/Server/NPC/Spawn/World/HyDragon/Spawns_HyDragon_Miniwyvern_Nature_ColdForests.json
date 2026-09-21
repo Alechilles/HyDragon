@@ -1,0 +1,13 @@
+{
+  "Environments": [
+    "Env_Zone3_Forests"
+  ],
+  "NPCs": [
+    {
+      "Id": "Wyvern_Mini_Nature",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Soil_NoSnow",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    }
+  ]
+}

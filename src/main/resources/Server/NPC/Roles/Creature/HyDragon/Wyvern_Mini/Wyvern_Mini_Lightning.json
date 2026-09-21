@@ -1,0 +1,13 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Wyvern_Mini_Flying_Hostile",
+  "Modify": {
+    "Appearance": "WyvernMini_Lightning",
+    "DropList": "Drop_Wyvern_Mini_Lightning",
+    "RangedAttack": "Root_NPC_Wyvern_Mini_Lightning_Projectile_Base",
+    "FlockArray": [
+      "Wyvern_Mini_Lightning"
+    ],
+    "NameTranslationKey": "server.npcRoles.Wyvern_Mini_Lightning.name"
+  }
+}
