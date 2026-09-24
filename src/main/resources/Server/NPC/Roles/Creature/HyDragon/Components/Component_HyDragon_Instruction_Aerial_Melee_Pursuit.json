@@ -16,10 +16,7 @@
         }
       ]
     },
-    "HeadMotion": {
-      "Type": "Aim",
-      "HitProbability": 1
-    },
+    "$Comment": "Leave head motion to the attack instruction so its Aim supplies the aiming data required to execute melee attacks.",
     "BodyMotion": {
       "Type": "TameworkFlyingOrbit",
       "Mode": "APPROACH",
