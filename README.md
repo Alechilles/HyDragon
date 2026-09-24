@@ -12,9 +12,10 @@ Explore forests, volcanic wilds, moonlit lands, and deep caves in search of an i
 - Brave the venomous attacks of the airborne Toxic Hydra.
 - Discover fire-breathing Nordic Drakes roaming the forests.
 - Challenge increasingly powerful Rock Drakes hidden beneath the earth.
+- Encounter hostile wild Miniwyvern flocks, including six elemental variants across their natural habitats.
 - Forge a lifelong Soul Bond with your very own Miniwyvern.
 
-Capture full-sized dragons with Draconic Stones, then call them to your side with the Dragon Flute. Your companions are more than temporary summons—they grow with you, retain their unique identity, answer your commands, and can even be restored when they fall.
+Capture full-sized dragons with Draconic Stones, then call them to your side with the Dragon Flute. Your companions are more than temporary summonsâ€”they grow with you, retain their unique identity, answer your commands, and can even be restored when they fall.
 
 Your Soul-Bonded Miniwyvern is a companion unlike any other. Attune it to Fire, Ice, Lightning, Nature, Toxic, or Void, each with a distinct appearance, combat style, talent path, and magical bond. Whether it is scorching enemies, freezing threats, calling down lightning, protecting allies, spreading poison, or wielding the power of the Void, your Miniwyvern becomes a reflection of the path you choose together.
 

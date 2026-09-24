@@ -2,18 +2,21 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
-## Unreleased
+## 1.3.0 - Wild Miniwyvern Flocks - 2026-09-23
 
 ### Added
 
-- Normal wild Miniwyverns spawn in flocks of one to five in Zone 1 plains. They fly in loose formations with generous spacing, circle in thermals, and rest on the ground between flights.
-- Wild Miniwyverns attack players with airborne projectiles and swooping bites. Nearby flockmates join the fight, then regroup when pursuit ends.
-- Wild Miniwyverns cannot be tamed. Soulbound companions still come from the Mysterious Egg.
-- Added Fire, Ice, Lightning, Nature, Toxic, and Void wild Miniwyverns in element-appropriate habitats across all four zones. Each flock has one element, with matching projectile effects and essence drops; Void flocks appear at night.
+- Wild Miniwyverns now spawn in hostile flocks of one to five, with one variant per flock and 40 health each.
+- Added normal, Fire, Ice, Lightning, Nature, Toxic, and Void encounters across the base game's habitats. Nature flocks appear in autumn forests, azure forests, and jungles; Void flocks appear at night and despawn during the day.
+- Flocks fly in loose formations, circle in thermals, and alternate slow ground walks with rests between flights.
+- Wild Miniwyverns fight from the air with aimed projectiles and swooping bites. Nearby flockmates join attacks, then regroup when pursuit ends.
+- Elemental variants use their matching projectile effects and drop matching elemental essence. Wild Miniwyverns cannot be tamed; Soulbound companions still come from the Mysterious Egg.
 
-### Changed
+### Fixed
 
-- Wild Miniwyverns use Animal Husbandry's raptor takeoff and flight steering while retaining loose flock formations, with takeoff handing control to normal flight as soon as the flight controller activates.
+- Soulbound Miniwyverns in Defend mode now retaliate instead of proactively acquiring hostile targets.
+- Set the Dragon Flute command cooldown to 0.25 seconds.
+- Corrected base Miniwyvern projectile aiming metadata so the engine can calculate ballistic aim.
 
 ## 1.2.0 - Companion Portraits and Localization - 2026-09-14
 
