@@ -17,7 +17,7 @@ Search the right terrain for each creature, then use the [Capturing Dragons guid
 | [Fire Hydra](/mod/hydragon/fire-hydra) | Zone 4 overworld volcanoes, on volcanic ground | Tranquilize and capture |
 | [Toxic Hydra](/mod/hydragon/toxic-hydra) | Zone 4 volcanic terrain on Dark Green Moss patches | Tranquilize and capture |
 | [Nordic Drake](/mod/hydragon/nordic-drake) | Zone 3 forests on non-snowy soil | Tranquilize and capture |
-| [Ghoul Dragon](/mod/hydragon/ghoul-dragon) | Zone 2 soil and sand at night, from 19:00 to 05:00 | Tranquilize and capture |
+| [Ghoul Dragon](/mod/hydragon/ghoul-dragon) | Zone 2 soil and sand during the day and night | Tranquilize and capture |
 | [Young Rock Drake](/mod/hydragon/rock-drakes) | Zone 1 volcanic cave aggro beacons, tiers 1-3 | Tranquilize and capture |
 | [Rock Drake](/mod/hydragon/rock-drakes) | Zone 2 volcanic cave goblin beacons, tiers 1-3 | Tranquilize and capture |
 | [Frost Rock Drake](/mod/hydragon/rock-drakes) | Zone 3 volcanic cave aggro beacons, tiers 1-3 | Tranquilize and capture |

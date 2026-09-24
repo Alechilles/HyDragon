@@ -9,7 +9,7 @@ draft: false
 
 Parent: [Dragon Compendium](/mod/hydragon/dragon-compendium-index) | [Home](/mod/hydragon/)
 
-Ghoul Dragons are flying melee predators found in **Zone 2 at night, from 19:00 to 05:00**. Search soil and sand in savannas, plateaus, scrublands, deserts, and oases.
+Ghoul Dragons are flying melee predators found in **Zone 2 during the day and night**. Search soil and sand in savannas, plateaus, scrublands, deserts, and oases.
 
 They alternate ground roaming and flight. When combat starts, they land and fight with left and right claw swipes and a bite. They have no breath attacks or projectiles, and losing health does not send them back into aerial combat.
 
