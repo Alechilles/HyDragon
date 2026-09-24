@@ -3,6 +3,7 @@
   "Priority": 200,
   "RoleIds": [
     "Tamed_Hydra",
+    "Tamed_Hydra_Fire",
     "Tamed_Hydra_Toxic"
   ],
   "Interactions": [

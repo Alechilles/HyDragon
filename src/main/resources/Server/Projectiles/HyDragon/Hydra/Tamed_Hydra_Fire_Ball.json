@@ -1,0 +1,43 @@
+{
+  "Appearance": "NordicDrake_Dragon_Fire_Ball_Projectile",
+  "Radius": 2.2,
+  "Height": -1,
+  "HorizontalCenterShot": 0,
+  "DepthShot": 3,
+  "PitchAdjustShot": true,
+  "SticksVertically": true,
+  "MuzzleVelocity": 30,
+  "TerminalVelocity": 42.5,
+  "Gravity": 4.4,
+  "Damage": 11,
+  "DeathEffectsOnHit": true,
+  "TimeToLive": 6,
+  "DeadTimeMiss": 0,
+  "DeathParticles": {
+    "SystemId": "Impact_Explosion"
+  },
+  "MissParticles": {
+    "SystemId": "Impact_Explosion"
+  },
+  "ImpactSlowdown": 0,
+  "VerticalCenterShot": 0,
+  "HitParticles": {
+    "SystemId": "Impact_Explosion"
+  },
+  "DeathSoundEventId": "SFX_Staff_Flame_Fireball_Impact",
+  "ExplosionConfig": {
+    "DamageEntities": true,
+    "EntityDamageRadius": 3,
+    "EntityDamage": 5.5,
+    "Knockback": {
+      "Type": "Force",
+      "Force": 7,
+      "Direction": {
+        "Z": 0.5,
+        "Y": 2,
+        "X": 0.5
+      }
+    },
+    "DamageBlocks": true
+  }
+}

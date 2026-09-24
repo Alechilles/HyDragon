@@ -36,6 +36,14 @@ The themed Hydra trees make those roles explicit:
 | **Glacierguard** | Ice Hydra health and incoming-damage protection. |
 | **Broodcaller's Pact** | Ice Hydra summon-duration and summon-cooldown improvements. |
 
+### Fire Hydra trees
+
+| Branch | Focus |
+|---|---|
+| **Firestorm** | Fire Hydra combat damage. |
+| **Ashen Guard** | Fire Hydra health and incoming-damage protection. |
+| **Broodcaller's Pact** | Fire Hydra summon-duration and summon-cooldown improvements. |
+
 ### Toxic Hydra trees
 
 | Tree | Practical purpose |

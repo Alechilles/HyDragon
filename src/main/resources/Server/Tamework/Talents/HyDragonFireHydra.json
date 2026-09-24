@@ -1,0 +1,189 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "AllocationRevision": 1,
+  "RoleIds": [
+    "Tamed_Hydra_Fire"
+  ],
+  "Talents": [
+    {
+      "Id": "FireHydra_FlameDiscipline",
+      "DisplayName": "hydragon.talents.fire_hydra.flame_discipline.name",
+      "Description": "hydragon.talents.fire_hydra.flame_discipline.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.fire_hydra.branch.firestorm",
+      "PointCost": 2,
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.02}]
+    },
+    {
+      "Id": "FireHydra_MoltenCore",
+      "DisplayName": "hydragon.talents.fire_hydra.molten_core.name",
+      "Description": "hydragon.talents.fire_hydra.molten_core.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.fire_hydra.branch.firestorm",
+      "PointCost": 2,
+      "RequiresTalentIds": ["FireHydra_FlameDiscipline"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}]
+    },
+    {
+      "Id": "FireHydra_SearingMomentum",
+      "DisplayName": "hydragon.talents.fire_hydra.searing_momentum.name",
+      "Description": "hydragon.talents.fire_hydra.searing_momentum.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.fire_hydra.branch.firestorm",
+      "PointCost": 3,
+      "RequiresTalentIds": ["FireHydra_FlameDiscipline"],
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.035}]
+    },
+    {
+      "Id": "FireHydra_ScorchingBreath",
+      "DisplayName": "hydragon.talents.fire_hydra.scorching_breath.name",
+      "Description": "hydragon.talents.fire_hydra.scorching_breath.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.fire_hydra.branch.firestorm",
+      "PointCost": 4,
+      "RequiresTalentIds": ["FireHydra_SearingMomentum"],
+      "Effects": [{"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.045}]
+    },
+    {
+      "Id": "FireHydra_EmbercladTalons",
+      "DisplayName": "hydragon.talents.fire_hydra.emberclad_talons.name",
+      "Description": "hydragon.talents.fire_hydra.emberclad_talons.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.fire_hydra.branch.firestorm",
+      "PointCost": 3,
+      "RequiresTalentIds": ["FireHydra_MoltenCore"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05}]
+    },
+    {
+      "Id": "FireHydra_ThreefoldFlame",
+      "DisplayName": "hydragon.talents.fire_hydra.threefold_flame.name",
+      "Description": "hydragon.talents.fire_hydra.threefold_flame.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.fire_hydra.branch.firestorm",
+      "PointCost": 4,
+      "RequiresTalentIds": ["FireHydra_ScorchingBreath", "FireHydra_EmbercladTalons"],
+      "Effects": [
+        {"EffectKey": "DamageDealtMultiplier", "Multiplier": 1.04},
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0309278350515465}
+      ]
+    },
+    {
+      "Id": "FireHydra_CinderHide",
+      "DisplayName": "hydragon.talents.fire_hydra.cinder_hide.name",
+      "Description": "hydragon.talents.fire_hydra.cinder_hide.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.fire_hydra.branch.ashen_guard",
+      "PointCost": 1,
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
+    },
+    {
+      "Id": "FireHydra_MagmaScales",
+      "DisplayName": "hydragon.talents.fire_hydra.magma_scales.name",
+      "Description": "hydragon.talents.fire_hydra.magma_scales.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.fire_hydra.branch.ashen_guard",
+      "PointCost": 2,
+      "RequiresTalentIds": ["FireHydra_CinderHide"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}]
+    },
+    {
+      "Id": "FireHydra_LongVigil",
+      "DisplayName": "hydragon.talents.fire_hydra.long_vigil.name",
+      "Description": "hydragon.talents.fire_hydra.long_vigil.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.fire_hydra.branch.ashen_guard",
+      "PointCost": 2,
+      "RequiresTalentIds": ["FireHydra_CinderHide"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.04}]
+    },
+    {
+      "Id": "FireHydra_UnyieldingFlame",
+      "DisplayName": "hydragon.talents.fire_hydra.unyielding_flame.name",
+      "Description": "hydragon.talents.fire_hydra.unyielding_flame.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.fire_hydra.branch.ashen_guard",
+      "PointCost": 3,
+      "RequiresTalentIds": ["FireHydra_LongVigil"],
+      "Effects": [{"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.06}]
+    },
+    {
+      "Id": "FireHydra_Ashscar",
+      "DisplayName": "hydragon.talents.fire_hydra.ashscar.name",
+      "Description": "hydragon.talents.fire_hydra.ashscar.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.fire_hydra.branch.ashen_guard",
+      "PointCost": 3,
+      "RequiresTalentIds": ["FireHydra_MagmaScales"],
+      "Effects": [{"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0638297872340425}]
+    },
+    {
+      "Id": "FireHydra_MoltenBulwark",
+      "DisplayName": "hydragon.talents.fire_hydra.molten_bulwark.name",
+      "Description": "hydragon.talents.fire_hydra.molten_bulwark.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.fire_hydra.branch.ashen_guard",
+      "PointCost": 4,
+      "RequiresTalentIds": ["FireHydra_UnyieldingFlame", "FireHydra_Ashscar"],
+      "Effects": [
+        {"EffectKey": "MaxHealthMultiplier", "Multiplier": 1.05},
+        {"EffectKey": "DamageTakenMultiplier", "Multiplier": 1.0416666666666667}
+      ]
+    },
+    {
+      "Id": "FireHydra_FireboundPact",
+      "DisplayName": "hydragon.talents.fire_hydra.firebound_pact.name",
+      "Description": "hydragon.talents.fire_hydra.firebound_pact.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.fire_hydra.branch.broodcallers_pact",
+      "PointCost": 1,
+      "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.25}]
+    },
+    {
+      "Id": "FireHydra_SwiftRecall",
+      "DisplayName": "hydragon.talents.fire_hydra.swift_recall.name",
+      "Description": "hydragon.talents.fire_hydra.swift_recall.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.fire_hydra.branch.broodcallers_pact",
+      "PointCost": 2,
+      "RequiresTalentIds": ["FireHydra_FireboundPact"],
+      "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.8}]
+    },
+    {
+      "Id": "FireHydra_EndlessBlaze",
+      "DisplayName": "hydragon.talents.fire_hydra.endless_blaze.name",
+      "Description": "hydragon.talents.fire_hydra.endless_blaze.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.fire_hydra.branch.broodcallers_pact",
+      "PointCost": 3,
+      "RequiresTalentIds": ["FireHydra_SwiftRecall"],
+      "Effects": [{"EffectKey": "SummonSessionDurationMultiplier", "Multiplier": 1.6}]
+    },
+    {
+      "Id": "FireHydra_BroodmastersCall",
+      "DisplayName": "hydragon.talents.fire_hydra.broodmasters_call.name",
+      "Description": "hydragon.talents.fire_hydra.broodmasters_call.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.fire_hydra.branch.broodcallers_pact",
+      "PointCost": 4,
+      "RequiresTalentIds": ["FireHydra_EndlessBlaze"],
+      "Effects": [{"EffectKey": "SummonCooldownMultiplier", "Multiplier": 0.625}]
+    }
+  ]
+}

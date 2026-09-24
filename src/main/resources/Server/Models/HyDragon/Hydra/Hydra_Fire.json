@@ -1,0 +1,24 @@
+{
+  "Parent": "Hydra_Ice",
+  "Texture": "NPC/HyDragon/Hydra/Models/Hydra_Fire.png",
+  "AnimationSets": {
+    "Rainshoot": {
+      "Animations": [
+        {
+          "Animation": "NPC/HyDragon/Hydra/Animations/Rainshoot.blockyanim",
+          "Looping": false,
+          "SoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
+          "Speed": 0.5
+        }
+      ],
+      "NextAnimationDelay": {
+        "Min": 1,
+        "Max": 1
+      }
+    }
+  },
+  "Light": {
+    "Radius": 1,
+    "Color": "#f83"
+  }
+}

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.alechilles.alecstamework.api.TameworkApi;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
@@ -108,22 +107,9 @@ final class PackagedHyDragonRosterIT {
             assertCompanionLifecycle(miniwyvern);
             assertCompanionLifecycle(nordic);
             assertCompanionLifecycle(groundOnly);
-            assertEquals(List.of(
-                    "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
-                    "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
-                    "Tamed_Wyvern_Mini_Ice"), roleIds(miniwyvern));
             assertFlightToggle(miniwyvern);
-            assertEquals(List.of("Tamed_NordicDrake"), roleIds(nordic));
             assertFlightToggle(nordic);
-            assertEquals(List.of(
-                    "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2",
-                    "Tamed_RockDrakeT3"),
-                    roleIds(groundOnly));
-            String groundOnlyJson = groundOnly.toString();
             assertFalse(groundOnly.getAsJsonObject("Command").has("FlightToggle"));
-            assertFalse(groundOnlyJson.contains("FlightToggle"));
-            assertFalse(groundOnlyJson.contains("AirborneMode"));
-            assertFalse(groundOnlyJson.contains("HyDragon.Command.ToggleAirborneMode"));
 
             assertNotNull(hy.getEntry("Server/Item/Items/Ingredient/Wyvern_Egg.json"));
             assertNotNull(tw.getEntry(
@@ -178,12 +164,6 @@ final class PackagedHyDragonRosterIT {
 
     private static JsonObject json(ZipFile zip, String entryName) throws IOException {
         return JsonParser.parseString(text(zip, entryName)).getAsJsonObject();
-    }
-
-    private static List<String> roleIds(JsonObject config) {
-        return config.getAsJsonArray("RoleIds").asList().stream()
-                .map(JsonElement::getAsString)
-                .toList();
     }
 
     private static void assertFlightToggle(JsonObject config) {

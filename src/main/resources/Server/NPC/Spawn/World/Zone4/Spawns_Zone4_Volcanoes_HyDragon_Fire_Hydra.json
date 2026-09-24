@@ -1,0 +1,19 @@
+{
+  "Environments": [
+    "Env_Zone4_Volcanoes"
+  ],
+  "NPCs": [
+    {
+      "Weight": 0.75,
+      "SpawnBlockSet": "Volcanic",
+      "Id": "Hydra_Fire"
+    }
+  ],
+  "MoonPhaseWeightModifiers": [
+    2,
+    1,
+    1,
+    1,
+    1
+  ]
+}

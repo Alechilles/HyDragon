@@ -8,6 +8,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 - Added Ghoul Dragon with four skins, nighttime Zone 2 spawns, mixed ground/air roaming, and ground-only bite and claw combat. It supports capture, Dragon Flute commands, revival, leveling, talents, and mounted flight without ranged attacks.
 
+- Fire Hydras spawn on volcanic ground in Zone 4 overworld volcanoes. They use fireballs and burning rain, wear a fire skin, and support capture, ground riding, breeding, leveling, and fire-themed talents.
+
 ## 1.3.0 - Wild Miniwyvern Flocks - 2026-09-23
 
 ### Added

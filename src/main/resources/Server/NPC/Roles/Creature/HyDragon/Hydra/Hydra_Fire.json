@@ -1,0 +1,199 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Hydra_Intelligent",
+  "Modify": {
+    "Appearance": {
+      "Compute": "Appearance"
+    },
+    "Weapons": [],
+    "OffHand": [],
+    "NighttimeOffhandSlot": -1,
+    "FlockArray": {
+      "Compute": "FlockArray"
+    },
+    "AttitudeGroup": "PredatorsBig",
+    "WanderRadius": 8,
+    "ViewRange": 36,
+    "HearingRange": 24,
+    "DropList": "Drop_Hydra_Fire",
+    "MaxSpeed": 7,
+    "_CombatConfig": "CAE_Hydra",
+    "UseCombatActionEvaluator": true,
+    "Attack": "Root_NPC_Hydra_Attack",
+    "AttackDistance": 5,
+    "DesiredAttackDistanceRange": [
+      0.5,
+      5
+    ],
+    "TargetRange": 12,
+    "CombatBehaviorDistance": 18,
+    "CombatAlwaysMovingWeight": 10,
+    "CombatBackwardsRelativeSpeed": 0.4,
+    "RunThreshold": 0.3,
+    "KnockbackScale": 0.1,
+    "ClimbHeight": 2,
+    "MinJumpHeight": 1.5,
+    "AscentAnimationType": "Walk",
+    "ClimbSpeedMult": 1,
+    "ClimbSpeedPow": 1,
+    "ClimbSpeedConst": 5,
+    "DescendSpeedCompensation": 1,
+    "DescendFlatness": 0.9,
+    "DescentSteepness": 0.9,
+    "DescentBlending": 1.5,
+    "LeashDistance": 60,
+    "HardLeashDistance": 100,
+    "LeashMinPlayerDistance": 15,
+    "LeashTimer": [
+      12,
+      16
+    ],
+    "WakingPeriod": [
+      0,
+      24
+    ],
+    "MaxHealth": 650,
+    "IsTameable": true,
+    "TameRoleChange": {
+      "Compute": "TameRoleChange"
+    },
+    "AttractiveItemSet": [],
+    "AttractiveItemSetParticles": "Want_Food_Wildmeat_Raw",
+    "TranquilizerSleepThresholdSeconds": 50,
+    "InteractionConfigId": "HyDragonIntBeast",
+    "IsMemory": true,
+    "MemoriesCategory": "Reptile",
+    "MemoriesNameOverride": {
+      "Compute": "MemoriesNameOverride"
+    },
+    "BreathesInWater": false,
+    "_InteractionVars": {
+      "Bite_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Bite_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 57.8
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Swipe_Left_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Swipe_Left_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 57.8
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Swipe_Right_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Swipe_Right_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 57.8
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Stomp_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Stomp_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 57.8
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Tail_Spin_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Tail_Spin_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": {
+                "Physical": 57.8
+              },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Hydra_Ball_Charge_Effect": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Fire_Ball_Charge_Effect"
+          }
+        ]
+      },
+      "Hydra_Ball_Launch": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Fire_Ball_Launch"
+          }
+        ]
+      },
+      "Hydra_Rain_Charge_Effect": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Rain_Fire_Charge_Effect"
+          }
+        ]
+      },
+      "Hydra_Rain_Launch": {
+        "Interactions": [
+          {
+            "Parent": "Hydra_Rain_Fire_Launch"
+          }
+        ]
+      }
+    },
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Parameters": {
+    "Appearance": {
+      "Value": "Hydra_Fire",
+      "Description": "Model asset used for this Hydra variant."
+    },
+    "FlockArray": {
+      "Value": [
+        "Hydra_Fire"
+      ],
+      "TypeHint": "String",
+      "Description": "NPC role IDs that can flock with this Hydra variant."
+    },
+    "MemoriesNameOverride": {
+      "Value": "Fire Hydra",
+      "Description": "Display name used for this Hydra variant in Memories."
+    },
+    "TameRoleChange": {
+      "Value": "Tamed_Hydra_Fire",
+      "Description": "Role this Hydra variant changes into when tamed."
+    },
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Hydra_Fire.name",
+      "Description": "Translation key for NPC name display"
+    }
+  }
+}

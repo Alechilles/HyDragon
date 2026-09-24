@@ -1,0 +1,9 @@
+{
+  "RoleIds": [
+    "Hydra_Fire",
+    "Tamed_Hydra_Fire"
+  ],
+  "IconOverrides": [],
+  "IconDefault": "Icons/ItemsGenerated/HyDragon/Companions/Hydra_Fire/base.png",
+  "Enabled": true
+}

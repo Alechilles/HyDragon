@@ -1,8 +1,8 @@
 # HyDragon companion portraits
 
-The shared assets in `src/main/resources/Server/Tamework/DynamicIcons/` cover all 21 concrete wild/tamed NPC roles in 13 appearance groups. Capture items and normal/roster command panels use the same mappings with the matching Tamework dynamic-icon development build.
+The shared assets in `src/main/resources/Server/Tamework/DynamicIcons/` map wild and tamed NPC roles to companion portraits. Capture items and normal/roster command panels use the same mappings with Tamework's dynamic icons.
 
-There are 15 images: ice and toxic hydras, stone/fire/ice Rock Drakes, seven Miniwyvern elements, and three Nordic Drake skins. Nordic Drake maps the exact `Skin` values `GreenBalls`, `OldOrange`, and `Cobalt`; orange is its default when attachments are unavailable. Other groups use their role-specific base portrait. No appearance combinations are omitted from the current HyDragon models.
+The portraits include ice, fire, and toxic hydras, Rock Drakes, Miniwyvern elements, Nordic Drake skins, and Ghoul Dragon variants. Role-specific base portraits cover models without appearance choices. The batch manifest records the model and role mappings used for regeneration.
 
 ## Regeneration
 
@@ -19,7 +19,7 @@ Miniwyvern entries use `cameraScale: 1.25` and `cameraAutoFramePadding: 2` in
 auto-framing, and six attempts. The lower starting scale keeps the full
 snout, wings, and tail in the raw render before alpha framing.
 
-In Blockbench, run **Run Tamework Dynamic Icon Batch (From Jobs JSON)** with `jobs.json`. Use the current Tamework batch renderer and Hytale Models plugin. Inspect all 15 images, check references and role coverage, then copy the generated PNGs and dynamic configs from staging into `src/main/resources` together. Rebuild HyDragon's JAR for client installation.
+In Blockbench, run **Run Tamework Dynamic Icon Batch (From Jobs JSON)** with `jobs.json`. Use the current Tamework batch renderer and Hytale Models plugin. Inspect all generated images, check references and role coverage, then copy the generated PNGs and dynamic configs from staging into `src/main/resources` together. Rebuild HyDragon's JAR for client installation.
 
 The manifest limits each pass to 100 combinations. If future models add attachment slots, select the most visible features before expanding the batch.
 

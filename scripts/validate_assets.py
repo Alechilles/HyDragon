@@ -819,15 +819,16 @@ def validate_companion_flight_toggle_contract(parsed: dict[Path, object], errors
             "Tamed_Wyvern_Mini_Ice",
         ],
         "HyDragonNordicDrake.json": ["Tamed_NordicDrake"],
+        "HyDragonGhoulDragon.json": ["Tamed_GhoulDragon"],
         "HyDragonFullDragons.json": [
-            "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2",
+            "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_Hydra_Fire", "Tamed_RockDrakeT1", "Tamed_RockDrakeT2",
             "Tamed_RockDrakeT3",
         ],
     }
     for filename, roles in expected_roles.items():
         path = companion_root / filename
         data = parsed.get(path)
-        if not isinstance(data, dict) or data.get("RoleIds") != roles:
+        if not isinstance(data, dict) or set(data.get("RoleIds", [])) != set(roles):
             fail(errors, f"{path.relative_to(ROOT)} has an invalid flight-toggle role partition")
             continue
         command = data.get("Command")
@@ -1424,7 +1425,7 @@ def validate_command_item(parsed: dict[Path, object], errors: list[str]) -> None
             fail(errors, f"Dragon Horn {command_id} flute audio file is missing")
     allowed = config.get("AllowedRoles")
     required_roles = {
-        "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_NordicDrake", "Tamed_RockDrakeT1",
+        "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_Hydra_Fire", "Tamed_NordicDrake", "Tamed_GhoulDragon", "Tamed_RockDrakeT1",
         "Tamed_RockDrakeT2", "Tamed_RockDrakeT3",
         "Tamed_Wyvern_Mini_Wild", "Tamed_Wyvern_Mini_Nature", "Tamed_Wyvern_Mini_Toxic",
         "Tamed_Wyvern_Mini_Fire", "Tamed_Wyvern_Mini_Void", "Tamed_Wyvern_Mini_Lightning",
@@ -1454,7 +1455,7 @@ def validate_revival_configs(parsed: dict[Path, object], errors: list[str]) -> N
         "HyDragonFullDragons.json": {
             "FamilyId": "hydragon:full_dragons", "MaximumOwned": 0,
             "MaximumActive": 1,
-            "AllowedRoles": {"Tamed_NordicDrake", "Tamed_Hydra", "Tamed_Hydra_Toxic",
+            "AllowedRoles": {"Tamed_NordicDrake", "Tamed_GhoulDragon", "Tamed_Hydra", "Tamed_Hydra_Toxic", "Tamed_Hydra_Fire",
                              "Tamed_RockDrakeT1", "Tamed_RockDrakeT2", "Tamed_RockDrakeT3"},
             "Features": {"Capture": True, "Provision": False, "Summon": True,
                          "Dismiss": True, "Revive": True},

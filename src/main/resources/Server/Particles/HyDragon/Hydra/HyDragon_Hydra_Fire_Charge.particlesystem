@@ -1,0 +1,20 @@
+{
+  "Spawners": [
+    {
+      "SpawnerId": "Fire_Projectile_Fire_Core",
+      "LifeSpan": {
+        "Min": 0.5,
+        "Max": 0.5
+      }
+    },
+    {
+      "SpawnerId": "Fire_Projectile_Sparks",
+      "LifeSpan": {
+        "Min": 0.5,
+        "Max": 0.5
+      }
+    }
+  ],
+  "CullDistance": 100.0,
+  "IsImportant": false
+}

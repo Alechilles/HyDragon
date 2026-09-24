@@ -1,0 +1,33 @@
+{
+  "Type": "TameworkLaunchProjectile",
+  "Effects": {
+    "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
+    "LocalSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
+    "Particles": [
+      {
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Origin_Projectile",
+        "SystemId": "HyDragon_Hydra_Fire_Charge",
+        "DetachedFromModel": false,
+        "PositionOffset": {},
+        "Scale": 1.5
+      }
+    ]
+  },
+  "ProjectileId": "Hydra_Fire_Ball",
+  "LaunchPositionOffset": {
+    "X": 0.0,
+    "Y": 1.8,
+    "Z": 0.0
+  },
+  "TrajectoryMode": "Direct",
+  "TargetSlot": "CAETargetSlot",
+  "ImpactEffect": {
+    "EffectId": "Flame_Staff_Burn",
+    "Radius": 3.0,
+    "ExcludeSource": true
+  },
+  "Tags": {
+    "AimingReference": []
+  }
+}

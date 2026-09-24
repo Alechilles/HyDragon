@@ -1,7 +1,7 @@
 {
   "Enabled": true,
   "Priority": 100,
-  "RoleIds": [ "Hydra", "Hydra_Toxic" ],
+  "RoleIds": [ "Hydra", "Hydra_Fire", "Hydra_Toxic" ],
   "Difficulty": {
     "MinimumPower": 0,
     "Resistance": 0.11,

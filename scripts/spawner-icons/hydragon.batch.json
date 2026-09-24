@@ -50,6 +50,16 @@
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/Hydra_Ice/{combo_slug}.png"
     },
     {
+      "id": "Hydra_Fire",
+      "source": "hydragon",
+      "model": "HyDragon/Hydra/Hydra_Fire.json",
+      "roles": [
+        "Hydra_Fire",
+        "Tamed_Hydra_Fire"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/Hydra_Fire/{combo_slug}.png"
+    },
+    {
       "id": "NordicDrake",
       "source": "hydragon",
       "model": "HyDragon/NordicDrake/NordicDrake.json",

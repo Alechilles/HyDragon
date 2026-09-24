@@ -8,7 +8,7 @@ HyDragon transforms your world into the ultimate dragon adventure. Seek out lege
 
 Explore forests, volcanic wilds, moonlit lands, and deep caves in search of an incredible dragon roster:
 
-- Command mighty Hydras and unleash storms of ice.
+- Command Ice and Fire Hydras and unleash storms of ice or burning fire.
 - Brave the venomous attacks of the airborne Toxic Hydra.
 - Discover fire-breathing Nordic Drakes roaming the forests.
 - Find Ghoul Dragons in Zone 2 at night, then take flight with a companion that lands to fight with claws and teeth.

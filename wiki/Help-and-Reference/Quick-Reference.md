@@ -18,6 +18,7 @@ The stone column is a practical progression, not a hard minimum. Every eligible 
 | Creature | Where to search | Suggested stone or route | Details |
 |---|---|---|---|
 | [Hydra](/mod/hydragon/hydra) | Zone 3 glacial ice-and-snow terrain; its favored moon phase increases sightings | [Cobalt](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
+| [Fire Hydra](/mod/hydragon/fire-hydra) | Zone 4 overworld volcanoes on volcanic ground | [Adamantium](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
 | [Toxic Hydra](/mod/hydragon/toxic-hydra) | Zone 4 volcanic terrain on Dark Green Moss patches | [Adamantium](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
 | [Nordic Drake](/mod/hydragon/nordic-drake) | Zone 3 forests on non-snowy soil | [Adamantium](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
 | [Young Rock Drake](/mod/hydragon/rock-drakes) | Zone 1 volcanic cave aggro beacons, tiers 1–3 | [Iron](/mod/hydragon/draconic-stones) | [Finding Dragons](/mod/hydragon/finding-dragons) |
@@ -30,6 +31,7 @@ The stone column is a practical progression, not a hard minimum. Every eligible 
 | Companion | Combat identity | Ground or flight | Details |
 |---|---|---|---|
 | [Hydra](/mod/hydragon/hydra) | Ice ball and ice rain | Ground mount | [Mounts and Flight](/mod/hydragon/mounts-and-flight) |
+| [Fire Hydra](/mod/hydragon/fire-hydra) | Fireballs and burning rain | Ground mount | [Mounts and Flight](/mod/hydragon/mounts-and-flight) |
 | [Toxic Hydra](/mod/hydragon/toxic-hydra) | Toxic bolts, poison breath, poison clouds, and aerial attacks | Ground mode plus Winged Toxic Hydra avatar flight | [Toxic Hydra](/mod/hydragon/toxic-hydra) |
 | [Nordic Drake](/mod/hydragon/nordic-drake) | Fireballs and flame breath | Avatar flight | [Mounts and Flight](/mod/hydragon/mounts-and-flight) |
 | [Rock Drakes](/mod/hydragon/rock-drakes) | Boulder attacks | Ground mount | [Rock Drakes](/mod/hydragon/rock-drakes) |
@@ -42,6 +44,7 @@ These are the common family materials and guaranteed elemental identities. Void 
 | Creature | Primary drops | Details |
 |---|---|---|
 | [Hydra](/mod/hydragon/hydra) | 5–6 scales, 5–6 plain essence, 3–4 Ice essence, 2–3 Earth essence; possible Void and decorative Drake Egg | [Hydra](/mod/hydragon/hydra) |
+| [Fire Hydra](/mod/hydragon/fire-hydra) | 5�6 scales, 5�6 plain essence, 3�4 Fire essence, 2�3 Earth essence; possible Void | [Fire Hydra](/mod/hydragon/fire-hydra) |
 | [Toxic Hydra](/mod/hydragon/toxic-hydra) | 5–6 scales, 5–6 plain essence, 3–4 Toxic essence, 2–3 Earth essence; possible Void; **no Drake Egg** | [Toxic Hydra](/mod/hydragon/toxic-hydra) |
 | [Nordic Drake](/mod/hydragon/nordic-drake) | 6–8 scales, 6–8 plain essence, 4–5 Ice essence, 2–3 Wind essence; rare Void | [Nordic Drake](/mod/hydragon/nordic-drake) |
 | [Young Rock Drake](/mod/hydragon/rock-drakes) | 2–3 scales, 2–3 plain essence, 1–2 Nature essence; Fire may also drop | [Rock Drakes](/mod/hydragon/rock-drakes) |
@@ -85,6 +88,7 @@ No Miniwyvern timer is published; use the roster's current status.
 | Companion | Cost | Details |
 |---|---|---|
 | [Hydra](/mod/hydragon/summoning-and-revival) | 2 Revitalizing Essences + 2 Ice Draconic Essences | [Summoning and Revival](/mod/hydragon/summoning-and-revival) |
+| [Fire Hydra](/mod/hydragon/summoning-and-revival) | 2 Revitalizing Essences + 2 Fire Draconic Essences | [Summoning and Revival](/mod/hydragon/summoning-and-revival) |
 | [Nordic Drake](/mod/hydragon/summoning-and-revival) | 2 Revitalizing Essences + 2 Ice Draconic Essences | [Summoning and Revival](/mod/hydragon/summoning-and-revival) |
 | [Toxic Hydra](/mod/hydragon/summoning-and-revival) | 2 Revitalizing Essences + 2 Toxic Draconic Essences | [Summoning and Revival](/mod/hydragon/summoning-and-revival) |
 | [Rock Drakes](/mod/hydragon/summoning-and-revival) | 2 Revitalizing Essences + 2 Nature Draconic Essences | [Summoning and Revival](/mod/hydragon/summoning-and-revival) |

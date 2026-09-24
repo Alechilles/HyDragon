@@ -1,8 +1,9 @@
 {
   "Id": "hydragon:hydra",
-  "WildRoleIds": [ "Hydra", "Hydra_Toxic" ],
+  "WildRoleIds": [ "Hydra", "Hydra_Fire", "Hydra_Toxic" ],
   "TamedRoleIdByWildRole": {
     "Hydra": "Tamed_Hydra",
+    "Hydra_Fire": "Tamed_Hydra_Fire",
     "Hydra_Toxic": "Tamed_Hydra_Toxic"
   },
   "DifficultyId": "epic",
@@ -17,12 +18,13 @@
   "Spawn": {
     "OrdinarySpawnAssetIds": [
       "Spawns_Zone3_Glacial_HyDragon_Predator",
-      "Spawns_Zone4_Volcanoes_HyDragon_Predator"
+      "Spawns_Zone4_Volcanoes_HyDragon_Predator",
+      "Spawns_Zone4_Volcanoes_HyDragon_Fire_Hydra"
     ],
     "PluginEncounterIds": []
   },
   "Presentation": {
     "LocalizationPrefix": "server.npcRoles.Hydra.name",
-    "ModelIds": [ "Hydra_Ice", "HydraWinged_Toxic" ]
+    "ModelIds": [ "Hydra_Ice", "HydraWinged_Toxic", "Hydra_Fire" ]
   }
 }

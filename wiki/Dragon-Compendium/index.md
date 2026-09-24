@@ -14,6 +14,7 @@ Use this compendium to choose a dragon, plan a capture, and see what each compan
 ## Child Pages
 
 - [Hydra](/mod/hydragon/hydra)
+- [Fire Hydra](/mod/hydragon/fire-hydra)
 - [Toxic Hydra](/mod/hydragon/toxic-hydra)
 - [Nordic Drake](/mod/hydragon/nordic-drake)
 - [Ghoul Dragon](/mod/hydragon/ghoul-dragon)

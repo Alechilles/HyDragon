@@ -39,6 +39,7 @@ Full dragons use two Revitalizing Essences plus two role-matched essences:
 | Full dragon | Revival materials |
 |---|---|
 | **Hydra** | 2 Revitalizing Essences + 2 Ice Draconic Essences |
+| **Fire Hydra** | 2 Revitalizing Essences + 2 Fire Draconic Essences |
 | **Nordic Drake** | 2 Revitalizing Essences + 2 Ice Draconic Essences |
 | **Toxic Hydra** | 2 Revitalizing Essences + 2 Toxic Draconic Essences |
 | **Young Rock Drake, Rock Drake, or Frost Rock Drake** | 2 Revitalizing Essences + 2 Nature Draconic Essences |

@@ -1,0 +1,36 @@
+{
+  "Type": "TameworkLaunchProjectile",
+  "ProjectileId": "Hydra_Rain_Fire_Ball",
+  "LaunchPositionOffset": {
+    "X": 0.0,
+    "Y": -1.0,
+    "Z": -2.0
+  },
+  "RandomAroundSourceMinRadius": 6.0,
+  "RandomAroundSourceMaxRadius": 15.0,
+  "RandomAroundSourceVerticalOffset": 0.0,
+  "LingeringHazard": {
+    "Radius": 4.0,
+    "DurationSeconds": 6.0,
+    "TickIntervalSeconds": 1.0,
+    "DamagePerTick": 4.25,
+    "ExcludeSource": true,
+    "EffectId": "Flame_Staff_Burn",
+    "SourceTypeId": "hydragon.rain_fire_hazard"
+  },
+  "Effects": {
+    "WorldSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
+    "LocalSoundEventId": "SFX_HyDragon_NordicDrake_Avatar_Fireball_Launch",
+    "Particles": [
+      {
+        "TargetEntityPart": "Entity",
+        "TargetNodeName": "Origin_Projectile",
+        "SystemId": "HyDragon_Hydra_Fire_Charge",
+        "DetachedFromModel": false,
+        "PositionOffset": {},
+        "Scale": 1.5
+      }
+    ]
+  },
+  "Tags": {}
+}
