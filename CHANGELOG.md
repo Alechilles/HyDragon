@@ -4,6 +4,10 @@ All notable player-facing changes to HyDragon are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Wild Miniwyverns now spawn in flocks of two to six, with three or four making up 70% of flock sizes.
+
 ### Added
 
 - Added Ghoul Dragon with four skins, day and night Zone 2 spawns, mixed ground/air roaming, and ground-only bite and claw combat. It supports capture, Dragon Flute commands, revival, leveling, talents, and mounted flight without ranged attacks.

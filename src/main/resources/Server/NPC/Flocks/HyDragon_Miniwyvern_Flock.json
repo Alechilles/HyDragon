@@ -1,5 +1,12 @@
 {
-  "Type": "Default",
-  "Size": [1, 5],
-  "MaxGrowSize": 5
+  "Type": "Weighted",
+  "MinSize": 2,
+  "SizeWeights": [
+    10,
+    35,
+    35,
+    15,
+    5
+  ],
+  "MaxGrowSize": 6
 }
