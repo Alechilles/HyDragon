@@ -1,0 +1,101 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_HyDragon_Dragon_Tamed",
+  "Modify": {
+    "Appearance": "GhoulDragon",
+    "Weapons": [],
+    "FlockArray": ["Tamed_GhoulDragon"],
+    "AttitudeGroup": "HyDragonCompanion",
+    "WanderRadius": 8,
+    "ViewRange": 36,
+    "HearingRange": 24,
+    "DropList": "Empty",
+    "MaxSpeed": 7,
+    "Attack": "Root_NPC_GhoulDragon_Attack",
+    "AttackDistance": 5,
+    "AttackPauseRange": [3, 4],
+    "CombatAttackPostDelay": [0.7, 0.7],
+    "TargetRange": 12,
+    "CombatBehaviorDistance": 19,
+    "CombatAlwaysMovingWeight": 10,
+    "RunThreshold": 0.3,
+    "KnockbackScale": 0.1,
+    "ClimbHeight": 2,
+    "MinJumpHeight": 1.5,
+    "AscentAnimationType": "Walk",
+    "ClimbSpeedMult": 1,
+    "ClimbSpeedPow": 1,
+    "ClimbSpeedConst": 5,
+    "DescendSpeedCompensation": 1,
+    "DescendFlatness": 0.9,
+    "DescentSteepness": 0.9,
+    "DescentBlending": 1.5,
+    "LeashDistance": 60,
+    "HardLeashDistance": 100,
+    "LeashMinPlayerDistance": 15,
+    "LeashTimer": [12, 16],
+    "MaxHealth": 100,
+    "AttractiveItemSet": [],
+    "InteractionConfigId": "HyDragonIntDragon",
+    "MountMode": "TameworkAvatarFlight",
+    "AvatarFlightConfig": "HyDragonGhoulDragon",
+    "CanFollow": true,
+    "CanHold": true,
+    "CanDefend": true,
+    "CanAggressive": true,
+    "CanAttackTarget": true,
+    "CanMoveToLocation": true,
+    "CanReturnHome": true,
+    "CanRecall": true,
+    "CanSetHome": true,
+    "CanBreedPair": true,
+    "GroundMeleeOnly": true,
+    "IsMountable": true,
+    "MountAnchorX": 0,
+    "MountAnchorY": 3.65,
+    "MountAnchorZ": -0.3,
+    "IsMemory": true,
+    "MemoriesCategory": "Reptile",
+    "MemoriesNameOverride": "Ghoul Dragon",
+    "BreathesInWater": false,
+    "_InteractionVars": {
+      "Bite_Damage": {
+        "Interactions": [
+          {
+            "Parent": "GhoulDragon_Bite_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": { "Physical": 34 },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Swipe_Left_Damage": {
+        "Interactions": [
+          {
+            "Parent": "GhoulDragon_Swipe_Left_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": { "Physical": 34 },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      },
+      "Swipe_Right_Damage": {
+        "Interactions": [
+          {
+            "Parent": "GhoulDragon_Swipe_Right_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": { "Physical": 34 },
+              "RandomPercentageModifier": 0.1
+            }
+          }
+        ]
+      }
+    },
+    "NameTranslationKey": "server.npcRoles.Tamed_GhoulDragon.name"
+  }
+}

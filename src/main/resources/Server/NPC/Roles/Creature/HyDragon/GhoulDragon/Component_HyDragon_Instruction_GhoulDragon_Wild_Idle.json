@@ -1,0 +1,130 @@
+{
+  "Type": "Component",
+  "Class": "Instruction",
+  "Interface": "Hytale.Instruction.Idle",
+  "DefaultState": ".Ground",
+  "Parameters": {
+    "WanderRadius": { "Value": 8 },
+    "GroundDurationRange": { "Value": [10, 16] },
+    "AirDurationRange": { "Value": [12, 18] }
+  },
+  "Content": {
+    "Instructions": [
+      {
+        "Sensor": { "Type": "State", "State": ".Ground" },
+        "Instructions": [
+          {
+            "Sensor": { "Type": "MotionController", "MotionController": "Fly" },
+            "Actions": [ { "Type": "State", "State": ".Air" } ]
+          },
+          {
+            "Continue": true,
+            "ActionsBlocking": true,
+            "Actions": [
+              { "Type": "Timeout", "Delay": { "Compute": "GroundDurationRange" } },
+              { "Type": "State", "State": ".TakeOff" }
+            ]
+          },
+          {
+            "BodyMotion": {
+              "Type": "WanderInCircle",
+              "Radius": { "Compute": "WanderRadius" },
+              "RelativeSpeed": 0.2
+            }
+          }
+        ]
+      },
+      {
+        "Sensor": { "Type": "State", "State": ".TakeOff" },
+        "Instructions": [
+          {
+            "Sensor": { "Type": "MotionController", "MotionController": "Walk" },
+            "BodyMotion": { "Type": "TakeOff", "JumpSpeed": 4 }
+          },
+          {
+            "Sensor": { "Type": "MotionController", "MotionController": "Fly" },
+            "Actions": [ { "Type": "State", "State": ".Air" } ]
+          }
+        ]
+      },
+      {
+        "Sensor": { "Type": "State", "State": ".Air" },
+        "Instructions": [
+          {
+            "Sensor": { "Type": "MotionController", "MotionController": "Walk" },
+            "Actions": [ { "Type": "State", "State": ".Ground" } ]
+          },
+          {
+            "Continue": true,
+            "ActionsBlocking": true,
+            "Actions": [
+              { "Type": "Timeout", "Delay": { "Compute": "AirDurationRange" } },
+              { "Type": "State", "State": ".Land" }
+            ]
+          },
+          {
+            "BodyMotion": {
+              "Type": "WanderInCircle",
+              "Radius": { "Compute": "WanderRadius * 3" },
+              "RelativeSpeed": 0.3
+            }
+          }
+        ]
+      },
+      {
+        "Sensor": { "Type": "State", "State": ".Land" },
+        "Instructions": [
+          {
+            "Sensor": { "Type": "MotionController", "MotionController": "Walk" },
+            "Actions": [
+              { "Type": "ResetSearchRays" },
+              { "Type": "State", "State": ".Ground" }
+            ]
+          },
+          {
+            "Sensor": { "Type": "And", "Sensors": [
+              { "Type": "MotionController", "MotionController": "Fly" },
+              { "Type": "OnGround" }
+            ] },
+            "Actions": [ { "Type": "TameworkConfirmLanding" } ]
+          },
+          {
+            "Continue": true,
+            "ActionsBlocking": true,
+            "Actions": [
+              { "Type": "Timeout", "Delay": [8, 10] },
+              { "Type": "ResetSearchRays" },
+              { "Type": "State", "State": ".Air" }
+            ]
+          },
+          {
+            "Sensor": {
+              "Type": "AdjustPosition",
+              "Offset": [0, 1, 0],
+              "Sensor": {
+                "Type": "SearchRay",
+                "Name": "GhoulDragonIdleLandingRay",
+                "Range": 64,
+                "Angle": 90,
+                "Blocks": "StoneAndSoil"
+              }
+            },
+            "BodyMotion": {
+              "Type": "Land",
+              "UsePathfinder": false,
+              "SkipSteering": false,
+              "SlowDownDistance": 5,
+              "StopDistance": 0.5,
+              "HeightDifference": [-3, 2],
+              "GoalLenience": 3,
+              "DesiredAltitudeWeight": 0
+            }
+          },
+          {
+            "BodyMotion": { "Type": "Wander", "RelativeSpeed": 0.2 }
+          }
+        ]
+      }
+    ]
+  }
+}

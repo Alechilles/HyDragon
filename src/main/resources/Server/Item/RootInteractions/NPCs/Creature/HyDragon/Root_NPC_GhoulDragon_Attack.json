@@ -1,0 +1,19 @@
+{
+  "Interactions": [
+    {
+      "Type": "Chaining",
+      "ChainId": "GhoulDragonAttacks",
+      "ChainingAllowance": 15,
+      "Next": [
+        "GhoulDragon_Swipe_Left",
+        "GhoulDragon_Swipe_Right",
+        "GhoulDragon_Bite"
+      ]
+    }
+  ],
+  "Tags": {
+    "Attack": [
+      "Melee"
+    ]
+  }
+}

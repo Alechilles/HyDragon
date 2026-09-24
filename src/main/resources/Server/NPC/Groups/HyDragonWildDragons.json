@@ -2,6 +2,7 @@
   "IncludeRoles": [
     "Hydra*",
     "NordicDrake*",
+    "GhoulDragon*",
     "RockDrake*",
     "Wyvern_Mini*"
   ]

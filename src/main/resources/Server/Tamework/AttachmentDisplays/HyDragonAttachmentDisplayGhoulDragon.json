@@ -1,0 +1,30 @@
+{
+  "Enabled": true,
+  "Priority": 0,
+  "Entries": [
+    {
+      "Id": "hydragon-ghoul-dragon-skin",
+      "AppliesTo": {
+        "ModelIds": [
+          "GhoulDragon",
+          "GhoulDragon_AvatarFlight"
+        ],
+        "RoleIds": [
+          "GhoulDragon",
+          "Tamed_GhoulDragon"
+        ]
+      },
+      "Sets": {
+        "Skin": {
+          "Label": "hydragon.attachments.skin.label",
+          "Values": {
+            "BrilliantBlue": "hydragon.attachments.skin.brilliant_blue",
+            "Savanna": "hydragon.attachments.skin.savanna",
+            "SavannaDusk": "hydragon.attachments.skin.savanna_dusk",
+            "SilverMoon": "hydragon.attachments.skin.silver_moon"
+          }
+        }
+      }
+    }
+  ]
+}

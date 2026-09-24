@@ -1,0 +1,408 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": [
+    "Tamed_GhoulDragon"
+  ],
+  "Talents": [
+    {
+      "Id": "GhoulDragon_GravewindResolve",
+      "DisplayName": "hydragon.talents.ghoul_dragon.gravewind_resolve.name",
+      "Description": "hydragon.talents.nordic_drake.northwind_resolve.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 1,
+      "Effects": [
+        {
+          "EffectKey": "AvatarFlightVigourCapacityMultiplier",
+          "Multiplier": 1.15
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_SustainedCurrent",
+      "DisplayName": "hydragon.talents.nordic_drake.sustained_current.name",
+      "Description": "hydragon.talents.nordic_drake.sustained_current.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 2,
+      "RequiresTalentIds": [
+        "GhoulDragon_GravewindResolve"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "AvatarFlightVigourRechargeRateMultiplier",
+          "Multiplier": 1.15
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_HuntingGust",
+      "DisplayName": "hydragon.talents.ghoul_dragon.hunting_gust.name",
+      "Description": "hydragon.talents.nordic_drake.flamewake.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 2,
+      "RequiresTalentIds": [
+        "GhoulDragon_GravewindResolve"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "AvatarFlightForwardBoostCostMultiplier",
+          "Multiplier": 0.88
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_SilentGlide",
+      "DisplayName": "hydragon.talents.ghoul_dragon.silent_glide.name",
+      "Description": "hydragon.talents.nordic_drake.thermal_guard.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 3,
+      "RequiresTalentIds": [
+        "GhoulDragon_SustainedCurrent"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "AvatarFlightGlideSinkMultiplier",
+          "Multiplier": 0.86
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_Skyrend",
+      "DisplayName": "hydragon.talents.nordic_drake.skyrend.name",
+      "Description": "hydragon.talents.nordic_drake.skyrend.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 3,
+      "RequiresTalentIds": [
+        "GhoulDragon_HuntingGust"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "AvatarFlightForwardBoostImpulseMultiplier",
+          "Multiplier": 1.15
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_NightSovereign",
+      "DisplayName": "hydragon.talents.ghoul_dragon.night_sovereign.name",
+      "Description": "hydragon.talents.ghoul_dragon.night_sovereign.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.nordic_drake.branch.aerial_mastery",
+      "PointCost": 4,
+      "RequiresTalentIds": [
+        "GhoulDragon_SilentGlide",
+        "GhoulDragon_Skyrend"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "AvatarFlightVigourCapacityMultiplier",
+          "Multiplier": 1.1
+        },
+        {
+          "EffectKey": "AvatarFlightClimbLiftMultiplier",
+          "Multiplier": 1.12
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_PredatorsFocus",
+      "DisplayName": "hydragon.talents.ghoul_dragon.predators_focus.name",
+      "Description": "hydragon.talents.nordic_drake.ember_discipline.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 2,
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.02
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_UndyingHeart",
+      "DisplayName": "hydragon.talents.ghoul_dragon.undying_heart.name",
+      "Description": "hydragon.talents.nordic_drake.furnace_heart.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 2,
+      "RequiresTalentIds": [
+        "GhoulDragon_PredatorsFocus"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0309278350515465
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_SavageMomentum",
+      "DisplayName": "hydragon.talents.ghoul_dragon.savage_momentum.name",
+      "Description": "hydragon.talents.nordic_drake.scorching_momentum.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 3,
+      "RequiresTalentIds": [
+        "GhoulDragon_PredatorsFocus"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.035
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_RendingJaws",
+      "DisplayName": "hydragon.talents.ghoul_dragon.rending_jaws.name",
+      "Description": "hydragon.talents.ghoul_dragon.rending_jaws.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 4,
+      "RequiresTalentIds": [
+        "GhoulDragon_SavageMomentum"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.045
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_IronTalons",
+      "DisplayName": "hydragon.talents.nordic_drake.iron_talons.name",
+      "Description": "hydragon.talents.nordic_drake.iron_talons.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 3,
+      "RequiresTalentIds": [
+        "GhoulDragon_UndyingHeart"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.05
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_GraveReaper",
+      "DisplayName": "hydragon.talents.ghoul_dragon.grave_reaper.name",
+      "Description": "hydragon.talents.nordic_drake.jarls_bane.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Strength.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.nordic_drake.branch.war_drake",
+      "PointCost": 4,
+      "RequiresTalentIds": [
+        "GhoulDragon_RendingJaws",
+        "GhoulDragon_IronTalons"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageDealtMultiplier",
+          "Multiplier": 1.04
+        },
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0309278350515465
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_AncientHide",
+      "DisplayName": "hydragon.talents.ghoul_dragon.ancient_hide.name",
+      "Description": "hydragon.talents.nordic_drake.runestone_hide.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 1,
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.04
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_BoneScales",
+      "DisplayName": "hydragon.talents.ghoul_dragon.bone_scales.name",
+      "Description": "hydragon.talents.nordic_drake.glacier_scales.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 2,
+      "RequiresTalentIds": [
+        "GhoulDragon_AncientHide"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_LongVigil",
+      "DisplayName": "hydragon.talents.nordic_drake.long_vigil.name",
+      "Description": "hydragon.talents.nordic_drake.long_vigil.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 2,
+      "RequiresTalentIds": [
+        "GhoulDragon_AncientHide"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.04
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_Unyielding",
+      "DisplayName": "hydragon.talents.nordic_drake.unyielding.name",
+      "Description": "hydragon.talents.nordic_drake.unyielding.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 3,
+      "RequiresTalentIds": [
+        "GhoulDragon_LongVigil"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.06
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_BattleScars",
+      "DisplayName": "hydragon.talents.ghoul_dragon.battle_scars.name",
+      "Description": "hydragon.talents.nordic_drake.sagascar.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Toughness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 3,
+      "RequiresTalentIds": [
+        "GhoulDragon_BoneScales"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0638297872340425
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_DeathlessBulwark",
+      "DisplayName": "hydragon.talents.ghoul_dragon.deathless_bulwark.name",
+      "Description": "hydragon.talents.nordic_drake.northern_bulwark.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Health.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.nordic_drake.branch.wyrmguard",
+      "PointCost": 4,
+      "RequiresTalentIds": [
+        "GhoulDragon_Unyielding",
+        "GhoulDragon_BattleScars"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "MaxHealthMultiplier",
+          "Multiplier": 1.05
+        },
+        {
+          "EffectKey": "DamageTakenMultiplier",
+          "Multiplier": 1.0416666666666667
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_DragonboundPact",
+      "DisplayName": "hydragon.talents.nordic_drake.dragonbound_pact.name",
+      "Description": "hydragon.talents.nordic_drake.dragonbound_pact.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 1,
+      "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
+      "PointCost": 1,
+      "Effects": [
+        {
+          "EffectKey": "SummonSessionDurationMultiplier",
+          "Multiplier": 1.25
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_SwiftRecall",
+      "DisplayName": "hydragon.talents.nordic_drake.swift_recall.name",
+      "Description": "hydragon.talents.nordic_drake.swift_recall.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 2,
+      "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
+      "PointCost": 2,
+      "RequiresTalentIds": [
+        "GhoulDragon_DragonboundPact"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SummonCooldownMultiplier",
+          "Multiplier": 0.8
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_EternalWings",
+      "DisplayName": "hydragon.talents.nordic_drake.eternal_wings.name",
+      "Description": "hydragon.talents.nordic_drake.eternal_wings.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 3,
+      "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
+      "PointCost": 3,
+      "RequiresTalentIds": [
+        "GhoulDragon_SwiftRecall"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SummonSessionDurationMultiplier",
+          "Multiplier": 1.6
+        }
+      ]
+    },
+    {
+      "Id": "GhoulDragon_HornmastersCall",
+      "DisplayName": "hydragon.talents.nordic_drake.hornmasters_call.name",
+      "Description": "hydragon.talents.nordic_drake.hornmasters_call.description",
+      "IconPath": "Tamework/LinkedPanelIcons/Trait_Swiftness.png",
+      "Tier": 4,
+      "Branch": "hydragon.talents.nordic_drake.branch.summoners_pact",
+      "PointCost": 4,
+      "RequiresTalentIds": [
+        "GhoulDragon_EternalWings"
+      ],
+      "Effects": [
+        {
+          "EffectKey": "SummonCooldownMultiplier",
+          "Multiplier": 0.625
+        }
+      ]
+    }
+  ]
+}

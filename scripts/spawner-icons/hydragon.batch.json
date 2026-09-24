@@ -171,6 +171,20 @@
       "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/WyvernMini_Void/{combo_slug}.png",
       "cameraScale": 1.25,
       "cameraAutoFramePadding": 2
+    },
+    {
+      "id": "GhoulDragon",
+      "source": "hydragon",
+      "model": "HyDragon/GhoulDragon/GhoulDragon.json",
+      "roles": [
+        "GhoulDragon",
+        "Tamed_GhoulDragon"
+      ],
+      "iconTemplate": "Icons/ItemsGenerated/HyDragon/Companions/GhoulDragon/{combo_slug}.png",
+      "keepAttachmentSets": [
+        "Skin"
+      ],
+      "iconDefault": "Icons/ItemsGenerated/HyDragon/Companions/GhoulDragon/skin-brilliantblue.png"
     }
   ]
 }

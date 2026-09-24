@@ -1,0 +1,37 @@
+{
+  "Id": "hydragon:ghoul_dragon",
+  "WildRoleIds": [
+    "GhoulDragon"
+  ],
+  "TamedRoleIdByWildRole": {
+    "GhoulDragon": "Tamed_GhoulDragon"
+  },
+  "DifficultyId": "legendary",
+  "StatsAndBehaviorAssetIds": [
+    "CAE_GhoulDragon",
+    "Root_NPC_GhoulDragon_Attack"
+  ],
+  "DropListId": "Drop_GhoulDragon",
+  "Mount": {
+    "Mode": "AVATAR_FLIGHT",
+    "AvatarFlightConfigId": "HyDragonGhoulDragon"
+  },
+  "Capture": {
+    "Resistance": 0.25,
+    "MinimumStoneTier": 4,
+    "SpecialRequirementIds": []
+  },
+  "Spawn": {
+    "OrdinarySpawnAssetIds": [
+      "Spawns_HyDragon_GhoulDragon_Zone2_Night"
+    ],
+    "PluginEncounterIds": []
+  },
+  "Presentation": {
+    "LocalizationPrefix": "server.npcRoles.GhoulDragon.name",
+    "ModelIds": [
+      "GhoulDragon",
+      "GhoulDragon_AvatarFlight"
+    ]
+  }
+}

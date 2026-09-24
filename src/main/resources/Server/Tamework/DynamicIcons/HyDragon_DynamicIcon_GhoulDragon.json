@@ -1,0 +1,34 @@
+{
+  "RoleIds": [
+    "GhoulDragon",
+    "Tamed_GhoulDragon"
+  ],
+  "IconOverrides": [
+    {
+      "Icon": "Icons/ItemsGenerated/HyDragon/Companions/GhoulDragon/skin-brilliantblue.png",
+      "Attachments": {
+        "Skin": "BrilliantBlue"
+      }
+    },
+    {
+      "Icon": "Icons/ItemsGenerated/HyDragon/Companions/GhoulDragon/skin-savanna.png",
+      "Attachments": {
+        "Skin": "Savanna"
+      }
+    },
+    {
+      "Icon": "Icons/ItemsGenerated/HyDragon/Companions/GhoulDragon/skin-savannadusk.png",
+      "Attachments": {
+        "Skin": "SavannaDusk"
+      }
+    },
+    {
+      "Icon": "Icons/ItemsGenerated/HyDragon/Companions/GhoulDragon/skin-silvermoon.png",
+      "Attachments": {
+        "Skin": "SilverMoon"
+      }
+    }
+  ],
+  "IconDefault": "Icons/ItemsGenerated/HyDragon/Companions/GhoulDragon/skin-brilliantblue.png",
+  "Enabled": true
+}

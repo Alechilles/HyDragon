@@ -1,0 +1,15 @@
+{
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": [
+    "GhoulDragon"
+  ],
+  "Difficulty": {
+    "MinimumPower": 0,
+    "Resistance": 0.14,
+    "ChanceMultiplier": 0.65,
+    "MissingHealthBonus": 0.22,
+    "TranquilizedBonus": 0.25,
+    "GuaranteedAtPower": 5
+  }
+}

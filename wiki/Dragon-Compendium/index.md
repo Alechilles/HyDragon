@@ -16,6 +16,7 @@ Use this compendium to choose a dragon, plan a capture, and see what each compan
 - [Hydra](/mod/hydragon/hydra)
 - [Toxic Hydra](/mod/hydragon/toxic-hydra)
 - [Nordic Drake](/mod/hydragon/nordic-drake)
+- [Ghoul Dragon](/mod/hydragon/ghoul-dragon)
 - [Rock Drakes](/mod/hydragon/rock-drakes)
 - [Soulbound Miniwyvern](/mod/hydragon/soulbound-miniwyvern)
 - [Miniwyvern Forms](/mod/hydragon/miniwyvern-forms)

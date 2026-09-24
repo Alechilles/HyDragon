@@ -2,7 +2,8 @@
   "Enabled": true,
   "Priority": 200,
   "RoleIds": [
-    "Tamed_NordicDrake"
+    "Tamed_NordicDrake",
+    "Tamed_GhoulDragon"
   ],
   "Interactions": [
     {

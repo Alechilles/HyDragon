@@ -1,0 +1,63 @@
+{
+  "Type": "CombatActionEvaluator",
+  "TargetMemoryDuration": 10,
+  "CombatActionEvaluator": {
+    "RunConditions": [
+      {
+        "Type": "TimeSinceLastUsed",
+        "Curve": {
+          "ResponseCurve": "Linear",
+          "XRange": [
+            0,
+            2
+          ]
+        }
+      },
+      {
+        "Type": "Randomiser",
+        "MinValue": 0.85,
+        "MaxValue": 1
+      }
+    ],
+    "MinRunUtility": 0.5,
+    "MinActionUtility": 0.1,
+    "PredictabilityRange": [
+      0.75,
+      0.95
+    ],
+    "AvailableActions": {
+      "SelectTarget": {
+        "Type": "SelectBasicAttackTarget",
+        "Description": "Select a hostile target for basic attacks.",
+        "Conditions": [
+          {
+            "Type": "TimeSinceLastUsed",
+            "Curve": {
+              "Type": "Switch",
+              "SwitchPoint": 4
+            }
+          }
+        ]
+      }
+    },
+    "ActionSets": {
+      "Default": {
+        "BasicAttacks": {
+          "Attacks": [
+            "Root_NPC_GhoulDragon_Attack"
+          ],
+          "Randomise": false,
+          "MaxRange": 5.25,
+          "Timeout": 2,
+          "CooldownRange": [
+            1.5,
+            2.5
+          ]
+        },
+        "Actions": [
+          "SelectTarget"
+        ]
+      }
+    }
+  }
+}

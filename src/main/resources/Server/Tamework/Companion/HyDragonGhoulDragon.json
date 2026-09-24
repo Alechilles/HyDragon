@@ -1,0 +1,20 @@
+{
+  "Parent": "TwCompanionDefault",
+  "Enabled": true,
+  "Priority": 100,
+  "RoleIds": [
+    "Tamed_GhoulDragon"
+  ],
+  "Command": {
+    "ReturnHomeTeleportDistance": 128.0,
+    "ReturnHomePathDistanceBeforeTeleport": 32.0,
+    "RecallSafeSpawnDistance": 24.0,
+    "RecallForceRelocateDistance": 96.0,
+    "PlacementMinRelativeY": -4.0,
+    "PlacementMaxRelativeY": 8.0,
+    "FlightToggle": {
+      "Enabled": true,
+      "HookId": "HyDragon.Command.ToggleAirborneMode"
+    }
+  }
+}

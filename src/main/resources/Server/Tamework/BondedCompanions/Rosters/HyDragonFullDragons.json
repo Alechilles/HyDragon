@@ -4,6 +4,7 @@
   "FamilyId": "hydragon:full_dragons",
   "AllowedRoles": [
     "Tamed_NordicDrake",
+    "Tamed_GhoulDragon",
     "Tamed_Hydra",
     "Tamed_Hydra_Toxic",
     "Tamed_RockDrakeT1",
@@ -17,6 +18,7 @@
   "SummonAuraEffectId": "HyDragon_DragonStone_SummonAura",
   "ExpiryWarningEffectId": "HyDragon_Dragon_Desummon",
   "RevivePriceByRole": [
+    { "RoleId": "Tamed_GhoulDragon", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Void", "Quantity": 2 } ] },
     { "RoleId": "Tamed_NordicDrake", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Fire", "Quantity": 2 } ] },
     { "RoleId": "Tamed_Hydra", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Ice", "Quantity": 2 } ] },
     { "RoleId": "Tamed_Hydra_Toxic", "Costs": [ { "ItemId": "Revitalizing_Essence", "Quantity": 2 }, { "ItemId": "Draconic_Essence_Toxic", "Quantity": 2 } ] },

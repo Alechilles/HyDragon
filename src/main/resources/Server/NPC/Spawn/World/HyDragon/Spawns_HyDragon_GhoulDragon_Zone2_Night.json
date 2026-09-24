@@ -1,0 +1,25 @@
+{
+  "Environments": [
+    "Env_Zone2_Savanna",
+    "Env_Zone2_Plateaus",
+    "Env_Zone2_Scrub",
+    "Env_Zone2_Deserts",
+    "Env_Zone2_Oasis"
+  ],
+  "NPCs": [
+    {
+      "Id": "GhoulDragon",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Soil"
+    },
+    {
+      "Id": "GhoulDragon",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Sand"
+    }
+  ],
+  "DayTimeRange": [
+    19,
+    5
+  ]
+}

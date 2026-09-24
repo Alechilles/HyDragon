@@ -4,6 +4,7 @@
     "Mode": "Allowlist",
     "Allowlist": [
       "NordicDrake",
+      "GhoulDragon",
       "Hydra",
       "Hydra_Toxic",
       "RockDrakeT1",
@@ -21,6 +22,7 @@
     "ChannelSoundEvent": "SFX_Tamework_Capture_Channel_Dark_Magic",
     "TamedRoleOverrides": {
       "NordicDrake": "Tamed_NordicDrake",
+      "GhoulDragon": "Tamed_GhoulDragon",
       "Hydra": "Tamed_Hydra",
       "Hydra_Toxic": "Tamed_Hydra_Toxic",
       "RockDrakeT1": "Tamed_RockDrakeT1",
