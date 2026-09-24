@@ -6,7 +6,7 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Changed
 
-- Wild Miniwyverns now spawn in flocks of two to six, with three or four making up 70% of flock sizes.
+- Wild Miniwyverns now spawn in flocks of two to six, with three or four making up 50% of flock sizes.
 
 ### Added
 

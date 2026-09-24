@@ -2,11 +2,11 @@
   "Type": "Weighted",
   "MinSize": 2,
   "SizeWeights": [
-    10,
-    35,
-    35,
+    20,
+    25,
+    25,
     15,
-    5
+    15
   ],
   "MaxGrowSize": 6
 }
