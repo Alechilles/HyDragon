@@ -46,7 +46,7 @@
         "Min": -15
       },
       "TargetNodes": [
-        "AF_Head"
+        "Head"
       ]
     },
     "PositionOffset": {
@@ -60,7 +60,7 @@
         "Min": -30
       },
       "TargetNodes": [
-        "AF_Head"
+        "Head"
       ]
     }
   },
