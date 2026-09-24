@@ -19,7 +19,7 @@
     "UseCombatActionEvaluator": true,
     "LandForMeleeCombat": true,
     "Attack": "Root_NPC_GhoulDragon_Attack",
-    "AttackDistance": 5,
+    "AttackDistance": 5.75,
     "DesiredAttackDistanceRange": [0.5, 5],
     "TargetRange": 12,
     "CombatBehaviorDistance": 18,

@@ -12,7 +12,7 @@
     "DropList": "Empty",
     "MaxSpeed": 7,
     "Attack": "Root_NPC_GhoulDragon_Attack",
-    "AttackDistance": 5,
+    "AttackDistance": 5.75,
     "AttackPauseRange": [3, 4],
     "CombatAttackPostDelay": [0.7, 0.7],
     "TargetRange": 12,

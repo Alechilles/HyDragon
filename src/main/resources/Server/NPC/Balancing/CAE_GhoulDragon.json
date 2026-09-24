@@ -47,7 +47,7 @@
             "Root_NPC_GhoulDragon_Attack"
           ],
           "Randomise": false,
-          "MaxRange": 5.25,
+          "MaxRange": 5.75,
           "Timeout": 2,
           "CooldownRange": [
             1.5,
