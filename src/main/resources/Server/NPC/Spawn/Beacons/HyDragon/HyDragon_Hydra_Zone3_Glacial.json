@@ -17,9 +17,9 @@
     "PT25M"
   ],
   "BeaconVacantDespawnGameTime": "PT1H",
-  "BeaconRadius": 160,
-  "SpawnRadius": 96,
-  "TargetDistanceFromPlayer": 64,
+  "BeaconRadius": 200,
+  "SpawnRadius": 145,
+  "TargetDistanceFromPlayer": 110,
   "YRange": [
     -32,
     32
@@ -30,5 +30,6 @@
       "SpawnBlockSet": "IceAndSnow",
       "Id": "Hydra"
     }
-  ]
+  ],
+  "NPCIdleDespawnTime": 500
 }

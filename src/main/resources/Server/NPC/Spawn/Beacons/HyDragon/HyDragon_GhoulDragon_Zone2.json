@@ -34,5 +34,6 @@
       "Weight": 1,
       "SpawnBlockSet": "Soil"
     }
-  ]
+  ],
+  "NPCIdleDespawnTime": 500
 }
