@@ -1,6 +1,6 @@
 # HyDragon
 
-Requires **Alec's Tamework 4.0.0 or later**.
+Requires **Alec's Tamework 4.2.0 or later**.
 
 ### Raise dragons. Master the elements. Rule the skies.
 
@@ -11,7 +11,7 @@ Explore forests, volcanic wilds, moonlit lands, and deep caves in search of an i
 - Command Ice and Fire Hydras and unleash storms of ice or burning fire.
 - Brave the venomous attacks of the airborne Toxic Hydra.
 - Discover fire-breathing Nordic Drakes roaming the forests.
-- Find Ghoul Dragons in Zone 2 during the day and night, then take flight with a companion that lands to fight with claws and teeth.
+- Find Ghoul Dragons in Zone 2 during the day and night, then take flight with a companion that fights with claws and teeth on the ground or in the air.
 - Challenge increasingly powerful Rock Drakes hidden beneath the earth.
 - Encounter hostile wild Miniwyvern flocks, including six elemental variants across their natural habitats.
 - Forge a lifelong Soul Bond with your very own Miniwyvern.

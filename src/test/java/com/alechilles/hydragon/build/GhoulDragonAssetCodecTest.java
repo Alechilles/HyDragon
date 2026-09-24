@@ -1,5 +1,7 @@
 package com.alechilles.hydragon.build;
 
+import com.alechilles.alecstamework.npc.movement.BuilderBodyMotionTameworkFlyingOrbit;
+import com.google.gson.JsonParser;
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.validation.ValidationResults;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -34,6 +36,15 @@ final class GhoulDragonAssetCodecTest {
                 "Models/HyDragon/GhoulDragon/GhoulDragon_AvatarFlight.json").getDocument("Camera"), info);
         CameraSettings.CODEC.validate(camera, info);
         info.getValidationResults().logOrThrowValidatorExceptions(HytaleLogger.getLogger());
+    }
+
+    @Test
+    void aerialPursuitPassesMovementBuilderValidation() throws Exception {
+        var component = JsonParser.parseString(Files.readString(SERVER.resolve(
+                "NPC/Roles/Creature/HyDragon/Components/Component_HyDragon_Instruction_Aerial_Melee_Pursuit.json")))
+                .getAsJsonObject().getAsJsonObject("Content");
+        // A negative altitude offset rejects NPC loading even though ordinary JSON validation passes.
+        new BuilderBodyMotionTameworkFlyingOrbit().readConfig(component.get("BodyMotion"));
     }
 
     private static BsonDocument read(String relativePath) throws Exception {

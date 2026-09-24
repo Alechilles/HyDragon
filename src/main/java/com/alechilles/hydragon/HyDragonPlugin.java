@@ -35,6 +35,7 @@ import com.alechilles.hydragon.integration.creditor.CreditorIntegration;
 import com.alechilles.hydragon.interactions.HyDragonInteractionRuntime;
 import com.alechilles.hydragon.interactions.HyDragonSoulBondInteraction;
 import com.alechilles.hydragon.persistence.HyDragonStateStore;
+import com.alechilles.hydragon.npc.BuilderSensorHyDragonTargetAirborne;
 import com.alechilles.hydragon.runtime.ConsumableRefundClaimService;
 import com.alechilles.hydragon.runtime.ConsumableSagaRecoveryRuntime;
 import com.alechilles.hydragon.runtime.HyDragonGameplayRuntime;
@@ -54,6 +55,9 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.npc.NPCPlugin;
+import com.hypixel.hytale.server.npc.asset.builder.BuilderFactory;
+import com.hypixel.hytale.server.npc.instructions.Sensor;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
@@ -84,6 +88,8 @@ public final class HyDragonPlugin extends JavaPlugin {
     @Override
     protected void setup() {
         CreditorIntegration.setup(this);
+        BuilderFactory<Sensor> sensors = NPCPlugin.get().getBuilderManager().getFactory(Sensor.class);
+        sensors.add(BuilderSensorHyDragonTargetAirborne.ID, BuilderSensorHyDragonTargetAirborne::new);
         registerInteractionCodecs();
         // The persistent encounter marker and damage system must exist before any world loads.
         serverRuntime = HyDragonEncounterRegistrationFacade.registerServerRuntime(this);

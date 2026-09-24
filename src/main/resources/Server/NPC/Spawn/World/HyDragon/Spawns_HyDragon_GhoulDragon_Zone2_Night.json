@@ -9,13 +9,8 @@
   "NPCs": [
     {
       "Id": "GhoulDragon",
-      "Weight": 0.5,
+      "Weight": 0.05,
       "SpawnBlockSet": "Soil"
-    },
-    {
-      "Id": "GhoulDragon",
-      "Weight": 0.5,
-      "SpawnBlockSet": "Sand"
     }
   ]
 }

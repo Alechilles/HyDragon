@@ -1,0 +1,37 @@
+{
+  "Type": "Component",
+  "Class": "Instruction",
+  "Content": {
+    "Continue": true,
+    "Sensor": {
+      "Type": "And",
+      "Sensors": [
+        {
+          "Type": "Target",
+          "TargetSlot": "LockedTarget"
+        },
+        {
+          "Type": "MotionController",
+          "MotionController": "Fly"
+        }
+      ]
+    },
+    "HeadMotion": {
+      "Type": "Aim",
+      "HitProbability": 1
+    },
+    "BodyMotion": {
+      "Type": "TameworkFlyingOrbit",
+      "Mode": "APPROACH",
+      "ApproachStopDistance": 3.5,
+      "ApproachSlowDownDistance": 5.75,
+      "RelativeSpeed": 1,
+      "DesiredAltitudeRange": [
+        0,
+        0.5
+      ],
+      "ClimbRelativeSpeed": 1,
+      "SinkRelativeSpeed": 1
+    }
+  }
+}

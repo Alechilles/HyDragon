@@ -232,7 +232,7 @@
     },
     "LandForMeleeCombat": {
       "Value": false,
-      "Description": "Land before using grounded melee combat when combat begins in flight."
+      "Description": "Use aerial melee pursuit for airborne targets and land to fight grounded targets."
     },
     "FlightSpeed": {
       "Value": 12,
@@ -1709,19 +1709,6 @@
               ]
             },
             {
-              "$Comment": "Melee-only flyers land immediately on entering combat, regardless of health.",
-              "Enabled": { "Compute": "LandForMeleeCombat" },
-              "Continue": true,
-              "Sensor": {
-                "Type": "And",
-                "Sensors": [
-                  { "Type": "State", "State": ".Default" },
-                  { "Type": "MotionController", "MotionController": "Fly" }
-                ]
-              },
-              "Actions": [ { "Type": "State", "State": ".AirTouchdown" } ]
-            },
-            {
               "Enabled": { "Compute": "UseHealthPhaseFlight" },
               "Continue": true,
               "Sensor": {
@@ -1804,6 +1791,161 @@
                   "Actions": [
                     {
                       "Type": "AddToHostileTargetMemory"
+                    }
+                  ]
+                },
+                {
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Any"
+                  },
+                  "Instructions": [
+                    {
+                      "Sensor": {
+                        "Type": "HyDragonTargetAirborne"
+                      },
+                      "Actions": [
+                        {
+                          "Type": "SetFlag",
+                          "Name": "HyDragon_TargetAirborne",
+                          "SetTo": true
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "Actions": [
+                        {
+                          "Type": "SetFlag",
+                          "Name": "HyDragon_TargetAirborne",
+                          "SetTo": false
+                        }
+                      ]
+                    }
+                  ],
+                  "Enabled": {
+                    "Compute": "LandForMeleeCombat"
+                  }
+                },
+                {
+                  "Enabled": {
+                    "Compute": "LandForMeleeCombat"
+                  },
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "Flag",
+                        "Name": "HyDragon_TargetAirborne",
+                        "Set": true
+                      },
+                      {
+                        "Type": "Or",
+                        "Sensors": [
+                          {
+                            "Type": "State",
+                            "State": ".AirLand",
+                            "IgnoreMissingSetState": true
+                          },
+                          {
+                            "Type": "State",
+                            "State": ".AirTouchdown",
+                            "IgnoreMissingSetState": true
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "ResetSearchRays"
+                    },
+                    {
+                      "Type": "State",
+                      "State": ".Default"
+                    }
+                  ]
+                },
+                {
+                  "Enabled": {
+                    "Compute": "LandForMeleeCombat"
+                  },
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "Flag",
+                        "Name": "HyDragon_TargetAirborne",
+                        "Set": true
+                      },
+                      {
+                        "Type": "MotionController",
+                        "MotionController": "Walk"
+                      }
+                    ]
+                  },
+                  "BodyMotion": {
+                    "Type": "TakeOff",
+                    "JumpSpeed": 4
+                  }
+                },
+                {
+                  "Enabled": {
+                    "Compute": "LandForMeleeCombat"
+                  },
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "And",
+                    "Sensors": [
+                      {
+                        "Type": "Flag",
+                        "Name": "HyDragon_TargetAirborne",
+                        "Set": false
+                      },
+                      {
+                        "Type": "MotionController",
+                        "MotionController": "Fly"
+                      },
+                      {
+                        "Type": "Or",
+                        "Sensors": [
+                          {
+                            "Type": "State",
+                            "State": ".Default",
+                            "IgnoreMissingSetState": true
+                          },
+                          {
+                            "Type": "State",
+                            "State": ".Melee",
+                            "IgnoreMissingSetState": true
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "State",
+                      "State": ".AirTouchdown"
+                    }
+                  ]
+                },
+                {
+                  "Enabled": {
+                    "Compute": "LandForMeleeCombat"
+                  },
+                  "Continue": true,
+                  "Sensor": {
+                    "Type": "Flag",
+                    "Name": "HyDragon_TargetAirborne",
+                    "Set": true
+                  },
+                  "Instructions": [
+                    {
+                      "Reference": "Component_HyDragon_Instruction_Aerial_Melee_Pursuit"
                     }
                   ]
                 },

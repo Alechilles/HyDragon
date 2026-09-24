@@ -17,7 +17,7 @@
     "Main": "com.alechilles.hydragon.HyDragonPlugin",
     "ServerVersion": ">=0.5.0 <0.7.0",
     "Dependencies": {
-        "Alechilles:Alec's Tamework!": ">=4.0.0"
+        "Alechilles:Alec's Tamework!": ">=4.2.0"
     },
     "OptionalDependencies": {
         "Alechilles:Alec's Nametags!": "*",

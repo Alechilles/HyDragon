@@ -528,9 +528,9 @@
       "Value": false,
       "Description": "Whether Defend hands a valid LockedTarget to the Nordic Drake combat component."
     },
-    "GroundMeleeOnly": {
+    "UseTargetAwareMeleeFlight": {
       "Value": false,
-      "Description": "Land when entering Defend or Aggressive so melee combat uses the walk controller."
+      "Description": "Choose ground or aerial melee combat from the current target movement."
     },
     "UseToxicHydraTamedCombat": {
       "Value": false,
@@ -1141,20 +1141,85 @@
       ]
     },
     {
-      "$Comment": "Melee-only companions leave airborne mode before Defend or Aggressive can attack.",
-      "Enabled": { "Compute": "GroundMeleeOnly" },
+      "Continue": true,
+      "Sensor": {
+        "Type": "Or",
+        "Sensors": [
+          {
+            "Type": "State",
+            "State": "Defend"
+          },
+          {
+            "Type": "State",
+            "State": "Aggressive"
+          }
+        ]
+      },
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "HyDragonTargetAirborne"
+          },
+          "Actions": [
+            {
+              "Type": "SetFlag",
+              "Name": "AirborneMode",
+              "SetTo": true
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "Target",
+            "TargetSlot": "LockedTarget"
+          },
+          "Actions": [
+            {
+              "Type": "SetFlag",
+              "Name": "AirborneMode",
+              "SetTo": false
+            }
+          ]
+        }
+      ],
+      "Enabled": {
+        "Compute": "UseTargetAwareMeleeFlight"
+      },
+      "$Comment": "Match combat flight to the target; leave the selected mode alone without a target."
+    },
+    {
+      "Enabled": {
+        "Compute": "UseTargetAwareMeleeFlight"
+      },
       "Continue": true,
       "Sensor": {
         "Type": "And",
         "Sensors": [
-          { "Type": "Or", "Sensors": [
-            { "Type": "State", "State": "Defend" },
-            { "Type": "State", "State": "Aggressive" }
-          ] },
-          { "Type": "Flag", "Name": "AirborneMode", "Set": true }
+          {
+            "Type": "Or",
+            "Sensors": [
+              {
+                "Type": "State",
+                "State": "Defend"
+              },
+              {
+                "Type": "State",
+                "State": "Aggressive"
+              }
+            ]
+          },
+          {
+            "Type": "Flag",
+            "Name": "AirborneMode",
+            "Set": true
+          }
         ]
       },
-      "Actions": [ { "Type": "SetFlag", "Name": "AirborneMode", "SetTo": false } ]
+      "Instructions": [
+        {
+          "Reference": "Component_HyDragon_Instruction_Aerial_Melee_Pursuit"
+        }
+      ]
     },
     {
       "$Comment": "Keep the Horn airborne mode controller transition global across every order.",

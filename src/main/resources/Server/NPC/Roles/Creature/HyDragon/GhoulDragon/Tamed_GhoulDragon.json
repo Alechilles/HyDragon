@@ -49,7 +49,7 @@
     "CanRecall": true,
     "CanSetHome": true,
     "CanBreedPair": true,
-    "GroundMeleeOnly": true,
+    "UseTargetAwareMeleeFlight": true,
     "IsMountable": true,
     "MountAnchorX": 0,
     "MountAnchorY": 3.65,

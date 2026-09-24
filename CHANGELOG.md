@@ -6,11 +6,15 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Changed
 
+- Reduced Ghoul Dragon natural spawn weight by 90%, keeping day and night spawning throughout Zone 2.
+
+- Ghoul Dragons now pursue airborne targets with melee attacks and land for grounded targets. Requires Alec's Tamework 4.2.0 or later.
+
 - Wild Miniwyverns now spawn in flocks of two to six, with three or four making up 50% of flock sizes.
 
 ### Added
 
-- Added Ghoul Dragon with four skins, day and night Zone 2 spawns, mixed ground/air roaming, and ground-only bite and claw combat. It supports capture, Dragon Flute commands, revival, leveling, talents, and mounted flight without ranged attacks.
+- Added Ghoul Dragon with four skins, day and night Zone 2 spawns, mixed ground/air roaming, and ground and aerial bite and claw combat. It supports capture, Dragon Flute commands, revival, leveling, talents, and mounted flight without ranged attacks.
 
 - Fire Hydras spawn on volcanic ground in Zone 4 overworld volcanoes. They use fireballs and burning rain, wear a fire skin, and support capture, ground riding, breeding, leveling, and fire-themed talents.
 
