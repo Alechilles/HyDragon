@@ -1,0 +1,34 @@
+{
+  "Environments": [
+    "Env_Zone3_Glacial"
+  ],
+  "MinDistanceFromPlayer": 40,
+  "MaxSpawnedNPCs": 1,
+  "ConcurrentSpawnsRange": [
+    1,
+    1
+  ],
+  "InitialSpawnDelayRange": [
+    60,
+    180
+  ],
+  "SpawnAfterRealTimeRange": [
+    "PT15M",
+    "PT25M"
+  ],
+  "BeaconVacantDespawnGameTime": "PT1H",
+  "BeaconRadius": 160,
+  "SpawnRadius": 96,
+  "TargetDistanceFromPlayer": 64,
+  "YRange": [
+    -32,
+    32
+  ],
+  "NPCs": [
+    {
+      "Weight": 1,
+      "SpawnBlockSet": "IceAndSnow",
+      "Id": "Hydra"
+    }
+  ]
+}

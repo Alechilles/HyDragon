@@ -23,7 +23,7 @@
   },
   "Spawn": {
     "OrdinarySpawnAssetIds": [
-      "Spawns_HyDragon_GhoulDragon_Zone2_Night"
+      "HyDragon_GhoulDragon_Zone2"
     ],
     "PluginEncounterIds": []
   },

@@ -12,6 +12,7 @@ Explore forests, volcanic wilds, moonlit lands, and deep caves in search of an i
 - Brave the venomous attacks of the airborne Toxic Hydra.
 - Discover fire-breathing Nordic Drakes roaming the forests.
 - Find Ghoul Dragons in Zone 2 during the day and night, then take flight with a companion that fights with claws and teeth on the ground or in the air.
+- Major dragons appear through native spawn beacons with one dragon per beacon, a 1-3 minute initial delay, and a 15-25 minute real-time respawn cooldown. Fire and Winged Toxic Hydras share a beacon limit.
 - Challenge increasingly powerful Rock Drakes hidden beneath the earth.
 - Encounter hostile wild Miniwyvern flocks, including six elemental variants across their natural habitats.
 - Forge a lifelong Soul Bond with your very own Miniwyvern.

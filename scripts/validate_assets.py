@@ -1167,11 +1167,6 @@ def validate_release_content_contracts(parsed: dict[Path, object], errors: list[
     mount = nordic_species.get("Mount") if isinstance(nordic_species, dict) else None
     if mount != {"Mode": "AVATAR_FLIGHT", "AvatarFlightConfigId": "HyDragonNordicDrake"}:
         fail(errors, "Nordic Drake species must select the HyDragonNordicDrake avatar-flight config")
-    nordic_spawn = nordic_species.get("Spawn") if isinstance(nordic_species, dict) else None
-    if not isinstance(nordic_spawn, dict) \
-            or nordic_spawn.get("OrdinarySpawnAssetIds") != ["Spawns_Zone3_Forests_Predator"] \
-            or nordic_spawn.get("PluginEncounterIds") != []:
-        fail(errors, "Nordic Drake must use only the Zone 3 forest ordinary spawn route")
     nordic_policy = parsed.get(RESOURCE_ROOT / "Server/Tamework/CapturePolicies/HyDragonNordicDrake.json")
     if not isinstance(nordic_policy, dict) or nordic_policy.get("Requirements", []) != []:
         fail(errors, "Nordic Drake capture policy must not require an encounter phase")
