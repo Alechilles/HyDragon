@@ -18,7 +18,7 @@
   "Spawn": {
     "OrdinarySpawnAssetIds": [
       "HyDragon_Hydra_Zone3_Glacial",
-      "HyDragon_Hydras_Zone4_Volcanoes"
+      "HyDragon_Hydras_Zone4"
     ],
     "PluginEncounterIds": []
   },

@@ -1,6 +1,7 @@
 {
   "Environments": [
-    "Env_Zone4_Volcanoes"
+    "Env_Zone4_Volcanoes",
+    "Env_Zone4_Wastes"
   ],
   "MinDistanceFromPlayer": 40,
   "MaxSpawnedNPCs": 1,
