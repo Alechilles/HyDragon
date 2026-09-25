@@ -6,7 +6,7 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Changed
 
-- Wild Miniwyverns now use distant beacon encounters with a 50% chance of an empty round and 30-60 minute real-time cooldowns. Successful rounds spawn one single-variant flock of 2-6; beacons do not assign players as combat targets.
+- Wild Miniwyverns now use distant beacon encounters with 30-60 minute real-time cooldowns (empty rounds temporarily disabled for spawn testing). Successful rounds spawn one single-variant flock of 2-6; beacons do not assign players as combat targets.
 
 - Fixed aerial Ghoul Dragon pursuit taking priority over melee aiming and preventing attacks from starting.
 

@@ -25,7 +25,7 @@ Search the right terrain for each creature, then use the [Capturing Dragons guid
 
 The Soulbound Miniwyvern is made through the [Soul Bond and Attunement guide](/mod/hydragon/soul-bond-and-attunement), not found as a wild spawn.
 
-Wild Miniwyverns travel in hostile flocks of two to six, most often three or four, with one element per flock. All have 40 health and cannot be tamed. Encounters spawn well away from players, with a 1-3 minute initial delay, a 50% chance of no flock each round, and 30-60 minute real-time cooldowns. Flocks roam normally and attack only after detecting a target. They do not replace the crafted-egg companion route.
+Wild Miniwyverns travel in hostile flocks of two to six, most often three or four, with one element per flock. All have 40 health and cannot be tamed. Encounters spawn well away from players, with a 1-3 minute initial delay, 30-60 minute real-time cooldowns, and one flock attempt per round (empty rounds temporarily disabled for testing). Flocks roam normally and attack only after detecting a target. They do not replace the crafted-egg companion route.
 
 | Wild variant | Where to search |
 |---|---|

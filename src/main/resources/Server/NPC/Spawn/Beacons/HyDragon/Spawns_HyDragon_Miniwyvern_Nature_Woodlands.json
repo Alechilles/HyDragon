@@ -15,7 +15,7 @@
   "MinDistanceFromPlayer": 40,
   "MaxSpawnedNPCs": 1,
   "ConcurrentSpawnsRange": [
-    0,
+    1,
     1
   ],
   "InitialSpawnDelayRange": [
