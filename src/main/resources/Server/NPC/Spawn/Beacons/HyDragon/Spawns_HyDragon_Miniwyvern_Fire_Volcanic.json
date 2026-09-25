@@ -7,13 +7,7 @@
     {
       "Id": "Wyvern_Mini_Fire",
       "Weight": 0.5,
-      "SpawnBlockSet": "Soil",
-      "Flock": "HyDragon_Miniwyvern_Flock"
-    },
-    {
-      "Id": "Wyvern_Mini_Fire",
-      "Weight": 0.5,
-      "SpawnBlockSet": "Volcanic",
+      "SpawnBlockSet": "HyDragon_Miniwyvern_SoilVolcanic",
       "Flock": "HyDragon_Miniwyvern_Flock"
     }
   ],

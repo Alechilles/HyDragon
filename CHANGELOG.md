@@ -24,6 +24,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Fixed
 
+- Fixed duplicate Miniwyvern spawn entries that caused volcanic and muddy spawn surfaces to be ignored.
+
 - Wild Fire Hydras consistently use fire projectiles for their three-shot burst and rain barrage.
 
 ## 1.3.0 - Wild Miniwyvern Flocks - 2026-09-23

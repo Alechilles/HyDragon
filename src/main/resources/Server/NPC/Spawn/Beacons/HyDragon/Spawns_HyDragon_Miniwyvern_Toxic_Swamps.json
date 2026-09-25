@@ -6,13 +6,7 @@
     {
       "Id": "Wyvern_Mini_Toxic",
       "Weight": 0.5,
-      "SpawnBlockSet": "Soil",
-      "Flock": "HyDragon_Miniwyvern_Flock"
-    },
-    {
-      "Id": "Wyvern_Mini_Toxic",
-      "Weight": 0.5,
-      "SpawnBlockSet": "Soil_Mud",
+      "SpawnBlockSet": "HyDragon_Miniwyvern_SoilMud",
       "Flock": "HyDragon_Miniwyvern_Flock"
     }
   ],
