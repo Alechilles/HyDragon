@@ -24,6 +24,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Fixed
 
+- Wild Miniwyvern followers now descend in formation with their leader, then land nearby after its touchdown, matching Animal Husbandry birds.
+
 - Fixed duplicate Miniwyvern spawn entries that caused volcanic and muddy spawn surfaces to be ignored.
 
 - Wild Fire Hydras consistently use fire projectiles for their three-shot burst and rain barrage.

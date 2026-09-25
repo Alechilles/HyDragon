@@ -184,6 +184,36 @@
         "Continue": true
       },
       {
+        "$Comment": "Only a leader that has actually touched down provides the shared flock landing area.",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "Self",
+              "Filters": [
+                {
+                  "Type": "Flock",
+                  "FlockStatus": "Leader"
+                }
+              ]
+            },
+            {
+              "Type": "MotionController",
+              "MotionController": "Walk"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "FlockBeacon",
+            "Message": "HD_Wild_Flock_Touchdown",
+            "SendToSelf": false,
+            "ExpirationTime": 1
+          }
+        ]
+      },
+      {
         "Sensor": {
           "Type": "State",
           "State": ".Default"
@@ -927,6 +957,161 @@
               "MaxHeadingChange": 180,
               "RelativeSpeed": 1
             }
+          },
+          {
+            "$Comment": "Follow the Animal Husbandry bird descent: hold formation until leader touchdown, then land below each follower.",
+            "Sensor": {
+              "Type": "And",
+              "Sensors": [
+                {
+                  "Type": "FlockLeader"
+                },
+                {
+                  "Type": "Self",
+                  "Filters": [
+                    {
+                      "Type": "Flock",
+                      "FlockStatus": "Follower"
+                    }
+                  ]
+                }
+              ]
+            },
+            "Instructions": [
+              {
+                "$Comment": "After leader touchdown, land below each follower instead of converging on the leader.",
+                "Sensor": {
+                  "Type": "And",
+                  "Sensors": [
+                    {
+                      "Type": "FlockLeader"
+                    },
+                    {
+                      "Type": "Beacon",
+                      "Message": "HD_Wild_Flock_Touchdown",
+                      "Range": 256,
+                      "ConsumeMessage": false
+                    }
+                  ]
+                },
+                "Instructions": [
+                  {
+                    "Sensor": {
+                      "Type": "AdjustPosition",
+                      "Offset": [
+                        0,
+                        1,
+                        0
+                      ],
+                      "Sensor": {
+                        "Type": "SearchRay",
+                        "Name": "HD_Wild_Flock_Landing",
+                        "Range": 64,
+                        "Angle": 90,
+                        "Blocks": "StoneAndSoil"
+                      }
+                    },
+                    "BodyMotion": {
+                      "Type": "Land",
+                      "RelativeSpeed": 0.4,
+                      "SlowDownDistance": 1,
+                      "StopDistance": 0.5,
+                      "UsePathfinder": true
+                    }
+                  }
+                ]
+              },
+              {
+                "$Comment": "Keep separate formation slots while the leader descends; touchdown landing above takes priority.",
+                "Reference": "Component_Tamework_Instruction_Flight_Formation",
+                "Modify": {
+                  "FlightFormation": {
+                    "Compute": "FlightFormation"
+                  },
+                  "FlightFormationSpacing": {
+                    "Compute": "FlightFormationSpacing"
+                  },
+                  "FlightFormationTightness": {
+                    "Compute": "FlightFormationTightness"
+                  }
+                }
+              },
+              {
+                "$Comment": "Start catching up outside the flock radius.",
+                "Continue": true,
+                "Sensor": {
+                  "Type": "Leash",
+                  "Range": {
+                    "Compute": "FlockFollowDistance"
+                  }
+                },
+                "Actions": [
+                  {
+                    "Type": "SetFlag",
+                    "Name": "HD_Wild_FlockCatchingUp",
+                    "SetTo": true
+                  }
+                ]
+              },
+              {
+                "$Comment": "Rejoin well inside the radius so movement does not switch every tick at its edge.",
+                "Continue": true,
+                "Sensor": {
+                  "Type": "Not",
+                  "Sensor": {
+                    "Type": "Leash",
+                    "Range": {
+                      "Compute": "FlockFollowDistance * 0.5"
+                    }
+                  }
+                },
+                "Actions": [
+                  {
+                    "Type": "SetFlag",
+                    "Name": "HD_Wild_FlockCatchingUp",
+                    "SetTo": false
+                  }
+                ]
+              },
+              {
+                "Sensor": {
+                  "Type": "And",
+                  "Sensors": [
+                    {
+                      "Type": "FlockLeader"
+                    },
+                    {
+                      "Type": "Flag",
+                      "Name": "HD_Wild_FlockCatchingUp",
+                      "Set": true
+                    }
+                  ]
+                },
+                "BodyMotion": {
+                  "Type": "Seek",
+                  "SlowDownDistance": 1.5,
+                  "StopDistance": 0.5,
+                  "RelativeSpeed": 0.4,
+                  "UsePathfinder": true,
+                  "Falloff": 1,
+                  "DesiredAltitudeWeight": 0
+                },
+                "$Comment": "Catch up only while separated; switch to roaming before reaching the seek stopping distance."
+              },
+              {
+                "$Comment": "Keep flying around the moving leader leash point rather than stopping directly behind it.",
+                "BodyMotion": {
+                  "Type": "WanderInCircle",
+                  "Radius": {
+                    "Compute": "FlockFollowDistance"
+                  },
+                  "UseSphere": true,
+                  "MaxHeadingChange": 45,
+                  "RelativeSpeed": 0.25,
+                  "DesiredAltitudeWeight": 0
+                }
+              }
+            ]
           },
           {
             "Sensor": {
