@@ -6,6 +6,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ### Changed
 
+- Wild Miniwyverns now use distant beacon encounters with a 50% chance of an empty round and 30-60 minute real-time cooldowns. Successful rounds spawn one single-variant flock of 2-6; beacons do not assign players as combat targets.
+
 - Fixed aerial Ghoul Dragon pursuit taking priority over melee aiming and preventing attacks from starting.
 
 - Moved Ghoul Dragons, Nordic Drakes, and all Hydra variants to native spawn beacons for rarer encounters: one dragon per beacon, a 1-3 minute initial delay, and a 15-25 minute real-time respawn cooldown. Fire and Winged Toxic Hydras share one beacon limit. Ghoul Dragons retain day and night Zone 2 spawning. Existing wild dragons remain until normal despawn.

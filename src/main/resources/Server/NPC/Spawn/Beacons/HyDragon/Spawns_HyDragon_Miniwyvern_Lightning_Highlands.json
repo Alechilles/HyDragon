@@ -1,0 +1,39 @@
+{
+  "Environments": [
+    "Env_Zone1_Mountains",
+    "Env_Zone2_Plateaus",
+    "Env_Zone3_Mountains"
+  ],
+  "NPCs": [
+    {
+      "Id": "Wyvern_Mini_Lightning",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Soil",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    }
+  ],
+  "MinDistanceFromPlayer": 40,
+  "MaxSpawnedNPCs": 1,
+  "ConcurrentSpawnsRange": [
+    0,
+    1
+  ],
+  "InitialSpawnDelayRange": [
+    60,
+    180
+  ],
+  "SpawnAfterRealTimeRange": [
+    "PT30M",
+    "PT1H"
+  ],
+  "BeaconVacantDespawnGameTime": "PT1H",
+  "BeaconRadius": 200,
+  "SpawnRadius": 145,
+  "TargetDistanceFromPlayer": 110,
+  "YRange": [
+    -32,
+    32
+  ],
+  "TargetSlot": "HD_Wild_BeaconPlayer",
+  "OverrideSpawnSuppressors": false
+}

@@ -354,6 +354,19 @@
   ],
   "Instructions": [
     {
+      "$Comment": "Discard the beacon player hint so wild flocks acquire combat targets through ordinary perception.",
+      "Continue": true,
+      "Sensor": {
+        "Type": "Any"
+      },
+      "Actions": [
+        {
+          "Type": "ReleaseTarget",
+          "TargetSlot": "HD_Wild_BeaconPlayer"
+        }
+      ]
+    },
+    {
       "$Comment": "Latch tranquilizer sleep eligibility once remaining duration reaches threshold.",
       "Continue": true,
       "Sensor": {

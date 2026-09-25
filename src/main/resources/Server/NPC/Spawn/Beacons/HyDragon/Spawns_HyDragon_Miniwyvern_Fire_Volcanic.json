@@ -1,0 +1,44 @@
+{
+  "Environments": [
+    "Env_Zone4_Volcanoes",
+    "Env_Zone4_Forests"
+  ],
+  "NPCs": [
+    {
+      "Id": "Wyvern_Mini_Fire",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Soil",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    },
+    {
+      "Id": "Wyvern_Mini_Fire",
+      "Weight": 0.5,
+      "SpawnBlockSet": "Volcanic",
+      "Flock": "HyDragon_Miniwyvern_Flock"
+    }
+  ],
+  "MinDistanceFromPlayer": 40,
+  "MaxSpawnedNPCs": 1,
+  "ConcurrentSpawnsRange": [
+    0,
+    1
+  ],
+  "InitialSpawnDelayRange": [
+    60,
+    180
+  ],
+  "SpawnAfterRealTimeRange": [
+    "PT30M",
+    "PT1H"
+  ],
+  "BeaconVacantDespawnGameTime": "PT1H",
+  "BeaconRadius": 200,
+  "SpawnRadius": 145,
+  "TargetDistanceFromPlayer": 110,
+  "YRange": [
+    -32,
+    32
+  ],
+  "TargetSlot": "HD_Wild_BeaconPlayer",
+  "OverrideSpawnSuppressors": false
+}
