@@ -34,7 +34,10 @@ class ManifestCompatibilityTest {
         assertAccepted(range, "0.6.0");
         assertRejected(range, "0.4.9");
         assertRejected(range, "0.6.0-pre.11");
-        assertRejected(range, "0.7.0");
+        assertAccepted(range, "0.7.0-pre.4");
+        assertAccepted(range, "0.7.0");
+        assertRejected(range, "0.7.0-pre.3");
+        assertRejected(range, "0.8.0");
     }
 
     private static void assertAccepted(SemverRange range, String version) {

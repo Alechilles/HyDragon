@@ -4,6 +4,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ## Unreleased
 
+- Added Hytale Update 7 compatibility, including the `0.7.0-pre.4` pre-release, while retaining Update 5 and Update 6 support.
+
 ### Changed
 
 - Wild Miniwyverns now use distant beacon encounters with 30-60 minute real-time cooldowns (empty rounds temporarily disabled for spawn testing). Successful rounds spawn one single-variant flock of 3-6; beacons do not assign players as combat targets.
