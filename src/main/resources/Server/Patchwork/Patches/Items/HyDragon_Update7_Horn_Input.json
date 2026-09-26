@@ -1,0 +1,23 @@
+{
+  "$Comment": "Update 7 rune inputs require a held weapon. Keep legacy tool classification when rune assets are absent.",
+  "Id": "HyDragon_Update7_Horn_Input",
+  "Target": "Server/Item/Items/Tool/HyDragon_Dragon_Horn.json",
+  "When": {
+    "AssetExists": "Server/Item/Items/Rune/Ability/Rune_Enrage.json"
+  },
+  "Operations": [
+    {
+      "Id": "enable-rune-input",
+      "Op": "Merge",
+      "Path": "",
+      "Value": {
+        "Weapon": {},
+        "Tags": {
+          "Family": [
+            "TameworkInput"
+          ]
+        }
+      }
+    }
+  ]
+}

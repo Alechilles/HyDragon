@@ -5,6 +5,7 @@ All notable player-facing changes to HyDragon are documented here.
 ## Unreleased
 
 - Added Hytale Update 7 compatibility, including the `0.7.0-pre.4` pre-release, while retaining Update 5 and Update 6 support.
+- Kept the Dragon Horn's E/R shortcuts available through Tamework's temporary control runes on Update 7.
 
 ### Changed
 
