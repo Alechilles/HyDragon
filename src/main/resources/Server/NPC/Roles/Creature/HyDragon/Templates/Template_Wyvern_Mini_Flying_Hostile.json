@@ -354,6 +354,44 @@
   ],
   "Instructions": [
     {
+      "$Comment": "Disable natural health regeneration while engaged; restore it after disengaging.",
+      "Continue": true,
+      "Instructions": [
+        {
+          "Sensor": {
+            "Type": "Or",
+            "Sensors": [
+              {
+                "Type": "State",
+                "State": "Engage"
+              },
+              {
+                "Type": "State",
+                "State": "Combat"
+              }
+            ]
+          },
+          "Actions": [
+            {
+              "Type": "SetHealthRegen",
+              "EnableRegen": false
+            }
+          ]
+        },
+        {
+          "Sensor": {
+            "Type": "Any"
+          },
+          "Actions": [
+            {
+              "Type": "SetHealthRegen",
+              "EnableRegen": true
+            }
+          ]
+        }
+      ]
+    },
+    {
       "$Comment": "Discard the beacon player hint so wild flocks acquire combat targets through ordinary perception.",
       "Continue": true,
       "Sensor": {

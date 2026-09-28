@@ -4,6 +4,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ## Unreleased
 
+- All dragons and Miniwyverns, both wild and tamed, no longer naturally regenerate health while fighting. Normal regeneration resumes after disengaging.
+
 - Added Hytale Update 7 compatibility, including the `0.7.0-pre.4` pre-release, while retaining Update 5 and Update 6 support.
 - Kept the Dragon Horn's E/R shortcuts available through Tamework's temporary control runes on Update 7.
 
