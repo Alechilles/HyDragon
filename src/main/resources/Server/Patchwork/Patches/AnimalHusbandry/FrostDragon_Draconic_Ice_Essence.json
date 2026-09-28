@@ -1,0 +1,38 @@
+{
+  "Id": "HyDragon_AnimalHusbandry_FrostDragon_Draconic_Ice_Essence",
+  "$Comment": "Adds Draconic Ice Essence to Animal Husbandry's frost dragon drops.",
+  "Target": "Server/Drops/NPCs/Elemental/Drop_Dragon_Frost.json",
+  "When": {
+    "All": [
+      {
+        "TargetExists": true
+      },
+      {
+        "ModInstalled": "Alechilles:Alec's Animal Husbandry!"
+      },
+      {
+        "JsonPathExists": {
+          "Path": "/Container/Containers"
+        }
+      }
+    ]
+  },
+  "Priority": 110,
+  "Enabled": true,
+  "Operations": [
+    {
+      "Id": "add-frost-dragon-draconic-ice-essence",
+      "Op": "Add",
+      "Path": "/Container/Containers/-",
+      "Value": {
+        "Type": "Single",
+        "Weight": 100,
+        "Item": {
+          "ItemId": "Draconic_Essence_Ice",
+          "QuantityMin": 4,
+          "QuantityMax": 5
+        }
+      }
+    }
+  ]
+}
