@@ -1,6 +1,6 @@
 {
   "Id": "HyDragon_AnimalHusbandry_FrostDragon_Draconic_Ice_Essence",
-  "$Comment": "Adds Draconic Ice Essence to Animal Husbandry's frost dragon drops.",
+  "$Comment": "Adds Draconic Ice Essence and Draconic Scales to Animal Husbandry's frost dragon drops.",
   "Target": "Server/Drops/NPCs/Elemental/Drop_Dragon_Frost.json",
   "When": {
     "All": [
@@ -20,6 +20,20 @@
   "Priority": 110,
   "Enabled": true,
   "Operations": [
+    {
+      "Id": "add-frost-dragon-draconic-scales",
+      "Op": "Add",
+      "Path": "/Container/Containers/-",
+      "Value": {
+        "Type": "Single",
+        "Weight": 100,
+        "Item": {
+          "ItemId": "Draconic_Scale",
+          "QuantityMin": 6,
+          "QuantityMax": 8
+        }
+      }
+    },
     {
       "Id": "add-frost-dragon-draconic-ice-essence",
       "Op": "Add",
