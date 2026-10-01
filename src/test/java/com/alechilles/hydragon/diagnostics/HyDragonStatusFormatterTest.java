@@ -28,13 +28,13 @@ class HyDragonStatusFormatterTest {
             gates.put(feature, new FeatureGate(
                     feature,
                     diagnostics,
-                    diagnostics ? Set.of("DIAGNOSTICS") : Set.of("COMMAND_FAMILY_ROSTERS"),
-                    diagnostics ? Set.of() : Set.of("COMMAND_FAMILY_ROSTERS"),
+                    diagnostics ? Set.of("DIAGNOSTICS") : Set.of("BONDED_COMPANIONS"),
+                    diagnostics ? Set.of() : Set.of("BONDED_COMPANIONS"),
                     List.of()));
         }
         TameworkBridge.Snapshot bridge = new TameworkBridge.Snapshot("0.8.0", Set.of("DIAGNOSTICS"), gates, null);
         TameworkRuntimeDiagnostics.Snapshot diagnostics = new TameworkRuntimeDiagnostics.Snapshot(
-                true, "HEALTHY", null, 0, "READY", "COMPLETE", "READ_WRITE", null);
+                true, "HEALTHY", null, 0, "READY", 0);
 
         HyDragonPersistenceStatus localPersistence = new HyDragonPersistenceStatus(
                 true, true, 1, 1, 0, 3, 0, 5,
@@ -47,7 +47,7 @@ class HyDragonStatusFormatterTest {
                 "1.0.0", config, config.issues(), bridge, diagnostics, localPersistence);
 
         assertTrue(lines.stream().anyMatch(line -> line.equals("HyDragon 1.0.0 status")));
-        assertTrue(lines.stream().anyMatch(line -> line.contains("required=>=4.0.0")));
+        assertTrue(lines.stream().anyMatch(line -> line.contains("required=>=4.3.1")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("Config: INVALID")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("missing bundled assets")));
         assertTrue(lines.stream().anyMatch(line -> line.contains("CAPTURE_AND_ROSTER: DISABLED")));
@@ -70,7 +70,7 @@ class HyDragonStatusFormatterTest {
         }
         TameworkBridge.Snapshot bridge = new TameworkBridge.Snapshot("0.9.0", Set.of(), gates, null);
         TameworkRuntimeDiagnostics.Snapshot diagnostics = new TameworkRuntimeDiagnostics.Snapshot(
-                true, "HEALTHY", null, 0, "READY", "COMPLETE", "READ_WRITE", null);
+                true, "HEALTHY", null, 0, "READY", 0);
         HyDragonPersistenceStatus persistence = new HyDragonPersistenceStatus(
                 true, true, 0, 0, 0, 0, 0, 0, List.of(), null);
         List<String> rejectedIssues = List.of("Encounter[storm]: TargetSpeciesId is missing");

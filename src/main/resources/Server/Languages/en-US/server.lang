@@ -130,7 +130,7 @@ messages.status.configMore=  config: ... and {count} more
 messages.status.rejectedReload=Last config reload: rejected with {issues} issue(s); the valid configuration remains active.
 messages.status.tamework=Tamework: required={range}; Public API={apiVersion}; capabilities={capabilities}
 messages.status.feature=  {feature}: {state}; {reason}
-messages.status.tameworkPersistence=Tamework persistence: {status}; queue={queue}; population={population}; resilience={resilience}
+messages.status.tameworkPersistence=Tamework persistence: {status}; queue={queue}; population={population}; unreadable={unreadable}
 messages.status.diagnosticsIssue=  diagnostics: {reason}
 messages.status.localPersistence=HyDragon persistence: {state}; players={players}, profiles={profiles}, encounters={encounters}, pendingProfileProjections={pendingProfileProjections}, quarantined={quarantined}, reconcile={reconcile}, orphanedLinks={orphanedLinks}
 messages.status.orphan=  orphan[{kind}]: {identity}; action={action}

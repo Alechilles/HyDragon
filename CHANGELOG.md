@@ -4,6 +4,8 @@ All notable player-facing changes to HyDragon are documented here.
 
 ## Unreleased
 
+- Updated for Tamework public API 3.0.0 (the companion store rewrite). `/hydragon status` now reports unreadable Tamework companion records in place of the removed resilience state. Requires the Tamework release that ships public API 3.0.0.
+
 - All dragons and Miniwyverns, both wild and tamed, no longer naturally regenerate health while fighting. Normal regeneration resumes after disengaging.
 
 - Added Hytale Update 7 compatibility, including the `0.7.0-pre.4` pre-release, while retaining Update 5 and Update 6 support.

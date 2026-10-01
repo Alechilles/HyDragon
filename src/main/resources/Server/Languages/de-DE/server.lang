@@ -130,7 +130,7 @@ messages.status.configMore=  Konfiguration: ... und {count} weitere
 messages.status.rejectedReload=Die letzte Konfigurationsaktualisierung wurde mit {issues} Problem(en) abgelehnt; die gültige Konfiguration bleibt aktiv.
 messages.status.tamework=Tamework: benötigt={range}; öffentliche API={apiVersion}; Fähigkeiten={capabilities}
 messages.status.feature=  {feature}: {state}; {reason}
-messages.status.tameworkPersistence=Tamework-Persistenz: {status}; Warteschlange={queue}; Population={population}; Ausfallsicherheit={resilience}
+messages.status.tameworkPersistence=Tamework-Persistenz: {status}; Warteschlange={queue}; Population={population}; unlesbar={unreadable}
 messages.status.diagnosticsIssue=  Diagnose: {reason}
 messages.status.localPersistence=HyDragon-Persistenz: {state}; Spieler={players}, Profile={profiles}, Begegnungen={encounters}, ausstehendeProfilprojektionen={pendingProfileProjections}, Quarantäne={quarantined}, Abgleich={reconcile}, verwaisteVerknüpfungen={orphanedLinks}
 messages.status.orphan=  verwaist[{kind}]: {identity}; Maßnahme={action}

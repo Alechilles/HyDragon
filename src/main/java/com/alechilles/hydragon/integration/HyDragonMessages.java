@@ -69,12 +69,12 @@ public final class HyDragonMessages {
                 .param("reason", reason);
     }
     public static Message statusTameworkPersistence(
-            String status, long queue, String population, String resilience) {
+            String status, long queue, String population, long unreadable) {
         return translated("status.tameworkPersistence")
                 .param("status", status)
                 .param("queue", queue)
                 .param("population", population)
-                .param("resilience", resilience);
+                .param("unreadable", unreadable);
     }
     public static Message statusDiagnosticsIssue(String reason) {
         return translated("status.diagnosticsIssue").param("reason", reason);

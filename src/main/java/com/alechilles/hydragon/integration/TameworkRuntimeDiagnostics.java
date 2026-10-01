@@ -2,7 +2,6 @@ package com.alechilles.hydragon.integration;
 
 import com.alechilles.alecstamework.api.DiagnosticsApi;
 import com.alechilles.alecstamework.api.PersistenceDiagnosticsView;
-import com.alechilles.alecstamework.api.PersistenceResilienceView;
 import com.alechilles.alecstamework.api.PopulationDiagnosticsView;
 import com.alechilles.alecstamework.api.TameworkApi;
 import javax.annotation.Nonnull;
@@ -23,16 +22,13 @@ public final class TameworkRuntimeDiagnostics {
             DiagnosticsApi diagnostics = api.diagnostics();
             PersistenceDiagnosticsView persistence = diagnostics.getPersistenceDiagnostics();
             PopulationDiagnosticsView population = diagnostics.getPopulationDiagnostics();
-            PersistenceResilienceView resilience = diagnostics.getPersistenceResilience();
             return new Snapshot(
                     true,
                     persistence.health().status(),
                     persistence.health().reason(),
                     persistence.queueMetrics().queueDepth(),
                     population.readiness().ownerGlobal(),
-                    population.reconciliation().state(),
-                    resilience.storageState(),
-                    resilience.storageReason()
+                    persistence.unreadableRecords()
             );
         } catch (RuntimeException | LinkageError failure) {
             return Snapshot.unavailable("diagnostics read failed: " + failure.getClass().getSimpleName());
@@ -45,11 +41,9 @@ public final class TameworkRuntimeDiagnostics {
             String persistenceReason,
             int queueDepth,
             String populationReadiness,
-            String populationReconciliation,
-            String resilienceState,
-            String resilienceReason) {
+            int unreadableRecords) {
         private static Snapshot unavailable(String reason) {
-            return new Snapshot(false, "UNAVAILABLE", reason, -1, "UNAVAILABLE", "UNKNOWN", "READ_ONLY", reason);
+            return new Snapshot(false, "UNAVAILABLE", reason, -1, "UNAVAILABLE", -1);
         }
     }
 }

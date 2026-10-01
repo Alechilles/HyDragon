@@ -24,10 +24,7 @@ final class BondedCompanionBridgeContractTest {
             HyDragonFeature.MINIWYVERN_ABILITIES);
 
     private static final Set<String> LEGACY_GENERIC_CAPABILITIES = Set.of(
-            "PROFILES", "POLICY", "PERSISTENCE_RESILIENCE",
-            "POPULATION_GROUPS", "COMPANION_PROVISIONING",
-            "COMMAND_FAMILY_ROSTERS", "COMMAND_TIMED_SUMMONING",
-            "PAID_COMMAND_REVIVAL", "PROFILE_DATA",
+            "PROFILES", "POLICY", "POPULATION_GROUPS", "PROFILE_DATA",
             "PROFILE_DATA_TRANSACTIONS", "CAPTURE_TAME_AND_LINK");
 
     @Test

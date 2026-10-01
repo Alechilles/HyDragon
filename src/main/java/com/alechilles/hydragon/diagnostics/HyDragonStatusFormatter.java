@@ -56,7 +56,7 @@ public final class HyDragonStatusFormatter {
         lines.add("Tamework persistence: " + diagnostics.persistenceStatus()
                 + "; queue=" + diagnostics.queueDepth()
                 + "; population=" + diagnostics.populationReadiness()
-                + "; resilience=" + diagnostics.resilienceState());
+                + "; unreadable=" + diagnostics.unreadableRecords());
         if (!diagnostics.available() && diagnostics.persistenceReason() != null) {
             lines.add("  diagnostics: " + diagnostics.persistenceReason());
         }
@@ -113,7 +113,7 @@ public final class HyDragonStatusFormatter {
         }
         messages.add(HyDragonMessages.statusTameworkPersistence(
                 diagnostics.persistenceStatus(), diagnostics.queueDepth(),
-                diagnostics.populationReadiness(), diagnostics.resilienceState()));
+                diagnostics.populationReadiness(), diagnostics.unreadableRecords()));
         if (!diagnostics.available() && diagnostics.persistenceReason() != null) {
             messages.add(HyDragonMessages.statusDiagnosticsIssue(
                     HyDragonDiagnosticText.diagnosticsReason(diagnostics.persistenceReason())));
