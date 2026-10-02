@@ -2,6 +2,7 @@
   "Priority": 100,
   "RosterId": "hydragon:dragon_horn",
   "FamilyId": "hydragon:full_dragons",
+  "NameKey": "server.messages.roster.family.fullDragons",
   "AllowedRoles": [
     "Tamed_NordicDrake",
     "Tamed_GhoulDragon",

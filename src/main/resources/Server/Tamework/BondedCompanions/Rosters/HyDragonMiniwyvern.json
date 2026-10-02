@@ -2,6 +2,7 @@
   "Priority": 100,
   "RosterId": "hydragon:dragon_horn",
   "FamilyId": "hydragon:soulbound_mini",
+  "NameKey": "server.messages.roster.family.miniwyvern",
   "AllowedRoles": [
     "Tamed_Wyvern_Mini_Wild",
     "Tamed_Wyvern_Mini_Nature",
