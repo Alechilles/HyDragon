@@ -37,7 +37,7 @@ class TameworkCapabilityDiagnosticsTest {
                 .orElseThrow();
         assertFalse(missing.present());
         assertTrue(missing.affectedFeatures().contains(HyDragonFeature.CAPTURE_AND_ROSTER));
-        assertTrue(missing.operatorAction().contains(">=4.3.1"));
+        assertTrue(missing.operatorAction().contains(">=5.0.0"));
         assertTrue(missing.operatorAction().contains("BONDED_COMPANIONS"));
         assertTrue(missing.format().contains("MISSING"));
 
