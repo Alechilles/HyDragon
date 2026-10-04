@@ -3309,7 +3309,7 @@
                     },
                     {
                       "id": "39",
-                      "name": "cube--C3",
+                      "name": "R-WingSkin",
                       "position": {
                         "x": -12.65096,
                         "y": 4.77307,
@@ -3508,7 +3508,7 @@
                         },
                         {
                           "id": "42",
-                          "name": "cube--C2",
+                          "name": "R-Wing2Skin",
                           "position": {
                             "x": -5.30608,
                             "y": 4.4429,
@@ -5356,7 +5356,7 @@
                     },
                     {
                       "id": "64",
-                      "name": "cube--C3",
+                      "name": "L-WingSkin",
                       "position": {
                         "x": 12.65096,
                         "y": 4.77307,
@@ -5555,7 +5555,7 @@
                         },
                         {
                           "id": "67",
-                          "name": "cube--C2",
+                          "name": "L-Wing2Skin",
                           "position": {
                             "x": 5.30608,
                             "y": 4.4429,
