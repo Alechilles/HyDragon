@@ -3399,7 +3399,7 @@
                       "children": [
                         {
                           "id": "41",
-                          "name": "cube--C1",
+                          "name": "R-Wing2Arm",
                           "position": {
                             "x": -3,
                             "y": 13,
@@ -5446,7 +5446,7 @@
                       "children": [
                         {
                           "id": "66",
-                          "name": "cube--C1",
+                          "name": "L-Wing2Arm",
                           "position": {
                             "x": 3,
                             "y": 13,
