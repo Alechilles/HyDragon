@@ -2,26 +2,9 @@
 
 All notable player-facing changes to HyDragon are documented here.
 
-## Unreleased
+## 1.4.0 - Ghoul Dragon and Tamework 5 - 2026-10-04
 
-- Updated for Tamework public API 3.0.0 (the companion store rewrite). `/hydragon status` now reports unreadable Tamework companion records in place of the removed resilience state. Requires the Tamework release that ships public API 3.0.0.
-
-- All dragons and Miniwyverns, both wild and tamed, no longer naturally regenerate health while fighting. Normal regeneration resumes after disengaging.
-
-- Added Hytale Update 7 compatibility, including the `0.7.0-pre.4` pre-release, while retaining Update 5 and Update 6 support.
-- Kept the Dragon Horn's E/R shortcuts available through Tamework's temporary control runes on Update 7.
-
-### Changed
-
-- Wild Miniwyverns now use distant beacon encounters with 30-60 minute real-time cooldowns (empty rounds temporarily disabled for spawn testing). Successful rounds spawn one single-variant flock of 3-6; beacons do not assign players as combat targets.
-
-- Fixed aerial Ghoul Dragon pursuit taking priority over melee aiming and preventing attacks from starting.
-
-- Moved Ghoul Dragons, Nordic Drakes, and all Hydra variants to native spawn beacons for rarer encounters: one dragon per beacon, a 1-3 minute initial delay, and a 15-25 minute real-time respawn cooldown. Fire and Winged Toxic Hydras share one beacon limit. Ghoul Dragons retain day and night Zone 2 spawning. Existing wild dragons remain until normal despawn.
-
-- Ghoul Dragons now pursue airborne targets with melee attacks and land for grounded targets. Requires Alec's Tamework 4.2.0 or later.
-
-- Wild Miniwyverns now spawn in flocks of three to six, weighted 10% / 20% / 35% / 35% toward larger groups.
+Requires Alec's Tamework 5.0.0 or later.
 
 ### Added
 
@@ -29,7 +12,27 @@ All notable player-facing changes to HyDragon are documented here.
 
 - Fire Hydras spawn on volcanic ground in Zone 4 overworld volcanoes. They use fireballs and burning rain, wear a fire skin, and support capture, ground riding, breeding, leveling, and fire-themed talents.
 
+- Added Hytale Update 7 compatibility, including the `0.7.0-pre.4` pre-release, while retaining Update 6 support.
+
+- Kept the Dragon Horn's E/R shortcuts available through Tamework's temporary control runes on Update 7.
+
+### Changed
+
+- Updated for Tamework public API 3.0.0 (the companion store rewrite). `/hydragon status` now reports unreadable Tamework companion records in place of the removed resilience state.
+
+- All dragons and Miniwyverns, both wild and tamed, no longer naturally regenerate health while fighting. Normal regeneration resumes after disengaging.
+
+- Wild Miniwyverns now use distant beacon encounters with 30-60 minute real-time cooldowns (empty rounds temporarily disabled for spawn testing). Successful rounds spawn one single-variant flock of 3-6; beacons do not assign players as combat targets.
+
+- Moved Ghoul Dragons, Nordic Drakes, and all Hydra variants to native spawn beacons for rarer encounters: one dragon per beacon, a 1-3 minute initial delay, and a 15-25 minute real-time respawn cooldown. Fire and Winged Toxic Hydras share one beacon limit. Ghoul Dragons retain day and night Zone 2 spawning. Existing wild dragons remain until normal despawn.
+
+- Ghoul Dragons now pursue airborne targets with melee attacks and land for grounded targets.
+
+- Wild Miniwyverns now spawn in flocks of three to six, weighted 10% / 20% / 35% / 35% toward larger groups.
+
 ### Fixed
+
+- Fixed aerial Ghoul Dragon pursuit taking priority over melee aiming and preventing attacks from starting.
 
 - Wild Miniwyvern followers now descend in formation with their leader, then land nearby after its touchdown, matching Animal Husbandry birds.
 
